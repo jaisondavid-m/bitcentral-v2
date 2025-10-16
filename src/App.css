@@ -25,7 +25,7 @@ body {
 }
 
 .card img {
-  width: 100%;
+  width: 300px;
   height: 200px;
   object-fit: cover;
 }
@@ -49,7 +49,7 @@ body {
     padding: 15px;
   }
   .cardContainer .card {
-    width: 40%;
+    width: 45%;
     height: auto;
   }
 }

@@ -11,11 +11,11 @@
   background-color: #fff;
 }
 .card .img img {
-  width: 100%;
+  width: 300px;
   height: 300px;
   object-fit: cover;
   border-radius: 10px 10px 0 0;
-  display: bloc;
+  display: block;
 }
 .cardbottom {
   text-align: center;
