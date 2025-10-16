@@ -3,6 +3,7 @@ import Card from './Content-Components/Card/Card'
 import NavBar from './Component/NavBar/NavBar'
 import data from "../Data/Data.json"
 import './App.css'
+import Footer from './Component/Footer/Footer'
 
 function App() {
 
@@ -22,6 +23,7 @@ function App() {
         ))
       }
       </div>
+      <Footer/>
     </div>
   )
 }
