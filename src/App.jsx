@@ -14,7 +14,7 @@ function App() {
         {
         data.cards.map((card,index)=>(
           <Card
-           key={index} 
+           key={index}  
            name={card.name}
            link={card.link}
            img={card.img}

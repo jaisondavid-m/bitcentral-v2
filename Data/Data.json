@@ -5,6 +5,7 @@
         {"img":"./CardImgs/studyimg.jpg" ,"name":"Study Material" , "link":"https://wiki.bitsathy.ac.in/wiki/BITWIKI:Departments_and_Semesters_2025-2026#2022_Regulation","btntext":"Open Material"},
         {"img":"./CardImgs/leaveimg.webp" ,"name":"Leave Apply" , "link":"https://camps.bitsathy.ac.in/CAMPS/JSP/student/student_leave.jsp","btntext":"Open Link"},
         {"img":"./CardImgs/mycourse.png" ,"name":"My PS Courses" , "link":"https://ps.bitsathy.ac.in/my-course","btntext":"Open Link"},
+        {"img":"./CardImgs/mycourse.png" ,"name":"Report An Issues" , "link":"https://docs.google.com/forms/d/e/1FAIpQLScnl0udcN2pUDENHl45HIj5HZbvDuwZ0g2eepBbp8tJYg-NvQ/viewform","btntext":"Report Now"},
         {"img":"./CardImgs/profile.jpg" ,"name":"College DashBoard" , "link":"https://bip.bitsathy.ac.in/dashboard","btntext":"Open Link"},
         {"img":"./CardImgs/wifi.jpg" ,"name":"Wifi Details(works only if Connected to wifi)" , "link":"http://1.1.1.1/","btntext":"Open Link"},
         {"img":"./CardImgs/biometeric.jpg" ,"name":"Biometeric Details" , "link":"https://bip.bitsathy.ac.in/dashboard","btntext":"View Details"},
