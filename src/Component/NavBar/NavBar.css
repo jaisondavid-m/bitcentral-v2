@@ -1,0 +1,23 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.header{
+    background-color: blue;
+}
+.header h1{
+    display: flex;
+    height: 150px;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.header h1 img{
+    border-radius: 50%;
+    height: 100px;
+    width: 100px;
+    margin: 20px;
+    background-color: white;
+}
