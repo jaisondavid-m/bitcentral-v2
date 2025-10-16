@@ -12,8 +12,10 @@
 }
 .card .img img {
   width: 100%;
-  height: auto;
+  height: 300px;
+  object-fit: cover;
   border-radius: 10px 10px 0 0;
+  display: bloc;
 }
 .cardbottom {
   text-align: center;
