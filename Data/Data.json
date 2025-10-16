@@ -1,13 +1,13 @@
 {
     "cards":[
-        {"img":"src/assets/CardImgs/otp.jpg" ,"name":"Attendance" , "link":"psapp://onboard?org=bitsathy&url=https%3A%2F%2Fps.bitsathy.ac.in%2Fapi%2Fps_app_v2","btntext":"Enter OTP"},
-        {"img":"src/assets/CardImgs/studyimg.jpg" ,"name":"Study Material" , "link":"https://wiki.bitsathy.ac.in/wiki/BITWIKI:Departments_and_Semesters_2025-2026#2022_Regulation","btntext":"Open Material"},
-        {"img":"src/assets/CardImgs/leaveimg.webp" ,"name":"Leave Apply" , "link":"https://camps.bitsathy.ac.in/CAMPS/JSP/student/student_leave.jsp","btntext":"Open Link"},
-        {"img":"src/assets/CardImgs/rewardpoint.png" ,"name":"Reward Points Checker" , "link":"https://praneshjs-rewardpointssite.hf.space/","btntext":"Check Reward Point"},
-        {"img":"src/assets/CardImgs/mycourse.png" ,"name":"My PS Courses" , "link":"https://ps.bitsathy.ac.in/my-course","btntext":"Open Link"},
-        {"img":"src/assets/CardImgs/profile.jpg" ,"name":"College DashBoard" , "link":"https://bip.bitsathy.ac.in/dashboard","btntext":"Open Link"},
-        {"img":"src/assets/CardImgs/wifi.jpg" ,"name":"Wifi Details(works only if Connected to wifi)" , "link":"http://1.1.1.1/","btntext":"Open Link"},
-        {"img":"src/assets/CardImgs/biometeric.jpg" ,"name":"Biometeric Details" , "link":"https://bip.bitsathy.ac.in/dashboard","btntext":"View Details"},
-        {"img":"src/assets/CardImgs/pass.png" ,"name":"Movement Pass Details And Create It" , "link":"https://ps.bitsathy.ac.in/academics/attendance/pass","btntext":"View/Create Pass"}
+        {"img":"./CardImgs/otp.jpg" ,"name":"Attendance" , "link":"psapp://onboard?org=bitsathy&url=https%3A%2F%2Fps.bitsathy.ac.in%2Fapi%2Fps_app_v2","btntext":"Enter OTP"},
+        {"img":"./CardImgs/studyimg.jpg" ,"name":"Study Material" , "link":"https://wiki.bitsathy.ac.in/wiki/BITWIKI:Departments_and_Semesters_2025-2026#2022_Regulation","btntext":"Open Material"},
+        {"img":"./CardImgs/leaveimg.webp" ,"name":"Leave Apply" , "link":"https://camps.bitsathy.ac.in/CAMPS/JSP/student/student_leave.jsp","btntext":"Open Link"},
+        {"img":"./CardImgs/rewardpoint.png" ,"name":"Reward Points Checker" , "link":"https://praneshjs-rewardpointssite.hf.space/","btntext":"Check Reward Point"},
+        {"img":"./CardImgs/mycourse.png" ,"name":"My PS Courses" , "link":"https://ps.bitsathy.ac.in/my-course","btntext":"Open Link"},
+        {"img":"./CardImgs/profile.jpg" ,"name":"College DashBoard" , "link":"https://bip.bitsathy.ac.in/dashboard","btntext":"Open Link"},
+        {"img":"./CardImgs/wifi.jpg" ,"name":"Wifi Details(works only if Connected to wifi)" , "link":"http://1.1.1.1/","btntext":"Open Link"},
+        {"img":"./CardImgs/biometeric.jpg" ,"name":"Biometeric Details" , "link":"https://bip.bitsathy.ac.in/dashboard","btntext":"View Details"},
+        {"img":"./CardImgs/pass.png" ,"name":"Movement Pass Details And Create It" , "link":"https://ps.bitsathy.ac.in/academics/attendance/pass","btntext":"View/Create Pass"}
     ]
 } 
