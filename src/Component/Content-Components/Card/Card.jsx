@@ -1,5 +1,5 @@
 import React, { useRef , useEffect} from 'react'
-import Button from '../../Component/Button/Button'
+import Button from '../../Button/Button'
 import './Card.css'
 
 
