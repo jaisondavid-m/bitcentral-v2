@@ -1,6 +1,6 @@
 import './Home.css'
 import Card from '../../Component/Content-Components/Card/Card'
-import data from "../../../Data/data"
+import data from "../../../Data/Data.json"
 
 import React from 'react'
 
