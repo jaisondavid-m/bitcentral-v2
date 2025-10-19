@@ -9,7 +9,7 @@ function Card({name,link,img,btntext}) {
   return (
     <div className='card'>
       <div className="img">
-        <img src={img} alt="" style={{display:"block",height:"300px", width:"max-content",borderRadius:"10px"}}/>
+        <img src={img} alt="" style={{display:"block",height:"auto",borderRadius:"8px"}}/>
         <hr style={{marginTop:"20px"}}/>
       </div>
       <div className="cardbottom">
