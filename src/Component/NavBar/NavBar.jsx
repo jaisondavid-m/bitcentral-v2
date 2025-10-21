@@ -1,9 +1,17 @@
 // Navbar.jsx
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Await, Link,useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "../../Firebase";
 
 function Navbar() {
   const [open, setOpen] = useState(false);
+  const Navigate=useNavigate();
+
+  const handleLogout = async()=>{
+    await signOut(auth);
+    Navigate("/");
+  }
 
   return (
     <nav className="bg-blue-600 text-white">
@@ -16,6 +24,7 @@ function Navbar() {
             <li><Link to="/home" className="hover:text-gray-200">Home</Link></li>
             <li><Link to="/contact" className="hover:text-gray-200">Contact</Link></li>
             <li><Link to="/about" className="hover:text-gray-200">About</Link></li>
+            <li><Link to="/" className="hover:text-gray-200" onClick={handleLogout}>Logout</Link></li>
           </ul>
 
           <button
@@ -30,6 +39,7 @@ function Navbar() {
             <li><Link to="/home" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>Home</Link></li>
             <li><Link to="/contact" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>Contact</Link></li>
             <li><Link to="/about" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>About</Link></li>
+            <li><Link className="block hover:bg-blue-700 p-2 rounded" onClick={handleLogout}>Logout</Link></li>
           </ul>
         )}
       </div>
