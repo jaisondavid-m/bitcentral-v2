@@ -1,4 +1,3 @@
-// src/firebase.js
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 
@@ -12,15 +11,11 @@ const firebaseConfig = {
   measurementId: "G-T3C10RN98R"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Auth
 export const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// Google Sign-in function
 export const signInWithGoogle = () => signInWithPopup(auth, provider);
 
-// Logout function
 export const logout = () => signOut(auth);

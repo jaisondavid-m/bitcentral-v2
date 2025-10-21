@@ -28,6 +28,7 @@ function App() {
     <div>
 
       {!hideLayout && <NavBar/>}
+
       <Routes>
         <Route path='/' element={user ? <Navigate to="/home" /> : <Login />}/>
         <Route path='/home' element={<Home/>}/>
