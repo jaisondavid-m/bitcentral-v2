@@ -1,14 +1,11 @@
 import './Home.css'
 import Card from '../../Component/Content-Components/Card/Card'
 import data from "../../../Data/Data.json"
-import { useAuthState } from "react-firebase-hooks/auth"
-import { auth } from './../../Firebase';
 
 import React, { useState } from 'react'
 
-function Home({ name, link, img }) {
+function Home() {
 
-  const [user] = useAuthState(auth);
   const [sreach,Setsreach]=useState("");
 
   const handleSreach=(e)=>{
@@ -21,7 +18,7 @@ function Home({ name, link, img }) {
 
   return (
     <div>
-      <div className='txt border-b-2  text-center font-bold md:text-blue-900 md:text-4xl text-blue-500 text-2xl p-2'><p>Welcome {user ? user.displayName : "Guest"}</p></div>
+      <div className='txt border-b-2  text-center font-bold md:text-blue-900 md:text-4xl text-blue-500 text-2xl p-2'><p>Welcome To BIT Centeral</p></div>
       <input type="text"
        placeholder='Sreach...'
        onChange={handleSreach}
