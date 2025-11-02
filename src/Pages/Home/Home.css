@@ -2,12 +2,14 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center; 
-  gap: 20px; 
+  gap: 100px;
   padding: 20px;
+  
 }
 .cardContainer .card {
   background-color: #fff;
   border-radius: 10px;
+  margin-bottom: 20px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   overflow: hidden;
   width: 300px;
