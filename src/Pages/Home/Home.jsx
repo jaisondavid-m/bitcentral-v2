@@ -21,7 +21,7 @@ function Home({ name, link, img }) {
 
   return (
     <div>
-      <div className='border-b-2  text-center font-bold md:text-blue-900 md:text-4xl text-blue-500 text-2xl p-2'>Welcome {user ? user.displayName : "Guest"}</div>
+      <div className='txt border-b-2  text-center font-bold md:text-blue-900 md:text-4xl text-blue-500 text-2xl p-2'><p>Welcome {user ? user.displayName : "Guest"}</p></div>
       <input type="text"
        placeholder='Sreach...'
        onChange={handleSreach}

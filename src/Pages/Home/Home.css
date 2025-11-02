@@ -15,7 +15,6 @@
   width: 300px;
   transition: transform 0.2s, box-shadow 0.2s;
 }
-
 .cardContainer .card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 16px rgba(0,0,0,0.2);
@@ -57,5 +56,27 @@
 
   .card h3 {
     font-size: 1rem;
+  }
+}
+
+.txt p{
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: clamp(16px,4vw,28px);
+  border-right: 1px solid black;
+  animation: typing 3s steps(22) forwards , blink 0.7s step-end infinite alternate;
+}
+@keyframes typing{
+  from{
+    width: 0;
+  }
+  to{
+    width: 23ch;
+  }
+}
+@keyframes blink {
+  50%{
+    border-color: transparent;
   }
 }
