@@ -21,7 +21,7 @@ function Home() {
       <div className='txt border-b-2  text-center font-bold md:text-blue-900 md:text-4xl text-blue-500 text-2xl p-2'><p>Welcome To BIT Central</p></div>
       <DigitalClock/>
       <input type="text"
-       placeholder='Sreach...'
+       placeholder='Search...'
        onChange={handleSreach}
        className="block cosmic-input w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto my-6 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-slate-50 to-slate-100 border-2 border-slate-300 hover:border-slate-400 focus:outline-none focus:border-transparent focus:ring-4 focus:ring-blue-500/50 shadow-lg hover:shadow-xl focus:shadow-2xl transition-all duration-300 ease-in-out placeholder:text-slate-400 text-slate-800 font-medium"
       />
