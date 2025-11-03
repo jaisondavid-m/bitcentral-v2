@@ -18,7 +18,7 @@ function Home() {
 
   return (
     <div>
-      <div className='txt border-b-2  text-center font-bold md:text-blue-900 md:text-4xl text-blue-500 text-2xl p-2'><p>Welcome To BIT Centeral</p></div>
+      <div className='txt border-b-2  text-center font-bold md:text-blue-900 md:text-4xl text-blue-500 text-2xl p-2'><p>Welcome To BIT Central</p></div>
       <input type="text"
        placeholder='Sreach...'
        onChange={handleSreach}
