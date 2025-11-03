@@ -33,7 +33,6 @@ function Navbar() {
             <li><Link to="/home" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>Home</Link></li>
             <li><Link to="/contact" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>Contact</Link></li>
             <li><Link to="/about" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>About</Link></li>
-           
           </ul>
         )}
       </div>
