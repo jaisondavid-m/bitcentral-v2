@@ -1,9 +1,9 @@
 {
     "cards":[
         {"img":"./CardImgs/rewardpoint.png" ,"name":"Reward Points Checker" , "link":"https://reward-point-checker.vercel.app/","btntext":"Check Reward Point"},
-        {"img":"./CardImgs/studyimg.jpg" ,"name":"Wiki Page" , "link":"https://wiki.bitsathy.ac.in/wiki/BITWIKI:Departments_and_Semesters_2025-2026#2022_Regulation","btntext":"Open Material"},
-        {"img":"./CardImgs/bitmenu.png" ,"name":"Wiki Page" , "link":"https://bitmess.vercel.app/","btntext":"View Menu Details"},      
-        {"img":"./CardImgs/leaveimg.webp" ,"name":"Leave Apply" , "link":"https://camps.bitsathy.ac.in/CAMPS/JSP/student/student_leave.jsp","btntext":"Open Link"},
+        {"img":"./CardImgs/studyimg.jpg" ,"name":"Wiki Page📖" , "link":"https://wiki.bitsathy.ac.in/wiki/BITWIKI:Departments_and_Semesters_2025-2026#2022_Regulation","btntext":"Open Material"},
+        {"img":"./CardImgs/bitmenu.png" ,"name":"Food Menu😋" , "link":"https://bitmess.vercel.app/","btntext":"View Menu Details"},      
+        {"img":"./CardImgs/leaveimg.webp" ,"name":"Leave Apply✈️" , "link":"https://camps.bitsathy.ac.in/CAMPS/JSP/student/student_leave.jsp","btntext":"Open Link"},
         {"img":"./CardImgs/mycourse.png" ,"name":"My PS Courses" , "link":"https://ps.bitsathy.ac.in/my-course","btntext":"Open Link"},
         {"img":"./CardImgs/otp.jpg" ,"name":"Attendance" , "link":"psapp://onboard?org=bitsathy&url=https%3A%2F%2Fps.bitsathy.ac.in%2Fapi%2Fps_app_v2","btntext":"Enter OTP"},
         {"img":"./CardImgs/profile.jpg" ,"name":"College DashBoard" , "link":"https://bip.bitsathy.ac.in/dashboard","btntext":"Open Link"},
