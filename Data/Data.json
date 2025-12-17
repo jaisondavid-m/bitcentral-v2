@@ -1,6 +1,6 @@
 {
     "cards":[
-        {"name":"PT-2 Maths Answer Key(1st Year)" , "link":"https://drive.google.com/file/d/16Q0oV3bVEyq6xC1PI-4eoHO9urvykHmQ/view?usp=sharing","btntext":"View Answer Key"},
+        {"name":"PT-2 Maths Discourse Answer Key(1st Year)" , "link":"https://drive.google.com/file/d/16Q0oV3bVEyq6xC1PI-4eoHO9urvykHmQ/view?usp=sharing","btntext":"View Answer Key"},
         {"img":"./CardImgs/rewardpoint.png" ,"name":"Reward Points Checker" , "link":"https://reward-point-checker.vercel.app/","btntext":"Check Reward Point"},
         {"img":"./CardImgs/bitai.jpg" ,"name":"BIT AI" , "link":"https://bit-bot-ai.vercel.app/","btntext":"Try BIT AI"},
         {"img":"./CardImgs/studyimg.jpg" ,"name":"Wiki Page📖" , "link":"https://wiki.bitsathy.ac.in/wiki/BITWIKI:Departments_and_Semesters_2025-2026#2022_Regulation","btntext":"Open Material"},
