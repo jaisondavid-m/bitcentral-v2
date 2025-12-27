@@ -5,9 +5,6 @@ import { Await, Link,useNavigate } from "react-router-dom";
 function Navbar() {
   const [open, setOpen] = useState(false);
   const Navigate=useNavigate();
-
- 
-
   return (
     <nav className="bg-blue-600 text-white">
       <div className="max-w-6xl mx-auto px-4">
@@ -18,6 +15,7 @@ function Navbar() {
           <ul className="hidden md:flex space-x-6">
             <li><Link to="/home" className="hover:text-gray-200">Home</Link></li>
             <li><Link to="/rpsite" className="hover:text-gray-200">RP Site</Link></li>
+            <li><Link to="/profile" className="hover:text-gray-200">My Profile</Link></li>
             <li><Link to="/about" className="hover:text-gray-200">About</Link></li>
           </ul>
 
@@ -32,7 +30,9 @@ function Navbar() {
           <ul className="md:hidden flex flex-col space-y-2 pb-3">
             <li><Link to="/home" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>Home</Link></li>
             <li><Link to="/rpsite" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>RP Site</Link></li>
+            <li><Link to="/profile" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>My Profile</Link></li>
             <li><Link to="/about" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>About</Link></li>
+            
           </ul>
         )}
       </div>

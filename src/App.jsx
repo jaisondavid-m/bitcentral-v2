@@ -1,32 +1,40 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+
+import { auth } from "./Authentication/firebase.js"
+
 import NavBar from './Component/NavBar/NavBar'
-import './App.css'
 import Footer from './Component/Footer/Footer'
-import Home from './Pages/Home/Home'
-import About from './Pages/About/About'
-import Rpsite from './Pages/RPsite/Rpsite'
-import { Route,Routes,Navigate, useLocation } from 'react-router-dom'
+
+import Login from './Pages/Login/Login.jsx'
+import Dashboard from './Pages/Dashboard/Dashboard.jsx'
+import Home from './Pages/Home/Home.jsx'
+import About from './Pages/About/About.jsx'
+import Rpsite from './Pages/RPsite/Rpsite.jsx'
+
+import './App.css'
 
 function App() {
 
+   const [user,setUser]=useState();
 
+   useEffect(()=>{
+    const unsub = auth.onAuthStateChanged(setUser);
+    return unsub;
+   })
 
   return(
     <div>
-
-      
-      <NavBar/>
-
-      <Routes>
-        
-        <Route path='/' element={<Navigate to="/home" />}/>
-        <Route path='/home' element={<Home/>}/>
-        <Route path='/rpsite' element={<Rpsite/>}/>
-        <Route path='/about' element={<About/>}/>
-        
-      </Routes>
-      
-      <Footer/>
+      {user && <NavBar/>}
+          <Routes>
+             <Route path='/' element={user ? <Navigate to="/home" /> : <Login />}/>
+             <Route path='/dashboard' element={user ? <Dashboard/> : <Login />}/>
+            <Route path='/home' element={user?<Home/>:<Login />}/>
+            <Route path='/rpsite' element={user?<Rpsite/>:<Login />}/>
+            <Route path='/about' element={user?<About/>:<Login />}/>
+            <Route path='/profile' element={user?<Dashboard/>:<Login />}/>
+          </Routes>
+       {user && <Footer/>}
     </div>
   )
 }
