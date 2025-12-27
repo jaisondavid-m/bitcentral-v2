@@ -17,7 +17,7 @@ function Navbar() {
 
           <ul className="hidden md:flex space-x-6">
             <li><Link to="/home" className="hover:text-gray-200">Home</Link></li>
-            <li><Link to="/rpsite" className="hover:text-gray-200">RP SITE</Link></li>
+            <li><Link to="/rpsite" className="hover:text-gray-200">RP Site</Link></li>
             <li><Link to="/about" className="hover:text-gray-200">About</Link></li>
           </ul>
 
@@ -31,7 +31,7 @@ function Navbar() {
         {open && (
           <ul className="md:hidden flex flex-col space-y-2 pb-3">
             <li><Link to="/home" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>Home</Link></li>
-            <li><Link to="/rpsite" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>RP SITE</Link></li>
+            <li><Link to="/rpsite" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>RP Site</Link></li>
             <li><Link to="/about" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>About</Link></li>
           </ul>
         )}

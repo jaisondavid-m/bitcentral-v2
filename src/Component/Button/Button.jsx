@@ -4,7 +4,12 @@ import './Button.css'
 function Button({text,color,link}) {
 
   const handleClick = (l) => {
-    window.open(l, "_blank");
+    if(l!="https://bitcenteral.netlify.app/rpsite"){
+      window.open(l, "_blank");
+    }
+    else{
+      window.open(l, "_self");
+    }
   };
 
   return (
