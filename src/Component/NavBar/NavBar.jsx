@@ -1,42 +1,57 @@
 // Navbar.jsx
 import React, { useState } from "react";
-import { Await, Link,useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import Hamburger from "hamburger-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 function Navbar() {
-  const [open, setOpen] = useState(false);
-  const Navigate=useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <nav className="bg-blue-600 text-white">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
+    <>
+      {/* Top Navbar */}
+      <div className="sticky top-0 items-center flex justify-between w-screen py-2 px-5 md:p-10 lg:h-20 lg:px-36 lg:py-5 bg-blue-600 text-white shadow-lg z-40">
+        <h1 className="text-2xl justify-center items-center lg:text-4xl font-bold">BIT-CENTRAL</h1>
 
-          <h1 className="text-2xl font-bold">BIT-CENTRAL</h1>
+        {/* Desktop Menu */}
+        <ul className="hidden lg:flex gap-8 font-bold text-xl">
+          <li><Link to="/home">Home</Link></li>
+          <li><Link to="/rpsite">RP Site</Link></li>
+          <li><Link to="/profile">My Profile</Link></li>
+          <li><Link to="/about">About</Link></li>
+        </ul>
 
-          <ul className="hidden md:flex space-x-6">
-            <li><Link to="/home" className="hover:text-gray-200">Home</Link></li>
-            <li><Link to="/rpsite" className="hover:text-gray-200">RP Site</Link></li>
-            <li><Link to="/profile" className="hover:text-gray-200">My Profile</Link></li>
-            <li><Link to="/about" className="hover:text-gray-200">About</Link></li>
-          </ul>
-
-          <button
-            className="md:hidden text-2xl"
-            onClick={() => setOpen(!open)}
-          >
-            {open?"X":"☰"}
-          </button>
+        {/* Mobile Hamburger */}
+        <div className="lg:hidden">
+          <Hamburger toggled={isOpen} toggle={setIsOpen} color="white" />
         </div>
-        {open && (
-          <ul className="md:hidden flex flex-col space-y-2 pb-3">
-            <li><Link to="/home" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>Home</Link></li>
-            <li><Link to="/rpsite" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>RP Site</Link></li>
-            <li><Link to="/profile" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>My Profile</Link></li>
-            <li><Link to="/about" className="block hover:bg-blue-700 p-2 rounded" onClick={() => setOpen(!open)}>About</Link></li>
-            
-          </ul>
-        )}
       </div>
-    </nav>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            key="mobile-menu"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", stiffness: 100, damping: 20 }}
+            className="fixed inset-0 bg-blue-700 text-white flex flex-col items-center py-20 z-50"
+          >
+            <div className="absolute top-5 right-5">
+              <Hamburger toggled={isOpen} toggle={setIsOpen} color="white" />
+            </div>
+
+            <div className="flex flex-col items-center gap-8 mt-10 text-3xl font-bold">
+              <Link className="underline" to="/home" onClick={() => setIsOpen(false)}>Home</Link>
+              <Link className="underline" to="/rpsite" onClick={() => setIsOpen(false)}>RP Site</Link>
+              <Link className="underline" to="/profile" onClick={() => setIsOpen(false)}>My Profile</Link>
+              <Link className="underline" to="/about" onClick={() => setIsOpen(false)}>About</Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 

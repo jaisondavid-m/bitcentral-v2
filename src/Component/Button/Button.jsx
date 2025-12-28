@@ -1,20 +1,21 @@
 import React from 'react'
-import './Button.css'
+import { useNavigate } from 'react-router-dom';
 
 function Button({text,color,link}) {
+  const navigate = useNavigate();
 
   const handleClick = (l) => {
-    if(l!="https://bitcenteral.netlify.app/rpsite"){
-      window.open(l, "_blank");
+    if (link.startsWith("/")) {
+      navigate(link);
     }
     else{
-      window.open(l, "_self");
+      window.open(l, "_blank");
     }
   };
 
   return (
-    <div>
-      <a onClick={()=>handleClick(link)}><button style={{backgroundColor:color}} className='btn' >{text}</button></a>
+    <div className='text-sm font-mono lg:text-xl lg:p-5'>
+      <a  onClick={()=>handleClick(link)}><button className='rounded-xl border border-blue-500 p-1  tracking-tight text-white' style={{backgroundColor:color}}>{text}</button></a>
     </div>
   )
 }

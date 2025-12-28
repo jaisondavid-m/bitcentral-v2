@@ -4,7 +4,6 @@
   justify-content: center; 
   gap: 100px;
   padding: 20px;
-  
 }
 .cardContainer .card {
   background-color: #fff;
@@ -45,13 +44,14 @@
   }
   .cardContainer .card {
     width: 45%;
-    height:auto;
+    /* height:auto;*/
   }
 }
 
 @media (max-width: 480px) {
   .cardContainer .card {
-    width: 90%  ;
+    width: 40%;
+    height: 120px;
   }
 
   .card h3 {
@@ -72,7 +72,7 @@
     width: 0;
   }
   to{
-    width: 22ch;
+    width: 24ch;
   }
 }
 @keyframes blink {

@@ -7,8 +7,6 @@ import profile from "../../../public/CardImgs/profile.jpg"
 function Dashboard() {
 
     const [user] = useAuthState(auth);
-    console.log(user);
-
     if (!user) {
     navigate("/login");  
     return null;
@@ -26,7 +24,7 @@ function Dashboard() {
                 <h1>Email Verified : {user.emailVerified ? "Yes ✅" : "No ❌"}</h1>
                 <h1>First Login to Our Page :{new Date(Number(user.metadata.createdAt)).toLocaleString()}</h1>
                 <h1>Last Login At :{new Date(Number(user.metadata.lastLoginAt)).toLocaleString()}</h1>
-            </div>{console.log(user.photoURL)}
+            </div>
             <button className='bg-blue-500 text-white rounded-2xl p-2 mx-auto mt-10 w-20 flex justify-center ' onClick={logout}>Logout</button>
         </div>
         
