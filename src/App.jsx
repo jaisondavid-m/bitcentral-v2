@@ -11,7 +11,7 @@ import Dashboard from './Pages/Dashboard/Dashboard.jsx'
 import Home from './Pages/Home/Home.jsx'
 import About from './Pages/About/About.jsx'
 import Rpsite from './Pages/RPsite/Rpsite.jsx'
-
+import SemOne from './Pages/Sem1material/SemOne.jsx'
 import './App.css'
 
 function App() {
@@ -33,6 +33,7 @@ function App() {
             <Route path='/rpsite' element={user?<Rpsite/>:<Login />}/>
             <Route path='/about' element={user?<About/>:<Login />}/>
             <Route path='/profile' element={user?<Dashboard/>:<Login />}/>
+            <Route path='/sem1mat' element={user?<SemOne/>:<Login />}/>
           </Routes>
        {user && <Footer/>}
     </div>

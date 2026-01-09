@@ -1,5 +1,6 @@
 {
     "cards":[
+        {"img":"./CardImgs/image.png" ,"name":"SEM 1 Materials" , "link":"/sem1mat","btntext":"Open Now"},
         {"img":"./CardImgs/rewardpoint.png" ,"name":"RP Checker" , "link":"/rpsite","btntext":"Check RP Now"},
         {"img":"./CardImgs/studyimg.jpg" ,"name":"Wiki Page📖" , "link":"https://wiki.bitsathy.ac.in/wiki/BITWIKI:Departments_and_Semesters_2025-2026#2022_Regulation","btntext":"Open Material"},
         {"img":"./CardImgs/leaveimg.webp" ,"name":"Leave Apply✈️" , "link":"https://ps.bitsathy.ac.in/activity/my-leaves","btntext":"Open Link"},
