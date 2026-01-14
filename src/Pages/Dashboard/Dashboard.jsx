@@ -13,8 +13,8 @@ function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-md p-6">
+    <div className="mt-10 lg:mt-20 md:mt-16  bg-gray-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-md border border-blue-700 bg-white rounded-xl shadow-md p-6">
         
         {/* Header */}
         <div className="text-center mb-6">
@@ -39,14 +39,22 @@ function Dashboard() {
           <div className="flex justify-between">
             <span>First Login</span>
             <span>
-              {new Date(Number(user.metadata.createdAt)).toLocaleDateString()}
+              {new Date(Number(user.metadata.createdAt)).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                })}
             </span>
           </div>
 
           <div className="flex justify-between">
             <span>Last Login</span>
             <span>
-              {new Date(Number(user.metadata.lastLoginAt)).toLocaleDateString()}
+              {new Date(Number(user.metadata.lastLoginAt)).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                })}
             </span>
           </div>
         </div>
@@ -54,7 +62,7 @@ function Dashboard() {
         {/* Logout */}
         <button
           onClick={logout}
-          className="mt-6 w-full py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+          className="mt-6 w-full py-2 rounded-lg border border-blue-700 text-gray-700 hover:bg-gray-100 transition"
         >
           Logout
         </button>

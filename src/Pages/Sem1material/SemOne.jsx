@@ -6,8 +6,8 @@ const subjects = [
     name: "ENGINEERING MATHEMATICS I",
     qb1: "https://drive.google.com/file/d/1AMpdasHFaaQ_VnTO5uXVJsXhK0OD9tGW/view",
     qb2: "https://drive.google.com/file/d/1W7uvueoce4tlNBh8bUq0gcxVkLZhGkyq/view",
-    ak1: null,
-    ak2: null,
+    ak1: "https://drive.google.com/file/d/1TR4pbAxI11iDocwf2CYWlXaJ8d3Upcx2/view?usp=drivesdk",
+    ak2: "https://drive.google.com/file/d/1Scs9K2InJJBs-GsUJCJh_QpMhQjsfgMc/view?usp=drivesdk",
   },
   {
     code: "22GE003",
@@ -30,8 +30,8 @@ const subjects = [
     name: "ENGINEERING PHYSICS",
     qb1: "https://drive.google.com/file/d/1Rz12cLYbCulYXFnTYkO7nYM5p_O43NBj/view",
     qb2: "https://drive.google.com/file/d/1ddivnmWnfv5YvWX5EwDVIq-GNhyIIMm3/view",
-    ak1: null,
-    ak2: null,
+    ak1: "https://drive.google.com/file/d/153GAPcOqOvwaqETazPUJ2-D6SjAPD962/view?usp=drivesdk",
+    ak2: "https://drive.google.com/file/d/1bM-10o00RoXj5kkihD7IvCI48P7G_lHu/view?usp=drivesdk",
   },
   {
     code: "22CH103",
