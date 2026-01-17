@@ -12,6 +12,7 @@ import Home from './Pages/Home/Home.jsx'
 import About from './Pages/About/About.jsx'
 import Rpsite from './Pages/RPsite/Rpsite.jsx'
 import SemOne from './Pages/Sem1material/SemOne.jsx'
+import MessMenu from './Pages/MessDetails/Mess.jsx'
 import './App.css'
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
             <Route path='/about' element={user?<About/>:<Login />}/>
             <Route path='/profile' element={user?<Dashboard/>:<Login />}/>
             <Route path='/sem1mat' element={user?<SemOne/>:<Login />}/>
+            <Route path='/mess' element={user?<MessMenu/>:<Login />}/>
           </Routes>
        {user && <Footer/>}
     </div>

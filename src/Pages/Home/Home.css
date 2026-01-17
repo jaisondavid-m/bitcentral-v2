@@ -37,6 +37,8 @@
   font-weight: bold;
 }
 
+
+
 @media (max-width: 768px) {
   .cardContainer {
     gap: 15px;
@@ -59,9 +61,12 @@
   }
 }
 
+
+
 .txt p{
   display: inline-block;
   white-space: nowrap;
+  font-weight: bold;
   overflow: hidden;
   font-size: clamp(16px,4vw,28px);
   border-right: 1px solid blue;

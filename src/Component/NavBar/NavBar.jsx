@@ -9,49 +9,177 @@ function Navbar() {
 
   return (
     <>
-      {/* Top Navbar */}
-      <div className="sticky top-0 items-center flex justify-between w-screen py-2 px-5 md:p-10 lg:h-20 lg:px-36 lg:py-5 bg-blue-600 text-white shadow-lg z-40">
-        <h1 className="text-2xl justify-center items-center lg:text-4xl font-bold">BIT-CENTRAL</h1>
+      
+      <div className="sticky top-0 left-0 right-0 z-40">
+        <div className="mx-2 mt-2 md:mx-4 md:mt-4 lg:mx-8 lg:mt-4">
+          <div className="relative overflow-hidden rounded-2xl lg:rounded-3xl backdrop-blur-xl bg-blue-600/90 shadow-2xl border border-white/20">
+            
+            <div className="relative flex items-center justify-between px-4 py-3 md:px-8 md:py-4 lg:px-12 lg:py-5">
+              
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-white drop-shadow-lg">
+                BIT-CENTRAL
+              </h1>
+              
+              <div className="hidden lg:flex">
+                <ul className="flex gap-2 bg-white/10 backdrop-blur-md rounded-full p-1.5 border border-white/20">
+                  <NavLink to="/home">Home</NavLink>
+                  <NavLink to="/rpsite">RP Site</NavLink>
+                  <NavLink to="/profile">My Profile</NavLink>
+                  <NavLink to="/about">About</NavLink>
+                </ul>
+              </div>
+              
 
-        {/* Desktop Menu */}
-        <ul className="hidden lg:flex gap-8 font-bold text-xl">
-          <li><Link to="/home">Home</Link></li>
-          <li><Link to="/rpsite">RP Site</Link></li>
-          <li><Link to="/profile">My Profile</Link></li>
-          <li><Link to="/about">About</Link></li>
-        </ul>
-
-        {/* Mobile Hamburger */}
-        <div className="lg:hidden">
-          <Hamburger toggled={isOpen} toggle={setIsOpen} color="white" />
+              {/* Mobile Hamburger - iOS Style */}
+              <div className="lg:hidden relative">
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-1 border border-white/20">
+                  <Hamburger toggled={isOpen} toggle={setIsOpen} color="white" size={20} />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* iOS-Style Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            key="mobile-menu"
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", stiffness: 100, damping: 20 }}
-            className="fixed inset-0 bg-blue-700 text-white flex flex-col items-center py-20 z-50"
-          >
-            <div className="absolute top-5 right-5">
-              <Hamburger toggled={isOpen} toggle={setIsOpen} color="white" />
-            </div>
+          <>
+            {/* Backdrop Blur */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+              onClick={() => setIsOpen(false)}
+            />
 
-            <div className="flex flex-col items-center gap-8 mt-10 text-3xl font-bold">
-              <Link className="underline" to="/home" onClick={() => setIsOpen(false)}>Home</Link>
-              <Link className="underline" to="/rpsite" onClick={() => setIsOpen(false)}>RP Site</Link>
-              <Link className="underline" to="/profile" onClick={() => setIsOpen(false)}>My Profile</Link>
-              <Link className="underline" to="/about" onClick={() => setIsOpen(false)}>About</Link>
-            </div>
-          </motion.div>
+            {/* Menu Panel - iOS Bottom Sheet Style */}
+            <motion.div
+              key="mobile-menu"
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 300, 
+                damping: 30,
+                mass: 0.8
+              }}
+              className="fixed inset-x-0 bottom-0 z-50 pb-safe"
+            >
+              <div className="mx-2 mb-2">
+                <div className="relative overflow-hidden rounded-3xl backdrop-blur-2xl bg-blue-600/95 shadow-2xl border border-white/20">
+                  {/* iOS-style handle */}
+                  <div className="flex justify-center pt-3 pb-2">
+                    <div className="w-10 h-1 bg-white/30 rounded-full"></div>
+                  </div>
+
+                  {/* Close button */}
+                  <div className="absolute top-4 right-4">
+                    <button 
+                      onClick={() => setIsOpen(false)}
+                      className="bg-white/10 backdrop-blur-md rounded-full p-2 border border-white/20 hover:bg-white/20 transition-colors"
+                    >
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Menu Items */}
+                  <div className="px-6 pt-8 pb-8 space-y-3">
+                    <MobileNavLink to="/home" onClick={() => setIsOpen(false)} delay={0.1}>
+                      <HomeIcon />
+                      Home
+                    </MobileNavLink>
+                    <MobileNavLink to="/rpsite" onClick={() => setIsOpen(false)} delay={0.15}>
+                      <SiteIcon />
+                      RP Site
+                    </MobileNavLink>
+                    <MobileNavLink to="/profile" onClick={() => setIsOpen(false)} delay={0.2}>
+                      <ProfileIcon />
+                      My Profile
+                    </MobileNavLink>
+                    <MobileNavLink to="/about" onClick={() => setIsOpen(false)} delay={0.25}>
+                      <AboutIcon />
+                      About
+                    </MobileNavLink>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+// Desktop Navigation Link Component
+function NavLink({ to, children }) {
+  return (
+    <li className="list-none">
+      <Link
+        to={to}
+        className="block px-5 py-2.5 text-sm font-semibold text-white rounded-full hover:bg-white/20 active:bg-white/30 transition-all duration-200 hover:scale-105 active:scale-95"
+      >
+        {children}
+      </Link>
+    </li>
+  );
+}
+
+// Mobile Navigation Link Component with iOS-style card
+function MobileNavLink({ to, children, onClick, delay }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay, duration: 0.3 }}
+    >
+      <Link
+        to={to}
+        onClick={onClick}
+        className="flex items-center gap-4 px-5 py-4 text-lg font-semibold text-white bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:bg-white/20 active:bg-white/30 transition-all duration-200 active:scale-95"
+      >
+        {children}
+      </Link>
+    </motion.div>
+  );
+}
+
+// iOS-style Icons
+function HomeIcon() {
+  return (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+    </svg>
+  );
+}
+
+function SiteIcon() {
+  return (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+    </svg>
+  );
+}
+
+function ProfileIcon() {
+  return (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+  );
+}
+
+function AboutIcon() {
+  return (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
   );
 }
 
