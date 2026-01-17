@@ -62,7 +62,6 @@ export default function MessMenu() {
         </div>
 
         <div className="relative bg-gradient-to-br from-slate-50 to-slate-100 p-1 rounded-[20px] flex w-full md:w-fit shadow-lg border border-white/50 backdrop-blur-xl">
-        {/* Animated background pill */}
         <div 
             className={`absolute top-1 bottom-1 rounded-[16px] bg-gradient-to-br from-white via-white to-slate-50 shadow-2xl transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
             activeTab === HostelType.BOYS ? 'left-1 right-1/2 mr-0.5' : 'left-1/2 right-1 ml-0.5'

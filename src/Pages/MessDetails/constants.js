@@ -208,6 +208,7 @@ export const GIRLS_DATA = {
       "day": "Sunday",
       "breakfast": ["Bread + jam + butter", "Thinai Pongal", "Sambar", "Coconut Chutney", "Tea/coffee/milk"],
       "lunch": ["Rice", "Soya Biryani", "Pachapuli Rasam", "Egg Gravy", "Onion Raita", "Butter Milk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Roast", "Poatao Kuruma", "Noodles(Rice/Normal)", "Tomato Sauce", "Curd Rice & Banana", "Veg Chutney", "Rose Milk / Chukku Milk"]
     },
     {
@@ -215,6 +216,7 @@ export const GIRLS_DATA = {
       "day": "Monday",
       "breakfast": ["Idly", "White Kuruma", "Kesari", "Aval Upma", "Kaara Chutney", "Tea/coffee/milk"],
       "lunch": ["Rice", "Avarai Mochaikulambu", "Pineapple Rasam", "Bottle Gourd Kootu", "Kambu Koozh + Vathal", "Butter Milk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Onion Dosa", "Pasiparuppu Sambar", "Puli Sadham", "Curd Rice", "Coriander Chutney", "Banana"]
     },
     {
@@ -222,6 +224,7 @@ export const GIRLS_DATA = {
       "day": "Tuesday",
       "breakfast": ["Ven pongal", "Sambar", "Malli semiya", "Meduvadai", "Coconut chutney", "Tea/coffee/Milk"],
       "lunch": ["Rice", "Pachai payaru kadayal", "Mixed Veg Poriyal", "Appalam & Curd"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Chapathi", "Tomato Thokku", "Karuveppillai sadam", "Curd Rice & Boiled egg", "Veg Salad & Jam"]
     },
     {
@@ -229,6 +232,7 @@ export const GIRLS_DATA = {
       "day": "Wednesday",
       "breakfast": ["Variety Dosa", "Wheat rava upma", "Sambar", "Onion chutney", "Tea /Coffee /Milk"],
       "lunch": ["Rice", "Dhall fry", "Dhall Rasam", "Appalam", "Payasam", "Aviyal / Erissery", "Butter milk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Idly", "Potato kuruma", "Noodles", "Curd Rice", "Coconut chutney", "Badam Milk / Ragi Malt", "Tomato Sauce"]
     },
     {
@@ -236,6 +240,7 @@ export const GIRLS_DATA = {
       "day": "Thursday",
       "breakfast": ["Bread", "Jam+Butter", "Masala Uthappam", "Sambar", "Groundnut chutney", "Tea/ Coffee/ Milk"],
       "lunch": ["Rice", "Thatta Payaru kulambu", "Kollu Rasam", "Cabbage masala Poriyal", "Appalam", "Butter milk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Chapati", "Channa Masala", "Rajma Beans Pulao", "Curd Rice", "Egg masala / Egg pepper Fry", "Jam / Veg Salad"]
     },
     {
@@ -243,6 +248,7 @@ export const GIRLS_DATA = {
       "day": "Friday",
       "breakfast": ["Ragi Idly", "Yellow pumpkin sambar", "Sweet pongal", "Medu Vadai", "Coconut chutney", "Tea/ Coffee/ Milk"],
       "lunch": ["Rice", "Kothavarai vathal kulambu", "Lemon Rasam", "Snake gourd Poriyal", "Appalam", "Curd"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Rumali Roti", "Mixed veg curry", "Ghee rice", "Curd Rice", "Banana"]
     },
     {
@@ -250,6 +256,7 @@ export const GIRLS_DATA = {
       "day": "Saturday",
       "breakfast": ["Machine Dosa", "Veg Paya", "Ragi Semiya", "Coconut chutney", "Tea /coffee/milk"],
       "lunch": ["Rice", "Drumstick Sambar", "Tomato Rasam", "Payasam", "Paruppuvadai+ Poriyal", "Buttermilk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Idly", "Brinjal Gosthu", "Variety rice", "Curd Rice", "Kara Chutney", "Rose Milk / Chukkupaal"]
     },
     {
@@ -257,6 +264,7 @@ export const GIRLS_DATA = {
       "day": "Sunday",
       "breakfast": ["Bread", "Jam butter", "Semiya(Variety)", "Sambar", "Coconut Chutney", "Tea /Coffee/ Milk"],
       "lunch": ["Mushroom Biryani", "Onion Raita", "White rice", "Pacha puli / Coconut milk Rasam", "Egg gravy", "Butter milk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Onion Dosa", "Veg Rice", "Curd Rice", "Banana + Tomato Sauce", "Coriander Chutney"]
     },
     {
@@ -264,6 +272,7 @@ export const GIRLS_DATA = {
       "day": "Monday",
       "breakfast": ["Veg uthappam", "Rava upma", "White kuruma", "Kara chutney", "Tea /Coffee/ Milk"],
       "lunch": ["Rice", "Arachuvecha (Onion + Drumstick) Kulambu", "Rasam", "Bottle gourd kootu", "Kambu Koozh + Vathal", "Buttermilk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Idly", "Lemon sadham", "Sambar", "Coconut chutney", "Idly podi with gingelly oil", "Curd rice", "Banana"]
     },
     {
@@ -271,6 +280,7 @@ export const GIRLS_DATA = {
       "day": "Tuesday",
       "breakfast": ["Seeragasambakunjai Pongal", "Tomato Semiya", "Sambar", "Medhu Vadai", "Coconut Chutney", "Tea/coffee/milk"],
       "lunch": ["Rice", "Kollu paruppu", "Kollu Rasam", "Carrot Green Peas Poriyal", "Appalam", "Curd"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Chapathi", "Pattani Paal Curry Kuruma", "Empty Biriyani", "Egg + Jam", "Curd Rice", "Veg Salad / Onion Raitha"]
     },
     {
@@ -278,6 +288,7 @@ export const GIRLS_DATA = {
       "day": "Sunday",
       "breakfast": ["Bread + Jam + Butter", "Ven Pongal", "Sambar", "Coconut Chutney", "Tea/coffee/milk"],
       "lunch": ["Rice", "Veg Biriyani", "Pachapuli Rasam", "Egg Greavey", "Onion Raitha", "Butter Milk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Podi Dosa", "Noodles", "Brinjal Kosthu", "Curd Rice", "Tomato Sauce", "Banana"]
     },
     {
@@ -285,6 +296,7 @@ export const GIRLS_DATA = {
       "day": "Monday",
       "breakfast": ["Idly", "Kesari", "Potato kuruma", "Bread Upma/Aval Upma", "Groundnut Chutney", "Tea/coffee/milk"],
       "lunch": ["Rice", "Sundal Kulambu", "Milagu Rasam", "Kadhamba Poriyal", "Kambu Koozh + Vathal", "Butter Milk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Variety Dosa", "Pasiparuppu Sambar", "Coconut Rice", "Curd Rice", "Veg Chutney", "Banana"]
     },
     {
@@ -292,6 +304,7 @@ export const GIRLS_DATA = {
       "day": "Tuesday",
       "breakfast": ["Malli Pongal", "Sambar", "Semiya Upma", "Medhu Vadai", "Coconut Chutney", "Tea /Coffee/Milk"],
       "lunch": ["Rice", "Pachapayaru Kulambu", "Tomato Rasam", "Banana Stem Poriyal", "Appalam", "Butter Milk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Chappathi", "Veg Butter Masala", "Kushka", "Curd Rice", "Ragi / Aval Sweet", "Boiled Egg", "Onion Raitha / Veg Salad"]
     },
     {
@@ -299,6 +312,7 @@ export const GIRLS_DATA = {
       "day": "Wednesday",
       "breakfast": ["Roast", "Kumbakonam kadappa", "Wheat rava upma + Curd", "Tomato Chutney", "Tea/Coffee/Milk"],
       "lunch": ["Rice", "Vendaikai Pulikulambu (Chettinad style)", "Tomato Rasam", "Beetroot poriyal", "Payasam", "Appalam & Butter Milk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Variety Idly", "Sambar", "Thatta payaru Sadham", "Curd Rice", "Kara Chutney", "Badham Milk / Ragi Malt"]
     },
     {
@@ -306,6 +320,7 @@ export const GIRLS_DATA = {
       "day": "Thursday",
       "breakfast": ["Bread+ Jam+Butter", "Onion Mini Uthappam", "Tomato Kulambu", "Coriander Chutney", "Tea/ coffee/ milk"],
       "lunch": ["Rice", "Dhall Fry", "Dhall Rasam", "Potato Pattani Poriyal", "Appalam", "Butter Milk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Chapati+ Jam", "Kadai Veg Curry", "Channa Pulao", "Curd Rice", "Veg Salad / Onion Raita", "Egg Masala / Pepper Fry"]
     },
     {
@@ -313,6 +328,7 @@ export const GIRLS_DATA = {
       "day": "Friday",
       "breakfast": ["Idly", "Sambar", "Kakandu Pineapple Pongal", "Meduvadai", "Coconut Chutney", "Tea/coffee/milk"],
       "lunch": ["Rice", "Vathal Puli Kulambu", "Kollu Rasam", "Appalam", "Snake Gourd Poriyal", "Curd"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Romali Roti", "Channa Masala", "Tomato Bath", "Curd Rice", "Banana"]
     },
     {
@@ -320,6 +336,7 @@ export const GIRLS_DATA = {
       "day": "Saturday",
       "breakfast": ["Machine Dosa", "Veg Paya", "Aval Upma", "Kara Chutney", "Tea/coffee/milk"],
       "lunch": ["Rice", "Drumstick Sambar", "Rasam", "Payasam+Poriyal", "Paruppu Vadai", "Butter Milk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Idly", "Sambar", "Noodles(Rice/Normal)", "Curd Rice & Tomato Sauce", "Coconut Chutney", "Rose Milk / Chukku Milk"]
     },
     {
@@ -327,6 +344,7 @@ export const GIRLS_DATA = {
       "day": "Sunday",
       "breakfast": ["Bread + Jam + Butter", "Semiya Upma", "Coconut Chutney", "Tea/ coffee /milk"],
       "lunch": ["Rice", "Kushka Biryani", "Coconut Milk Rasam", "Egg Gravy", "Onion Raitha", "Butter Milk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Masala Utthappam", "Sambar", "Coconut Rice", "Curd Rice", "Onion Thuvaiyal", "Banana"]
     },
     {
@@ -334,6 +352,7 @@ export const GIRLS_DATA = {
       "day": "Monday",
       "breakfast": ["Podi Dosa", "Plain Kuruma", "Rava Kitchadi", "Coconut Chutney", "Tea/coffee/milk"],
       "lunch": ["Rice", "Ladies finger Morkulambu", "Tomato Rasam", "Yam Poriyal", "Kambu Koozh + Vathal", "Butter Milk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Idly", "Tiffin Sambar", "Veg Fried Rice", "Curd Rice", "Tomato Sauce", "Kaara Chutney"]
     },
     {
@@ -341,6 +360,7 @@ export const GIRLS_DATA = {
       "day": "Tuesday",
       "breakfast": ["Variety Pongal", "Veg Semiya", "Sambar", "Meduvadai", "Coconut Chutney", "Tea/coffee/milk"],
       "lunch": ["Rice", "Chettinad Ennai Kathirikai Kulambu", "Rasam", "Cabbage Poriyal", "Appalam", "Buttermilk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Chapati", "Green Peas Masala", "Mint Rice", "Veg Salad / Onion Raita", "Curd Rice", "Ragi / Aval Sweet"]
     },
     {
@@ -348,6 +368,7 @@ export const GIRLS_DATA = {
       "day": "Wednesday",
       "breakfast": ["Millet Idly", "Aval Upma", "Sambar", "Coconut Chutney", "Tea /Coffee/ Milk"],
       "lunch": ["Rice", "Tomato Kulambu", "Puli Rasam", "Beet Root Poriyal", "Payasam + Appalam", "Buttermilk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Machine Dosa", "Dhall Fry", "Thatta payaru Sadham", "Curd Rice", "Kaara Chutney"]
     },
     {
@@ -355,6 +376,7 @@ export const GIRLS_DATA = {
       "day": "Thursday",
       "breakfast": ["Bread + Jam + Butter", "Ghee podi Utthappam", "Nilgiri Kuruma", "Groundnut Chutney", "Tea /Coffee/ Milk"],
       "lunch": ["Rice", "Tomato Bath (Kurunai) Sambar", "Dhall Rasam", "Vadagam", "Butter Milk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Chapati ,Jam", "Soya Kuruma(Chettinad Style)", "Peas Pulao", "Curd Rice", "Onion Raitha", "Veg Salad/ Onion Raita", "Egg Pepper Fry / Masala"]
     },
     {
@@ -362,6 +384,7 @@ export const GIRLS_DATA = {
       "day": "Friday",
       "breakfast": ["Idly", "Karuppatti Pongal", "Sambar", "Meduvadai", "Coconut Chutney", "Tea/Coffee/Milk"],
       "lunch": ["Rice", "Kollu Paruppu", "Kollu Rasam", "Potato poriyal", "Appalam", "Curd"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Wheat Parotta", "Plain Salna", "Paruppu Sadham", "Curd Rice", "Coconut Chutney", "Banana"]
     },
     {
@@ -369,6 +392,7 @@ export const GIRLS_DATA = {
       "day": "Saturday",
       "breakfast": ["Kal dosa", "Wheat Rava Upma+Curd", "Coconut Chutney", "Tea/coffee/milk"],
       "lunch": ["Rice", "Brinjal Kosthu Kulambu", "Dhall Rasam", "Payasam+Poriyal", "Paruppu Vadai", "Buttermilk"],
+      "tea": ["Tea", "Coffee", "Snacks"],
       "dinner": ["Idly", "Kadhamba Sambar", "Lemon Sadham", "Curd Rice", "Beetroot Chutney", "Rose Milk/Chukku"]
     }
   ]
