@@ -1,16 +1,5 @@
-// import React from 'react'
-
-// function Footer() {
-//   return (
-//     <div className='bg-blue-700 text-white text-center p-3' style={{display:"fixed",bottom:"0px"}}>
-//        <p>&copy; All rights Reserved</p>
-//        <a href="https://www.linkedin.com/in/jaison-david-m-a14072360/" target="_blank"><p className='font-bold'>Crafted by an average 1st-year boy</p></a>
-//     </div>
-//   )
-// }
-
-// export default Footer
 import React from "react";
+import { HashLink as Link } from 'react-router-hash-link';
 
 export default function Footer(){
   return (
@@ -25,7 +14,7 @@ export default function Footer(){
         <div className="flex gap-6 text-sm">
           <a href="#" className="hover:text-white transition">Privacy Policy</a>
           <a href="#" className="hover:text-white transition">Terms</a>
-          <a href="#" className="hover:text-white transition">Contact</a>
+          <Link to="/about#contact" className="hover:text-white transition">Contact</Link>
         </div>
       </div>
     </footer>
