@@ -1,36 +1,64 @@
-// Navbar.jsx
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Hamburger from "hamburger-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+
+  const navItems = [
+    { to: "/home", label: "Home" },
+    { to: "/rpsite", label: "RP Site" },
+    { to: "/profile", label: "My Profile" },
+    { to: "/about", label: "About" }
+  ];
+
+  const activeIndex = navItems.findIndex(item => location.pathname === item.to);
 
   return (
     <>
-      
       <div className="sticky top-0 left-0 right-0 z-40">
-        <div className="mx-2 mt-2 md:mx-4 md:mt-4 lg:mx-8 lg:mt-4">
-          <div className="relative overflow-hidden rounded-2xl lg:rounded-3xl backdrop-blur-xl bg-blue-600/90 shadow-2xl border border-white/20">
-            
+        <div>
+          <div className="relative overflow-hidden backdrop-blur-xl bg-blue-600/90 shadow-2xl border border-white/20">
             <div className="relative flex items-center justify-between px-4 py-3 md:px-8 md:py-4 lg:px-12 lg:py-5">
-              
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-white drop-shadow-lg">
                 BIT-CENTRAL
               </h1>
               
               <div className="hidden lg:flex">
-                <ul className="flex gap-2 bg-white/10 backdrop-blur-md rounded-full p-1.5 border border-white/20">
-                  <NavLink to="/home">Home</NavLink>
-                  <NavLink to="/rpsite">RP Site</NavLink>
-                  <NavLink to="/profile">My Profile</NavLink>
-                  <NavLink to="/about">About</NavLink>
-                </ul>
+                <div className="relative bg-white/10 backdrop-blur-md rounded-full p-1.5 border border-white/20">
+                  {activeIndex !== -1 && (
+                    <motion.div
+                      className="absolute inset-y-1.5 bg-white/30 backdrop-blur-lg rounded-full border border-white/40"
+                      initial={false}
+                      animate={{
+                        left: `${activeIndex * 25}%`,
+                        width: `${100 / navItems.length}%`
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 35,
+                        mass: 0.8
+                      }}
+                      style={{ paddingLeft: '6px', paddingRight: '6px' }}
+                    />
+                  )}
+                  <ul className="relative flex gap-2">
+                    {navItems.map((item, index) => (
+                      <NavLink 
+                        key={item.to} 
+                        to={item.to} 
+                        isActive={location.pathname === item.to}
+                      >
+                        {item.label}
+                      </NavLink>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              
 
-              {/* Mobile Hamburger - iOS Style */}
               <div className="lg:hidden relative">
                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-1 border border-white/20">
                   <Hamburger toggled={isOpen} toggle={setIsOpen} color="white" size={20} />
@@ -41,11 +69,9 @@ function Navbar() {
         </div>
       </div>
 
-      {/* iOS-Style Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop Blur */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -55,7 +81,6 @@ function Navbar() {
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Menu Panel - iOS Bottom Sheet Style */}
             <motion.div
               key="mobile-menu"
               initial={{ y: "100%" }}
@@ -71,12 +96,10 @@ function Navbar() {
             >
               <div className="mx-2 mb-2">
                 <div className="relative overflow-hidden rounded-3xl backdrop-blur-2xl bg-blue-600/95 shadow-2xl border border-white/20">
-                  {/* iOS-style handle */}
                   <div className="flex justify-center pt-3 pb-2">
                     <div className="w-10 h-1 bg-white/30 rounded-full"></div>
                   </div>
 
-                  {/* Close button */}
                   <div className="absolute top-4 right-4">
                     <button 
                       onClick={() => setIsOpen(false)}
@@ -88,21 +111,20 @@ function Navbar() {
                     </button>
                   </div>
 
-                  {/* Menu Items */}
                   <div className="px-6 pt-8 pb-8 space-y-3">
-                    <MobileNavLink to="/home" onClick={() => setIsOpen(false)} delay={0.1}>
+                    <MobileNavLink to="/home" onClick={() => setIsOpen(false)} delay={0.1} isActive={location.pathname === "/home"}>
                       <HomeIcon />
                       Home
                     </MobileNavLink>
-                    <MobileNavLink to="/rpsite" onClick={() => setIsOpen(false)} delay={0.15}>
+                    <MobileNavLink to="/rpsite" onClick={() => setIsOpen(false)} delay={0.15} isActive={location.pathname === "/rpsite"}>
                       <SiteIcon />
                       RP Site
                     </MobileNavLink>
-                    <MobileNavLink to="/profile" onClick={() => setIsOpen(false)} delay={0.2}>
+                    <MobileNavLink to="/profile" onClick={() => setIsOpen(false)} delay={0.2} isActive={location.pathname === "/profile"}>
                       <ProfileIcon />
                       My Profile
                     </MobileNavLink>
-                    <MobileNavLink to="/about" onClick={() => setIsOpen(false)} delay={0.25}>
+                    <MobileNavLink to="/about" onClick={() => setIsOpen(false)} delay={0.25} isActive={location.pathname === "/about"}>
                       <AboutIcon />
                       About
                     </MobileNavLink>
@@ -117,13 +139,14 @@ function Navbar() {
   );
 }
 
-// Desktop Navigation Link Component
-function NavLink({ to, children }) {
+function NavLink({ to, children, isActive }) {
   return (
-    <li className="list-none">
+    <li className="list-none relative z-10">
       <Link
         to={to}
-        className="block px-5 py-2.5 text-sm font-semibold text-white rounded-full hover:bg-white/20 active:bg-white/30 transition-all duration-200 hover:scale-105 active:scale-95"
+        className={`block px-5 py-2.5 text-sm font-semibold rounded-full transition-all duration-300 ${
+          isActive ? 'text-white' : 'text-white'
+        }`}
       >
         {children}
       </Link>
@@ -131,8 +154,7 @@ function NavLink({ to, children }) {
   );
 }
 
-// Mobile Navigation Link Component with iOS-style card
-function MobileNavLink({ to, children, onClick, delay }) {
+function MobileNavLink({ to, children, onClick, delay, isActive }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -142,7 +164,11 @@ function MobileNavLink({ to, children, onClick, delay }) {
       <Link
         to={to}
         onClick={onClick}
-        className="flex items-center gap-4 px-5 py-4 text-lg font-semibold text-white bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:bg-white/20 active:bg-white/30 transition-all duration-200 active:scale-95"
+        className={`flex items-center gap-4 px-5 py-4 text-lg font-semibold backdrop-blur-md rounded-2xl border transition-all duration-300 active:scale-95 ${
+          isActive 
+            ? 'text-white bg-white/25 border-white/30' 
+            : 'text-white/80 bg-white/10 border-white/20 hover:bg-white/20 active:bg-white/30'
+        }`}
       >
         {children}
       </Link>
@@ -150,7 +176,6 @@ function MobileNavLink({ to, children, onClick, delay }) {
   );
 }
 
-// iOS-style Icons
 function HomeIcon() {
   return (
     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

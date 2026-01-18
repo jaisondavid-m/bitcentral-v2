@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { HostelType, MEAL_TIMINGS } from './constants.js';
 import { 
@@ -38,6 +37,24 @@ export default function MessMenu() {
   };
 
   const mealSections = ['breakfast', 'lunch', 'tea', 'dinner'];
+
+  // Sort meals to show current/upcoming meal first
+  const sortedMealSections = useMemo(() => {
+    if (!isSelectedDateToday || !currentMealType) {
+      return mealSections;
+    }
+    
+    const currentIndex = mealSections.indexOf(currentMealType);
+    if (currentIndex === -1) {
+      return mealSections;
+    }
+    
+    // Reorder array to put current meal first, followed by remaining meals in order
+    return [
+      ...mealSections.slice(currentIndex),
+      ...mealSections.slice(0, currentIndex)
+    ];
+  }, [isSelectedDateToday, currentMealType]);
 
   return (
     <div className="min-h-screen pb-20 max-w-6xl mx-auto px-4 md:px-8">
@@ -114,7 +131,7 @@ export default function MessMenu() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {mealSections.map((meal) => {
+            {sortedMealSections.map((meal) => {
               const isCurrent = isSelectedDateToday && currentMealType === meal;
               const timeRange = `${MEAL_TIMINGS[meal].start} - ${MEAL_TIMINGS[meal].end}`;
               
@@ -133,4 +150,4 @@ export default function MessMenu() {
       </main>
     </div>
   );
-}
+}   
