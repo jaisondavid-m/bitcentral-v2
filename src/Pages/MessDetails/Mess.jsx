@@ -38,7 +38,7 @@ export default function MessMenu() {
 
   const mealSections = ['breakfast', 'lunch', 'tea', 'dinner'];
 
-  // Sort meals to show current/upcoming meal first
+  // Sort meals to show current/upcoming meal firstl
   const sortedMealSections = useMemo(() => {
     if (!isSelectedDateToday || !currentMealType) {
       return mealSections;
