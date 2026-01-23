@@ -234,8 +234,7 @@ function Dashboard() {
             </div>
           </div>
         </div>
-
-        {/* Logout Button */}
+        
         <div className="flex justify-center">
             <button
               onClick={handleLogout}

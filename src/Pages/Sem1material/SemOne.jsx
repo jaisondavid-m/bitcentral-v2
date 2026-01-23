@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import FullScreenLoader from "../../Component/Loader/FullScreenLoader";
 
 export default function SemOne() {
   const [subjects, setSubjects] = useState([]);
@@ -23,9 +24,7 @@ export default function SemOne() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-blue-600">
-        Loading subjects...
-      </div>
+      <FullScreenLoader/>
     );
   }
 

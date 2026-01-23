@@ -1,10 +1,11 @@
 .cardContainer {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center; 
+  justify-content: center;
   gap: 100px;
   padding: 20px;
 }
+
 .cardContainer .card {
   background-color: #fff;
   border-radius: 10px;
@@ -36,8 +37,6 @@
   color: #007bff;
   font-weight: bold;
 }
-
-
 
 @media (max-width: 768px) {
   .cardContainer {
