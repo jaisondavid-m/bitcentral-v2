@@ -24,15 +24,17 @@ function Home() {
     );
     return nameMatch || keywordsMatch;
   });
+  const welcomeText = `Hi ${user?.displayName || "there"}`;
 
   return (
     <div>
-      <div className='txt border-b-2 mt-5  text-center font-bold md:text-blue-900 md:text-4xl text-blue-500 text-2xl p-2'><p>Welcome {user.displayName}</p></div>
+      <div className="welcome-wrap">
+        <p className="welcome-text" style={{ "--chars": welcomeText.length }} >{welcomeText}</p>
+        <span className="welcome-sub">Welcome back !!</span>
+      </div>
       <DigitalClock/>
-      <input type="text"
-       placeholder='Search...'
-       onChange={handleSreach}
-       className="block cosmic-input w-[70%] max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto my-2 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-slate-50 to-slate-100 border-2 border-slate-300 hover:border-slate-400 focus:outline-none focus:border-transparent focus:ring-4 focus:ring-blue-500/50 shadow-lg hover:shadow-xl focus:shadow-2xl transition-all duration-300 ease-in-out placeholder:text-slate-400 text-slate-800 font-medium"
+      <input type="text" placeholder="Search..." onChange={handleSreach}
+        className="block w-[80%] max-w-md mx-auto px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-200 transition-all placeholder:text-gray-400 text-gray-900"
       />
       <div className="cardContainer">
 
