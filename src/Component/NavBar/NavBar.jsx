@@ -20,11 +20,9 @@ function Navbar() {
     <>
       <div className="sticky top-0 left-0 right-0 z-40">
         <div>
-          <div className="relative overflow-hidden backdrop-blur-xl bg-blue-600/90 shadow-2xl border border-white/20">
-            <div className="relative flex items-center justify-between px-4 py-3 md:px-8 md:py-4 lg:px-12 lg:py-5">
-              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-white drop-shadow-lg">
-                BIT-CENTRAL
-              </h1>
+          <div className="relative overflow-hidden  bg-blue-600 shadow-2xl border border-white/20">
+            <div className="relative flex items-center justify-between px-2 py-1 md:px-8 md:py-2 lg:px-12">
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-white drop-shadow-lg">BIT-CENTRAL</h1>
               
               <div className="hidden lg:flex">
                 <div className="relative bg-white/10 backdrop-blur-md rounded-full p-1.5 border border-white/20">
@@ -60,7 +58,7 @@ function Navbar() {
               </div>
 
               <div className="lg:hidden relative">
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-1 border border-white/20">
+                <div className="">
                   <Hamburger toggled={isOpen} toggle={setIsOpen} color="white" size={20} />
                 </div>
               </div>

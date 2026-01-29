@@ -1,5 +1,5 @@
 import React from 'react'
-import Button from '../../Button/Button'
+import Button from '../Button/Button'
 import { useNavigate } from 'react-router-dom';
 
 function Card({ name, link, img, btntext }) {
