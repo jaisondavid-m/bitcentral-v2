@@ -49,7 +49,7 @@ function Home() {
     const fetchCards = async () => {
       try {
         const res = await api.get("/cards");
-        setCards(res.data.data);
+        setCards(res.data.data || []);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch cards");
       } finally {

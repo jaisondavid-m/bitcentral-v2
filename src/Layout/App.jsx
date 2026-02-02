@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { auth } from "../Authentication/firebase.js";
-import Navbar from "../Component/NavBar.jsx";
-import Footer from "../Component/Footer.jsx";
 import Login from "../Pages/Login.jsx";
 import Dashboard from "../Pages/Dashboard.jsx";
 import Home from "../Pages/Home.jsx";
