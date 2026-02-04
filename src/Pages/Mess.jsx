@@ -4,11 +4,12 @@ import { MealCard } from '../Component/MealCard.jsx';
 import { MessMenuSkeleton } from '../Component/Skeltons/MealCardSkeleton.jsx';
 import { useNavigate } from "react-router-dom";
 
-const MEAL_ORDER = ['breakfast', 'lunch', 'tea', 'dinner'];
+const MEAL_ORDER = ['breakfast', 'lunch', 'dinner'];
 
 export default function MessMenu() {
   const navigate = useNavigate();
   const [hostel, setHostel] = useState('boys');
+  const [selectedMeal, setSelectedMeal] = useState('breakfast');
   const [selectedDate, setSelectedDate] = useState(() =>
     new Date().toISOString().split('T')[0]
   );
@@ -25,6 +26,11 @@ export default function MessMenu() {
           params: { hostel, date: selectedDate }
         });
         setMessResponse(res.data);
+        
+        // Set active meal as selected if it exists and is valid
+        if (res.data?.activeMeal && MEAL_ORDER.includes(res.data.activeMeal)) {
+          setSelectedMeal(res.data.activeMeal);
+        }
       } catch (err) {
         setError('No mess data available');
         setMessResponse(null);
@@ -35,35 +41,19 @@ export default function MessMenu() {
     fetchMess();
   }, [hostel, selectedDate]);
 
-  const orderedMeals = useMemo(() => {
-    if (!messResponse?.activeMeal) return MEAL_ORDER;
-    const idx = MEAL_ORDER.indexOf(messResponse.activeMeal);
-    if (idx === -1) return MEAL_ORDER;
-    return [...MEAL_ORDER.slice(idx), ...MEAL_ORDER.slice(0, idx)];
-  }, [messResponse]);
-
   return (
-    <div className="min-h-screen bg-slate-50 py-4 px-3 md:py-6 md:px-6">
+    <div className="min-h-screen bg-slate-50 py-2 px-3 md:py-6 md:px-6">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <div className="bg-white rounded-lg shadow border border-slate-200 p-4 md:p-5 mb-5">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="flex items-center justify-between md:flex-row md:items-center md:justify-between gap-3">
             <div>
-              <h1 className="text-xl md:text-2xl font-bold text-slate-800">
-                Hostel Mess Menu
-              </h1>
-              {messResponse?.data?.day && (
-                <p className="text-sm text-slate-500 mt-1">
-                  {messResponse.data.day}, {messResponse.date}
-                </p>
-              )}
+              <h1 className="text-xl tracking-tight md:text-2xl font-bold text-slate-800">Mess Menu</h1>
             </div>
-            
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="px-3 py-2 rounded-lg border border-slate-300 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 outline-none transition text-sm"
+              className="px-3 py-2 max-w-[50%] rounded-lg border border-slate-300 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 outline-none transition text-sm"
             />
           </div>
 
@@ -90,6 +80,40 @@ export default function MessMenu() {
               👧 Girls Hostel
             </button>
           </div>
+
+          {/* Meal Tabs */}
+          <div className="mt-4 flex gap-2 bg-slate-100 p-1 rounded-lg">
+            <button
+              onClick={() => setSelectedMeal('breakfast')}
+              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${
+                selectedMeal === 'breakfast'
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              🍳 Breakfast
+            </button>
+            <button
+              onClick={() => setSelectedMeal('lunch')}
+              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${
+                selectedMeal === 'lunch'
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              🍱 Lunch
+            </button>
+            <button
+              onClick={() => setSelectedMeal('dinner')}
+              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${
+                selectedMeal === 'dinner'
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              🍽️ Dinner
+            </button>
+          </div>
         </div>
 
         {/* Content */}
@@ -101,15 +125,12 @@ export default function MessMenu() {
             <p className="text-slate-500">{error}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-            {orderedMeals.map((meal) => (
-              <MealCard
-                key={meal}
-                type={meal}
-                items={messResponse?.data?.[meal] || []}
-                isActive={messResponse?.activeMeal === meal}
-              />
-            ))}
+          <div className="max-w-md mx-auto">
+            <MealCard
+              type={selectedMeal}
+              items={messResponse?.data?.[selectedMeal] || []}
+              isActive={messResponse?.activeMeal === selectedMeal}
+            />
           </div>
         )}
       </div>

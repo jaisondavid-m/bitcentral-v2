@@ -1,10 +1,9 @@
-import React from 'react';
+import React from "react";
 
 const mealLabels = {
-  breakfast: { title: 'Breakfast', icon: '🍳' },
-  lunch: { title: 'Lunch', icon: '🍱' },
-  tea: { title: 'Tea Break', icon: '☕' },
-  dinner: { title: 'Dinner', icon: '🍽️' },
+  breakfast: { title: "Breakfast", icon: "🍳" },
+  lunch: { title: "Lunch", icon: "🍱" },
+  dinner: { title: "Dinner", icon: "🍽️" },
 };
 
 export const MealCard = ({ type, items = [], isActive }) => {
@@ -12,46 +11,47 @@ export const MealCard = ({ type, items = [], isActive }) => {
 
   return (
     <div
-      className={`relative rounded-lg border overflow-hidden transition-all ${isActive ? 'border-blue-300 shadow-lg bg-blue-50' : 'border-slate-200 shadow bg-white hover:shadow-md'}`}
+      className={`rounded-xl bg-white transition-all
+        ${isActive ? "ring-2 ring-blue-400 shadow-lg" : "shadow-sm hover:shadow-md"}
+      `}
     >
-      
-      <div className={`px-4 py-3 border-b ${isActive ? 'border-blue-200 bg-white' : 'border-slate-200'}`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">{config.icon}</span>
-            <h3 className="text-base md:text-lg font-semibold text-slate-900">
-              {config.title}
-            </h3>
-          </div>
-          
-          {isActive && ( <span className="bg-blue-500 text-white text-[10px] font-semibold px-2 py-1 rounded uppercase tracking-wide">Active / Upcoming</span>)}
-        
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">{config.icon}</span>
+          <h3 className="text-lg font-semibold text-slate-900">
+            {config.title}
+          </h3>
         </div>
+
+        {isActive && (
+          <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+            Active / Upcoming
+          </span>
+        )}
       </div>
 
-
-      <div className="p-4">
+      {/* Content */}
+      <div className="px-5 pb-5">
         {items.length > 0 ? (
           <>
             <ul className="space-y-2">
               {items.map((item, idx) => (
-                <li key={idx} className={`flex items-start gap-2 ${isActive ? 'text-slate-800' : 'text-slate-700'}`}>
-                  <span className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${isActive ? 'bg-blue-500' : 'bg-slate-400'}`} />
-                  <span className="text-sm leading-relaxed">{item}</span>
+                <li key={idx} className="flex items-start gap-3 text-slate-700">
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-slate-400 shrink-0" />
+                  <span className="text-sm">{item}</span>
                 </li>
               ))}
             </ul>
-            
-            <div className={`mt-3 pt-3 border-t ${isActive ? 'border-blue-200' : 'border-slate-200'}`}>
-              <p className={`text-xs text-center ${isActive ? 'text-blue-600 font-medium' : 'text-slate-500'}`}>
-                {items.length} {items.length === 1 ? 'item' : 'items'}
-              </p>
-            </div>
+
+            <p className="mt-4 text-xs text-slate-500 text-right">
+              {items.length} {items.length === 1 ? "item" : "items"}
+            </p>
           </>
         ) : (
-          <div className="text-center py-6">
-            <p className="text-slate-400 text-sm">No items available</p>
-          </div>
+          <p className="text-sm text-slate-400 text-center py-6">
+            No items available
+          </p>
         )}
       </div>
     </div>
