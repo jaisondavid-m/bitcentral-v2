@@ -26,7 +26,7 @@ export const MealCard = ({ type, items = [], isActive }) => {
 
         {isActive && (
           <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-            Active / Upcoming
+            Active
           </span>
         )}
       </div>
