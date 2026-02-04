@@ -3,25 +3,29 @@ import { useNavigate } from "react-router-dom";
 import FullScreenLoader from "../Component/FullScreenLoader";
 import SubjectCard from "../Component/SubjectCard";
 import api from "../api/axios";
+import { useAuth } from "../context/StudentContext";
+import SearchBar from "../Component/SearchBar";
 
 export default function Semester() {
   const navigate = useNavigate();
+  const { user, student } = useAuth();
+  const [search, setSearch] = useState("");
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const storedYear = localStorage.getItem("year") || "1";
-  const [selectedYear, setSelectedYear] = useState(storedYear);
+  
 
   useEffect(() => {
     const getSubjects = async () => {
+      if (!student?.yearCode) {
+        setError("Unable to determine your year. Please use a BITSATHY email.");
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       setError(null);
       try {
-        const yearNum = ["1", "2", "3", "4"].includes(storedYear)
-          ? storedYear
-          : "1";
-        const res = await api.get(`/semesters/${yearNum}`);
+        const res = await api.get(`/semesters/${student.yearCode}`);
         setSubjects(res.data.data);
       } catch (err) {
         console.error("Full error:", err);
@@ -30,9 +34,8 @@ export default function Semester() {
         setLoading(false);
       }
     };
-
     getSubjects();
-  }, [selectedYear]);
+  }, [user]);
 
   if (loading) return <FullScreenLoader />;
 
@@ -43,6 +46,7 @@ export default function Semester() {
       </div>
     );
   }
+  const filteredSubjects = subjects.filter((sub) => (sub.name || "").toLowerCase().includes(search.toLowerCase()));
 
   return (
     <div className="min-h-screen bg-blue-50 py-8 px-4">
@@ -57,8 +61,7 @@ export default function Semester() {
             Answer keys are for reference only and may contain errors.
           </p>
         </div>
-
-        {/* Exam Hall Finder — small, left-aligned */}
+        
         <div className="mb-5 mt-3">
           <button
             onClick={() =>
@@ -69,6 +72,7 @@ export default function Semester() {
             Find Your Exam Hall
           </button>
         </div>
+        <SearchBar search={search} setSearch={setSearch}/>
 
         {/* Subject Cards List */}
         <div className="flex flex-col gap-3">
@@ -77,7 +81,7 @@ export default function Semester() {
               No subjects found for Year {selectedYear}
             </div>
           ) : (
-            subjects.map((sub, index) => (
+            filteredSubjects.map((sub, index) => (
               <SubjectCard key={index} subject={sub} />
             ))
           )}
