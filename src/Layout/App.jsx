@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import Login from "../Pages/Login.jsx";
 import Dashboard from "../Pages/Dashboard.jsx";
 import Home from "../Pages/Home.jsx";
@@ -11,28 +12,31 @@ import ProtectedLayout from "../routes/ProtectedLayout.jsx";
 
 function App() {
   return (
-    <Routes>
-      {/* Public */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/" element={<Navigate to="/home" />} />
+    <>
+      <Routes>
+        {/* Public */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Navigate to="/home" />} />
 
-      {/* Protected Layout */}
-      <Route
-        element={
-          <ProtectedRoute>
-            <ProtectedLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="/home" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile" element={<Dashboard />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/rpsite" element={<Rpsite />} />
-        <Route path="/semester" element={<Semester />} />
-        <Route path="/mess" element={<MessMenu />} />
-      </Route>
-    </Routes>
+        {/* Protected Layout */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <ProtectedLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/home" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Dashboard />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/rpsite" element={<Rpsite />} />
+          <Route path="/semester" element={<Semester />} />
+          <Route path="/mess" element={<MessMenu />} />
+        </Route>
+      </Routes>
+      <Analytics />
+    </>
   );
 }
 
