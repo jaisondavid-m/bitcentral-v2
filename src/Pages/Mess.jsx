@@ -27,7 +27,6 @@ export default function MessMenu() {
         });
         setMessResponse(res.data);
         
-        // Set active meal as selected if it exists and is valid
         if (res.data?.activeMeal && MEAL_ORDER.includes(res.data.activeMeal)) {
           setSelectedMeal(res.data.activeMeal);
         }
@@ -49,74 +48,39 @@ export default function MessMenu() {
             <div>
               <h1 className="text-xl tracking-tight md:text-2xl font-bold text-slate-800">Mess Menu</h1>
             </div>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
+            <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}
               className="px-3 py-2 max-w-[50%] rounded-lg border border-slate-300 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 outline-none transition text-sm"
             />
           </div>
-
-          {/* Hostel Switch */}
+          
           <div className="mt-4 flex gap-2 bg-slate-100 p-1 rounded-lg">
-            <button
-              onClick={() => setHostel('boys')}
-              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${
-                hostel === 'boys'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+            <button onClick={() => setHostel('boys')} className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${hostel === 'boys' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
             >
               👦 Boys Hostel
             </button>
-            <button
-              onClick={() => setHostel('girls')}
-              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${
-                hostel === 'girls'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+            <button onClick={() => setHostel('girls')} className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${hostel === 'girls' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
             >
               👧 Girls Hostel
             </button>
           </div>
-
-          {/* Meal Tabs */}
+          
           <div className="mt-4 flex gap-2 bg-slate-100 p-1 rounded-lg">
-            <button
-              onClick={() => setSelectedMeal('breakfast')}
-              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${
-                selectedMeal === 'breakfast'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+            <button onClick={() => setSelectedMeal('breakfast')} className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${selectedMeal === 'breakfast' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
             >
               🍳 Breakfast
             </button>
-            <button
-              onClick={() => setSelectedMeal('lunch')}
-              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${
-                selectedMeal === 'lunch'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+            <button onClick={() => setSelectedMeal('lunch')}
+              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${selectedMeal === 'lunch' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
             >
               🍱 Lunch
             </button>
-            <button
-              onClick={() => setSelectedMeal('dinner')}
-              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${
-                selectedMeal === 'dinner'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+            <button onClick={() => setSelectedMeal('dinner')} className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${ selectedMeal === 'dinner' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
             >
               🍽️ Dinner
             </button>
           </div>
         </div>
-
-        {/* Content */}
+        
         {loading ? (
           <MessMenuSkeleton />
         ) : error ? (
@@ -126,11 +90,7 @@ export default function MessMenu() {
           </div>
         ) : (
           <div className="max-w-md mx-auto">
-            <MealCard
-              type={selectedMeal}
-              items={messResponse?.data?.[selectedMeal] || []}
-              isActive={messResponse?.activeMeal === selectedMeal}
-            />
+            <MealCard type={selectedMeal} items={messResponse?.data?.[selectedMeal] || []} isActive={messResponse?.activeMeal === selectedMeal}/>
           </div>
         )}
       </div>

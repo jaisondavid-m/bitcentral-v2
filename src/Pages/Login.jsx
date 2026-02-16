@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, signInWithGoogle } from "../Authentication/firebase.js";
+import { AlertCircle } from "lucide-react";
 
 function Login() {
   const [disabled, setDisabled] = useState(true);
@@ -9,6 +10,7 @@ function Login() {
   const location = useLocation();
   const navigate = useNavigate();
   const [user, loading] = useAuthState(auth);
+  const ALLOWED_EXTRA_EMAIL = "jasmineisaac1978@gmail.com";
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -16,33 +18,27 @@ function Login() {
     }, 2000);
     return () => clearTimeout(timer);
   }, []);
-
-  // Check if redirected due to unauthorized email
+  
   useEffect(() => {
     if (location.state?.error === "unauthorized") {
       setError("Only @bitsathy.ac.in email accounts are allowed to sign in.");
-      // Clear the state
       window.history.replaceState({}, document.title);
     }
   }, [location]);
-
-  // Redirect if already logged in with valid email
+  
   useEffect(() => {
-    if (user && user.email?.endsWith("@bitsathy.ac.in")) {
+    if (user && (user.email?.endsWith("@bitsathy.ac.in") || user.email === ALLOWED_EXTRA_EMAIL)) {
       navigate("/home", { replace: true });
     }
   }, [user, navigate]);
 
   const handleSignIn = async () => {
     try {
-      setError(""); // Clear any previous errors
+      setError("");
       await signInWithGoogle();
     } catch (err) {
-      if (err.message === "Unauthorized email domain") {
-        setError("Only @bitsathy.ac.in email accounts are allowed to sign in.");
-      } else if (err.code !== "auth/popup-closed-by-user" && err.code !== "auth/cancelled-popup-request") {
-        setError("Sign in failed. Please try again.");
-      }
+      console.log(err);
+      setError("Sign in failed. Please try again.");
     }
   };
 
@@ -72,39 +68,23 @@ function Login() {
             <span className="font-medium text-blue-600">@bitsathy.ac.in</span>{" "}
             email accounts are allowed
           </p>
-
-          {/* Error Message */}
+          
           {error && (
             <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
               <div className="flex items-start gap-3">
-                <svg className="h-5 w-5 flex-shrink-0 text-red-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <AlertCircle className="h-5 w-5 flex-shrink-0 text-red-600 mt-0.5" />
                 <p className="text-sm text-red-800">{error}</p>
               </div>
             </div>
           )}
 
-          <button 
-            disabled={disabled} 
-            onClick={!disabled ? handleSignIn : undefined} 
-            className={`flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
-              disabled 
-                ? "cursor-not-allowed bg-blue-300 text-white" 
-                : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
-          >
-            <img 
-              src="https://img.icons8.com/?size=96&id=17949&format=png" 
-              alt="Google" 
-              className="h-5 w-5 bg-white rounded-full p-0.5"
-            />
+          <button disabled={disabled} onClick={!disabled ? handleSignIn : undefined} className={`flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${ disabled ? "cursor-not-allowed bg-blue-300 text-white" : "bg-blue-600 text-white hover:bg-blue-700"}`}>
+            <img src="https://img.icons8.com/color/48/google-logo.png" alt="Google" className="h-5 w-5 rounded-full"/>
             {disabled ? "Initializing..." : "Sign in with Google"}
           </button>
           
-          <p className="mt-6 text-center text-xs text-gray-400">
-            Secure authentication powered by Google
-          </p>
+          <p className="mt-6 text-center text-xs text-gray-400">Secure authentication powered by Google</p>
+
         </div>
       </div>
     </div>

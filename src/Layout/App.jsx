@@ -9,6 +9,7 @@ import Semester from "../Pages/Semester.jsx";
 import MessMenu from "../Pages/Mess.jsx";
 import ProtectedRoute from "../routes/ProtectedRoute.jsx";
 import ProtectedLayout from "../routes/ProtectedLayout.jsx";
+import NotFound from "../Pages/NotFound.jsx";
 
 function App() {
   return (
@@ -33,7 +34,9 @@ function App() {
           <Route path="/rpsite" element={<Rpsite />} />
           <Route path="/semester" element={<Semester />} />
           <Route path="/mess" element={<MessMenu />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Analytics />
     </>

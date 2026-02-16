@@ -15,10 +15,7 @@ export function MealCardSkeleton() {
         {[1, 2, 3, 4, 5, 6].map((item) => (
           <div key={item} className="flex items-start gap-2">
             <div className="h-1.5 w-1.5 bg-slate-200 rounded-full mt-1.5 shrink-0"></div>
-            <div 
-              className="h-4 bg-slate-200 rounded flex-1" 
-              style={{ width: `${60 + Math.random() * 40}%` }}
-            ></div>
+            <div className="h-4 bg-slate-200 rounded flex-1 w-[70%]"></div>
           </div>
         ))}
         <div className="mt-3 pt-3 border-t border-slate-200">

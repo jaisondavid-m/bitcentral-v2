@@ -8,13 +8,6 @@ const LinkButton = ({ href, label }) => {
   );
 };
 
-const SectionLabel = ({ children }) => (
-  <p className="text-xs font-semibold uppercase tracking-wide text-blue-400 mb-2">
-    {children}
-  </p>
-  
-);
-
 const Divider = () => <hr className="border-blue-100 my-3" />;
 
 export default function SubjectCard({ subject }) {
@@ -51,7 +44,7 @@ export default function SubjectCard({ subject }) {
       {hasDiscourse && (
         <>
           <Divider />
-          <SectionLabel>Discourse Question Banks</SectionLabel>
+          <p className="text-xs font-semibold uppercase tracking-wide text-blue-400 mb-2">Discourse Question Banks</p>
           <div className="flex flex-wrap gap-2">
             {qb1 && <LinkButton href={qb1} label="Discourse-1" />}
             {qb2 && <LinkButton href={qb2} label="Discourse-2" />}
@@ -62,7 +55,7 @@ export default function SubjectCard({ subject }) {
       {hasAnswerKeys && (
         <>
           <Divider />
-          <SectionLabel>Answer Keys</SectionLabel>
+          <p className="text-xs font-semibold uppercase tracking-wide text-blue-400 mb-2">Answer Keys</p>
           <div className="flex flex-wrap gap-2">
             {ak1 && <LinkButton href={ak1} label="Discourse-1" />}
             {ak2 && <LinkButton href={ak2} label="Discourse-2" />}

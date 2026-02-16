@@ -51,11 +51,8 @@ export default function Semester() {
   return (
     <div className="min-h-screen bg-blue-50 py-8 px-4">
       <div className="max-w-2xl mx-auto">
-        {/* Page Header */}
         <div className="mb-2">
-          <h1 className="text-2xl font-bold text-blue-800 tracking-tight">
-            Discourse Question Banks
-          </h1>
+          <h1 className="text-2xl font-bold text-blue-800 tracking-tight">Discourse Question Banks</h1>
           <p className="mt-1.5 text-xs text-gray-400">
             <span className="font-semibold text-gray-500">Disclaimer:</span>{" "}
             Answer keys are for reference only and may contain errors.
@@ -63,18 +60,14 @@ export default function Semester() {
         </div>
         
         <div className="mb-5 mt-3">
-          <button
-            onClick={() =>
-              window.open("https://exam-hall-finder.vercel.app", "_blank")
-            }
+          <button onClick={() => window.open("https://exam-hall-finder.vercel.app", "_blank")}
             className="px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition"
           >
             Find Your Exam Hall
           </button>
         </div>
         <SearchBar search={search} setSearch={setSearch}/>
-
-        {/* Subject Cards List */}
+        
         <div className="flex flex-col gap-3">
           {subjects.length === 0 ? (
             <div className="text-center py-12 text-gray-400 text-sm">

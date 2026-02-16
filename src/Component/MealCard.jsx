@@ -10,18 +10,11 @@ export const MealCard = ({ type, items = [], isActive }) => {
   const config = mealLabels[type];
 
   return (
-    <div
-      className={`rounded-xl bg-white transition-all
-        ${isActive ? "ring-2 ring-blue-400 shadow-lg" : "shadow-sm hover:shadow-md"}
-      `}
-    >
-      {/* Header */}
+    <div className={`rounded-xl bg-white transition-all ${isActive ? "ring-2 ring-blue-400 shadow-lg" : "shadow-sm hover:shadow-md"}`}>
       <div className="flex items-center justify-between px-5 py-4">
         <div className="flex items-center gap-3">
           <span className="text-2xl">{config.icon}</span>
-          <h3 className="text-lg font-semibold text-slate-900">
-            {config.title}
-          </h3>
+          <h3 className="text-lg font-semibold text-slate-900">{config.title}</h3>
         </div>
 
         {isActive && (
@@ -30,8 +23,7 @@ export const MealCard = ({ type, items = [], isActive }) => {
           </span>
         )}
       </div>
-
-      {/* Content */}
+      
       <div className="px-5 pb-5">
         {items.length > 0 ? (
           <>

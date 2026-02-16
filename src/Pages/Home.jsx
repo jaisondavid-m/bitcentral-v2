@@ -11,11 +11,6 @@ function Home() {
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isListening, setIsListening] = useState(false);
-  const [user] = useAuthState(auth);
-  const recognitionRef = useRef(null);
-
-
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -28,24 +23,8 @@ function Home() {
         setLoading(false);
       }
     };
-
     fetchCards();
   }, []);
-
-  const toggleVoiceSearch = () => {
-    if (!recognitionRef.current) {
-      alert('Voice search is not supported in your browser');
-      return;
-    }
-
-    if (isListening) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    } else {
-      recognitionRef.current.start();
-      setIsListening(true);
-    }
-  };
 
   const filteredCards = cards.filter((card) => {
     const query = search.toLowerCase().trim();
@@ -72,29 +51,21 @@ function Home() {
         <SearchBar search={search} setSearch={setSearch} />
         {loading ? (
           <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, index) => (
+            {[1,2,3,4,5,6,7,8].map((_, index) => (
               <HomeCardSkeleton key={index} />
             ))}
           </div>
         ) : filteredCards.length > 0 ? (
           <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
             {filteredCards.map((card, index) => (
-              <Card
-                key={card.id || index}
-                name={card.name}
-                link={card.link}
-                img={card.img}
-                btntext={card.btntext}
-              />
+              <Card key={card.id || index} name={card.name} link={card.link} img={card.img} btntext={card.btntext} />
             ))}
           </div>
         ) : (
           <div className="py-12 text-center">
             <p className="text-base text-gray-500 sm:text-lg">No Site Found</p>
             {search && (
-              <p className="mt-2 text-xs text-gray-400 sm:text-sm">
-                Try adjusting your search
-              </p>
+              <p className="mt-2 text-xs text-gray-400 sm:text-sm">Try adjusting your search</p>
             )}
           </div>
         )}
