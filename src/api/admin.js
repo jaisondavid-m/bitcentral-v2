@@ -24,6 +24,7 @@ export async function listAdminUsers({ adminSecret, maxResults = 1000, pageToken
 
 export async function listAllAdminUsers({ adminSecret, batchSize = 1000 } = {}) {
   const users = [];
+  
   let pageToken;
 
   do {

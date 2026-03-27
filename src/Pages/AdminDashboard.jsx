@@ -73,9 +73,12 @@ function normalizeUsageSeries(source) {
 }
 
 function normalizeUsageSummary(payload) {
-  const dailySource = payload?.dailyUsage ?? payload?.daily ?? payload?.usage?.dailyUsage ?? payload?.usage?.daily;
+  const source =
+    payload?.data && typeof payload.data === "object" && !Array.isArray(payload.data) ? payload.data : payload;
+
+  const dailySource = source?.dailyUsage ?? source?.daily ?? source?.usage?.dailyUsage ?? source?.usage?.daily;
   const monthlySource =
-    payload?.monthlyUsage ?? payload?.monthly ?? payload?.usage?.monthlyUsage ?? payload?.usage?.monthly;
+    source?.monthlyUsage ?? source?.monthly ?? source?.usage?.monthlyUsage ?? source?.usage?.monthly;
 
   const dailyUsage = normalizeUsageSeries(dailySource).sort((a, b) => String(a.label).localeCompare(String(b.label)));
   const monthlyUsage = normalizeUsageSeries(monthlySource).sort((a, b) =>
@@ -246,20 +249,34 @@ function AdminDashboard() {
     setIsLoading(true);
     setBanner({ type: "", message: "" });
 
-    try {
-      const usageDataPromise = getAdminUsageSummary({ adminSecret });
-      await loadUsersPage({ pageToken: "", page: 1 });
-      const usageData = await usageDataPromise;
-      setUsageSummary(normalizeUsageSummary(usageData));
-    } catch (error) {
-      setBanner({ type: "error", message: normalizeError(error, "Failed to load dashboard data") });
+    const [usersResult, usageResult] = await Promise.allSettled([
+      loadUsersPage({ pageToken: "", page: 1 }),
+      getAdminUsageSummary({ adminSecret }),
+    ]);
+
+    let errorMessage = "";
+
+    if (usersResult.status === "rejected") {
       setUsers([]);
       setPageNumber(1);
       setNextPageToken("");
-      setUsageSummary({ dailyUsage: [], monthlyUsage: [] });
-    } finally {
-      setIsLoading(false);
+      errorMessage = normalizeError(usersResult.reason, "Failed to load users");
     }
+
+    if (usageResult.status === "fulfilled") {
+      setUsageSummary(normalizeUsageSummary(usageResult.value));
+    } else {
+      setUsageSummary({ dailyUsage: [], monthlyUsage: [] });
+      errorMessage = errorMessage
+        ? `${errorMessage}. ${normalizeError(usageResult.reason, "Failed to load usage")}`
+        : normalizeError(usageResult.reason, "Failed to load usage");
+    }
+
+    if (errorMessage) {
+      setBanner({ type: "error", message: errorMessage });
+    }
+
+    setIsLoading(false);
   };
 
   useEffect(() => {
