@@ -27,8 +27,12 @@ export const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
     
-    // Check if email ends with @bitsathy.ac.in
-    if (!user.email?.endsWith("@bitsathy.ac.in")) {
+    // Check if email ends with @bitsathy.ac.in or allowed email
+    const ALLOWED_EXTRA_EMAIL = "jasmineisaac1978@gmail.com";
+    if (
+      !user.email?.toLowerCase().endsWith("@bitsathy.ac.in") &&
+      user.email?.toLowerCase() !== ALLOWED_EXTRA_EMAIL
+    ) {
       await signOut(auth);
       throw new Error("Unauthorized email domain");
     }
