@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, signInWithGoogle } from "../Authentication/firebase.js";
+import { isAllowedEmail } from "../Authentication/authRules.js";
 import { AlertCircle } from "lucide-react";
 
 function Login() {
@@ -10,7 +11,6 @@ function Login() {
   const location = useLocation();
   const navigate = useNavigate();
   const [user, loading] = useAuthState(auth);
-  const ALLOWED_EXTRA_EMAIL = "jasmineisaac1978@gmail.com";
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -27,7 +27,7 @@ function Login() {
   }, [location]);
   
   useEffect(() => {
-    if (user && (user.email?.endsWith("@bitsathy.ac.in") || user.email === ALLOWED_EXTRA_EMAIL)) {
+    if (user && isAllowedEmail(user.email)) {
       navigate("/home", { replace: true });
     }
   }, [user, navigate]);

@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, logout } from "../Authentication/firebase.js";
+import { isAllowedEmail } from "../Authentication/authRules.js";
 
 function ProtectedRoute({ children }) {
   const [user, loading] = useAuthState(auth);
   const [shouldRedirect, setShouldRedirect] = useState(false);
 
   useEffect(() => {
-    if (user && !user.email?.endsWith("@bitsathy.ac.in")) {
+    if (user && !isAllowedEmail(user.email)) {
       logout();
       setShouldRedirect(true);
     }

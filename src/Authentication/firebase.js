@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { isAllowedEmail } from "./authRules.js";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -27,12 +28,8 @@ export const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
     
-    // Check if email ends with @bitsathy.ac.in or allowed email
-    const ALLOWED_EXTRA_EMAIL = "jasmineisaac1978@gmail.com";
-    if (
-      !user.email?.toLowerCase().endsWith("@bitsathy.ac.in") &&
-      user.email?.toLowerCase() !== ALLOWED_EXTRA_EMAIL
-    ) {
+    // Ensure only allowed accounts can keep the signed-in session.
+    if (!isAllowedEmail(user.email)) {
       await signOut(auth);
       throw new Error("Unauthorized email domain");
     }
