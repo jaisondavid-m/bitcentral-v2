@@ -11,7 +11,7 @@ function withAdminSecret(adminSecret) {
 }
 
 export async function listAdminUsers({ adminSecret, maxResults = 100, pageToken }) {
-  const response = await api.get("/api/admin/users", {
+  const response = await api.get("/admin/users", {
     params: {
       maxResults,
       ...(pageToken ? { pageToken } : {}),
@@ -23,7 +23,7 @@ export async function listAdminUsers({ adminSecret, maxResults = 100, pageToken 
 }
 
 export async function createAdminUser({ adminSecret, payload }) {
-  const response = await api.post("/api/admin/users", payload, {
+  const response = await api.post("/admin/users", payload, {
     headers: withAdminSecret(adminSecret),
   });
 
@@ -31,7 +31,7 @@ export async function createAdminUser({ adminSecret, payload }) {
 }
 
 export async function updateAdminUser({ adminSecret, uid, payload }) {
-  const response = await api.put(`/api/admin/users/${uid}`, payload, {
+  const response = await api.put(`/admin/users/${uid}`, payload, {
     headers: withAdminSecret(adminSecret),
   });
 
@@ -39,7 +39,7 @@ export async function updateAdminUser({ adminSecret, uid, payload }) {
 }
 
 export async function deleteAdminUser({ adminSecret, uid }) {
-  const response = await api.delete(`/api/admin/users/${uid}`, {
+  const response = await api.delete(`/admin/users/${uid}`, {
     headers: withAdminSecret(adminSecret),
   });
 
@@ -48,7 +48,7 @@ export async function deleteAdminUser({ adminSecret, uid }) {
 
 export async function updateAdminCustomClaims({ adminSecret, uid, claims }) {
   const response = await api.post(
-    `/api/admin/users/${uid}/custom-claims`,
+    `/admin/users/${uid}/custom-claims`,
     { claims },
     {
       headers: withAdminSecret(adminSecret),
