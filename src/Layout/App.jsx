@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import Login from "../Pages/Login.jsx";
 import Dashboard from "../Pages/Dashboard.jsx";
+import AdminDashboard from "../Pages/AdminDashboard.jsx";
 import Home from "../Pages/Home.jsx";
 import About from "../Pages/About.jsx";
 import Rpsite from "../Pages/Rpsite.jsx";
@@ -29,6 +30,7 @@ function App() {
         >
           <Route path="/home" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/profile" element={<Dashboard />} />
           <Route path="/about" element={<About />} />
           <Route path="/rpsite" element={<Rpsite />} />
