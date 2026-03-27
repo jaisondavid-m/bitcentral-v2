@@ -120,6 +120,14 @@ function UsageChart({ usage, period }) {
         return usage.reduce((max, item) => Math.max(max, item.signups, item.activeUsers), 1);
     }, [usage]);
 
+    const chartWidth = useMemo(() => Math.max(usage.length * 30, 640), [usage.length]);
+
+    const toHeight = (value) => {
+        if (!value) return 0;
+        const height = Math.round((value / peak) * 100);
+        return Math.max(height, 4);
+    };
+
     if (!usage.length) {
         return <p className="text-sm text-gray-500">No usage data available.</p>;
     }
@@ -137,33 +145,51 @@ function UsageChart({ usage, period }) {
                 </span>
             </div>
 
-            <div className="h-48 rounded-lg border border-gray-200 bg-gray-50 px-2 pb-2 pt-4">
-                <div className="flex h-36 items-end gap-1 overflow-hidden">
-                    {usage.map((item) => {
-                        const signupsHeight = Math.round((item.signups / peak) * 100);
-                        const activeHeight = Math.round((item.activeUsers / peak) * 100);
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+                <div className="mb-2 text-right text-[11px] font-medium text-gray-500">Peak: {peak}</div>
 
-                        return (
-                            <div key={item.label} className="flex min-w-0 flex-1 items-end justify-center gap-0.5">
-                                <div
-                                    className="w-1.5 rounded-t bg-blue-500"
-                                    style={{ height: `${signupsHeight}%` }}
-                                    title={`${item.label}: ${item.signups} signups`}
-                                />
-                                <div
-                                    className="w-1.5 rounded-t bg-emerald-500"
-                                    style={{ height: `${activeHeight}%` }}
-                                    title={`${item.label}: ${item.activeUsers} active users`}
-                                />
-                            </div>
-                        );
-                    })}
-                </div>
+                <div className="overflow-x-auto">
+                    <div className="relative" style={{ width: `${chartWidth}px` }}>
+                        <div className="pointer-events-none absolute inset-0 flex flex-col justify-between">
+                            <span className="border-t border-dashed border-gray-200" />
+                            <span className="border-t border-dashed border-gray-200" />
+                            <span className="border-t border-dashed border-gray-200" />
+                            <span className="border-t border-dashed border-gray-200" />
+                        </div>
 
-                <div className="mt-2 grid grid-cols-6 gap-1 text-[10px] text-gray-500">
-                    {usage.filter((_, index) => index % Math.ceil(usage.length / 6) === 0).map((item) => (
-                        <span key={item.label}>{formatUsageLabel(item.label, period)}</span>
-                    ))}
+                        <div className="relative flex h-48 items-end gap-2">
+                            {usage.map((item) => {
+                                const signupsHeight = toHeight(item.signups);
+                                const activeHeight = toHeight(item.activeUsers);
+
+                                return (
+                                    <div key={item.label} className="flex w-6 flex-shrink-0 items-end justify-center gap-1">
+                                        <div
+                                            className="w-2 rounded-t bg-blue-500"
+                                            style={{ height: `${signupsHeight}%` }}
+                                            title={`${item.label}: ${item.signups} signups`}
+                                        />
+                                        <div
+                                            className="w-2 rounded-t bg-emerald-500"
+                                            style={{ height: `${activeHeight}%` }}
+                                            title={`${item.label}: ${item.activeUsers} active users`}
+                                        />
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        <div className="mt-2 flex gap-2 text-[10px] text-gray-500">
+                            {usage.map((item, index) => {
+                                const step = Math.max(1, Math.ceil(usage.length / 8));
+                                return (
+                                    <span key={item.label} className="w-6 flex-shrink-0 text-center">
+                                        {index % step === 0 ? formatUsageLabel(item.label, period) : ""}
+                                    </span>
+                                );
+                            })}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -210,6 +236,7 @@ function AdminDashboard() {
     const [users, setUsers] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [pageNumber, setPageNumber] = useState(1);
+    const [pageTokens, setPageTokens] = useState([""]);
     const [nextPageToken, setNextPageToken] = useState("");
     const [usageSummary, setUsageSummary] = useState({ dailyUsage: [], monthlyUsage: [] });
     const [usagePeriod, setUsagePeriod] = useState("daily");
@@ -264,6 +291,7 @@ function AdminDashboard() {
         if (usersResult.status === "rejected") {
             setUsers([]);
             setPageNumber(1);
+            setPageTokens([""]);
             setNextPageToken("");
             errorMessage = normalizeError(usersResult.reason, "Failed to load users");
         }
@@ -330,6 +358,7 @@ function AdminDashboard() {
         setSecretDraft("");
         setUsers([]);
         setPageNumber(1);
+        setPageTokens([""]);
         setNextPageToken("");
         setUsageSummary({ dailyUsage: [], monthlyUsage: [] });
     };
@@ -340,10 +369,31 @@ function AdminDashboard() {
         setIsLoading(true);
         setBanner({ type: "", message: "" });
 
+        const targetToken = nextPageToken;
+
         try {
-            await loadUsersPage({ pageToken: nextPageToken, page: pageNumber + 1 });
+            await loadUsersPage({ pageToken: targetToken, page: pageNumber + 1 });
+            setPageTokens((prev) => [...prev, targetToken]);
         } catch (error) {
             setBanner({ type: "error", message: normalizeError(error, "Failed to load next users page") });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const onPreviousPage = async () => {
+        if (pageNumber <= 1 || isLoading || !adminSecret) return;
+
+        const previousToken = pageTokens[pageNumber - 2] ?? "";
+
+        setIsLoading(true);
+        setBanner({ type: "", message: "" });
+
+        try {
+            await loadUsersPage({ pageToken: previousToken, page: pageNumber - 1 });
+            setPageTokens((prev) => prev.slice(0, -1));
+        } catch (error) {
+            setBanner({ type: "error", message: normalizeError(error, "Failed to load previous users page") });
         } finally {
             setIsLoading(false);
         }
@@ -462,14 +512,24 @@ function AdminDashboard() {
                 <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
                     <div className="mb-4 flex items-center justify-between">
                         <h2 className="text-lg font-semibold text-gray-900">Users</h2>
-                        <button
-                            type="button"
-                            onClick={onNextPage}
-                            disabled={!nextPageToken || isLoading}
-                            className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                            Next 1000
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={onPreviousPage}
+                                disabled={pageNumber <= 1 || isLoading}
+                                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                                Previous 1000
+                            </button>
+                            <button
+                                type="button"
+                                onClick={onNextPage}
+                                disabled={!nextPageToken || isLoading}
+                                className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                                Next 1000
+                            </button>
+                        </div>
                     </div>
 
                     <div className="mb-4 flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
