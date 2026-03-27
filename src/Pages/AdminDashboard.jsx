@@ -120,12 +120,13 @@ function UsageChart({ usage, period }) {
         return usage.reduce((max, item) => Math.max(max, item.signups, item.activeUsers), 1);
     }, [usage]);
 
-    const chartWidth = useMemo(() => Math.max(usage.length * 30, 640), [usage.length]);
+    const chartHeight = 180;
+    const chartWidth = useMemo(() => Math.max(usage.length * 34, 680), [usage.length]);
 
-    const toHeight = (value) => {
+    const toBarHeightPx = (value) => {
         if (!value) return 0;
-        const height = Math.round((value / peak) * 100);
-        return Math.max(height, 4);
+        const height = Math.round((value / peak) * chartHeight);
+        return Math.max(height, 6);
     };
 
     if (!usage.length) {
@@ -150,28 +151,30 @@ function UsageChart({ usage, period }) {
 
                 <div className="overflow-x-auto">
                     <div className="relative" style={{ width: `${chartWidth}px` }}>
-                        <div className="pointer-events-none absolute inset-0 flex flex-col justify-between">
+                        <div className="pointer-events-none absolute inset-x-0 top-0" style={{ height: `${chartHeight}px` }}>
+                            <div className="flex h-full flex-col justify-between">
                             <span className="border-t border-dashed border-gray-200" />
                             <span className="border-t border-dashed border-gray-200" />
                             <span className="border-t border-dashed border-gray-200" />
                             <span className="border-t border-dashed border-gray-200" />
+                            </div>
                         </div>
 
-                        <div className="relative flex h-48 items-end gap-2">
+                        <div className="relative flex items-end gap-2" style={{ height: `${chartHeight}px` }}>
                             {usage.map((item) => {
-                                const signupsHeight = toHeight(item.signups);
-                                const activeHeight = toHeight(item.activeUsers);
+                                const signupsHeight = toBarHeightPx(item.signups);
+                                const activeHeight = toBarHeightPx(item.activeUsers);
 
                                 return (
-                                    <div key={item.label} className="flex w-6 flex-shrink-0 items-end justify-center gap-1">
+                                    <div key={item.label} className="flex w-7 flex-shrink-0 items-end justify-center gap-1">
                                         <div
-                                            className="w-2 rounded-t bg-blue-500"
-                                            style={{ height: `${signupsHeight}%` }}
+                                            className="w-3 rounded-t bg-blue-500"
+                                            style={{ height: `${signupsHeight}px` }}
                                             title={`${item.label}: ${item.signups} signups`}
                                         />
                                         <div
-                                            className="w-2 rounded-t bg-emerald-500"
-                                            style={{ height: `${activeHeight}%` }}
+                                            className="w-3 rounded-t bg-emerald-500"
+                                            style={{ height: `${activeHeight}px` }}
                                             title={`${item.label}: ${item.activeUsers} active users`}
                                         />
                                     </div>
