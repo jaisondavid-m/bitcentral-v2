@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { deleteAdminUser, getAdminUsageSummary, listAllAdminUsers } from "../api/admin.js";
-import { AlertTriangle, Loader, RefreshCw, Shield, Trash2, Users } from "lucide-react";
+import { deleteAdminUser, getAdminUsageSummary, listAdminUsers } from "../api/admin.js";
+import { AlertTriangle, Loader, RefreshCw, Search, Shield, Trash2, Users } from "lucide-react";
 
 const ADMIN_SECRET_KEY = "admin-dashboard-secret";
+const USERS_PAGE_SIZE = 1000;
 
 function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
@@ -17,6 +18,92 @@ function formatUsageLabel(label, period) {
   }
 
   return label.slice(5);
+}
+
+function parseNumber(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : 0;
+}
+
+function normalizeUsageItem(item, fallbackLabel) {
+  if (!item || typeof item !== "object") {
+    return {
+      label: fallbackLabel,
+      signups: 0,
+      activeUsers: 0,
+    };
+  }
+
+  const label =
+    item.label || item.date || item.day || item.month || item.bucket || item.key || fallbackLabel || "";
+
+  return {
+    label,
+    signups: parseNumber(item.signups ?? item.newUsers ?? item.createdUsers ?? item.count),
+    activeUsers: parseNumber(item.activeUsers ?? item.active ?? item.activeCount),
+  };
+}
+
+function normalizeUsageSeries(source) {
+  if (!source) return [];
+
+  if (Array.isArray(source)) {
+    return source
+      .map((item, index) => normalizeUsageItem(item, String(index)))
+      .filter((item) => Boolean(item.label));
+  }
+
+  if (typeof source === "object") {
+    return Object.entries(source)
+      .map(([label, value]) => {
+        if (value && typeof value === "object") {
+          return normalizeUsageItem(value, label);
+        }
+
+        return {
+          label,
+          signups: parseNumber(value),
+          activeUsers: 0,
+        };
+      })
+      .filter((item) => Boolean(item.label));
+  }
+
+  return [];
+}
+
+function normalizeUsageSummary(payload) {
+  const dailySource = payload?.dailyUsage ?? payload?.daily ?? payload?.usage?.dailyUsage ?? payload?.usage?.daily;
+  const monthlySource =
+    payload?.monthlyUsage ?? payload?.monthly ?? payload?.usage?.monthlyUsage ?? payload?.usage?.monthly;
+
+  const dailyUsage = normalizeUsageSeries(dailySource).sort((a, b) => String(a.label).localeCompare(String(b.label)));
+  const monthlyUsage = normalizeUsageSeries(monthlySource).sort((a, b) =>
+    String(a.label).localeCompare(String(b.label))
+  );
+
+  return { dailyUsage, monthlyUsage };
+}
+
+function formatDateTime(value) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return date.toLocaleString();
+}
+
+function getCreatedTime(user) {
+  return (
+    user?.creationTime ||
+    user?.createdAt ||
+    user?.metadata?.creationTime ||
+    user?.providerData?.[0]?.creationTime ||
+    null
+  );
+}
+
+function getLastLoginTime(user) {
+  return user?.lastSignInTime || user?.lastLoginAt || user?.metadata?.lastSignInTime || null;
 }
 
 function UsageChart({ usage, period }) {
@@ -113,6 +200,9 @@ function AdminDashboard() {
   const [needsSecret, setNeedsSecret] = useState(() => !localStorage.getItem(ADMIN_SECRET_KEY));
 
   const [users, setUsers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [pageNumber, setPageNumber] = useState(1);
+  const [nextPageToken, setNextPageToken] = useState("");
   const [usageSummary, setUsageSummary] = useState({ dailyUsage: [], monthlyUsage: [] });
   const [usagePeriod, setUsagePeriod] = useState("daily");
   const [isLoading, setIsLoading] = useState(false);
@@ -120,12 +210,35 @@ function AdminDashboard() {
   const [banner, setBanner] = useState({ type: "", message: "" });
 
   const usage = usagePeriod === "daily" ? usageSummary.dailyUsage || [] : usageSummary.monthlyUsage || [];
+  const filteredUsers = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return users;
+
+    return users.filter((user) => {
+      const email = (user.email || "").toLowerCase();
+      const name = (user.displayName || "").toLowerCase();
+      const uid = (user.uid || "").toLowerCase();
+      return email.includes(q) || name.includes(q) || uid.includes(q);
+    });
+  }, [users, searchQuery]);
 
   useEffect(() => {
     if (adminSecret) {
       localStorage.setItem(ADMIN_SECRET_KEY, adminSecret);
     }
   }, [adminSecret]);
+
+  const loadUsersPage = async ({ pageToken = "", page = 1 } = {}) => {
+    const usersData = await listAdminUsers({
+      adminSecret,
+      maxResults: USERS_PAGE_SIZE,
+      ...(pageToken ? { pageToken } : {}),
+    });
+
+    setUsers(usersData.users || []);
+    setNextPageToken(usersData.nextPageToken || "");
+    setPageNumber(page);
+  };
 
   const loadDashboardData = async () => {
     if (!adminSecret) return;
@@ -134,19 +247,15 @@ function AdminDashboard() {
     setBanner({ type: "", message: "" });
 
     try {
-      const [usersData, usageData] = await Promise.all([
-        listAllAdminUsers({ adminSecret, batchSize: 1000 }),
-        getAdminUsageSummary({ adminSecret }),
-      ]);
-
-      setUsers(usersData.users || []);
-      setUsageSummary({
-        dailyUsage: usageData.dailyUsage || [],
-        monthlyUsage: usageData.monthlyUsage || [],
-      });
+      const usageDataPromise = getAdminUsageSummary({ adminSecret });
+      await loadUsersPage({ pageToken: "", page: 1 });
+      const usageData = await usageDataPromise;
+      setUsageSummary(normalizeUsageSummary(usageData));
     } catch (error) {
       setBanner({ type: "error", message: normalizeError(error, "Failed to load dashboard data") });
       setUsers([]);
+      setPageNumber(1);
+      setNextPageToken("");
       setUsageSummary({ dailyUsage: [], monthlyUsage: [] });
     } finally {
       setIsLoading(false);
@@ -184,10 +293,7 @@ function AdminDashboard() {
       setUsers((prev) => prev.filter((user) => user.uid !== uid));
       setBanner({ type: "success", message: "User deleted successfully" });
       const usageData = await getAdminUsageSummary({ adminSecret });
-      setUsageSummary({
-        dailyUsage: usageData.dailyUsage || [],
-        monthlyUsage: usageData.monthlyUsage || [],
-      });
+      setUsageSummary(normalizeUsageSummary(usageData));
     } catch (error) {
       setBanner({ type: "error", message: normalizeError(error, "Failed to delete user") });
     } finally {
@@ -201,7 +307,24 @@ function AdminDashboard() {
     setNeedsSecret(true);
     setSecretDraft("");
     setUsers([]);
+    setPageNumber(1);
+    setNextPageToken("");
     setUsageSummary({ dailyUsage: [], monthlyUsage: [] });
+  };
+
+  const onNextPage = async () => {
+    if (!nextPageToken || isLoading || !adminSecret) return;
+
+    setIsLoading(true);
+    setBanner({ type: "", message: "" });
+
+    try {
+      await loadUsersPage({ pageToken: nextPageToken, page: pageNumber + 1 });
+    } catch (error) {
+      setBanner({ type: "error", message: normalizeError(error, "Failed to load next users page") });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -259,7 +382,7 @@ function AdminDashboard() {
 
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Loaded</p>
-                <p className="mt-2 text-3xl font-bold text-gray-900">All Users</p>
+                <p className="mt-2 text-3xl font-bold text-gray-900">Page {pageNumber}</p>
               </div>
             </div>
 
@@ -320,29 +443,71 @@ function AdminDashboard() {
         <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">Users</h2>
+            <button
+              type="button"
+              onClick={onNextPage}
+              disabled={!nextPageToken || isLoading}
+              className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Next 1000
+            </button>
+          </div>
+
+          <div className="mb-4 flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+            <Search className="h-4 w-4 text-gray-500" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search by email, name, or UID"
+              className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400"
+            />
           </div>
 
           <div className="overflow-x-auto rounded-lg border border-gray-200">
             <table className="min-w-full divide-y divide-gray-200 text-sm">
               <thead className="bg-gray-50">
                 <tr>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700">S.No</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700">Photo</th>
                   <th className="px-4 py-3 text-left font-semibold text-gray-700">Email</th>
                   <th className="px-4 py-3 text-left font-semibold text-gray-700">Display Name</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700">Creation Time</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700">Last Login</th>
                   <th className="px-4 py-3 text-left font-semibold text-gray-700">Delete</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
-                {users.length === 0 ? (
+                {filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan={3} className="px-4 py-8 text-center text-gray-500">
-                      {isLoading ? "Loading users..." : "No users found"}
+                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                      {isLoading ? "Loading users..." : "No users found for your search"}
                     </td>
                   </tr>
                 ) : (
-                  users.map((userItem) => (
+                  filteredUsers.map((userItem, index) => (
                     <tr key={userItem.uid}>
+                      <td className="px-4 py-3 font-medium text-gray-700">
+                        {(pageNumber - 1) * USERS_PAGE_SIZE + index + 1}
+                      </td>
+                      <td className="px-4 py-3">
+                        {userItem.photoURL ? (
+                          <img
+                            src={userItem.photoURL}
+                            alt={userItem.displayName || userItem.email || "User"}
+                            className="h-9 w-9 rounded-full border border-gray-200 object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-500">
+                            {(userItem.displayName || userItem.email || "U").charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-gray-700">{userItem.email || "-"}</td>
                       <td className="px-4 py-3 text-gray-700">{userItem.displayName || "-"}</td>
+                      <td className="px-4 py-3 text-gray-700">{formatDateTime(getCreatedTime(userItem))}</td>
+                      <td className="px-4 py-3 text-gray-700">{formatDateTime(getLastLoginTime(userItem))}</td>
                       <td className="px-4 py-3">
                         <button
                           type="button"

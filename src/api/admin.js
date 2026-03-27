@@ -10,7 +10,7 @@ function withAdminSecret(adminSecret) {
   };
 }
 
-export async function listAdminUsers({ adminSecret, maxResults = 100, pageToken }) {
+export async function listAdminUsers({ adminSecret, maxResults = 1000, pageToken }) {
   const response = await api.get("/admin/users", {
     params: {
       maxResults,
