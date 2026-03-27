@@ -1,8 +1,5 @@
-import { useEffect, useState } from "react";
-import {
-  deleteAdminUser,
-  listAdminUsers,
-} from "../api/admin.js";
+import { useEffect, useMemo, useState } from "react";
+import { deleteAdminUser, getAdminUsageSummary, listAllAdminUsers } from "../api/admin.js";
 import { AlertTriangle, Loader, RefreshCw, Shield, Trash2, Users } from "lucide-react";
 
 const ADMIN_SECRET_KEY = "admin-dashboard-secret";
@@ -11,94 +8,212 @@ function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
 }
 
+function formatUsageLabel(label, period) {
+  if (!label) return "";
+
+  if (period === "monthly") {
+    const [year, month] = label.split("-");
+    return `${month}/${year?.slice(2) || ""}`;
+  }
+
+  return label.slice(5);
+}
+
+function UsageChart({ usage, period }) {
+  const peak = useMemo(() => {
+    if (!usage.length) return 1;
+    return usage.reduce((max, item) => Math.max(max, item.signups, item.activeUsers), 1);
+  }, [usage]);
+
+  if (!usage.length) {
+    return <p className="text-sm text-gray-500">No usage data available.</p>;
+  }
+
+  return (
+    <div>
+      <div className="mb-3 flex flex-wrap items-center gap-4 text-xs text-gray-600">
+        <span className="inline-flex items-center gap-2">
+          <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
+          Signups
+        </span>
+        <span className="inline-flex items-center gap-2">
+          <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+          Active Users
+        </span>
+      </div>
+
+      <div className="h-48 rounded-lg border border-gray-200 bg-gray-50 px-2 pb-2 pt-4">
+        <div className="flex h-36 items-end gap-1 overflow-hidden">
+          {usage.map((item) => {
+            const signupsHeight = Math.round((item.signups / peak) * 100);
+            const activeHeight = Math.round((item.activeUsers / peak) * 100);
+
+            return (
+              <div key={item.label} className="flex min-w-0 flex-1 items-end justify-center gap-0.5">
+                <div
+                  className="w-1.5 rounded-t bg-blue-500"
+                  style={{ height: `${signupsHeight}%` }}
+                  title={`${item.label}: ${item.signups} signups`}
+                />
+                <div
+                  className="w-1.5 rounded-t bg-emerald-500"
+                  style={{ height: `${activeHeight}%` }}
+                  title={`${item.label}: ${item.activeUsers} active users`}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-2 grid grid-cols-6 gap-1 text-[10px] text-gray-500">
+          {usage.filter((_, index) => index % Math.ceil(usage.length / 6) === 0).map((item) => (
+            <span key={item.label}>{formatUsageLabel(item.label, period)}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SecretPrompt({ value, onChange, onSubmit }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4">
+      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+        <h2 className="text-xl font-bold text-gray-900">Admin Secret Required</h2>
+        <p className="mt-2 text-sm text-gray-600">
+          Enter Admin secret header (x-admin-secret). This will be stored in localStorage and asked only once.
+        </p>
+
+        <form onSubmit={onSubmit} className="mt-4 space-y-4">
+          <input
+            type="password"
+            value={value}
+            onChange={onChange}
+            placeholder="Enter x-admin-secret"
+            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring"
+            autoFocus
+            required
+          />
+
+          <button
+            type="submit"
+            className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+          >
+            Continue
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 function AdminDashboard() {
-  const [adminSecret, setAdminSecret] = useState(() => sessionStorage.getItem(ADMIN_SECRET_KEY) || "");
+  const [adminSecret, setAdminSecret] = useState(() => localStorage.getItem(ADMIN_SECRET_KEY) || "");
+  const [secretDraft, setSecretDraft] = useState("");
+  const [needsSecret, setNeedsSecret] = useState(() => !localStorage.getItem(ADMIN_SECRET_KEY));
+
   const [users, setUsers] = useState([]);
-  const [maxResults, setMaxResults] = useState(50);
-  const [pageToken, setPageToken] = useState("");
-  const [tokenHistory, setTokenHistory] = useState([""]);
-  const [nextPageToken, setNextPageToken] = useState(null);
+  const [usageSummary, setUsageSummary] = useState({ dailyUsage: [], monthlyUsage: [] });
+  const [usagePeriod, setUsagePeriod] = useState("daily");
   const [isLoading, setIsLoading] = useState(false);
+  const [deletingUid, setDeletingUid] = useState("");
   const [banner, setBanner] = useState({ type: "", message: "" });
 
-  const [deleteUid, setDeleteUid] = useState("");
+  const usage = usagePeriod === "daily" ? usageSummary.dailyUsage || [] : usageSummary.monthlyUsage || [];
 
   useEffect(() => {
-    sessionStorage.setItem(ADMIN_SECRET_KEY, adminSecret);
+    if (adminSecret) {
+      localStorage.setItem(ADMIN_SECRET_KEY, adminSecret);
+    }
   }, [adminSecret]);
 
-  const loadUsers = async (token = "", options = { pushHistory: true }) => {
+  const loadDashboardData = async () => {
+    if (!adminSecret) return;
+
     setIsLoading(true);
     setBanner({ type: "", message: "" });
 
     try {
-      const data = await listAdminUsers({
-        adminSecret,
-        maxResults,
-        pageToken: token || undefined,
+      const [usersData, usageData] = await Promise.all([
+        listAllAdminUsers({ adminSecret, batchSize: 1000 }),
+        getAdminUsageSummary({ adminSecret }),
+      ]);
+
+      setUsers(usersData.users || []);
+      setUsageSummary({
+        dailyUsage: usageData.dailyUsage || [],
+        monthlyUsage: usageData.monthlyUsage || [],
       });
-
-      setUsers(data.users || []);
-      setNextPageToken(data.nextPageToken || null);
-      setPageToken(token);
-
-      if (options.pushHistory) {
-        setTokenHistory((prev) => {
-          const last = prev[prev.length - 1] || "";
-          if (last === token) return prev;
-          return [...prev, token];
-        });
-      }
     } catch (error) {
-      setBanner({ type: "error", message: normalizeError(error, "Failed to load users") });
+      setBanner({ type: "error", message: normalizeError(error, "Failed to load dashboard data") });
       setUsers([]);
-      setNextPageToken(null);
+      setUsageSummary({ dailyUsage: [], monthlyUsage: [] });
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    loadUsers("");
+    if (!adminSecret) return;
+    loadDashboardData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [maxResults]);
+  }, [adminSecret]);
 
-  const onDeleteUser = async (event) => {
+  const onSubmitSecret = (event) => {
     event.preventDefault();
-    setBanner({ type: "", message: "" });
+    const trimmed = secretDraft.trim();
 
-    const uid = deleteUid.trim();
-    if (!uid) {
-      setBanner({ type: "error", message: "UID is required to delete a user" });
+    if (!trimmed) {
       return;
     }
 
+    setAdminSecret(trimmed);
+    setNeedsSecret(false);
+    setSecretDraft("");
+  };
+
+  const onDeleteUser = async (uid) => {
+    const confirmed = window.confirm("Delete this user permanently?");
+    if (!confirmed) return;
+
+    setDeletingUid(uid);
+    setBanner({ type: "", message: "" });
+
     try {
       await deleteAdminUser({ adminSecret, uid });
-      setDeleteUid("");
-      setBanner({ type: "success", message: `User ${uid} deleted` });
-      await loadUsers(pageToken, { pushHistory: false });
+      setUsers((prev) => prev.filter((user) => user.uid !== uid));
+      setBanner({ type: "success", message: "User deleted successfully" });
+      const usageData = await getAdminUsageSummary({ adminSecret });
+      setUsageSummary({
+        dailyUsage: usageData.dailyUsage || [],
+        monthlyUsage: usageData.monthlyUsage || [],
+      });
     } catch (error) {
       setBanner({ type: "error", message: normalizeError(error, "Failed to delete user") });
+    } finally {
+      setDeletingUid("");
     }
   };
 
-  const goToNextPage = async () => {
-    if (!nextPageToken) return;
-    await loadUsers(nextPageToken);
-  };
-
-  const goToPreviousPage = async () => {
-    if (tokenHistory.length <= 1) return;
-
-    const previousHistory = tokenHistory.slice(0, -1);
-    const previousToken = previousHistory[previousHistory.length - 1] || "";
-    setTokenHistory(previousHistory);
-    await loadUsers(previousToken, { pushHistory: false });
+  const clearStoredSecret = () => {
+    localStorage.removeItem(ADMIN_SECRET_KEY);
+    setAdminSecret("");
+    setNeedsSecret(true);
+    setSecretDraft("");
+    setUsers([]);
+    setUsageSummary({ dailyUsage: [], monthlyUsage: [] });
   };
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 lg:px-8">
+      {needsSecret && (
+        <SecretPrompt
+          value={secretDraft}
+          onChange={(event) => setSecretDraft(event.target.value)}
+          onSubmit={onSubmitSecret}
+        />
+      )}
+
       <div className="mx-auto max-w-5xl space-y-6">
         <section className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
           <div className="bg-blue-600 px-6 py-7 sm:px-8">
@@ -109,149 +224,139 @@ function AdminDashboard() {
                   Admin Dashboard
                 </h1>
                 <p className="mt-2 text-sm text-white/90">
-                  Manage Firebase Authentication users and account access from one place.
+                  Full user list with quick usage analytics and row-level delete actions.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => loadUsers(pageToken, { pushHistory: false })}
-                disabled={isLoading}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isLoading ? <Loader className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                Refresh Users
-              </button>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={loadDashboardData}
+                  disabled={isLoading || !adminSecret}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isLoading ? <Loader className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                  Refresh
+                </button>
+
+                <button
+                  type="button"
+                  onClick={clearStoredSecret}
+                  className="inline-flex items-center justify-center rounded-lg border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20"
+                >
+                  Change Secret
+                </button>
+              </div>
             </div>
           </div>
 
           <div className="p-5 sm:p-6">
-          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-            <div className="w-full rounded-lg border border-gray-200 bg-gray-50 p-4">
-              <h2 className="text-base font-semibold text-gray-900">Admin Access</h2>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Total Users</p>
+                <p className="mt-2 text-3xl font-bold text-gray-900">{users.length}</p>
+              </div>
 
-              <div className="mt-3 grid gap-4 sm:grid-cols-[1fr_auto]">
-                <label className="text-sm font-medium text-gray-700">
-                  Admin secret header (x-admin-secret)
-                  <input
-                    type="password"
-                    value={adminSecret}
-                    onChange={(event) => setAdminSecret(event.target.value)}
-                    placeholder="Leave empty if backend has no ADMIN_DASHBOARD_SECRET"
-                    className="mt-1.5 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring"
-                  />
-                </label>
-
-                <label className="text-sm font-medium text-gray-700">
-                  Max results
-                  <input
-                    type="number"
-                    min={1}
-                    max={1000}
-                    value={maxResults}
-                    onChange={(event) => setMaxResults(Math.min(Number(event.target.value) || 1, 1000))}
-                    className="mt-1.5 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring"
-                  />
-                </label>
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Loaded</p>
+                <p className="mt-2 text-3xl font-bold text-gray-900">All Users</p>
               </div>
             </div>
-          </div>
 
-          {banner.message && (
-            <div
-              className={`mt-4 flex items-start gap-2 rounded-lg border px-4 py-3 text-sm ${
-                banner.type === "error"
-                  ? "border-red-300 bg-red-50 text-red-700"
-                  : "border-emerald-300 bg-emerald-50 text-emerald-700"
-              }`}
-            >
-              {banner.type === "error" ? (
-                <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-              ) : (
-                <Users className="mt-0.5 h-4 w-4 flex-shrink-0" />
-              )}
-              <span>{banner.message}</span>
-            </div>
-          )}
+            {banner.message && (
+              <div
+                className={`mt-4 flex items-start gap-2 rounded-lg border px-4 py-3 text-sm ${
+                  banner.type === "error"
+                    ? "border-red-300 bg-red-50 text-red-700"
+                    : "border-emerald-300 bg-emerald-50 text-emerald-700"
+                }`}
+              >
+                {banner.type === "error" ? (
+                  <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <Users className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                )}
+                <span>{banner.message}</span>
+              </div>
+            )}
           </div>
         </section>
 
         <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
-          <form onSubmit={onDeleteUser} className="max-w-xl">
-            <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-900">
-              <Trash2 className="h-5 w-5 text-red-600" />
-              Delete User
-            </h2>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <input
-                type="text"
-                required
-                value={deleteUid}
-                onChange={(event) => setDeleteUid(event.target.value)}
-                placeholder="Enter UID"
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring"
-              />
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">Usage Chart</h2>
+            <div className="inline-flex rounded-lg border border-gray-200 p-1">
               <button
-                type="submit"
-                className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
+                type="button"
+                onClick={() => setUsagePeriod("daily")}
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+                  usagePeriod === "daily" ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"
+                }`}
               >
-                Delete
+                Daily
+              </button>
+              <button
+                type="button"
+                onClick={() => setUsagePeriod("monthly")}
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+                  usagePeriod === "monthly" ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                Monthly
               </button>
             </div>
-          </form>
+          </div>
+
+          {isLoading ? (
+            <div className="flex h-48 items-center justify-center text-gray-500">
+              <Loader className="h-5 w-5 animate-spin" />
+              <span className="ml-2 text-sm">Loading usage data...</span>
+            </div>
+          ) : (
+            <UsageChart usage={usage} period={usagePeriod} />
+          )}
         </section>
 
         <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
-          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">Users</h2>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={goToPreviousPage}
-                disabled={tokenHistory.length <= 1 || isLoading}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <button
-                type="button"
-                onClick={goToNextPage}
-                disabled={!nextPageToken || isLoading}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
           </div>
 
           <div className="overflow-x-auto rounded-lg border border-gray-200">
             <table className="min-w-full divide-y divide-gray-200 text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700">UID</th>
                   <th className="px-4 py-3 text-left font-semibold text-gray-700">Email</th>
                   <th className="px-4 py-3 text-left font-semibold text-gray-700">Display Name</th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700">Verified</th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700">Disabled</th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700">Claims</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700">Delete</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
                 {users.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan={3} className="px-4 py-8 text-center text-gray-500">
                       {isLoading ? "Loading users..." : "No users found"}
                     </td>
                   </tr>
                 ) : (
                   users.map((userItem) => (
                     <tr key={userItem.uid}>
-                      <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-gray-700">{userItem.uid}</td>
-                      <td className="whitespace-nowrap px-4 py-3 text-gray-700">{userItem.email || "-"}</td>
-                      <td className="whitespace-nowrap px-4 py-3 text-gray-700">{userItem.displayName || "-"}</td>
-                      <td className="px-4 py-3 text-gray-700">{userItem.emailVerified ? "Yes" : "No"}</td>
-                      <td className="px-4 py-3 text-gray-700">{userItem.disabled ? "Yes" : "No"}</td>
-                      <td className="max-w-xs px-4 py-3 font-mono text-xs text-gray-700">
-                        <div className="line-clamp-2">{JSON.stringify(userItem.customClaims || {})}</div>
+                      <td className="px-4 py-3 text-gray-700">{userItem.email || "-"}</td>
+                      <td className="px-4 py-3 text-gray-700">{userItem.displayName || "-"}</td>
+                      <td className="px-4 py-3">
+                        <button
+                          type="button"
+                          onClick={() => onDeleteUser(userItem.uid)}
+                          disabled={deletingUid === userItem.uid}
+                          className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {deletingUid === userItem.uid ? (
+                            <Loader className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   ))

@@ -13,6 +13,7 @@ import ProtectedLayout from "../routes/ProtectedLayout.jsx";
 import NotFound from "../Pages/NotFound.jsx";
 
 function App() {
+  const ADMIN_ROUTE = import.meta.env.VITE_ADMIN_ROUTE;
   return (
     <>
       <Routes>
@@ -30,7 +31,7 @@ function App() {
         >
           <Route path="/home" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path={`/${ADMIN_ROUTE}`} element={<AdminDashboard />} />
           <Route path="/profile" element={<Dashboard />} />
           <Route path="/about" element={<About />} />
           <Route path="/rpsite" element={<Rpsite />} />

@@ -14,7 +14,6 @@ function Navbar() {
     { to: "/home", label: "Home" },
     { to: "/rpsite", label: "RP Site" },
     { to: "/profile", label: "My Profile" },
-    { to: "/admin", label: "Admin" },
     { to: "/about", label: "About" }
   ];
 
