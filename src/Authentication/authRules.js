@@ -1,4 +1,4 @@
-export const ALLOWED_EXTRA_EMAIL = "jasmineisaac1978@gmail.com";
+export const ALLOWED_EXTRA_EMAIL = "jaison7373@gmail.com";
 
 export const isBitsathyEmail = (email) =>
   typeof email === "string" && email.toLowerCase().endsWith("@bitsathy.ac.in");
