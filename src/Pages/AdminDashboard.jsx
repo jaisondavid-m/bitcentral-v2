@@ -20,6 +20,17 @@ function formatUsageLabel(label, period) {
     return label.slice(5);
 }
 
+function formatUsageLabelFull(label, period) {
+    if (!label) return "";
+
+    if (period === "monthly") {
+        const [year, month] = label.split("-");
+        return `${month}/${year}`;
+    }
+
+    return label;
+}
+
 function parseNumber(value) {
     const number = Number(value);
     return Number.isFinite(number) ? number : 0;
@@ -115,6 +126,8 @@ function getLastLoginTime(user) {
 }
 
 function UsageChart({ usage, period }) {
+    const [hoveredLabel, setHoveredLabel] = useState("");
+
     const peak = useMemo(() => {
         if (!usage.length) return 1;
         return usage.reduce((max, item) => Math.max(max, item.signups, item.activeUsers), 1);
@@ -133,6 +146,9 @@ function UsageChart({ usage, period }) {
         return <p className="text-sm text-gray-500">No usage data available.</p>;
     }
 
+    const selectedUsage = usage.find((item) => item.label === hoveredLabel) || usage[usage.length - 1];
+    const axisStep = period === "daily" ? 7 : 1;
+
     return (
         <div>
             <div className="mb-3 flex flex-wrap items-center gap-4 text-xs text-gray-600">
@@ -147,7 +163,14 @@ function UsageChart({ usage, period }) {
             </div>
 
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
-                <div className="mb-2 text-right text-[11px] font-medium text-gray-500">Peak: {peak}</div>
+                <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-[11px] font-medium text-gray-600">
+                    <div>
+                        Selected: <span className="font-semibold text-gray-800">{formatUsageLabelFull(selectedUsage?.label, period)}</span>
+                        <span className="ml-3 text-blue-600">Signups {selectedUsage?.signups ?? 0}</span>
+                        <span className="ml-2 text-emerald-600">Active {selectedUsage?.activeUsers ?? 0}</span>
+                    </div>
+                    <span className="text-gray-500">Peak: {peak}</span>
+                </div>
 
                 <div className="overflow-x-auto">
                     <div className="relative" style={{ width: `${chartWidth}px` }}>
@@ -166,7 +189,12 @@ function UsageChart({ usage, period }) {
                                 const activeHeight = toBarHeightPx(item.activeUsers);
 
                                 return (
-                                    <div key={item.label} className="flex w-7 flex-shrink-0 items-end justify-center gap-1">
+                                    <div
+                                        key={item.label}
+                                        className="flex w-7 flex-shrink-0 items-end justify-center gap-1"
+                                        onMouseEnter={() => setHoveredLabel(item.label)}
+                                        title={`${formatUsageLabelFull(item.label, period)} | Signups: ${item.signups} | Active: ${item.activeUsers}`}
+                                    >
                                         <div
                                             className="w-3 rounded-t bg-blue-500"
                                             style={{ height: `${signupsHeight}px` }}
@@ -184,10 +212,10 @@ function UsageChart({ usage, period }) {
 
                         <div className="mt-2 flex gap-2 text-[10px] text-gray-500">
                             {usage.map((item, index) => {
-                                const step = Math.max(1, Math.ceil(usage.length / 8));
+                                const showTick = index % axisStep === 0 || index === usage.length - 1;
                                 return (
-                                    <span key={item.label} className="w-6 flex-shrink-0 text-center">
-                                        {index % step === 0 ? formatUsageLabel(item.label, period) : ""}
+                                    <span key={item.label} className="w-7 flex-shrink-0 text-center">
+                                        {showTick ? formatUsageLabel(item.label, period) : ""}
                                     </span>
                                 );
                             })}
