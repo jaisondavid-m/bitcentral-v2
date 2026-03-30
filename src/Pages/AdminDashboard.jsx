@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { deleteAdminUser, getAdminUsageSummary, listAdminUsers } from "../api/admin.js";
+import { deleteAdminUser, getAdminUsageSummary, listAdminUsers, updateAdminPsToken } from "../api/admin.js";
 import { AlertTriangle, Loader, RefreshCw, Search, Shield, Trash2, Users } from "lucide-react";
 
 const ADMIN_SECRET_KEY = "admin-dashboard-secret";
+const PS_TOKEN_UPDATED_AT_KEY = "admin-ps-token-updated-at";
+const PS_TOKEN_INTERVAL_MS = 3 * 60 * 60 * 1000;
 const USERS_PAGE_SIZE = 1000;
 
 function normalizeError(error, fallback) {
@@ -123,6 +125,16 @@ function getCreatedTime(user) {
 
 function getLastLoginTime(user) {
     return user?.lastSignInTime || user?.lastLoginAt || user?.metadata?.lastSignInTime || null;
+}
+
+function formatCountdown(ms) {
+    const clamped = Math.max(0, ms);
+    const totalSeconds = Math.floor(clamped / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return [hours, minutes, seconds].map((value) => String(value).padStart(2, "0")).join(":");
 }
 
 function UsageChart({ usage, period }) {
@@ -273,6 +285,15 @@ function AdminDashboard() {
     const [usagePeriod, setUsagePeriod] = useState("daily");
     const [isLoading, setIsLoading] = useState(false);
     const [deletingUid, setDeletingUid] = useState("");
+    const [psToken, setPsToken] = useState("");
+    const [psTokenAdminUser, setPsTokenAdminUser] = useState("admin");
+    const [isUpdatingPsToken, setIsUpdatingPsToken] = useState(false);
+    const [psTokenUpdatedAt, setPsTokenUpdatedAt] = useState(() => {
+        const stored = localStorage.getItem(PS_TOKEN_UPDATED_AT_KEY);
+        const parsed = Number(stored);
+        return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+    });
+    const [nowTs, setNowTs] = useState(() => Date.now());
     const [banner, setBanner] = useState({ type: "", message: "" });
 
     const usage = usagePeriod === "daily" ? usageSummary.dailyUsage || [] : usageSummary.monthlyUsage || [];
@@ -288,11 +309,23 @@ function AdminDashboard() {
         });
     }, [users, searchQuery]);
 
+    const nextUpdateAt = psTokenUpdatedAt ? psTokenUpdatedAt + PS_TOKEN_INTERVAL_MS : 0;
+    const remainingMs = nextUpdateAt ? Math.max(0, nextUpdateAt - nowTs) : 0;
+    const isPsTokenDue = !psTokenUpdatedAt || remainingMs === 0;
+
     useEffect(() => {
         if (adminSecret) {
             localStorage.setItem(ADMIN_SECRET_KEY, adminSecret);
         }
     }, [adminSecret]);
+
+    useEffect(() => {
+        const intervalId = window.setInterval(() => {
+            setNowTs(Date.now());
+        }, 1000);
+
+        return () => window.clearInterval(intervalId);
+    }, []);
 
     const loadUsersPage = async ({ pageToken = "", page = 1 } = {}) => {
         const usersData = await listAdminUsers({
@@ -379,6 +412,43 @@ function AdminDashboard() {
             setBanner({ type: "error", message: normalizeError(error, "Failed to delete user") });
         } finally {
             setDeletingUid("");
+        }
+    };
+
+    const onUpdatePsToken = async (event) => {
+        event.preventDefault();
+
+        const tokenValue = psToken.trim();
+        if (!tokenValue) {
+            setBanner({ type: "error", message: "PS token is required" });
+            return;
+        }
+
+        setIsUpdatingPsToken(true);
+        setBanner({ type: "", message: "" });
+
+        try {
+            const adminUser = psTokenAdminUser.trim() || "admin";
+            const result = await updateAdminPsToken({
+                adminSecret,
+                token: tokenValue,
+                adminUser,
+            });
+
+            const updatedAtTs = Date.now();
+            localStorage.setItem(PS_TOKEN_UPDATED_AT_KEY, String(updatedAtTs));
+            setPsTokenUpdatedAt(updatedAtTs);
+            setNowTs(updatedAtTs);
+            setPsToken("");
+
+            setBanner({
+                type: "success",
+                message: result?.message || "PS token updated successfully",
+            });
+        } catch (error) {
+            setBanner({ type: "error", message: normalizeError(error, "Failed to update PS token") });
+        } finally {
+            setIsUpdatingPsToken(false);
         }
     };
 
@@ -505,6 +575,62 @@ function AdminDashboard() {
                             </div>
                         )}
                     </div>
+                </section>
+
+                <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+                    <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h2 className="text-lg font-semibold text-gray-900">PS Token Rotation</h2>
+                            <p className="mt-1 text-sm text-gray-600">
+                                Update your PS token every 3 hours. Timer is saved in localStorage.
+                            </p>
+                        </div>
+                        <div
+                            className={`inline-flex w-fit items-center rounded-lg border px-3 py-2 text-sm font-semibold ${isPsTokenDue
+                                    ? "border-amber-300 bg-amber-50 text-amber-700"
+                                    : "border-emerald-300 bg-emerald-50 text-emerald-700"
+                                }`}
+                        >
+                            {isPsTokenDue ? "Token update due now" : `Next update in ${formatCountdown(remainingMs)}`}
+                        </div>
+                    </div>
+
+                    <div className="mb-4 grid gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 sm:grid-cols-2">
+                        <p className="text-sm text-gray-700">
+                            <span className="font-semibold text-gray-900">Last updated:</span>{" "}
+                            {psTokenUpdatedAt ? formatDateTime(psTokenUpdatedAt) : "Not updated yet"}
+                        </p>
+                        <p className="text-sm text-gray-700">
+                            <span className="font-semibold text-gray-900">Next recommended:</span>{" "}
+                            {nextUpdateAt ? formatDateTime(nextUpdateAt) : "Update once to start timer"}
+                        </p>
+                    </div>
+
+                    <form onSubmit={onUpdatePsToken} className="grid gap-3 sm:grid-cols-3">
+                        <input
+                            type="password"
+                            value={psToken}
+                            onChange={(event) => setPsToken(event.target.value)}
+                            placeholder="Enter new PS token"
+                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring sm:col-span-2"
+                            required
+                        />
+                        <input
+                            type="text"
+                            value={psTokenAdminUser}
+                            onChange={(event) => setPsTokenAdminUser(event.target.value)}
+                            placeholder="Admin user"
+                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring"
+                        />
+                        <button
+                            type="submit"
+                            disabled={isUpdatingPsToken || !adminSecret}
+                            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 sm:col-span-3"
+                        >
+                            {isUpdatingPsToken ? <Loader className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                            {isUpdatingPsToken ? "Updating PS token..." : "Update PS token"}
+                        </button>
+                    </form>
                 </section>
 
                 <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-6">

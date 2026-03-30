@@ -99,3 +99,20 @@ export async function getAdminUsageSummary({ adminSecret }) {
 
   return response.data;
 }
+
+export async function updateAdminPsToken({ adminSecret, token, adminUser }) {
+  const headers = {
+    ...(withAdminSecret(adminSecret) || {}),
+    ...(adminUser ? { "x-admin-user": adminUser } : {}),
+  };
+
+  const response = await api.put(
+    "/admin/ps-token",
+    { token },
+    {
+      headers,
+    }
+  );
+
+  return response.data;
+}

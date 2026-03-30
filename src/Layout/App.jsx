@@ -11,6 +11,7 @@ import MessMenu from "../Pages/Mess.jsx";
 import ProtectedRoute from "../routes/ProtectedRoute.jsx";
 import ProtectedLayout from "../routes/ProtectedLayout.jsx";
 import NotFound from "../Pages/NotFound.jsx";
+import Apsite from "../Pages/Apsite.jsx";
 
 function App() {
   const ADMIN_ROUTE = import.meta.env.VITE_ADMIN_ROUTE;
@@ -35,6 +36,7 @@ function App() {
           <Route path="/profile" element={<Dashboard />} />
           <Route path="/about" element={<About />} />
           <Route path="/rpsite" element={<Rpsite />} />
+          <Route path="/apsite" element={<Apsite />} />
           <Route path="/semester" element={<Semester />} />
           <Route path="/mess" element={<MessMenu />} />
           <Route path="*" element={<NotFound />} />

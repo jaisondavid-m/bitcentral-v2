@@ -12,7 +12,6 @@ function Navbar() {
 
   const navItems = [
     { to: "/home", label: "Home" },
-    { to: "/rpsite", label: "RP Site" },
     { to: "/profile", label: "My Profile" },
     { to: "/about", label: "About" }
   ];
