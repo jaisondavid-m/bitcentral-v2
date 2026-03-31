@@ -1,45 +1,57 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../Authentication/firebase.js";
+import React, { useMemo, useState } from "react";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import api from "../api/axios.js";
 import { Card } from "../Component/HomeCard.jsx";
 import { HomeCardSkeleton } from "../Component/Skeltons/HomeCardSkeleton.jsx";
 import SearchBar from "../Component/SearchBar.jsx";
 
-function Home() {
+const homeQueryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+function HomeContent() {
   const [search, setSearch] = useState("");
-  const [cards, setCards] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    data: cards = [],
+    error,
+    isPending,
+    refetch,
+  } = useQuery({
+    queryKey: ["home-cards"],
+    queryFn: async () => {
+      const res = await api.get("/cards");
+      return res?.data?.data || [];
+    },
+  });
 
-  useEffect(() => {
-    const fetchCards = async () => {
-      try {
-        const res = await api.get("/cards");
-        setCards(res.data.data || []);
-      } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch cards");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCards();
-  }, []);
-
-  const filteredCards = cards.filter((card) => {
+  const filteredCards = useMemo(() => cards.filter((card) => {
     const query = search.toLowerCase().trim();
     return (
       card.name.toLowerCase().includes(query) ||
       card.keywords.some((k) => k.toLowerCase().includes(query))
     );
-  });
+  }), [cards, search]);
 
-  if (error) {
+  const errorMessage = error ? error?.response?.data?.message || error?.message || "Failed to fetch cards" : "";
+
+  if (error && !isPending) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <p className="text-lg font-semibold text-red-600">{error}</p>
-          <button onClick={() => window.location.reload()} className="mt-4 rounded-lg bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700">Retry</button>
+          <p className="text-lg font-semibold text-red-600">{errorMessage}</p>
+          <button
+            onClick={() => refetch()}
+            className="mt-4 rounded-lg bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -49,7 +61,7 @@ function Home() {
     <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
       <div className="mx-auto max-w-7xl px-3 sm:px-6">
         <SearchBar search={search} setSearch={setSearch} />
-        {loading ? (
+        {isPending ? (
           <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
             {[1,2,3,4,5,6,7,8].map((_, index) => (
               <HomeCardSkeleton key={index} />
@@ -71,6 +83,14 @@ function Home() {
         )}
       </div>
     </div>
+  );
+}
+
+function Home() {
+  return (
+    <QueryClientProvider client={homeQueryClient}>
+      <HomeContent />
+    </QueryClientProvider>
   );
 }
 

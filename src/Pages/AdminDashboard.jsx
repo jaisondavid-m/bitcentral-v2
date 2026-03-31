@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { deleteAdminUser, getAdminUsageSummary, listAdminUsers, updateAdminPsToken } from "../api/admin.js";
 import { AlertTriangle, Loader, RefreshCw, Search, Shield, Trash2, Users } from "lucide-react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../Authentication/firebase.js";
 
 const ADMIN_SECRET_KEY = "admin-dashboard-secret";
 const PS_TOKEN_UPDATED_AT_KEY = "admin-ps-token-updated-at";
@@ -272,6 +274,8 @@ function SecretPrompt({ value, onChange, onSubmit }) {
 }
 
 function AdminDashboard() {
+    const [authUser] = useAuthState(auth);
+
     const [adminSecret, setAdminSecret] = useState(() => localStorage.getItem(ADMIN_SECRET_KEY) || "");
     const [secretDraft, setSecretDraft] = useState("");
     const [needsSecret, setNeedsSecret] = useState(() => !localStorage.getItem(ADMIN_SECRET_KEY));
@@ -286,7 +290,6 @@ function AdminDashboard() {
     const [isLoading, setIsLoading] = useState(false);
     const [deletingUid, setDeletingUid] = useState("");
     const [psToken, setPsToken] = useState("");
-    const [psTokenAdminUser, setPsTokenAdminUser] = useState("admin");
     const [isUpdatingPsToken, setIsUpdatingPsToken] = useState(false);
     const [psTokenUpdatedAt, setPsTokenUpdatedAt] = useState(() => {
         const stored = localStorage.getItem(PS_TOKEN_UPDATED_AT_KEY);
@@ -297,6 +300,10 @@ function AdminDashboard() {
     const [banner, setBanner] = useState({ type: "", message: "" });
 
     const usage = usagePeriod === "daily" ? usageSummary.dailyUsage || [] : usageSummary.monthlyUsage || [];
+    const currentAdminUser = useMemo(() => {
+        return (authUser?.displayName || authUser?.email || "admin").trim();
+    }, [authUser]);
+
     const filteredUsers = useMemo(() => {
         const q = searchQuery.trim().toLowerCase();
         if (!q) return users;
@@ -428,11 +435,10 @@ function AdminDashboard() {
         setBanner({ type: "", message: "" });
 
         try {
-            const adminUser = psTokenAdminUser.trim() || "admin";
             const result = await updateAdminPsToken({
                 adminSecret,
                 token: tokenValue,
-                adminUser,
+                adminUser: currentAdminUser,
             });
 
             const updatedAtTs = Date.now();
@@ -612,16 +618,12 @@ function AdminDashboard() {
                             value={psToken}
                             onChange={(event) => setPsToken(event.target.value)}
                             placeholder="Enter new PS token"
-                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring sm:col-span-2"
+                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring sm:col-span-3"
                             required
                         />
-                        <input
-                            type="text"
-                            value={psTokenAdminUser}
-                            onChange={(event) => setPsTokenAdminUser(event.target.value)}
-                            placeholder="Admin user"
-                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring"
-                        />
+                        <p className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600 sm:col-span-3">
+                            Updating as: <span className="font-semibold text-gray-800">{currentAdminUser}</span>
+                        </p>
                         <button
                             type="submit"
                             disabled={isUpdatingPsToken || !adminSecret}

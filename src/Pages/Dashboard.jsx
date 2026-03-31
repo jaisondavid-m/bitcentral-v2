@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { logout } from "../Authentication/firebase.js";
 import { useAuth } from "../context/StudentContext.jsx";
 import { Navigate } from "react-router-dom";
@@ -8,6 +8,13 @@ import { Loader , CheckCircle , AlertTriangle , GraduationCap , Calendar , Clock
 function Dashboard() {
   const { user, student, loading } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showIdentityModal, setShowIdentityModal] = useState(false);
+  const [rollNo, setRollNo] = useState("");
+  const [registerNo, setRegisterNo] = useState("");
+  const [identityError, setIdentityError] = useState("");
+  const [savedIdentity, setSavedIdentity] = useState(null);
+  const identityStoreKey = user?.uid ? `dashboard-identity-${user.uid}` : "";
+  const identityPromptDateKey = user?.uid ? `dashboard-identity-prompt-date-${user.uid}` : "";
   
 
   const handleLogout = async () => {
@@ -18,6 +25,32 @@ function Dashboard() {
       setIsLoggingOut(false);
     }
   };
+
+  useEffect(() => {
+    if (!user?.uid || loading) return;
+
+    const savedIdentity = localStorage.getItem(identityStoreKey);
+    if (savedIdentity) {
+      try {
+        const parsedIdentity = JSON.parse(savedIdentity);
+        setSavedIdentity(parsedIdentity);
+      } catch {
+        setSavedIdentity(null);
+      }
+      setShowIdentityModal(false);
+      return;
+    }
+
+    setSavedIdentity(null);
+
+    const today = new Date().toISOString().slice(0, 10);
+    const lastPromptDate = localStorage.getItem(identityPromptDateKey);
+
+    if (lastPromptDate !== today) {
+      setShowIdentityModal(true);
+      localStorage.setItem(identityPromptDateKey, today);
+    }
+  }, [identityPromptDateKey, identityStoreKey, loading, user?.uid]);
 
   if (loading) {
     return (
@@ -34,10 +67,98 @@ function Dashboard() {
     return <Navigate to="/login" />;
   }
 
+  const onSaveIdentity = (event) => {
+    event.preventDefault();
+    const normalizedRollNo = rollNo.trim();
+    const normalizedRegisterNo = registerNo.trim();
+
+    if (!normalizedRollNo || !normalizedRegisterNo) {
+      setIdentityError("Both Roll No and Register No are required.");
+      return;
+    }
+
+    localStorage.setItem(
+      identityStoreKey,
+      JSON.stringify({
+        rollNo: normalizedRollNo,
+        registerNo: normalizedRegisterNo,
+        savedAt: Date.now(),
+      })
+    );
+
+    setSavedIdentity({
+      rollNo: normalizedRollNo,
+      registerNo: normalizedRegisterNo,
+      savedAt: Date.now(),
+    });
+    setIdentityError("");
+    setShowIdentityModal(false);
+  };
+
+  const onRemindLater = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    localStorage.setItem(identityPromptDateKey, today);
+    setIdentityError("");
+    setShowIdentityModal(false);
+  };
+
+  const onEditIdentity = () => {
+    setRollNo(savedIdentity?.rollNo || "");
+    setRegisterNo(savedIdentity?.registerNo || "");
+    setIdentityError("");
+    setShowIdentityModal(true);
+  };
+
   const isBitsathyEmail = user.email?.endsWith("@bitsathy.ac.in");
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 lg:px-8">
+    <>
+      {showIdentityModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-5 shadow-xl">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Student Identity</h2>
+            <p className="mt-1 text-sm font-medium text-gray-700">Please add Roll No and Register No.</p>
+
+            <form onSubmit={onSaveIdentity} className="mt-4 space-y-3">
+              <input
+                type="text"
+                value={rollNo}
+                onChange={(event) => setRollNo(event.target.value)}
+                placeholder="Roll No"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none ring-blue-500 focus:ring"
+              />
+
+              <input
+                type="text"
+                value={registerNo}
+                onChange={(event) => setRegisterNo(event.target.value)}
+                placeholder="Register No"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none ring-blue-500 focus:ring"
+              />
+
+              {identityError && <p className="text-xs text-red-600">{identityError}</p>}
+
+              <div className="flex items-center justify-end gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={onRemindLater}
+                  className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+                >
+                  Later
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <div className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl">
         <div className="mb-6 overflow-hidden rounded-lg bg-white shadow-sm border border-gray-200">
           <div className="bg-blue-600 px-6 py-8 sm:px-8">
@@ -73,6 +194,39 @@ function Dashboard() {
         )}
         
         <div className="mb-6 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:col-span-2">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Student Identity</h3>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={onEditIdentity}
+                  className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+                >
+                  {savedIdentity ? "Edit" : "Add"}
+                </button>
+                <div className="rounded-full bg-blue-100 p-2">
+                  <CheckCircle className="h-5 w-5 text-blue-600" />
+                </div>
+              </div>
+            </div>
+
+            {savedIdentity ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Roll No</p>
+                  <p className="mt-1 text-lg font-bold text-blue-900">{savedIdentity.rollNo}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Register No</p>
+                  <p className="mt-1 text-lg font-bold text-blue-900">{savedIdentity.registerNo}</p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">Roll No and Register No are not added yet.</p>
+            )}
+          </div>
+
           {student && (
             <>
               <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
@@ -140,6 +294,7 @@ function Dashboard() {
         
       </div>
     </div>
+    </>
   );
 }
 

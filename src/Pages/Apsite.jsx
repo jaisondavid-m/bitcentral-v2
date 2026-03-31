@@ -1,19 +1,98 @@
 import { Search, Loader2, AlertCircle, Award, BookOpen, TrendingUp, ShieldAlert } from "lucide-react";
-import { useMemo, useState } from "react";
-
-const REWARDS_API_BASE_URL = "https://subject-api-dgl2.onrender.com/api/rewards";
+import { useMemo, useState, useEffect } from "react";
+import api from "../api/axios.js";
 
 function parseNumber(value) {
   const number = Number(value);
   return Number.isFinite(number) ? number : 0;
 }
 
+function parseIdentityValue(rawValue) {
+  if (!rawValue) return null;
+
+  try {
+    const parsed = JSON.parse(rawValue);
+    const normalized = typeof parsed === "string" ? JSON.parse(parsed) : parsed;
+
+    if (!normalized || typeof normalized !== "object") return null;
+
+    const rollNo = String(normalized.rollNo || "").trim();
+    const registerNo = String(normalized.registerNo || "").trim();
+    const savedAt = Number(normalized.savedAt) || 0;
+    const enrollment = rollNo || registerNo;
+
+    if (!enrollment) return null;
+
+    return { enrollment, savedAt };
+  } catch {
+    return null;
+  }
+}
+
+function getDefaultEnrollmentFromStorage() {
+  if (typeof window === "undefined") return "";
+
+  let bestMatch = { enrollment: "", savedAt: -1 };
+
+  for (let i = 0; i < window.localStorage.length; i += 1) {
+    const key = window.localStorage.key(i);
+    if (!key || !key.startsWith("dashboard-identity-")) continue;
+
+    const parsedIdentity = parseIdentityValue(window.localStorage.getItem(key));
+    if (!parsedIdentity) continue;
+
+    if (parsedIdentity.savedAt >= bestMatch.savedAt) {
+      bestMatch = parsedIdentity;
+    }
+  }
+
+  return bestMatch.enrollment;
+}
+
 function Apsite() {
-  const [enrollmentNo, setEnrollmentNo] = useState("");
+  const [enrollmentNo, setEnrollmentNo] = useState(() => getDefaultEnrollmentFromStorage());
   const [searchedEnrollmentNo, setSearchedEnrollmentNo] = useState("");
   const [rewards, setRewards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Perform the actual search
+  const performSearch = async (enrollment) => {
+    const normalizedEnrollmentNo = enrollment.trim().toLowerCase();
+    if (!normalizedEnrollmentNo) {
+      setErrorMessage("Please enter your enrollment no.");
+      setRewards([]);
+      return;
+    }
+    setIsLoading(true);
+    setErrorMessage("");
+    setSearchedEnrollmentNo(normalizedEnrollmentNo);
+    try {
+      const { data: payload } = await api.get(`/rewards/${encodeURIComponent(normalizedEnrollmentNo)}`);
+      if (!payload?.success) {
+        throw new Error(payload?.message || "Unable to fetch rewards");
+      }
+      setRewards(Array.isArray(payload?.data) ? payload.data : []);
+    } catch (error) {
+      setRewards([]);
+      setErrorMessage(error?.response?.data?.message || error?.message || "Something went wrong while fetching rewards");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Auto-load if enrollment exists in localStorage
+  useEffect(() => {
+    if (enrollmentNo && enrollmentNo.trim()) {
+      performSearch(enrollmentNo);
+    }
+  }, []);
+
+  // Handle form submission
+  const handleSearch = async (event) => {
+    event.preventDefault();
+    performSearch(enrollmentNo);
+  };
 
   const totals = useMemo(() => {
     return rewards.reduce(
@@ -27,32 +106,6 @@ function Apsite() {
   }, [rewards]);
 
   const totalActivityPoints = totals.earned;
-
-  const handleSearch = async (event) => {
-    event.preventDefault();
-    const normalizedEnrollmentNo = enrollmentNo.trim().toLowerCase();
-    if (!normalizedEnrollmentNo) {
-      setErrorMessage("Please enter your enrollment no.");
-      setRewards([]);
-      return;
-    }
-    setIsLoading(true);
-    setErrorMessage("");
-    setSearchedEnrollmentNo(normalizedEnrollmentNo);
-    try {
-      const response = await fetch(`${REWARDS_API_BASE_URL}/${encodeURIComponent(normalizedEnrollmentNo)}`);
-      const payload = await response.json();
-      if (!response.ok || !payload?.success) {
-        throw new Error(payload?.message || "Unable to fetch rewards");
-      }
-      setRewards(Array.isArray(payload?.data) ? payload.data : []);
-    } catch (error) {
-      setRewards([]);
-      setErrorMessage(error?.message || "Something went wrong while fetching rewards");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <>
