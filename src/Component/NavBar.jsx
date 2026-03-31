@@ -3,12 +3,14 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import Hamburger from "hamburger-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { logout } from "../Authentication/firebase.js";
-import { LogOut , Star , X } from "lucide-react";
+import { LogOut, Moon, Star, Sun, X } from "lucide-react";
+import { useTheme } from "../context/ThemeContext.jsx";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   const navItems = [
     { to: "/home", label: "Home" },
@@ -30,11 +32,11 @@ function Navbar() {
     <>
       <div className="sticky top-0 left-0 right-0 z-40">
         <div className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 opacity-90">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 opacity-90 dark:from-black dark:via-slate-900 dark:to-blue-950">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,180,255,0.3),transparent)] animate-pulse"></div>
           </div>
           
-          <div className="absolute inset-0 backdrop-blur-md bg-white/10 border-b border-white/20"></div>
+          <div className="absolute inset-0 backdrop-blur-md bg-white/10 border-b border-white/20 dark:bg-black/35 dark:border-blue-900/50"></div>
           
           <div className="relative max-w-7xl mx-auto">
             <div className="flex items-center justify-between px-4 py-3 md:px-6 lg:px-8">
@@ -45,6 +47,16 @@ function Navbar() {
               
               <nav className="hidden lg:block">
                 <ul className="flex items-center gap-6">
+                  <li>
+                    <button
+                      onClick={toggleTheme}
+                      className="flex cursor-pointer items-center gap-2 text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 px-4 py-2 rounded-full border border-white/20 transition-all duration-300"
+                      aria-label="Toggle theme"
+                    >
+                      {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                      {theme === "dark" ? "Light" : "Dark"}
+                    </button>
+                  </li>
                   {navItems.map((item) => (
                     <li key={item.to}>
                       <Link to={item.to} className={`text-sm font-medium transition-all duration-300 ${location.pathname === item.to ? "text-white bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30" : "text-white/90 hover:text-white hover:bg-white/10 px-4 py-2 rounded-full"}`}>
@@ -89,12 +101,12 @@ function Navbar() {
               className="fixed top-0 right-0 bottom-0 w-72 z-50 lg:hidden"
             >
               <div className="relative h-full overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 dark:from-black dark:via-slate-900 dark:to-blue-950">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(120,180,255,0.4),transparent)]"></div>
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(60,140,255,0.3),transparent)]"></div>
                 </div>
                 
-                <div className="absolute inset-0 backdrop-blur-xl bg-white/10 border-l border-white/20"></div>
+                <div className="absolute inset-0 backdrop-blur-xl bg-white/10 border-l border-white/20 dark:bg-black/35 dark:border-blue-900/50"></div>
                 
                 <div className="relative flex flex-col h-full">
                   <div className="flex items-center justify-between px-6 py-4 border-b border-white/20">
@@ -106,6 +118,17 @@ function Navbar() {
                   
                   <nav className="flex-1 px-6 py-6">
                     <ul className="space-y-3">
+                      <li>
+                        <button
+                          onClick={toggleTheme}
+                          className="w-full px-4 py-3 rounded-xl text-sm font-medium text-white/90 hover:bg-white/15 hover:text-white border border-white/20 transition-all duration-300"
+                        >
+                          <span className="inline-flex items-center gap-2">
+                            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                            {theme === "dark" ? "Switch to Light" : "Switch to Dark"}
+                          </span>
+                        </button>
+                      </li>
                       {navItems.map((item) => (
                         <li key={item.to}>
                           <Link to={item.to} onClick={() => setIsOpen(false)} className={`block px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${ location.pathname === item.to ? "bg-white/25 backdrop-blur-md text-white border border-white/30 shadow-lg" : "text-white/90 hover:bg-white/15 hover:text-white border border-transparent" }`}>

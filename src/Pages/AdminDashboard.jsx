@@ -157,7 +157,7 @@ function UsageChart({ usage, period }) {
     };
 
     if (!usage.length) {
-        return <p className="text-sm text-gray-500">No usage data available.</p>;
+        return <p className="text-sm text-gray-500 dark:text-slate-300">No usage data available.</p>;
     }
 
     const selectedUsage = usage.find((item) => item.label === hoveredLabel) || usage[usage.length - 1];
@@ -165,7 +165,7 @@ function UsageChart({ usage, period }) {
 
     return (
         <div>
-            <div className="mb-3 flex flex-wrap items-center gap-4 text-xs text-gray-600">
+            <div className="mb-3 flex flex-wrap items-center gap-4 text-xs text-gray-600 dark:text-slate-300">
                 <span className="inline-flex items-center gap-2">
                     <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
                     Signups
@@ -176,14 +176,14 @@ function UsageChart({ usage, period }) {
                 </span>
             </div>
 
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
-                <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-[11px] font-medium text-gray-600">
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-blue-900 dark:bg-slate-900">
+                <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-[11px] font-medium text-gray-600 dark:text-slate-300">
                     <div>
-                        Selected: <span className="font-semibold text-gray-800">{formatUsageLabelFull(selectedUsage?.label, period)}</span>
+                        Selected: <span className="font-semibold text-gray-800 dark:text-slate-100">{formatUsageLabelFull(selectedUsage?.label, period)}</span>
                         <span className="ml-3 text-blue-600">Signups {selectedUsage?.signups ?? 0}</span>
                         <span className="ml-2 text-emerald-600">Active {selectedUsage?.activeUsers ?? 0}</span>
                     </div>
-                    <span className="text-gray-500">Peak: {peak}</span>
+                    <span className="text-gray-500 dark:text-slate-400">Peak: {peak}</span>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -224,7 +224,7 @@ function UsageChart({ usage, period }) {
                             })}
                         </div>
 
-                        <div className="mt-2 flex gap-2 text-[10px] text-gray-500">
+                        <div className="mt-2 flex gap-2 text-[10px] text-gray-500 dark:text-slate-400">
                             {usage.map((item, index) => {
                                 const showTick = index % axisStep === 0 || index === usage.length - 1;
                                 return (
@@ -244,9 +244,9 @@ function UsageChart({ usage, period }) {
 function SecretPrompt({ value, onChange, onSubmit }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4">
-            <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
-                <h2 className="text-xl font-bold text-gray-900">Admin Secret Required</h2>
-                <p className="mt-2 text-sm text-gray-600">
+            <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg dark:border dark:border-blue-900 dark:bg-slate-950">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100">Admin Secret Required</h2>
+                <p className="mt-2 text-sm text-gray-600 dark:text-slate-300">
                     Enter Admin secret header (x-admin-secret). This will be stored in localStorage and asked only once.
                 </p>
 
@@ -256,7 +256,7 @@ function SecretPrompt({ value, onChange, onSubmit }) {
                         value={value}
                         onChange={onChange}
                         placeholder="Enter x-admin-secret"
-                        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring"
+                        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
                         autoFocus
                         required
                     />
@@ -507,7 +507,7 @@ function AdminDashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 lg:px-8 dark:bg-black">
             {needsSecret && (
                 <SecretPrompt
                     value={secretDraft}
@@ -517,7 +517,7 @@ function AdminDashboard() {
             )}
 
             <div className="mx-auto max-w-5xl space-y-6">
-                <section className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+                <section className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-blue-900 dark:bg-slate-950">
                     <div className="bg-blue-600 px-6 py-7 sm:px-8">
                         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
                             <div>
@@ -554,14 +554,14 @@ function AdminDashboard() {
 
                     <div className="p-5 sm:p-6">
                         <div className="grid gap-4 sm:grid-cols-2">
-                            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-                                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Total Users</p>
-                                <p className="mt-2 text-3xl font-bold text-gray-900">{users.length}</p>
+                            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-blue-900 dark:bg-slate-900">
+                                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">Total Users</p>
+                                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-slate-100">{users.length}</p>
                             </div>
 
-                            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-                                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Loaded</p>
-                                <p className="mt-2 text-3xl font-bold text-gray-900">Page {pageNumber}</p>
+                            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-blue-900 dark:bg-slate-900">
+                                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">Loaded</p>
+                                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-slate-100">Page {pageNumber}</p>
                             </div>
                         </div>
 
@@ -583,11 +583,11 @@ function AdminDashboard() {
                     </div>
                 </section>
 
-                <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+                <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-6 dark:border-blue-900 dark:bg-slate-950">
                     <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <h2 className="text-lg font-semibold text-gray-900">PS Token Rotation</h2>
-                            <p className="mt-1 text-sm text-gray-600">
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">PS Token Rotation</h2>
+                            <p className="mt-1 text-sm text-gray-600 dark:text-slate-300">
                                 Update your PS token every 3 hours. Timer is saved in localStorage.
                             </p>
                         </div>
@@ -601,13 +601,13 @@ function AdminDashboard() {
                         </div>
                     </div>
 
-                    <div className="mb-4 grid gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 sm:grid-cols-2">
-                        <p className="text-sm text-gray-700">
-                            <span className="font-semibold text-gray-900">Last updated:</span>{" "}
+                    <div className="mb-4 grid gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 sm:grid-cols-2 dark:border-blue-900 dark:bg-slate-900">
+                        <p className="text-sm text-gray-700 dark:text-slate-300">
+                            <span className="font-semibold text-gray-900 dark:text-slate-100">Last updated:</span>{" "}
                             {psTokenUpdatedAt ? formatDateTime(psTokenUpdatedAt) : "Not updated yet"}
                         </p>
-                        <p className="text-sm text-gray-700">
-                            <span className="font-semibold text-gray-900">Next recommended:</span>{" "}
+                        <p className="text-sm text-gray-700 dark:text-slate-300">
+                            <span className="font-semibold text-gray-900 dark:text-slate-100">Next recommended:</span>{" "}
                             {nextUpdateAt ? formatDateTime(nextUpdateAt) : "Update once to start timer"}
                         </p>
                     </div>
@@ -618,11 +618,11 @@ function AdminDashboard() {
                             value={psToken}
                             onChange={(event) => setPsToken(event.target.value)}
                             placeholder="Enter new PS token"
-                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring sm:col-span-3"
+                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring sm:col-span-3 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
                             required
                         />
-                        <p className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600 sm:col-span-3">
-                            Updating as: <span className="font-semibold text-gray-800">{currentAdminUser}</span>
+                        <p className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600 sm:col-span-3 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-300">
+                            Updating as: <span className="font-semibold text-gray-800 dark:text-slate-100">{currentAdminUser}</span>
                         </p>
                         <button
                             type="submit"
@@ -635,14 +635,14 @@ function AdminDashboard() {
                     </form>
                 </section>
 
-                <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+                <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-6 dark:border-blue-900 dark:bg-slate-950">
                     <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <h2 className="text-lg font-semibold text-gray-900">Usage Chart</h2>
-                        <div className="inline-flex rounded-lg border border-gray-200 p-1">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Usage Chart</h2>
+                        <div className="inline-flex rounded-lg border border-gray-200 p-1 dark:border-blue-900 dark:bg-slate-900">
                             <button
                                 type="button"
                                 onClick={() => setUsagePeriod("daily")}
-                                className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${usagePeriod === "daily" ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"
+                                className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${usagePeriod === "daily" ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-800"
                                     }`}
                             >
                                 Daily
@@ -650,7 +650,7 @@ function AdminDashboard() {
                             <button
                                 type="button"
                                 onClick={() => setUsagePeriod("monthly")}
-                                className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${usagePeriod === "monthly" ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"
+                                className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${usagePeriod === "monthly" ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-800"
                                     }`}
                             >
                                 Monthly
@@ -659,7 +659,7 @@ function AdminDashboard() {
                     </div>
 
                     {isLoading ? (
-                        <div className="flex h-48 items-center justify-center text-gray-500">
+                        <div className="flex h-48 items-center justify-center text-gray-500 dark:text-slate-300">
                             <Loader className="h-5 w-5 animate-spin" />
                             <span className="ml-2 text-sm">Loading usage data...</span>
                         </div>
@@ -668,15 +668,15 @@ function AdminDashboard() {
                     )}
                 </section>
 
-                <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+                <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6 dark:border-blue-900 dark:bg-slate-950">
                     <div className="mb-4 flex items-center justify-between">
-                        <h2 className="text-lg font-semibold text-gray-900">Users</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Users</h2>
                         <div className="flex items-center gap-2">
                             <button
                                 type="button"
                                 onClick={onPreviousPage}
                                 disabled={pageNumber <= 1 || isLoading}
-                                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
                             >
                                 Previous 1000
                             </button>
@@ -691,41 +691,41 @@ function AdminDashboard() {
                         </div>
                     </div>
 
-                    <div className="mb-4 flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
-                        <Search className="h-4 w-4 text-gray-500" />
+                    <div className="mb-4 flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-blue-900 dark:bg-slate-900">
+                        <Search className="h-4 w-4 text-gray-500 dark:text-slate-400" />
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(event) => setSearchQuery(event.target.value)}
                             placeholder="Search by email, name, or UID"
-                            className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400"
+                            className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400 dark:text-slate-100 dark:placeholder:text-slate-500"
                         />
                     </div>
 
-                    <div className="overflow-x-auto rounded-lg border border-gray-200">
-                        <table className="min-w-full divide-y divide-gray-200 text-sm">
-                            <thead className="bg-gray-50">
+                    <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-blue-900">
+                        <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-blue-900">
+                            <thead className="bg-gray-50 dark:bg-slate-900">
                                 <tr>
-                                    <th className="px-4 py-3 text-left font-semibold text-gray-700">S.No</th>
-                                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Photo</th>
-                                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Email</th>
-                                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Display Name</th>
-                                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Creation Time</th>
-                                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Last Login</th>
-                                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Delete</th>
+                                    <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">S.No</th>
+                                    <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">Photo</th>
+                                    <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">Email</th>
+                                    <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">Display Name</th>
+                                    <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">Creation Time</th>
+                                    <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">Last Login</th>
+                                    <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">Delete</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-200 bg-white">
+                            <tbody className="divide-y divide-gray-200 bg-white dark:divide-blue-900 dark:bg-slate-950">
                                 {filteredUsers.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                                        <td colSpan={7} className="px-4 py-8 text-center text-gray-500 dark:text-slate-300">
                                             {isLoading ? "Loading users..." : "No users found for your search"}
                                         </td>
                                     </tr>
                                 ) : (
                                     filteredUsers.map((userItem, index) => (
                                         <tr key={userItem.uid}>
-                                            <td className="px-4 py-3 font-medium text-gray-700">
+                                            <td className="px-4 py-3 font-medium text-gray-700 dark:text-slate-300">
                                                 {(pageNumber - 1) * USERS_PAGE_SIZE + index + 1}
                                             </td>
                                             <td className="px-4 py-3">
@@ -733,19 +733,19 @@ function AdminDashboard() {
                                                     <img
                                                         src={userItem.photoURL}
                                                         alt={userItem.displayName || userItem.email || "User"}
-                                                        className="h-9 w-9 rounded-full border border-gray-200 object-cover"
+                                                        className="h-9 w-9 rounded-full border border-gray-200 object-cover dark:border-blue-900"
                                                         loading="lazy"
                                                     />
                                                 ) : (
-                                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-500">
+                                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-500 dark:bg-slate-900 dark:text-slate-300">
                                                         {(userItem.displayName || userItem.email || "U").charAt(0).toUpperCase()}
                                                     </div>
                                                 )}
                                             </td>
-                                            <td className="px-4 py-3 text-gray-700">{userItem.email || "-"}</td>
-                                            <td className="px-4 py-3 text-gray-700">{userItem.displayName || "-"}</td>
-                                            <td className="px-4 py-3 text-gray-700">{formatDateTime(getCreatedTime(userItem))}</td>
-                                            <td className="px-4 py-3 text-gray-700">{formatDateTime(getLastLoginTime(userItem))}</td>
+                                            <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.email || "-"}</td>
+                                            <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.displayName || "-"}</td>
+                                            <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatDateTime(getCreatedTime(userItem))}</td>
+                                            <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatDateTime(getLastLoginTime(userItem))}</td>
                                             <td className="px-4 py-3">
                                                 <button
                                                     type="button"

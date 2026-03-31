@@ -43,7 +43,7 @@ function HomeContent() {
 
   if (error && !isPending) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center dark:bg-black">
         <div className="text-center">
           <p className="text-lg font-semibold text-red-600">{errorMessage}</p>
           <button
@@ -58,7 +58,7 @@ function HomeContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-8 dark:bg-black">
       <div className="mx-auto max-w-7xl px-3 sm:px-6">
         <SearchBar search={search} setSearch={setSearch} />
         {isPending ? (
@@ -75,9 +75,9 @@ function HomeContent() {
           </div>
         ) : (
           <div className="py-12 text-center">
-            <p className="text-base text-gray-500 sm:text-lg">No Site Found</p>
+            <p className="text-base text-gray-500 sm:text-lg dark:text-slate-300">No Site Found</p>
             {search && (
-              <p className="mt-2 text-xs text-gray-400 sm:text-sm">Try adjusting your search</p>
+              <p className="mt-2 text-xs text-gray-400 sm:text-sm dark:text-slate-400">Try adjusting your search</p>
             )}
           </div>
         )}

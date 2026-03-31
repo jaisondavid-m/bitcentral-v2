@@ -2,13 +2,13 @@ import { Link } from "react-router-dom";
 
 function NotFound() {
   return (
-    <div className="min-h-[70vh] lg:min-h-[82vh] flex items-center justify-center bg-gradient-to-br from-blue-100 via-blue-200 to-white px-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+    <div className="min-h-[70vh] lg:min-h-[82vh] flex items-center justify-center bg-gradient-to-br from-blue-100 via-blue-200 to-white px-4 dark:from-black dark:via-slate-900 dark:to-blue-950">
+      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center dark:bg-slate-950 dark:border dark:border-blue-900">
 
         <h1 className="text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">404</h1>
-        <p className="mt-4 text-xl font-semibold text-blue-900">Page Not Found</p>
+        <p className="mt-4 text-xl font-semibold text-blue-900 dark:text-blue-300">Page Not Found</p>
 
-        <p className="mt-2 text-blue-700 leading-relaxed">
+        <p className="mt-2 text-blue-700 leading-relaxed dark:text-blue-200">
           The page you are looking for does not exist or may have been moved.
           Please verify the URL or return to the homepage.
         </p>
@@ -18,7 +18,7 @@ function NotFound() {
             Go to Home
           </Link>
         </div>
-        <p className="mt-6 text-sm text-blue-500">Error code: 404</p>
+        <p className="mt-6 text-sm text-blue-500 dark:text-blue-400">Error code: 404</p>
       </div>
     </div>
   );

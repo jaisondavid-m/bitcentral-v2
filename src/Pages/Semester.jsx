@@ -41,7 +41,7 @@ export default function Semester() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-red-500">
+      <div className="min-h-screen flex items-center justify-center text-red-500 dark:bg-black">
         {error}
       </div>
     );
@@ -49,12 +49,12 @@ export default function Semester() {
   const filteredSubjects = subjects.filter((sub) => (sub.name || "").toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="min-h-screen bg-blue-50 py-8 px-4">
+    <div className="min-h-screen bg-blue-50 py-8 px-4 dark:bg-black">
       <div className="max-w-2xl mx-auto">
         <div className="mb-2">
-          <h1 className="text-2xl font-bold text-blue-800 tracking-tight">Discourse Question Banks</h1>
-          <p className="mt-1.5 text-xs text-gray-400">
-            <span className="font-semibold text-gray-500">Disclaimer:</span>{" "}
+          <h1 className="text-2xl font-bold text-blue-800 tracking-tight dark:text-blue-300">Discourse Question Banks</h1>
+          <p className="mt-1.5 text-xs text-gray-400 dark:text-slate-400">
+            <span className="font-semibold text-gray-500 dark:text-slate-300">Disclaimer:</span>{" "}
             Answer keys are for reference only and may contain errors.
           </p>
         </div>
@@ -70,8 +70,8 @@ export default function Semester() {
         
         <div className="flex flex-col gap-3">
           {subjects.length === 0 ? (
-            <div className="text-center py-12 text-gray-400 text-sm">
-              No subjects found for Year {selectedYear}
+            <div className="text-center py-12 text-gray-400 text-sm dark:text-slate-400">
+              No subjects found for Year {student?.yearCode || "-"}
             </div>
           ) : (
             filteredSubjects.map((sub, index) => (

@@ -55,10 +55,10 @@ function SearchBar({ search, setSearch }) {
     <div className="mb-4 sm:mb-8">
       <div className="relative mx-auto max-w-md">
         <input type="text" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)}
-          className="block w-full rounded-lg border border-gray-200 bg-white px-3 py-2 pr-12 text-sm text-gray-900 placeholder:text-gray-400 transition-all focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 sm:rounded-xl sm:px-4 sm:py-2.5 sm:pr-12 sm:text-base"
+          className="block w-full rounded-lg border border-gray-200 bg-white px-3 py-2 pr-12 text-sm text-gray-900 placeholder:text-gray-400 transition-all focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 sm:rounded-xl sm:px-4 sm:py-2.5 sm:pr-12 sm:text-base dark:border-blue-900 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-400 dark:focus:border-blue-700 dark:focus:ring-blue-900/50"
         />
 
-        <button onClick={toggleVoiceSearch} className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 transition-all ${isListening ? "text-red-500" : "text-gray-500 hover:text-gray-700"}`} aria-label="Voice search">
+        <button onClick={toggleVoiceSearch} className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 transition-all ${isListening ? "text-red-500" : "text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200"}`} aria-label="Voice search">
           {isListening ? (
             <MicOff className="h-5 w-5" strokeWidth={2} /> ) : (
             <Mic className="h-5 w-5" strokeWidth={2} />

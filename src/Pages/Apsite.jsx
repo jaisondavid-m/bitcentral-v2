@@ -1,6 +1,7 @@
 import { Search, Loader2, AlertCircle, Award, BookOpen, TrendingUp, ShieldAlert } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
 import api from "../api/axios.js";
+import { useTheme } from "../context/ThemeContext.jsx";
 
 function parseNumber(value) {
   const number = Number(value);
@@ -50,6 +51,7 @@ function getDefaultEnrollmentFromStorage() {
 }
 
 function Apsite() {
+  const { theme } = useTheme();
   const [enrollmentNo, setEnrollmentNo] = useState(() => getDefaultEnrollmentFromStorage());
   const [searchedEnrollmentNo, setSearchedEnrollmentNo] = useState("");
   const [rewards, setRewards] = useState([]);
@@ -492,6 +494,52 @@ function Apsite() {
           animation: shimmer 2s infinite;
         }
 
+        .ap-root.ap-dark {
+          background: #020617;
+          background-image:
+            radial-gradient(ellipse 80% 50% at 50% -10%, rgba(37,99,235,0.2) 0%, transparent 70%),
+            radial-gradient(ellipse 45% 30% at 90% 90%, rgba(14,116,244,0.18) 0%, transparent 60%);
+        }
+        .ap-root.ap-dark .ap-card,
+        .ap-root.ap-dark .ap-category,
+        .ap-root.ap-dark .ap-skeleton-card {
+          background: #0f172a;
+          border-color: #1e3a8a;
+        }
+        .ap-root.ap-dark .ap-title { color: #dbeafe; }
+        .ap-root.ap-dark .ap-subtitle,
+        .ap-root.ap-dark .ap-results-title,
+        .ap-root.ap-dark .ap-table th,
+        .ap-root.ap-dark .ap-empty,
+        .ap-root.ap-dark .ap-search-label { color: #93c5fd; }
+        .ap-root.ap-dark .ap-category-name,
+        .ap-root.ap-dark .ap-table td,
+        .ap-root.ap-dark .ap-input { color: #e2e8f0; }
+        .ap-root.ap-dark .ap-category-header,
+        .ap-root.ap-dark .ap-table thead tr,
+        .ap-root.ap-dark .ap-skeleton-header {
+          background: #0b1228;
+          border-color: #1e3a8a;
+        }
+        .ap-root.ap-dark .ap-input {
+          background: #0b1228;
+          border-color: #1e3a8a;
+        }
+        .ap-root.ap-dark .ap-input::placeholder { color: #64748b; }
+        .ap-root.ap-dark .ap-input:focus {
+          background: #111c3a;
+          border-color: #2563eb;
+        }
+        .ap-root.ap-dark .ap-table td,
+        .ap-root.ap-dark .ap-table th,
+        .ap-root.ap-dark .ap-table .td-empty,
+        .ap-root.ap-dark .ap-results-title {
+          border-color: #1e3a8a;
+        }
+        .ap-root.ap-dark .ap-table tbody tr:hover td {
+          background: #101a35;
+        }
+
         @media (max-width: 600px) {
           .ap-search-section { padding: 1.25rem 1.1rem; }
           .ap-stats { grid-template-columns: 1fr; }
@@ -500,7 +548,7 @@ function Apsite() {
         }
       `}</style>
 
-      <div className="ap-root">
+      <div className={`ap-root ${theme === "dark" ? "ap-dark" : ""}`}>
         <div className="ap-container">
 
           {/* Header */}
