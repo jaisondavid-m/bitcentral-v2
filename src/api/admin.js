@@ -1,116 +1,45 @@
 import api from "./axios";
 
-function withAdminSecret(adminSecret) {
-  if (!adminSecret) {
-    return undefined;
-  }
-
-  return {
-    "x-admin-secret": adminSecret,
-  };
-}
-
-export async function listAdminUsers({ adminSecret, maxResults = 1000, pageToken }) {
+export async function listAdminUsers({ adminSecret }) {
   const response = await api.get("/admin/users", {
-    params: {
-      maxResults,
-      ...(pageToken ? { pageToken } : {}),
+    headers: {
+      "x-admin-secret": adminSecret,
     },
-    headers: withAdminSecret(adminSecret),
   });
 
-  return response.data;
-}
-
-export async function listAllAdminUsers({ adminSecret, batchSize = 1000 } = {}) {
-  const users = [];
-  
-  let pageToken;
-
-  do {
-    const batch = await listAdminUsers({
-      adminSecret,
-      maxResults: batchSize,
-      pageToken,
-    });
-
-    users.push(...(batch.users || []));
-    pageToken = batch.nextPageToken;
-  } while (pageToken);
-
   return {
-    users,
-    totalUsers: users.length,
+    success: response.data.success,
+    users: response.data.users || [],
   };
 }
 
-export async function createAdminUser({ adminSecret, payload }) {
-  const response = await api.post("/admin/users", payload, {
-    headers: withAdminSecret(adminSecret),
-  });
+export async function listAllAdminUsers({ adminSecret } = {}) {
+  const data = await listAdminUsers({ adminSecret });
 
-  return response.data;
-}
-
-export async function updateAdminUser({ adminSecret, uid, payload }) {
-  const response = await api.put(`/admin/users/${uid}`, payload, {
-    headers: withAdminSecret(adminSecret),
-  });
-
-  return response.data;
+  return {
+    users: data.users || [],
+    totalUsers: (data.users || []).length,
+  };
 }
 
 export async function deleteAdminUser({ adminSecret, uid }) {
   const response = await api.delete(`/admin/users/${uid}`, {
-    headers: withAdminSecret(adminSecret),
-  });
-
-  return response.data;
-}
-
-export async function updateAdminCustomClaims({ adminSecret, uid, claims }) {
-  const response = await api.post(
-    `/admin/users/${uid}/custom-claims`,
-    { claims },
-    {
-      headers: withAdminSecret(adminSecret),
-    }
-  );
-
-  return response.data;
-}
-
-export async function getAdminUsage({ adminSecret, period = "daily", range }) {
-  const response = await api.get("/admin/usage", {
-    params: {
-      period,
-      ...(range ? { range } : {}),
+    headers: {
+      "x-admin-secret": adminSecret,
     },
-    headers: withAdminSecret(adminSecret),
   });
 
   return response.data;
 }
 
-export async function getAdminUsageSummary({ adminSecret }) {
-  const response = await api.get("/admin/usage/summary", {
-    headers: withAdminSecret(adminSecret),
-  });
-
-  return response.data;
-}
-
-export async function updateAdminPsToken({ adminSecret, token, adminUser }) {
-  const headers = {
-    ...(withAdminSecret(adminSecret) || {}),
-    ...(adminUser ? { "x-admin-user": adminUser } : {}),
-  };
-
-  const response = await api.put(
+export async function updateAdminPsToken({ adminSecret, token }) {
+  const response = await api.post(
     "/admin/ps-token",
     { token },
     {
-      headers,
+      headers: {
+        "x-admin-secret": adminSecret,
+      },
     }
   );
 

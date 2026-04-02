@@ -7,7 +7,7 @@ import Home from "../Pages/Home.jsx";
 import About from "../Pages/About.jsx";
 import Rpsite from "../Pages/Rpsite.jsx";
 import Semester from "../Pages/Semester.jsx";
-import MessMenu from "../Pages/Mess.jsx";
+import MessMenu from "../Pages/MessMenu.jsx";
 import ProtectedRoute from "../routes/ProtectedRoute.jsx";
 import ProtectedLayout from "../routes/ProtectedLayout.jsx";
 import NotFound from "../Pages/NotFound.jsx";

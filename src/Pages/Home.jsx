@@ -2,8 +2,9 @@ import React, { useMemo, useState } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import api from "../api/axios.js";
 import { Card } from "../Component/HomeCard.jsx";
-import { HomeCardSkeleton } from "../Component/Skeltons/HomeCardSkeleton.jsx";
+import { HomeCardSkeleton } from "../Component/HomeCardSkeleton.jsx";
 import SearchBar from "../Component/SearchBar.jsx";
+import Fuse from "fuse.js";
 
 const homeQueryClient = new QueryClient({
   defaultOptions: {
@@ -17,7 +18,9 @@ const homeQueryClient = new QueryClient({
 });
 
 function HomeContent() {
+
   const [search, setSearch] = useState("");
+
   const {
     data: cards = [],
     error,
@@ -31,15 +34,31 @@ function HomeContent() {
     },
   });
 
-  const filteredCards = useMemo(() => cards.filter((card) => {
-    const query = search.toLowerCase().trim();
-    return (
-      card.name.toLowerCase().includes(query) ||
-      card.keywords.some((k) => k.toLowerCase().includes(query))
-    );
-  }), [cards, search]);
+  const fuse = useMemo(() => {
+    return new Fuse(cards, {
+      keys: [
+        { name: "name", weight: 0.5 },
+        { name: "btntext", weight: 0.2 },
+        { name: "keywords", weight: 0.3 },
+      ],
+      threshold: 0.35,
+      includeScore: true,
+    });
+  }, [cards]);
+  
+  const filteredCards = useMemo(() => {
+    if (!search.trim()) return cards;
 
-  const errorMessage = error ? error?.response?.data?.message || error?.message || "Failed to fetch cards" : "";
+    const results = fuse.search(search);
+    return results.map((res) => res.item);
+  }, [cards, search, fuse]);
+
+  const displayCards = filteredCards;
+  const isLoading = isPending;
+
+  const errorMessage = error
+    ? error?.response?.data?.message || error?.message || "Failed to fetch cards"
+    : "";
 
   if (error && !isPending) {
     return (
@@ -61,23 +80,34 @@ function HomeContent() {
     <div className="min-h-screen bg-gray-50 py-4 sm:py-8 dark:bg-black">
       <div className="mx-auto max-w-7xl px-3 sm:px-6">
         <SearchBar search={search} setSearch={setSearch} />
-        {isPending ? (
+
+        {isLoading ? (
           <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
-            {[1,2,3,4,5,6,7,8].map((_, index) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((_, index) => (
               <HomeCardSkeleton key={index} />
             ))}
           </div>
-        ) : filteredCards.length > 0 ? (
+        ) : displayCards.length > 0 ? (
           <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
-            {filteredCards.map((card, index) => (
-              <Card key={card.id || index} name={card.name} link={card.link} img={card.img} btntext={card.btntext} />
+            {displayCards.map((card, index) => (
+              <Card
+                key={card.id || index}
+                name={card.name}
+                link={card.link}
+                img={card.img}
+                btntext={card.btntext}
+              />
             ))}
           </div>
         ) : (
           <div className="py-12 text-center">
-            <p className="text-base text-gray-500 sm:text-lg dark:text-slate-300">No Site Found</p>
+            <p className="text-base text-gray-500 sm:text-lg dark:text-slate-300">
+              No Site Found
+            </p>
             {search && (
-              <p className="mt-2 text-xs text-gray-400 sm:text-sm dark:text-slate-400">Try adjusting your search</p>
+              <p className="mt-2 text-xs text-gray-400 sm:text-sm dark:text-slate-400">
+                Try adjusting your search
+              </p>
             )}
           </div>
         )}
