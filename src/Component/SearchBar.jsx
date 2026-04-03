@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Mic, MicOff, X } from "lucide-react";
+import { Loader2, Mic, MicOff, X } from "lucide-react";
 
-function SearchBar({ search, setSearch }) {
+function SearchBar({ search, setSearch, isSearching = false }) {
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState("");
   const recognitionRef = useRef(null);
@@ -77,11 +77,19 @@ function SearchBar({ search, setSearch }) {
         {search && (
           <button
             onClick={handleClearSearch}
-            className="absolute right-12 top-1/2 -translate-y-1/2 rounded-lg p-2 text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-300"
+            className={`absolute top-1/2 -translate-y-1/2 rounded-lg p-2 text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-300 ${
+              isSearching ? "right-20" : "right-12"
+            }`}
             aria-label="Clear search"
           >
             <X className="h-5 w-5" strokeWidth={2} />
           </button>
+        )}
+
+        {isSearching && (
+          <div className="absolute right-12 top-1/2 -translate-y-1/2 text-blue-600 dark:text-blue-300">
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </div>
         )}
 
         <button
@@ -111,6 +119,12 @@ function SearchBar({ search, setSearch }) {
       {error && (
         <p className="mt-2 text-center text-xs text-red-500 sm:text-sm">
           {error}
+        </p>
+      )}
+
+      {isSearching && !isListening && !error && (
+        <p className="mt-2 text-center text-xs text-blue-600 dark:text-blue-300 sm:text-sm">
+          Searching...
         </p>
       )}
     </div>

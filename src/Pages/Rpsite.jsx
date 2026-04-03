@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { debounce } from "lodash";
-import { Medal, RefreshCw, UserSearch } from "lucide-react";
+import { Loader2, Medal, RefreshCw, UserSearch } from "lucide-react";
 import api from "../api/axios.js";
 import SearchBar from "../Component/SearchBar.jsx";
 import RpCard from "../Component/RpCard.jsx";
@@ -34,6 +34,24 @@ function filterStudents(students, query) {
   );
 }
 
+function RpCardSkeleton() {
+  return (
+    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
+      <div className="space-y-3 animate-pulse">
+        <div className="h-4 w-2/3 rounded bg-slate-200 dark:bg-slate-800" />
+        <div className="h-3 w-1/3 rounded bg-slate-200 dark:bg-slate-800" />
+        <div className="h-px w-full bg-slate-200 dark:bg-slate-800" />
+        <div className="space-y-2">
+          <div className="h-3 w-5/6 rounded bg-slate-200 dark:bg-slate-800" />
+          <div className="h-3 w-4/6 rounded bg-slate-200 dark:bg-slate-800" />
+          <div className="h-3 w-3/6 rounded bg-slate-200 dark:bg-slate-800" />
+        </div>
+        <div className="h-20 rounded-xl bg-slate-100 dark:bg-slate-800/80" />
+      </div>
+    </article>
+  );
+}
+
 function RpsiteContent() {
   const [search, setSearch] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -55,7 +73,7 @@ function RpsiteContent() {
     updateQuery(value.trim());
   };
 
-  const { data: students = [], isLoading } = useQuery({
+  const { data: students = [], isLoading, isFetching } = useQuery({
     queryKey: ["rp-search", debouncedQuery],
     queryFn: async ({ signal }) => {
       if (!debouncedQuery) return [];
@@ -85,6 +103,11 @@ function RpsiteContent() {
     placeholderData: (prev) => prev,
   });
 
+  const hasSearchText = search.trim().length > 0;
+  const isDebouncing = hasSearchText && search.trim() !== debouncedQuery;
+  const isSearching = hasSearchText && (isDebouncing || isFetching);
+  const showSkeletonGrid = hasSearchText && (isLoading || isSearching) && students.length === 0;
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-indigo-500/20 dark:bg-[#020617] dark:text-slate-200 dark:selection:bg-indigo-500/30">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
@@ -97,8 +120,8 @@ function RpsiteContent() {
             </div>
 
             <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center lg:max-w-3xl lg:justify-end">
-              <div className="w-full sm:flex-1 sm:min-w-[280px] lg:max-w-sm">
-                <SearchBar search={search} setSearch={handleSearchChange} />
+              <div className="w-full sm:flex-1 sm:min-w-70 lg:max-w-sm">
+                <SearchBar search={search} setSearch={handleSearchChange} isSearching={isSearching} />
               </div>
               <button
                 type="button"
@@ -113,7 +136,19 @@ function RpsiteContent() {
         </header>
 
         <main className="min-h-80">
-          {isLoading ? (
+          {showSkeletonGrid ? (
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 dark:border-slate-700 dark:bg-slate-900 dark:text-blue-300">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Searching students...
+              </div>
+              <div className="grid items-stretch gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <RpCardSkeleton key={`rp-skeleton-${index}`} />
+                ))}
+              </div>
+            </div>
+          ) : isLoading ? (
             <div className="flex flex-col items-center justify-center py-16">
               <RefreshCw className="mb-3 h-6 w-6 animate-spin text-indigo-500" />
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
@@ -121,10 +156,18 @@ function RpsiteContent() {
               </p>
             </div>
           ) : students.length > 0 ? (
-            <div className="grid items-stretch animate-in gap-3.5 duration-500 fade-in slide-in-from-bottom-2 sm:grid-cols-2 lg:grid-cols-3">
-              {students.map((student) => (
-                <RpCard key={student.roll_no} student={student} />
-              ))}
+            <div className="space-y-3">
+              {isSearching && (
+                <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 dark:border-slate-700 dark:bg-slate-900 dark:text-blue-300">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Updating results...
+                </div>
+              )}
+              <div className="grid items-stretch animate-in gap-3.5 duration-500 fade-in slide-in-from-bottom-2 sm:grid-cols-2 lg:grid-cols-3">
+                {students.map((student) => (
+                  <RpCard key={student.roll_no} student={student} />
+                ))}
+              </div>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-14 dark:border-slate-800 dark:bg-slate-900/25">
