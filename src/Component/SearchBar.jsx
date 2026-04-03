@@ -61,7 +61,7 @@ function SearchBar({ search, setSearch }) {
   }, [setSearch]);
 
   return (
-    <div className="mb-4 sm:mb-8">
+    <div>
       <div className="relative mx-auto max-w-md">
         <input
           type="text"
@@ -71,13 +71,13 @@ function SearchBar({ search, setSearch }) {
             setSearch(e.target.value);
             setError("");
           }}
-          className="block w-full rounded-lg border border-gray-200 bg-white px-3 py-2 pr-24 text-sm text-gray-900 placeholder:text-gray-400 transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200 sm:rounded-xl sm:px-4 sm:py-2.5 sm:pr-24 sm:text-base dark:border-blue-900 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-400 dark:focus:border-blue-700 dark:focus:ring-blue-900/50"
+          className="block w-full rounded-xl border border-blue-200 bg-white px-3 py-2.5 pr-24 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 sm:px-4 sm:py-3 sm:pr-24 sm:text-base dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-700 dark:focus:ring-blue-900/40"
         />
 
         {search && (
           <button
             onClick={handleClearSearch}
-            className="absolute right-12 top-1/2 -translate-y-1/2 rounded-lg p-2 text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-slate-300"
+            className="absolute right-12 top-1/2 -translate-y-1/2 rounded-lg p-2 text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-300"
             aria-label="Clear search"
           >
             <X className="h-5 w-5" strokeWidth={2} />
@@ -89,7 +89,7 @@ function SearchBar({ search, setSearch }) {
           className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 transition-all ${
             isListening
               ? "text-red-500 dark:text-red-400"
-              : "text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200"
+                : "text-slate-500 hover:text-blue-700 dark:text-slate-400 dark:hover:text-blue-300"
           }`}
           aria-label="Voice search"
           title={isListening ? "Stop listening" : "Start voice search"}

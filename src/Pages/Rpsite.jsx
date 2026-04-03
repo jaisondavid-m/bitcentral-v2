@@ -1,10 +1,11 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { debounce } from "lodash";
-import { RefreshCw, UserSearch } from "lucide-react";
+import { Medal, RefreshCw, UserSearch } from "lucide-react";
 import api from "../api/axios.js";
 import SearchBar from "../Component/SearchBar.jsx";
 import RpCard from "../Component/RpCard.jsx";
+import Leaderboard from "../Component/Leaderboard.jsx";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,12 +37,18 @@ function filterStudents(students, query) {
 function RpsiteContent() {
   const [search, setSearch] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const resultCache = useRef(new Map());
 
-  const updateQuery = useCallback(
-    debounce((value) => setDebouncedQuery(value), 300),
-    []
-  );
+  const updateQuery = useRef(
+    debounce((value) => setDebouncedQuery(value), 300)
+  ).current;
+
+  useEffect(() => {
+    return () => {
+      updateQuery.cancel();
+    };
+  }, [updateQuery]);
 
   const handleSearchChange = (value) => {
     setSearch(value);
@@ -52,21 +59,19 @@ function RpsiteContent() {
     queryKey: ["rp-search", debouncedQuery],
     queryFn: async ({ signal }) => {
       if (!debouncedQuery) return [];
-
-      // 1️⃣ Exact cache hit — free
+      
       if (resultCache.current.has(debouncedQuery)) {
         return resultCache.current.get(debouncedQuery);
       }
 
-      // 2️⃣ Ancestor cache hit — filter locally, no network call
-      const ancestor = findCachedAncestor(resultCache.current, debouncedQuery);
-      if (ancestor) {
-        const filtered = filterStudents(ancestor.data, debouncedQuery);
-        resultCache.current.set(debouncedQuery, filtered);
-        return filtered;
+      for (const [, data] of resultCache.current) {
+        const filtered = filterStudents(data, debouncedQuery);
+        if (filtered.length > 0) {
+          resultCache.current.set(debouncedQuery, filtered);
+          return filtered;
+        }
       }
-
-      // 3️⃣ Nothing cached — real API call
+      
       const res = await api.get("/search", {
         params: { q: debouncedQuery },
         signal,
@@ -83,14 +88,27 @@ function RpsiteContent() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-indigo-500/20 dark:bg-[#020617] dark:text-slate-200 dark:selection:bg-indigo-500/30">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
-        <header className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
-          <div className="shrink-0">
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
-              Reward <span className="text-indigo-500">Points</span>
-            </h1>
-          </div>
-          <div className="w-full md:ml-auto md:max-w-sm">
-            <SearchBar search={search} setSearch={handleSearchChange} />
+        <header className="mb-6 rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/40 sm:p-5">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div className="shrink-0">
+              <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                Reward <span className="text-indigo-500">Points</span>
+              </h1>
+            </div>
+
+            <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center lg:max-w-3xl lg:justify-end">
+              <div className="w-full sm:flex-1 sm:min-w-[280px] lg:max-w-sm">
+                <SearchBar search={search} setSearch={handleSearchChange} />
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowLeaderboard(true)}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm font-semibold text-indigo-700 shadow-sm transition-all hover:-translate-y-px hover:border-indigo-300 hover:bg-indigo-100 dark:border-slate-700 dark:bg-slate-900 dark:text-indigo-300 dark:hover:border-slate-600 dark:hover:bg-slate-800"
+              >
+                <Medal className="h-4 w-4" />
+                Leaderboard
+              </button>
+            </div>
           </div>
         </header>
 
@@ -118,6 +136,22 @@ function RpsiteContent() {
           )}
         </main>
       </div>
+
+      {showLeaderboard && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/70 px-0 py-0 backdrop-blur-sm sm:items-center sm:p-6"
+          onClick={() => setShowLeaderboard(false)}
+        >
+          <div
+            className="relative flex h-[92dvh] w-full max-w-6xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-slate-50 shadow-2xl shadow-slate-950/50 dark:border-slate-800 dark:bg-[#020617] sm:rounded-3xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="h-full overflow-auto p-3 sm:p-5">
+              <Leaderboard onClose={() => setShowLeaderboard(false)} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

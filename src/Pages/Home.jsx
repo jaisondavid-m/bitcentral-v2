@@ -79,7 +79,9 @@ function HomeContent() {
   return (
     <div className="min-h-screen bg-gray-50 py-4 sm:py-8 dark:bg-black">
       <div className="mx-auto max-w-7xl px-3 sm:px-6">
-        <SearchBar search={search} setSearch={setSearch} />
+        <div className="mb-8">
+          <SearchBar search={search} setSearch={setSearch} />
+        </div>
 
         {isLoading ? (
           <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
