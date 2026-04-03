@@ -1,9 +1,9 @@
 import React from 'react';
 
 const mealLabels = {
-  breakfast: { title: 'Breakfast', icon: '☀️', time: '7:00 – 9:30 AM' },
-  lunch:     { title: 'Lunch',     icon: '🌤️', time: '12:00 – 2:30 PM' },
-  dinner:    { title: 'Dinner',    icon: '🌙', time: '7:00 – 9:30 PM' },
+  breakfast: { title: 'Breakfast', icon: '☀️', time: '7:00 – 8:30 AM' },
+  lunch:     { title: 'Lunch',     icon: '🌤️', time: '12:20 – 1:30 PM' },
+  dinner:    { title: 'Dinner',    icon: '🌙', time: '7:00 – 8:30 PM' },
 };
 
 export const MealCard = ({ type, items = [], isActive, isServingNow = false }) => {
