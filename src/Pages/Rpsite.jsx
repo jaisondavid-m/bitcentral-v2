@@ -24,7 +24,6 @@ function findCachedAncestor(cache, query) {
   }
   return null;
 }
-
 function filterStudents(students, query) {
   const q = query.toLowerCase();
   return students.filter((s) =>
@@ -77,19 +76,19 @@ function RpsiteContent() {
     queryKey: ["rp-search", debouncedQuery],
     queryFn: async ({ signal }) => {
       if (!debouncedQuery) return [];
-      
+
       if (resultCache.current.has(debouncedQuery)) {
         return resultCache.current.get(debouncedQuery);
       }
 
-      for (const [, data] of resultCache.current) {
-        const filtered = filterStudents(data, debouncedQuery);
-        if (filtered.length > 0) {
-          resultCache.current.set(debouncedQuery, filtered);
-          return filtered;
-        }
+      const ancestor = findCachedAncestor(resultCache.current, debouncedQuery);
+
+      if (ancestor) {
+        const filtered = filterStudents(ancestor.data, debouncedQuery);
+        resultCache.current.set(debouncedQuery, filtered);
+        return filtered;
       }
-      
+
       const res = await api.get("/search", {
         params: { q: debouncedQuery },
         signal,
@@ -100,7 +99,7 @@ function RpsiteContent() {
       return data;
     },
     enabled: !!debouncedQuery,
-    placeholderData: (prev) => prev,
+    keepPreviousData: true,
   });
 
   const hasSearchText = search.trim().length > 0;
