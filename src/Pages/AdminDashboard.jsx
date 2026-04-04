@@ -3,6 +3,7 @@ import {
   deleteAdminUser,
   listAdminUsers,
   updateAdminPsToken,
+  updateUsers
 } from "../api/admin.js";
 import {
   AlertTriangle,
@@ -98,6 +99,7 @@ function AdminDashboard() {
   const [deletingUid, setDeletingUid] = useState("");
   const [psToken, setPsToken] = useState("");
   const [isUpdatingPsToken, setIsUpdatingPsToken] = useState(false);
+  const [isUpdatingUsers, setIsUpdatingUsers] = useState(false);
   const [psTokenUpdatedAt, setPsTokenUpdatedAt] = useState(() => {
     const stored = localStorage.getItem(PS_TOKEN_UPDATED_AT_KEY);
     const parsed = Number(stored);
@@ -105,6 +107,28 @@ function AdminDashboard() {
   });
   const [nowTs, setNowTs] = useState(() => Date.now());
   const [banner, setBanner] = useState({ type: "", message: "" });
+  const onUpdateUsers = async () => {
+    if (!adminSecret) return;
+
+    setIsUpdatingUsers(true);
+    setBanner({ type: "", message: "" });
+
+    try {
+      const result = await updateUsers({ adminSecret });
+      setBanner({
+        type: "success",
+        message: result?.message || "Users updated successfully",
+      });
+      await loadUsers();
+    } catch (error) {
+      setBanner({
+        type: "error",
+        message: normalizeError(error, "Failed to update users"),
+      });
+    } finally {
+      setIsUpdatingUsers(false);
+    }
+  };
 
   const currentAdminUser = useMemo(() => {
     return (authUser?.displayName || authUser?.email || "admin").trim();
@@ -282,7 +306,7 @@ function AdminDashboard() {
                   disabled={!adminSecret}
                   className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                    <RefreshCw className="h-4 w-4" /> Refresh
+                  <RefreshCw className="h-4 w-4" /> Refresh
                 </button>
 
                 <button
@@ -319,11 +343,10 @@ function AdminDashboard() {
                   Token Status
                 </p>
                 <p
-                  className={`mt-2 text-sm font-semibold ${
-                    isPsTokenDue
-                      ? "text-amber-700 dark:text-amber-300"
-                      : "text-emerald-700 dark:text-emerald-300"
-                  }`}
+                  className={`mt-2 text-sm font-semibold ${isPsTokenDue
+                    ? "text-amber-700 dark:text-amber-300"
+                    : "text-emerald-700 dark:text-emerald-300"
+                    }`}
                 >
                   {isPsTokenDue ? "Update due" : "On schedule"}
                 </p>
@@ -332,11 +355,10 @@ function AdminDashboard() {
 
             {banner.message && (
               <div
-                className={`mt-4 flex items-start gap-2 rounded-lg border px-4 py-3 text-sm ${
-                  banner.type === "error"
-                    ? "border-red-300 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-200"
-                    : "border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200"
-                }`}
+                className={`mt-4 flex items-start gap-2 rounded-lg border px-4 py-3 text-sm ${banner.type === "error"
+                  ? "border-red-300 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-200"
+                  : "border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200"
+                  }`}
               >
                 {banner.type === "error" ? (
                   <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -360,11 +382,10 @@ function AdminDashboard() {
               </p>
             </div>
             <div
-              className={`inline-flex w-fit items-center rounded-lg border px-3 py-2 text-sm font-semibold ${
-                isPsTokenDue
-                  ? "border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200"
-                  : "border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200"
-              }`}
+              className={`inline-flex w-fit items-center rounded-lg border px-3 py-2 text-sm font-semibold ${isPsTokenDue
+                ? "border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200"
+                : "border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200"
+                }`}
             >
               {isPsTokenDue
                 ? "Token update due now"
@@ -418,26 +439,42 @@ function AdminDashboard() {
           </form>
         </section>
 
-        
+
 
         <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6 dark:border-blue-900 dark:bg-slate-950">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
               Users
             </h2>
-            <button
-              type="button"
-              onClick={loadUsers}
-              disabled={isLoadingUsers || !adminSecret}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isLoadingUsers ? (
-                <Loader className="h-4 w-4 animate-spin" />
-              ) : (
-                <Users className="h-4 w-4" />
-              )}
-              {isLoadingUsers ? "Loading..." : usersLoaded ? "Reload Users" : "Load Users"}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onUpdateUsers}
+                disabled={isUpdatingUsers || !adminSecret}
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isUpdatingUsers ? (
+                  <Loader className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
+                {isUpdatingUsers ? "Updating..." : "Update Users"}
+              </button>
+
+              <button
+                type="button"
+                onClick={loadUsers}
+                disabled={isLoadingUsers || !adminSecret}
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isLoadingUsers ? (
+                  <Loader className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Users className="h-4 w-4" />
+                )}
+                {isLoadingUsers ? "Loading..." : usersLoaded ? "Reload Users" : "Load Users"}
+              </button>
+            </div>
           </div>
 
           {!usersLoaded ? (

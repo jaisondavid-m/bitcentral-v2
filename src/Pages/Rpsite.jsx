@@ -24,6 +24,7 @@ function findCachedAncestor(cache, query) {
   }
   return null;
 }
+
 function filterStudents(students, query) {
   const q = query.toLowerCase();
   return students.filter((s) =>
@@ -36,7 +37,7 @@ function filterStudents(students, query) {
 function RpCardSkeleton() {
   return (
     <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
-      <div className="space-y-3 animate-pulse">
+      <div className="animate-pulse space-y-3">
         <div className="h-4 w-2/3 rounded bg-slate-200 dark:bg-slate-800" />
         <div className="h-3 w-1/3 rounded bg-slate-200 dark:bg-slate-800" />
         <div className="h-px w-full bg-slate-200 dark:bg-slate-800" />
@@ -60,6 +61,24 @@ function RpsiteContent() {
   const updateQuery = useRef(
     debounce((value) => setDebouncedQuery(value), 300)
   ).current;
+
+  // Auto-load from saved register no
+  useEffect(() => {
+    const key = Object.keys(localStorage).find((k) =>
+      k.startsWith("home-register-no-")
+    );
+    if (!key) return;
+    try {
+      const saved = JSON.parse(localStorage.getItem(key));
+      if (saved?.registerNo) {
+        const reg = saved.registerNo.trim();
+        setSearch(reg);
+        setDebouncedQuery(reg);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -105,7 +124,8 @@ function RpsiteContent() {
   const hasSearchText = search.trim().length > 0;
   const isDebouncing = hasSearchText && search.trim() !== debouncedQuery;
   const isSearching = hasSearchText && (isDebouncing || isFetching);
-  const showSkeletonGrid = hasSearchText && (isLoading || isSearching) && students.length === 0;
+  const showSkeletonGrid =
+    hasSearchText && (isLoading || isSearching) && students.length === 0;
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-indigo-500/20 dark:bg-[#020617] dark:text-slate-200 dark:selection:bg-indigo-500/30">
@@ -119,8 +139,13 @@ function RpsiteContent() {
             </div>
 
             <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center lg:max-w-3xl lg:justify-end">
-              <div className="w-full sm:flex-1 sm:min-w-70 lg:max-w-sm">
-                <SearchBar search={search} setSearch={handleSearchChange} isSearching={isSearching} />
+              <div className="w-full sm:min-w-70 sm:flex-1 lg:max-w-sm">
+                <SearchBar
+                  search={search}
+                  setSearch={handleSearchChange}
+                  isSearching={isSearching}
+                  placeholder="Search By Name or Register No"
+                />
               </div>
               <button
                 type="button"
@@ -162,7 +187,7 @@ function RpsiteContent() {
                   Updating results...
                 </div>
               )}
-              <div className="grid items-stretch animate-in gap-3.5 duration-500 fade-in slide-in-from-bottom-2 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="animate-in fade-in slide-in-from-bottom-2 grid items-stretch gap-3.5 duration-500 sm:grid-cols-2 lg:grid-cols-3">
                 {students.map((student) => (
                   <RpCard key={student.roll_no} student={student} />
                 ))}

@@ -32,6 +32,16 @@ export async function deleteAdminUser({ adminSecret, uid }) {
   return response.data;
 }
 
+export async function updateUsers({ adminSecret }) {
+  const response = await api.get("/admin/users/update", {
+    headers: {
+      "x-admin-secret": adminSecret,
+    },
+  });
+
+  return response.data;
+}
+
 export async function updateAdminPsToken({ adminSecret, token }) {
   const response = await api.post(
     "/admin/ps-token",

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Filter, Loader2, Trophy, X, ChevronDown, Check } from "lucide-react";
 import api from "../api/axios.js";
+import { useAuth } from "../context/StudentContext";
 
 const YEARS = ["I", "II", "III", "IV"];
 
@@ -34,6 +35,7 @@ function getRankClass(index) {
 }
 
 export default function Leaderboard({ onClose }) {
+    const { student } = useAuth();
     const [draftYear, setDraftYear] = useState("");
     const [draftDept, setDraftDept] = useState("");
     const [students, setStudents] = useState(null);
@@ -58,6 +60,39 @@ export default function Leaderboard({ onClose }) {
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [onClose]);
+
+    // Set default year based on batch
+    useEffect(() => {
+        if (student?.batch) {
+            let yearToSet = "";
+            if (student.batch.includes("2025")) {
+                yearToSet = "I";
+            } else if (student.batch.includes("2024")) {
+                yearToSet = "II";
+            }
+
+            if (yearToSet) {
+                setDraftYear(yearToSet);
+                setAppliedYear(yearToSet);
+                setApplied(true);
+                setLoading(true);
+
+                // Fetch leaderboard for default year
+                const fetchDefaultLeaderboard = async () => {
+                    try {
+                        const res = await api.get(`/top10?year=${yearToSet}`);
+                        setStudents(res?.data?.data || []);
+                    } catch {
+                        setStudents([]);
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+
+                fetchDefaultLeaderboard();
+            }
+        }
+    }, [student?.batch]);
 
     const handleApply = async () => {
         setLoading(true);

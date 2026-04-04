@@ -40,10 +40,10 @@ function Navbar() {
           
           <div className="relative max-w-7xl mx-auto">
             <div className="flex items-center justify-between px-4 py-3 md:px-6 lg:px-8">
-              <div className="flex items-center gap-2 md:gap-3">
+              <Link to="/home" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity">
                 <Star className="h-8 w-8 md:h-10 md:w-10 text-white drop-shadow-lg" fill="currentColor"/>
                 <h1 className="text-xl md:text-2xl font-bold text-white drop-shadow-lg">BIT-CENTRAL</h1>
-              </div>
+              </Link>
               
               <nav className="hidden lg:block">
                 <ul className="flex items-center gap-6">

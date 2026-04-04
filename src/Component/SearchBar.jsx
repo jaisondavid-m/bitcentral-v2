@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Loader2, Mic, MicOff, X } from "lucide-react";
 
-function SearchBar({ search, setSearch, isSearching = false }) {
+function SearchBar({ search, setSearch, isSearching = false, placeholder = "Search..."  }) {
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState("");
   const recognitionRef = useRef(null);
@@ -65,7 +65,7 @@ function SearchBar({ search, setSearch, isSearching = false }) {
       <div className="relative mx-auto max-w-md">
         <input
           type="text"
-          placeholder="Search..."
+          placeholder={placeholder}
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
