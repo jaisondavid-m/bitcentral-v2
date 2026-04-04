@@ -18,8 +18,7 @@ function getInitialTheme() {
     return savedTheme;
   }
 
-  const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-  return prefersDark ? "dark" : "light";
+  return "light";
 }
 
 export function ThemeProvider({ children }) {
