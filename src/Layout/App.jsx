@@ -10,6 +10,7 @@ import Semester from "../Pages/Semester.jsx";
 import MessMenu from "../Pages/MessMenu.jsx";
 import ProtectedRoute from "../routes/ProtectedRoute.jsx";
 import ProtectedLayout from "../routes/ProtectedLayout.jsx";
+import PCDP from "../Pages/PCDP.jsx";
 import NotFound from "../Pages/NotFound.jsx";
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
           <Route path="/profile" element={<Dashboard />} />
           <Route path="/about" element={<About />} />
           <Route path="/rpsite" element={<Rpsite />} />
+          <Route path="/pcdp" element={<PCDP />} />
           {/* <Route path="/apsite" element={<Apsite />} /> */}
           <Route path="/semester" element={<Semester />} />
           <Route path="/mess" element={<MessMenu />} />
