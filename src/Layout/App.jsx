@@ -12,6 +12,7 @@ import ProtectedRoute from "../routes/ProtectedRoute.jsx";
 import ProtectedLayout from "../routes/ProtectedLayout.jsx";
 import PCDP from "../Pages/PCDP.jsx";
 import NotFound from "../Pages/NotFound.jsx";
+import LeaveDetails from "../Pages/LeaveDetails.jsx";
 
 function App() {
   const ADMIN_ROUTE = import.meta.env.VITE_ADMIN_ROUTE;
@@ -38,6 +39,7 @@ function App() {
           <Route path="/rpsite" element={<Rpsite />} />
           <Route path="/pcdp" element={<PCDP />} />
           {/* <Route path="/apsite" element={<Apsite />} /> */}
+          <Route path="/leavedetails" element={<LeaveDetails />} />
           <Route path="/semester" element={<Semester />} />
           <Route path="/mess" element={<MessMenu />} />
           <Route path="*" element={<NotFound />} />
