@@ -25,7 +25,16 @@ export default function RpCard({ student }) {
   if (!student) return null;
 
   const rollNo = String(student.roll_no || "").trim();
-  const studentPoints = Number(student?.cumulative_reward_points ?? 0);
+
+  const parseNumeric = (value) => {
+    if (typeof value === "number") return value;
+    if (value == null) return Number.NaN;
+    const normalized = String(value).replace(/,/g, "").trim();
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : Number.NaN;
+  };
+
+  const studentPoints = parseNumeric(student?.cumulative_reward_points);
 
   const { data: averages = {}, isFetching: isAveragesLoading } = useQuery({
     queryKey: ["rp-averages"],
@@ -40,23 +49,22 @@ export default function RpCard({ student }) {
 
   const resolveYearKey = (year) => {
     const value = String(year || "").trim().toLowerCase();
-    if (value.startsWith("1") || value.startsWith("i")) return "year_1";
-    if (value.startsWith("2") || value.startsWith("ii")) return "year_2";
-    if (value.startsWith("3") || value.startsWith("iii")) return "year_3";
     if (value.startsWith("4") || value.startsWith("iv")) return "year_4";
+    if (value.startsWith("3") || value.startsWith("iii")) return "year_3";
+    if (value.startsWith("2") || value.startsWith("ii")) return "year_2";
+    if (value.startsWith("1") || value.startsWith("i")) return "year_1";
     return "";
   };
 
   const yearKey = resolveYearKey(student.year);
-  const yearAverage = yearKey ? Number(averages?.[yearKey]) : Number.NaN;
-  const averageDelta = Number.isFinite(yearAverage)
+  const yearAverage = yearKey ? parseNumeric(averages?.[yearKey]) : Number.NaN;
+  const averageDelta = Number.isFinite(yearAverage) && Number.isFinite(studentPoints)
     ? Math.round(studentPoints - yearAverage)
     : null;
 
   let averageMessage = null;
   let averageTone = "border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-300";
-
-  if (Number.isFinite(yearAverage)) {
+  if (Number.isFinite(yearAverage) && averageDelta !== null) {
     if (averageDelta > 0) {
       averageMessage = `You are ${averageDelta} points higher than average.`;
       averageTone = "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-300";
