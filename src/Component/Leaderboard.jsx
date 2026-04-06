@@ -9,7 +9,7 @@ const DEPARTMENTS = [
     { code: "", name: "All Departments" },
     { code: "CSE", name: "Computer Science & Engineering" },
     { code: "IT", name: "Information Technology" },
-    { code: "AI%26DS", name: "AI & Data Science" },
+    { code: "AI&DS", name: "AI & Data Science" },
     { code: "AIML", name: "AI & Machine Learning" },
     { code: "AGRI", name: "Agricultural Engineering" },
     { code: "ECE", name: "Electronics & Communication" },
@@ -61,7 +61,6 @@ export default function Leaderboard({ onClose }) {
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [onClose]);
 
-    // Set default year based on batch
     useEffect(() => {
         if (student?.batch) {
             let yearToSet = "";
