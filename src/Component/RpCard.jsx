@@ -34,7 +34,7 @@ export default function RpCard({ student }) {
     return Number.isFinite(parsed) ? parsed : Number.NaN;
   };
 
-  const studentPoints = parseNumeric(student?.cumulative_reward_points);
+  const studentPoints = parseNumeric(student?.balance_points);
 
   const { data: averages = {}, isFetching: isAveragesLoading } = useQuery({
     queryKey: ["rp-averages"],
