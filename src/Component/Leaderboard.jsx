@@ -39,6 +39,8 @@ export default function Leaderboard({ onClose }) {
     const [draftYear, setDraftYear] = useState("");
     const [draftDept, setDraftDept] = useState("");
     const [students, setStudents] = useState(null);
+    const [averages, setAverages] = useState({});
+    const [avgLoading, setAvgLoading] = useState(false);
     const [loading, setLoading] = useState(false);
     const [showFilters, setShowFilters] = useState(false);
     const [applied, setApplied] = useState(false);
@@ -49,6 +51,22 @@ export default function Leaderboard({ onClose }) {
     const selectedDept = DEPARTMENTS.find((d) => d.code === draftDept);
 
     const canApply = Boolean(draftYear || draftDept);
+
+    useEffect(() => {
+        const fetchAverages = async () => {
+            setAvgLoading(true);
+            try {
+                const res = await api.get("/averages");
+                setAverages(res?.data?.averages || {});
+            } catch {
+                setAverages({});
+            } finally {
+                setAvgLoading(false);
+            }
+        };
+
+        fetchAverages();
+    }, []);
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -153,11 +171,21 @@ export default function Leaderboard({ onClose }) {
         return `${appliedYear ? `Year ${appliedYear}` : "All Years"} • ${appliedDeptName}`;
     }, [applied, appliedYear, appliedDeptName]);
 
+    const averageItems = useMemo(
+        () => [
+            { key: "year_1", label: "I", value: averages?.year_1 ?? "0" },
+            { key: "year_2", label: "II", value: averages?.year_2 ?? "0" },
+            { key: "year_3", label: "III", value: averages?.year_3 ?? "0" },
+            { key: "year_4", label: "IV", value: averages?.year_4 ?? "0" },
+        ],
+        [averages]
+    );
+
     return (
         <div className="w-full overflow-hidden rounded-3xl border border-blue-100 bg-white text-slate-900 shadow-2xl shadow-blue-900/10 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100">
-            <div className="flex items-start justify-between gap-4 border-b border-blue-100 bg-gradient-to-r from-blue-50 via-white to-white px-5 py-4 dark:border-slate-800 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 sm:px-6">
+            <div className="flex items-start justify-between gap-4 border-b border-blue-100 bg-linear-to-r from-blue-50 via-white to-white px-5 py-4 dark:border-slate-800 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 sm:px-6">
                 <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-600/20 dark:from-blue-500 dark:to-blue-700">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-600/20 dark:from-blue-500 dark:to-blue-700">
                         <Trophy className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 hidden lg:block">
@@ -296,19 +324,39 @@ export default function Leaderboard({ onClose }) {
                         </div>
                     </div>
 
+                    <div className="rounded-2xl border border-blue-100 bg-white px-3 py-2.5 dark:border-slate-800 dark:bg-slate-900/70">
+                        <div className="mb-2 flex items-center justify-between">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-blue-700/70 dark:text-blue-300/70">
+                                Year Averages
+                            </p>
+                            {avgLoading && <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-600 dark:text-blue-300" />}
+                        </div>
+                        <div className="grid grid-cols-4 gap-2">
+                            {averageItems.map((item) => (
+                                <div
+                                    key={item.key}
+                                    className="rounded-lg border border-blue-100 bg-blue-50/60 px-2 py-2 text-center dark:border-slate-700 dark:bg-slate-800/70"
+                                >
+                                    <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Year {item.label}</p>
+                                    <p className="mt-0.5 text-sm font-bold tabular-nums text-slate-900 dark:text-white">{item.value}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
                     {loading ? (
-                        <div className="flex min-h-[16rem] items-center justify-center rounded-3xl border border-blue-100 bg-white dark:border-slate-800 dark:bg-slate-900/60">
+                        <div className="flex min-h-64 items-center justify-center rounded-3xl border border-blue-100 bg-white dark:border-slate-800 dark:bg-slate-900/60">
                             <div className="flex flex-col items-center gap-2 text-blue-700 dark:text-blue-300">
                                 <Loader2 className="h-6 w-6 animate-spin" />
                                 <p className="text-sm">Fetching leaderboard...</p>
                             </div>
                         </div>
                     ) : !applied ? (
-                        <div className="flex min-h-[16rem] items-center justify-center rounded-3xl border border-dashed border-blue-200 bg-white p-6 text-center text-slate-500 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-400">
+                        <div className="flex min-h-64 items-center justify-center rounded-3xl border border-dashed border-blue-200 bg-white p-6 text-center text-slate-500 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-400">
                             Select a year or department and press Show Results.
                         </div>
                     ) : students?.length === 0 ? (
-                        <div className="flex min-h-[16rem] items-center justify-center rounded-3xl border border-dashed border-blue-200 bg-white p-6 text-center text-slate-500 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-400">
+                        <div className="flex min-h-64 items-center justify-center rounded-3xl border border-dashed border-blue-200 bg-white p-6 text-center text-slate-500 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-400">
                             No students found for this filter.
                         </div>
                     ) : (
@@ -335,7 +383,7 @@ export default function Leaderboard({ onClose }) {
 
                             <div className="hidden rounded-2xl border border-blue-100 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:block">
     
-    <div className="max-h-[420px] overflow-y-auto overflow-x-auto scrollbar-thin scrollbar-thumb-blue-300 dark:scrollbar-thumb-slate-700">
+    <div className="max-h-105 overflow-y-auto overflow-x-auto scrollbar-thin scrollbar-thumb-blue-300 dark:scrollbar-thumb-slate-700">
         
         <table className="w-full text-left">
                                         <thead className="bg-blue-50 dark:bg-slate-900 sticky top-0 z-10">

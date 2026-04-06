@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { debounce } from "lodash";
-import { Loader2, Medal, RefreshCw, UserSearch } from "lucide-react";
+import { BarChart3, Loader2, Medal, RefreshCw, UserSearch, X } from "lucide-react";
 import api from "../api/axios.js";
 import SearchBar from "../Component/SearchBar.jsx";
 import RpCard from "../Component/RpCard.jsx";
@@ -56,6 +56,7 @@ function RpsiteContent() {
   const [search, setSearch] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showAverages, setShowAverages] = useState(false);
   const resultCache = useRef(new Map());
 
   const updateQuery = useRef(
@@ -121,6 +122,17 @@ function RpsiteContent() {
     keepPreviousData: true,
   });
 
+  const { data: averagePoints = {}, isFetching: isAverageFetching } = useQuery({
+    queryKey: ["rp-averages"],
+    queryFn: async () => {
+      const res = await api.get("/averages");
+      return res?.data?.averages || {};
+    },
+    enabled: showAverages,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
   const hasSearchText = search.trim().length > 0;
   const isDebouncing = hasSearchText && search.trim() !== debouncedQuery;
   const isSearching = hasSearchText && (isDebouncing || isFetching);
@@ -154,6 +166,14 @@ function RpsiteContent() {
               >
                 <Medal className="h-4 w-4" />
                 Leaderboard
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAverages(true)}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:-translate-y-px hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800"
+              >
+                <BarChart3 className="h-4 w-4" />
+                Average RP
               </button>
             </div>
           </div>
@@ -215,6 +235,66 @@ function RpsiteContent() {
           >
             <div className="h-full overflow-auto p-3 sm:p-5">
               <Leaderboard onClose={() => setShowLeaderboard(false)} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAverages && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/70 px-0 py-0 backdrop-blur-sm sm:items-center sm:p-6"
+          onClick={() => setShowAverages(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-t-3xl border border-slate-200 bg-white shadow-2xl shadow-slate-950/40 dark:border-slate-800 dark:bg-slate-950 sm:rounded-3xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+                  Average RP
+                </p>
+                <h2 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+                  Year-wise averages
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAverages(false)}
+                className="rounded-lg border border-slate-200 p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+                aria-label="Close averages modal"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="p-5">
+              {isAverageFetching ? (
+                <div className="flex items-center justify-center py-10 text-slate-500 dark:text-slate-400">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {[
+                    ["I", averagePoints?.year_1],
+                    ["II", averagePoints?.year_2],
+                    ["III", averagePoints?.year_3],
+                    ["IV", averagePoints?.year_4],
+                  ].map(([year, value]) => (
+                    <div
+                      key={year}
+                      className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-center dark:border-slate-800 dark:bg-slate-900/70"
+                    >
+                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                        Year {year}
+                      </p>
+                      <p className="mt-1 text-lg font-extrabold tabular-nums text-slate-900 dark:text-white">
+                        {value ?? "0"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

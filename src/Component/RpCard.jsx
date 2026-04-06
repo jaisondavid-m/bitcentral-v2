@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { GraduationCap, MapPin, User, Loader2, X, ChevronRight } from "lucide-react";
 import api from "../api/axios.js";
 
@@ -24,6 +25,49 @@ export default function RpCard({ student }) {
   if (!student) return null;
 
   const rollNo = String(student.roll_no || "").trim();
+  const studentPoints = Number(student?.cumulative_reward_points ?? 0);
+
+  const { data: averages = {}, isFetching: isAveragesLoading } = useQuery({
+    queryKey: ["rp-averages"],
+    queryFn: async () => {
+      const res = await api.get("/averages");
+      return res?.data?.averages || {};
+    },
+    enabled: open,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  const resolveYearKey = (year) => {
+    const value = String(year || "").trim().toLowerCase();
+    if (value.startsWith("1") || value.startsWith("i")) return "year_1";
+    if (value.startsWith("2") || value.startsWith("ii")) return "year_2";
+    if (value.startsWith("3") || value.startsWith("iii")) return "year_3";
+    if (value.startsWith("4") || value.startsWith("iv")) return "year_4";
+    return "";
+  };
+
+  const yearKey = resolveYearKey(student.year);
+  const yearAverage = yearKey ? Number(averages?.[yearKey]) : Number.NaN;
+  const averageDelta = Number.isFinite(yearAverage)
+    ? Math.round(studentPoints - yearAverage)
+    : null;
+
+  let averageMessage = null;
+  let averageTone = "border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-300";
+
+  if (Number.isFinite(yearAverage)) {
+    if (averageDelta > 0) {
+      averageMessage = `You are ${averageDelta} points higher than average.`;
+      averageTone = "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-300";
+    } else if (averageDelta < 0) {
+      averageMessage = `You are ${Math.abs(averageDelta)} points below average.`;
+      averageTone = "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-300";
+    } else {
+      averageMessage = "You are exactly at the year average.";
+      averageTone = "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-300";
+    }
+  }
 
   const fetchPoints = async () => {
     setOpen(true);
@@ -171,6 +215,26 @@ export default function RpCard({ student }) {
                 </div>
               ) : (
                 <>
+                  {yearKey && (
+                    <div className={`mb-4 rounded-xl border px-4 py-3 text-sm ${averageTone}`}>
+                      {isAveragesLoading ? (
+                        <span className="inline-flex items-center gap-2 text-xs font-medium">
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          Checking year average...
+                        </span>
+                      ) : averageMessage ? (
+                        <>
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] opacity-70">
+                            Year average
+                          </p>
+                          <p className="mt-1 font-medium">{averageMessage}</p>
+                        </>
+                      ) : (
+                        <p className="text-xs font-medium">Year average is not available.</p>
+                      )}
+                    </div>
+                  )}
+
                   {/* Mobile cards */}
                   <div className="space-y-2 sm:hidden">
                     {points.map((e, i) => (
