@@ -19,6 +19,7 @@ export default function RpCard({ student }) {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
   const [points, setPoints]   = useState([]);
+  const pointsCache = React.useRef(new Map());
 
   if (!student) return null;
 
@@ -29,10 +30,21 @@ export default function RpCard({ student }) {
     setLoading(true);
     setError("");
     setPoints([]);
+    if (pointsCache.current.has(rollNo)) {
+      const cached = pointsCache.current.get(rollNo);
+      setPoints(cached);
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await api.get("/rewards", { params: { roll_no: rollNo } });
       const d   = res?.data;
-      setPoints(Array.isArray(d) ? d : Array.isArray(d?.data) ? d.data : []);
+      const data = Array.isArray(d) ? d : Array.isArray(d?.data) ? d.data : [];
+      
+      // Store in cache
+      pointsCache.current.set(rollNo, data);
+      setPoints(data);
     } catch (err) {
       setError(err?.response?.data?.message || err?.message || "Failed to load points.");
     } finally {
