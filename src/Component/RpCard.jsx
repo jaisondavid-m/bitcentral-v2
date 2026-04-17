@@ -255,8 +255,8 @@ export default function RpCard({ student }) {
                           </span>
                           <span
                             className={`shrink-0 text-sm font-semibold tabular-nums ${e?.type === "negative"
-                                ? "text-red-400"
-                                : "text-emerald-400"
+                              ? "text-red-400"
+                              : "text-emerald-400"
                               }`}
                           >
                             {e?.type === "negative" ? "-" : "+"}
@@ -295,8 +295,14 @@ export default function RpCard({ student }) {
                             <td className="px-4 py-3 whitespace-nowrap text-slate-500">{e?.date || "—"}</td>
                             <td className="px-4 py-3 whitespace-nowrap text-slate-700 dark:text-slate-300">{e?.activity_type || "—"}</td>
                             <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{e?.activity_name || "—"}</td>
-                            <td className="px-4 py-3 text-right font-semibold text-emerald-400 tabular-nums">
-                              +{e?.reward_points || "0"}
+                            <td
+                              className={`px-4 py-3 text-right font-semibold tabular-nums ${e?.type === "negative"
+                                  ? "text-red-400"
+                                  : "text-emerald-400"
+                                }`}
+                            >
+                              {e?.type === "negative" ? "-" : "+"}
+                              {e?.reward_points || "0"}
                             </td>
                           </tr>
                         ))}
