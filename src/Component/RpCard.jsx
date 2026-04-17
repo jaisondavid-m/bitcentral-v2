@@ -16,10 +16,10 @@ const Meta = ({ icon: Icon, children }) => (
 );
 
 export default function RpCard({ student }) {
-  const [open, setOpen]       = useState(false);
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState("");
-  const [points, setPoints]   = useState([]);
+  const [error, setError] = useState("");
+  const [points, setPoints] = useState([]);
   const pointsCache = React.useRef(new Map());
 
   if (!student) return null;
@@ -76,7 +76,6 @@ export default function RpCard({ student }) {
       averageTone = "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-300";
     }
   }
-
   const fetchPoints = async () => {
     setOpen(true);
     setLoading(true);
@@ -91,9 +90,9 @@ export default function RpCard({ student }) {
 
     try {
       const res = await api.get("/rewards", { params: { roll_no: rollNo } });
-      const d   = res?.data;
+      const d = res?.data;
       const data = Array.isArray(d) ? d : Array.isArray(d?.data) ? d.data : [];
-      
+
       // Store in cache
       pointsCache.current.set(rollNo, data);
       setPoints(data);
@@ -143,9 +142,9 @@ export default function RpCard({ student }) {
           {/* Points */}
           <div className="grid grid-cols-3 divide-x divide-slate-200 rounded-xl bg-slate-50 border border-slate-200 dark:divide-slate-800 dark:bg-slate-800/60 dark:border-slate-800">
             {[
-              { label: "Earned",   value: student.cumulative_reward_points, color: "text-slate-900 dark:text-white" },
-              { label: "Balance",  value: student.balance_points,           color: "text-amber-400" },
-              { label: "Redeemed", value: student.redeemed_points,          color: "text-emerald-400" },
+              { label: "Earned", value: student.cumulative_reward_points, color: "text-slate-900 dark:text-white" },
+              { label: "Balance", value: student.balance_points, color: "text-amber-400" },
+              { label: "Redeemed", value: student.redeemed_points, color: "text-emerald-400" },
             ].map(({ label, value, color }) => (
               <div key={label} className="flex flex-col items-center gap-1 py-3">
                 <span className="text-[9px] font-semibold uppercase tracking-widest text-slate-500">
@@ -254,8 +253,14 @@ export default function RpCard({ student }) {
                           <span className="text-[12px] font-medium text-slate-800 dark:text-slate-200 leading-snug flex-1">
                             {e?.activity_name || "—"}
                           </span>
-                          <span className="shrink-0 text-sm font-semibold text-emerald-400 tabular-nums">
-                            +{e?.reward_points || "0"}
+                          <span
+                            className={`shrink-0 text-sm font-semibold tabular-nums ${e?.type === "negative"
+                                ? "text-red-400"
+                                : "text-emerald-400"
+                              }`}
+                          >
+                            {e?.type === "negative" ? "-" : "+"}
+                            {e?.reward_points || "0"}
                           </span>
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
