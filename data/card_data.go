@@ -18,12 +18,12 @@ var Cards = []models.Card{
 		BtnText:  "View Details",
 	},
 {
-		Image: null,
-		Name:     "Question Bank site",
-		Keywords: []string{"bank", "qn", "question", "material", "study"},
-		Link:     "https://pcdp.bitsathy.ac.in/stf/coe"
-		BtnText:  "Open Now",
-	},
+	Image:    "",
+	Name:     "Question Bank site",
+	Keywords: []string{"bank", "qn", "question", "material", "study"},
+	Link:     "https://pcdp.bitsathy.ac.in/stf/coe",
+	BtnText:  "Open Now",
+},
 	{
 		Image:    "./CardImgs/image.png",
 		Name:     "Semester Material",
