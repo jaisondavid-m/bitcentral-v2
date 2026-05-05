@@ -150,13 +150,28 @@ func (h *SheetHandler) RequireAuth() gin.HandlerFunc {
 		if h.getSheetsService() == nil {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error":    "Not authenticated",
-				"login_at": "https://bit-ht4d.onrender.com/auth/login",
+				"login_at": h.getLoginURL(c),
 			})
 			c.Abort()
 			return
 		}
 		c.Next()
 	}
+}
+
+func (h *SheetHandler) getLoginURL(c *gin.Context) string {
+	scheme := "http"
+	if c.Request.TLS != nil {
+		scheme = "https"
+	}
+	host := c.Request.Host
+	if host == "" {
+		host = os.Getenv("BACKEND_HOST")
+		if host == "" {
+			host = "localhost:8080"
+		}
+	}
+	return fmt.Sprintf("%s://%s/auth/login", scheme, host)
 }
 
 func safeGet(row []interface{}, index int) string {

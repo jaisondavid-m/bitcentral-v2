@@ -27,6 +27,7 @@ func SetupRouter(
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
 			"http://localhost:5173",
+			"http://127.0.0.1:5173",
 			"https://bitcentral.vercel.app",
 			"https://bitcenteral.netlify.app",
 			"https://bitcentral.bitsathy.in",

@@ -17,6 +17,13 @@ var Cards = []models.Card{
 		Link:     "/mess",
 		BtnText:  "View Details",
 	},
+	{
+		Image:    "",
+		Name:     "Exam hall finder",
+		Keywords: []string{"exam", "hall", "finder", "examination"},
+		Link:     "/exam-hall",
+		BtnText:  "Find Now",
+	},
 {
 	Image:    "",
 	Name:     "Question Bank site",
