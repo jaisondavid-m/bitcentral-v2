@@ -22,19 +22,25 @@ func SetupRouter(
 
 	r := gin.Default()
 
+	// CORS configuration
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
 			"http://localhost:5173",
 			"https://bitcentral.vercel.app",
 			"https://bitcenteral.netlify.app",
-"https://bitcentral.bitsathy.in"
+			"https://bitcentral.bitsathy.in",
 		},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "x-admin-secret"},
+		AllowMethods: []string{
+			"GET", "POST", "PUT", "DELETE", "OPTIONS",
+		},
+		AllowHeaders: []string{
+			"Origin", "Content-Type", "Authorization", "x-admin-secret",
+		},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
 
+	// Health check
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": "ok",
@@ -42,11 +48,14 @@ func SetupRouter(
 		})
 	})
 
+	// Public routes
 	r.GET("/auth/login", handler.HandleLogin)
 	r.GET("/auth/callback", handler.HandleCallback)
 	r.GET("/leaves", leaveHandler.GetAllLeaves)
 
-	api := r.Group("/", handler.RequireAuth())
+	// Protected routes
+	api := r.Group("/")
+	api.Use(handler.RequireAuth())
 	{
 		api.GET("/search", handler.UniversalSearch)
 		api.GET("/rewards", handler.GetRewardsByRollNo)
@@ -58,9 +67,10 @@ func SetupRouter(
 		api.GET("/mess", messHandler.GetMess)
 		api.GET("/mess/timings", messHandler.GetMealTimings)
 
-		api.GET("/top10", leaderboardHandler.GetTop10Students) 
+		api.GET("/top10", leaderboardHandler.GetTop10Students)
 	}
 
+	// Admin routes
 	admin := r.Group("/admin")
 	admin.Use(middleware.RequireAdmin())
 	{
