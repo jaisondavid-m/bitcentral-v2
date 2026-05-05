@@ -13,7 +13,7 @@ import ProtectedLayout from "../routes/ProtectedLayout.jsx";
 import PCDP from "../Pages/PCDP.jsx";
 import NotFound from "../Pages/NotFound.jsx";
 import LeaveDetails from "../Pages/LeaveDetails.jsx";
-import ExamHall from "../Pages/Examhall.jsx";
+import ExamHall from "../Pages/ExamHall.jsx";
 
 function App() {
   const ADMIN_ROUTE = import.meta.env.VITE_ADMIN_ROUTE;
