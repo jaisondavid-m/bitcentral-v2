@@ -18,6 +18,7 @@ func SetupRouter(
 	messHandler *handlers.MessHandler,
 	leaderboardHandler *handlers.LeaderboardHandler,
 	leaveHandler *handlers.LeaveHandler,
+	examHallHandler *handlers.ExamHallHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -26,6 +27,7 @@ func SetupRouter(
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
 			"http://localhost:5173",
+			"http://127.0.0.1:5173",
 			"https://bitcentral.vercel.app",
 			"https://bitcenteral.netlify.app",
 			"https://bitcentral.bitsathy.in",
@@ -52,6 +54,7 @@ func SetupRouter(
 	r.GET("/auth/login", handler.HandleLogin)
 	r.GET("/auth/callback", handler.HandleCallback)
 	r.GET("/leaves", leaveHandler.GetAllLeaves)
+	r.GET("/exam-hall", examHallHandler.GetHall)
 
 	// Protected routes
 	api := r.Group("/")

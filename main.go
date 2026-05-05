@@ -16,8 +16,15 @@ func main() {
 		log.Printf("Failed to load .env (%v). Using system environment variables.", err)
 	}
 
-	config.InitMySQL()
-	config.InitFirebase()
+	// config.InitMySQL()
+	// config.InitFirebase()
+
+	if os.Getenv("SKIP_SERVICE_INIT") == "true" {
+		log.Println("⚠️ SKIPPING MySQL and Firebase initialization because SKIP_SERVICE_INIT=true")
+	} else {
+		config.InitMySQL()
+		config.InitFirebase()
+	}
 
 	sheetHandler := handlers.NewSheetHandler()
 	sheetHandler.InitOAuth()
@@ -31,6 +38,7 @@ func main() {
 	cardHandler := handlers.NewCardHandler()
 	semesterHandler := handlers.NewSemesterHandler()
 	adminHandler := handlers.NewAdminHandler()
+	examHallHandler := handlers.NewExamHallHandler()
 	messHandler := handlers.NewMessHandler(sheetHandler)
 	leaderboardHandler := handlers.NewLeaderboardHandler(sheetHandler)
 	leaveHandler := handlers.NewLeaveHandler()
@@ -43,6 +51,7 @@ func main() {
 		messHandler,
 		leaderboardHandler,
 		leaveHandler,
+		examHallHandler,
 	)
 
 	port := os.Getenv("PORT")
