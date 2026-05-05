@@ -27,6 +27,7 @@ func SetupRouter(
 			"http://localhost:5173",
 			"https://bitcentral.vercel.app",
 			"https://bitcenteral.netlify.app",
+"https://bitcentral.bitsathy.in"
 		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "x-admin-secret"},
