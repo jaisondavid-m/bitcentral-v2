@@ -129,13 +129,13 @@ export default function About() {
           <p className="mb-6 text-blue-700 dark:text-blue-300">Have questions or feedback? Feel free to reach out.</p>
 
           <div className="space-y-3">
-            <a href="mailto:jaison7373@gmail.com" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 transition-colors hover:bg-gray-100 dark:border-blue-900 dark:bg-slate-900 dark:hover:bg-slate-800">
+            <a href="mailto:developer@bitsathy.in" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 transition-colors hover:bg-gray-100 dark:border-blue-900 dark:bg-slate-900 dark:hover:bg-slate-800">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white">
                 <Mail className="h-5 w-5" />
               </div>
               <div className="text-left">
                 <p className="text-xs text-blue-600">Email</p>
-                <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">jaison7373@gmail.com</p>
+                <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">developer@bitsathy.in</p>
               </div>
             </a>
 
