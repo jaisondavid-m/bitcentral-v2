@@ -38,9 +38,13 @@ const COURSE_CODES = [
   "22AM302","22CE302","22CD302","22MC302","22AG302",
   "22EI302","22BT302",
 
-  // Additional found variations
-  "22AL302"
+  // Additional found variations (including PDF source)
+  "22AL302",
+  "22AI303", // From PDF: B.Tech AD[span_0](start_span)[span_0](end_span)
+  "22IS303"  // From PDF: B.E. SE (Correction from '221S303' typo in PDF)[span_1](start_span)[span_1](end_span)
 ];
+
+
 const ExamHall = () => {
   const { user } = useAuth();
 
