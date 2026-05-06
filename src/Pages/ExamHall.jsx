@@ -63,7 +63,7 @@ const ExamHall = () => {
       });
       return res.data;
     },
-    enabled: false, // 🔥 manual trigger
+    enabled: true,
   });
 
   const handleSearch = () => {
