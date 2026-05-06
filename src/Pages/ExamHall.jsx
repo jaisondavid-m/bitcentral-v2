@@ -4,7 +4,7 @@ import api from "../api/axios.js";
 import { useAuth } from "../context/StudentContext.jsx";
 import Fuse from "fuse.js";
 
-const COURSE_CODES = []string{
+const COURSE_CODES = [
 
 	// 08-05-2026 FN
 	"22CS034", "22EC003", "22IT039", "22AI029", "22BT013",
@@ -33,7 +33,7 @@ const COURSE_CODES = []string{
 	"22AM303", "22CS303", "22ME303", "22EI303", "22BT303",
 	"22CE303", "22IS303", "22CD303", "22FD303", "22BM303",
 	"22CT303", "22AG303", "22CB303",
-}
+]
 
 
 const ExamHall = () => {
