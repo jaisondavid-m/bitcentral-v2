@@ -4,6 +4,7 @@ import api from "../api/axios.js";
 import { useAuth } from "../context/StudentContext.jsx";
 
 const COURSE_CODES = [
+  // Core / Regular
   "22CS034","22EC003","22IT039","22AI029","22BT013",
   "22FD035","22CT038","22IS041","22EE011","22CD022",
   "22BM022","22MC027","22AG016","22EI009","22ME020",
@@ -13,22 +14,33 @@ const COURSE_CODES = [
   "22BTH30","22AIH09","22CEH01","22ITM48","22EIH04",
   "22MCH03","22FTH15","22ITH03","22CTH03","22AMH32",
 
+  // 500 series
   "22EC503","22IT503","22CS503","22CT503","22AG503",
   "22MC503","22AI503","22CE503","22BM503","22CD503",
   "22BT503","22CB503","22EE503","22ME503","22IS503",
   "22FD503","22AM503",
 
+  // 400 series
   "22CS401","22EC401","22IT401","22AI401","22AM401",
   "22EE401","22BT401","22AL401","22CE401","22MC401",
   "22BM401","22CD401","22FD401","22TT401","22CT401",
   "22AG401","22IS401","22CB401","22ME401","22EI401",
 
+  // 300 series (existing)
   "22EC303","22AI303","22EE303","22MC303","22IT303",
   "22AM303","22CS303","22ME303","22EI303","22BT303",
   "22CE303","22IS303","22CD303","22FD303","22BM303",
   "22CT303","22AG303","22CB303",
-];
+  "22HS008",
 
+  // 300 series (AN exam set)
+  "22EC302","22IT302","22EE302","22CS302","22ME302",
+  "22AM302","22CE302","22CD302","22MC302","22AG302",
+  "22EI302","22BT302",
+
+  // Additional found variations
+  "22AL302"
+];
 const ExamHall = () => {
   const { user } = useAuth();
 
