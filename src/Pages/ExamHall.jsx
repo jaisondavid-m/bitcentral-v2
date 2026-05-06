@@ -2,7 +2,6 @@ import React, { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import api from "../api/axios.js";
 import { useAuth } from "../context/StudentContext.jsx";
-import Fuse from "fuse.js";
 
 const COURSE_CODES = [
   "22CS034","22EC003","22IT039","22AI029","22BT013",
@@ -48,18 +47,20 @@ const ExamHall = () => {
   // 🔥 final course (manual OR selected)
   const finalCourse = selectedCourse || courseSearch;
 
-  const fuse = useMemo(
-    () => new Fuse(COURSE_CODES, { threshold: 0.3 }),
-    []
+const filteredCourses = useMemo(() => {
+  if (!courseSearch.trim()) return COURSE_CODES;
+
+  const filtered = COURSE_CODES.filter((code) =>
+    code.includes(courseSearch)
   );
 
-  const filteredCourses = useMemo(() => {
-    return courseSearch.trim() === ""
-      ? COURSE_CODES
-      : fuse.search(courseSearch).map((r) => r.item);
-  }, [courseSearch, fuse]);
+  if (!COURSE_CODES.includes(courseSearch)) {
+    return [courseSearch, ...filtered]; // 👈 add custom on top
+  }
 
-  // 🚀 Query (manual trigger)
+  return filtered;
+}, [courseSearch]);
+
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["exam-hall", registerNo, finalCourse],
     queryFn: async () => {
