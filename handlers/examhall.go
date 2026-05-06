@@ -3084,10 +3084,1049 @@ func buildSeatingData08AN() []models.SeatingRecord {
 	}
 }
 
+// buildSeatingData09FN returns all seating records from the 09-05-2026 FN exam
+// Exam Date: 09-05-2026 | Session: FN - 09:00 AM to 12:00 PM
+func buildSeatingData09FN() []models.SeatingRecord {
+	return []models.SeatingRecord{
+		// S.No 1 - AE 302 - B.E. CS - 22CS401
+		{HallNo: "AE 302", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS134", "7376241CS148")},
+
+		// S.No 2 - AE 302 - B.E. EC - 22EC401
+		{HallNo: "AE 302", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC127", "7376241EC136")},
+
+		// S.No 3 - EW 101 - B.E. CS - 22CS401
+		{HallNo: "EW 101", CourseCode: "22CS401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376241CS149", "7376241CS157")...)
+			r = append(r, expandRange("7376241CS159", "7376241CS164")...)
+			return r
+		}()},
+
+		// S.No 4 - EW 101 - B.E. EC - 22EC401
+		{HallNo: "EW 101", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC137", "7376241EC146")},
+
+		// S.No 5 - EW 102 - B.E. CS - 22CS401
+		{HallNo: "EW 102", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS165", "7376241CS179")},
+
+		// S.No 6 - EW 102 - B.E. EC - 22EC401
+		{HallNo: "EW 102", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC147", "7376241EC156")},
+
+		// S.No 7 - EW 103 - B.E. CS - 22CS401
+		{HallNo: "EW 103", CourseCode: "22CS401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376241CS226", "7376241CS228")...)
+			r = append(r, expandRange("7376241CS230", "7376241CS241")...)
+			return r
+		}()},
+
+		// S.No 8 - EW 103 - B.E. EC - 22EC401
+		{HallNo: "EW 103", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC188", "7376241EC197")},
+
+		// S.No 9 - EW 104 - B.E. CS - 22CS401
+		{HallNo: "EW 104", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS317", "7376241CS331")},
+
+		// S.No 10 - EW 104 - B.E. EC - 22EC401
+		{HallNo: "EW 104", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC250", "7376241EC259")},
+
+		// S.No 11 - EW 105 - B.E. CS - 22CS401
+		{HallNo: "EW 105", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS332", "7376241CS346")},
+
+		// S.No 12 - EW 105 - B.E. EC - 22EC401
+		{HallNo: "EW 105", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC260", "7376241EC269")},
+
+		// S.No 13 - EW 106 - 22EC401
+		{HallNo: "EW 106", CourseCode: "22EC401", RegisterNos: []string{
+			"7376241EC511", "7376241EC513",
+		}},
+
+		// S.No 14 - EW 106 - B.E. CS - 22CS401
+		{HallNo: "EW 106", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS449", "7376241CS463")},
+
+		// S.No 15 - EW 106 - B.E. EC - 22EC401
+		{HallNo: "EW 106", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC345", "7376241EC352")},
+
+		// S.No 16 - EW 107 - B.E. CS - 22CS401
+		{HallNo: "EW 107", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS196", "7376241CS210")},
+
+		// S.No 17 - EW 107 - B.E. EC - 22EC401
+		{HallNo: "EW 107", CourseCode: "22EC401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376241EC167", "7376241EC174")...)
+			r = append(r, "7376241EC176", "7376241EC177")
+			return r
+		}()},
+
+		// S.No 18 - EW 108 - B.E. CS - 22CS401
+		{HallNo: "EW 108", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS242", "7376241CS256")},
+
+		// S.No 19 - EW 108 - B.E. EC - 22EC401
+		{HallNo: "EW 108", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC198", "7376241EC207")},
+
+		// S.No 20 - EW 109 - B.E. CS - 22CS401
+		{HallNo: "EW 109", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS272", "7376241CS286")},
+
+		// S.No 21 - EW 109 - B.E. EC - 22EC401
+		{HallNo: "EW 109", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC219", "7376241EC228")},
+
+		// S.No 22 - EW 111 - B.E. CS - 22CS401
+		{HallNo: "EW 111", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS302", "7376241CS316")},
+
+		// S.No 23 - EW 111 - B.E. EC - 22EC401
+		{HallNo: "EW 111", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC240", "7376241EC249")},
+
+		// S.No 24 - EW 112 - B.E. CS - 22CS401
+		{HallNo: "EW 112", CourseCode: "22CS401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376241CS347", "7376241CS353")...)
+			r = append(r, expandRange("7376241CS355", "7376241CS362")...)
+			return r
+		}()},
+
+		// S.No 25 - EW 112 - B.E. EC - 22EC401
+		{HallNo: "EW 112", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC270", "7376241EC279")},
+
+		// S.No 26 - EW 113 - B.Tech. IT - 22IT401
+		{HallNo: "EW 113", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT247", "7376242IT256")},
+
+		// S.No 27 - EW 113 - B.Tech. AD - 22AI401
+		{HallNo: "EW 113", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD271", "7376242AD285")},
+
+		// S.No 28 - EW 114 - B.Tech. AL - 22AM401
+		{HallNo: "EW 114", CourseCode: "22AM401", RegisterNos: []string{
+			"7376222AL152", "7376222AL169",
+		}},
+
+		// S.No 29 - EW 114 - B.Tech. IT - 22IT401
+		{HallNo: "EW 114", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT308", "7376242IT317")},
+
+		// S.No 30 - EW 114 - B.Tech. AD - 22AI401
+		{HallNo: "EW 114", CourseCode: "22AI401", RegisterNos: expandRange("7376252AD504", "7376252AD516")},
+
+		// S.No 31 - EW 115 - B.Tech. IT - 22IT401
+		{HallNo: "EW 115", CourseCode: "22IT401", RegisterNos: []string{
+			"7376242IT506", "7376242IT509",
+		}},
+
+		// S.No 32 - EW 115 - 22IT401
+		{HallNo: "EW 115", CourseCode: "22IT401", RegisterNos: expandRange("7376252IT501", "7376252IT508")},
+
+		// S.No 33 - EW 115 - B.Tech. AL - 22AM401
+		{HallNo: "EW 115", CourseCode: "22AM401", RegisterNos: expandRange("7376242AL127", "7376242AL141")},
+
+		// S.No 34 - EW 116 - B.E. EE - 22EE401
+		{HallNo: "EW 116", CourseCode: "22EE401", RegisterNos: []string{
+			"7376231EE104", "7376231EE111",
+		}},
+
+		// S.No 35 - EW 116 - B.Tech. IT - 22IT401
+		{HallNo: "EW 116", CourseCode: "22IT401", RegisterNos: expandRange("7376252IT509", "7376252IT516")},
+
+		// S.No 36 - EW 116 - B.Tech. AL - 22AM401
+		{HallNo: "EW 116", CourseCode: "22AM401", RegisterNos: expandRange("7376242AL142", "7376242AL156")},
+
+		// S.No 37 - EW 117 - B.E. EE - 22EE401
+		{HallNo: "EW 117", CourseCode: "22EE401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376241EE109", "7376241EE111")...)
+			r = append(r, expandRange("7376241EE113", "7376241EE119")...)
+			return r
+		}()},
+
+		// S.No 38 - EW 117 - B.Tech. AL - 22AM401
+		{HallNo: "EW 117", CourseCode: "22AM401", RegisterNos: expandRange("7376242AL172", "7376242AL186")},
+
+		// S.No 39 - EW 118 - B.E. EE - 22EE401
+		{HallNo: "EW 118", CourseCode: "22EE401", RegisterNos: expandRange("7376241EE130", "7376241EE139")},
+
+		// S.No 40 - EW 118 - B.Tech. AL - 22AM401
+		{HallNo: "EW 118", CourseCode: "22AM401", RegisterNos: expandRange("7376242AL202", "7376242AL216")},
+
+		// S.No 41 - EW 201 - B.Tech. IT - 22IT401
+		{HallNo: "EW 201", CourseCode: "22IT401", RegisterNos: []string{
+			"7376222IT110", "7376232IT507",
+		}},
+
+		// S.No 42 - EW 201 - B.Tech. AD - 22AI401
+		{HallNo: "EW 201", CourseCode: "22AI401", RegisterNos: []string{
+			"7376222AD111", "7376222AD174", "7376222AD198",
+		}},
+
+		// S.No 43 - EW 201 - B.Tech. IT - 22IT401
+		{HallNo: "EW 201", CourseCode: "22IT401", RegisterNos: []string{
+			"7376232IT113", "7376232IT118", "7376232IT146", "7376232IT152",
+			"7376232IT274", "7376232IT282",
+		}},
+
+		// S.No 44 - EW 201 - B.Tech. AD - 22AI401
+		{HallNo: "EW 201", CourseCode: "22AI401", RegisterNos: []string{
+			"7376232AD115", "7376232AD119",
+		}},
+
+		// S.No 45 - EW 201 - B.E. CS - 22CS401
+		{HallNo: "EW 201", CourseCode: "22CS401", RegisterNos: expandRange("7376251CS515", "7376251CS524")},
+
+		// S.No 46 - EW 201 - B.E. EC - 22EC401
+		{HallNo: "EW 201", CourseCode: "22EC401", RegisterNos: []string{
+			"7376251EC520", "7376251EC521",
+		}},
+
+		// S.No 47 - EW 202 - B.Tech. IT - 22IT401
+		{HallNo: "EW 202", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT111", "7376242IT120")},
+
+		// S.No 48 - EW 202 - B.Tech. AD - 22AI401
+		{HallNo: "EW 202", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD105", "7376242AD119")},
+
+		// S.No 49 - EW 203 - B.Tech. IT - 22IT401
+		{HallNo: "EW 203", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT257", "7376242IT266")},
+
+		// S.No 50 - EW 203 - B.Tech. AD - 22AI401
+		{HallNo: "EW 203", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD286", "7376242AD300")},
+
+		// S.No 51 - EW 204 - B.Tech. IT - 22IT401
+		{HallNo: "EW 204", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT287", "7376242IT296")},
+
+		// S.No 52 - EW 204 - B.Tech. AD - 22AI401
+		{HallNo: "EW 204", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD331", "7376242AD340")},
+
+		// S.No 53 - EW 205 - B.Tech. AL - 22AM401
+		{HallNo: "EW 205", CourseCode: "22AM401", RegisterNos: []string{
+			"7376222AL179", "7376232AL502", "7376232AL503", "7376232AL507",
+			"7376232AL509", "7376232AL510",
+		}},
+
+		// S.No 54 - EW 205 - 22AM401
+		{HallNo: "EW 205", CourseCode: "22AM401", RegisterNos: []string{
+			"7376232AL157", "7376232AL158", "7376232AL183",
+		}},
+
+		// S.No 55 - EW 205 - B.Tech. IT - 22IT401
+		{HallNo: "EW 205", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT318", "7376242IT327")},
+
+		// S.No 56 - EW 205 - B.Tech. AL - 22AM401
+		{HallNo: "EW 205", CourseCode: "22AM401", RegisterNos: []string{"7376242AL101"}},
+
+		// S.No 57 - EW 206 - B.Tech. IT - 22IT401
+		{HallNo: "EW 206", CourseCode: "22IT401", RegisterNos: []string{"7376242IT502"}},
+
+		// S.No 58 - EW 206 - 22IT401
+		{HallNo: "EW 206", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT328", "7376242IT351")},
+
+		// S.No 59 - EW 206 - B.Tech. AL - 22AM401
+		{HallNo: "EW 206", CourseCode: "22AM401", RegisterNos: expandRange("7376242AL102", "7376242AL126")},
+
+		// S.No 60 - EW 207 - B.E. CS - 22CS401
+		{HallNo: "EW 207", CourseCode: "22CS401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376241CS433", "7376241CS442")...)
+			r = append(r, expandRange("7376241CS444", "7376241CS448")...)
+			return r
+		}()},
+
+		// S.No 61 - EW 207 - B.E. EC - 22EC401
+		{HallNo: "EW 207", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC335", "7376241EC344")},
+
+		// S.No 62 - EW 208 - B.E. CS - 22CS401
+		{HallNo: "EW 208", CourseCode: "22CS401", RegisterNos: []string{
+			"7376241CS503", "7376241CS506",
+		}},
+
+		// S.No 63 - EW 208 - B.E. EC - 22EC401
+		{HallNo: "EW 208", CourseCode: "22EC401", RegisterNos: []string{"7376241EC516"}},
+
+		// S.No 64 - EW 208 - B.E. CS - 22CS401
+		{HallNo: "EW 208", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS464", "7376241CS476")},
+
+		// S.No 65 - EW 208 - B.E. EC - 22EC401
+		{HallNo: "EW 208", CourseCode: "22EC401", RegisterNos: expandRange("7376251EC501", "7376251EC509")},
+
+		// S.No 66 - EW 209 - B.Tech. AD - 22AI401
+		{HallNo: "EW 209", CourseCode: "22AI401", RegisterNos: []string{"7376232AD502"}},
+
+		// S.No 67 - EW 209 - 22AI401
+		{HallNo: "EW 209", CourseCode: "22AI401", RegisterNos: []string{
+			"7376232AD122", "7376232AD136", "7376232AD158", "7376232AD170",
+			"7376232AD174", "7376232AD184", "7376232AD250", "7376232AD258",
+			"7376232AD265", "7376232AD277", "7376232AD282",
+		}},
+
+		// S.No 68 - EW 209 - B.Tech. IT - 22IT401
+		{HallNo: "EW 209", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT101", "7376242IT110")},
+
+		// S.No 69 - EW 209 - B.Tech. AD - 22AI401
+		{HallNo: "EW 209", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD102", "7376242AD104")},
+
+		// S.No 70 - EW 210 - B.Tech. IT - 22IT401
+		{HallNo: "EW 210", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT131", "7376242IT140")},
+
+		// S.No 71 - EW 210 - B.Tech. AD - 22AI401
+		{HallNo: "EW 210", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD136", "7376242AD145")},
+
+		// S.No 72 - EW 211 - B.Tech. IT - 22IT401
+		{HallNo: "EW 211", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT192", "7376242IT201")},
+
+		// S.No 73 - EW 211 - B.Tech. AD - 22AI401
+		{HallNo: "EW 211", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD211", "7376242AD220")},
+
+		// S.No 74 - EW 212 - B.Tech. IT - 22IT401
+		{HallNo: "EW 212", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT202", "7376242IT226")},
+
+		// S.No 75 - EW 212 - B.Tech. AD - 22AI401
+		{HallNo: "EW 212", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD221", "7376242AD245")},
+
+		// S.No 76 - EW 213 - B.Tech. AL - 22AM401
+		{HallNo: "EW 213", CourseCode: "22AM401", RegisterNos: []string{
+			"7376242AL501", "7376242AL502", "7376242AL503", "7376242AL504",
+			"7376242AL505", "7376242AL506",
+		}},
+
+		// S.No 77 - EW 213 - B.E. EE - 22EE401
+		{HallNo: "EW 213", CourseCode: "22EE401", RegisterNos: expandRange("7376241EE140", "7376241EE149")},
+
+		// S.No 78 - EW 213 - B.Tech. AL - 22AM401
+		{HallNo: "EW 213", CourseCode: "22AM401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376242AL217", "7376242AL223")...)
+			r = append(r, "7376252AL501", "7376252AL502")
+			return r
+		}()},
+
+		// S.No 79 - EW 214 - B.Tech. BT - 22BT401
+		{HallNo: "EW 214", CourseCode: "22BT401", RegisterNos: []string{"7376222BT110"}},
+
+		// S.No 80 - EW 214 - 22BT401
+		{HallNo: "EW 214", CourseCode: "22BT401", RegisterNos: []string{"7376232BT142"}},
+
+		// S.No 81 - EW 214 - B.E. EE - 22EE401
+		{HallNo: "EW 214", CourseCode: "22EE401", RegisterNos: expandRange("7376241EE150", "7376241EE159")},
+
+		// S.No 82 - EW 214 - B.Tech. BT - 22BT401
+		{HallNo: "EW 214", CourseCode: "22BT401", RegisterNos: expandRange("7376242BT102", "7376242BT113")},
+
+		// S.No 83 - EW 214 - B.Tech. AL - 22AM401
+		{HallNo: "EW 214", CourseCode: "22AM401", RegisterNos: []string{"7376252AL503"}},
+
+		// S.No 84 - EW 215 - B.E. EE - 22EE401
+		{HallNo: "EW 215", CourseCode: "22EE401", RegisterNos: expandRange("7376241EE160", "7376241EE169")},
+
+		// S.No 85 - EW 215 - B.Tech. BT - 22BT401
+		{HallNo: "EW 215", CourseCode: "22BT401", RegisterNos: expandRange("7376242BT114", "7376242BT128")},
+
+		// S.No 86 - EW 216 - B.E. EE - 22EE401
+		{HallNo: "EW 216", CourseCode: "22EE401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, "7376241EE170", "7376241EE171")
+			r = append(r, expandRange("7376241EE173", "7376241EE180")...)
+			return r
+		}()},
+
+		// S.No 87 - EW 216 - B.Tech. BT - 22BT401
+		{HallNo: "EW 216", CourseCode: "22BT401", RegisterNos: expandRange("7376242BT129", "7376242BT138")},
+
+		// S.No 88 - EW 217 - B.E. EE - 22EE401
+		{HallNo: "EW 217", CourseCode: "22EE401", RegisterNos: expandRange("7376241EE181", "7376241EE190")},
+
+		// S.No 89 - EW 217 - B.Tech. BT - 22BT401
+		{HallNo: "EW 217", CourseCode: "22BT401", RegisterNos: expandRange("7376242BT139", "7376242BT148")},
+
+		// S.No 90 - EW 218 - B.E. EE - 22EE401
+		{HallNo: "EW 218", CourseCode: "22EE401", RegisterNos: expandRange("7376241EE191", "7376241EE215")},
+
+		// S.No 91 - EW 218 - B.Tech. BT - 22BT401
+		{HallNo: "EW 218", CourseCode: "22BT401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376242BT149", "7376242BT160")...)
+			r = append(r, expandRange("7376242BT162", "7376242BT174")...)
+			return r
+		}()},
+
+		// S.No 92 - MH 301 - B.E. CS - 22CS401
+		{HallNo: "MH 301", CourseCode: "22CS401", RegisterNos: []string{
+			"7376221CS109", "7376221CS111", "7376221CS114", "7376221CS118",
+			"7376221CS140", "7376221CS147", "7376221CS196", "7376221CS229",
+			"7376221CS240", "7376221CS275", "7376221CS288", "7376221CS322",
+		}},
+
+		// S.No 93 - MH 301 - B.E. EC - 22EC401
+		{HallNo: "MH 301", CourseCode: "22EC401", RegisterNos: []string{
+			"7376221EC105", "7376221EC107", "7376221EC116", "7376221EC192",
+			"7376221EC337",
+		}},
+
+		// S.No 94 - MH 301 - B.E. CS - 22CS401
+		{HallNo: "MH 301", CourseCode: "22CS401", RegisterNos: []string{
+			"7376231CS102", "7376231CS103", "7376231CS173",
+		}},
+
+		// S.No 95 - MH 301 - B.E. EC - 22EC401
+		{HallNo: "MH 301", CourseCode: "22EC401", RegisterNos: []string{
+			"7376231EC110", "7376231EC112", "7376231EC121", "7376231EC196",
+			"7376231EC243",
+		}},
+
+		// S.No 96 - MH 302 - B.E. CS - 22CS401
+		{HallNo: "MH 302", CourseCode: "22CS401", RegisterNos: []string{
+			"7376231CS508", "7376231CS512",
+		}},
+
+		// S.No 97 - MH 302 - B.E. EC - 22EC401
+		{HallNo: "MH 302", CourseCode: "22EC401", RegisterNos: []string{
+			"7376231EC507", "7376231EC514",
+		}},
+
+		// S.No 98 - MH 302 - B.E. CS - 22CS401
+		{HallNo: "MH 302", CourseCode: "22CS401", RegisterNos: []string{
+			"7376231CS190", "7376231CS206", "7376231CS207", "7376231CS235",
+			"7376231CS240", "7376231CS244", "7376231CS259", "7376231CS269",
+			"7376231CS292", "7376231CS295", "7376231CS346",
+		}},
+
+		// S.No 99 - MH 302 - B.E. EC - 22EC401
+		{HallNo: "MH 302", CourseCode: "22EC401", RegisterNos: []string{
+			"7376231EC283", "7376231EC297", "7376231EC305", "7376231EC318",
+			"7376231EC331", "7376231EC334",
+		}},
+
+		// S.No 100 - MH 302 - B.E. CS - 22CS401
+		{HallNo: "MH 302", CourseCode: "22CS401", RegisterNos: []string{
+			"7376241CS102", "7376241CS103",
+		}},
+
+		// S.No 101 - MH 302 - B.E. EC - 22EC401
+		{HallNo: "MH 302", CourseCode: "22EC401", RegisterNos: []string{
+			"7376241EC103", "7376241EC104",
+		}},
+
+		// S.No 102 - MH 303 - B.E. CS - 22CS401
+		{HallNo: "MH 303", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS104", "7376241CS118")},
+
+		// S.No 103 - MH 303 - B.E. EC - 22EC401
+		{HallNo: "MH 303", CourseCode: "22EC401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376241EC105", "7376241EC110")...)
+			r = append(r, "7376241EC112", "7376241EC113", "7376241EC115", "7376241EC116")
+			return r
+		}()},
+
+		// S.No 104 - MH 305 - B.E. CS - 22CS401
+		{HallNo: "MH 305", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS119", "7376241CS133")},
+
+		// S.No 105 - MH 305 - B.E. EC - 22EC401
+		{HallNo: "MH 305", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC117", "7376241EC126")},
+
+		// S.No 106 - WW 002 - B.Tech. IT - 22IT401
+		{HallNo: "WW 002", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT172", "7376242IT181")},
+
+		// S.No 107 - WW 002 - B.Tech. AD - 22AI401
+		{HallNo: "WW 002", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD191", "7376242AD200")},
+
+		// S.No 108 - WW 003 - B.Tech. IT - 22IT401
+		{HallNo: "WW 003", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT182", "7376242IT191")},
+
+		// S.No 109 - WW 003 - B.Tech. AD - 22AI401
+		{HallNo: "WW 003", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD201", "7376242AD210")},
+
+		// S.No 110 - WW 004 - B.Tech. IT - 22IT401
+		{HallNo: "WW 004", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT227", "7376242IT236")},
+
+		// S.No 111 - WW 004 - B.Tech. AD - 22AI401
+		{HallNo: "WW 004", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD246", "7376242AD255")},
+
+		// S.No 112 - WW 005 - B.Tech. IT - 22IT401
+		{HallNo: "WW 005", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT237", "7376242IT246")},
+
+		// S.No 113 - WW 005 - B.Tech. AD - 22AI401
+		{HallNo: "WW 005", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD256", "7376242AD270")},
+
+		// S.No 114 - WW 006 - B.Tech. IT - 22IT401
+		{HallNo: "WW 006", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT267", "7376242IT276")},
+
+		// S.No 115 - WW 006 - B.Tech. AD - 22AI401
+		{HallNo: "WW 006", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD301", "7376242AD315")},
+
+		// S.No 116 - WW 007 - B.Tech. IT - 22IT401
+		{HallNo: "WW 007", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT277", "7376242IT286")},
+
+		// S.No 117 - WW 007 - B.Tech. AD - 22AI401
+		{HallNo: "WW 007", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD316", "7376242AD330")},
+
+		// S.No 118 - WW 008 - 22AI401
+		{HallNo: "WW 008", CourseCode: "22AI401", RegisterNos: []string{
+			"7376242AD502", "7376242AD503", "7376242AD505", "7376242AD506",
+			"7376242AD509", "7376242AD510",
+		}},
+
+		// S.No 119 - WW 008 - B.Tech. IT - 22IT401
+		{HallNo: "WW 008", CourseCode: "22IT401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376242IT297", "7376242IT303")...)
+			r = append(r, expandRange("7376242IT305", "7376242IT307")...)
+			return r
+		}()},
+
+		// S.No 120 - WW 008 - B.Tech. AD - 22AI401
+		{HallNo: "WW 008", CourseCode: "22AI401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376242AD341", "7376242AD346")...)
+			r = append(r, expandRange("7376252AD501", "7376252AD503")...)
+			return r
+		}()},
+
+		// S.No 121 - WW 011 - B.E. EE - 22EE401
+		{HallNo: "WW 011", CourseCode: "22EE401", RegisterNos: []string{"7376231EE504"}},
+
+		// S.No 122 - WW 011 - 22EE401
+		{HallNo: "WW 011", CourseCode: "22EE401", RegisterNos: []string{"7376231EE115"}},
+
+		// S.No 123 - WW 011 - 22EE401
+		{HallNo: "WW 011", CourseCode: "22EE401", RegisterNos: expandRange("7376241EE101", "7376241EE108")},
+
+		// S.No 124 - WW 011 - B.Tech. AL - 22AM401
+		{HallNo: "WW 011", CourseCode: "22AM401", RegisterNos: expandRange("7376242AL157", "7376242AL171")},
+
+		// S.No 125 - WW 012 - B.E. EE - 22EE401
+		{HallNo: "WW 012", CourseCode: "22EE401", RegisterNos: expandRange("7376241EE120", "7376241EE129")},
+
+		// S.No 126 - WW 012 - B.Tech. AL - 22AM401
+		{HallNo: "WW 012", CourseCode: "22AM401", RegisterNos: expandRange("7376242AL187", "7376242AL201")},
+
+		// S.No 127 - WW 113 - B.E. CS - 22CS401
+		{HallNo: "WW 113", CourseCode: "22CS401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376241CS180", "7376241CS188")...)
+			r = append(r, expandRange("7376241CS190", "7376241CS195")...)
+			return r
+		}()},
+
+		// S.No 128 - WW 113 - B.E. EC - 22EC401
+		{HallNo: "WW 113", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC157", "7376241EC166")},
+
+		// S.No 129 - WW 114 - B.E. CS - 22CS401
+		{HallNo: "WW 114", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS211", "7376241CS225")},
+
+		// S.No 130 - WW 114 - B.E. EC - 22EC401
+		{HallNo: "WW 114", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC178", "7376241EC187")},
+
+		// S.No 131 - WW 115 - B.E. CS - 22CS401
+		{HallNo: "WW 115", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS257", "7376241CS271")},
+
+		// S.No 132 - WW 115 - B.E. EC - 22EC401
+		{HallNo: "WW 115", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC209", "7376241EC218")},
+
+		// S.No 133 - WW 117 - B.E. CS - 22CS401
+		{HallNo: "WW 117", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS287", "7376241CS301")},
+
+		// S.No 134 - WW 117 - B.E. EC - 22EC401
+		{HallNo: "WW 117", CourseCode: "22EC401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, "7376241EC229", "7376241EC230")
+			r = append(r, expandRange("7376241EC232", "7376241EC239")...)
+			return r
+		}()},
+
+		// S.No 135 - WW 118 - B.E. CS - 22CS401
+		{HallNo: "WW 118", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS363", "7376241CS377")},
+
+		// S.No 136 - WW 118 - B.E. EC - 22EC401
+		{HallNo: "WW 118", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC280", "7376241EC289")},
+
+		// S.No 137 - WW 202 - B.E. CS - 22CS401
+		{HallNo: "WW 202", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS378", "7376241CS402")},
+
+		// S.No 138 - WW 202 - B.E. EC - 22EC401
+		{HallNo: "WW 202", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC290", "7376241EC314")},
+
+		// S.No 139 - WW 203 - B.E. CS - 22CS401
+		{HallNo: "WW 203", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS403", "7376241CS417")},
+
+		// S.No 140 - WW 203 - B.E. EC - 22EC401
+		{HallNo: "WW 203", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC315", "7376241EC324")},
+
+		// S.No 141 - WW 204 - B.E. CS - 22CS401
+		{HallNo: "WW 204", CourseCode: "22CS401", RegisterNos: []string{
+			"7376241CS507", "7376241CS517",
+		}},
+
+		// S.No 142 - WW 204 - 22CS401
+		{HallNo: "WW 204", CourseCode: "22CS401", RegisterNos: expandRange("7376251CS501", "7376251CS513")},
+
+		// S.No 143 - WW 204 - B.E. EC - 22EC401
+		{HallNo: "WW 204", CourseCode: "22EC401", RegisterNos: expandRange("7376251EC510", "7376251EC519")},
+
+		// S.No 144 - WW 205 - B.Tech. IT - 22IT401
+		{HallNo: "WW 205", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT141", "7376242IT150")},
+
+		// S.No 145 - WW 205 - B.Tech. AD - 22AI401
+		{HallNo: "WW 205", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD146", "7376242AD160")},
+
+		// S.No 146 - WW 211 - B.E. CS - 22CS401
+		{HallNo: "WW 211", CourseCode: "22CS401", RegisterNos: expandRange("7376241CS418", "7376241CS432")},
+
+		// S.No 147 - WW 211 - B.E. EC - 22EC401
+		{HallNo: "WW 211", CourseCode: "22EC401", RegisterNos: expandRange("7376241EC325", "7376241EC334")},
+
+		// S.No 148 - WW 212 - B.E. CE - 22CE401
+		{HallNo: "WW 212", CourseCode: "22CE401", RegisterNos: []string{"7376221CE124"}},
+
+		// S.No 149 - WW 212 - B.E. MC - 22MC401
+		{HallNo: "WW 212", CourseCode: "22MC401", RegisterNos: []string{
+			"7376221MC110", "7376231MC506", "7376231MC507", "7376231MC509",
+			"7376231MC510",
+		}},
+
+		// S.No 150 - WW 212 - B.E. BM - 22BM401
+		{HallNo: "WW 212", CourseCode: "22BM401", RegisterNos: []string{
+			"7376221BM128", "7376231BM501", "7376231BM502",
+		}},
+
+		// S.No 151 - WW 212 - B.E. CD - 22CD401
+		{HallNo: "WW 212", CourseCode: "22CD401", RegisterNos: []string{
+			"7376221CD114", "7376221CD144", "7376221CD153", "7376231CD503",
+		}},
+
+		// S.No 152 - WW 212 - B.Tech. FD - 22FD401
+		{HallNo: "WW 212", CourseCode: "22FD401", RegisterNos: []string{
+			"7376222FD107", "7376222FD125",
+		}},
+
+		// S.No 153 - WW 212 - B.Tech. TT - 22TT401
+		{HallNo: "WW 212", CourseCode: "22TT401", RegisterNos: []string{
+			"7376222TX134", "7376232TX504", "7376232TX508", "7376232TX515",
+		}},
+
+		// S.No 154 - WW 212 - B.Tech. CT - 22CT401
+		{HallNo: "WW 212", CourseCode: "22CT401", RegisterNos: []string{
+			"7376222CT126", "7376232CT501", "7376232CT502", "7376232CT504",
+		}},
+
+		// S.No 155 - WW 212 - B.E. CE - 22CE401
+		{HallNo: "WW 212", CourseCode: "22CE401", RegisterNos: []string{
+			"7376231CE117", "7376231CE120", "7376241CE501",
+		}},
+
+		// S.No 156 - WW 212 - B.E. BM - 22BM401
+		{HallNo: "WW 212", CourseCode: "22BM401", RegisterNos: []string{
+			"7376231BM107", "7376231BM132", "7376231BM134", "7376231BM137",
+			"7376231BM148", "7376241BM501",
+		}},
+
+		// S.No 157 - WW 212 - B.E. CD - 22CD401
+		{HallNo: "WW 212", CourseCode: "22CD401", RegisterNos: []string{
+			"7376231CD111", "7376231CD115", "7376231CD143", "7376241CD501",
+			"7376241CD502",
+		}},
+
+		// S.No 158 - WW 212 - B.Tech. CT - 22CT401
+		{HallNo: "WW 212", CourseCode: "22CT401", RegisterNos: []string{
+			"7376232CT102", "7376232CT117", "7376232CT122", "7376232CT127",
+			"7376242CT503",
+		}},
+
+		// S.No 159 - WW 212 - B.Tech. AG - 22AG401
+		{HallNo: "WW 212", CourseCode: "22AG401", RegisterNos: []string{
+			"7376242AG124", "7376252AG501", "7376252AG502",
+		}},
+
+		// S.No 160 - WW 213 - B.Tech. IT - 22IT401
+		{HallNo: "WW 213", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT121", "7376242IT130")},
+
+		// S.No 161 - WW 213 - B.Tech. AD - 22AI401
+		{HallNo: "WW 213", CourseCode: "22AI401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376242AD120", "7376242AD129")...)
+			r = append(r, expandRange("7376242AD131", "7376242AD135")...)
+			return r
+		}()},
+
+		// S.No 162 - WW 214 - B.Tech. IT - 22IT401
+		{HallNo: "WW 214", CourseCode: "22IT401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376242IT151", "7376242IT153")...)
+			r = append(r, expandRange("7376242IT155", "7376242IT161")...)
+			return r
+		}()},
+
+		// S.No 163 - WW 214 - B.Tech. AD - 22AI401
+		{HallNo: "WW 214", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD161", "7376242AD175")},
+
+		// S.No 164 - WW 215 - B.Tech. IT - 22IT401
+		{HallNo: "WW 215", CourseCode: "22IT401", RegisterNos: expandRange("7376242IT162", "7376242IT171")},
+
+		// S.No 165 - WW 215 - B.Tech. AD - 22AI401
+		{HallNo: "WW 215", CourseCode: "22AI401", RegisterNos: expandRange("7376242AD176", "7376242AD190")},
+
+		// S.No 166 - WW 218 - B.E. EE - 22EE401
+		{HallNo: "WW 218", CourseCode: "22EE401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, "7376241EE216", "7376241EE217")
+			r = append(r, expandRange("7376251EE501", "7376251EE508")...)
+			return r
+		}()},
+
+		// S.No 167 - WW 218 - B.Tech. BT - 22BT401
+		{HallNo: "WW 218", CourseCode: "22BT401", RegisterNos: expandRange("7376242BT175", "7376242BT189")},
+
+		// S.No 168 - WW 219 - B.E. MZ - 22MC401
+		{HallNo: "WW 219", CourseCode: "22MC401", RegisterNos: []string{"7376231MZ106"}},
+
+		// S.No 169 - WW 219 - B.E. EE - 22EE401
+		{HallNo: "WW 219", CourseCode: "22EE401", RegisterNos: expandRange("7376251EE509", "7376251EE517")},
+
+		// S.No 170 - WW 219 - B.Tech. BT - 22BT401
+		{HallNo: "WW 219", CourseCode: "22BT401", RegisterNos: expandRange("7376242BT190", "7376242BT204")},
+
+		// S.No 171 - WW 220 - B.E. MZ - 22MC401
+		{HallNo: "WW 220", CourseCode: "22MC401", RegisterNos: []string{
+			"7376231MZ107", "7376231MZ111", "7376231MZ113", "7376231MZ114",
+			"7376231MZ115", "7376231MZ119", "7376231MZ132", "7376231MZ143",
+			"7376231MZ145", "7376231MZ148",
+		}},
+
+		// S.No 172 - WW 220 - B.Tech. BT - 22BT401
+		{HallNo: "WW 220", CourseCode: "22BT401", RegisterNos: expandRange("7376242BT205", "7376242BT214")},
+
+		// S.No 173 - WW 221 - B.E. EI - 22EI401
+		{HallNo: "WW 221", CourseCode: "22EI401", RegisterNos: []string{"7376221EI142"}},
+
+		// S.No 174 - WW 221 - B.E. MZ - 22MC401
+		{HallNo: "WW 221", CourseCode: "22MC401", RegisterNos: []string{
+			"7376231MZ154", "7376231MZ158",
+		}},
+
+		// S.No 175 - WW 221 - 22MC401
+		{HallNo: "WW 221", CourseCode: "22MC401", RegisterNos: expandRange("7376241MZ101", "7376241MZ108")},
+
+		// S.No 176 - WW 221 - B.Tech. BT - 22BT401
+		{HallNo: "WW 221", CourseCode: "22BT401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376242BT215", "7376242BT222")...)
+			r = append(r, "7376252BT501")
+			return r
+		}()},
+
+		// S.No 177 - WW 222 - B.E. EI - 22EI401
+		{HallNo: "WW 222", CourseCode: "22EI401", RegisterNos: []string{
+			"7376221EI149", "7376221EI150", "7376231EI501", "7376231EI503",
+		}},
+
+		// S.No 178 - WW 222 - B.E. EI - 22EI401
+		{HallNo: "WW 222", CourseCode: "22EI401", RegisterNos: []string{
+			"7376231EI117", "7376231EI124", "7376231EI128", "7376231EI132",
+			"7376231EI143", "7376231EI144", "7376231EI151", "7376231EI156",
+			"7376231EI159",
+		}},
+
+		// S.No 179 - WW 222 - 22EI401
+		{HallNo: "WW 222", CourseCode: "22EI401", RegisterNos: expandRange("7376241EI101", "7376241EI112")},
+
+		// S.No 180 - WW 222 - B.E. MZ - 22MC401
+		{HallNo: "WW 222", CourseCode: "22MC401", RegisterNos: expandRange("7376241MZ109", "7376241MZ133")},
+
+		// S.No 181 - WW 223 - B.E. EI - 22EI401
+		{HallNo: "WW 223", CourseCode: "22EI401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376241EI113", "7376241EI125")...)
+			r = append(r, expandRange("7376241EI127", "7376241EI138")...)
+			return r
+		}()},
+
+		// S.No 182 - WW 223 - B.E. MZ - 22MC401
+		{HallNo: "WW 223", CourseCode: "22MC401", RegisterNos: expandRange("7376241MZ134", "7376241MZ158")},
+
+		// S.No 183 - WW 224 - B.E. EI - 22EI401
+		{HallNo: "WW 224", CourseCode: "22EI401", RegisterNos: []string{
+			"7376241EI501", "7376241EI503",
+		}},
+
+		// S.No 184 - WW 224 - B.E. ME - 22ME401
+		{HallNo: "WW 224", CourseCode: "22ME401", RegisterNos: []string{"7376231ME143"}},
+
+		// S.No 185 - WW 224 - B.E. MZ - 22MC401
+		{HallNo: "WW 224", CourseCode: "22MC401", RegisterNos: []string{
+			"7376241MZ501", "7376241MZ504",
+		}},
+
+		// S.No 186 - WW 224 - B.E. EI - 22EI401
+		{HallNo: "WW 224", CourseCode: "22EI401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376241EI139", "7376241EI160")...)
+			r = append(r, "7376251EI501")
+			return r
+		}()},
+
+		// S.No 187 - WW 224 - B.E. ME - 22ME401
+		{HallNo: "WW 224", CourseCode: "22ME401", RegisterNos: expandRange("7376241ME102", "7376241ME115")},
+
+		// S.No 188 - WW 224 - B.E. MZ - 22MC401
+		{HallNo: "WW 224", CourseCode: "22MC401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, "7376241MZ159", "7376241MZ160")
+			r = append(r, expandRange("7376251MZ501", "7376251MZ506")...)
+			return r
+		}()},
+
+		// S.No 189 - WW 225 - B.Tech. CB - 22CB401
+		{HallNo: "WW 225", CourseCode: "22CB401", RegisterNos: []string{
+			"7376232CB111", "7376232CB123", "7376232CB133",
+		}},
+
+		// S.No 190 - WW 225 - B.E. EI - 22EI401
+		{HallNo: "WW 225", CourseCode: "22EI401", RegisterNos: []string{"7376251EI502"}},
+
+		// S.No 191 - WW 225 - B.E. ME - 22ME401
+		{HallNo: "WW 225", CourseCode: "22ME401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376241ME116", "7376241ME132")...)
+			r = append(r, expandRange("7376241ME134", "7376241ME141")...)
+			return r
+		}()},
+
+		// S.No 192 - WW 225 - B.Tech. CB - 22CB401
+		{HallNo: "WW 225", CourseCode: "22CB401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376242CB102", "7376242CB105")...)
+			r = append(r, expandRange("7376242CB107", "7376242CB123")...)
+			return r
+		}()},
+
+		// S.No 193 - WW 226 - B.E. ME - 22ME401
+		{HallNo: "WW 226", CourseCode: "22ME401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376241ME142", "7376241ME159")...)
+			r = append(r, expandRange("7376251ME501", "7376251ME507")...)
+			return r
+		}()},
+
+		// S.No 194 - WW 226 - B.Tech. CB - 22CB401
+		{HallNo: "WW 226", CourseCode: "22CB401", RegisterNos: expandRange("7376242CB124", "7376242CB148")},
+
+		// S.No 195 - WW 227 - B.E. SE - 22IS401
+		{HallNo: "WW 227", CourseCode: "22IS401", RegisterNos: []string{
+			"7376221SE108", "7376221SE134", "7376221SE140", "7376231SE504",
+		}},
+
+		// S.No 196 - WW 227 - B.Tech. AG - 22AG401
+		{HallNo: "WW 227", CourseCode: "22AG401", RegisterNos: []string{"7376222AG120"}},
+
+		// S.No 197 - WW 227 - B.E. SE - 22IS401
+		{HallNo: "WW 227", CourseCode: "22IS401", RegisterNos: []string{
+			"7376231SE103", "7376231SE122", "7376231SE137", "7376231SE139",
+			"7376231SE153", "7376241SE501",
+		}},
+
+		// S.No 198 - WW 227 - B.Tech. CB - 22CB401
+		{HallNo: "WW 227", CourseCode: "22CB401", RegisterNos: []string{"7376242CB502"}},
+
+		// S.No 199 - WW 227 - B.E. ME - 22ME401
+		{HallNo: "WW 227", CourseCode: "22ME401", RegisterNos: []string{"7376251ME508"}},
+
+		// S.No 200 - WW 227 - B.Tech. CB - 22CB401
+		{HallNo: "WW 227", CourseCode: "22CB401", RegisterNos: func() []string {
+			var r []string
+			r = append(r, expandRange("7376242CB149", "7376242CB159")...)
+			r = append(r, expandRange("7376252CB501", "7376252CB503")...)
+			return r
+		}()},
+
+		// S.No 201 - WW 227 - B.Tech. AG - 22AG401
+		{HallNo: "WW 227", CourseCode: "22AG401", RegisterNos: expandRange("7376242AG101", "7376242AG123")},
+	}
+}
+
+// buildSeatingData09AN returns all seating records from the 09-05-2026 AN exam
+// Exam Date: 09-05-2026 | Session: AN - 01:30 PM to 04:30 PM
+func buildSeatingData09AN() []models.SeatingRecord {
+	return []models.SeatingRecord{
+		// S.No 1 - EW 101 - B.E. EC - 22EC303
+		{HallNo: "EW 101", CourseCode: "22EC303", RegisterNos: []string{
+			"7376221EC102", "7376221EC107", "7376221EC116",
+		}},
+
+		// S.No 2 - EW 101 - 22EC303
+		{HallNo: "EW 101", CourseCode: "22EC303", RegisterNos: []string{
+			"7376231EC101", "7376231EC110", "7376231EC112", "7376231EC208",
+			"7376231EC283", "7376231EC297", "7376231EC305", "7376231EC331",
+			"7376231EC334",
+		}},
+
+		// S.No 3 - EW 101 - B.Tech. AD - 22AI303
+		{HallNo: "EW 101", CourseCode: "22AI303", RegisterNos: []string{"7376232AD250"}},
+
+		// S.No 4 - EW 101 - B.E. EC - 22EC303
+		{HallNo: "EW 101", CourseCode: "22EC303", RegisterNos: []string{
+			"7376241EC137", "7376241EC138", "7376241EC145",
+		}},
+
+		// S.No 5 - EW 101 - B.Tech. AD - 22AI303
+		{HallNo: "EW 101", CourseCode: "22AI303", RegisterNos: []string{
+			"7376242AD137", "7376242AD146", "7376242AD189", "7376242AD190",
+			"7376242AD202", "7376242AD218", "7376242AD291", "7376242AD301",
+			"7376242AD320",
+		}},
+
+		// S.No 6 - EW 102 - B.E. EE - 22EE303
+		{HallNo: "EW 102", CourseCode: "22EE303", RegisterNos: []string{"7376231EE115"}},
+
+		// S.No 7 - EW 102 - B.E. MZ - 22MC303
+		{HallNo: "EW 102", CourseCode: "22MC303", RegisterNos: []string{
+			"7376231MZ106", "7376231MZ107", "7376231MZ111", "7376231MZ113",
+			"7376231MZ135",
+		}},
+
+		// S.No 8 - EW 102 - B.Tech. AD - 22AI303
+		{HallNo: "EW 102", CourseCode: "22AI303", RegisterNos: []string{"7376242AD510"}},
+
+		// S.No 9 - EW 102 - B.E. EC - 22EC303
+		{HallNo: "EW 102", CourseCode: "22EC303", RegisterNos: []string{
+			"7376241EC201", "7376241EC243", "7376241EC256", "7376241EC271",
+			"7376241EC302", "7376241EC312", "7376241EC333", "7376251EC509",
+			"7376251EC511", "7376251EC517", "7376251EC518", "7376251EC519",
+			"7376251EC521",
+		}},
+
+		// S.No 10 - EW 102 - B.E. EE - 22EE303
+		{HallNo: "EW 102", CourseCode: "22EE303", RegisterNos: []string{"7376241EE130"}},
+
+		// S.No 11 - EW 102 - B.E. MZ - 22MC303
+		{HallNo: "EW 102", CourseCode: "22MC303", RegisterNos: []string{"7376241MZ112"}},
+
+		// S.No 12 - EW 102 - B.Tech. AD - 22AI303
+		{HallNo: "EW 102", CourseCode: "22AI303", RegisterNos: []string{
+			"7376242AD326", "7376252AD510", "7376252AD515",
+		}},
+
+		// S.No 13 - EW 103 - B.E. EI - 22EI303
+		{HallNo: "EW 103", CourseCode: "22EI303", RegisterNos: []string{"7376231EI503"}},
+
+		// S.No 14 - EW 103 - 22EI303
+		{HallNo: "EW 103", CourseCode: "22EI303", RegisterNos: []string{"7376231EI159"}},
+
+		// S.No 15 - EW 103 - B.E. MZ - 22MC303
+		{HallNo: "EW 103", CourseCode: "22MC303", RegisterNos: []string{"7376241MZ501"}},
+
+		// S.No 16 - EW 103 - B.Tech. IT - 22IT303
+		{HallNo: "EW 103", CourseCode: "22IT303", RegisterNos: []string{"7376232IT118"}},
+
+		// S.No 17 - EW 103 - B.E. EE - 22EE303
+		{HallNo: "EW 103", CourseCode: "22EE303", RegisterNos: []string{
+			"7376241EE132", "7376241EE146", "7376241EE147", "7376241EE157",
+			"7376241EE193", "7376241EE211", "7376241EE213", "7376251EE502",
+			"7376251EE506", "7376251EE508", "7376251EE510", "7376251EE514",
+		}},
+
+		// S.No 18 - EW 103 - B.E. MZ - 22MC303
+		{HallNo: "EW 103", CourseCode: "22MC303", RegisterNos: []string{
+			"7376241MZ124", "7376241MZ127", "7376241MZ139", "7376241MZ143",
+			"7376251MZ504", "7376251MZ505", "7376251MZ506",
+		}},
+
+		// S.No 19 - EW 103 - B.Tech. IT - 22IT303
+		{HallNo: "EW 103", CourseCode: "22IT303", RegisterNos: []string{
+			"7376242IT146", "7376242IT184",
+		}},
+
+		// S.No 20 - EW 104 - B.E. CS - 22CS303
+		{HallNo: "EW 104", CourseCode: "22CS303", RegisterNos: []string{
+			"7376221CS118", "7376221CS288",
+		}},
+
+		// S.No 21 - EW 104 - B.E. ME - 22ME303
+		{HallNo: "EW 104", CourseCode: "22ME303", RegisterNos: []string{"7376221ME154"}},
+
+		// S.No 22 - EW 104 - B.E. CS - 22CS303
+		{HallNo: "EW 104", CourseCode: "22CS303", RegisterNos: []string{
+			"7376231CS244", "7376231CS259",
+		}},
+
+		// S.No 23 - EW 104 - B.E. ME - 22ME303
+		{HallNo: "EW 104", CourseCode: "22ME303", RegisterNos: []string{"7376231ME149"}},
+
+		// S.No 24 - EW 104 - B.E. CS - 22CS303
+		{HallNo: "EW 104", CourseCode: "22CS303", RegisterNos: []string{"7376241CS230"}},
+
+		// S.No 25 - EW 104 - B.E. EI - 22EI303
+		{HallNo: "EW 104", CourseCode: "22EI303", RegisterNos: []string{
+			"7376241EI104", "7376251EI501", "7376251EI502",
+		}},
+
+		// S.No 26 - EW 104 - B.E. ME - 22ME303
+		{HallNo: "EW 104", CourseCode: "22ME303", RegisterNos: []string{
+			"7376241ME104", "7376241ME123", "7376241ME127",
+		}},
+
+		// S.No 27 - EW 104 - B.Tech. BT - 22BT303
+		{HallNo: "EW 104", CourseCode: "22BT303", RegisterNos: []string{"7376242BT156"}},
+
+		// S.No 28 - EW 104 - B.Tech. IT - 22IT303
+		{HallNo: "EW 104", CourseCode: "22IT303", RegisterNos: []string{
+			"7376242IT188", "7376242IT214", "7376242IT227", "7376252IT502",
+			"7376252IT504", "7376252IT507", "7376252IT508", "7376252IT511",
+			"7376252IT512",
+		}},
+
+		// S.No 29 - EW 104 - B.Tech. AL - 22AM303
+		{HallNo: "EW 104", CourseCode: "22AM303", RegisterNos: []string{
+			"7376242AL169", "7376242AL207",
+		}},
+
+		// S.No 30 - EW 105 - B.E. CE - 22CE303
+		{HallNo: "EW 105", CourseCode: "22CE303", RegisterNos: []string{"7376221CE124"}},
+
+		// S.No 31 - EW 105 - B.E. MC - 22MC303
+		{HallNo: "EW 105", CourseCode: "22MC303", RegisterNos: []string{
+			"7376221MC125", "7376231MC507",
+		}},
+
+		// S.No 32 - EW 105 - B.E. SE - 22IS303
+		{HallNo: "EW 105", CourseCode: "22IS303", RegisterNos: []string{
+			"7376221SE134", "7376231SE504",
+		}},
+
+		// S.No 33 - EW 105 - B.E. CD - 22CD303
+		{HallNo: "EW 105", CourseCode: "22CD303", RegisterNos: []string{"7376221CD114"}},
+
+		// S.No 34 - EW 105 - B.Tech. FD - 22FD303
+		{HallNo: "EW 105", CourseCode: "22FD303", RegisterNos: []string{"7376222FD107"}},
+
+		// S.No 35 - EW 105 - B.Tech. AD - 22AI303
+		{HallNo: "EW 105", CourseCode: "22AI303", RegisterNos: []string{"7376232AD502"}},
+
+		// S.No 36 - EW 105 - B.E. CE - 22CE303
+		{HallNo: "EW 105", CourseCode: "22CE303", RegisterNos: []string{"7376241CE501"}},
+
+		// S.No 37 - EW 105 - B.E. BM - 22BM303
+		{HallNo: "EW 105", CourseCode: "22BM303", RegisterNos: []string{
+			"7376231BM107", "7376241BM501",
+		}},
+
+		// S.No 38 - EW 105 - B.E. SE - 22IS303
+		{HallNo: "EW 105", CourseCode: "22IS303", RegisterNos: []string{"7376231SE144"}},
+
+		// S.No 39 - EW 105 - B.E. CD - 22CD303
+		{HallNo: "EW 105", CourseCode: "22CD303", RegisterNos: []string{"7376241CD501"}},
+
+		// S.No 40 - EW 105 - B.Tech. CT - 22CT303
+		{HallNo: "EW 105", CourseCode: "22CT303", RegisterNos: []string{"7376232CT122"}},
+
+		// S.No 41 - EW 105 - B.Tech. AG - 22AG303
+		{HallNo: "EW 105", CourseCode: "22AG303", RegisterNos: []string{"7376232AG151"}},
+
+		// S.No 42 - EW 105 - B.E. CS - 22CS303
+		{HallNo: "EW 105", CourseCode: "22CS303", RegisterNos: []string{
+			"7376241CS395", "7376251CS512",
+		}},
+
+		// S.No 43 - EW 105 - B.Tech. BT - 22BT303
+		{HallNo: "EW 105", CourseCode: "22BT303", RegisterNos: []string{"7376242BT219"}},
+
+		// S.No 44 - EW 105 - B.Tech. CB - 22CB303
+		{HallNo: "EW 105", CourseCode: "22CB303", RegisterNos: []string{"7376242CB119"}},
+	}
+}
+
 // LookupHall returns the hall number for a given register number and course code.
-// It searches across all eight sessions: 04-05-2026 FN, 04-05-2026 AN,
+// It searches across all ten sessions: 04-05-2026 FN, 04-05-2026 AN,
 // 05-05-2026 FN, 05-05-2026 AN, 07-05-2026 FN, 07-05-2026 AN,
-// 08-05-2026 FN, and 08-05-2026 AN.
+// 08-05-2026 FN, 08-05-2026 AN, 09-05-2026 FN, and 09-05-2026 AN.
 // Register number lookup is case-insensitive and ignores leading/trailing spaces.
 func LookupHall(registerNo, courseCode string) (string, bool) {
 	registerNo = strings.TrimSpace(strings.ToUpper(registerNo))
@@ -3100,6 +4139,8 @@ func LookupHall(registerNo, courseCode string) (string, bool) {
 	allRecords = append(allRecords, buildSeatingData07AN()...)
 	allRecords = append(allRecords, buildSeatingData08FN()...)
 	allRecords = append(allRecords, buildSeatingData08AN()...)
+	allRecords = append(allRecords, buildSeatingData09FN()...)
+	allRecords = append(allRecords, buildSeatingData09AN()...)
 
 	for _, record := range allRecords {
 		if strings.ToUpper(record.CourseCode) != courseCode {
