@@ -18,15 +18,7 @@ export default function FullscreenPdfModal({ url, name, onClose, originalUrl }) 
     try { return u && new URL(u).hostname.includes('drive.google.com') } catch (e) { return false }
   }
 
-  const download = () => {
-    const a = document.createElement('a')
-    a.href = originalUrl || url
-    a.download = name
-    a.target = '_blank'
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-  }
+  // download removed intentionally
 
   return (
     <div className="fixed inset-0 z-50 flex items-stretch justify-center bg-black/40">
@@ -38,7 +30,6 @@ export default function FullscreenPdfModal({ url, name, onClose, originalUrl }) 
           </div>
           <div className="flex items-center gap-2">
             <button onClick={() => window.open(url, '_blank')} className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-slate-800">New tab</button>
-            <button onClick={download} className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-slate-800">Download</button>
             <button onClick={() => setZoom((z) => Math.min(3, +(z + 0.25).toFixed(2)))} className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-slate-800">+</button>
             <button onClick={() => setZoom((z) => Math.max(0.5, +(z - 0.25).toFixed(2)))} className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-slate-800">-</button>
           </div>
