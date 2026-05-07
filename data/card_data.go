@@ -10,6 +10,15 @@ var Cards = []models.Card{
 		Link:     "/rpsite",
 		BtnText:  "Check RP Now",
 	},
+
+
+	{
+		Image:    "./CardImgs/image.png",
+		Name:     "Semester Material",
+		Keywords: []string{"sem1", "semester 1", "materials", "notes", "study"},
+		Link:     "/semester",
+		BtnText:  "Open Now",
+	},
 	{
 		Image:    "./CardImgs/bitmenu.png",
 		Name:     "Mess Details",
@@ -31,13 +40,6 @@ var Cards = []models.Card{
 	Link:     "https://pcdp.bitsathy.ac.in/stf/coe",
 	BtnText:  "Open Now",
 },
-	{
-		Image:    "./CardImgs/image.png",
-		Name:     "Semester Material",
-		Keywords: []string{"sem1", "semester 1", "materials", "notes", "study"},
-		Link:     "/semester",
-		BtnText:  "Open Now",
-	},
 	{
 		Image:    "./CardImgs/leave.png",
 		Name:     "Upcoming Leave Details",
