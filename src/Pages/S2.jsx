@@ -4,63 +4,49 @@ import { FileText, CheckCircle } from 'lucide-react';
 import FullscreenPdfModal from '../Component/FullscreenPdfModal'
 
 const subjects = [
-    {
-        id: 1,
-        title: 'ENGINEERING MATHEMATICS II',
-        qnLink: "https://drive.google.com/file/d/14pm-5TzQukSpTPAlwjIBj6HQgzKt7xj8/view?usp=drive_link",
-        ansLink: null,
-    },
-    {
-        id: 2,
-        title: 'ELECTROMAGNETISM AND MODERN PHYSICS',
-        qnLink: "https://drive.google.com/file/d/1Hq9Drh17Idq4BdYcL5Rn90hmbiV13ymv/view?usp=drive_link",
-        ansLink: null,
-    },
-    {
-        id: 3,
-        title: 'ENGINEERING CHEMISTRY II',
-        qnLink: "https://drive.google.com/file/d/10r9L3IE86gjYPoOWffESb6Ow74RjFS0-/view?usp=drive_link",
-        ansLink: null,
-    },
-    {
-        id: 4,
-        title: 'COMPUTATIONAL PROBLEM SOLVING',
-        qnLink: "https://drive.google.com/file/d/1yhpb1YJyvmPyRip4wab9C3rrCZjPWvw4/view?usp=drive_link",
-        ansLink: null,
-    },
-    {
-        id: 5,
-        title: 'BASICS OF ELECTRONICS ENGINEERING',
-        qnLink: "https://drive.google.com/file/d/141hs2eZcBMnlbQ-pxa7VQ4cTRwAtQJhi/view?usp=drive_link",
-        ansLink: null,
-    },
-    {
-        id: 6,
-        title: 'BASICS OF ELECTRICAL ENGINEERING',
-        qnLink: "https://drive.google.com/file/d/1QCv9M86ETZOyf1QMx8qMhIsnQ0_pwhHs/view?usp=drive_link",
-        ansLink: null,
-    },
-    {
-        id: 7,
-        title: 'DIGITAL COMPUTER ELECTRONICS',
-        qnLink: "https://drive.google.com/file/d/1tcz9pShc3Wq12MhhdoggPziJSPCW2bYR/view?usp=drive_link",
-        ansLink: null,
-    },
+  {
+    id: 1,
+    title: 'ENGINEERING MATHEMATICS II',
+    qnLink: "https://drive.google.com/file/d/14pm-5TzQukSpTPAlwjIBj6HQgzKt7xj8/view?usp=drive_link",
+    ansLink: "https://drive.google.com/file/d/1lwfVGevvM4waDvA0JQfvKse0Q_WO79zo/view?usp=sharing",
+  },
+  {
+    id: 2,
+    title: 'ELECTROMAGNETISM AND MODERN PHYSICS',
+    qnLink: "https://drive.google.com/file/d/1Hq9Drh17Idq4BdYcL5Rn90hmbiV13ymv/view?usp=drive_link",
+    ansLink: null,
+  },
+  {
+    id: 3,
+    title: 'ENGINEERING CHEMISTRY II',
+    qnLink: "https://drive.google.com/file/d/10r9L3IE86gjYPoOWffESb6Ow74RjFS0-/view?usp=drive_link",
+    ansLink: null,
+  },
+  {
+    id: 4,
+    title: 'COMPUTATIONAL PROBLEM SOLVING',
+    qnLink: "https://drive.google.com/file/d/1yhpb1YJyvmPyRip4wab9C3rrCZjPWvw4/view?usp=drive_link",
+    ansLink: null,
+  },
+  {
+    id: 5,
+    title: 'BASICS OF ELECTRONICS ENGINEERING',
+    qnLink: "https://drive.google.com/file/d/141hs2eZcBMnlbQ-pxa7VQ4cTRwAtQJhi/view?usp=drive_link",
+    ansLink: null,
+  },
+  {
+    id: 6,
+    title: 'BASICS OF ELECTRICAL ENGINEERING',
+    qnLink: "https://drive.google.com/file/d/1QCv9M86ETZOyf1QMx8qMhIsnQ0_pwhHs/view?usp=drive_link",
+    ansLink: null,
+  },
+  {
+    id: 7,
+    title: 'DIGITAL COMPUTER ELECTRONICS',
+    qnLink: "https://drive.google.com/file/d/1tcz9pShc3Wq12MhhdoggPziJSPCW2bYR/view?usp=drive_link",
+    ansLink: null,
+  },
 ];
-
-const LinkButton = ({ href, icon: Icon, label }) => {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 transition dark:bg-blue-700 dark:hover:bg-blue-600"
-    >
-      <Icon size={14} />
-      {label}
-    </a>
-  );
-};
 
 function S2() {
   const navigate = useNavigate();
@@ -74,7 +60,7 @@ function S2() {
         // try /d/:id/ style
         const m = link.match(/\/d\/([a-zA-Z0-9_-]+)/)
         const id = m ? m[1] : u.searchParams.get('id')
-        if (id) return `https://drive.google.com/file/d/${id}/preview`
+        if (id) return `https://drive.google.com/file/d/${id}/preview?rm=minimal`
       }
     } catch (e) {
       // not a full URL, fall back
@@ -109,7 +95,7 @@ function S2() {
                         <FileText size={14} />
                         View
                       </button>
-                      <a href={sub.qnLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-md text-gray-600 bg-gray-100 hover:bg-gray-200">New tab</a>
+                      <a href={sub.qnLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-md text-gray-600 bg-gray-100 hover:bg-gray-200">Open in New tab</a>
                     </div>
                   ) : (
                     <span className="inline-block px-3 py-1.5 text-xs font-semibold rounded-md text-gray-500 bg-gray-100 dark:text-slate-400 dark:bg-slate-900">
@@ -121,7 +107,13 @@ function S2() {
                 <div>
                   <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 mb-2">Answer Key:</p>
                   {sub.ansLink ? (
-                    <LinkButton href={sub.ansLink} icon={CheckCircle} label="View" />
+                    <button
+                      onClick={() => setActivePdf({ url: toDrivePreview(sub.ansLink), name: `${sub.title} - Answer Key`, allowExternalActions: false })}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 transition dark:bg-blue-700 dark:hover:bg-blue-600"
+                    >
+                      <CheckCircle size={14} />
+                      View
+                    </button>
                   ) : (
                     <span className="inline-block px-3 py-1.5 text-xs font-semibold rounded-md text-gray-500 bg-gray-100 dark:text-slate-400 dark:bg-slate-900">
                       Coming soon
@@ -141,7 +133,13 @@ function S2() {
         </button>
       </div>
       {activePdf && (
-        <FullscreenPdfModal url={activePdf.url} originalUrl={activePdf.original} name={activePdf.name} onClose={() => setActivePdf(null)} />
+        <FullscreenPdfModal
+          url={activePdf.url}
+          originalUrl={activePdf.original}
+          name={activePdf.name}
+          allowExternalActions={activePdf.allowExternalActions !== false}
+          onClose={() => setActivePdf(null)}
+        />
       )}
     </div>
   );

@@ -9,6 +9,21 @@ export default function PdfViewer() {
   const [preview, setPreview] = useState(null)
   const [active, setActive] = useState(null) // pdf opened in fullscreen
 
+  const getDownloadUrl = (u) => {
+    try {
+      if (!u) return u
+      const parsed = new URL(u, window.location.origin)
+      if (parsed.hostname.includes('drive.google.com')) {
+        const match = parsed.pathname.match(/\/d\/([a-zA-Z0-9_-]+)/)
+        const id = match ? match[1] : parsed.searchParams.get('id')
+        if (id) return `https://drive.google.com/uc?export=download&id=${id}`
+      }
+      return parsed.href
+    } catch (e) {
+      return u
+    }
+  }
+
   useEffect(() => {
     const entries = Object.entries(pdfModules).map(([path, resolver]) => {
       const name = path.split('/').pop()
@@ -40,6 +55,7 @@ export default function PdfViewer() {
                     Open
                   </button>
                   <a href={p.url} target="_blank" rel="noreferrer" className="text-sm text-gray-600">New tab</a>
+                  <a href={getDownloadUrl(p.url)} download={p.name} className="text-sm text-emerald-700 hover:underline">Download</a>
                 </div>
               </li>
             ))}
@@ -54,6 +70,7 @@ export default function PdfViewer() {
                 <div className="flex gap-2">
                   <button onClick={() => setActive(preview)} className="text-sm px-2 py-1 bg-blue-600 text-white rounded">Open fullscreen</button>
                   <a href={preview.url} target="_blank" rel="noreferrer" className="text-sm px-2 py-1 bg-gray-200 rounded">New tab</a>
+                  <a href={getDownloadUrl(preview.url)} download={preview.name} className="text-sm px-2 py-1 bg-emerald-100 text-emerald-700 rounded">Download</a>
                 </div>
               </div>
               <iframe title="pdf-preview" src={preview.url} className="w-full h-[600px]" />
