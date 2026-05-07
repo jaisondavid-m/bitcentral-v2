@@ -63,23 +63,7 @@ function RpsiteContent() {
     debounce((value) => setDebouncedQuery(value), 300)
   ).current;
 
-  // Auto-load from saved register no
-  useEffect(() => {
-    const key = Object.keys(localStorage).find((k) =>
-      k.startsWith("home-register-no-")
-    );
-    if (!key) return;
-    try {
-      const saved = JSON.parse(localStorage.getItem(key));
-      if (saved?.registerNo) {
-        const reg = saved.registerNo.trim();
-        setSearch(reg);
-        setDebouncedQuery(reg);
-      }
-    } catch {
-      // ignore
-    }
-  }, []);
+
 
   useEffect(() => {
     return () => {
