@@ -106,6 +106,7 @@ function S2() {
 
                 <div>
                   <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 mb-2">Answer Key:</p>
+                  <p className="text-[10px] text-gray-500 dark:text-slate-500 mb-2">Note: Based on my knowledge, may not be 100% accurate</p>
                   {sub.ansLink ? (
                     <button
                       onClick={() => setActivePdf({ url: toDrivePreview(sub.ansLink), name: `${sub.title} - Answer Key`, allowExternalActions: false })}
