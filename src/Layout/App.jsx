@@ -14,6 +14,7 @@ import PCDP from "../Pages/PCDP.jsx";
 import NotFound from "../Pages/NotFound.jsx";
 import LeaveDetails from "../Pages/LeaveDetails.jsx";
 import ExamHall from "../Pages/ExamHall.jsx";
+import S2 from "../Pages/S2.jsx";
 
 function App() {
   const ADMIN_ROUTE = import.meta.env.VITE_ADMIN_ROUTE;
@@ -42,7 +43,7 @@ function App() {
           <Route path="/exam-hall" element={<ExamHall />} />
           {/* <Route path="/apsite" element={<Apsite />} /> */}
           <Route path="/leavedetails" element={<LeaveDetails />} />
-          <Route path="/semester" element={<Semester />} />
+          <Route path="/semester" element={<S2 />} />
           <Route path="/mess" element={<MessMenu />} />
           <Route path="*" element={<NotFound />} />
         </Route>
