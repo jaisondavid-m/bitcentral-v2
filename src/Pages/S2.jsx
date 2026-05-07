@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, CheckCircle } from 'lucide-react';
+import FullscreenPdfModal from '../Component/FullscreenPdfModal'
 
 const subjects = [
     {
@@ -63,6 +64,23 @@ const LinkButton = ({ href, icon: Icon, label }) => {
 
 function S2() {
   const navigate = useNavigate();
+  const [activePdf, setActivePdf] = useState(null)
+
+  const toDrivePreview = (link) => {
+    try {
+      if (!link) return link
+      const u = new URL(link)
+      if (u.hostname.includes('drive.google.com')) {
+        // try /d/:id/ style
+        const m = link.match(/\/d\/([a-zA-Z0-9_-]+)/)
+        const id = m ? m[1] : u.searchParams.get('id')
+        if (id) return `https://drive.google.com/file/d/${id}/preview`
+      }
+    } catch (e) {
+      // not a full URL, fall back
+    }
+    return link
+  }
 
   return (
     <div className="min-h-screen bg-blue-50 py-8 px-4 dark:bg-black">
@@ -86,7 +104,13 @@ function S2() {
                 <div>
                   <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 mb-2">Question Bank:</p>
                   {sub.qnLink ? (
-                    <LinkButton href={sub.qnLink} icon={FileText} label="View" />
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => setActivePdf({ url: toDrivePreview(sub.qnLink), original: sub.qnLink, name: sub.title })} className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 transition dark:bg-blue-700 dark:hover:bg-blue-600">
+                        <FileText size={14} />
+                        View
+                      </button>
+                      <a href={sub.qnLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-md text-gray-600 bg-gray-100 hover:bg-gray-200">New tab</a>
+                    </div>
                   ) : (
                     <span className="inline-block px-3 py-1.5 text-xs font-semibold rounded-md text-gray-500 bg-gray-100 dark:text-slate-400 dark:bg-slate-900">
                       Coming soon
@@ -116,6 +140,9 @@ function S2() {
           ⬅ Home
         </button>
       </div>
+      {activePdf && (
+        <FullscreenPdfModal url={activePdf.url} originalUrl={activePdf.original} name={activePdf.name} onClose={() => setActivePdf(null)} />
+      )}
     </div>
   );
 }

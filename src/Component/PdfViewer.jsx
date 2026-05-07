@@ -1,22 +1,21 @@
 import React, {useState, useEffect} from 'react'
+import FullscreenPdfModal from './FullscreenPdfModal'
 
 // Uses Vite's import.meta.glob to load PDFs from /src/data as URLs
 const pdfModules = import.meta.glob('/src/data/*.pdf', { as: 'url' })
 
 export default function PdfViewer() {
   const [pdfs, setPdfs] = useState([])
-  const [selected, setSelected] = useState(null)
+  const [preview, setPreview] = useState(null)
+  const [active, setActive] = useState(null) // pdf opened in fullscreen
 
   useEffect(() => {
-    // Resolve the glob into an array of {name, url}
     const entries = Object.entries(pdfModules).map(([path, resolver]) => {
-      // path looks like '/src/data/filename.pdf'
       const name = path.split('/').pop()
       return resolver().then((url) => ({ name, url }))
     })
 
     Promise.all(entries).then((res) => {
-      // sort alphabetically
       res.sort((a, b) => a.name.localeCompare(b.name))
       setPdfs(res)
     })
@@ -35,7 +34,7 @@ export default function PdfViewer() {
                 <span className="truncate mr-3">{p.name.replace(/_/g, ' ')}</span>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setSelected(p.url)}
+                    onClick={() => { setPreview(p); setActive(p) }}
                     className="text-sm text-blue-600 hover:underline"
                   >
                     Open
@@ -48,17 +47,30 @@ export default function PdfViewer() {
         </div>
 
         <div className="min-h-[400px] border rounded bg-white">
-          {selected ? (
-            <iframe
-              title="pdf-viewer"
-              src={selected}
-              className="w-full h-[600px]"
-            />
+          {preview ? (
+            <div className="p-2">
+              <div className="flex items-center justify-between mb-2">
+                <div className="font-medium truncate max-w-[70%]">{preview.name.replace(/_/g, ' ')}</div>
+                <div className="flex gap-2">
+                  <button onClick={() => setActive(preview)} className="text-sm px-2 py-1 bg-blue-600 text-white rounded">Open fullscreen</button>
+                  <a href={preview.url} target="_blank" rel="noreferrer" className="text-sm px-2 py-1 bg-gray-200 rounded">New tab</a>
+                </div>
+              </div>
+              <iframe title="pdf-preview" src={preview.url} className="w-full h-[600px]" />
+            </div>
           ) : (
             <div className="p-6 text-gray-500">Select a PDF to preview</div>
           )}
         </div>
       </div>
+
+      {active && (
+        <FullscreenPdfModal
+          url={active.url}
+          name={active.name}
+          onClose={() => setActive(null)}
+        />
+      )}
     </div>
   )
 }
