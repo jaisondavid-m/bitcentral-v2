@@ -14,7 +14,7 @@ const subjects = [
     id: 2,
     title: 'ELECTROMAGNETISM AND MODERN PHYSICS',
     qnLink: "https://drive.google.com/file/d/1Hq9Drh17Idq4BdYcL5Rn90hmbiV13ymv/view?usp=drive_link",
-    ansLink: "https://drive.google.com/file/d/1hUO84MfC06HnHbAP9D96oPPPPkigrQUA/view?usp=sharing",
+    ansLink: "https://drive.google.com/file/d/16mmelkOgLzmqtVT1eZPwPvD_60GofTca/view?usp=sharing",
   },
   {
     id: 3,
