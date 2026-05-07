@@ -10,8 +10,6 @@ var Cards = []models.Card{
 		Link:     "/rpsite",
 		BtnText:  "Check RP Now",
 	},
-
-
 	{
 		Image:    "./CardImgs/image.png",
 		Name:     "Semester Material",
@@ -33,6 +31,13 @@ var Cards = []models.Card{
 		Link:     "/exam-hall",
 		BtnText:  "Find Now",
 	},
+	{
+	Image:    "",
+	Name:     "PBL Portal",
+	Keywords: []string{"pdf", "exam hall", "hall", "venue", "study"},
+	Link:     "https://pcdp.bitsathy.ac.in/stf/pbl",
+	BtnText:  "Open Now",
+},
 {
 	Image:    "",
 	Name:     "Question Bank site",
