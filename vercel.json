@@ -1,9 +1,8 @@
 {
-  "redirects": [
+  "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "https://bitcentral.bitsathy.in/$1",
-      "permanent": true
+      "destination": "/"
     }
   ]
 }
