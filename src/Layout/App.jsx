@@ -18,6 +18,42 @@ import S2 from "../Pages/S2.jsx";
 
 function App() {
   const ADMIN_ROUTE = import.meta.env.VITE_ADMIN_ROUTE;
+  useEffect(() => {
+    // Disable right click
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+    };
+
+    // Disable keyboard shortcuts
+    const handleKeyDown = (e) => {
+      // F12
+      if (e.key === "F12") {
+        e.preventDefault();
+      }
+
+      // Ctrl+Shift+I/J/C
+      if (
+        e.ctrlKey &&
+        e.shiftKey &&
+        ["I", "J", "C"].includes(e.key)
+      ) {
+        e.preventDefault();
+      }
+
+      // Ctrl+U (view source)
+      if (e.ctrlKey && e.key === "u") {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
   return (
     <>
       <Routes>
