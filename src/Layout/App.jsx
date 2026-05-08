@@ -20,41 +20,51 @@ import S2 from "../Pages/S2.jsx";
 function App() {
   const ADMIN_ROUTE = import.meta.env.VITE_ADMIN_ROUTE;
   useEffect(() => {
-    // Disable right click
-    const handleContextMenu = (e) => {
+  const handleContextMenu = (e) => {
+    e.preventDefault();
+  };
+
+  const handleKeyDown = (e) => {
+    const key = e.key.toLowerCase();
+
+    // F12
+    if (key === "f12") {
       e.preventDefault();
-    };
+      return false;
+    }
 
-    // Disable keyboard shortcuts
-    const handleKeyDown = (e) => {
-      // F12
-      if (e.key === "F12") {
-        e.preventDefault();
-      }
+    // Ctrl + Shift + I/J/C
+    if (
+      e.ctrlKey &&
+      e.shiftKey &&
+      ["i", "j", "c"].includes(key)
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
 
-      // Ctrl+Shift+I/J/C
-      if (
-        e.ctrlKey &&
-        e.shiftKey &&
-        ["I", "J", "C"].includes(e.key)
-      ) {
-        e.preventDefault();
-      }
+    // Ctrl + U
+    if (e.ctrlKey && key === "u") {
+      e.preventDefault();
+      return false;
+    }
 
-      // Ctrl+U (view source)
-      if (e.ctrlKey && e.key === "u") {
-        e.preventDefault();
-      }
-    };
+    // Ctrl + S
+    if (e.ctrlKey && key === "s") {
+      e.preventDefault();
+      return false;
+    }
+  };
 
-    document.addEventListener("contextmenu", handleContextMenu);
-    document.addEventListener("keydown", handleKeyDown);
+  document.addEventListener("contextmenu", handleContextMenu);
+  window.addEventListener("keydown", handleKeyDown, true);
 
-    return () => {
-      document.removeEventListener("contextmenu", handleContextMenu);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
+  return () => {
+    document.removeEventListener("contextmenu", handleContextMenu);
+    window.removeEventListener("keydown", handleKeyDown, true);
+  };
+}, []);
   return (
     <>
       <Routes>
