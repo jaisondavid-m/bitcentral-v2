@@ -8,7 +8,7 @@ const subjects = [
     id: 3,
     title: 'ENGINEERING CHEMISTRY II',
     qnLink: "https://drive.google.com/file/d/10r9L3IE86gjYPoOWffESb6Ow74RjFS0-/view?usp=drive_link",
-    ansLink: "https://drive.google.com/file/d/1J4aoiLr9aC4KqGERnC-dkQT3Xc-8kJKC/view?usp=drivesdk",
+    ansLink: "https://drive.google.com/file/d/1w5Xzx7i44Etb27B-WFnqfRr0DVFNjNXx/view?usp=drivesdk",
   },
   {
     id: 4,
