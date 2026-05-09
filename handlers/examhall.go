@@ -1268,9 +1268,12 @@ func buildSeatingData12FN() []models.SeatingRecord {
 		{HallNo: "WW 117", CourseCode: "22EC402", RegisterNos: func() []string {
 			var r []string
 			r = append(r, "7376241EC229", "7376241EC230")
-			r = append(r, expandRange("7376241EC232", "7376241EC239")...)
+			r = append(r, expandRange("7376241EC231", "7376241EC239")...) 
 			return r
 		}()},
+	}
+}
+
 
 		// S.No 120 - WW 118 - B.E. CS - 22CS402
 		{HallNo: "WW 118", CourseCode: "22CS402", RegisterNos: expandRange("7376241CS383", "7376241CS397")},
@@ -1562,6 +1565,224 @@ func buildSeatingData12FN() []models.SeatingRecord {
 	}
 }
 
+func buildSeatingDataSession12AN() []models.SeatingRecord {
+	return []models.SeatingRecord{
+		{HallNo: "EW 101", CourseCode: "22EC304", RegisterNos: []string{
+			"7376221EC102",
+			"7376221EC107",
+			"7376221EC151",
+			"7376221EC192",
+			"7376221EC226",
+			"7376221EC290",
+			"7376221EC337",
+			"7376231EC101",
+			"7376231EC110",
+			"7376231EC112",
+			"7376231EC121",
+			"7376231EC283",
+			"7376231EC297",
+			"7376231EC305",
+			"7376231EC331",
+		}},
+
+		{HallNo: "EW 101", CourseCode: "22IT304", RegisterNos: []string{
+			"7376222IT110",
+			"7376232IT118",
+			"7376232IT152",
+			"7376232IT282",
+			"7376242IT164",
+			"7376242IT184",
+			"7376242IT214",
+			"7376242IT227",
+			"7376242IT287",
+			"7376252IT506",
+		}},
+
+		{HallNo: "EW 102", CourseCode: "22EC304", RegisterNos: []string{
+			"7376231EC514",
+			"7376231EC334",
+			"7376241EC133",
+			"7376241EC137",
+			"7376241EC144",
+			"7376241EC147",
+			"7376241EC151",
+			"7376241EC160",
+			"7376241EC163",
+			"7376241EC170",
+			"7376241EC246",
+			"7376241EC256",
+			"7376241EC271",
+			"7376241EC279",
+			"7376241EC284",
+		}},
+
+		{HallNo: "EW 102", CourseCode: "22EE304", RegisterNos: []string{
+			"7376241EE130",
+			"7376241EE146",
+			"7376241EE147",
+			"7376241EE157",
+			"7376241EE190",
+			"7376241EE193",
+			"7376251EE502",
+		}},
+
+		{HallNo: "EW 102", CourseCode: "22IT304", RegisterNos: []string{
+			"7376252IT507",
+			"7376252IT511",
+			"7376252IT513",
+		}},
+
+		{HallNo: "EW 103", CourseCode: "22ME304", RegisterNos: []string{
+			"7376221ME111",
+			"7376221ME114",
+			"7376221ME154",
+			"7376231ME121",
+			"7376231ME149",
+			"7376241ME102",
+		}},
+
+		{HallNo: "EW 103", CourseCode: "22EC304", RegisterNos: []string{
+			"7376241EC504",
+			"7376241EC513",
+			"7376241EC515",
+			"7376241EC312",
+			"7376241EC328",
+			"7376241EC334",
+			"7376241EC339",
+			"7376251EC505",
+			"7376251EC506",
+			"7376251EC507",
+			"7376251EC509",
+			"7376251EC511",
+			"7376251EC513",
+			"7376251EC516",
+			"7376251EC519",
+		}},
+
+		{HallNo: "EW 103", CourseCode: "22EE304", RegisterNos: []string{
+			"7376251EE504",
+			"7376251EE506",
+			"7376251EE507",
+			"7376251EE510",
+		}},
+
+		{HallNo: "EW 104", CourseCode: "22CS304", RegisterNos: []string{
+			"7376221CS118",
+			"7376221CS240",
+			"7376221CS275",
+			"7376231CS102",
+			"7376231CS103",
+			"7376231CS190",
+			"7376231CS235",
+			"7376231CS244",
+			"7376231CS259",
+			"7376241CS395",
+			"7376251CS522",
+		}},
+
+		{HallNo: "EW 104", CourseCode: "22CB304", RegisterNos: []string{
+			"7376232CB501",
+			"7376232CB111",
+			"7376232CB123",
+			"7376232CB133",
+			"7376242CB502",
+			"7376242CB116",
+			"7376242CB119",
+		}},
+
+		{HallNo: "EW 104", CourseCode: "22MC304", RegisterNos: []string{
+			"7376231MZ106",
+			"7376231MZ111",
+			"7376231MZ135",
+			"7376241MZ124",
+		}},
+
+		{HallNo: "EW 105", CourseCode: "22CE304", RegisterNos: []string{
+			"7376221CE124",
+			"7376231CE120",
+			"7376241CE501",
+		}},
+
+		{HallNo: "EW 105", CourseCode: "22AI304", RegisterNos: []string{
+			"7376232AD502",
+			"7376232AD250",
+			"7376242AD137",
+			"7376242AD189",
+			"7376242AD190",
+			"7376242AD320",
+			"7376252AD502",
+			"7376252AD510",
+		}},
+
+		{HallNo: "EW 105", CourseCode: "22AG304", RegisterNos: []string{
+			"7376222AG116",
+			"7376232AG502",
+			"7376232AG151",
+			"7376252AG502",
+		}},
+
+		{HallNo: "EW 105", CourseCode: "22EI304", RegisterNos: []string{
+			"7376241EI104",
+		}},
+
+		{HallNo: "EW 105", CourseCode: "22MC304", RegisterNos: []string{
+			"7376241MZ127",
+			"7376241MZ139",
+			"7376241MZ143",
+			"7376251MZ504",
+			"7376251MZ505",
+			"7376251MZ506",
+		}},
+
+		{HallNo: "EW 105", CourseCode: "22BT304", RegisterNos: []string{
+			"7376242BT113",
+		}},
+
+		{HallNo: "EW 105", CourseCode: "22AM304", RegisterNos: []string{
+			"7376242AL157",
+			"7376242AL207",
+		}},
+
+		{HallNo: "EW 106", CourseCode: "22MC304", RegisterNos: []string{
+			"7376231MC507",
+		}},
+
+		{HallNo: "EW 106", CourseCode: "22IS304", RegisterNos: []string{
+			"7376221SE134",
+			"7376221SE140",
+			"7376231SE144",
+		}},
+
+		{HallNo: "EW 106", CourseCode: "22CD304", RegisterNos: []string{
+			"7376221CD114",
+			"7376221CD144",
+			"7376241CD501",
+		}},
+
+		{HallNo: "EW 106", CourseCode: "22FD304", RegisterNos: []string{
+			"7376222FD107",
+			"7376222FD125",
+		}},
+
+		{HallNo: "EW 106", CourseCode: "22BM304", RegisterNos: []string{
+			"7376231BM107",
+			"7376241BM501",
+		}},
+
+		{HallNo: "EW 106", CourseCode: "22EI304", RegisterNos: []string{
+			"7376251EI502",
+		}},
+
+		{HallNo: "EW 106", CourseCode: "22BT304", RegisterNos: []string{
+			"7376242BT120",
+			"7376242BT138",
+			"7376242BT151",
+			"7376242BT156",
+			"7376252BT501",
+		}},
+	}
+}
+
 // LookupHall returns the hall number for a given register number and course code.
 func LookupHall(registerNo, courseCode string) (string, bool) {
 	registerNo = strings.TrimSpace(strings.ToUpper(registerNo))
@@ -1570,6 +1791,7 @@ func LookupHall(registerNo, courseCode string) (string, bool) {
 	allRecords := buildSeatingDataSession11FN()
  allRecords := buildSeatingDataSession11AN()
  allRecords := buildSeatingDataSession12FN()
+ allRecords := buildSeatingDataSession12AN()
 	for _, record := range allRecords {
 		if strings.ToUpper(record.CourseCode) != courseCode {
 			continue
