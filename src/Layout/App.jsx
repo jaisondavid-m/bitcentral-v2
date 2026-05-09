@@ -19,52 +19,52 @@ import S2 from "../Pages/S2.jsx";
 
 function App() {
   const ADMIN_ROUTE = import.meta.env.VITE_ADMIN_ROUTE;
-  // useEffect(() => {
-  //   const handleContextMenu = (e) => {
-  //     e.preventDefault();
-  //   };
+  useEffect(() => {
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+    };
 
-  //   const handleKeyDown = (e) => {
-  //     const key = e.key.toLowerCase();
+    const handleKeyDown = (e) => {
+      const key = e.key.toLowerCase();
 
-  //     // F12
-  //     if (key === "f12") {
-  //       e.preventDefault();
-  //       return false;
-  //     }
+      // F12
+      if (key === "f12") {
+        e.preventDefault();
+        return false;
+      }
 
-  //     // Ctrl + Shift + I/J/C
-  //     if (
-  //       e.ctrlKey &&
-  //       e.shiftKey &&
-  //       ["i", "j", "c"].includes(key)
-  //     ) {
-  //       e.preventDefault();
-  //       e.stopPropagation();
-  //       return false;
-  //     }
+      // Ctrl + Shift + I/J/C
+      if (
+        e.ctrlKey &&
+        e.shiftKey &&
+        ["i", "j", "c"].includes(key)
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
 
-  //     // Ctrl + U
-  //     if (e.ctrlKey && key === "u") {
-  //       e.preventDefault();
-  //       return false;
-  //     }
+      // Ctrl + U
+      if (e.ctrlKey && key === "u") {
+        e.preventDefault();
+        return false;
+      }
 
-  //     // Ctrl + S
-  //     if (e.ctrlKey && key === "s") {
-  //       e.preventDefault();
-  //       return false;
-  //     }
-  //   };
+      // Ctrl + S
+      if (e.ctrlKey && key === "s") {
+        e.preventDefault();
+        return false;
+      }
+    };
 
-  //   document.addEventListener("contextmenu", handleContextMenu);
-  //   window.addEventListener("keydown", handleKeyDown, true);
+    document.addEventListener("contextmenu", handleContextMenu);
+    window.addEventListener("keydown", handleKeyDown, true);
 
-  //   return () => {
-  //     document.removeEventListener("contextmenu", handleContextMenu);
-  //     window.removeEventListener("keydown", handleKeyDown, true);
-  //   };
-  // }, []);
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+      window.removeEventListener("keydown", handleKeyDown, true);
+    };
+  }, []);
   return (
     <>
       <Routes>
