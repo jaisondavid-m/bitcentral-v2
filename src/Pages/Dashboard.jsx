@@ -3,48 +3,11 @@ import { logout } from "../Authentication/firebase.js";
 import { useAuth } from "../context/StudentContext.jsx";
 import { Navigate } from "react-router-dom";
 import profile from "../assets/profile.jpg";
-import { Loader, CheckCircle, AlertTriangle, GraduationCap, Calendar, Clock, LogOut, Hash } from "lucide-react";
+import { Loader, CheckCircle, AlertTriangle, GraduationCap, Calendar, Clock, LogOut } from "lucide-react";
 
 function Dashboard() {
   const { user, student, loading } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  const [savedRegisterNo, setSavedRegisterNo] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [registerNoInput, setRegisterNoInput] = useState("");
-  const [registerNoError, setRegisterNoError] = useState("");
-
-  const registerStoreKey = user?.uid ? `home-register-no-${user.uid}` : "";
-
-  useEffect(() => {
-    if (!registerStoreKey) return;
-    try {
-      const saved = localStorage.getItem(registerStoreKey);
-      if (saved) setSavedRegisterNo(JSON.parse(saved));
-    } catch {
-      setSavedRegisterNo(null);
-    }
-  }, [registerStoreKey]);
-
-  const onOpenEdit = () => {
-    setRegisterNoInput(savedRegisterNo?.registerNo || "");
-    setRegisterNoError("");
-    setShowEditModal(true);
-  };
-
-  const onSaveRegisterNo = (e) => {
-    e.preventDefault();
-    const value = registerNoInput.trim();
-    if (!value) {
-      setRegisterNoError("Register No is required.");
-      return;
-    }
-    const updated = { registerNo: value, savedAt: Date.now() };
-    localStorage.setItem(registerStoreKey, JSON.stringify(updated));
-    setSavedRegisterNo(updated);
-    setRegisterNoError("");
-    setShowEditModal(false);
-  };
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -72,46 +35,6 @@ function Dashboard() {
 
   return (
     <>
-      {showEditModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-5 shadow-xl dark:border-blue-900 dark:bg-slate-950">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">
-              Student Identity
-            </h2>
-            <p className="mt-1 text-sm font-medium text-gray-700 dark:text-slate-200">
-              {savedRegisterNo ? "Edit your Register No." : "Enter your Register No."}
-            </p>
-
-            <form onSubmit={onSaveRegisterNo} className="mt-4 space-y-3">
-              <input
-                type="text"
-                value={registerNoInput}
-                onChange={(e) => setRegisterNoInput(e.target.value)}
-                placeholder="Register No"
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-              />
-              {registerNoError && <p className="text-xs text-red-600">{registerNoError}</p>}
-
-              <div className="flex items-center justify-end gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => { setRegisterNoError(""); setShowEditModal(false); }}
-                  className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
-                >
-                  Save
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
       <div className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 lg:px-8 dark:bg-black">
         <div className="mx-auto max-w-4xl">
 
@@ -130,11 +53,6 @@ function Dashboard() {
                 <div className="flex-1 text-center sm:text-left">
                   <h1 className="mb-1 text-2xl font-bold text-white sm:text-3xl">{user.displayName || "User"}</h1>
                   <p className="break-all text-sm text-white/90 sm:text-base">{user.email}</p>
-                  {savedRegisterNo && (
-                    <p className="mt-1 text-sm font-semibold text-white/80 sm:text-base">
-                      Reg No: {savedRegisterNo.registerNo}
-                    </p>
-                  )}
                 </div>
               </div>
             </div>

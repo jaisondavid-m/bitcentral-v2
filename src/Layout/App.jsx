@@ -1,3 +1,4 @@
+import React , { useEffect } from "react"
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import Login from "../Pages/Login.jsx";
@@ -14,9 +15,56 @@ import PCDP from "../Pages/PCDP.jsx";
 import NotFound from "../Pages/NotFound.jsx";
 import LeaveDetails from "../Pages/LeaveDetails.jsx";
 import ExamHall from "../Pages/ExamHall.jsx";
+import S2 from "../Pages/S2.jsx";
 
 function App() {
   const ADMIN_ROUTE = import.meta.env.VITE_ADMIN_ROUTE;
+  useEffect(() => {
+  const handleContextMenu = (e) => {
+    e.preventDefault();
+  };
+
+  const handleKeyDown = (e) => {
+    const key = e.key.toLowerCase();
+
+    // F12
+    if (key === "f12") {
+      e.preventDefault();
+      return false;
+    }
+
+    // Ctrl + Shift + I/J/C
+    if (
+      e.ctrlKey &&
+      e.shiftKey &&
+      ["i", "j", "c"].includes(key)
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    // Ctrl + U
+    if (e.ctrlKey && key === "u") {
+      e.preventDefault();
+      return false;
+    }
+
+    // Ctrl + S
+    if (e.ctrlKey && key === "s") {
+      e.preventDefault();
+      return false;
+    }
+  };
+
+  document.addEventListener("contextmenu", handleContextMenu);
+  window.addEventListener("keydown", handleKeyDown, true);
+
+  return () => {
+    document.removeEventListener("contextmenu", handleContextMenu);
+    window.removeEventListener("keydown", handleKeyDown, true);
+  };
+}, []);
   return (
     <>
       <Routes>
@@ -42,7 +90,7 @@ function App() {
           <Route path="/exam-hall" element={<ExamHall />} />
           {/* <Route path="/apsite" element={<Apsite />} /> */}
           <Route path="/leavedetails" element={<LeaveDetails />} />
-          <Route path="/semester" element={<Semester />} />
+          <Route path="/semester" element={<S2 />} />
           <Route path="/mess" element={<MessMenu />} />
           <Route path="*" element={<NotFound />} />
         </Route>

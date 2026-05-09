@@ -3,18 +3,32 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/
 import { getFirestore } from "firebase/firestore";
 import { isAllowedEmail } from "./authRules.js";
 
+// Read and sanitize the API key from Vite env variables
+const rawApiKey = import.meta.env.VITE_FIREBASE_API_KEY;
+const apiKey = rawApiKey ? String(rawApiKey).replace(/^"|"$/g, '').trim() : '';
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: "first-auth-app-project.firebaseapp.com",
-  projectId: "first-auth-app-project",
-  storageBucket: "first-auth-app-project.firebasestorage.app",
-  messagingSenderId: "956639761791",
-  appId: "1:956639761791:web:b453f88c306ba35cba364a",
-  measurementId: "G-T3C10RN98R"
+  apiKey,
+  authDomain: 'first-auth-app-project.firebaseapp.com',
+  projectId: 'first-auth-app-project',
+  storageBucket: 'first-auth-app-project.firebasestorage.app',
+  messagingSenderId: '956639761791',
+  appId: '1:956639761791:web:b453f88c306ba35cba364a',
+  measurementId: 'G-T3C10RN98R',
 };
 
+if (!apiKey) {
+  console.error('Firebase API key is missing or empty. Check .env and restart the dev server.');
+}
+
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+let app;
+try {
+  app = initializeApp(firebaseConfig);
+} catch (e) {
+  console.error('Failed to initialize Firebase:', e);
+  throw e;
+}
 
 // Initialize Auth
 export const auth = getAuth(app);
