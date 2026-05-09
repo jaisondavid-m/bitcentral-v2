@@ -4975,6 +4975,14 @@ func LookupHall(registerNo, courseCode string) (string, bool) {
 	allRecords := append(buildSeatingData11FN(), buildSeatingData11AN()...)
 	allRecords = append(allRecords, buildSeatingData12FN()...)
 	allRecords = append(allRecords, buildSeatingDataSession12AN()...)
+	allRecords = append(allRecords, buildSeatingData13FN()...)
+	allRecords = append(allRecords, buildSeatingData13AN()...)
+	allRecords = append(allRecords, buildSeatingData14FN()...)
+	allRecords = append(allRecords, buildSeatingData14AN()...)
+	allRecords = append(allRecords, buildSeatingData15FN()...)
+	allRecords = append(allRecords, buildSeatingData15AN()...)
+	allRecords = append(allRecords, buildSeatingData16FN()...)
+	allRecords = append(allRecords, buildSeatingData16AN()...)
 	for _, record := range allRecords {
 		if strings.ToUpper(record.CourseCode) != courseCode {
 			continue
