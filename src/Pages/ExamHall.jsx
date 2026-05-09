@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import api from "../api/axios.js";
 import { useAuth } from "../context/StudentContext.jsx";
@@ -64,6 +64,10 @@ const ExamHall = () => {
   const [courseSearch, setCourseSearch] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
+  const wrapperRef = useRef(null);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const [showModal, setShowModal] = useState(false);
+  const [modalSearch, setModalSearch] = useState("");
 
   const [registerNo, setRegisterNo] = useState(() => {
     if (!user?.uid) return "";
@@ -89,6 +93,51 @@ const filteredCourses = useMemo(() => {
 
   return filtered;
 }, [courseSearch]);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setShowDropdown(false);
+        setFocusedIndex(-1);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // keyboard navigation for dropdown
+  const handleKeyDown = (e) => {
+    if (!showDropdown) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setFocusedIndex((i) => Math.min(i + 1, filteredCourses.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setFocusedIndex((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (focusedIndex >= 0 && filteredCourses[focusedIndex]) {
+        const code = filteredCourses[focusedIndex];
+        setSelectedCourse(code);
+        setCourseSearch(code);
+        setShowDropdown(false);
+      } else {
+        // allow form submit via Search button
+        handleSearch();
+      }
+    } else if (e.key === "Escape") {
+      setShowDropdown(false);
+      setFocusedIndex(-1);
+    }
+  };
+
+  // modal filtered list
+  const modalFiltered = useMemo(() => {
+    const q = modalSearch.trim().toUpperCase();
+    if (!q) return COURSE_CODES;
+    return COURSE_CODES.filter((c) => c.includes(q));
+  }, [modalSearch]);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["exam-hall", registerNo, finalCourse],
@@ -134,7 +183,7 @@ const filteredCourses = useMemo(() => {
         </div>
 
         {/* Course Input */}
-        <div className="relative mb-5">
+        <div ref={wrapperRef} className="relative mb-5">
           <label className="text-xs font-semibold text-blue-600">
             Course Code
           </label>
@@ -142,36 +191,107 @@ const filteredCourses = useMemo(() => {
           <input
             type="text"
             value={selectedCourse || courseSearch}
-            placeholder="Search or type manually..."
-            onFocus={() => setShowDropdown(true)}
+            placeholder="e.g. 22CS601"
+            onFocus={() => {
+              setShowDropdown(true);
+              setShowModal(false);
+            }}
+             onKeyDown={(e) => {
+               if (e.key === "Enter") {
+                 handleSearch();
+               } else {
+                 handleKeyDown(e);
+               }
+             }}
             onChange={(e) => {
               setCourseSearch(e.target.value.toUpperCase());
               setSelectedCourse("");
               setShowDropdown(true);
+              setFocusedIndex(-1);
             }}
-            className="mt-1 w-full rounded-xl border px-4 py-2 text-sm"
+            aria-autocomplete="list"
+            aria-expanded={showDropdown}
+            className="mt-1 w-full rounded-xl border px-4 py-2 text-sm pr-10"
           />
+
+          {/* clear button */}
+          {(courseSearch || selectedCourse) && (
+            <button
+              aria-label="Clear course input"
+              onClick={() => {
+                setCourseSearch("");
+                setSelectedCourse("");
+                setShowDropdown(false);
+                setFocusedIndex(-1);
+              }}
+              className="absolute right-3 top-9 text-sm text-slate-500 hover:text-slate-800"
+            >
+              ✕
+            </button>
+          )}
+
+          {/* open full list button */}
+          <button
+            aria-label="Open course list"
+            onClick={() => setShowModal(true)}
+            className="absolute right-10 top-10 text-slate-500 hover:text-slate-800"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          {/* selected pill */}
+          {finalCourse && (
+            <div className="mt-2 flex items-center gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
+                {finalCourse}
+                <button aria-label="Edit course" onClick={() => setShowModal(true)} className="text-blue-600">✎</button>
+              </span>
+            </div>
+          )}
 
           {/* Dropdown */}
           {showDropdown && (
-            <ul className="absolute z-10 mt-1 max-h-44 w-full overflow-y-auto rounded-xl border bg-white shadow-lg">
+            <ul
+              role="listbox"
+              aria-label="Course suggestions"
+              className="absolute z-10 mt-1 max-h-44 w-full overflow-y-auto rounded-xl border bg-white shadow-lg"
+            >
               {filteredCourses.length > 0 ? (
-                filteredCourses.map((code) => (
+                filteredCourses.map((code, idx) => (
                   <li
                     key={code}
+                    role="option"
+                    aria-selected={focusedIndex === idx}
+                    onMouseEnter={() => setFocusedIndex(idx)}
                     onClick={() => {
                       setSelectedCourse(code);
                       setCourseSearch(code);
                       setShowDropdown(false);
+                      setFocusedIndex(-1);
                     }}
-                    className="cursor-pointer px-4 py-2 hover:bg-blue-50"
+                    className={`cursor-pointer px-4 py-2 ${focusedIndex === idx ? "bg-blue-50 font-semibold" : "hover:bg-blue-50"}`}
                   >
-                    {code}
+                    {/* highlight match */}
+                    {(() => {
+                      const q = courseSearch.trim();
+                      if (!q) return code;
+                      const i = code.indexOf(q);
+                      if (i === -1) return code;
+                      return (
+                        <>
+                          {code.slice(0, i)}
+                          <span className="bg-yellow-100">{code.slice(i, i + q.length)}</span>
+                          {code.slice(i + q.length)}
+                        </>
+                      );
+                    })()}
                   </li>
                 ))
               ) : (
                 <li className="px-4 py-2 text-sm text-gray-400">
-                  No match — press search to use manually
+                  No suggestions — press Search to use this code
                 </li>
               )}
             </ul>
@@ -183,15 +303,81 @@ const filteredCourses = useMemo(() => {
               Using custom course code
             </p>
           )}
+
+          {/* Modal popup for full selection */}
+          {showModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/40" onClick={() => setShowModal(false)} />
+              <div className="relative z-10 max-w-lg w-full rounded-xl bg-white p-6 shadow-xl">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">Select Course</h3>
+                  <button onClick={() => setShowModal(false)} className="text-slate-500">✕</button>
+                </div>
+                <div className="mt-4 flex items-center gap-3">
+                  <input
+                    value={modalSearch}
+                    onChange={(e) => setModalSearch(e.target.value)}
+                    placeholder="Filter courses or type custom code"
+                    className="flex-1 rounded-lg border px-3 py-2 text-sm"
+                    autoFocus
+                  />
+                  <button
+                    onClick={() => {
+                      const code = modalSearch.trim().toUpperCase();
+                      if (!code) return;
+                      setSelectedCourse(code);
+                      setCourseSearch(code);
+                      setShowModal(false);
+                    }}
+                    className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+                  >
+                    Use
+                  </button>
+                </div>
+
+                <div className="mt-3 max-h-56 overflow-y-auto rounded-md border">
+                  {modalFiltered.length > 0 ? (
+                    modalFiltered.map((code) => (
+                      <div
+                        key={code}
+                        onClick={() => {
+                          setSelectedCourse(code);
+                          setCourseSearch(code);
+                          setShowModal(false);
+                        }}
+                        className="cursor-pointer px-4 py-2 hover:bg-blue-50"
+                      >
+                        {code}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-4 py-2 text-sm text-gray-400">No results</div>
+                  )}
+                </div>
+
+                <p className="mt-3 text-xs text-slate-500">Click a code to select, or type a custom code above and press Use.</p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Button */}
         <button
           onClick={handleSearch}
           disabled={!registerNo || !finalCourse || isLoading}
-          className="w-full rounded-xl bg-blue-600 py-2 text-white font-semibold"
+          className={`w-full rounded-xl py-2 text-white font-semibold ${(!registerNo || !finalCourse || isLoading) ? 'bg-blue-400 opacity-80 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
         >
-          {isLoading ? "Searching..." : "Search Hall"}
+          {isLoading ? (
+            <span className="flex items-center justify-center gap-2">
+              <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              </svg>
+              Searching...
+            </span>
+          ) : (
+            'Search Hall'
+          )}
         </button>
 
         {/* Result */}
@@ -202,15 +388,14 @@ const filteredCourses = useMemo(() => {
             </p>
           )}
 
-          {isLoading && <p>Loading...</p>}
+          {/* {isLoading && <p>Loading...</p>} */}
 
           {data?.success && (
-            <>
-              <h2 className="text-5xl font-black text-blue-700">
-                {data.hallNo}
-              </h2>
-              <p>{data.courseCode}</p>
-            </>
+            <div className="mx-auto max-w-sm rounded-2xl border bg-white p-5 shadow-md">
+              <h2 className="text-4xl font-extrabold text-blue-700">{data.hallNo}</h2>
+              <p className="mt-2 text-sm text-slate-600">Course: <span className="font-medium">{data.courseCode}</span></p>
+              {data.room && <p className="mt-1 text-sm text-slate-500">Room: {data.room}</p>}
+            </div>
           )}
 
           {error && (
