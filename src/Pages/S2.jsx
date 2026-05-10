@@ -8,7 +8,7 @@ const subjects = [
     id: 6,
     title: 'BASICS OF ELECTRICAL ENGINEERING',
     qnLink: "https://drive.google.com/file/d/1QCv9M86ETZOyf1QMx8qMhIsnQ0_pwhHs/view?usp=drive_link",
-    ansLink: "https://drive.google.com/file/d/1BMhQxiZvqEMdJe3CHGNl1B57ILUDGfRk/view?usp=sharing",
+    ansLink: "https://drive.google.com/file/d/13lqrkhG9QfgfScD-RZlmnlQQWsFopwEO/view?usp=drivesdk",
   },
   {
     id: 7,
