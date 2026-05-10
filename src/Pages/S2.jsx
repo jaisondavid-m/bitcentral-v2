@@ -14,7 +14,7 @@ const subjects = [
     id: 7,
     title: 'DIGITAL COMPUTER ELECTRONICS',
     qnLink: "https://drive.google.com/file/d/1tcz9pShc3Wq12MhhdoggPziJSPCW2bYR/view?usp=drive_link",
-    ansLink: "https://drive.google.com/file/d/1LxDpjOMrUP_eLv__8uzp7Mb7GkNMqa6H/view?usp=drivesdk",
+    ansLink: "https://drive.google.com/file/d/1USTm6Ok-LVnnWX_SQ1JohVUQyU40g9Jt/view?usp=drivesdk",
   },
   {
     id: 5,
