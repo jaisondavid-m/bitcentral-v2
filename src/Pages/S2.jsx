@@ -5,33 +5,21 @@ import FullscreenPdfModal from '../Component/FullscreenPdfModal'
 
 const subjects = [
   {
-    id: 3,
-    title: 'ENGINEERING CHEMISTRY II',
-    qnLink: "https://drive.google.com/file/d/10r9L3IE86gjYPoOWffESb6Ow74RjFS0-/view?usp=drive_link",
-    ansLink: "https://drive.google.com/file/d/10BA-r75MtJ_lHe9mz_9B9GoY5jbXQsrr/view?usp=drivesdk",
-  },
-  {
-    id: 4,
-    title: 'COMPUTATIONAL PROBLEM SOLVING',
-    qnLink: "https://drive.google.com/file/d/1yhpb1YJyvmPyRip4wab9C3rrCZjPWvw4/view?usp=drive_link",
-    ansLink: null,
-  },
-  {
-    id: 5,
-    title: 'BASICS OF ELECTRONICS ENGINEERING',
-    qnLink: "https://drive.google.com/file/d/141hs2eZcBMnlbQ-pxa7VQ4cTRwAtQJhi/view?usp=drive_link",
-    ansLink: null,
-  },
-  {
     id: 6,
     title: 'BASICS OF ELECTRICAL ENGINEERING',
     qnLink: "https://drive.google.com/file/d/1QCv9M86ETZOyf1QMx8qMhIsnQ0_pwhHs/view?usp=drive_link",
-    ansLink: null,
+    ansLink: "https://drive.google.com/file/d/1BMhQxiZvqEMdJe3CHGNl1B57ILUDGfRk/view?usp=sharing",
   },
   {
     id: 7,
     title: 'DIGITAL COMPUTER ELECTRONICS',
     qnLink: "https://drive.google.com/file/d/1tcz9pShc3Wq12MhhdoggPziJSPCW2bYR/view?usp=drive_link",
+    ansLink: "https://drive.google.com/file/d/1LxDpjOMrUP_eLv__8uzp7Mb7GkNMqa6H/view?usp=drivesdk",
+  },
+  {
+    id: 5,
+    title: 'BASICS OF ELECTRONICS ENGINEERING',
+    qnLink: "https://drive.google.com/file/d/141hs2eZcBMnlbQ-pxa7VQ4cTRwAtQJhi/view?usp=drive_link",
     ansLink: null,
   },
   {
@@ -45,6 +33,18 @@ const subjects = [
     title: 'ELECTROMAGNETISM AND MODERN PHYSICS',
     qnLink: "https://drive.google.com/file/d/1Hq9Drh17Idq4BdYcL5Rn90hmbiV13ymv/view?usp=drive_link",
     ansLink: "https://drive.google.com/file/d/16mmelkOgLzmqtVT1eZPwPvD_60GofTca/view?usp=sharing",
+  },
+  {
+    id: 3,
+    title: 'ENGINEERING CHEMISTRY II',
+    qnLink: "https://drive.google.com/file/d/10r9L3IE86gjYPoOWffESb6Ow74RjFS0-/view?usp=drive_link",
+    ansLink: "https://drive.google.com/file/d/10BA-r75MtJ_lHe9mz_9B9GoY5jbXQsrr/view?usp=drivesdk",
+  },
+  {
+    id: 4,
+    title: 'COMPUTATIONAL PROBLEM SOLVING',
+    qnLink: "https://drive.google.com/file/d/1yhpb1YJyvmPyRip4wab9C3rrCZjPWvw4/view?usp=drive_link",
+    ansLink: null,
   },
 ];
 
