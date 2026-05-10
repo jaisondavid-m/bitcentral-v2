@@ -45,13 +45,7 @@ var Cards = []models.Card{
 // 	Link:     "https://pcdp.bitsathy.ac.in/stf/coe",
 // 	BtnText:  "Open Now",
 // },
-	{
-		Image:    "./CardImgs/geobits.png",
-		Name:     "GeoBits - Clg Map",
-		Keywords: []string{"map", "gmap", "location", "finder", "venues","geo","geobits","halls"},
-		Link:     "https://geobits.onrender.com/",
-		BtnText:  "View Now",
-	},
+	
 	{
 		Image:    "./CardImgs/leave.png",
 		Name:     "Upcoming Leave Details",
