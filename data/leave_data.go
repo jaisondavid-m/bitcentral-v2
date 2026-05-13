@@ -112,4 +112,9 @@ var Holidays = []models.Holiday{
 		Day:      "Friday",
 		Name:     "May Day",
 	},
+ {
+		FromDate: "2026-05-23(AN)",
+		ToDate:   "2026-05-31",
+		Name:     "Summer Holiday",
+	},
 }
