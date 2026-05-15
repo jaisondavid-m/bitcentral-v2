@@ -6,24 +6,6 @@ import FullscreenPdfModal from '../Component/FullscreenPdfModal'
 const moduleTestData = {
   mt1: [
     {
-      id: 6,
-      title: 'BASICS OF ELECTRICAL ENGINEERING',
-      qnLink: "https://drive.google.com/file/d/1QCv9M86ETZOyf1QMx8qMhIsnQ0_pwhHs/view?usp=drive_link",
-      ansLink: "https://drive.google.com/file/d/1MkTveMHotdI2MyQAIdNPVW4irL_538NQ/view?usp=drivesdk",
-    },
-    {
-      id: 7,
-      title: 'DIGITAL COMPUTER ELECTRONICS',
-      qnLink: "https://drive.google.com/file/d/1tcz9pShc3Wq12MhhdoggPziJSPCW2bYR/view?usp=drive_link",
-      ansLink: "https://drive.google.com/file/d/1USTm6Ok-LVnnWX_SQ1JohVUQyU40g9Jt/view?usp=drivesdk",
-    },
-    {
-      id: 5,
-      title: 'BASICS OF ELECTRONICS ENGINEERING',
-      qnLink: "https://drive.google.com/file/d/141hs2eZcBMnlbQ-pxa7VQ4cTRwAtQJhi/view?usp=drive_link",
-      ansLink: null,
-    },
-    {
       id: 1,
       title: 'ENGINEERING MATHEMATICS II',
       qnLink: "https://drive.google.com/file/d/14pm-5TzQukSpTPAlwjIBj6HQgzKt7xj8/view?usp=drive_link",
@@ -47,26 +29,26 @@ const moduleTestData = {
       qnLink: "https://drive.google.com/file/d/1yhpb1YJyvmPyRip4wab9C3rrCZjPWvw4/view?usp=drive_link",
       ansLink: null,
     },
-  ],
-  mt2: [
+    {
+      id: 5,
+      title: 'BASICS OF ELECTRONICS ENGINEERING',
+      qnLink: "https://drive.google.com/file/d/141hs2eZcBMnlbQ-pxa7VQ4cTRwAtQJhi/view?usp=drive_link",
+      ansLink: null,
+    },
     {
       id: 6,
       title: 'BASICS OF ELECTRICAL ENGINEERING',
-      qnLink: "https://drive.google.com/file/d/19spFMlU-poqcbFVKE8EYixPFpoBEzS6J/view",
-      ansLink: null,
+      qnLink: "https://drive.google.com/file/d/1QCv9M86ETZOyf1QMx8qMhIsnQ0_pwhHs/view?usp=drive_link",
+      ansLink: "https://drive.google.com/file/d/1MkTveMHotdI2MyQAIdNPVW4irL_538NQ/view?usp=drivesdk",
     },
     {
       id: 7,
       title: 'DIGITAL COMPUTER ELECTRONICS',
-      qnLink: "https://drive.google.com/file/d/1aMwcYrh3yd1kiR7tCre6wFCY7Mx2d9G6/view",
-      ansLink: null,
+      qnLink: "https://drive.google.com/file/d/1tcz9pShc3Wq12MhhdoggPziJSPCW2bYR/view?usp=drive_link",
+      ansLink: "https://drive.google.com/file/d/1USTm6Ok-LVnnWX_SQ1JohVUQyU40g9Jt/view?usp=drivesdk",
     },
-    {
-      id: 5,
-      title: 'BASICS OF ELECTRONICS ENGINEERING',
-      qnLink: "https://drive.google.com/file/d/1Lyqhxn8bisJ0N2BwAb5qYnDMQQlrq_5O/view",
-      ansLink: null,
-    },
+  ],
+  mt2: [
     {
       id: 1,
       title: 'ENGINEERING MATHEMATICS II',
@@ -89,6 +71,24 @@ const moduleTestData = {
       id: 4,
       title: 'COMPUTATIONAL PROBLEM SOLVING',
       qnLink: "https://drive.google.com/file/d/1C2YbR80jmyiw8Im7rLvIWkO06Rao4_cZ/view",
+      ansLink: null,
+    },
+    {
+      id: 5,
+      title: 'BASICS OF ELECTRONICS ENGINEERING',
+      qnLink: "https://drive.google.com/file/d/1Lyqhxn8bisJ0N2BwAb5qYnDMQQlrq_5O/view",
+      ansLink: null,
+    },
+    {
+      id: 6,
+      title: 'BASICS OF ELECTRICAL ENGINEERING',
+      qnLink: "https://drive.google.com/file/d/19spFMlU-poqcbFVKE8EYixPFpoBEzS6J/view",
+      ansLink: null,
+    },
+    {
+      id: 7,
+      title: 'DIGITAL COMPUTER ELECTRONICS',
+      qnLink: "https://drive.google.com/file/d/1aMwcYrh3yd1kiR7tCre6wFCY7Mx2d9G6/view",
       ansLink: null,
     },
   ],
