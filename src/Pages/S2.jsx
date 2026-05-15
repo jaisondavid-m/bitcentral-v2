@@ -52,7 +52,7 @@ const moduleTestData = {
     {
       id: 1,
       title: 'ENGINEERING MATHEMATICS II',
-      qnLink: "https://drive.google.com/file/d/1GGmDa0zJ9876E9G098HW1Rnerygob2m3/view",
+      qnLink: null,
       ansLink: null,
     },
     {
