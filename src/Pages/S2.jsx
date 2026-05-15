@@ -3,54 +3,103 @@ import { useNavigate } from 'react-router-dom';
 import { FileText, CheckCircle } from 'lucide-react';
 import FullscreenPdfModal from '../Component/FullscreenPdfModal'
 
-const subjects = [
-  {
-    id: 6,
-    title: 'BASICS OF ELECTRICAL ENGINEERING',
-    qnLink: "https://drive.google.com/file/d/1QCv9M86ETZOyf1QMx8qMhIsnQ0_pwhHs/view?usp=drive_link",
-    ansLink: "https://drive.google.com/file/d/1MkTveMHotdI2MyQAIdNPVW4irL_538NQ/view?usp=drivesdk",
-  },
-  {
-    id: 7,
-    title: 'DIGITAL COMPUTER ELECTRONICS',
-    qnLink: "https://drive.google.com/file/d/1tcz9pShc3Wq12MhhdoggPziJSPCW2bYR/view?usp=drive_link",
-    ansLink: "https://drive.google.com/file/d/1USTm6Ok-LVnnWX_SQ1JohVUQyU40g9Jt/view?usp=drivesdk",
-  },
-  {
-    id: 5,
-    title: 'BASICS OF ELECTRONICS ENGINEERING',
-    qnLink: "https://drive.google.com/file/d/141hs2eZcBMnlbQ-pxa7VQ4cTRwAtQJhi/view?usp=drive_link",
-    ansLink: null,
-  },
-  {
-    id: 1,
-    title: 'ENGINEERING MATHEMATICS II',
-    qnLink: "https://drive.google.com/file/d/14pm-5TzQukSpTPAlwjIBj6HQgzKt7xj8/view?usp=drive_link",
-    ansLink: "https://drive.google.com/file/d/1lwfVGevvM4waDvA0JQfvKse0Q_WO79zo/view?usp=sharing",
-  },
-  {
-    id: 2,
-    title: 'ELECTROMAGNETISM AND MODERN PHYSICS',
-    qnLink: "https://drive.google.com/file/d/1Hq9Drh17Idq4BdYcL5Rn90hmbiV13ymv/view?usp=drive_link",
-    ansLink: "https://drive.google.com/file/d/16mmelkOgLzmqtVT1eZPwPvD_60GofTca/view?usp=sharing",
-  },
-  {
-    id: 3,
-    title: 'ENGINEERING CHEMISTRY II',
-    qnLink: "https://drive.google.com/file/d/10r9L3IE86gjYPoOWffESb6Ow74RjFS0-/view?usp=drive_link",
-    ansLink: "https://drive.google.com/file/d/10BA-r75MtJ_lHe9mz_9B9GoY5jbXQsrr/view?usp=drivesdk",
-  },
-  {
-    id: 4,
-    title: 'COMPUTATIONAL PROBLEM SOLVING',
-    qnLink: "https://drive.google.com/file/d/1yhpb1YJyvmPyRip4wab9C3rrCZjPWvw4/view?usp=drive_link",
-    ansLink: null,
-  },
-];
+const moduleTestData = {
+  mt1: [
+    {
+      id: 6,
+      title: 'BASICS OF ELECTRICAL ENGINEERING',
+      qnLink: "https://drive.google.com/file/d/1QCv9M86ETZOyf1QMx8qMhIsnQ0_pwhHs/view?usp=drive_link",
+      ansLink: "https://drive.google.com/file/d/1MkTveMHotdI2MyQAIdNPVW4irL_538NQ/view?usp=drivesdk",
+    },
+    {
+      id: 7,
+      title: 'DIGITAL COMPUTER ELECTRONICS',
+      qnLink: "https://drive.google.com/file/d/1tcz9pShc3Wq12MhhdoggPziJSPCW2bYR/view?usp=drive_link",
+      ansLink: "https://drive.google.com/file/d/1USTm6Ok-LVnnWX_SQ1JohVUQyU40g9Jt/view?usp=drivesdk",
+    },
+    {
+      id: 5,
+      title: 'BASICS OF ELECTRONICS ENGINEERING',
+      qnLink: "https://drive.google.com/file/d/141hs2eZcBMnlbQ-pxa7VQ4cTRwAtQJhi/view?usp=drive_link",
+      ansLink: null,
+    },
+    {
+      id: 1,
+      title: 'ENGINEERING MATHEMATICS II',
+      qnLink: "https://drive.google.com/file/d/14pm-5TzQukSpTPAlwjIBj6HQgzKt7xj8/view?usp=drive_link",
+      ansLink: "https://drive.google.com/file/d/1lwfVGevvM4waDvA0JQfvKse0Q_WO79zo/view?usp=sharing",
+    },
+    {
+      id: 2,
+      title: 'ELECTROMAGNETISM AND MODERN PHYSICS',
+      qnLink: "https://drive.google.com/file/d/1Hq9Drh17Idq4BdYcL5Rn90hmbiV13ymv/view?usp=drive_link",
+      ansLink: "https://drive.google.com/file/d/16mmelkOgLzmqtVT1eZPwPvD_60GofTca/view?usp=sharing",
+    },
+    {
+      id: 3,
+      title: 'ENGINEERING CHEMISTRY II',
+      qnLink: "https://drive.google.com/file/d/10r9L3IE86gjYPoOWffESb6Ow74RjFS0-/view?usp=drive_link",
+      ansLink: "https://drive.google.com/file/d/10BA-r75MtJ_lHe9mz_9B9GoY5jbXQsrr/view?usp=drivesdk",
+    },
+    {
+      id: 4,
+      title: 'COMPUTATIONAL PROBLEM SOLVING',
+      qnLink: "https://drive.google.com/file/d/1yhpb1YJyvmPyRip4wab9C3rrCZjPWvw4/view?usp=drive_link",
+      ansLink: null,
+    },
+  ],
+  mt2: [
+    {
+      id: 6,
+      title: 'BASICS OF ELECTRICAL ENGINEERING',
+      qnLink: "https://drive.google.com/file/d/19spFMlU-poqcbFVKE8EYixPFpoBEzS6J/view",
+      ansLink: null,
+    },
+    {
+      id: 7,
+      title: 'DIGITAL COMPUTER ELECTRONICS',
+      qnLink: "https://drive.google.com/file/d/1aMwcYrh3yd1kiR7tCre6wFCY7Mx2d9G6/view",
+      ansLink: null,
+    },
+    {
+      id: 5,
+      title: 'BASICS OF ELECTRONICS ENGINEERING',
+      qnLink: "https://drive.google.com/file/d/1Lyqhxn8bisJ0N2BwAb5qYnDMQQlrq_5O/view",
+      ansLink: null,
+    },
+    {
+      id: 1,
+      title: 'ENGINEERING MATHEMATICS II',
+      qnLink: "https://drive.google.com/file/d/1GGmDa0zJ9876E9G098HW1Rnerygob2m3/view",
+      ansLink: null,
+    },
+    {
+      id: 2,
+      title: 'ELECTROMAGNETISM AND MODERN PHYSICS',
+      qnLink: "https://drive.google.com/file/d/1-7Kv89cv7LbHsC-LXTHj3hfX9s0E6Lbl/view",
+      ansLink: null,
+    },
+    {
+      id: 3,
+      title: 'ENGINEERING CHEMISTRY II',
+      qnLink: "https://drive.google.com/file/d/1o_t-HxFqTXYLufVCAfqW7tZmXjf5796u/view",
+      ansLink: null,
+    },
+    {
+      id: 4,
+      title: 'COMPUTATIONAL PROBLEM SOLVING',
+      qnLink: "https://drive.google.com/file/d/1C2YbR80jmyiw8Im7rLvIWkO06Rao4_cZ/view",
+      ansLink: null,
+    },
+  ],
+};
 
 function S2() {
   const navigate = useNavigate();
   const [activePdf, setActivePdf] = useState(null)
+  const [selectedTest, setSelectedTest] = useState('mt2')
+
+  const subjects = moduleTestData[selectedTest];
 
   const toDrivePreview = (link) => {
     try {
@@ -74,6 +123,29 @@ function S2() {
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-blue-800 tracking-tight dark:text-blue-300">Semester 2</h1>
           <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">Module test question banks and resources</p>
+        </div>
+
+        <div className="mb-6 flex gap-3">
+          <button
+            onClick={() => setSelectedTest('mt1')}
+            className={`px-4 py-2 rounded-lg font-semibold transition ${
+              selectedTest === 'mt1'
+                ? 'bg-blue-600 text-white dark:bg-blue-700'
+                : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
+            }`}
+          >
+            Module Test 1
+          </button>
+          <button
+            onClick={() => setSelectedTest('mt2')}
+            className={`px-4 py-2 rounded-lg font-semibold transition ${
+              selectedTest === 'mt2'
+                ? 'bg-blue-600 text-white dark:bg-blue-700'
+                : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
+            }`}
+          >
+            Module Test 2
+          </button>
         </div>
 
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
