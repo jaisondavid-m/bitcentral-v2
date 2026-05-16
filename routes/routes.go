@@ -67,7 +67,7 @@ func SetupRouter(
 
 		api.GET("/cards", handlers.GetCards)
 		api.GET("/semesters/:year", semesterHandler.GetSemesterByYear)
-		api.GET("/qb",qbHandler.List)
+		api.GET("/qb", qbHandler.List)
 
 		api.GET("/mess", messHandler.GetMess)
 		api.GET("/mess/timings", messHandler.GetMealTimings)
@@ -86,6 +86,7 @@ func SetupRouter(
 		admin.POST("/qb", qbHandler.Create)
 		admin.PUT("/qb/:id", qbHandler.Update)
 		admin.DELETE("/qb/:id", qbHandler.Delete)
+		admin.PUT("/semesters/:year", semesterHandler.UpdateSemesterByYear)
 	}
 
 	return r

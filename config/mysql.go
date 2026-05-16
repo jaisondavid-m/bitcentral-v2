@@ -92,6 +92,8 @@ func InitMySQL() {
 	log.Println("✅ MySQL connected successfully")
 
 	createTokenTable()
+	createQBAnswerKeyTable()
+	createSemesterSubjectsTable()
 }
 
 // ✅ Create table with dynamic name
@@ -137,4 +139,29 @@ func createQBAnswerKeyTable() {
 		log.Fatalf("❌ Failed to create qb_answer_keys table: %v", err)
 	}
 	log.Println("✅ qb_answer_keys table ready")
+}
+
+func createSemesterSubjectsTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS semester_subjects (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		year INT NOT NULL,
+		idx INT NOT NULL,
+		code VARCHAR(50),
+		name VARCHAR(255),
+		qb1 VARCHAR(1024),
+		qb2 VARCHAR(1024),
+		ak1 VARCHAR(1024),
+		ak2 VARCHAR(1024),
+		sem_qb_with_ans VARCHAR(1024),
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		UNIQUE KEY unique_year_idx (year, idx)
+	) ENGINE=InnoDB;`
+
+	_, err := DB.Exec(query)
+	if err != nil {
+		log.Fatalf("❌ Failed to create semester_subjects table: %v", err)
+	}
+	log.Println("✅ semester_subjects table ready")
 }
