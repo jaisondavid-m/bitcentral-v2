@@ -4,7 +4,7 @@ import {
   listAdminUsers,
   updateUsers,
   listQBAnswerKeys,
-  createQBAnswerKey,
+  createQBAnswerKeysBatch,
   updateQBAnswerKey,
   deleteQBAnswerKey,
 } from "../api/admin.js";
@@ -12,7 +12,6 @@ import {
   AlertTriangle,
   BookOpen,
   CheckCircle,
-  ChevronDown,
   Edit2,
   Loader,
   Plus,
@@ -37,16 +36,18 @@ function formatDateTime(value) {
   return date.toLocaleString();
 }
 
-const SEMESTER_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 const CURRENT_YEAR = new Date().getFullYear();
 const YEAR_OPTIONS = Array.from({ length: 6 }, (_, i) => CURRENT_YEAR - i);
 
 const EMPTY_QB_FORM = {
-  semester: "",
+  year: "",
   subject_code: "",
   subject_name: "",
-  year: "",
-  answers: "",
+  qb1: "",
+  qb2: "",
+  ak1: "",
+  ak2: "",
+  semqbwithans: "",
 };
 
 function Banner({ banner, onDismiss }) {
@@ -78,74 +79,41 @@ function Banner({ banner, onDismiss }) {
   );
 }
 
-// ─── QB Answer Key Form (Add / Edit) ─────────────────────────────────────────
+// ─── QB Subject Link Form (Edit single subject) ──────────────────────────────
 function QBForm({ initial, onSubmit, onCancel, isLoading }) {
   const [form, setForm] = useState(initial || EMPTY_QB_FORM);
-  const [answersRaw, setAnswersRaw] = useState(() => {
-    if (!initial?.answers) return "";
-    try {
-      const parsed = JSON.parse(initial.answers);
-      return Object.entries(parsed)
-        .map(([q, a]) => `${q}:${a}`)
-        .join("\n");
-    } catch {
-      return initial.answers;
-    }
-  });
-  const [answersError, setAnswersError] = useState("");
 
   const set = (key) => (e) =>
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
-  function parseAnswers(raw) {
-    const lines = raw.split(/\n|,/).map((l) => l.trim()).filter(Boolean);
-    const obj = {};
-    for (const line of lines) {
-      const parts = line.split(":");
-      if (parts.length !== 2) return null;
-      const [q, a] = parts.map((p) => p.trim());
-      if (!q || !a) return null;
-      obj[q] = a.toUpperCase();
-    }
-    return obj;
+  function toNullable(value) {
+    const trimmed = (value || "").trim();
+    return trimmed ? trimmed : null;
   }
 
   function handleSubmit(e) {
     e.preventDefault();
-    setAnswersError("");
-    const parsed = parseAnswers(answersRaw);
-    if (!parsed || Object.keys(parsed).length === 0) {
-      setAnswersError('Format each line as "1:A" or "2:B". Use one per line or comma-separated.');
+    if (!form.year || !form.subject_code.trim() || !form.subject_name.trim()) {
       return;
     }
-    onSubmit({ ...form, answers: JSON.stringify(parsed) });
+    onSubmit({
+      year: Number(form.year),
+      subject_code: form.subject_code.trim(),
+      subject_name: form.subject_name.trim(),
+      qb1: toNullable(form.qb1),
+      qb2: toNullable(form.qb2),
+      ak1: toNullable(form.ak1),
+      ak2: toNullable(form.ak2),
+      semqbwithans: toNullable(form.semqbwithans),
+    });
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-3">
         <div>
           <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">
-            Semester
-          </label>
-          <select
-            value={form.semester}
-            onChange={set("semester")}
-            required
-            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-          >
-            <option value="">Select semester</option>
-            {SEMESTER_OPTIONS.map((s) => (
-              <option key={s} value={s}>
-                Semester {s}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">
-            Exam year
+            Year
           </label>
           <select
             value={form.year}
@@ -191,24 +159,61 @@ function QBForm({ initial, onSubmit, onCancel, isLoading }) {
         </div>
       </div>
 
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div>
+          <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">QB1 link</label>
+          <input
+            type="url"
+            value={form.qb1 || ""}
+            onChange={set("qb1")}
+            placeholder="https://..."
+            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+          />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">QB2 link</label>
+          <input
+            type="url"
+            value={form.qb2 || ""}
+            onChange={set("qb2")}
+            placeholder="https://..."
+            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+          />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">AK1 link</label>
+          <input
+            type="url"
+            value={form.ak1 || ""}
+            onChange={set("ak1")}
+            placeholder="https://..."
+            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+          />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">AK2 link</label>
+          <input
+            type="url"
+            value={form.ak2 || ""}
+            onChange={set("ak2")}
+            placeholder="https://..."
+            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+          />
+        </div>
+      </div>
+
       <div>
-        <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">
-          Answer key{" "}
-          <span className="font-normal text-gray-500">
-            — one per line: <code className="rounded bg-gray-100 px-1 dark:bg-slate-800">1:A</code>, <code className="rounded bg-gray-100 px-1 dark:bg-slate-800">2:B</code> …
-          </span>
-        </label>
-        <textarea
-          value={answersRaw}
-          onChange={(e) => setAnswersRaw(e.target.value)}
-          rows={6}
-          placeholder={"1:A\n2:C\n3:B\n4:D"}
-          required
-          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 font-mono text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+        <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">Semester QB with answer link</label>
+        <input
+          type="url"
+          value={form.semqbwithans || ""}
+          onChange={set("semqbwithans")}
+          placeholder="https://..."
+          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
         />
-        {answersError && (
-          <p className="mt-1 text-xs text-red-600 dark:text-red-400">{answersError}</p>
-        )}
       </div>
 
       <div className="flex gap-2">
@@ -233,76 +238,56 @@ function QBForm({ initial, onSubmit, onCancel, isLoading }) {
   );
 }
 
-// ─── Expandable Answers ───────────────────────────────────────────────────────
-function AnswerKeyPreview({ answers }) {
-  const [open, setOpen] = useState(false);
-  let parsed = {};
-  try {
-    parsed = JSON.parse(answers);
-  } catch {
-    return <span className="text-xs text-gray-400">Invalid JSON</span>;
+function LinkCell({ value }) {
+  if (!value) {
+    return <span className="text-xs text-gray-400">-</span>;
   }
-
-  const entries = Object.entries(parsed);
-
   return (
-    <div>
-      <button
-        type="button"
-        onClick={() => setOpen((p) => !p)}
-        className="inline-flex items-center gap-1 rounded bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 transition hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300"
-      >
-        {entries.length} questions
-        <ChevronDown
-          className={`h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-
-      {open && (
-        <div className="mt-2 grid max-h-52 grid-cols-4 gap-1 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-2 dark:border-blue-900 dark:bg-slate-900 sm:grid-cols-6">
-          {entries.map(([q, a]) => (
-            <span
-              key={q}
-              className="flex items-center justify-between rounded border border-gray-200 bg-white px-2 py-1 text-xs dark:border-blue-900 dark:bg-slate-800"
-            >
-              <span className="text-gray-500 dark:text-slate-400">Q{q}</span>
-              <span className="font-semibold text-gray-800 dark:text-slate-100">{a}</span>
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
+    <a
+      href={value}
+      target="_blank"
+      rel="noreferrer"
+      className="text-xs font-semibold text-blue-700 underline-offset-2 hover:underline dark:text-blue-300"
+    >
+      Open
+    </a>
   );
 }
 
-// ─── QB Section ───────────────────────────────────────────────────────────────
+// ─── QB Handling Section (Year + Subject links) ──────────────────────────────
 function QBSection() {
   const [qbItems, setQbItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [editItem, setEditItem] = useState(null); // null = not editing, object = editing
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [showBatchForm, setShowBatchForm] = useState(false);
+  const [batchRows, setBatchRows] = useState([{ subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
   const [banner, setBanner] = useState({ type: "", message: "" });
-  const [filterSemester, setFilterSemester] = useState("");
-  const [filterYear, setFilterYear] = useState("");
+  const [filterYear, setFilterYear] = useState(String(CURRENT_YEAR));
   const [searchQuery, setSearchQuery] = useState("");
 
+  function toNullable(value) {
+    const trimmed = (value || "").trim();
+    return trimmed ? trimmed : null;
+  }
+
   const load = useCallback(async () => {
+    if (!filterYear) return;
     setIsLoading(true);
     setBanner({ type: "", message: "" });
     try {
       const result = await listQBAnswerKeys({
-        semester: filterSemester || undefined,
         year: filterYear || undefined,
       });
       setQbItems(result.data || []);
     } catch (err) {
-      setBanner({ type: "error", message: normalizeError(err, "Failed to load QB answer keys") });
+      setBanner({ type: "error", message: normalizeError(err, "Failed to load subjects") });
+      setQbItems([]);
     } finally {
       setIsLoading(false);
     }
-  }, [filterSemester, filterYear]);
+  }, [filterYear]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -311,36 +296,40 @@ function QBSection() {
     if (!q) return qbItems;
     return qbItems.filter(
       (item) =>
-        item.subject_code.toLowerCase().includes(q) ||
-        item.subject_name.toLowerCase().includes(q)
+        (item.subject_code || "").toLowerCase().includes(q) ||
+        (item.subject_name || "").toLowerCase().includes(q)
     );
   }, [qbItems, searchQuery]);
 
-  // Group by semester
-  const grouped = useMemo(() => {
-    const map = {};
-    for (const item of filtered) {
-      const key = `Semester ${item.semester}`;
-      if (!map[key]) map[key] = [];
-      map[key].push(item);
-    }
-    return Object.entries(map).sort(([a], [b]) => {
-      const numA = parseInt(a.replace("Semester ", ""));
-      const numB = parseInt(b.replace("Semester ", ""));
-      return numA - numB;
-    });
-  }, [filtered]);
+  async function handleCreateBatch() {
+    const validRows = batchRows
+      .map((row) => ({
+        year: Number(filterYear),
+        subject_code: row.subject_code.trim(),
+        subject_name: row.subject_name.trim(),
+        qb1: toNullable(row.qb1),
+        qb2: toNullable(row.qb2),
+        ak1: toNullable(row.ak1),
+        ak2: toNullable(row.ak2),
+        semqbwithans: toNullable(row.semqbwithans),
+      }))
+      .filter((row) => row.subject_code && row.subject_name);
 
-  async function handleCreate(payload) {
+    if (!filterYear || validRows.length === 0) {
+      setBanner({ type: "error", message: "Select year and add at least one subject code + name" });
+      return;
+    }
+
     setIsSaving(true);
     setBanner({ type: "", message: "" });
     try {
-      await createQBAnswerKey(payload);
-      setBanner({ type: "success", message: "Answer key added successfully" });
-      setShowAddForm(false);
+      await createQBAnswerKeysBatch({ year: Number(filterYear), subjects: validRows });
+      setBanner({ type: "success", message: "Subjects added successfully" });
+      setShowBatchForm(false);
+      setBatchRows([{ subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
       await load();
     } catch (err) {
-      setBanner({ type: "error", message: normalizeError(err, "Failed to add answer key") });
+      setBanner({ type: "error", message: normalizeError(err, "Failed to add subjects") });
     } finally {
       setIsSaving(false);
     }
@@ -351,26 +340,26 @@ function QBSection() {
     setBanner({ type: "", message: "" });
     try {
       await updateQBAnswerKey(editItem.id, payload);
-      setBanner({ type: "success", message: "Answer key updated successfully" });
+      setBanner({ type: "success", message: "Subject updated successfully" });
       setEditItem(null);
       await load();
     } catch (err) {
-      setBanner({ type: "error", message: normalizeError(err, "Failed to update answer key") });
+      setBanner({ type: "error", message: normalizeError(err, "Failed to update subject") });
     } finally {
       setIsSaving(false);
     }
   }
 
   async function handleDelete(id) {
-    if (!window.confirm("Delete this answer key permanently?")) return;
+    if (!window.confirm("Delete this subject permanently?")) return;
     setDeletingId(id);
     setBanner({ type: "", message: "" });
     try {
       await deleteQBAnswerKey(id);
       setQbItems((prev) => prev.filter((item) => item.id !== id));
-      setBanner({ type: "success", message: "Answer key deleted" });
+      setBanner({ type: "success", message: "Subject deleted" });
     } catch (err) {
-      setBanner({ type: "error", message: normalizeError(err, "Failed to delete answer key") });
+      setBanner({ type: "error", message: normalizeError(err, "Failed to delete subject") });
     } finally {
       setDeletingId(null);
     }
@@ -383,19 +372,19 @@ function QBSection() {
         <div>
           <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-slate-100">
             <BookOpen className="h-5 w-5 text-blue-600" />
-            QB Answer Keys
+            QB Handling
           </h2>
           <p className="mt-0.5 text-sm text-gray-500 dark:text-slate-400">
-            Semester-wise question bank answer keys
+            Add multiple subjects for a year, then edit links later
           </p>
         </div>
         <button
           type="button"
-          onClick={() => { setShowAddForm(true); setEditItem(null); }}
+          onClick={() => { setShowBatchForm(true); setEditItem(null); }}
           className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
         >
           <Plus className="h-4 w-4" />
-          Add answer key
+          Add subjects (batch)
         </button>
       </div>
 
@@ -406,33 +395,110 @@ function QBSection() {
         </div>
       )}
 
-      {/* Add form */}
-      {showAddForm && !editItem && (
+      {/* Batch add form */}
+      {showBatchForm && !editItem && (
         <div className="mb-5 rounded-lg border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-900 dark:bg-slate-900">
           <h3 className="mb-3 text-sm font-semibold text-gray-800 dark:text-slate-200">
-            Add new answer key
+            Add subjects for year {filterYear || "-"}
           </h3>
-          <QBForm
-            onSubmit={handleCreate}
-            onCancel={() => setShowAddForm(false)}
-            isLoading={isSaving}
-          />
+          <div className="space-y-3">
+            {batchRows.map((row, idx) => (
+              <div key={idx} className="grid gap-2 rounded-lg border border-blue-200 bg-white p-3 sm:grid-cols-7 dark:border-blue-900 dark:bg-slate-950">
+                <input
+                  type="text"
+                  value={row.subject_code}
+                  onChange={(e) => setBatchRows((prev) => prev.map((r, i) => (i === idx ? { ...r, subject_code: e.target.value } : r)))}
+                  placeholder="Code"
+                  className="rounded border border-gray-300 px-2 py-1.5 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+                />
+                <input
+                  type="text"
+                  value={row.subject_name}
+                  onChange={(e) => setBatchRows((prev) => prev.map((r, i) => (i === idx ? { ...r, subject_name: e.target.value } : r)))}
+                  placeholder="Subject name"
+                  className="rounded border border-gray-300 px-2 py-1.5 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+                />
+                <input
+                  type="url"
+                  value={row.qb1}
+                  onChange={(e) => setBatchRows((prev) => prev.map((r, i) => (i === idx ? { ...r, qb1: e.target.value } : r)))}
+                  placeholder="QB1"
+                  className="rounded border border-gray-300 px-2 py-1.5 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+                />
+                <input
+                  type="url"
+                  value={row.qb2}
+                  onChange={(e) => setBatchRows((prev) => prev.map((r, i) => (i === idx ? { ...r, qb2: e.target.value } : r)))}
+                  placeholder="QB2"
+                  className="rounded border border-gray-300 px-2 py-1.5 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+                />
+                <input
+                  type="url"
+                  value={row.ak1}
+                  onChange={(e) => setBatchRows((prev) => prev.map((r, i) => (i === idx ? { ...r, ak1: e.target.value } : r)))}
+                  placeholder="AK1"
+                  className="rounded border border-gray-300 px-2 py-1.5 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+                />
+                <input
+                  type="url"
+                  value={row.ak2}
+                  onChange={(e) => setBatchRows((prev) => prev.map((r, i) => (i === idx ? { ...r, ak2: e.target.value } : r)))}
+                  placeholder="AK2"
+                  className="rounded border border-gray-300 px-2 py-1.5 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+                />
+                <div className="flex items-center gap-2">
+                  <input
+                    type="url"
+                    value={row.semqbwithans}
+                    onChange={(e) => setBatchRows((prev) => prev.map((r, i) => (i === idx ? { ...r, semqbwithans: e.target.value } : r)))}
+                    placeholder="Sem QB + Ans"
+                    className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setBatchRows((prev) => prev.filter((_, i) => i !== idx))}
+                    disabled={batchRows.length === 1}
+                    className="rounded border border-red-300 px-2 py-1.5 text-xs font-semibold text-red-600 disabled:opacity-40"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setBatchRows((prev) => [...prev, { subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }])}
+                className="inline-flex items-center gap-2 rounded-lg border border-blue-300 bg-white px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-50 dark:border-blue-900 dark:bg-slate-950 dark:text-blue-300 dark:hover:bg-slate-900"
+              >
+                <Plus className="h-4 w-4" />
+                Add row
+              </button>
+              <button
+                type="button"
+                onClick={handleCreateBatch}
+                disabled={isSaving}
+                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
+              >
+                {isSaving ? <Loader className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+                Save batch
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowBatchForm(false)}
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+              >
+                <X className="h-4 w-4" />
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Filters */}
       <div className="mb-4 flex flex-wrap gap-2">
-        <select
-          value={filterSemester}
-          onChange={(e) => setFilterSemester(e.target.value)}
-          className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-        >
-          <option value="">All semesters</option>
-          {SEMESTER_OPTIONS.map((s) => (
-            <option key={s} value={s}>Semester {s}</option>
-          ))}
-        </select>
-
         <select
           value={filterYear}
           onChange={(e) => setFilterYear(e.target.value)}
@@ -471,100 +537,91 @@ function QBSection() {
         <div className="flex h-32 items-center justify-center">
           <Loader className="h-6 w-6 animate-spin text-blue-600" />
         </div>
-      ) : grouped.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <div className="flex h-32 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 dark:border-blue-900 dark:bg-slate-900">
           <BookOpen className="h-7 w-7 text-gray-400" />
-          <p className="text-sm text-gray-500 dark:text-slate-400">No answer keys found</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400">No subjects found</p>
         </div>
       ) : (
-        <div className="space-y-5">
-          {grouped.map(([semLabel, items]) => (
-            <div key={semLabel}>
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">
-                {semLabel}
-              </h3>
-              <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-blue-900">
-                <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-blue-900">
-                  <thead className="bg-gray-50 dark:bg-slate-900">
-                    <tr>
-                      <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">#</th>
-                      <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Code</th>
-                      <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Subject</th>
-                      <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Year</th>
-                      <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Answers</th>
-                      <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Updated</th>
-                      <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white dark:divide-blue-900 dark:bg-slate-950">
-                    {items.map((item, idx) =>
-                      editItem?.id === item.id ? (
-                        <tr key={item.id}>
-                          <td colSpan={7} className="px-4 py-4">
-                            <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-900 dark:bg-slate-900">
-                              <h4 className="mb-3 text-sm font-semibold text-gray-800 dark:text-slate-200">
-                                Edit: {item.subject_code} — {item.subject_name}
-                              </h4>
-                              <QBForm
-                                initial={editItem}
-                                onSubmit={handleUpdate}
-                                onCancel={() => setEditItem(null)}
-                                isLoading={isSaving}
-                              />
-                            </div>
-                          </td>
-                        </tr>
-                      ) : (
-                        <tr key={item.id} className="transition hover:bg-gray-50 dark:hover:bg-slate-900">
-                          <td className="px-4 py-3 font-medium text-gray-500 dark:text-slate-400">
-                            {idx + 1}
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="rounded bg-gray-100 px-2 py-0.5 font-mono text-xs font-semibold text-gray-700 dark:bg-slate-800 dark:text-slate-200">
-                              {item.subject_code}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-gray-800 dark:text-slate-200">{item.subject_name}</td>
-                          <td className="px-4 py-3 text-gray-600 dark:text-slate-300">{item.year}</td>
-                          <td className="px-4 py-3">
-                            <AnswerKeyPreview answers={item.answers} />
-                          </td>
-                          <td className="px-4 py-3 text-gray-500 dark:text-slate-400">
-                            {formatDateTime(item.updated_at)}
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="flex gap-2">
-                              <button
-                                type="button"
-                                onClick={() => { setEditItem(item); setShowAddForm(false); }}
-                                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-200"
-                              >
-                                <Edit2 className="h-3.5 w-3.5" />
-                                Edit
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleDelete(item.id)}
-                                disabled={deletingId === item.id}
-                                className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
-                              >
-                                {deletingId === item.id ? (
-                                  <Loader className="h-3.5 w-3.5 animate-spin" />
-                                ) : (
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                )}
-                                Delete
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      )
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ))}
+        <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-blue-900">
+          <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-blue-900">
+            <thead className="bg-gray-50 dark:bg-slate-900">
+              <tr>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">#</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Code</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Subject</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">QB1</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">QB2</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">AK1</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">AK2</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Sem + Ans</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Updated</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 bg-white dark:divide-blue-900 dark:bg-slate-950">
+              {filtered.map((item, idx) =>
+                editItem?.id === item.id ? (
+                  <tr key={item.id}>
+                    <td colSpan={10} className="px-4 py-4">
+                      <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-900 dark:bg-slate-900">
+                        <h4 className="mb-3 text-sm font-semibold text-gray-800 dark:text-slate-200">
+                          Edit: {item.subject_code} - {item.subject_name}
+                        </h4>
+                        <QBForm
+                          initial={{ ...editItem, year: String(editItem.year) }}
+                          onSubmit={handleUpdate}
+                          onCancel={() => setEditItem(null)}
+                          isLoading={isSaving}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  <tr key={item.id} className="transition hover:bg-gray-50 dark:hover:bg-slate-900">
+                    <td className="px-4 py-3 font-medium text-gray-500 dark:text-slate-400">{idx + 1}</td>
+                    <td className="px-4 py-3">
+                      <span className="rounded bg-gray-100 px-2 py-0.5 font-mono text-xs font-semibold text-gray-700 dark:bg-slate-800 dark:text-slate-200">
+                        {item.subject_code}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-gray-800 dark:text-slate-200">{item.subject_name}</td>
+                    <td className="px-4 py-3"><LinkCell value={item.qb1} /></td>
+                    <td className="px-4 py-3"><LinkCell value={item.qb2} /></td>
+                    <td className="px-4 py-3"><LinkCell value={item.ak1} /></td>
+                    <td className="px-4 py-3"><LinkCell value={item.ak2} /></td>
+                    <td className="px-4 py-3"><LinkCell value={item.semqbwithans} /></td>
+                    <td className="px-4 py-3 text-gray-500 dark:text-slate-400">{formatDateTime(item.updated_at)}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => { setEditItem(item); setShowBatchForm(false); }}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-200"
+                        >
+                          <Edit2 className="h-3.5 w-3.5" />
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(item.id)}
+                          disabled={deletingId === item.id}
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
+                        >
+                          {deletingId === item.id ? (
+                            <Loader className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-3.5 w-3.5" />
+                          )}
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
         </div>
       )}
     </section>

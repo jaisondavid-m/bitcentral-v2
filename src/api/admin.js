@@ -59,7 +59,7 @@ export async function listQBAnswerKeys({ semester, year } = {}) {
   const params = new URLSearchParams();
   if (semester) params.set("semester", semester);
   if (year) params.set("year", year);
-  const response = await api.get(`/admin/qb?${params}`, { headers });
+  const response = await api.get(`/admin/qb?${params.toString()}`, { headers });
   return response.data;
 }
 
@@ -72,6 +72,12 @@ export async function createQBAnswerKey(payload) {
 export async function updateQBAnswerKey(id, payload) {
   const headers = await getAdminHeaders();
   const response = await api.put(`/admin/qb/${id}`, payload, { headers });
+  return response.data;
+}
+
+export async function createQBAnswerKeysBatch(payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.post("/admin/qb/batch", payload, { headers });
   return response.data;
 }
 
