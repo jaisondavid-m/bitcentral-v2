@@ -71,7 +71,7 @@ function SearchBar({ search, setSearch, isSearching = false, placeholder = "Sear
             setSearch(e.target.value);
             setError("");
           }}
-          className="block w-full rounded-xl border border-blue-200 bg-white px-3 py-2.5 pr-24 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 sm:px-4 sm:py-3 sm:pr-24 sm:text-base dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-700 dark:focus:ring-blue-900/40"
+          className="block w-full rounded-xl border border-blue-200 bg-white px-3 py-2 pr-24 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 sm:px-3.5 sm:py-2.5 sm:pr-24 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-700 dark:focus:ring-blue-900/40"
         />
 
         {search && (
