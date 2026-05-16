@@ -1,4 +1,3 @@
-y
 import React from "react";
 
 const LinkButton = ({ href, label }) => {
