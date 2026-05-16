@@ -11,6 +11,7 @@ import (
 	"server/handlers"
 	"server/routes"
 )
+
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Printf("Failed to load .env (%v). Using system environment variables.", err)
@@ -43,7 +44,7 @@ func main() {
 	leaderboardHandler := handlers.NewLeaderboardHandler(sheetHandler)
 	leaveHandler := handlers.NewLeaveHandler()
 	qbHandler := handlers.NewQBHandler()
-    uploadHandler := handlers.NewUploadHandler()
+	uploadHandler := handlers.NewUploadHandler()
 
 	r := routes.SetupRouter(
 		sheetHandler,

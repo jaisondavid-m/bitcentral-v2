@@ -4,12 +4,19 @@ import (
 	"context"
 	"log"
 	"os"
+	"sync"
 
 	firebase "firebase.google.com/go"
+	"firebase.google.com/go/auth"
 	"google.golang.org/api/option"
 )
 
 var FirebaseApp *firebase.App
+var (
+	firebaseAuthClient *auth.Client
+	firebaseAuthOnce   sync.Once
+	firebaseAuthErr    error
+)
 
 func InitFirebase() {
 	credentialsJSON := os.Getenv("FIREBASE_CREDENTIALS_JSON")
@@ -33,4 +40,16 @@ func InitFirebase() {
 
 	FirebaseApp = app
 	log.Println("✅ Firebase initialized successfully")
+}
+
+func FirebaseAuthClient() (*auth.Client, error) {
+	if FirebaseApp == nil {
+		return nil, nil
+	}
+
+	firebaseAuthOnce.Do(func() {
+		firebaseAuthClient, firebaseAuthErr = FirebaseApp.Auth(context.Background())
+	})
+
+	return firebaseAuthClient, firebaseAuthErr
 }

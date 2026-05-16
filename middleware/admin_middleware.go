@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"net/http"
 	"os"
 	"strings"
@@ -43,8 +42,8 @@ func RequireAdmin() gin.HandlerFunc {
 			return
 		}
 
-		client, err := config.FirebaseApp.Auth(context.Background())
-		if err != nil {
+		client, err := config.FirebaseAuthClient()
+		if err != nil || client == nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"success": false,
 				"message": "Failed to initialize Firebase auth",

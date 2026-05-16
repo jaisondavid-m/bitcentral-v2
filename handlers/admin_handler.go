@@ -22,7 +22,11 @@ func NewAdminHandler() *AdminHandler {
 	}
 }
 func (h *AdminHandler) GetUsers(c *gin.Context) {
-	client, _ := config.FirebaseApp.Auth(context.Background())
+	client, err := config.FirebaseAuthClient()
+	if err != nil || client == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to initialize Firebase auth"})
+		return
+	}
 
 	iter := client.Users(context.Background(), "")
 
@@ -50,7 +54,11 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 	})
 }
 func (h *AdminHandler) UpdateUsers(c *gin.Context) {
-	client, _ := config.FirebaseApp.Auth(context.Background())
+	client, err := config.FirebaseAuthClient()
+	if err != nil || client == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to initialize Firebase auth"})
+		return
+	}
 	iter := client.Users(context.Background(), "")
 
 	var users []models.User
@@ -133,8 +141,15 @@ func (h *AdminHandler) syncUsersToMySQL(users []models.User) error {
 func (h *AdminHandler) DeleteUser(c *gin.Context) {
 	uid := c.Param("uid")
 
-	client, _ := config.FirebaseApp.Auth(context.Background())
-	client.DeleteUser(context.Background(), uid)
+	client, err := config.FirebaseAuthClient()
+	if err != nil || client == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to initialize Firebase auth"})
+		return
+	}
+	if err := client.DeleteUser(context.Background(), uid); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true})
 }
