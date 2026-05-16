@@ -14,20 +14,31 @@ type PSToken struct {
 }
 
 type QBAnswerKey struct {
-	ID         int    `json:"id"`
-	Semester   int    `json:"semester"`
-	SubjectCode string `json:"subject_code"`
-	SubjectName string `json:"subject_name"`
-	Year       int    `json:"year"`      // exam year
-	Answers    string `json:"answers"`   // JSON string: {"1":"A","2":"C",...}
-	CreatedAt  string `json:"created_at"`
-	UpdatedAt  string `json:"updated_at"`
+	ID           int     `json:"id"`
+	Year         int     `json:"year"`
+	SubjectCode  string  `json:"subject_code"`
+	SubjectName  string  `json:"subject_name"`
+	QB1          *string `json:"qb1"`
+	QB2          *string `json:"qb2"`
+	AK1          *string `json:"ak1"`
+	AK2          *string `json:"ak2"`
+	SemQBWithAns *string `json:"semqbwithans"`
+	CreatedAt    string  `json:"created_at"`
+	UpdatedAt    string  `json:"updated_at"`
 }
 
 type QBAnswerKeyInput struct {
-	Semester    int    `json:"semester" binding:"required"`
-	SubjectCode string `json:"subject_code" binding:"required"`
-	SubjectName string `json:"subject_name" binding:"required"`
-	Year        int    `json:"year" binding:"required"`
-	Answers     string `json:"answers" binding:"required"`
+	Year         int     `json:"year" binding:"required"`
+	SubjectCode  string  `json:"subject_code" binding:"required"`
+	SubjectName  string  `json:"subject_name" binding:"required"`
+	QB1          *string `json:"qb1"`
+	QB2          *string `json:"qb2"`
+	AK1          *string `json:"ak1"`
+	AK2          *string `json:"ak2"`
+	SemQBWithAns *string `json:"semqbwithans"`
+}
+
+type QBAnswerKeyBatchInput struct {
+	Year     int                `json:"year" binding:"required"`
+	Subjects []QBAnswerKeyInput `json:"subjects" binding:"required"`
 }

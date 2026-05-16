@@ -163,5 +163,9 @@ func createSemesterSubjectsTable() {
 	if err != nil {
 		log.Fatalf("❌ Failed to create semester_subjects table: %v", err)
 	}
+
+	if _, err := DB.Exec(`ALTER TABLE semester_subjects ADD UNIQUE KEY unique_year_code (year, code)`); err != nil {
+		log.Printf("ℹ️ unique_year_code index not created (may already exist): %v", err)
+	}
 	log.Println("✅ semester_subjects table ready")
 }
