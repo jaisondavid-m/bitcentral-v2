@@ -17,7 +17,6 @@ import {
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../Authentication/firebase.js";
 
-const ADMIN_SECRET_KEY = "admin-dashboard-secret";
 const PS_TOKEN_UPDATED_AT_KEY = "admin-ps-token-updated-at";
 const PS_TOKEN_INTERVAL_MS = 3 * 60 * 60 * 1000; // 3 hours
 
@@ -43,54 +42,8 @@ function formatCountdown(ms) {
     .map((value) => String(value).padStart(2, "0"))
     .join(":");
 }
-
-
-
-function SecretPrompt({ value, onChange, onSubmit }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4">
-      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg dark:border dark:border-blue-900 dark:bg-slate-950">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100">
-          Admin Secret Required
-        </h2>
-        <p className="mt-2 text-sm text-gray-600 dark:text-slate-300">
-          Enter the admin secret header (x-admin-secret). This will be stored in
-          localStorage.
-        </p>
-
-        <form onSubmit={onSubmit} className="mt-4 space-y-4">
-          <input
-            type="password"
-            value={value}
-            onChange={onChange}
-            placeholder="Enter x-admin-secret"
-            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-            autoFocus
-            required
-          />
-
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
-          >
-            Continue
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
 function AdminDashboard() {
   const [authUser] = useAuthState(auth);
-
-  const [adminSecret, setAdminSecret] = useState(
-    () => localStorage.getItem(ADMIN_SECRET_KEY) || ""
-  );
-  const [secretDraft, setSecretDraft] = useState("");
-  const [needsSecret, setNeedsSecret] = useState(
-    () => !localStorage.getItem(ADMIN_SECRET_KEY)
-  );
 
   const [users, setUsers] = useState([]);
   const [usersLoaded, setUsersLoaded] = useState(false);
@@ -108,13 +61,11 @@ function AdminDashboard() {
   const [nowTs, setNowTs] = useState(() => Date.now());
   const [banner, setBanner] = useState({ type: "", message: "" });
   const onUpdateUsers = async () => {
-    if (!adminSecret) return;
-
     setIsUpdatingUsers(true);
     setBanner({ type: "", message: "" });
 
     try {
-      const result = await updateUsers({ adminSecret });
+      const result = await updateUsers();
       setBanner({
         type: "success",
         message: result?.message || "Users updated successfully",
@@ -153,12 +104,6 @@ function AdminDashboard() {
   const isPsTokenDue = !psTokenUpdatedAt || remainingMs === 0;
 
   useEffect(() => {
-    if (adminSecret) {
-      localStorage.setItem(ADMIN_SECRET_KEY, adminSecret);
-    }
-  }, [adminSecret]);
-
-  useEffect(() => {
     const intervalId = window.setInterval(() => {
       setNowTs(Date.now());
     }, 1000);
@@ -168,13 +113,11 @@ function AdminDashboard() {
 
 
   const loadUsers = async () => {
-    if (!adminSecret) return;
-
     setIsLoadingUsers(true);
     setBanner({ type: "", message: "" });
 
     try {
-      const usersResult = await listAdminUsers({ adminSecret });
+      const usersResult = await listAdminUsers();
       setUsers(usersResult.users || []);
       setUsersLoaded(true);
     } catch (error) {
@@ -192,19 +135,6 @@ function AdminDashboard() {
     await loadUsers();
   };
 
-  const onSubmitSecret = (event) => {
-    event.preventDefault();
-    const trimmed = secretDraft.trim();
-
-    if (!trimmed) {
-      return;
-    }
-
-    setAdminSecret(trimmed);
-    setNeedsSecret(false);
-    setSecretDraft("");
-  };
-
   const onDeleteUser = async (uid) => {
     const confirmed = window.confirm("Delete this user permanently?");
     if (!confirmed) return;
@@ -213,7 +143,7 @@ function AdminDashboard() {
     setBanner({ type: "", message: "" });
 
     try {
-      await deleteAdminUser({ adminSecret, uid });
+      await deleteAdminUser({ uid });
       setUsers((prev) => prev.filter((user) => user.uid !== uid));
       setBanner({ type: "success", message: "User deleted successfully" });
     } catch (error) {
@@ -240,7 +170,6 @@ function AdminDashboard() {
 
     try {
       const result = await updateAdminPsToken({
-        adminSecret,
         token: tokenValue,
       });
 
@@ -264,26 +193,10 @@ function AdminDashboard() {
     }
   };
 
-  const clearStoredSecret = () => {
-    localStorage.removeItem(ADMIN_SECRET_KEY);
-    setAdminSecret("");
-    setNeedsSecret(true);
-    setSecretDraft("");
-    setUsers([]);
-    setUsersLoaded(false);
-  };
-
   return (
     <div className="relative min-h-screen overflow-hidden bg-linear-to-b from-sky-50 via-white to-slate-100 px-4 py-6 sm:px-6 lg:px-8 dark:from-black dark:via-slate-950 dark:to-black">
       <div className="pointer-events-none absolute -left-16 top-12 h-44 w-44 rounded-full bg-cyan-200/40 blur-3xl dark:bg-cyan-900/20" />
       <div className="pointer-events-none absolute -right-20 top-28 h-56 w-56 rounded-full bg-blue-300/35 blur-3xl dark:bg-blue-900/20" />
-      {needsSecret && (
-        <SecretPrompt
-          value={secretDraft}
-          onChange={(event) => setSecretDraft(event.target.value)}
-          onSubmit={onSubmitSecret}
-        />
-      )}
 
       <div className="relative z-10 mx-auto max-w-5xl space-y-6">
         <section className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-blue-900 dark:bg-slate-950">
@@ -303,18 +216,9 @@ function AdminDashboard() {
                 <button
                   type="button"
                   onClick={loadDashboardData}
-                  disabled={!adminSecret}
                   className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <RefreshCw className="h-4 w-4" /> Refresh
-                </button>
-
-                <button
-                  type="button"
-                  onClick={clearStoredSecret}
-                  className="inline-flex items-center justify-center rounded-lg border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20"
-                >
-                  Change Secret
                 </button>
               </div>
             </div>
@@ -426,7 +330,7 @@ function AdminDashboard() {
             </p>
             <button
               type="submit"
-              disabled={isUpdatingPsToken || !adminSecret}
+              disabled={isUpdatingPsToken}
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 sm:col-span-3"
             >
               {isUpdatingPsToken ? (
@@ -450,7 +354,7 @@ function AdminDashboard() {
               <button
                 type="button"
                 onClick={onUpdateUsers}
-                disabled={isUpdatingUsers || !adminSecret}
+                disabled={isUpdatingUsers}
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isUpdatingUsers ? (
@@ -464,7 +368,7 @@ function AdminDashboard() {
               <button
                 type="button"
                 onClick={loadUsers}
-                disabled={isLoadingUsers || !adminSecret}
+                disabled={isLoadingUsers}
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isLoadingUsers ? (

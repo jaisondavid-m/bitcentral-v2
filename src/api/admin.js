@@ -1,10 +1,24 @@
 import api from "./axios";
+import { auth } from "../Authentication/firebase.js";
 
-export async function listAdminUsers({ adminSecret }) {
+async function getAdminHeaders() {
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) {
+    throw new Error("You must be signed in to use the admin dashboard");
+  }
+
+  const idToken = await currentUser.getIdToken();
+
+  return {
+    Authorization: `Bearer ${idToken}`,
+  };
+}
+
+export async function listAdminUsers() {
+  const headers = await getAdminHeaders();
   const response = await api.get("/admin/users", {
-    headers: {
-      "x-admin-secret": adminSecret,
-    },
+    headers,
   });
 
   return {
@@ -13,8 +27,8 @@ export async function listAdminUsers({ adminSecret }) {
   };
 }
 
-export async function listAllAdminUsers({ adminSecret } = {}) {
-  const data = await listAdminUsers({ adminSecret });
+export async function listAllAdminUsers() {
+  const data = await listAdminUsers();
 
   return {
     users: data.users || [],
@@ -22,34 +36,31 @@ export async function listAllAdminUsers({ adminSecret } = {}) {
   };
 }
 
-export async function deleteAdminUser({ adminSecret, uid }) {
+export async function deleteAdminUser({ uid }) {
+  const headers = await getAdminHeaders();
   const response = await api.delete(`/admin/users/${uid}`, {
-    headers: {
-      "x-admin-secret": adminSecret,
-    },
+    headers,
   });
 
   return response.data;
 }
 
-export async function updateUsers({ adminSecret }) {
+export async function updateUsers() {
+  const headers = await getAdminHeaders();
   const response = await api.get("/admin/users/update", {
-    headers: {
-      "x-admin-secret": adminSecret,
-    },
+    headers,
   });
 
   return response.data;
 }
 
-export async function updateAdminPsToken({ adminSecret, token }) {
+export async function updateAdminPsToken({ token }) {
+  const headers = await getAdminHeaders();
   const response = await api.post(
     "/admin/ps-token",
     { token },
     {
-      headers: {
-        "x-admin-secret": adminSecret,
-      },
+      headers,
     }
   );
 

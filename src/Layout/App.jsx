@@ -10,6 +10,7 @@ import Rpsite from "../Pages/Rpsite.jsx";
 import Semester from "../Pages/Semester.jsx";
 import MessMenu from "../Pages/MessMenu.jsx";
 import ProtectedRoute from "../routes/ProtectedRoute.jsx";
+import AdminRoute from "../routes/AdminRoute.jsx";
 import ProtectedLayout from "../routes/ProtectedLayout.jsx";
 import PCDP from "../Pages/PCDP.jsx";
 import NotFound from "../Pages/NotFound.jsx";
@@ -82,7 +83,14 @@ function App() {
         >
           <Route path="/home" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path={`/${ADMIN_ROUTE}`} element={<AdminDashboard />} />
+          <Route
+            path={`/${ADMIN_ROUTE}`}
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
           <Route path="/profile" element={<Dashboard />} />
           <Route path="/about" element={<About />} />
           <Route path="/rpsite" element={<Rpsite />} />
