@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import Login from "../Pages/Login.jsx";
@@ -17,54 +17,16 @@ import NotFound from "../Pages/NotFound.jsx";
 import LeaveDetails from "../Pages/LeaveDetails.jsx";
 import ExamHall from "../Pages/ExamHall.jsx";
 import S2 from "../Pages/S2.jsx";
+import FullScreenLoader from "../Component/FullScreenLoader.jsx";
+import { useAuth } from "../context/StudentContext.jsx";
 
 function App() {
-  // useEffect(() => {
-  //   const handleContextMenu = (e) => {
-  //     e.preventDefault();
-  //   };
+  const { loading } = useAuth();
 
-  //   const handleKeyDown = (e) => {
-  //     const key = e.key.toLowerCase();
+  if (loading) {
+    return <FullScreenLoader />;
+  }
 
-  //     // F12
-  //     if (key === "f12") {
-  //       e.preventDefault();
-  //       return false;
-  //     }
-
-  //     // Ctrl + Shift + I/J/C
-  //     if (
-  //       e.ctrlKey &&
-  //       e.shiftKey &&
-  //       ["i", "j", "c"].includes(key)
-  //     ) {
-  //       e.preventDefault();
-  //       e.stopPropagation();
-  //       return false;
-  //     }
-
-  //     // Ctrl + U
-  //     if (e.ctrlKey && key === "u") {
-  //       e.preventDefault();
-  //       return false;
-  //     }
-
-  //     // Ctrl + S
-  //     if (e.ctrlKey && key === "s") {
-  //       e.preventDefault();
-  //       return false;
-  //     }
-  //   };
-
-  //   document.addEventListener("contextmenu", handleContextMenu);
-  //   window.addEventListener("keydown", handleKeyDown, true);
-
-  //   return () => {
-  //     document.removeEventListener("contextmenu", handleContextMenu);
-  //     window.removeEventListener("keydown", handleKeyDown, true);
-  //   };
-  // }, []);
   return (
     <>
       <Routes>
