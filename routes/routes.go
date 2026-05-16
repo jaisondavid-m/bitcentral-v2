@@ -20,6 +20,7 @@ func SetupRouter(
 	leaveHandler *handlers.LeaveHandler,
 	examHallHandler *handlers.ExamHallHandler,
 	qbHandler *handlers.QBHandler,
+	uploadHandler *handlers.UploadHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -75,6 +76,9 @@ func SetupRouter(
 		api.GET("/top10", leaderboardHandler.GetTop10Students)
 	}
 
+	// Serve uploaded files
+	r.Static("/uploads", "./uploads")
+
 	// Admin routes
 	admin := r.Group("/admin")
 	admin.Use(middleware.RequireAdmin())
@@ -89,6 +93,7 @@ func SetupRouter(
 		admin.PUT("/qb/:id", qbHandler.Update)
 		admin.DELETE("/qb/:id", qbHandler.Delete)
 		admin.PUT("/semesters/:year", semesterHandler.UpdateSemesterByYear)
+		admin.POST("/upload", uploadHandler.Upload)
 	}
 
 	return r

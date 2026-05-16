@@ -43,6 +43,7 @@ func main() {
 	leaderboardHandler := handlers.NewLeaderboardHandler(sheetHandler)
 	leaveHandler := handlers.NewLeaveHandler()
 	qbHandler := handlers.NewQBHandler()
+    uploadHandler := handlers.NewUploadHandler()
 
 	r := routes.SetupRouter(
 		sheetHandler,
@@ -54,6 +55,7 @@ func main() {
 		leaveHandler,
 		examHallHandler,
 		qbHandler,
+		uploadHandler,
 	)
 
 	port := os.Getenv("PORT")
