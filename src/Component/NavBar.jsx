@@ -1,22 +1,30 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Hamburger from "hamburger-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { logout } from "../Authentication/firebase.js";
+import { auth, logout } from "../Authentication/firebase.js";
 import { LogOut, Moon, Star, Sun, X } from "lucide-react";
+import { useAuthState } from "react-firebase-hooks/auth";
 import { useTheme } from "../context/ThemeContext.jsx";
 
 function Navbar() {
+  const [user] = useAuthState(auth);
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const adminUID = import.meta.env.VITE_ADMIN_FIREBASE_UID?.trim();
+
+  const isAdmin = useMemo(() => {
+    return Boolean(adminUID && user?.uid === adminUID);
+  }, [adminUID, user?.uid]);
 
   const navItems = [
-    { to: "/home", label: "Home" },
-    { to: "/profile", label: "My Profile" },
-    { to: "/about", label: "About" }
-  ];
+  { to: "/home", label: "Home" },
+  ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
+  { to: "/profile", label: "My Profile" },
+  { to: "/about", label: "About" }
+];
 
   const handleLogout = async () => {
     try {
@@ -43,6 +51,11 @@ function Navbar() {
               <Link to="/home" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity">
                 <Star className="h-8 w-8 md:h-10 md:w-10 text-white drop-shadow-lg" fill="currentColor"/>
                 <h1 className="text-xl md:text-2xl font-bold text-white drop-shadow-lg">BIT-CENTRAL</h1>
+                {isAdmin && (
+                  <span className="rounded-full border border-white/30 bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white/95 backdrop-blur-sm">
+                    Admin
+                  </span>
+                )}
               </Link>
               
               <nav className="hidden lg:block">
@@ -110,7 +123,14 @@ function Navbar() {
                 
                 <div className="relative flex flex-col h-full">
                   <div className="flex items-center justify-between px-6 py-4 border-b border-white/20">
-                    <h2 className="text-lg font-semibold text-white drop-shadow-lg">Menu</h2>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg font-semibold text-white drop-shadow-lg">Menu</h2>
+                      {isAdmin && (
+                        <span className="rounded-full border border-white/25 bg-white/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/90">
+                          Admin
+                        </span>
+                      )}
+                    </div>
                     <button onClick={() => setIsOpen(false)} className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all">
                       <X className="w-5 h-5" />
                     </button>

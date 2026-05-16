@@ -8,4 +8,11 @@ const api = axios.create({
   },
 });
 
+export async function listQBAnswerKeys({ semester } = {}) {
+  const params = new URLSearchParams();
+  if (semester) params.set("semester", semester);
+  const res = await api.get(`/qb?${params}`);
+  return res.data.data || [];
+}
+
 export default api;

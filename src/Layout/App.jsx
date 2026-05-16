@@ -19,7 +19,6 @@ import ExamHall from "../Pages/ExamHall.jsx";
 import S2 from "../Pages/S2.jsx";
 
 function App() {
-  const ADMIN_ROUTE = import.meta.env.VITE_ADMIN_ROUTE;
   useEffect(() => {
     const handleContextMenu = (e) => {
       e.preventDefault();
@@ -84,7 +83,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route
-            path={`/${ADMIN_ROUTE}`}
+            path="/admin"
             element={
               <AdminRoute>
                 <AdminDashboard />
@@ -98,7 +97,7 @@ function App() {
           <Route path="/exam-hall" element={<ExamHall />} />
           {/* <Route path="/apsite" element={<Apsite />} /> */}
           <Route path="/leavedetails" element={<LeaveDetails />} />
-          <Route path="/semester" element={<S2 />} />
+          <Route path="/semester" element={<Semester />} />
           <Route path="/mess" element={<MessMenu />} />
           <Route path="*" element={<NotFound />} />
         </Route>

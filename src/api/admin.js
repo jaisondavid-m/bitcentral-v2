@@ -54,15 +54,29 @@ export async function updateUsers() {
   return response.data;
 }
 
-export async function updateAdminPsToken({ token }) {
+export async function listQBAnswerKeys({ semester, year } = {}) {
   const headers = await getAdminHeaders();
-  const response = await api.post(
-    "/admin/ps-token",
-    { token },
-    {
-      headers,
-    }
-  );
+  const params = new URLSearchParams();
+  if (semester) params.set("semester", semester);
+  if (year) params.set("year", year);
+  const response = await api.get(`/admin/qb?${params}`, { headers });
+  return response.data;
+}
 
+export async function createQBAnswerKey(payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.post("/admin/qb", payload, { headers });
+  return response.data;
+}
+
+export async function updateQBAnswerKey(id, payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.put(`/admin/qb/${id}`, payload, { headers });
+  return response.data;
+}
+
+export async function deleteQBAnswerKey(id) {
+  const headers = await getAdminHeaders();
+  const response = await api.delete(`/admin/qb/${id}`, { headers });
   return response.data;
 }
