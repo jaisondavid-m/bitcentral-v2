@@ -86,3 +86,26 @@ export async function deleteQBAnswerKey(id) {
   const response = await api.delete(`/admin/qb/${id}`, { headers });
   return response.data;
 }
+
+export async function uploadAdminFile(formData) {
+  const headers = await getAdminHeaders();
+  // Let axios set Content-Type with boundary for multipart
+  const response = await api.post(`/admin/upload`, formData, {
+    headers: {
+      ...headers,
+      "Content-Type": "multipart/form-data",
+    },
+    timeout: 0,
+  });
+  const data = response.data || {};
+  if (data.url && data.url.startsWith("/")) {
+    try {
+      // Ensure returned url is absolute so <input type="url"> accepts it
+      const base = import.meta.env.VITE_API_BASE_URL || api.defaults.baseURL;
+      data.url = new URL(data.url, base).href;
+    } catch (e) {
+      // fallback: leave as-is
+    }
+  }
+  return data;
+}

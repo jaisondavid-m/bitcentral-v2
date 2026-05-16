@@ -7,6 +7,7 @@ import {
   createQBAnswerKeysBatch,
   updateQBAnswerKey,
   deleteQBAnswerKey,
+  uploadAdminFile,
 } from "../api/admin.js";
 import {
   AlertTriangle,
@@ -82,6 +83,25 @@ function Banner({ banner, onDismiss }) {
 // ─── QB Subject Link Form (Edit single subject) ──────────────────────────────
 function QBForm({ initial, onSubmit, onCancel, isLoading }) {
   const [form, setForm] = useState(initial || EMPTY_QB_FORM);
+  const [uploading, setUploading] = useState({});
+
+  const handleFileChange = (field) => async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append("file", file);
+    try {
+      setUploading((s) => ({ ...s, [field]: true }));
+      const res = await uploadAdminFile(fd);
+      if (res && res.success && res.url) {
+        setForm((prev) => ({ ...prev, [field]: res.url }));
+      }
+    } catch (err) {
+      console.error("upload error", err);
+    } finally {
+      setUploading((s) => ({ ...s, [field]: false }));
+    }
+  };
 
   const set = (key) => (e) =>
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
@@ -162,58 +182,88 @@ function QBForm({ initial, onSubmit, onCancel, isLoading }) {
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">QB1 link</label>
-          <input
-            type="url"
-            value={form.qb1 || ""}
-            onChange={set("qb1")}
-            placeholder="https://..."
-            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-          />
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={form.qb1 || ""}
+              onChange={set("qb1")}
+              placeholder="https://..."
+              className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+            />
+            <label className="inline-flex items-center rounded-md border px-3 py-2 bg-white text-sm text-gray-700 cursor-pointer">
+              {uploading.qb1 ? "Uploading…" : "Upload"}
+              <input type="file" accept="application/pdf" onChange={handleFileChange("qb1")} className="sr-only" />
+            </label>
+          </div>
         </div>
 
         <div>
           <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">QB2 link</label>
-          <input
-            type="url"
-            value={form.qb2 || ""}
-            onChange={set("qb2")}
-            placeholder="https://..."
-            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-          />
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={form.qb2 || ""}
+              onChange={set("qb2")}
+              placeholder="https://..."
+              className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+            />
+            <label className="inline-flex items-center rounded-md border px-3 py-2 bg-white text-sm text-gray-700 cursor-pointer">
+              {uploading.qb2 ? "Uploading…" : "Upload"}
+              <input type="file" accept="application/pdf" onChange={handleFileChange("qb2")} className="sr-only" />
+            </label>
+          </div>
         </div>
 
         <div>
           <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">AK1 link</label>
-          <input
-            type="url"
-            value={form.ak1 || ""}
-            onChange={set("ak1")}
-            placeholder="https://..."
-            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-          />
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={form.ak1 || ""}
+              onChange={set("ak1")}
+              placeholder="https://..."
+              className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+            />
+            <label className="inline-flex items-center rounded-md border px-3 py-2 bg-white text-sm text-gray-700 cursor-pointer">
+              {uploading.ak1 ? "Uploading…" : "Upload"}
+              <input type="file" accept="application/pdf" onChange={handleFileChange("ak1")} className="sr-only" />
+            </label>
+          </div>
         </div>
 
         <div>
           <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">AK2 link</label>
-          <input
-            type="url"
-            value={form.ak2 || ""}
-            onChange={set("ak2")}
-            placeholder="https://..."
-            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-          />
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={form.ak2 || ""}
+              onChange={set("ak2")}
+              placeholder="https://..."
+              className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+            />
+            <label className="inline-flex items-center rounded-md border px-3 py-2 bg-white text-sm text-gray-700 cursor-pointer">
+              {uploading.ak2 ? "Uploading…" : "Upload"}
+              <input type="file" accept="application/pdf" onChange={handleFileChange("ak2")} className="sr-only" />
+            </label>
+          </div>
         </div>
       </div>
 
       <div>
         <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">Semester QB with answer link</label>
-        <input
-          type="url"
-          value={form.semqbwithans || ""}
-          onChange={set("semqbwithans")}
-          placeholder="https://..."
-          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-        />
+        <div className="flex gap-2">
+          <input
+            type="url"
+            value={form.semqbwithans || ""}
+            onChange={set("semqbwithans")}
+            placeholder="https://..."
+            className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+          />
+          <label className="inline-flex items-center rounded-md border px-3 py-2 bg-white text-sm text-gray-700 cursor-pointer">
+            {uploading.semqbwithans ? "Uploading…" : "Upload"}
+            <input type="file" accept="application/pdf" onChange={handleFileChange("semqbwithans")} className="sr-only" />
+          </label>
+        </div>
       </div>
 
       <div className="flex gap-2">
