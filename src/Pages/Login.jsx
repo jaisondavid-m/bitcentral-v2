@@ -8,18 +8,10 @@ import { useTheme } from "../context/ThemeContext.jsx";
 
 function Login() {
   const { theme, toggleTheme } = useTheme();
-  const [disabled, setDisabled] = useState(true);
   const [error, setError] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
   const [user, loading] = useAuthState(auth);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDisabled(false);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, []);
   
   useEffect(() => {
     if (location.state?.error === "unauthorized") {
@@ -88,9 +80,9 @@ function Login() {
             </div>
           )}
 
-          <button disabled={disabled} onClick={!disabled ? handleSignIn : undefined} className={`flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${ disabled ? "cursor-not-allowed bg-blue-300 text-white" : "bg-blue-600 text-white hover:bg-blue-700"}`}>
+          <button disabled={loading} onClick={handleSignIn} className={`flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${ loading ? "cursor-not-allowed bg-blue-300 text-white" : "bg-blue-600 text-white hover:bg-blue-700"}`}>
             <img src="https://img.icons8.com/color/48/google-logo.png" alt="Google" className="h-5 w-5 rounded-full"/>
-            {disabled ? "Initializing..." : "Sign in with Google"}
+            {loading ? "Initializing..." : "Sign in with Google"}
           </button>
           
           <p className="mt-6 text-center text-xs text-gray-400 dark:text-slate-400">Secure authentication powered by Google</p>
