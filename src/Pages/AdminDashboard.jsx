@@ -582,6 +582,7 @@ function AdminDashboard() {
   const [deletingUid, setDeletingUid] = useState("");
   const [isUpdatingUsers, setIsUpdatingUsers] = useState(false);
   const [banner, setBanner] = useState({ type: "", message: "" });
+  const [activeTab, setActiveTab] = useState("qb");
 
   const filteredUsers = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -689,10 +690,39 @@ function AdminDashboard() {
           </div>
         </section>
 
-        {/* ── QB Answer Keys ── */}
-        <QBSection />
+        {/* Tabs: QB Handling / Users */}
+        <div className="mb-4 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab("qb")}
+            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition ${
+              activeTab === "qb"
+                ? "bg-blue-600 text-white"
+                : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+            }`}
+          >
+            <BookOpen className="h-4 w-4" />
+            QB Handling
+          </button>
 
-        {/* ── Users ── */}
+          <button
+            type="button"
+            onClick={() => setActiveTab("users")}
+            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition ${
+              activeTab === "users"
+                ? "bg-blue-600 text-white"
+                : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+            }`}
+          >
+            <Users className="h-4 w-4" />
+            Users
+          </button>
+        </div>
+
+        {activeTab === "qb" ? (
+          <QBSection />
+        ) : (
+        /* ── Users ── */
         <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6 dark:border-blue-900 dark:bg-slate-950">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Users</h2>
@@ -802,6 +832,7 @@ function AdminDashboard() {
             </>
           )}
         </section>
+        )}
       </div>
     </div>
   );
