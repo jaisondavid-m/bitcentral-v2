@@ -42,6 +42,7 @@ func main() {
 	messHandler := handlers.NewMessHandler(sheetHandler)
 	leaderboardHandler := handlers.NewLeaderboardHandler(sheetHandler)
 	leaveHandler := handlers.NewLeaveHandler()
+	qbHandler := handlers.NewQBHandler()
 
 	r := routes.SetupRouter(
 		sheetHandler,
@@ -52,6 +53,7 @@ func main() {
 		leaderboardHandler,
 		leaveHandler,
 		examHallHandler,
+		qbHandler,
 	)
 
 	port := os.Getenv("PORT")

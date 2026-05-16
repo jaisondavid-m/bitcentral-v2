@@ -19,6 +19,7 @@ func SetupRouter(
 	leaderboardHandler *handlers.LeaderboardHandler,
 	leaveHandler *handlers.LeaveHandler,
 	examHallHandler *handlers.ExamHallHandler,
+	qbHandler *handlers.QBHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -66,6 +67,7 @@ func SetupRouter(
 
 		api.GET("/cards", handlers.GetCards)
 		api.GET("/semesters/:year", semesterHandler.GetSemesterByYear)
+		api.GET("/qb",qbHandler.List)
 
 		api.GET("/mess", messHandler.GetMess)
 		api.GET("/mess/timings", messHandler.GetMealTimings)
@@ -80,7 +82,10 @@ func SetupRouter(
 		admin.GET("/users", adminHandler.GetUsers)
 		admin.GET("/users/update", adminHandler.UpdateUsers)
 		admin.DELETE("/users/:uid", adminHandler.DeleteUser)
-		admin.POST("/ps-token", adminHandler.UpdatePSToken)
+		// admin.GET("/qb", qbHandler.List)
+		admin.POST("/qb", qbHandler.Create)
+		admin.PUT("/qb/:id", qbHandler.Update)
+		admin.DELETE("/qb/:id", qbHandler.Delete)
 	}
 
 	return r

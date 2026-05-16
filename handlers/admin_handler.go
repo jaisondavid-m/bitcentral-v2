@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"net/http"
-	"time"
 
 	"server/config"
 	"server/models"
@@ -138,31 +137,4 @@ func (h *AdminHandler) DeleteUser(c *gin.Context) {
 	client.DeleteUser(context.Background(), uid)
 
 	c.JSON(http.StatusOK, gin.H{"success": true})
-}
-
-func (h *AdminHandler) UpdatePSToken(c *gin.Context) {
-	var body models.PSToken
-
-	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false,"message":"invalid payload"})
-		return
-	}
-
-	query := `
-	INSERT INTO ps_tokens (token_key, token, updated_at, updated_by)
-	VALUES ('ps_token', ?, ?, ?)
-	ON DUPLICATE KEY UPDATE token=?, updated_at=?`
-
-	now := time.Now()
-
-	_, err := h.DB.Exec(query, body.Token, now, "admin", body.Token, now)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false , "err":err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "Token updated",
-	})
 }

@@ -117,3 +117,24 @@ func createTokenTable() {
 
 	log.Printf("✅ %s table ready\n", table)
 }
+
+func createQBAnswerKeyTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS qb_answer_keys (
+		id           INT AUTO_INCREMENT PRIMARY KEY,
+		semester     INT NOT NULL,
+		subject_code VARCHAR(50) NOT NULL,
+		subject_name VARCHAR(200) NOT NULL,
+		year         INT NOT NULL,
+		answers      JSON NOT NULL,
+		created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		UNIQUE KEY unique_qb (semester, subject_code, year)
+	) ENGINE=InnoDB;`
+
+	_, err := DB.Exec(query)
+	if err != nil {
+		log.Fatalf("❌ Failed to create qb_answer_keys table: %v", err)
+	}
+	log.Println("✅ qb_answer_keys table ready")
+}
