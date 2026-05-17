@@ -3205,7 +3205,7 @@ func buildSeatingData20FN() []models.SeatingRecord {
 	}
 }
 func buildSeatingData06AN() []models.SeatingRecord {
-	return []SeatingRecord{
+	return []models.SeatingRecord{
 		// S.No 1 - EW 206 - B.E. CE - 22CE008
 		{HallNo: "EW 206", CourseCode: "22CE008", RegisterNos: []string{
 			"7376221CE124", "7376231CE503",
@@ -3265,7 +3265,7 @@ func buildSeatingData06AN() []models.SeatingRecord {
 }
 
 func buildSeatingData07FN() []models.SeatingRecord {
-	return []SeatingRecord{
+	return []models.SeatingRecord{
 		// S.No 1 - AE 302 - B.E. CS - 22CS008
 		{HallNo: "AE 302", CourseCode: "22CS008", RegisterNos: func() []string {
 			var r []string
@@ -4510,7 +4510,7 @@ func buildSeatingData07FN() []models.SeatingRecord {
 }
 
 func buildSeatingData08AN() []models.SeatingRecord {
-	return []SeatingRecord{
+	return []models.SeatingRecord{
 		// S.No 1 - EW 101 - B.E. CS - 22CS701
 		{HallNo: "EW 101", CourseCode: "22CS701", RegisterNos: []string{
 			"7376221CS109", "7376221CS111", "7376221CS118", "7376221CS196",
@@ -4622,7 +4622,7 @@ func buildSeatingData08AN() []models.SeatingRecord {
 }
 
 func buildSeatingData09FN() []models.SeatingRecord {
-	return []SeatingRecord{
+	return []models.SeatingRecord{
 		// S.No 1 - EW 101 - B.E. EC - 22OCS01
 		{HallNo: "EW 101", CourseCode: "22OCS01", RegisterNos: []string{"7376221EC192"}},
 
@@ -5801,7 +5801,7 @@ func buildSeatingData09FN() []models.SeatingRecord {
 }
 
 func buildSeatingData10AN() []models.SeatingRecord {
-	return []SeatingRecord{
+	return []models.SeatingRecord{
 		// S.No 1 - EW 101 - B.E. CE - 22CE013
 		{HallNo: "EW 101", CourseCode: "22CE013", RegisterNos: []string{"7376221CE124"}},
 

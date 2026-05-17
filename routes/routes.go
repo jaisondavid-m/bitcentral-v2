@@ -33,6 +33,7 @@ func SetupRouter(
 			"https://bitcentral.vercel.app",
 			"https://bitcenteral.netlify.app",
 			"https://bitcentral.bitsathy.in",
+			"https://bitsathy.in",
 		},
 		AllowMethods: []string{
 			"GET", "POST", "PUT", "DELETE", "OPTIONS",
