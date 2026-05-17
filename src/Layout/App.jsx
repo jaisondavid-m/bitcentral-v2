@@ -64,9 +64,7 @@ function App() {
         const widthDiff = window.outerWidth - window.innerWidth;
         const heightDiff = window.outerHeight - window.innerHeight;
         if (widthDiff > threshold || heightDiff > threshold) {
-          // Notify user (do not force-close tab)
-          // eslint-disable-next-line no-alert
-          alert("Developer tools detected. Please close it to continue.");
+          // alert("Developer tools detected. Please close it to continue.");
         }
       } catch (err) {
         // ignore
