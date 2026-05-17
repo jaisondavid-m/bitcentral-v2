@@ -6,6 +6,8 @@ import Dashboard from "../Pages/Dashboard.jsx";
 import AdminDashboard from "../Pages/AdminDashboard.jsx";
 import Home from "../Pages/Home.jsx";
 import About from "../Pages/About.jsx";
+import PrivacyPolicy from "../Pages/PrivacyPolicy.jsx";
+import Terms from "../Pages/Terms.jsx";
 import Rpsite from "../Pages/Rpsite.jsx";
 import Semester from "../Pages/Semester.jsx";
 import MessMenu from "../Pages/MessMenu.jsx";
@@ -93,6 +95,8 @@ function App() {
       <Routes>
         {/* Public */}
         <Route path="/login" element={<Login />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<Terms />} />
         <Route path="/" element={<Navigate to="/home" />} />
 
         {/* Protected Layout */}

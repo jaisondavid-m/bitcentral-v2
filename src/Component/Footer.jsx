@@ -1,5 +1,6 @@
 import React from "react";
-import { HashLink as Link } from 'react-router-hash-link';
+import { Link } from "react-router-dom";
+import { HashLink as HashLink } from 'react-router-hash-link';
 
 export default function Footer(){
   return (
@@ -10,9 +11,13 @@ export default function Footer(){
           <p className="text-sm text-white">© {new Date().getFullYear()} BIT CENTRAL . All rights reserved.</p>
           
           <div className="flex gap-6 text-sm text-white">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms</a>
-            <Link to="/about#contact" className="hover:text-white transition-colors">Contact</Link>
+            <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
+            <a href="mailto:developer@bitsathy.in" className="hover:text-white transition-colors">Contact</a>
+          </div>
+          <div className="text-xs text-blue-100 sm:text-right">
+            <p>developer@bitsathy.in</p>
+            <p>+91 98437 77817</p>
           </div>
           
         </div>
