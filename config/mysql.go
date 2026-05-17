@@ -92,6 +92,7 @@ func InitMySQL() {
 	log.Println("✅ MySQL connected successfully")
 
 	createTokenTable()
+	createUsersTable()
 	createQBAnswerKeyTable()
 	createSemesterSubjectsTable()
 }
@@ -118,6 +119,30 @@ func createTokenTable() {
 	}
 
 	log.Printf("✅ %s table ready\n", table)
+}
+
+func createUsersTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS users (
+		uid VARCHAR(128) PRIMARY KEY,
+		email VARCHAR(255),
+		display_name VARCHAR(255),
+		photo_url VARCHAR(1024),
+		creation_time VARCHAR(64),
+		last_sign_in_time VARCHAR(64),
+		last_seen_at VARCHAR(64),
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+	) ENGINE=InnoDB;`
+
+	if _, err := DB.Exec(query); err != nil {
+		log.Fatalf("❌ Failed to create users table: %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN last_seen_at VARCHAR(64) NULL`); err != nil {
+		log.Printf("ℹ️ last_seen_at column not created (may already exist): %v", err)
+	}
+
+	log.Println("✅ users table ready")
 }
 
 func createQBAnswerKeyTable() {

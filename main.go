@@ -39,6 +39,7 @@ func main() {
 	cardHandler := handlers.NewCardHandler()
 	semesterHandler := handlers.NewSemesterHandler()
 	adminHandler := handlers.NewAdminHandler()
+	presenceHandler := handlers.NewPresenceHandler(adminHandler)
 	examHallHandler := handlers.NewExamHallHandler()
 	messHandler := handlers.NewMessHandler(sheetHandler)
 	leaderboardHandler := handlers.NewLeaderboardHandler(sheetHandler)
@@ -51,6 +52,7 @@ func main() {
 		cardHandler,
 		semesterHandler,
 		adminHandler,
+		presenceHandler,
 		messHandler,
 		leaderboardHandler,
 		leaveHandler,

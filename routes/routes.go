@@ -15,6 +15,7 @@ func SetupRouter(
 	cardHandler *handlers.CardHandler,
 	semesterHandler *handlers.SemesterHandler,
 	adminHandler *handlers.AdminHandler,
+	presenceHandler *handlers.PresenceHandler,
 	messHandler *handlers.MessHandler,
 	leaderboardHandler *handlers.LeaderboardHandler,
 	leaveHandler *handlers.LeaveHandler,
@@ -34,7 +35,6 @@ func SetupRouter(
 			"https://bitcenteral.netlify.app",
 			"https://bitcentral.bitsathy.in",
 			"https://bitsathy.in",
-			"https://www.bitsathy.in",
 		},
 		AllowMethods: []string{
 			"GET", "POST", "PUT", "DELETE", "OPTIONS",
@@ -97,6 +97,8 @@ func SetupRouter(
 		admin.PUT("/semesters/:year", semesterHandler.UpdateSemesterByYear)
 		admin.POST("/upload", uploadHandler.Upload)
 	}
+
+	r.POST("/presence/ping", presenceHandler.Ping)
 
 	return r
 }

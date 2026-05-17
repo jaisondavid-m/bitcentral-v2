@@ -7,6 +7,8 @@ type User struct {
 	PhotoURL       string `json:"photoURL"`
 	CreationTime   string `json:"creationTime"`
 	LastSignInTime string `json:"lastSignInTime"`
+	LastSeenAt     string `json:"lastSeenAt"`
+	IsOnline       bool   `json:"isOnline"`
 }
 
 type PSToken struct {
