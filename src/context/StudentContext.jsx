@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../Authentication/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { pingPresence } from "../api/presence.js";
 import {
   clearGuestSession,
   createGuestStudent,
@@ -107,6 +108,33 @@ export const StudentContext = ({ children }) => {
       unsubscribeGuest();
     };
   }, []);
+
+  useEffect(() => {
+    if (!user || typeof user.getIdToken !== "function") {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    const sendPresencePing = async () => {
+      try {
+        if (cancelled) return;
+        await pingPresence();
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Failed to update presence", error);
+        }
+      }
+    };
+
+    sendPresencePing();
+    const intervalId = window.setInterval(sendPresencePing, 60000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [user?.uid]);
 
   return (
     <AuthContext.Provider value={{ user, student, loading }}>

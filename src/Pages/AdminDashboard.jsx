@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import {
   deleteAdminUser,
   listAdminUsers,
@@ -18,13 +19,10 @@ import {
   Plus,
   RefreshCw,
   Search,
-  Shield,
   Trash2,
   Users,
   X,
 } from "lucide-react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../Authentication/firebase.js";
 
 function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
@@ -301,6 +299,262 @@ function LinkCell({ value }) {
     >
       Open
     </a>
+  );
+}
+
+function AdminPageShell({ title, description, children }) {
+  const location = useLocation();
+
+  const navItems = [
+    { to: "/admin/users", label: "Users", icon: Users },
+    { to: "/admin/qb", label: "QB Handling", icon: BookOpen },
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-50 px-4 py-6 dark:bg-black">
+      <div className="mx-auto max-w-6xl space-y-4">
+        <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-blue-900 dark:bg-slate-950">
+          <div className="flex flex-col gap-4 border-b border-gray-200 pb-4 dark:border-blue-900 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500 dark:text-slate-400">Admin</p>
+              <h1 className="mt-1 text-2xl font-semibold text-gray-900 dark:text-slate-100">{title}</h1>
+              <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">{description}</p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const active = location.pathname === item.to;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                      active
+                        ? "bg-blue-600 text-white"
+                        : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function UsersSection() {
+  const [users, setUsers] = useState([]);
+  const [usersLoaded, setUsersLoaded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [deletingUid, setDeletingUid] = useState("");
+  const [isUpdatingUsers, setIsUpdatingUsers] = useState(false);
+  const [banner, setBanner] = useState({ type: "", message: "" });
+
+  const filteredUsers = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return users;
+    return users.filter((user) => {
+      const email = (user.email || "").toLowerCase();
+      const name = (user.displayName || "").toLowerCase();
+      const uid = (user.uid || "").toLowerCase();
+      return email.includes(q) || name.includes(q) || uid.includes(q);
+    });
+  }, [users, searchQuery]);
+
+  const loadUsers = useCallback(async () => {
+    setIsLoadingUsers(true);
+    setBanner({ type: "", message: "" });
+    try {
+      const result = await listAdminUsers();
+      setUsers(result.users || []);
+      setUsersLoaded(true);
+    } catch (error) {
+      setUsers([]);
+      setUsersLoaded(false);
+      setBanner({ type: "error", message: normalizeError(error, "Failed to load users") });
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(loadUsers, 30000);
+    return () => window.clearInterval(intervalId);
+  }, [loadUsers]);
+
+  const onUpdateUsers = async () => {
+    setIsUpdatingUsers(true);
+    setBanner({ type: "", message: "" });
+    try {
+      const result = await updateUsers();
+      setBanner({ type: "success", message: result?.message || "Users updated successfully" });
+      await loadUsers();
+    } catch (error) {
+      setBanner({ type: "error", message: normalizeError(error, "Failed to update users") });
+    } finally {
+      setIsUpdatingUsers(false);
+    }
+  };
+
+  const onDeleteUser = async (uid) => {
+    if (!window.confirm("Delete this user permanently?")) return;
+    setDeletingUid(uid);
+    setBanner({ type: "", message: "" });
+    try {
+      await deleteAdminUser({ uid });
+      setUsers((prev) => prev.filter((user) => user.uid !== uid));
+      setBanner({ type: "success", message: "User deleted successfully" });
+    } catch (error) {
+      setBanner({ type: "error", message: normalizeError(error, "Failed to delete user") });
+    } finally {
+      setDeletingUid("");
+    }
+  };
+
+  return (
+    <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6 dark:border-blue-900 dark:bg-slate-950">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Users</h2>
+          <p className="mt-0.5 text-sm text-gray-500 dark:text-slate-400">Search and remove users.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onUpdateUsers}
+            disabled={isUpdatingUsers}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isUpdatingUsers ? <Loader className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            {isUpdatingUsers ? "Updating…" : "Update users"}
+          </button>
+          <button
+            type="button"
+            onClick={loadUsers}
+            disabled={isLoadingUsers}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isLoadingUsers ? <Loader className="h-4 w-4 animate-spin" /> : <Users className="h-4 w-4" />}
+            {isLoadingUsers ? "Loading…" : "Refresh"}
+          </button>
+        </div>
+      </div>
+
+      {banner.message && (
+        <div className="mb-4">
+          <Banner banner={banner} onDismiss={() => setBanner({ type: "", message: "" })} />
+        </div>
+      )}
+
+      {isLoadingUsers && !usersLoaded ? (
+        <div className="flex h-36 items-center justify-center">
+          <Loader className="h-6 w-6 animate-spin text-blue-600" />
+        </div>
+      ) : (
+        <>
+          <div className="mb-4 flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-blue-900 dark:bg-slate-900">
+            <Search className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by email, name, or UID"
+              className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400 dark:text-slate-100 dark:placeholder:text-slate-500"
+            />
+          </div>
+
+          <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-blue-900">
+            <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-blue-900">
+              <thead className="bg-gray-50 dark:bg-slate-900">
+                <tr>
+                  {['#', 'Photo', 'Email', 'Display name', 'Created', 'Activity', 'Delete'].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 bg-white dark:divide-blue-900 dark:bg-slate-950">
+                {filteredUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500 dark:text-slate-300">
+                      No users found
+                    </td>
+                  </tr>
+                ) : (
+                  filteredUsers.map((userItem, index) => (
+                    <tr key={userItem.uid} className="transition hover:bg-gray-50 dark:hover:bg-slate-900">
+                      <td className="px-4 py-3 font-medium text-gray-700 dark:text-slate-300">{index + 1}</td>
+                      <td className="px-4 py-3">
+                        {userItem.photoURL ? (
+                          <img
+                            src={userItem.photoURL}
+                            alt={userItem.displayName || userItem.email || 'User'}
+                            className="h-9 w-9 rounded-full border border-gray-200 object-cover dark:border-blue-900"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-500 dark:bg-slate-900 dark:text-slate-300">
+                            {(userItem.displayName || userItem.email || 'U').charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.email || '-'}</td>
+                      <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.displayName || '-'}</td>
+                      <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatDateTime(userItem.creationTime)}</td>
+                      <td className="px-4 py-3 text-gray-700 dark:text-slate-300">
+                        <div className="space-y-1">
+                          <span
+                            className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                              userItem.isOnline
+                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                                : "bg-gray-100 text-gray-600 dark:bg-slate-900 dark:text-slate-300"
+                            }`}
+                          >
+                            {userItem.isOnline ? "Online" : "Offline"}
+                          </span>
+                          <div className="text-xs text-gray-500 dark:text-slate-400">
+                            {userItem.lastSeenAt ? formatDateTime(userItem.lastSeenAt) : "Never"}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          type="button"
+                          onClick={() => onDeleteUser(userItem.uid)}
+                          disabled={deletingUid === userItem.uid}
+                          className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {deletingUid === userItem.uid ? (
+                            <Loader className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+    </section>
   );
 }
 
@@ -678,271 +932,31 @@ function QBSection() {
   );
 }
 
-// ─── Main Dashboard ───────────────────────────────────────────────────────────
-function AdminDashboard() {
-  const [authUser] = useAuthState(auth);
-
-  const [users, setUsers] = useState([]);
-  const [usersLoaded, setUsersLoaded] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
-  const [deletingUid, setDeletingUid] = useState("");
-  const [isUpdatingUsers, setIsUpdatingUsers] = useState(false);
-  const [banner, setBanner] = useState({ type: "", message: "" });
-  const [activeTab, setActiveTab] = useState("qb");
-
-  const filteredUsers = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return users;
-    return users.filter((user) => {
-      const email = (user.email || "").toLowerCase();
-      const name = (user.displayName || "").toLowerCase();
-      const uid = (user.uid || "").toLowerCase();
-      return email.includes(q) || name.includes(q) || uid.includes(q);
-    });
-  }, [users, searchQuery]);
-
-  const loadUsers = async () => {
-    setIsLoadingUsers(true);
-    setBanner({ type: "", message: "" });
-    try {
-      const result = await listAdminUsers();
-      setUsers(result.users || []);
-      setUsersLoaded(true);
-    } catch (error) {
-      setUsers([]);
-      setBanner({ type: "error", message: normalizeError(error, "Failed to load users") });
-    } finally {
-      setIsLoadingUsers(false);
-    }
-  };
-
-  const onUpdateUsers = async () => {
-    setIsUpdatingUsers(true);
-    setBanner({ type: "", message: "" });
-    try {
-      const result = await updateUsers();
-      setBanner({ type: "success", message: result?.message || "Users updated successfully" });
-      await loadUsers();
-    } catch (error) {
-      setBanner({ type: "error", message: normalizeError(error, "Failed to update users") });
-    } finally {
-      setIsUpdatingUsers(false);
-    }
-  };
-
-  const onDeleteUser = async (uid) => {
-    if (!window.confirm("Delete this user permanently?")) return;
-    setDeletingUid(uid);
-    setBanner({ type: "", message: "" });
-    try {
-      await deleteAdminUser({ uid });
-      setUsers((prev) => prev.filter((user) => user.uid !== uid));
-      setBanner({ type: "success", message: "User deleted successfully" });
-    } catch (error) {
-      setBanner({ type: "error", message: normalizeError(error, "Failed to delete user") });
-    } finally {
-      setDeletingUid("");
-    }
-  };
-
+function AdminUsersPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-linear-to-b from-sky-50 via-white to-slate-100 px-4 py-6 sm:px-6 lg:px-8 dark:from-black dark:via-slate-950 dark:to-black">
-      <div className="pointer-events-none absolute -left-16 top-12 h-44 w-44 rounded-full bg-cyan-200/40 blur-3xl dark:bg-cyan-900/20" />
-      <div className="pointer-events-none absolute -right-20 top-28 h-56 w-56 rounded-full bg-blue-300/35 blur-3xl dark:bg-blue-900/20" />
-
-      <div className="relative z-10 mx-auto max-w-5xl space-y-6">
-        {/* ── Header card ── */}
-        <section className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-blue-900 dark:bg-slate-950">
-          <div className="bg-linear-to-r from-sky-600 via-blue-600 to-indigo-600 px-6 py-7 sm:px-8">
-            <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-              <div>
-                <h1 className="flex items-center gap-2 text-2xl font-bold text-white sm:text-3xl">
-                  <Shield className="h-7 w-7" />
-                  Admin Dashboard
-                </h1>
-                <p className="mt-2 text-sm text-white/90">Manage users and QB answer keys.</p>
-              </div>
-              <button
-                type="button"
-                onClick={loadUsers}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20"
-              >
-                <RefreshCw className="h-4 w-4" /> Refresh
-              </button>
-            </div>
-          </div>
-
-          <div className="p-5 sm:p-6">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-blue-900 dark:bg-slate-900">
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">Total users</p>
-                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-slate-100">
-                  {usersLoaded ? users.length : "-"}
-                </p>
-              </div>
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-blue-900 dark:bg-slate-900">
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">Showing</p>
-                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-slate-100">
-                  {usersLoaded ? filteredUsers.length : "-"}
-                </p>
-              </div>
-            </div>
-
-            {banner.message && (
-              <div className="mt-4">
-                <Banner banner={banner} onDismiss={() => setBanner({ type: "", message: "" })} />
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Tabs: QB Handling / Users */}
-        <div className="mb-4 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setActiveTab("qb")}
-            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition ${
-              activeTab === "qb"
-                ? "bg-blue-600 text-white"
-                : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-            }`}
-          >
-            <BookOpen className="h-4 w-4" />
-            QB Handling
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("users")}
-            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition ${
-              activeTab === "users"
-                ? "bg-blue-600 text-white"
-                : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-            }`}
-          >
-            <Users className="h-4 w-4" />
-            Users
-          </button>
-        </div>
-
-        {activeTab === "qb" ? (
-          <QBSection />
-        ) : (
-        /* ── Users ── */
-        <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6 dark:border-blue-900 dark:bg-slate-950">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Users</h2>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={onUpdateUsers}
-                disabled={isUpdatingUsers}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isUpdatingUsers ? <Loader className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                {isUpdatingUsers ? "Updating…" : "Update users"}
-              </button>
-              <button
-                type="button"
-                onClick={loadUsers}
-                disabled={isLoadingUsers}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isLoadingUsers ? <Loader className="h-4 w-4 animate-spin" /> : <Users className="h-4 w-4" />}
-                {isLoadingUsers ? "Loading…" : usersLoaded ? "Reload users" : "Load users"}
-              </button>
-            </div>
-          </div>
-
-          {!usersLoaded ? (
-            <div className="flex h-36 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-gray-300 bg-gray-50 dark:border-blue-900 dark:bg-slate-900">
-              <Users className="h-8 w-8 text-gray-400 dark:text-slate-500" />
-              <p className="text-sm text-gray-500 dark:text-slate-400">
-                Click <span className="font-semibold text-blue-600">Load users</span> to fetch the user list.
-              </p>
-            </div>
-          ) : (
-            <>
-              <div className="mb-4 flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-blue-900 dark:bg-slate-900">
-                <Search className="h-4 w-4 text-gray-500 dark:text-slate-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by email, name, or UID"
-                  className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400 dark:text-slate-100 dark:placeholder:text-slate-500"
-                />
-              </div>
-
-              <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-blue-900">
-                <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-blue-900">
-                  <thead className="bg-gray-50 dark:bg-slate-900">
-                    <tr>
-                      {["#", "Photo", "Email", "Display name", "Created", "Last login", "Delete"].map((h) => (
-                        <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white dark:divide-blue-900 dark:bg-slate-950">
-                    {filteredUsers.length === 0 ? (
-                      <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center text-gray-500 dark:text-slate-300">
-                          No users found
-                        </td>
-                      </tr>
-                    ) : (
-                      filteredUsers.map((userItem, index) => (
-                        <tr key={userItem.uid} className="transition hover:bg-gray-50 dark:hover:bg-slate-900">
-                          <td className="px-4 py-3 font-medium text-gray-700 dark:text-slate-300">{index + 1}</td>
-                          <td className="px-4 py-3">
-                            {userItem.photoURL ? (
-                              <img
-                                src={userItem.photoURL}
-                                alt={userItem.displayName || userItem.email || "User"}
-                                className="h-9 w-9 rounded-full border border-gray-200 object-cover dark:border-blue-900"
-                                loading="lazy"
-                              />
-                            ) : (
-                              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-500 dark:bg-slate-900 dark:text-slate-300">
-                                {(userItem.displayName || userItem.email || "U").charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.email || "-"}</td>
-                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.displayName || "-"}</td>
-                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatDateTime(userItem.creationTime)}</td>
-                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatDateTime(userItem.lastSignInTime)}</td>
-                          <td className="px-4 py-3">
-                            <button
-                              type="button"
-                              onClick={() => onDeleteUser(userItem.uid)}
-                              disabled={deletingUid === userItem.uid}
-                              className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
-                            >
-                              {deletingUid === userItem.uid ? (
-                                <Loader className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <Trash2 className="h-4 w-4" />
-                              )}
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </>
-          )}
-        </section>
-        )}
-      </div>
-    </div>
+    <AdminPageShell
+      title="Users"
+      description="Manage admin-visible user accounts."
+    >
+      <UsersSection />
+    </AdminPageShell>
   );
 }
 
+function AdminQBPage() {
+  return (
+    <AdminPageShell
+      title="QB Handling"
+      description="Create and edit question bank entries."
+    >
+      <QBSection />
+    </AdminPageShell>
+  );
+}
+
+function AdminDashboard() {
+  return <Navigate to="/admin/users" replace />;
+}
+
+export { AdminUsersPage, AdminQBPage };
 export default AdminDashboard;

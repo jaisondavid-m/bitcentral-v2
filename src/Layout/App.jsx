@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import Login from "../Pages/Login.jsx";
 import Dashboard from "../Pages/Dashboard.jsx";
-import AdminDashboard from "../Pages/AdminDashboard.jsx";
+import AdminDashboard, { AdminQBPage, AdminUsersPage } from "../Pages/AdminDashboard.jsx";
 import Home from "../Pages/Home.jsx";
 import About from "../Pages/About.jsx";
 import PrivacyPolicy from "../Pages/PrivacyPolicy.jsx";
@@ -25,66 +25,66 @@ import { useAuth } from "../context/StudentContext.jsx";
 function App() {
   const { loading } = useAuth();
 
-  // useEffect(() => {
-  //   const handleKeyDown = (e) => {
-  //     const key = (e.key || "").toLowerCase();
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const key = (e.key || "").toLowerCase();
 
-  //     // Block F12
-  //     if (e.key === "F12") {
-  //       e.preventDefault();
-  //       e.stopPropagation();
-  //       return false;
-  //     }
+      // Block F12
+      if (e.key === "F12") {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
 
-  //     // Block Ctrl/Cmd + Shift + [I/J/C/K]
-  //     if ((e.ctrlKey || e.metaKey) && e.shiftKey && (key === "i" || key === "j" || key === "c" || key === "k")) {
-  //       e.preventDefault();
-  //       e.stopPropagation();
-  //       return false;
-  //     }
+      // Block Ctrl/Cmd + Shift + [I/J/C/K]
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (key === "i" || key === "j" || key === "c" || key === "k")) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
 
-  //     // Block Ctrl/Cmd + U (view source) and Ctrl/Cmd + S (save)
-  //     if ((e.ctrlKey || e.metaKey) && (key === "u" || key === "s")) {
-  //       e.preventDefault();
-  //       e.stopPropagation();
-  //       return false;
-  //     }
-  //   };
+      // Block Ctrl/Cmd + U (view source) and Ctrl/Cmd + S (save)
+      if ((e.ctrlKey || e.metaKey) && (key === "u" || key === "s")) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    };
 
-  //   const handleContext = (e) => {
-  //     e.preventDefault();
-  //     e.stopPropagation();
-  //     return false;
-  //   };
+    const handleContext = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    };
 
-  //   // Best-effort devtools detection by measuring window sizes
-  //   const checkDevTools = () => {
-  //     try {
-  //       const threshold = 160; // heuristic
-  //       const widthDiff = window.outerWidth - window.innerWidth;
-  //       const heightDiff = window.outerHeight - window.innerHeight;
-  //       if (widthDiff > threshold || heightDiff > threshold) {
-  //         // Notify user (do not force-close tab)
-  //         // eslint-disable-next-line no-alert
-  //         alert("Developer tools detected. Please close it to continue.");
-  //       }
-  //     } catch (err) {
-  //       // ignore
-  //     }
-  //   };
+    // Best-effort devtools detection by measuring window sizes
+    const checkDevTools = () => {
+      try {
+        const threshold = 160; // heuristic
+        const widthDiff = window.outerWidth - window.innerWidth;
+        const heightDiff = window.outerHeight - window.innerHeight;
+        if (widthDiff > threshold || heightDiff > threshold) {
+          // Notify user (do not force-close tab)
+          // eslint-disable-next-line no-alert
+          alert("Developer tools detected. Please close it to continue.");
+        }
+      } catch (err) {
+        // ignore
+      }
+    };
 
-  //   document.addEventListener("keydown", handleKeyDown, true);
-  //   document.addEventListener("contextmenu", handleContext, true);
-  //   window.addEventListener("resize", checkDevTools);
-  //   const intervalId = setInterval(checkDevTools, 1500);
+    document.addEventListener("keydown", handleKeyDown, true);
+    document.addEventListener("contextmenu", handleContext, true);
+    window.addEventListener("resize", checkDevTools);
+    const intervalId = setInterval(checkDevTools, 1500);
 
-  //   return () => {
-  //     document.removeEventListener("keydown", handleKeyDown, true);
-  //     document.removeEventListener("contextmenu", handleContext, true);
-  //     window.removeEventListener("resize", checkDevTools);
-  //     clearInterval(intervalId);
-  //   };
-  // }, []);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown, true);
+      document.removeEventListener("contextmenu", handleContext, true);
+      window.removeEventListener("resize", checkDevTools);
+      clearInterval(intervalId);
+    };
+  }, []);
 
   if (loading) {
     return <FullScreenLoader />;
@@ -114,6 +114,22 @@ function App() {
             element={
               <AdminRoute>
                 <AdminDashboard />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <AdminRoute>
+                <AdminUsersPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/qb"
+            element={
+              <AdminRoute>
+                <AdminQBPage />
               </AdminRoute>
             }
           />
