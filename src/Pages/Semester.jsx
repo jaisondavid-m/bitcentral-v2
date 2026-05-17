@@ -90,13 +90,13 @@ export default function Semester() {
   const tabMeta = {
     test1: {
       title: "Module Test 1",
-      subtitle: "QB1 and AK1 links",
+      subtitle: "Question Bank and Answer Key",
       empty: "No Module Test 1 links are available for your year.",
       view: "test1",
     },
     test2: {
       title: "Module Test 2",
-      subtitle: "QB2 and AK2 links",
+      subtitle: "Question Bank and Answer Key",
       empty: "No Module Test 2 links are available for your year.",
       view: "test2",
     },
