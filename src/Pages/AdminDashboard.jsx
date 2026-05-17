@@ -35,6 +35,11 @@ function formatDateTime(value) {
   return date.toLocaleString();
 }
 
+function formatRouteLabel(value) {
+  if (!value) return "-";
+  return value;
+}
+
 function parseDateValue(value) {
   if (!value) return 0;
   const date = new Date(value);
@@ -493,6 +498,9 @@ function UsersSection() {
           <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
             {latestActiveUser?.lastSeenAt ? formatDateTime(latestActiveUser.lastSeenAt) : "Never"}
           </p>
+          <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
+            {latestActiveUser?.lastUsedRoute ? formatRouteLabel(latestActiveUser.lastUsedRoute) : "No route yet"}
+          </p>
         </div>
       </div>
 
@@ -533,7 +541,7 @@ function UsersSection() {
                   <table className="min-w-full divide-y divide-emerald-200 text-sm dark:divide-emerald-900">
                     <thead className="bg-white/70 dark:bg-slate-900/70">
                       <tr>
-                        {['#', 'Photo', 'Email', 'Display name', 'Last used', 'Delete'].map((h) => (
+                        {['#', 'Photo', 'Email', 'Display name', 'Last seen', 'Last used', 'Delete'].map((h) => (
                           <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">
                             {h}
                           </th>
@@ -561,6 +569,7 @@ function UsersSection() {
                           <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.email || "-"}</td>
                           <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.displayName || "-"}</td>
                           <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatDateTime(userItem.lastSeenAt)}</td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatRouteLabel(userItem.lastUsedRoute)}</td>
                           <td className="px-4 py-3">
                             <button
                               type="button"
@@ -597,7 +606,7 @@ function UsersSection() {
                   <table className="min-w-full divide-y divide-blue-200 text-sm dark:divide-blue-900">
                     <thead className="bg-white/70 dark:bg-slate-900/70">
                       <tr>
-                        {['#', 'Photo', 'Email', 'Display name', 'Status', 'Last used', 'Delete'].map((h) => (
+                        {['#', 'Photo', 'Email', 'Display name', 'Status', 'Last seen', 'Last used', 'Delete'].map((h) => (
                           <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">
                             {h}
                           </th>
@@ -630,6 +639,7 @@ function UsersSection() {
                             </span>
                           </td>
                           <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.lastSeenAt ? formatDateTime(userItem.lastSeenAt) : "Never"}</td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatRouteLabel(userItem.lastUsedRoute)}</td>
                           <td className="px-4 py-3">
                             <button
                               type="button"

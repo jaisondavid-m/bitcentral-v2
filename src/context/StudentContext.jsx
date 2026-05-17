@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { auth } from "../Authentication/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { pingPresence } from "../api/presence.js";
@@ -53,11 +54,32 @@ const decodeCollegeEmail = (email) => {
   };
 };
 
+function getPresenceRouteLabel(pathname = "") {
+  const path = pathname.toLowerCase();
+
+  if (!path || path === "/" || path === "/home") return "Home";
+  if (path.startsWith("/dashboard") || path.startsWith("/profile")) return "Dashboard";
+  if (path.startsWith("/semester")) return "Semester";
+  if (path.startsWith("/mess")) return "Mess Menu";
+  if (path.startsWith("/exam-hall")) return "Exam Hall";
+  if (path.startsWith("/pcdp")) return "PCDP";
+  if (path.startsWith("/rpsite")) return "RP Site";
+  if (path.startsWith("/leavedetails")) return "Leave Details";
+  if (path.startsWith("/privacy-policy")) return "Privacy Policy";
+  if (path.startsWith("/terms")) return "Terms";
+  if (path.startsWith("/login")) return "Login";
+  if (path.startsWith("/admin")) return "Admin";
+
+  return "Other";
+}
+
 export const StudentContext = ({ children }) => {
+  const location = useLocation();
   const initialGuestSession = readGuestSession();
   const [user, setUser] = useState(initialGuestSession ? createGuestUser(initialGuestSession) : null);
   const [student, setStudent] = useState(initialGuestSession ? createGuestStudent() : null);
   const [loading, setLoading] = useState(!initialGuestSession);
+  const currentRouteLabel = useMemo(() => getPresenceRouteLabel(location.pathname), [location.pathname]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -119,7 +141,7 @@ export const StudentContext = ({ children }) => {
     const sendPresencePing = async () => {
       try {
         if (cancelled) return;
-        await pingPresence(user);
+        await pingPresence(user, currentRouteLabel);
       } catch (error) {
         if (!cancelled) {
           console.error("Failed to update presence", error);
@@ -143,7 +165,7 @@ export const StudentContext = ({ children }) => {
       window.removeEventListener("focus", handleFocus);
       document.removeEventListener("visibilitychange", handleFocus);
     };
-  }, [user?.uid]);
+  }, [user?.uid, currentRouteLabel]);
 
   return (
     <AuthContext.Provider value={{ user, student, loading }}>
