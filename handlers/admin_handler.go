@@ -154,7 +154,7 @@ type userPresence struct {
 }
 
 func (h *AdminHandler) loadUserPresenceMap() (map[string]userPresence, error) {
-	rows, err := h.DB.Query(`SELECT uid, last_seen_at FROM users`)
+	rows, err := h.DB.Query(`SELECT uid, last_seen_at FROM user_presence`)
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +194,7 @@ func isOnlineFromTimestamp(value string) bool {
 
 func (h *AdminHandler) TouchUserPresence(uid string) error {
 	_, err := h.DB.Exec(`
-		INSERT INTO users (uid, last_seen_at)
+		INSERT INTO user_presence (uid, last_seen_at)
 		VALUES (?, ?)
 		ON DUPLICATE KEY UPDATE last_seen_at = VALUES(last_seen_at)`,
 		uid,
