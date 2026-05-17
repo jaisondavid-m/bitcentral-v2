@@ -34,6 +34,7 @@ func SetupRouter(
 			"https://bitcenteral.netlify.app",
 			"https://bitcentral.bitsathy.in",
 			"https://bitsathy.in",
+			"https://www.bitsathy.in",
 		},
 		AllowMethods: []string{
 			"GET", "POST", "PUT", "DELETE", "OPTIONS",
