@@ -9,6 +9,25 @@ function Dashboard() {
   const { user, student, loading } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+  const formatAuthDate = (value) => {
+    if (value == null) {
+      return "-";
+    }
+
+    const numericValue = Number(value);
+    const timestamp = Number.isFinite(numericValue) ? numericValue : Date.parse(value);
+
+    if (!Number.isFinite(timestamp)) {
+      return "-";
+    }
+
+    return new Date(timestamp).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
@@ -107,7 +126,7 @@ function Dashboard() {
                 </div>
               </div>
               <p className="text-xl font-bold text-blue-900 dark:text-blue-300">
-                {new Date(Number(user.metadata.createdAt)).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                {formatAuthDate(user?.metadata?.createdAt ?? user?.metadata?.creationTime)}
               </p>
             </div>
 
@@ -119,7 +138,7 @@ function Dashboard() {
                 </div>
               </div>
               <p className="text-xl font-bold text-blue-900 dark:text-blue-300">
-                {new Date(Number(user.metadata.lastLoginAt)).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                {formatAuthDate(user?.metadata?.lastLoginAt ?? user?.metadata?.lastSignInTime)}
               </p>
             </div>
           </div>

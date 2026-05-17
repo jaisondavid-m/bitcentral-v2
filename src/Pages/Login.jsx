@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, signInWithGoogle } from "../Authentication/firebase.js";
+import { signInWithGoogle } from "../Authentication/firebase.js";
 import { isAllowedEmail } from "../Authentication/authRules.js";
-import { AlertCircle, Moon, Sun } from "lucide-react";
+import { AlertCircle, LogIn, Moon, Sun } from "lucide-react";
 import { useTheme } from "../context/ThemeContext.jsx";
+import { activateGuestSession, isGuestLoginEnabled } from "../Authentication/guestSession.js";
+import { useAuth } from "../context/StudentContext.jsx";
 
 function Login() {
   const { theme, toggleTheme } = useTheme();
   const [error, setError] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
-  const [user, loading] = useAuthState(auth);
+  const { user, loading } = useAuth();
   
   useEffect(() => {
     if (location.state?.error === "unauthorized") {
@@ -34,6 +35,12 @@ function Login() {
       console.log(err);
       setError("Sign in failed. Please try again.");
     }
+  };
+
+  const handleGuestLogin = () => {
+    setError("");
+    activateGuestSession();
+    navigate("/home", { replace: true });
   };
 
   if (loading) {
@@ -84,8 +91,25 @@ function Login() {
             <img src="https://img.icons8.com/color/48/google-logo.png" alt="Google" className="h-5 w-5 rounded-full"/>
             {loading ? "Initializing..." : "Sign in with Google"}
           </button>
+
+          {isGuestLoginEnabled && (
+            <button
+              type="button"
+              onClick={handleGuestLogin}
+              className="mt-3 flex w-full items-center justify-center gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700 transition-all hover:border-blue-300 hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-200 dark:hover:bg-blue-950"
+            >
+              <LogIn className="h-5 w-5" />
+              Continue as Guest
+            </button>
+          )}
           
           <p className="mt-6 text-center text-xs text-gray-400 dark:text-slate-400">Secure authentication powered by Google</p>
+
+          {isGuestLoginEnabled && (
+            <p className="mt-3 text-center text-[11px] text-blue-500 dark:text-blue-300">
+              Guest login is enabled temporarily through the environment flag.
+            </p>
+          )}
 
         </div>
       </div>

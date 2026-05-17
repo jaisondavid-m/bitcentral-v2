@@ -1,6 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../Authentication/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import {
+  clearGuestSession,
+  createGuestStudent,
+  createGuestUser,
+  readGuestSession,
+  subscribeToGuestSessionChanges,
+} from "../Authentication/guestSession.js";
 
 const AuthContext = createContext();
 
@@ -46,15 +53,26 @@ const decodeCollegeEmail = (email) => {
 };
 
 export const StudentContext = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [student, setStudent] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const initialGuestSession = readGuestSession();
+  const [user, setUser] = useState(initialGuestSession ? createGuestUser(initialGuestSession) : null);
+  const [student, setStudent] = useState(initialGuestSession ? createGuestStudent() : null);
+  const [loading, setLoading] = useState(!initialGuestSession);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      const guestSession = readGuestSession();
+
+      if (guestSession) {
+        setUser(createGuestUser(guestSession));
+        setStudent(createGuestStudent());
+        setLoading(false);
+        return;
+      }
+
       setUser(currentUser);
 
       if (currentUser?.email) {
+        clearGuestSession();
         const decoded = decodeCollegeEmail(currentUser.email);
         setStudent(decoded);
       } else {
@@ -63,7 +81,25 @@ export const StudentContext = ({ children }) => {
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    const unsubscribeGuest = subscribeToGuestSessionChanges(() => {
+      const guestSession = readGuestSession();
+
+      if (guestSession) {
+        setUser(createGuestUser(guestSession));
+        setStudent(createGuestStudent());
+        setLoading(false);
+        return;
+      }
+
+      setUser(null);
+      setStudent(null);
+      setLoading(false);
+    });
+
+    return () => {
+      unsubscribe();
+      unsubscribeGuest();
+    };
   }, []);
 
   return (

@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { isAllowedEmail } from "./authRules.js";
+import { clearGuestSession } from "./guestSession.js";
 
 // Read and sanitize the API key from Vite env variables
 const rawApiKey = import.meta.env.VITE_FIREBASE_API_KEY;
@@ -47,6 +48,8 @@ export const signInWithGoogle = async () => {
       await signOut(auth);
       throw new Error("Unauthorized email domain");
     }
+
+    clearGuestSession();
     
     return result;
   } catch (error) {
@@ -56,4 +59,7 @@ export const signInWithGoogle = async () => {
 };
 
 // Logout function
-export const logout = () => signOut(auth);
+export const logout = async () => {
+  clearGuestSession();
+  return signOut(auth);
+};
