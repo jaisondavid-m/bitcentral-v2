@@ -155,6 +155,11 @@ export default function FullscreenPdfModal({
     if (!viewUrl) return;
     const controller = new AbortController();
 
+    if (isGdrive && !allowExternalActions) {
+      setLoadState("blocked");
+      return () => controller.abort();
+    }
+
     (async () => {
       try {
         const fetchCandidates = [];
@@ -568,7 +573,7 @@ export default function FullscreenPdfModal({
                   </a>
                 )}
               </div>
-              <iframe src={embedUrl} style={S.gdriveFrame} title="PDF Preview" allow="autoplay" />
+              <iframe src={`${embedUrl}${embedUrl.includes("?") ? "&" : "?"}rm=minimal`} style={S.gdriveFrame} title="PDF Preview" allow="autoplay" />
             </div>
           )}
 
