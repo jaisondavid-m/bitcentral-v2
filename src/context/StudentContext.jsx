@@ -119,7 +119,7 @@ export const StudentContext = ({ children }) => {
     const sendPresencePing = async () => {
       try {
         if (cancelled) return;
-        await pingPresence();
+        await pingPresence(user);
       } catch (error) {
         if (!cancelled) {
           console.error("Failed to update presence", error);
@@ -128,11 +128,20 @@ export const StudentContext = ({ children }) => {
     };
 
     sendPresencePing();
-    const intervalId = window.setInterval(sendPresencePing, 60000);
+    const intervalId = window.setInterval(sendPresencePing, 30000);
+
+    const handleFocus = () => {
+      sendPresencePing();
+    };
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleFocus);
 
     return () => {
       cancelled = true;
       window.clearInterval(intervalId);
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleFocus);
     };
   }, [user?.uid]);
 
