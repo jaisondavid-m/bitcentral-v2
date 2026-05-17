@@ -84,6 +84,7 @@ export default function FullscreenPdfModal({
 
   const showOpenNew = allowExternalActions && !isGdrive;
   const showDownload = allowExternalActions && !isGdrive;
+  const hideExternalActions = !allowExternalActions;
   const canShowNav = numPages > 0 && (loadState === "rendering" || loadState === "ready");
 
   useEffect(() => {
@@ -500,6 +501,21 @@ export default function FullscreenPdfModal({
               <Download size={14} />
               {!isMobile && <span>Save</span>}
             </a>
+          )}
+
+          {hideExternalActions && !showOpenNew && !showDownload && (
+            <div
+              aria-hidden="true"
+              title="External actions disabled for this PDF"
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 6,
+                background: "#000",
+                border: "1px solid #111",
+                flexShrink: 0,
+              }}
+            />
           )}
         </div>
       </div>

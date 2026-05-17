@@ -35,6 +35,12 @@ function formatDateTime(value) {
   return date.toLocaleString();
 }
 
+function parseDateValue(value) {
+  if (!value) return 0;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? 0 : date.getTime();
+}
+
 const CURRENT_YEAR = new Date().getFullYear();
 const YEAR_OPTIONS = Array.from({ length: 6 }, (_, i) => CURRENT_YEAR - i);
 
@@ -370,6 +376,27 @@ function UsersSection() {
     });
   }, [users, searchQuery]);
 
+  const sortedUsers = useMemo(() => {
+    return [...filteredUsers].sort((left, right) => {
+      const leftOnline = Boolean(left.isOnline);
+      const rightOnline = Boolean(right.isOnline);
+
+      if (leftOnline !== rightOnline) {
+        return leftOnline ? -1 : 1;
+      }
+
+      const lastSeenDiff = parseDateValue(right.lastSeenAt) - parseDateValue(left.lastSeenAt);
+      if (lastSeenDiff !== 0) return lastSeenDiff;
+
+      return parseDateValue(right.creationTime) - parseDateValue(left.creationTime);
+    });
+  }, [filteredUsers]);
+
+  const onlineUsers = useMemo(() => sortedUsers.filter((user) => user.isOnline), [sortedUsers]);
+  const recentActivityUsers = useMemo(() => sortedUsers.filter((user) => !user.isOnline && user.lastSeenAt), [sortedUsers]);
+  const neverActiveUsers = useMemo(() => sortedUsers.filter((user) => !user.isOnline && !user.lastSeenAt), [sortedUsers]);
+  const latestActiveUser = sortedUsers[0] || null;
+
   const loadUsers = useCallback(async () => {
     setIsLoadingUsers(true);
     setBanner({ type: "", message: "" });
@@ -453,6 +480,22 @@ function UsersSection() {
         </div>
       </div>
 
+      <div className="mb-4 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950/30">
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">Online now</p>
+          <p className="mt-2 text-3xl font-bold text-emerald-800 dark:text-emerald-200">{onlineUsers.length}</p>
+        </div>
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/30">
+          <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 dark:text-blue-300">Latest activity</p>
+          <p className="mt-2 text-sm font-semibold text-blue-800 dark:text-blue-200">
+            {latestActiveUser ? latestActiveUser.displayName || latestActiveUser.email || latestActiveUser.uid : "No activity yet"}
+          </p>
+          <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
+            {latestActiveUser?.lastSeenAt ? formatDateTime(latestActiveUser.lastSeenAt) : "Never"}
+          </p>
+        </div>
+      </div>
+
       {banner.message && (
         <div className="mb-4">
           <Banner banner={banner} onDismiss={() => setBanner({ type: "", message: "" })} />
@@ -476,81 +519,139 @@ function UsersSection() {
             />
           </div>
 
-          <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-blue-900">
-            <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-blue-900">
-              <thead className="bg-gray-50 dark:bg-slate-900">
-                <tr>
-                  {['#', 'Photo', 'Email', 'Display name', 'Created', 'Activity', 'Delete'].map((h) => (
-                    <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 bg-white dark:divide-blue-900 dark:bg-slate-950">
-                {filteredUsers.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500 dark:text-slate-300">
-                      No users found
-                    </td>
-                  </tr>
-                ) : (
-                  filteredUsers.map((userItem, index) => (
-                    <tr key={userItem.uid} className="transition hover:bg-gray-50 dark:hover:bg-slate-900">
-                      <td className="px-4 py-3 font-medium text-gray-700 dark:text-slate-300">{index + 1}</td>
-                      <td className="px-4 py-3">
-                        {userItem.photoURL ? (
-                          <img
-                            src={userItem.photoURL}
-                            alt={userItem.displayName || userItem.email || 'User'}
-                            className="h-9 w-9 rounded-full border border-gray-200 object-cover dark:border-blue-900"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-500 dark:bg-slate-900 dark:text-slate-300">
-                            {(userItem.displayName || userItem.email || 'U').charAt(0).toUpperCase()}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.email || '-'}</td>
-                      <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.displayName || '-'}</td>
-                      <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatDateTime(userItem.creationTime)}</td>
-                      <td className="px-4 py-3 text-gray-700 dark:text-slate-300">
-                        <div className="space-y-1">
-                          <span
-                            className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                              userItem.isOnline
-                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
-                                : "bg-gray-100 text-gray-600 dark:bg-slate-900 dark:text-slate-300"
-                            }`}
-                          >
-                            {userItem.isOnline ? "Online" : "Offline"}
-                          </span>
-                          <div className="text-xs text-gray-500 dark:text-slate-400">
-                            {userItem.lastSeenAt ? formatDateTime(userItem.lastSeenAt) : "Never"}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          type="button"
-                          onClick={() => onDeleteUser(userItem.uid)}
-                          disabled={deletingUid === userItem.uid}
-                          className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          {deletingUid === userItem.uid ? (
-                            <Loader className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-4 w-4" />
-                          )}
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+          <div className="space-y-4">
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50/40 dark:border-emerald-900 dark:bg-emerald-950/20">
+              <div className="border-b border-emerald-200 px-4 py-3 dark:border-emerald-900">
+                <h3 className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">
+                  Online now
+                </h3>
+              </div>
+              {onlineUsers.length === 0 ? (
+                <p className="px-4 py-6 text-sm text-gray-500 dark:text-slate-400">No users online right now.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-emerald-200 text-sm dark:divide-emerald-900">
+                    <thead className="bg-white/70 dark:bg-slate-900/70">
+                      <tr>
+                        {['#', 'Photo', 'Email', 'Display name', 'Last used', 'Delete'].map((h) => (
+                          <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-emerald-200 bg-white dark:divide-emerald-900 dark:bg-slate-950">
+                      {onlineUsers.map((userItem, index) => (
+                        <tr key={userItem.uid} className="transition hover:bg-emerald-50 dark:hover:bg-slate-900">
+                          <td className="px-4 py-3 font-medium text-gray-700 dark:text-slate-300">{index + 1}</td>
+                          <td className="px-4 py-3">
+                            {userItem.photoURL ? (
+                              <img
+                                src={userItem.photoURL}
+                                alt={userItem.displayName || userItem.email || "User"}
+                                className="h-9 w-9 rounded-full border border-gray-200 object-cover dark:border-blue-900"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-500 dark:bg-slate-900 dark:text-slate-300">
+                                {(userItem.displayName || userItem.email || "U").charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.email || "-"}</td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.displayName || "-"}</td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatDateTime(userItem.lastSeenAt)}</td>
+                          <td className="px-4 py-3">
+                            <button
+                              type="button"
+                              onClick={() => onDeleteUser(userItem.uid)}
+                              disabled={deletingUid === userItem.uid}
+                              className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                              {deletingUid === userItem.uid ? (
+                                <Loader className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-lg border border-blue-200 bg-blue-50/40 dark:border-blue-900 dark:bg-blue-950/20">
+              <div className="border-b border-blue-200 px-4 py-3 dark:border-blue-900">
+                <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-200">
+                  Latest used users
+                </h3>
+              </div>
+              {recentActivityUsers.length === 0 && neverActiveUsers.length === 0 ? (
+                <p className="px-4 py-6 text-sm text-gray-500 dark:text-slate-400">No activity history available.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-blue-200 text-sm dark:divide-blue-900">
+                    <thead className="bg-white/70 dark:bg-slate-900/70">
+                      <tr>
+                        {['#', 'Photo', 'Email', 'Display name', 'Status', 'Last used', 'Delete'].map((h) => (
+                          <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-blue-200 bg-white dark:divide-blue-900 dark:bg-slate-950">
+                      {[...recentActivityUsers, ...neverActiveUsers].map((userItem, index) => (
+                        <tr key={userItem.uid} className="transition hover:bg-blue-50 dark:hover:bg-slate-900">
+                          <td className="px-4 py-3 font-medium text-gray-700 dark:text-slate-300">{index + 1}</td>
+                          <td className="px-4 py-3">
+                            {userItem.photoURL ? (
+                              <img
+                                src={userItem.photoURL}
+                                alt={userItem.displayName || userItem.email || "User"}
+                                className="h-9 w-9 rounded-full border border-gray-200 object-cover dark:border-blue-900"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-500 dark:bg-slate-900 dark:text-slate-300">
+                                {(userItem.displayName || userItem.email || "U").charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.email || "-"}</td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.displayName || "-"}</td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">
+                            <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${userItem.isOnline ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300" : "bg-gray-100 text-gray-600 dark:bg-slate-900 dark:text-slate-300"}`}>
+                              {userItem.isOnline ? "Online" : "Offline"}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.lastSeenAt ? formatDateTime(userItem.lastSeenAt) : "Never"}</td>
+                          <td className="px-4 py-3">
+                            <button
+                              type="button"
+                              onClick={() => onDeleteUser(userItem.uid)}
+                              disabled={deletingUid === userItem.uid}
+                              className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                              {deletingUid === userItem.uid ? (
+                                <Loader className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         </>
       )}
