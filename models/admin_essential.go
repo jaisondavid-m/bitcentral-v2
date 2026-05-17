@@ -8,6 +8,7 @@ type User struct {
 	CreationTime   string `json:"creationTime"`
 	LastSignInTime string `json:"lastSignInTime"`
 	LastSeenAt     string `json:"lastSeenAt"`
+	LastUsedRoute  string `json:"lastUsedRoute"`
 	IsOnline       bool   `json:"isOnline"`
 }
 

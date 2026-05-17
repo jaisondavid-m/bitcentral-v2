@@ -53,6 +53,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 			CreationTime:   utils.TsToString(u.UserMetadata.CreationTimestamp),
 			LastSignInTime: utils.TsToString(u.UserMetadata.LastLogInTimestamp),
 			LastSeenAt:     presenceByUID[u.UID].LastSeenAt,
+			LastUsedRoute:  presenceByUID[u.UID].LastUsedRoute,
 			IsOnline:       presenceByUID[u.UID].IsOnline,
 		})
 	}
@@ -149,12 +150,13 @@ func (h *AdminHandler) syncUsersToMySQL(users []models.User) error {
 }
 
 type userPresence struct {
-	LastSeenAt string
-	IsOnline   bool
+	LastSeenAt    string
+	LastUsedRoute string
+	IsOnline      bool
 }
 
 func (h *AdminHandler) loadUserPresenceMap() (map[string]userPresence, error) {
-	rows, err := h.DB.Query(`SELECT uid, last_seen_at FROM user_presence`)
+	rows, err := h.DB.Query(`SELECT uid, last_seen_at, last_used_route FROM user_presence`)
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +166,8 @@ func (h *AdminHandler) loadUserPresenceMap() (map[string]userPresence, error) {
 	for rows.Next() {
 		var uid string
 		var lastSeen sql.NullString
-		if err := rows.Scan(&uid, &lastSeen); err != nil {
+		var lastUsedRoute sql.NullString
+		if err := rows.Scan(&uid, &lastSeen, &lastUsedRoute); err != nil {
 			return nil, err
 		}
 
@@ -172,6 +175,9 @@ func (h *AdminHandler) loadUserPresenceMap() (map[string]userPresence, error) {
 		if lastSeen.Valid {
 			presence.LastSeenAt = lastSeen.String
 			presence.IsOnline = isOnlineFromTimestamp(lastSeen.String)
+		}
+		if lastUsedRoute.Valid {
+			presence.LastUsedRoute = lastUsedRoute.String
 		}
 		result[uid] = presence
 	}
@@ -192,13 +198,14 @@ func isOnlineFromTimestamp(value string) bool {
 	return time.Since(parsed) <= 2*time.Minute
 }
 
-func (h *AdminHandler) TouchUserPresence(uid string) error {
+func (h *AdminHandler) TouchUserPresence(uid, routeLabel string) error {
 	_, err := h.DB.Exec(`
-		INSERT INTO user_presence (uid, last_seen_at)
-		VALUES (?, ?)
-		ON DUPLICATE KEY UPDATE last_seen_at = VALUES(last_seen_at)`,
+		INSERT INTO user_presence (uid, last_seen_at, last_used_route)
+		VALUES (?, ?, ?)
+		ON DUPLICATE KEY UPDATE last_seen_at = VALUES(last_seen_at), last_used_route = VALUES(last_used_route)`,
 		uid,
 		utils.TimeToString(time.Now()),
+		routeLabel,
 	)
 	return err
 }

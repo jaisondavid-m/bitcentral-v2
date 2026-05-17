@@ -151,11 +151,16 @@ func createUserPresenceTable() {
 	CREATE TABLE IF NOT EXISTS user_presence (
 		uid VARCHAR(128) PRIMARY KEY,
 		last_seen_at VARCHAR(64) NOT NULL,
+		last_used_route VARCHAR(128) NULL,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 	) ENGINE=InnoDB;`
 
 	if _, err := DB.Exec(query); err != nil {
 		log.Fatalf("❌ Failed to create user_presence table: %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE user_presence ADD COLUMN last_used_route VARCHAR(128) NULL`); err != nil {
+		log.Printf("ℹ️ last_used_route column not created (may already exist): %v", err)
 	}
 
 	log.Println("✅ user_presence table ready")
