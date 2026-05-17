@@ -529,7 +529,7 @@ function UsersSection() {
 
           <div className="space-y-4">
             <div className="rounded-lg border border-emerald-200 bg-emerald-50/40 dark:border-emerald-900 dark:bg-emerald-950/20">
-              <div className="border-b border-emerald-200 px-4 py-3 dark:border-emerald-900">
+              <div className="border-b b  order-emerald-200 px-4 py-3 dark:border-emerald-900">
                 <h3 className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">
                   Online now
                 </h3>
