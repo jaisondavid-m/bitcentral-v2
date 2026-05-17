@@ -91,8 +91,14 @@ export const StudentContext = ({ children }) => {
         return;
       }
 
-      setUser(null);
-      setStudent(null);
+      const currentUser = auth.currentUser;
+      setUser(currentUser);
+      if (currentUser?.email) {
+        const decoded = decodeCollegeEmail(currentUser.email);
+        setStudent(decoded);
+      } else {
+        setStudent(null);
+      }
       setLoading(false);
     });
 
