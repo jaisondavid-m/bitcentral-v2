@@ -1,168 +1,338 @@
-import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/build/pdf.mjs";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+import {
+  X,
+  Menu,
+  ChevronLeft,
+  ChevronRight,
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  Search,
+  ExternalLink,
+  Download,
+} from "lucide-react";
 
 GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
-function getInitialZoom() {
-  if (typeof window === "undefined") return 1;
-  if (window.innerWidth < 640) return 0.7;
-  if (window.innerWidth < 1024) return 0.9;
-  return 1.2;
+const ZOOM_STEP = 0.15;
+const ZOOM_MIN = 0.3;
+const ZOOM_MAX = 4.0;
+
+function fitZoom(pageNaturalW, containerW) {
+  if (!pageNaturalW || !containerW) return 1;
+  const padding = 32;
+  return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, (containerW - padding) / pageNaturalW));
 }
 
-const ZOOM_STEP = 0.15;
-const ZOOM_MIN = 0.4;
-const ZOOM_MAX = 3.0;
+function resolveGoogleDriveUrl(url = "") {
+  if (!url) return { viewUrl: "", downloadUrl: "", embedUrl: "", fileId: "", isGdrive: false };
+
+  const isGdrive = url.includes("drive.google.com") || url.includes("docs.google.com");
+  if (!isGdrive) return { viewUrl: url, downloadUrl: url, embedUrl: "", fileId: "", isGdrive: false };
+
+  const patterns = [/\/d\/([a-zA-Z0-9_-]+)/, /id=([a-zA-Z0-9_-]+)/, /\/file\/d\/([a-zA-Z0-9_-]+)/];
+  let fileId = "";
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) {
+      fileId = match[1];
+      break;
+    }
+  }
+
+  if (!fileId) return { viewUrl: url, downloadUrl: url, embedUrl: url, fileId: "", isGdrive: true };
+
+  const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+  const embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+  return { viewUrl: downloadUrl, downloadUrl, embedUrl, fileId, isGdrive: true };
+}
 
 export default function FullscreenPdfModal({
   url,
-  name,
+  name = "Document",
   onClose,
-  originalUrl,
   allowExternalActions = true,
 }) {
-  const [zoom, setZoom] = useState(getInitialZoom);
-  const [loadError, setLoadError] = useState("");
-  const [pdfSource, setPdfSource] = useState("");
+  const [zoom, setZoom] = useState(null);
   const [numPages, setNumPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [loadingPages, setLoadingPages] = useState(true);
-  const [fetchingPdf, setFetchingPdf] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [thumbnails, setThumbnails] = useState([]);
+  const [loadState, setLoadState] = useState("fetching");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [pdfSource, setPdfSource] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [thumbnails, setThumbnails] = useState([]);
+  const [pageInput, setPageInput] = useState("1");
+  const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 640 : false);
 
+  const scrollRef = useRef(null);
   const canvasRefs = useRef([]);
   const pageRefs = useRef([]);
-  const scrollRef = useRef(null);
-  const searchInputRef = useRef(null);
   const renderTasksRef = useRef([]);
   const pdfDocRef = useRef(null);
+  const objectUrlRef = useRef("");
+  const firstPageWRef = useRef(0);
+  const searchInputRef = useRef(null);
 
-  const resolveUrl = (value) => {
-    if (!value) return "";
-    try {
-      return new URL(value, import.meta.env?.VITE_API_BASE_URL || window.location.origin).href;
-    } catch {
-      return value;
-    }
-  };
+  const { viewUrl, downloadUrl, embedUrl, isGdrive } = useMemo(
+    () => resolveGoogleDriveUrl(url),
+    [url]
+  );
 
-  const resolvedUrl = useMemo(() => resolveUrl(url), [url]);
-  const resolvedOriginalUrl = useMemo(() => resolveUrl(originalUrl || url), [originalUrl, url]);
+  const showOpenNew = allowExternalActions && !isGdrive;
+  const showDownload = allowExternalActions && !isGdrive;
+  const canShowNav = numPages > 0 && (loadState === "rendering" || loadState === "ready");
 
-  // Lock body scroll
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, []);
 
-  // Keyboard shortcuts
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 640);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") {
         if (showSearch) setShowSearch(false);
-        else onClose();
+        else onClose?.();
       }
-      if ((e.ctrlKey || e.metaKey) && e.key === "f") {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") {
         e.preventDefault();
         setShowSearch((v) => !v);
       }
-      if ((e.ctrlKey || e.metaKey) && e.key === "=") {
+      if ((e.ctrlKey || e.metaKey) && (e.key === "=" || e.key === "+")) {
         e.preventDefault();
-        setZoom((z) => Math.min(ZOOM_MAX, +(z + ZOOM_STEP).toFixed(2)));
+        setZoom((z) => Math.min(ZOOM_MAX, +(((z ?? 1) + ZOOM_STEP).toFixed(2))));
       }
       if ((e.ctrlKey || e.metaKey) && e.key === "-") {
         e.preventDefault();
-        setZoom((z) => Math.max(ZOOM_MIN, +(z - ZOOM_STEP).toFixed(2)));
+        setZoom((z) => Math.max(ZOOM_MIN, +(((z ?? 1) - ZOOM_STEP).toFixed(2))));
       }
       if ((e.ctrlKey || e.metaKey) && e.key === "0") {
         e.preventDefault();
-        setZoom(1);
+        recalcFitZoom();
       }
     };
+
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose, showSearch]);
+  }, [showSearch, onClose]);
 
-  // Focus search input when shown
   useEffect(() => {
     if (showSearch) searchInputRef.current?.focus();
   }, [showSearch]);
 
-  // Reset on URL change
   useEffect(() => {
-    setZoom(getInitialZoom());
-    setLoadError("");
+    setZoom(null);
+    setErrorMsg("");
     setPdfSource("");
     setNumPages(0);
     setCurrentPage(1);
-    setLoadingPages(true);
-    setFetchingPdf(true);
+    setPageInput("1");
+    setLoadState("fetching");
     setThumbnails([]);
     canvasRefs.current = [];
     pageRefs.current = [];
+    firstPageWRef.current = 0;
+
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = "";
+    }
   }, [url]);
 
-  // Fetch PDF blob
   useEffect(() => {
-    if (!resolvedUrl) return;
+    if (!viewUrl) return;
     const controller = new AbortController();
-    let objectUrl = "";
 
     (async () => {
       try {
-        setFetchingPdf(true);
-        const response = await fetch(resolvedUrl, { signal: controller.signal });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const blob = await response.blob();
-        objectUrl = URL.createObjectURL(blob);
-        setPdfSource(objectUrl);
-      } catch (err) {
+        const fetchCandidates = [];
+
+        if (isGdrive) {
+          if (downloadUrl) fetchCandidates.push(downloadUrl);
+          if (embedUrl && embedUrl.includes("/d/")) {
+            const fid = embedUrl.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1];
+            if (fid) {
+              fetchCandidates.push(`https://drive.google.com/uc?export=download&id=${fid}&confirm=1`);
+              fetchCandidates.push(`https://drive.google.com/uc?export=download&confirm=1&id=${fid}`);
+            }
+          }
+        }
+
+        if (!fetchCandidates.length) fetchCandidates.push(viewUrl);
+
+        let usedBlob = null;
+        let lastError = null;
+
+        for (const candidate of fetchCandidates) {
+          try {
+            const response = await fetch(candidate, { signal: controller.signal });
+            const contentType = response.headers.get("content-type") || "";
+            if (!response.ok || contentType.includes("text/html")) {
+              lastError = new Error(`HTTP ${response.status} or HTML response`);
+              continue;
+            }
+
+            usedBlob = await response.blob();
+            break;
+          } catch (error) {
+            if (controller.signal.aborted) return;
+            lastError = error;
+          }
+        }
+
+        if (usedBlob) {
+          const objectUrl = URL.createObjectURL(usedBlob);
+          objectUrlRef.current = objectUrl;
+          setPdfSource(objectUrl);
+          return;
+        }
+
+        if (isGdrive) {
+          if (allowExternalActions) {
+            setLoadState("blocked");
+            return;
+          }
+
+          setErrorMsg("This Google Drive file cannot be previewed here — it may require sign-in or different sharing permissions.");
+          setLoadState("error");
+          return;
+        }
+
+        throw lastError || new Error("Failed to fetch PDF");
+      } catch {
         if (controller.signal.aborted) return;
-        setLoadError("Failed to load PDF. Please check the file URL and try again.");
-        setFetchingPdf(false);
+        if (isGdrive && allowExternalActions) {
+          setLoadState("blocked");
+        } else {
+          setErrorMsg("Failed to load PDF. Check the URL and try again.");
+          setLoadState("error");
+        }
       }
     })();
 
     return () => {
       controller.abort();
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = "";
+      }
     };
-  }, [resolvedUrl]);
+  }, [viewUrl, downloadUrl, embedUrl, isGdrive, allowExternalActions]);
 
-  // Load PDF document
   useEffect(() => {
     if (!pdfSource) return;
     let cancelled = false;
 
     (async () => {
       try {
-        const task = getDocument(pdfSource);
-        const doc = await task.promise;
-        if (cancelled) { doc.destroy(); return; }
+        const doc = await getDocument(pdfSource).promise;
+        if (cancelled) {
+          doc.destroy();
+          return;
+        }
+
         pdfDocRef.current = doc;
+
+        const page1 = await doc.getPage(1);
+        const vp1 = page1.getViewport({ scale: 1 });
+        firstPageWRef.current = vp1.width;
+        page1.cleanup();
+
         setNumPages(doc.numPages);
-        setFetchingPdf(false);
-        setLoadingPages(true);
-        setLoadError("");
+        setLoadState("rendering");
         generateThumbnails(doc);
-      } catch (err) {
-        if (cancelled) return;
-        setLoadError("Could not parse PDF. The file may be corrupted or unsupported.");
-        setFetchingPdf(false);
+      } catch {
+        if (!cancelled) {
+          setErrorMsg("Could not parse PDF.");
+          setLoadState("error");
+        }
       }
     })();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [pdfSource]);
 
-  // Generate thumbnails for sidebar
+  useEffect(() => {
+    if (!numPages || !firstPageWRef.current) return;
+    if (zoom !== null) return;
+    const containerW = scrollRef.current?.clientWidth ?? window.innerWidth;
+    setZoom(fitZoom(firstPageWRef.current, containerW));
+  }, [numPages, zoom]);
+
+  useEffect(() => {
+    if (!pdfSource || !numPages || zoom === null) return;
+    let cancelled = false;
+
+    renderTasksRef.current.forEach((task) => {
+      try {
+        task.cancel();
+      } catch {}
+    });
+    renderTasksRef.current = [];
+
+    (async () => {
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      if (cancelled) return;
+
+      const doc = pdfDocRef.current;
+      if (!doc) return;
+
+      try {
+        for (let pageNumber = 1; pageNumber <= doc.numPages; pageNumber++) {
+          const canvas = canvasRefs.current[pageNumber - 1];
+          if (!canvas || cancelled) break;
+
+          const page = await doc.getPage(pageNumber);
+          if (cancelled) return;
+
+          const dpr = window.devicePixelRatio || 1;
+          const vp = page.getViewport({ scale: zoom * dpr });
+
+          canvas.width = vp.width;
+          canvas.height = vp.height;
+          canvas.style.width = `${vp.width / dpr}px`;
+          canvas.style.height = `${vp.height / dpr}px`;
+
+          const task = page.render({ canvasContext: canvas.getContext("2d"), viewport: vp });
+          renderTasksRef.current.push(task);
+          await task.promise;
+          page.cleanup();
+        }
+
+        if (!cancelled) setLoadState("ready");
+      } catch (error) {
+        if (cancelled || error?.name === "RenderingCancelledException") return;
+        setErrorMsg("Error rendering pages.");
+        setLoadState("error");
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      renderTasksRef.current.forEach((task) => {
+        try {
+          task.cancel();
+        } catch {}
+      });
+    };
+  }, [pdfSource, numPages, zoom]);
+
   const generateThumbnails = async (doc) => {
-    const thumbs = [];
+    const results = [];
     for (let i = 1; i <= doc.numPages; i++) {
       try {
         const page = await doc.getPage(i);
@@ -171,65 +341,15 @@ export default function FullscreenPdfModal({
         canvas.width = vp.width;
         canvas.height = vp.height;
         await page.render({ canvasContext: canvas.getContext("2d"), viewport: vp }).promise;
-        thumbs.push({ src: canvas.toDataURL(), width: vp.width, height: vp.height });
+        results.push(canvas.toDataURL());
+        page.cleanup();
       } catch {
-        thumbs.push(null);
+        results.push(null);
       }
+      setThumbnails([...results]);
     }
-    setThumbnails(thumbs);
   };
 
-  // Render PDF pages
-  useEffect(() => {
-    if (!pdfSource || !numPages) return;
-    let cancelled = false;
-
-    // Cancel previous render tasks
-    renderTasksRef.current.forEach((t) => { try { t.cancel(); } catch {} });
-    renderTasksRef.current = [];
-
-    (async () => {
-      try {
-        await new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(res)));
-        if (cancelled) return;
-
-        const doc = pdfDocRef.current;
-        if (!doc) return;
-
-        for (let pageNum = 1; pageNum <= doc.numPages; pageNum++) {
-          const canvas = canvasRefs.current[pageNum - 1];
-          if (!canvas) continue;
-
-          const page = await doc.getPage(pageNum);
-          if (cancelled) return;
-
-          const vp = page.getViewport({ scale: zoom * (window.devicePixelRatio || 1) });
-          const ctx = canvas.getContext("2d");
-
-          canvas.width = vp.width;
-          canvas.height = vp.height;
-          canvas.style.width = `${vp.width / (window.devicePixelRatio || 1)}px`;
-          canvas.style.height = `${vp.height / (window.devicePixelRatio || 1)}px`;
-
-          const task = page.render({ canvasContext: ctx, viewport: vp });
-          renderTasksRef.current.push(task);
-          await task.promise;
-        }
-
-        if (!cancelled) setLoadingPages(false);
-      } catch (err) {
-        if (cancelled || err?.name === "RenderingCancelledException") return;
-        setLoadError("Error rendering PDF pages.");
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      renderTasksRef.current.forEach((t) => { try { t.cancel(); } catch {} });
-    };
-  }, [pdfSource, numPages, zoom]);
-
-  // Track current page via scroll
   useEffect(() => {
     const container = scrollRef.current;
     if (!container || !numPages) return;
@@ -238,327 +358,195 @@ export default function FullscreenPdfModal({
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const idx = pageRefs.current.indexOf(entry.target);
-            if (idx !== -1) setCurrentPage(idx + 1);
+            const index = pageRefs.current.indexOf(entry.target);
+            if (index !== -1) {
+              setCurrentPage(index + 1);
+              setPageInput(String(index + 1));
+            }
           }
         });
       },
-      { root: container, threshold: 0.4 }
+      { root: container, threshold: 0.3 }
     );
 
-    pageRefs.current.forEach((el) => { if (el) observer.observe(el); });
+    pageRefs.current.forEach((el) => el && observer.observe(el));
     return () => observer.disconnect();
-  }, [numPages, loadingPages]);
+  }, [numPages, loadState]);
 
-  const scrollToPage = (pageNum) => {
-    const el = pageRefs.current[pageNum - 1];
+  const scrollToPage = (n) => {
+    const el = pageRefs.current[n - 1];
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-    setCurrentPage(pageNum);
+    setCurrentPage(n);
+    setPageInput(String(n));
   };
 
-  const getDownloadUrl = (u) => {
-    try {
-      if (!u) return u;
-      const parsed = new URL(u, window.location.origin);
-      if (parsed.hostname.includes("drive.google.com")) {
-        const match = parsed.pathname.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        const id = match ? match[1] : parsed.searchParams.get("id");
-        if (id) return `https://drive.google.com/uc?export=download&id=${id}`;
-      }
-      return parsed.href;
-    } catch {
-      return u;
+  const recalcFitZoom = () => {
+    const pageWidth = firstPageWRef.current;
+    const containerWidth = scrollRef.current?.clientWidth ?? window.innerWidth;
+    if (pageWidth && containerWidth) {
+      setZoom(fitZoom(pageWidth, containerWidth));
     }
   };
 
-  const downloadUrl = useMemo(() => getDownloadUrl(resolvedOriginalUrl), [resolvedOriginalUrl]);
-  const zoomPercent = Math.round(zoom * 100);
+  const changeZoom = (delta) =>
+    setZoom((z) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, +(((z ?? 1) + delta).toFixed(2)))));
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 9999,
-        display: "flex",
-        flexDirection: "column",
-        background: "#1a1a1a",
-        fontFamily: "system-ui, -apple-system, sans-serif",
-        color: "#e8e8e8",
-      }}
-    >
-      {/* ── TOP TOOLBAR ── */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          padding: "0 12px",
-          height: 52,
-          background: "#242424",
-          borderBottom: "1px solid #333",
-          flexShrink: 0,
-          userSelect: "none",
-        }}
-      >
-        {/* Left group */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <ToolBtn onClick={onClose} title="Close (Esc)" danger>
-            ✕
-          </ToolBtn>
-          <ToolBtn onClick={() => setSidebarOpen((v) => !v)} title="Toggle thumbnails" active={sidebarOpen}>
-            ☰
-          </ToolBtn>
-        </div>
-
-        <Divider />
-
-        {/* File name */}
-        <div
-          style={{
-            flex: 1,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            fontSize: 13,
-            color: "#ccc",
-            fontWeight: 500,
-          }}
-        >
-          {name || "PDF Document"}
-        </div>
-
-        {/* Page navigation */}
-        {numPages > 0 && (
-          <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-            <ToolBtn
-              onClick={() => scrollToPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage <= 1}
-              title="Previous page"
-            >
-              ‹
-            </ToolBtn>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-                fontSize: 13,
-                color: "#ccc",
-                minWidth: 70,
-                justifyContent: "center",
-              }}
-            >
-              <input
-                type="number"
-                min={1}
-                max={numPages}
-                value={currentPage}
-                onChange={(e) => {
-                  const v = parseInt(e.target.value, 10);
-                  if (v >= 1 && v <= numPages) scrollToPage(v);
-                }}
-                style={{
-                  width: 36,
-                  background: "#333",
-                  border: "1px solid #444",
-                  borderRadius: 4,
-                  color: "#e8e8e8",
-                  fontSize: 13,
-                  textAlign: "center",
-                  padding: "2px 4px",
-                  outline: "none",
-                }}
-              />
-              <span style={{ color: "#888" }}>/ {numPages}</span>
-            </div>
-            <ToolBtn
-              onClick={() => scrollToPage(Math.min(numPages, currentPage + 1))}
-              disabled={currentPage >= numPages}
-              title="Next page"
-            >
-              ›
-            </ToolBtn>
-          </div>
-        )}
-
-        <Divider />
-
-        {/* Zoom controls */}
-        <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-          <ToolBtn
-            onClick={() => setZoom((z) => Math.max(ZOOM_MIN, +(z - ZOOM_STEP).toFixed(2)))}
-            disabled={zoom <= ZOOM_MIN}
-            title="Zoom out (Ctrl -)"
-          >
-            −
-          </ToolBtn>
-          <button
-            onClick={() => setZoom(1)}
-            title="Reset zoom (Ctrl 0)"
-            style={{
-              background: "#333",
-              border: "1px solid #444",
-              borderRadius: 4,
-              color: "#e8e8e8",
-              fontSize: 12,
-              fontWeight: 600,
-              padding: "3px 8px",
-              cursor: "pointer",
-              minWidth: 48,
-              textAlign: "center",
-            }}
-          >
-            {zoomPercent}%
+    <div style={S.root}>
+      <div style={S.toolbar}>
+        <div style={S.row}>
+          <button onClick={onClose} style={S.iconBtn("danger")} title="Close">
+            <X size={16} />
           </button>
-          <ToolBtn
-            onClick={() => setZoom((z) => Math.min(ZOOM_MAX, +(z + ZOOM_STEP).toFixed(2)))}
-            disabled={zoom >= ZOOM_MAX}
-            title="Zoom in (Ctrl +)"
-          >
-            +
-          </ToolBtn>
-        </div>
-
-        <Divider />
-
-        {/* Fit options */}
-        <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
-          <ToolBtn onClick={() => fitToWidth()} title="Fit to width">⇔</ToolBtn>
-          <ToolBtn onClick={() => setZoom(1)} title="Actual size">⊡</ToolBtn>
-        </div>
-
-        <Divider />
-
-        {/* Search */}
-        <ToolBtn
-          onClick={() => setShowSearch((v) => !v)}
-          active={showSearch}
-          title="Search (Ctrl+F)"
-        >
-          🔍
-        </ToolBtn>
-
-        {/* External actions */}
-        {allowExternalActions && (
-          <>
-            <Divider />
-            <ToolBtn onClick={() => window.open(resolvedUrl, "_blank")} title="Open in new tab">
-              ↗
-            </ToolBtn>
-            <a
-              href={downloadUrl}
-              download={name}
-              title="Download"
-              style={{
-                background: "#1a6b3c",
-                border: "1px solid #2a8a4f",
-                borderRadius: 4,
-                color: "#7fffb3",
-                fontSize: 13,
-                padding: "4px 10px",
-                cursor: "pointer",
-                textDecoration: "none",
-                fontWeight: 600,
-                whiteSpace: "nowrap",
-              }}
+          {canShowNav && (
+            <button
+              onClick={() => setSidebarOpen((v) => !v)}
+              style={S.iconBtn(sidebarOpen ? "active" : "default")}
+              title="Thumbnails"
             >
-              ↓ Save
+              <Menu size={16} />
+            </button>
+          )}
+        </div>
+
+        <div style={S.fileName}>
+          <span style={S.fileNameText} title={name}>
+            {name}
+          </span>
+          {isGdrive && <span style={S.akBadge}>Google Drive</span>}
+        </div>
+
+        <div style={S.row}>
+          {canShowNav && !isMobile && (
+            <>
+              <button
+                onClick={() => scrollToPage(Math.max(1, currentPage - 1))}
+                style={S.iconBtn()}
+                disabled={currentPage <= 1}
+                title="Prev"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <div style={S.pageBox}>
+                <input
+                  type="number"
+                  min={1}
+                  max={numPages}
+                  value={pageInput}
+                  onChange={(e) => setPageInput(e.target.value)}
+                  onBlur={() => {
+                    const n = parseInt(pageInput, 10);
+                    if (n >= 1 && n <= numPages) scrollToPage(n);
+                    else setPageInput(String(currentPage));
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const n = parseInt(pageInput, 10);
+                      if (n >= 1 && n <= numPages) scrollToPage(n);
+                      else setPageInput(String(currentPage));
+                    }
+                  }}
+                  style={S.pageInput}
+                />
+                <span style={S.pageTotal}>/ {numPages}</span>
+              </div>
+              <button
+                onClick={() => scrollToPage(Math.min(numPages, currentPage + 1))}
+                style={S.iconBtn()}
+                disabled={currentPage >= numPages}
+                title="Next"
+              >
+                <ChevronRight size={16} />
+              </button>
+              <div style={S.sep} />
+            </>
+          )}
+
+          <button onClick={() => changeZoom(-ZOOM_STEP)} style={S.iconBtn()} disabled={zoom !== null && zoom <= ZOOM_MIN} title="Zoom out">
+            <ZoomOut size={16} />
+          </button>
+          <button onClick={recalcFitZoom} style={S.zoomBadge} title="Fit to width">
+            {zoom !== null ? `${Math.round(zoom * 100)}%` : "…"}
+          </button>
+          <button onClick={() => changeZoom(ZOOM_STEP)} style={S.iconBtn()} disabled={zoom !== null && zoom >= ZOOM_MAX} title="Zoom in">
+            <ZoomIn size={16} />
+          </button>
+
+          {canShowNav && (
+            <>
+              <div style={S.sep} />
+              <button onClick={recalcFitZoom} style={S.iconBtn()} title="Fit to width">
+                <Maximize2 size={14} />
+              </button>
+              <button onClick={() => setShowSearch((v) => !v)} style={S.iconBtn(showSearch ? "active" : "default")} title="Search">
+                <Search size={15} />
+              </button>
+            </>
+          )}
+
+          {showOpenNew && (
+            <button onClick={() => window.open(url, "_blank")} style={S.iconBtn()} title="Open in new tab">
+              <ExternalLink size={15} />
+            </button>
+          )}
+
+          {showDownload && (
+            <a href={downloadUrl} download={name} style={S.downloadBtn} title="Download">
+              <Download size={14} />
+              {!isMobile && <span>Save</span>}
             </a>
-          </>
-        )}
+          )}
+        </div>
       </div>
 
-      {/* ── SEARCH BAR ── */}
+      {canShowNav && isMobile && (
+        <div style={S.mobileNav}>
+          <button onClick={() => scrollToPage(Math.max(1, currentPage - 1))} style={S.mobileNavBtn} disabled={currentPage <= 1}>
+            <ChevronLeft size={18} />
+          </button>
+          <span style={S.mobileNavLabel}>Page {currentPage} / {numPages}</span>
+          <button onClick={() => scrollToPage(Math.min(numPages, currentPage + 1))} style={S.mobileNavBtn} disabled={currentPage >= numPages}>
+            <ChevronRight size={18} />
+          </button>
+        </div>
+      )}
+
       {showSearch && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "8px 12px",
-            background: "#2a2a2a",
-            borderBottom: "1px solid #333",
-            flexShrink: 0,
-          }}
-        >
+        <div style={S.searchBar}>
           <input
             ref={searchInputRef}
             type="text"
             placeholder="Search in document…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              flex: 1,
-              background: "#333",
-              border: "1px solid #555",
-              borderRadius: 4,
-              color: "#e8e8e8",
-              fontSize: 13,
-              padding: "5px 10px",
-              outline: "none",
-              maxWidth: 360,
-            }}
+            style={S.searchInput}
           />
-          <span style={{ fontSize: 12, color: "#888" }}>
-            Use Ctrl+F to toggle
-          </span>
-          <ToolBtn onClick={() => setShowSearch(false)}>✕</ToolBtn>
+          <button onClick={() => setShowSearch(false)} style={S.iconBtn()}>
+            <X size={14} />
+          </button>
         </div>
       )}
 
-      {/* ── MAIN BODY ── */}
-      <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
-
-        {/* ── SIDEBAR THUMBNAILS ── */}
-        {sidebarOpen && (
-          <div
-            style={{
-              width: 140,
-              background: "#1e1e1e",
-              borderRight: "1px solid #333",
-              overflowY: "auto",
-              flexShrink: 0,
-              padding: "8px 6px",
-              display: "flex",
-              flexDirection: "column",
-              gap: 6,
-            }}
-          >
+      <div style={S.body}>
+        {sidebarOpen && canShowNav && (
+          <div style={S.sidebar}>
             {Array.from({ length: numPages }, (_, i) => (
               <button
                 key={i}
                 onClick={() => scrollToPage(i + 1)}
                 title={`Page ${i + 1}`}
                 style={{
-                  background: currentPage === i + 1 ? "#2a5fff22" : "transparent",
-                  border: currentPage === i + 1 ? "2px solid #4a7fff" : "2px solid transparent",
-                  borderRadius: 4,
-                  cursor: "pointer",
-                  padding: 4,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 4,
+                  ...S.thumbBtn,
+                  border: `2px solid ${currentPage === i + 1 ? "#3b6ef8" : "transparent"}`,
+                  background: currentPage === i + 1 ? "#1e3a7a18" : "transparent",
                 }}
               >
                 {thumbnails[i] ? (
-                  <img
-                    src={thumbnails[i].src}
-                    alt={`Page ${i + 1}`}
-                    style={{ width: "100%", borderRadius: 2, display: "block" }}
-                  />
+                  <img src={thumbnails[i]} alt={`Page ${i + 1}`} style={{ width: "100%", display: "block", borderRadius: 2 }} />
                 ) : (
-                  <div
-                    style={{
-                      width: "100%",
-                      aspectRatio: "0.77",
-                      background: "#2a2a2a",
-                      borderRadius: 2,
-                    }}
-                  />
+                  <div style={S.thumbPlaceholder} />
                 )}
-                <span style={{ fontSize: 10, color: currentPage === i + 1 ? "#7aaeff" : "#777" }}>
+                <span style={{ fontSize: 10, color: currentPage === i + 1 ? "#3b6ef8" : "#888", fontWeight: 500 }}>
                   {i + 1}
                 </span>
               </button>
@@ -566,211 +554,133 @@ export default function FullscreenPdfModal({
           </div>
         )}
 
-        {/* ── PAGE CANVAS AREA ── */}
-        <div
-          ref={scrollRef}
-          style={{
-            flex: 1,
-            overflowY: "auto",
-            overflowX: "auto",
-            padding: "20px 16px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 16,
-            background: "#2c2c2c",
-          }}
-        >
-          {/* Loading / error states */}
-          {fetchingPdf && !loadError && (
-            <div style={statusBoxStyle}>
-              <Spinner />
-              <span>Loading PDF…</span>
+        <div ref={scrollRef} style={S.canvasArea}>
+          {loadState === "fetching" && <StatusBox><Spin /> Loading PDF…</StatusBox>}
+          {loadState === "error" && <StatusBox danger><span style={{ fontSize: 20 }}>⚠</span>{errorMsg}</StatusBox>}
+
+          {loadState === "blocked" && embedUrl && (
+            <div style={{ display: "flex", flexDirection: "column", width: "100%", flex: 1, minHeight: 0 }}>
+              <div style={S.gdriveNotice}>
+                <span>📄 Showing Google Drive preview</span>
+                {allowExternalActions && (
+                  <a href={url} target="_blank" rel="noreferrer" style={{ color: "#3b6ef8", fontSize: 12, marginLeft: "auto" }}>
+                    Open in Drive ↗
+                  </a>
+                )}
+              </div>
+              <iframe src={embedUrl} style={S.gdriveFrame} title="PDF Preview" allow="autoplay" />
             </div>
           )}
 
-          {loadError && (
-            <div
-              style={{
-                ...statusBoxStyle,
-                background: "#3a1010",
-                border: "1px solid #7a2020",
-                color: "#f88",
-                maxWidth: 500,
-                textAlign: "center",
-              }}
-            >
-              <span style={{ fontSize: 20 }}>⚠</span>
-              <div>{loadError}</div>
-            </div>
+          {loadState === "blocked" && !embedUrl && (
+            <StatusBox danger>
+              <span style={{ fontSize: 20 }}>🔒</span>
+              <div>Could not load this PDF. Permissions may be restricted.</div>
+            </StatusBox>
           )}
 
-          {/* Pages */}
-          {!loadError &&
+          {(loadState === "rendering" || loadState === "ready") &&
             Array.from({ length: numPages }, (_, i) => (
-              <div
-                key={i}
-                ref={(el) => { pageRefs.current[i] = el; }}
-                style={{
-                  position: "relative",
-                  background: "#fff",
-                  borderRadius: 4,
-                  boxShadow: "0 4px 24px rgba(0,0,0,0.5)",
-                  overflow: "hidden",
-                  flexShrink: 0,
-                }}
-              >
-                {/* Page number label */}
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 6,
-                    right: 8,
-                    background: "rgba(0,0,0,0.45)",
-                    color: "#fff",
-                    fontSize: 10,
-                    borderRadius: 3,
-                    padding: "1px 5px",
-                    zIndex: 2,
-                    pointerEvents: "none",
-                    userSelect: "none",
-                  }}
-                >
-                  {i + 1}
-                </div>
-                <canvas
-                  ref={(el) => { canvasRefs.current[i] = el; }}
-                  style={{ display: "block" }}
-                />
+              <div key={i} ref={(el) => { pageRefs.current[i] = el; }} style={{ ...S.pageWrap, width: "min(1100px, 95vw)" }}>
+                <div style={S.pageLabel}>{i + 1}</div>
+                <canvas ref={(el) => { canvasRefs.current[i] = el; }} style={{ display: "block", width: "100%", height: "auto" }} />
               </div>
             ))}
 
-          {/* Rendering indicator */}
-          {!fetchingPdf && !loadError && numPages > 0 && loadingPages && (
-            <div style={statusBoxStyle}>
-              <Spinner />
-              <span>Rendering pages…</span>
-            </div>
-          )}
-
-          {/* Empty state */}
-          {!fetchingPdf && !loadError && numPages === 0 && !loadingPages && (
-            <div style={statusBoxStyle}>No pages found in this PDF.</div>
-          )}
+          {loadState === "rendering" && numPages > 0 && <StatusBox><Spin /> Rendering…</StatusBox>}
         </div>
       </div>
 
-      {/* ── STATUS BAR ── */}
-      <div
-        style={{
-          height: 28,
-          background: "#1e1e1e",
-          borderTop: "1px solid #333",
-          display: "flex",
-          alignItems: "center",
-          padding: "0 12px",
-          gap: 16,
-          fontSize: 11,
-          color: "#777",
-          flexShrink: 0,
-          userSelect: "none",
-        }}
-      >
-        {numPages > 0 && <span>Page {currentPage} of {numPages}</span>}
-        <span>{zoomPercent}% zoom</span>
-        {loadingPages && !fetchingPdf && <span style={{ color: "#4a7fff" }}>Rendering…</span>}
-        {!loadingPages && !loadError && <span style={{ color: "#4a4" }}>✓ Ready</span>}
-        <span style={{ marginLeft: "auto" }}>Ctrl+F: Search &nbsp;·&nbsp; Ctrl+±: Zoom &nbsp;·&nbsp; Esc: Close</span>
+      <div style={S.statusBar}>
+        {canShowNav && <span>Page {currentPage} of {numPages}</span>}
+        <span>{zoom !== null ? `${Math.round(zoom * 100)}%` : "…"} zoom</span>
+        {loadState === "rendering" && <span style={{ color: "#3b6ef8" }}>Loading…</span>}
+        {loadState === "ready" && <span style={{ color: "#22c55e" }}>✓ Ready</span>}
+        {loadState === "blocked" && <span style={{ color: "#f59e0b" }}>Embed mode</span>}
+        <span style={{ marginLeft: "auto", color: "#555", fontSize: 10 }}>
+          {!isMobile && "Ctrl+F · Ctrl+± · "}Esc to close
+        </span>
       </div>
     </div>
   );
-
-  function fitToWidth() {
-    const container = scrollRef.current;
-    if (!container || !pdfDocRef.current) return;
-    pdfDocRef.current.getPage(1).then((page) => {
-      const vp = page.getViewport({ scale: 1 });
-      const availW = container.clientWidth - 32;
-      const newZoom = availW / vp.width;
-      setZoom(Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, +newZoom.toFixed(2))));
-    });
-  }
 }
 
-// ── Helpers ──
-
-function ToolBtn({ onClick, children, title, active, danger, disabled }) {
-  return (
-    <button
-      onClick={onClick}
-      title={title}
-      disabled={disabled}
-      style={{
-        background: active ? "#2a4aaa" : danger ? "#3a1212" : "transparent",
-        border: `1px solid ${active ? "#4a7fff" : danger ? "#7a2020" : "#3a3a3a"}`,
-        borderRadius: 4,
-        color: disabled ? "#555" : active ? "#9ab8ff" : danger ? "#f88" : "#ccc",
-        fontSize: 15,
-        lineHeight: 1,
-        padding: "4px 8px",
-        cursor: disabled ? "default" : "pointer",
-        minWidth: 28,
-        textAlign: "center",
-        transition: "background 0.1s, border-color 0.1s",
-      }}
-      onMouseEnter={(e) => {
-        if (!disabled && !active) e.currentTarget.style.background = "#333";
-      }}
-      onMouseLeave={(e) => {
-        if (!active) e.currentTarget.style.background = active ? "#2a4aaa" : "transparent";
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Divider() {
-  return (
-    <div
-      style={{ width: 1, height: 20, background: "#3a3a3a", flexShrink: 0, margin: "0 2px" }}
-    />
-  );
-}
-
-function Spinner() {
+function Spin() {
   return (
     <span
       style={{
         display: "inline-block",
-        width: 16,
-        height: 16,
-        border: "2px solid #444",
-        borderTopColor: "#4a7fff",
+        width: 15,
+        height: 15,
+        flexShrink: 0,
+        border: "2px solid #333",
+        borderTopColor: "#3b6ef8",
         borderRadius: "50%",
-        animation: "spin 0.7s linear infinite",
+        animation: "pdfSpin .7s linear infinite",
       }}
     />
   );
 }
 
-const statusBoxStyle = {
-  display: "flex",
-  alignItems: "center",
-  gap: 10,
-  background: "#242424",
-  border: "1px solid #333",
-  borderRadius: 6,
-  padding: "12px 20px",
-  fontSize: 13,
-  color: "#aaa",
-  marginTop: 20,
+function StatusBox({ children, danger }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        flexDirection: "column",
+        background: danger ? "#2a0f0f" : "#1e1e1e",
+        border: `1px solid ${danger ? "#7a2020" : "#2e2e2e"}`,
+        borderRadius: 10,
+        padding: "18px 26px",
+        fontSize: 13,
+        color: danger ? "#f88" : "#999",
+        marginTop: 24,
+        maxWidth: 460,
+        textAlign: "center",
+        lineHeight: 1.6,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+const S = {
+  root: { position: "fixed", inset: 0, zIndex: 9999, display: "flex", flexDirection: "column", background: "#111", color: "#ddd", fontFamily: "'DM Sans', 'Segoe UI', system-ui, sans-serif", overflow: "hidden" },
+  toolbar: { display: "flex", alignItems: "center", gap: 6, padding: "0 10px", height: 48, flexShrink: 0, background: "#1a1a1a", borderBottom: "1px solid #272727", userSelect: "none", overflowX: "auto", overflowY: "hidden" },
+  row: { display: "flex", alignItems: "center", gap: 4, flexShrink: 0 },
+  sep: { width: 1, height: 20, background: "#2e2e2e", margin: "0 2px", flexShrink: 0 },
+  fileName: { flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 8, overflow: "hidden" },
+  fileNameText: { fontSize: 13, fontWeight: 500, color: "#bbb", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+  akBadge: { flexShrink: 0, fontSize: 10, fontWeight: 700, background: "#7c3aed22", color: "#a78bfa", border: "1px solid #7c3aed55", borderRadius: 4, padding: "1px 7px", letterSpacing: "0.04em" },
+  iconBtn: (variant) => ({ display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, borderRadius: 6, border: "1px solid", cursor: "pointer", transition: "all .1s", flexShrink: 0, background: variant === "active" ? "#1e3a7a" : variant === "danger" ? "#3a0f0f" : "transparent", borderColor: variant === "active" ? "#3b6ef8" : variant === "danger" ? "#7a1e1e" : "#2e2e2e", color: variant === "active" ? "#7aaeff" : variant === "danger" ? "#f87171" : "#ccc" }),
+  pageBox: { display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "#bbb" },
+  pageInput: { width: 38, background: "#222", border: "1px solid #333", borderRadius: 4, color: "#e0e0e0", fontSize: 12, textAlign: "center", padding: "2px 4px", outline: "none" },
+  pageTotal: { color: "#555" },
+  zoomBadge: { background: "#222", border: "1px solid #333", borderRadius: 5, color: "#ccc", fontSize: 11, fontWeight: 600, padding: "3px 9px", cursor: "pointer", minWidth: 46, textAlign: "center", flexShrink: 0 },
+  downloadBtn: { display: "flex", alignItems: "center", gap: 5, flexShrink: 0, background: "#052e16", border: "1px solid #16a34a55", borderRadius: 6, color: "#4ade80", fontSize: 12, fontWeight: 700, padding: "4px 11px", textDecoration: "none" },
+  mobileNav: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "4px 12px", background: "#161616", borderBottom: "1px solid #222", flexShrink: 0 },
+  mobileNavBtn: { display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 6, border: "1px solid #2e2e2e", background: "transparent", color: "#ccc", cursor: "pointer" },
+  mobileNavLabel: { fontSize: 12, fontWeight: 500, color: "#999" },
+  searchBar: { display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", background: "#161616", borderBottom: "1px solid #222", flexShrink: 0 },
+  searchInput: { flex: 1, maxWidth: 320, background: "#222", border: "1px solid #333", borderRadius: 4, color: "#e0e0e0", fontSize: 13, padding: "5px 10px", outline: "none" },
+  body: { flex: 1, display: "flex", overflow: "hidden" },
+  sidebar: { width: 140, background: "#151515", borderRight: "1px solid #222", overflowY: "auto", flexShrink: 0, padding: "8px 6px", display: "flex", flexDirection: "column", gap: 6 },
+  thumbBtn: { background: "transparent", border: "2px solid transparent", borderRadius: 5, cursor: "pointer", padding: 4, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, width: "100%", transition: "border-color .15s, background .15s" },
+  thumbPlaceholder: { width: "100%", aspectRatio: "0.77", background: "#222", borderRadius: 2 },
+  canvasArea: { flex: 1, overflowY: "auto", overflowX: "auto", padding: "16px 12px 40px", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, background: "#1c1c1c" },
+  pageWrap: { position: "relative", background: "#fff", borderRadius: 3, flexShrink: 0, boxShadow: "0 4px 24px rgba(0,0,0,.55)", overflow: "hidden", maxWidth: "100%" },
+  pageLabel: { position: "absolute", top: 6, right: 8, background: "rgba(0,0,0,.5)", color: "#fff", fontSize: 10, fontWeight: 600, borderRadius: 3, padding: "1px 5px", zIndex: 2, pointerEvents: "none", userSelect: "none" },
+  gdriveNotice: { display: "flex", alignItems: "center", gap: 8, flexShrink: 0, background: "#1a2a1a", border: "1px solid #1e4a1e", borderRadius: "8px 8px 0 0", padding: "8px 14px", fontSize: 12, color: "#86efac" },
+  gdriveFrame: { flex: 1, width: "100%", border: "none", minHeight: "calc(100vh - 160px)", background: "#fff" },
+  statusBar: { height: 26, background: "#111", borderTop: "1px solid #1e1e1e", display: "flex", alignItems: "center", padding: "0 12px", gap: 16, fontSize: 11, color: "#555", flexShrink: 0, userSelect: "none" },
 };
 
-// Inject spinner keyframes once
-if (typeof document !== "undefined" && !document.getElementById("pdf-spinner-kf")) {
-  const style = document.createElement("style");
-  style.id = "pdf-spinner-kf";
-  style.textContent = "@keyframes spin { to { transform: rotate(360deg); } }";
-  document.head.appendChild(style);
+if (typeof document !== "undefined" && !document.getElementById("pdfSpin-kf")) {
+  const s = document.createElement("style");
+  s.id = "pdfSpin-kf";
+  s.textContent = "@keyframes pdfSpin { to { transform: rotate(360deg); } }";
+  document.head.appendChild(s);
 }

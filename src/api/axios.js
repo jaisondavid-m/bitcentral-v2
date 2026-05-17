@@ -1,14 +1,7 @@
 import axios from "axios";
 
-const rawBaseURL = import.meta.env.VITE_API_BASE_URL;
-const sanitizedBaseURL = rawBaseURL
-  ? String(rawBaseURL).replace(/^"|"$/g, "").trim().replace(/\/$/, "")
-  : "";
-
-const resolvedBaseURL = sanitizedBaseURL || "https://api.bitcentral.bitsathy.in";
-
 const api = axios.create({
-  baseURL: resolvedBaseURL,
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

@@ -159,15 +159,6 @@ export default function Semester() {
               {activeMeta.subtitle}
             </p>
           </div>
-
-          <button
-            type="button"
-            onClick={() => navigate("/exam-hall")}
-            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
-          >
-            Find Your Exam Hall
-            <ArrowRight className="h-4 w-4" />
-          </button>
           </div>
         </div>
 
@@ -184,9 +175,9 @@ export default function Semester() {
         </div>
 
         <div className="flex flex-col gap-3 rounded-2xl border border-blue-100 bg-white p-3.5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-slate-500">
+          {/* <p className="text-sm text-slate-500">
             Search by subject code or name.
-          </p>
+          </p> */}
           <div className="w-full max-w-sm">
             <SearchBar search={search} setSearch={setSearch} placeholder="Search code or subject name" />
           </div>
