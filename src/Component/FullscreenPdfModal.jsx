@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from “react”;
-import { getDocument, GlobalWorkerOptions } from “pdfjs-dist/build/pdf.mjs”;
-import pdfWorkerUrl from “pdfjs-dist/build/pdf.worker.min.mjs?url”;
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/build/pdf.mjs";
+import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import {
 X,
 Menu,
@@ -12,7 +12,7 @@ Maximize2,
 Search,
 ExternalLink,
 Download,
-} from “lucide-react”;
+} from "lucide-react";
 
 GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
