@@ -63,10 +63,12 @@ export default function FullscreenPdfModal({
   const [loadState, setLoadState] = useState("fetching");
   const [errorMsg, setErrorMsg] = useState("");
   const [pdfSource, setPdfSource] = useState("");
+  const [nativePreviewUrl, setNativePreviewUrl] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [pageInput, setPageInput] = useState("1");
   const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 640 : false);
+  const [isFitMode, setIsFitMode] = useState(true);
 
   const scrollRef = useRef(null);
   const canvasRefs = useRef([]);
@@ -137,11 +139,13 @@ export default function FullscreenPdfModal({
     setZoom(null);
     setErrorMsg("");
     setPdfSource("");
+    setNativePreviewUrl("");
     setNumPages(0);
     setCurrentPage(1);
     setPageInput("1");
     setLoadState("fetching");
     setThumbnails([]);
+    setIsFitMode(true);
     canvasRefs.current = [];
     pageRefs.current = [];
     firstPageWRef.current = 0;
@@ -222,8 +226,8 @@ export default function FullscreenPdfModal({
         if (isGdrive && allowExternalActions) {
           setLoadState("blocked");
         } else {
-          setErrorMsg("Failed to load PDF. Check the URL and try again.");
-          setLoadState("error");
+          setNativePreviewUrl(viewUrl);
+          setLoadState("native");
         }
       }
     })();
@@ -251,18 +255,24 @@ export default function FullscreenPdfModal({
 
         pdfDocRef.current = doc;
 
-        const page1 = await doc.getPage(1);
-        const vp1 = page1.getViewport({ scale: 1 });
-        firstPageWRef.current = vp1.width;
-        page1.cleanup();
+        const pageWidths = await Promise.all(
+          Array.from({ length: doc.numPages }, async (_, index) => {
+            const page = await doc.getPage(index + 1);
+            const viewport = page.getViewport({ scale: 1 });
+            page.cleanup();
+            return viewport.width;
+          })
+        );
+        firstPageWRef.current = Math.max(...pageWidths);
 
         setNumPages(doc.numPages);
         setLoadState("rendering");
         generateThumbnails(doc);
       } catch {
         if (!cancelled) {
-          setErrorMsg("Could not parse PDF.");
-          setLoadState("error");
+          setErrorMsg("Could not parse PDF. Showing the browser PDF viewer instead.");
+          setNativePreviewUrl(viewUrl);
+          setLoadState("native");
         }
       }
     })();
@@ -278,6 +288,27 @@ export default function FullscreenPdfModal({
     const containerW = scrollRef.current?.clientWidth ?? window.innerWidth;
     setZoom(fitZoom(firstPageWRef.current, containerW));
   }, [numPages, zoom]);
+
+  useEffect(() => {
+    if (!isFitMode || !numPages || !firstPageWRef.current) return;
+
+    const updateZoom = () => {
+      const containerW = scrollRef.current?.clientWidth ?? window.innerWidth;
+      setZoom(fitZoom(firstPageWRef.current, containerW));
+    };
+
+    updateZoom();
+
+    const container = scrollRef.current;
+    if (!container || typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updateZoom);
+      return () => window.removeEventListener("resize", updateZoom);
+    }
+
+    const observer = new ResizeObserver(updateZoom);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [isFitMode, numPages]);
 
   useEffect(() => {
     if (!pdfSource || !numPages || zoom === null) return;
@@ -390,12 +421,16 @@ export default function FullscreenPdfModal({
     const pageWidth = firstPageWRef.current;
     const containerWidth = scrollRef.current?.clientWidth ?? window.innerWidth;
     if (pageWidth && containerWidth) {
+      setIsFitMode(true);
       setZoom(fitZoom(pageWidth, containerWidth));
     }
   };
 
   const changeZoom = (delta) =>
-    setZoom((z) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, +(((z ?? 1) + delta).toFixed(2)))));
+    setZoom((z) => {
+      setIsFitMode(false);
+      return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, +(((z ?? 1) + delta).toFixed(2))));
+    });
 
   return (
     <div style={S.root}>
@@ -600,9 +635,23 @@ export default function FullscreenPdfModal({
             </StatusBox>
           )}
 
+          {loadState === "native" && nativePreviewUrl && (
+            <div style={{ display: "flex", flexDirection: "column", width: "100%", flex: 1, minHeight: 0 }}>
+              <div style={S.gdriveNotice}>
+                <span>📄 Showing browser PDF preview</span>
+                {allowExternalActions && (
+                  <a href={viewUrl} target="_blank" rel="noreferrer" style={{ color: "#3b6ef8", fontSize: 12, marginLeft: "auto" }}>
+                    Open raw file ↗
+                  </a>
+                )}
+              </div>
+              <iframe src={nativePreviewUrl} style={S.gdriveFrame} title="PDF Preview" />
+            </div>
+          )}
+
           {(loadState === "rendering" || loadState === "ready") &&
             Array.from({ length: numPages }, (_, i) => (
-              <div key={i} ref={(el) => { pageRefs.current[i] = el; }} style={{ ...S.pageWrap, width: "min(1100px, 95vw)" }}>
+              <div key={i} ref={(el) => { pageRefs.current[i] = el; }} style={S.pageWrap}>
                 <div style={S.pageLabel}>{i + 1}</div>
                 <canvas ref={(el) => { canvasRefs.current[i] = el; }} style={{ display: "block", width: "100%", height: "auto" }} />
               </div>
@@ -617,6 +666,7 @@ export default function FullscreenPdfModal({
         <span>{zoom !== null ? `${Math.round(zoom * 100)}%` : "…"} zoom</span>
         {loadState === "rendering" && <span style={{ color: "#3b6ef8" }}>Loading…</span>}
         {loadState === "ready" && <span style={{ color: "#22c55e" }}>✓ Ready</span>}
+        {loadState === "native" && <span style={{ color: "#60a5fa" }}>Browser preview</span>}
         {loadState === "blocked" && <span style={{ color: "#f59e0b" }}>Embed mode</span>}
         <span style={{ marginLeft: "auto", color: "#555", fontSize: 10 }}>
           {!isMobile && "Ctrl+F · Ctrl+± · "}Esc to close
@@ -692,7 +742,7 @@ const S = {
   thumbBtn: { background: "transparent", border: "2px solid transparent", borderRadius: 5, cursor: "pointer", padding: 4, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, width: "100%", transition: "border-color .15s, background .15s" },
   thumbPlaceholder: { width: "100%", aspectRatio: "0.77", background: "#222", borderRadius: 2 },
   canvasArea: { flex: 1, overflowY: "auto", overflowX: "auto", padding: "16px 12px 40px", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, background: "#1c1c1c" },
-  pageWrap: { position: "relative", background: "#fff", borderRadius: 3, flexShrink: 0, boxShadow: "0 4px 24px rgba(0,0,0,.55)", overflow: "hidden", maxWidth: "100%" },
+  pageWrap: { position: "relative", background: "#fff", borderRadius: 3, flexShrink: 0, boxShadow: "0 4px 24px rgba(0,0,0,.55)", overflow: "visible", width: "fit-content", maxWidth: "none" },
   pageLabel: { position: "absolute", top: 6, right: 8, background: "rgba(0,0,0,.5)", color: "#fff", fontSize: 10, fontWeight: 600, borderRadius: 3, padding: "1px 5px", zIndex: 2, pointerEvents: "none", userSelect: "none" },
   gdriveNotice: { display: "flex", alignItems: "center", gap: 8, flexShrink: 0, background: "#1a2a1a", border: "1px solid #1e4a1e", borderRadius: "8px 8px 0 0", padding: "8px 14px", fontSize: 12, color: "#86efac" },
   gdriveFrame: { flex: 1, width: "100%", border: "none", minHeight: "calc(100vh - 160px)", background: "#fff" },
