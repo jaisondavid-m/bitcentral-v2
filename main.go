@@ -60,6 +60,7 @@ func main() {
 		qbHandler,
 		uploadHandler,
 	)
+	r.Static("/pdfs", "./pdfs")
 
 	port := os.Getenv("PORT")
 	if port == "" {
