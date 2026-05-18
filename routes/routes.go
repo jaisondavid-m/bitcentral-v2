@@ -81,6 +81,9 @@ func SetupRouter(
 	// Serve uploaded files
 	r.Static("/uploads", "./uploads")
 
+	// Proxy PDF by Google Drive ID (keeps original links hidden)
+	r.GET("/pdf/:id", uploadHandler.ProxyPDF)
+
 	// Admin routes
 	admin := r.Group("/admin")
 	admin.Use(middleware.RequireAdmin())
