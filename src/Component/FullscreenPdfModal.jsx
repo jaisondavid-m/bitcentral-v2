@@ -216,10 +216,11 @@ function ToolbarBtn({ children, onClick, title, variant = "ghost" }) {
 // ─── PdfFrame ─────────────────────────────────────────────────────────────────
 
 function PdfFrame({ url, name, allowExternalActions }) {
-  const isMobile = typeof navigator !== "undefined" && /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile/.test(navigator.userAgent);
-  const [status, setStatus] = useState(isMobile ? "ready" : "loading");
+  const [status, setStatus] = useState("loading");
   const src = getViewUrl(url, allowExternalActions);
   const toolbarCrop = allowExternalActions ? 0 : 56;
+
+  const isMobile = typeof navigator !== "undefined" && /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile/.test(navigator.userAgent);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
