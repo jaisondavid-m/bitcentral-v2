@@ -220,6 +220,8 @@ function PdfFrame({ url, name, allowExternalActions }) {
   const src = getViewUrl(url, allowExternalActions);
   const toolbarCrop = allowExternalActions ? 0 : 56;
 
+  const isMobile = typeof navigator !== "undefined" && /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile/.test(navigator.userAgent);
+
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       {status === "loading" && (
@@ -305,24 +307,81 @@ function PdfFrame({ url, name, allowExternalActions }) {
         </div>
       )}
 
-      <iframe
-        key={src}
-        src={src}
-        title={name}
-        onLoad={() => setStatus("ready")}
-        onError={() => setStatus("error")}
-        style={{
-          position: "absolute",
-          top: -toolbarCrop,
-          left: 0,
-          width: "100%",
-          height: `calc(100% + ${toolbarCrop}px)`,
-          border: "none",
-          display: "block",
-          opacity: status === "loading" ? 0 : 1,
-          transition: "opacity 0.25s",
-        }}
-      />
+      {isMobile ? (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 12,
+            background: "#f8fafc",
+            zIndex: 1,
+            padding: 20,
+          }}
+        >
+          <FileText size={36} color="#2563eb" />
+          <div style={{ fontSize: 15, fontWeight: 600, color: "#111827" }}>{name}</div>
+          <div style={{ fontSize: 13, color: "#6b7280", textAlign: "center", maxWidth: 320 }}>
+            PDFs often don't embed inline on mobile browsers. Open this file in a new tab or download it.
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <a
+              href={src}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                padding: "10px 16px",
+                borderRadius: 8,
+                background: "#2563eb",
+                color: "#fff",
+                fontSize: 14,
+                fontWeight: 500,
+                textDecoration: "none",
+              }}
+            >
+              Open
+            </a>
+            <a
+              href={getDownloadUrl(url)}
+              download={name}
+              style={{
+                padding: "10px 16px",
+                borderRadius: 8,
+                background: "#f0fdf4",
+                color: "#15803d",
+                border: "1px solid #bbf7d0",
+                fontSize: 14,
+                fontWeight: 500,
+                textDecoration: "none",
+              }}
+            >
+              Download
+            </a>
+          </div>
+        </div>
+      ) : (
+        <iframe
+          key={src}
+          src={src}
+          title={name}
+          onLoad={() => setStatus("ready")}
+          onError={() => setStatus("error")}
+          style={{
+            position: "absolute",
+            top: -toolbarCrop,
+            left: 0,
+            width: "100%",
+            height: `calc(100% + ${toolbarCrop}px)`,
+            border: "none",
+            display: "block",
+            opacity: status === "loading" ? 0 : 1,
+            transition: "opacity 0.25s",
+          }}
+        />
+      )}
     </div>
   );
 }
