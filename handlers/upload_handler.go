@@ -1,14 +1,16 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
-	"net/http"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/oauth2/google"
 )
 
 type UploadHandler struct {
@@ -53,8 +55,49 @@ func (h *UploadHandler) ProxyPDF(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "id is required"})
 		return
 	}
+	// If a Google service account key path is provided via env, use it to fetch private Drive files
+	keyPath := os.Getenv("GOOGLE_SERVICE_ACCOUNT_KEY")
+	if keyPath != "" {
+		data, err := os.ReadFile(keyPath)
+		if err == nil {
+			conf, err := google.JWTConfigFromJSON(data, "https://www.googleapis.com/auth/drive.readonly")
+			if err == nil {
+				client := conf.Client(context.Background())
+				driveURL := fmt.Sprintf("https://www.googleapis.com/drive/v3/files/%s?alt=media", id)
+				resp, err := client.Get(driveURL)
+				if err != nil {
+					c.JSON(http.StatusBadGateway, gin.H{"success": false, "message": err.Error()})
+					return
+				}
+				defer resp.Body.Close()
 
-	// construct drive direct download URL
+				if resp.StatusCode != http.StatusOK {
+					c.Status(resp.StatusCode)
+					io.Copy(c.Writer, resp.Body)
+					return
+				}
+
+				if c.Query("download") != "" {
+					c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", id))
+				} else {
+					c.Header("Content-Disposition", "inline")
+				}
+
+				if ct := resp.Header.Get("Content-Type"); ct != "" {
+					c.Header("Content-Type", ct)
+				} else {
+					c.Header("Content-Type", "application/octet-stream")
+				}
+
+				c.Status(http.StatusOK)
+				io.Copy(c.Writer, resp.Body)
+				return
+			}
+		}
+		// if reading key or creating client fails, fall back to public fetch below
+	}
+
+	// construct drive direct download URL (public files)
 	url := fmt.Sprintf("https://drive.google.com/uc?export=download&id=%s", id)
 
 	client := &http.Client{}
