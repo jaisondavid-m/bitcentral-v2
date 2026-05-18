@@ -1,186 +1,528 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  X,
+  Download,
+  ExternalLink,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  AlertCircle,
+  Loader2,
+} from "lucide-react";
 
-export default function FullscreenPdfModal({ url, name, onClose, originalUrl, allowExternalActions = true }) {
-  const [zoom, setZoom] = useState(1)
-  const iframeSandbox = allowExternalActions
-    ? undefined
-    : 'allow-scripts allow-same-origin allow-forms'
+// ─── helpers ────────────────────────────────────────────────────────────────
 
-  // detect Google Drive file id when present
-  const parsedUrl = (() => {
-    try {
-      return new URL(originalUrl || url, window.location.origin)
-    } catch (e) {
-      return null
-    }
-  })()
-  let driveId = null
-  if (parsedUrl && parsedUrl.hostname.includes('drive.google.com')) {
-    const m = parsedUrl.pathname.match(/\/d\/([a-zA-Z0-9_-]+)/)
-    driveId = m ? m[1] : parsedUrl.searchParams.get('id')
+function getDriveId(url) {
+  try {
+    const parsed = new URL(url);
+    if (!parsed.hostname.includes("drive.google.com")) return null;
+    const m = parsed.pathname.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    return m ? m[1] : parsed.searchParams.get("id");
+  } catch {
+    return null;
   }
-  const drivePreviewUrl = driveId ? `https://drive.google.com/file/d/${driveId}/preview` : null
-  const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || null
-  const [pdfBlobUrl, setPdfBlobUrl] = useState(null)
-  const [fetchingPdf, setFetchingPdf] = useState(false)
-  const [pdfError, setPdfError] = useState(null)
+}
 
-  useEffect(() => {
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    const onKey = (e) => { if (e.key === 'Escape') onClose() }
-    window.addEventListener('keydown', onKey)
-    return () => {
-      window.removeEventListener('keydown', onKey)
-      document.body.style.overflow = prev
-    }
-  }, [onClose])
+function getDownloadUrl(url) {
+  const driveId = getDriveId(url);
+  if (driveId) return `https://drive.google.com/uc?export=download&id=${driveId}`;
+  return url;
+}
 
-  const getDownloadUrl = (u) => {
-    try {
-      if (!u) return u
-      const parsed = new URL(u, window.location.origin)
-      if (parsed.hostname.includes('drive.google.com')) {
-        const match = parsed.pathname.match(/\/d\/([a-zA-Z0-9_-]+)/)
-        const id = match ? match[1] : parsed.searchParams.get('id')
-        if (id) return `https://drive.google.com/uc?export=download&id=${id}`
-      }
-      return parsed.href
-    } catch (e) {
-      return u
-    }
+function getDrivePreviewUrl(url) {
+  const driveId = getDriveId(url);
+  if (driveId) return `https://drive.google.com/file/d/${driveId}/preview`;
+  return null;
+}
+
+function isDirectPdf(url) {
+  try {
+    return new URL(url).pathname.toLowerCase().endsWith(".pdf");
+  } catch {
+    return false;
   }
+}
 
-  const downloadUrl = getDownloadUrl(originalUrl || url)
+// ─── Toolbar ─────────────────────────────────────────────────────────────────
+
+function Toolbar({ name, zoom, onZoomIn, onZoomOut, onResetZoom, onNewTab, onDownload, onClose, downloadUrl, allowExternalActions }) {
+  return (
+    <header
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "10px 16px",
+        borderBottom: "1px solid #e5e7eb",
+        background: "#ffffff",
+        gap: 12,
+        minHeight: 52,
+        flexShrink: 0,
+      }}
+    >
+      {/* Left: close + title */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+        <button
+          onClick={onClose}
+          title="Close"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 32,
+            height: 32,
+            borderRadius: 8,
+            border: "1px solid #e5e7eb",
+            background: "transparent",
+            cursor: "pointer",
+            color: "#374151",
+            flexShrink: 0,
+          }}
+        >
+          <X size={16} />
+        </button>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 7,
+            overflow: "hidden",
+          }}
+        >
+          <FileText size={15} color="#2563eb" style={{ flexShrink: 0 }} />
+          <span
+            style={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: "#111827",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: "38vw",
+            }}
+          >
+            {name}
+          </span>
+        </div>
+      </div>
+
+      {/* Right: zoom + actions */}
+      <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+        {/* Zoom controls */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+            background: "#f3f4f6",
+            borderRadius: 8,
+            padding: "3px 6px",
+          }}
+        >
+          <ToolbarBtn onClick={onZoomOut} title="Zoom out">
+            <ZoomOut size={15} />
+          </ToolbarBtn>
+          <button
+            onClick={onResetZoom}
+            title="Reset zoom"
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: "#374151",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              padding: "0 4px",
+              minWidth: 38,
+              textAlign: "center",
+            }}
+          >
+            {Math.round(zoom * 100)}%
+          </button>
+          <ToolbarBtn onClick={onZoomIn} title="Zoom in">
+            <ZoomIn size={15} />
+          </ToolbarBtn>
+        </div>
+
+        {allowExternalActions && (
+          <>
+            <ToolbarBtn onClick={onNewTab} title="Open in new tab" variant="ghost">
+              <ExternalLink size={15} />
+            </ToolbarBtn>
+            <a
+              href={downloadUrl}
+              download={name}
+              title="Download"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 32,
+                height: 32,
+                borderRadius: 8,
+                border: "1px solid #bbf7d0",
+                background: "#f0fdf4",
+                color: "#15803d",
+                cursor: "pointer",
+                textDecoration: "none",
+                flexShrink: 0,
+              }}
+            >
+              <Download size={15} />
+            </a>
+          </>
+        )}
+      </div>
+    </header>
+  );
+}
+
+function ToolbarBtn({ children, onClick, title, variant = "ghost" }) {
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 28,
+        height: 28,
+        borderRadius: 6,
+        border: variant === "outline" ? "1px solid #e5e7eb" : "none",
+        background: "transparent",
+        cursor: "pointer",
+        color: "#374151",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+// ─── PdfFrame ─────────────────────────────────────────────────────────────────
+
+function PdfFrame({ url, name, allowExternalActions }) {
+  const [status, setStatus] = useState("loading"); // loading | ready | error
+  const drivePreview = getDrivePreviewUrl(url);
+  const src = drivePreview || url;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-stretch justify-center bg-black/40">
-      <div className="relative w-full h-full bg-white text-slate-900 flex flex-col shadow-xl">
-        <header className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <button onClick={onClose} className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-slate-800">Close</button>
-            <div className="font-medium truncate max-w-[60vw]">{name}</div>
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      {status === "loading" && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 12,
+            background: "#f8fafc",
+            zIndex: 2,
+          }}
+        >
+          <Loader2 size={32} color="#2563eb" style={{ animation: "spin 1s linear infinite" }} />
+          <span style={{ fontSize: 14, color: "#6b7280" }}>Loading PDF…</span>
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      )}
+
+      {status === "error" && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 16,
+            background: "#f8fafc",
+            padding: 32,
+            zIndex: 2,
+          }}
+        >
+          <AlertCircle size={40} color="#dc2626" />
+          <div style={{ textAlign: "center" }}>
+            <p style={{ fontSize: 15, fontWeight: 600, color: "#111827", margin: "0 0 6px" }}>
+              Unable to preview
+            </p>
+            <p style={{ fontSize: 13, color: "#6b7280", margin: 0 }}>
+              This file may require sign-in or may be restricted.
+            </p>
           </div>
-          <div className="flex items-center gap-2">
-            {allowExternalActions && (
-              <button onClick={() => window.open(url, '_blank')} className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-slate-800">New tab</button>
-            )}
-            {allowExternalActions && (
-              <a href={downloadUrl} download={name} className="px-3 py-1 rounded bg-emerald-100 hover:bg-emerald-200 text-emerald-800">Download</a>
-            )}
-            <button onClick={() => setZoom((z) => Math.min(3, +(z + 0.25).toFixed(2)))} className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-slate-800">+</button>
-            <button onClick={() => setZoom((z) => Math.max(0.5, +(z - 0.25).toFixed(2)))} className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-slate-800">-</button>
-          </div>
-        </header>
-
-        <div className="flex-1 overflow-auto flex items-start justify-center p-4 bg-white">
-          {driveId ? (
-            <div style={{ width: `${100 / zoom}%`, transform: `scale(${zoom})`, transformOrigin: 'top left' }} className="relative min-h-full">
-              {pdfError ? (
-                <div className="p-6 text-center">
-                  <p className="text-sm text-red-600">{pdfError}</p>
-                </div>
-              ) : pdfBlobUrl ? (
-                <iframe title={name} src={pdfBlobUrl} className="w-full h-[90vh] border border-gray-200 bg-white" />
-              ) : (
-                <div className="p-6 text-center">
-                  <p className="text-sm text-slate-600">Preview requires permission to access this Drive file.</p>
-                  <div className="mt-3 flex justify-center gap-2">
-                    <button
-                      onClick={async () => {
-                        // if we have a Google client id, attempt to get an access token and fetch via proxy
-                        if (!googleClientId) {
-                          // fallback to proxy direct (public/service-account)
-                          window.open(`${apiBase.replace(/\/$/, '')}/pdf/${driveId}`)
-                          return
-                        }
-                        setFetchingPdf(true)
-                        setPdfError(null)
-                        try {
-                          // load GSI script if needed
-                          if (!window.google || !window.google.accounts || !window.google.accounts.oauth2) {
-                            await new Promise((res, rej) => {
-                              const s = document.createElement('script')
-                              s.src = 'https://accounts.google.com/gsi/client'
-                              s.async = true
-                              s.defer = true
-                              s.onload = res
-                              s.onerror = rej
-                              document.head.appendChild(s)
-                            })
-                          }
-
-                          const tokenClient = window.google.accounts.oauth2.initTokenClient({
-                            client_id: googleClientId,
-                            scope: 'https://www.googleapis.com/auth/drive.readonly',
-                            callback: async (resp) => {
-                              if (resp.error) {
-                                setPdfError('Failed to acquire access token')
-                                setFetchingPdf(false)
-                                return
-                              }
-                              try {
-                                const r = await fetch(`${apiBase.replace(/\/$/, '')}/pdf/${driveId}`, {
-                                  headers: { Authorization: `Bearer ${resp.access_token}` },
-                                })
-                                if (!r.ok) throw new Error(`Failed to fetch PDF: ${r.status}`)
-                                const blob = await r.blob()
-                                const url = URL.createObjectURL(blob)
-                                setPdfBlobUrl(url)
-                              } catch (err) {
-                                setPdfError(String(err))
-                              } finally {
-                                setFetchingPdf(false)
-                              }
-                            },
-                          })
-
-                          // try to request token silently first (prompt: none)
-                          tokenClient.requestAccessToken({ prompt: '' })
-                        } catch (err) {
-                          setPdfError('Could not load Google auth library')
-                          setFetchingPdf(false)
-                        }
-                      }}
-                      className="px-4 py-2 rounded bg-blue-600 text-white"
-                      disabled={fetchingPdf}
-                    >
-                      {fetchingPdf ? 'Loading…' : 'Load preview'}
-                    </button>
-                    {allowExternalActions && (
-                      <a href={`${apiBase.replace(/\/$/, '')}/pdf/${driveId}?download=1`} className="px-4 py-2 rounded bg-emerald-100 hover:bg-emerald-200 text-emerald-800">Download</a>
-                    )}
-                  </div>
-                </div>
-              )}
-              <div className="absolute top-4 right-4 flex gap-2">
-                {!allowExternalActions && (
-                  <div
-                    className="absolute top-0 right-0 z-10 h-14 w-14 bg-[#1f2023]"
-                    aria-hidden="true"
-                  />
-                )}
-              </div>
-            </div>
-          ) : (
-            <div style={{ width: `${100 / zoom}%`, transform: `scale(${zoom})`, transformOrigin: 'top left' }} className="relative min-h-full">
-              <iframe
-                title={name}
-                src={url}
-                sandbox={iframeSandbox}
-                className="w-full h-[90vh] border border-gray-200 bg-white"
-              />
-              {!allowExternalActions && (
-                <div
-                  className="absolute top-0 right-0 z-10 h-14 w-14 bg-[#1f2023]"
-                  aria-hidden="true"
-                />
-              )}
+          {allowExternalActions && (
+            <div style={{ display: "flex", gap: 8 }}>
+              <a
+                href={url}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: 8,
+                  background: "#2563eb",
+                  color: "#fff",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  textDecoration: "none",
+                }}
+              >
+                Open in new tab
+              </a>
+              <a
+                href={getDownloadUrl(url)}
+                download={name}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: 8,
+                  background: "#f0fdf4",
+                  color: "#15803d",
+                  border: "1px solid #bbf7d0",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  textDecoration: "none",
+                }}
+              >
+                Download
+              </a>
             </div>
           )}
         </div>
-      </div>
+      )}
+
+      <iframe
+        key={src}
+        src={src}
+        title={name}
+        onLoad={() => setStatus("ready")}
+        onError={() => setStatus("error")}
+        style={{
+          width: "100%",
+          height: "100%",
+          border: "none",
+          display: "block",
+          opacity: status === "loading" ? 0 : 1,
+          transition: "opacity 0.25s",
+        }}
+        sandbox={
+          allowExternalActions
+            ? undefined
+            : "allow-scripts allow-same-origin allow-forms"
+        }
+      />
+
+      {/* Block Google Drive download button overlay (top-right corner) */}
+      {drivePreview && !allowExternalActions && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            width: 60,
+            height: 60,
+            background: "#1f2023",
+            zIndex: 10,
+          }}
+        />
+      )}
     </div>
-  )
+  );
+}
+
+// ─── Main Modal ───────────────────────────────────────────────────────────────
+
+export default function FullscreenPdfModal({
+  url,
+  name,
+  onClose,
+  originalUrl,
+  allowExternalActions = true,
+  // Optional: pass siblings for prev/next navigation
+  siblings = [],   // [{ url, name, allowExternalActions }]
+  siblingIndex = 0,
+}) {
+  const [zoom, setZoom] = useState(1);
+  const [currentIndex, setCurrentIndex] = useState(siblingIndex);
+
+  const hasSiblings = siblings.length > 1;
+  const current = hasSiblings ? siblings[currentIndex] : { url, name, allowExternalActions };
+
+  const activeUrl = current.url;
+  const activeName = current.name;
+  const activeAllow = current.allowExternalActions ?? true;
+
+  // Lock body scroll
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft" && hasSiblings) setCurrentIndex((i) => Math.max(0, i - 1));
+      if (e.key === "ArrowRight" && hasSiblings) setCurrentIndex((i) => Math.min(siblings.length - 1, i + 1));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose, hasSiblings, siblings.length]);
+
+  const clampZoom = (z) => Math.min(3, Math.max(0.5, +z.toFixed(2)));
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 1000,
+        display: "flex",
+        flexDirection: "column",
+        background: "#fff",
+      }}
+    >
+      {/* Toolbar */}
+      <Toolbar
+        name={activeName}
+        zoom={zoom}
+        onZoomIn={() => setZoom((z) => clampZoom(z + 0.25))}
+        onZoomOut={() => setZoom((z) => clampZoom(z - 0.25))}
+        onResetZoom={() => setZoom(1)}
+        onNewTab={() => window.open(activeUrl, "_blank")}
+        downloadUrl={getDownloadUrl(originalUrl || activeUrl)}
+        onClose={onClose}
+        allowExternalActions={activeAllow}
+      />
+
+      {/* Sibling navigation pills */}
+      {hasSiblings && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "8px 16px",
+            borderBottom: "1px solid #e5e7eb",
+            background: "#f9fafb",
+            overflowX: "auto",
+            flexShrink: 0,
+          }}
+        >
+          {siblings.map((s, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentIndex(i)}
+              style={{
+                padding: "4px 12px",
+                borderRadius: 20,
+                border: `1px solid ${i === currentIndex ? "#2563eb" : "#e5e7eb"}`,
+                background: i === currentIndex ? "#2563eb" : "#fff",
+                color: i === currentIndex ? "#fff" : "#374151",
+                fontSize: 12,
+                fontWeight: i === currentIndex ? 600 : 400,
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
+            >
+              {s.name}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* PDF Viewport */}
+      <div
+        style={{
+          flex: 1,
+          overflow: "hidden",
+          background: "#e5e7eb",
+          position: "relative",
+        }}
+      >
+        <div
+          style={{
+            width: `${100 / zoom}%`,
+            height: `${100 / zoom}%`,
+            transform: `scale(${zoom})`,
+            transformOrigin: "top left",
+          }}
+        >
+          <PdfFrame
+            key={activeUrl}
+            url={activeUrl}
+            name={activeName}
+            allowExternalActions={activeAllow}
+          />
+        </div>
+
+        {/* Prev / Next arrows for siblings */}
+        {hasSiblings && (
+          <>
+            <NavArrow
+              direction="left"
+              disabled={currentIndex === 0}
+              onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
+            />
+            <NavArrow
+              direction="right"
+              disabled={currentIndex === siblings.length - 1}
+              onClick={() => setCurrentIndex((i) => Math.min(siblings.length - 1, i + 1))}
+            />
+          </>
+        )}
+      </div>
+
+      {/* Bottom bar: pagination */}
+      {hasSiblings && (
+        <div
+          style={{
+            padding: "6px 16px",
+            borderTop: "1px solid #e5e7eb",
+            background: "#f9fafb",
+            fontSize: 12,
+            color: "#6b7280",
+            textAlign: "center",
+            flexShrink: 0,
+          }}
+        >
+          {currentIndex + 1} / {siblings.length}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NavArrow({ direction, disabled, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        position: "absolute",
+        top: "50%",
+        [direction === "left" ? "left" : "right"]: 12,
+        transform: "translateY(-50%)",
+        width: 36,
+        height: 36,
+        borderRadius: "50%",
+        border: "1px solid #e5e7eb",
+        background: disabled ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.9)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: disabled ? "default" : "pointer",
+        opacity: disabled ? 0.3 : 1,
+        zIndex: 10,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+      }}
+    >
+      {direction === "left" ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+    </button>
+  );
 }
