@@ -1,46 +1,63 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   X,
   Download,
   ExternalLink,
   ZoomIn,
   ZoomOut,
-  RotateCcw,
-  ChevronLeft,
-  ChevronRight,
   FileText,
   AlertCircle,
   Loader2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
+function getApiBase() {
+  return (import.meta.env.VITE_API_BASE_URL || window.location.origin).replace(/\/$/, "");
+}
+
+function normalizeUrl(url) {
+  return typeof url === "string" ? url.trim() : url;
+}
+
 function getDriveId(url) {
   try {
-    const parsed = new URL(url);
+    const parsed = new URL(normalizeUrl(url));
     if (!parsed.hostname.includes("drive.google.com")) return null;
-    const m = parsed.pathname.match(/\/d\/([a-zA-Z0-9_-]+)/);
-    return m ? m[1] : parsed.searchParams.get("id");
+    const match = parsed.pathname.match(/(?:\/file\/d\/|\/d\/)([a-zA-Z0-9_-]+)/);
+    return match ? match[1] : parsed.searchParams.get("id");
   } catch {
     return null;
   }
 }
 
-function getDownloadUrl(url) {
-  const driveId = getDriveId(url);
-  if (driveId) return `https://drive.google.com/uc?export=download&id=${driveId}`;
-  return url;
+function getDrivePreviewUrl(id) {
+  return `https://drive.google.com/file/d/${id}/preview?rm=minimal`;
 }
 
-function getDrivePreviewUrl(url) {
+function getDriveProxyUrl(id, download = false) {
+  return `${getApiBase()}/pdf/${id}${download ? "?download=1" : ""}`;
+}
+
+function getViewUrl(url) {
   const driveId = getDriveId(url);
-  if (driveId) return `https://drive.google.com/file/d/${driveId}/preview`;
-  return null;
+  if (!driveId) return normalizeUrl(url);
+  return import.meta.env.PROD ? getDriveProxyUrl(driveId) : getDrivePreviewUrl(driveId);
+}
+
+function getDownloadUrl(url) {
+  const driveId = getDriveId(url);
+  if (!driveId) return normalizeUrl(url);
+  return import.meta.env.PROD
+    ? getDriveProxyUrl(driveId, true)
+    : `https://drive.google.com/uc?export=download&id=${driveId}`;
 }
 
 function isDirectPdf(url) {
   try {
-    return new URL(url).pathname.toLowerCase().endsWith(".pdf");
+    return new URL(normalizeUrl(url)).pathname.toLowerCase().endsWith(".pdf");
   } catch {
     return false;
   }
@@ -48,7 +65,7 @@ function isDirectPdf(url) {
 
 // ─── Toolbar ─────────────────────────────────────────────────────────────────
 
-function Toolbar({ name, zoom, onZoomIn, onZoomOut, onResetZoom, onNewTab, onDownload, onClose, downloadUrl, allowExternalActions }) {
+function Toolbar({ name, zoom, onZoomIn, onZoomOut, onResetZoom, onNewTab, onClose, downloadUrl, allowExternalActions }) {
   return (
     <header
       style={{
@@ -63,7 +80,6 @@ function Toolbar({ name, zoom, onZoomIn, onZoomOut, onResetZoom, onNewTab, onDow
         flexShrink: 0,
       }}
     >
-      {/* Left: close + title */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
         <button
           onClick={onClose}
@@ -84,14 +100,7 @@ function Toolbar({ name, zoom, onZoomIn, onZoomOut, onResetZoom, onNewTab, onDow
         >
           <X size={16} />
         </button>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 7,
-            overflow: "hidden",
-          }}
-        >
+        <div style={{ display: "flex", alignItems: "center", gap: 7, overflow: "hidden" }}>
           <FileText size={15} color="#2563eb" style={{ flexShrink: 0 }} />
           <span
             style={{
@@ -109,9 +118,7 @@ function Toolbar({ name, zoom, onZoomIn, onZoomOut, onResetZoom, onNewTab, onDow
         </div>
       </div>
 
-      {/* Right: zoom + actions */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-        {/* Zoom controls */}
         <div
           style={{
             display: "flex",
@@ -206,9 +213,9 @@ function ToolbarBtn({ children, onClick, title, variant = "ghost" }) {
 // ─── PdfFrame ─────────────────────────────────────────────────────────────────
 
 function PdfFrame({ url, name, allowExternalActions }) {
-  const [status, setStatus] = useState("loading"); // loading | ready | error
-  const drivePreview = getDrivePreviewUrl(url);
-  const src = drivePreview || url;
+  const [status, setStatus] = useState("loading");
+  const src = getViewUrl(url);
+  const toolbarCrop = allowExternalActions ? 0 : 56;
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -259,7 +266,7 @@ function PdfFrame({ url, name, allowExternalActions }) {
           {allowExternalActions && (
             <div style={{ display: "flex", gap: 8 }}>
               <a
-                href={url}
+                href={src}
                 target="_blank"
                 rel="noreferrer"
                 style={{
@@ -302,35 +309,17 @@ function PdfFrame({ url, name, allowExternalActions }) {
         onLoad={() => setStatus("ready")}
         onError={() => setStatus("error")}
         style={{
+          position: "absolute",
+          top: -toolbarCrop,
+          left: 0,
           width: "100%",
-          height: "100%",
+          height: `calc(100% + ${toolbarCrop}px)`,
           border: "none",
           display: "block",
           opacity: status === "loading" ? 0 : 1,
           transition: "opacity 0.25s",
         }}
-        sandbox={
-          allowExternalActions
-            ? undefined
-            : "allow-scripts allow-same-origin allow-forms"
-        }
       />
-
-      {/* Block Google Drive download button overlay (top-right corner) */}
-      {drivePreview && !allowExternalActions && (
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            top: 0,
-            right: 0,
-            width: 60,
-            height: 60,
-            background: "#1f2023",
-            zIndex: 10,
-          }}
-        />
-      )}
     </div>
   );
 }
@@ -343,8 +332,7 @@ export default function FullscreenPdfModal({
   onClose,
   originalUrl,
   allowExternalActions = true,
-  // Optional: pass siblings for prev/next navigation
-  siblings = [],   // [{ url, name, allowExternalActions }]
+  siblings = [],
   siblingIndex = 0,
 }) {
   const [zoom, setZoom] = useState(1);
@@ -357,7 +345,6 @@ export default function FullscreenPdfModal({
   const activeName = current.name;
   const activeAllow = current.allowExternalActions ?? true;
 
-  // Lock body scroll
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -386,20 +373,18 @@ export default function FullscreenPdfModal({
         background: "#fff",
       }}
     >
-      {/* Toolbar */}
       <Toolbar
         name={activeName}
         zoom={zoom}
         onZoomIn={() => setZoom((z) => clampZoom(z + 0.25))}
         onZoomOut={() => setZoom((z) => clampZoom(z - 0.25))}
         onResetZoom={() => setZoom(1)}
-        onNewTab={() => window.open(activeUrl, "_blank")}
+        onNewTab={() => window.open(getViewUrl(activeUrl), "_blank")}
         downloadUrl={getDownloadUrl(originalUrl || activeUrl)}
         onClose={onClose}
         allowExternalActions={activeAllow}
       />
 
-      {/* Sibling navigation pills */}
       {hasSiblings && (
         <div
           style={{
@@ -436,7 +421,6 @@ export default function FullscreenPdfModal({
         </div>
       )}
 
-      {/* PDF Viewport */}
       <div
         style={{
           flex: 1,
@@ -453,15 +437,9 @@ export default function FullscreenPdfModal({
             transformOrigin: "top left",
           }}
         >
-          <PdfFrame
-            key={activeUrl}
-            url={activeUrl}
-            name={activeName}
-            allowExternalActions={activeAllow}
-          />
+          <PdfFrame key={activeUrl} url={activeUrl} name={activeName} allowExternalActions={activeAllow} />
         </div>
 
-        {/* Prev / Next arrows for siblings */}
         {hasSiblings && (
           <>
             <NavArrow
@@ -478,7 +456,6 @@ export default function FullscreenPdfModal({
         )}
       </div>
 
-      {/* Bottom bar: pagination */}
       {hasSiblings && (
         <div
           style={{
@@ -499,6 +476,8 @@ export default function FullscreenPdfModal({
 }
 
 function NavArrow({ direction, disabled, onClick }) {
+  const Icon = direction === "left" ? ChevronLeft : ChevronRight;
+
   return (
     <button
       onClick={onClick}
@@ -518,11 +497,10 @@ function NavArrow({ direction, disabled, onClick }) {
         justifyContent: "center",
         cursor: disabled ? "default" : "pointer",
         opacity: disabled ? 0.3 : 1,
-        zIndex: 10,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
       }}
     >
-      {direction === "left" ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+      <Icon size={18} />
     </button>
   );
 }
