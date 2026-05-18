@@ -44,7 +44,9 @@ function getDriveProxyUrl(id, download = false) {
 function getViewUrl(url, allowExternalActions = true) {
   const driveId = getDriveId(url);
   if (!driveId) return normalizeUrl(url);
-  if (!allowExternalActions) return getDrivePreviewUrl(driveId);
+  if (!allowExternalActions) {
+    return import.meta.env.PROD ? getDriveProxyUrl(driveId) : getDrivePreviewUrl(driveId);
+  }
   return import.meta.env.PROD ? getDriveProxyUrl(driveId) : getDrivePreviewUrl(driveId);
 }
 
