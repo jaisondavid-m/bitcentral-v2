@@ -41,9 +41,10 @@ function getDriveProxyUrl(id, download = false) {
   return `${getApiBase()}/pdf/${id}${download ? "?download=1" : ""}`;
 }
 
-function getViewUrl(url) {
+function getViewUrl(url, allowExternalActions = true) {
   const driveId = getDriveId(url);
   if (!driveId) return normalizeUrl(url);
+  if (!allowExternalActions) return getDrivePreviewUrl(driveId);
   return import.meta.env.PROD ? getDriveProxyUrl(driveId) : getDrivePreviewUrl(driveId);
 }
 
@@ -214,7 +215,7 @@ function ToolbarBtn({ children, onClick, title, variant = "ghost" }) {
 
 function PdfFrame({ url, name, allowExternalActions }) {
   const [status, setStatus] = useState("loading");
-  const src = getViewUrl(url);
+  const src = getViewUrl(url, allowExternalActions);
   const toolbarCrop = allowExternalActions ? 0 : 56;
 
   return (
