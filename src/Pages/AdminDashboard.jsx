@@ -347,7 +347,7 @@ function AdminPageShell({ title, description, children }) {
                     }`}
                   >
                     <Icon className="h-4 w-4" />
-                    {item.label}
+                      <span className="hidden sm:inline">{item.label}</span>
                   </Link>
                 );
               })}
@@ -541,17 +541,19 @@ function UsersSection() {
                   <table className="min-w-full divide-y divide-emerald-200 text-sm dark:divide-emerald-900">
                     <thead className="bg-white/70 dark:bg-slate-900/70">
                       <tr>
-                        {['#', 'Photo', 'Email', 'Display name', 'Last seen', 'Last used', 'Delete'].map((h) => (
-                          <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">
-                            {h}
-                          </th>
-                        ))}
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200 hidden sm:table-cell">#</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">Photo</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">Email</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200 hidden sm:table-cell">Display name</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200 hidden sm:table-cell">Last seen</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200 hidden sm:table-cell">Last used</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">Delete</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-emerald-200 bg-white dark:divide-emerald-900 dark:bg-slate-950">
                       {onlineUsers.map((userItem, index) => (
                         <tr key={userItem.uid} className="transition hover:bg-emerald-50 dark:hover:bg-slate-900">
-                          <td className="px-4 py-3 font-medium text-gray-700 dark:text-slate-300">{index + 1}</td>
+                          <td className="px-4 py-3 font-medium text-gray-700 dark:text-slate-300 hidden sm:table-cell">{index + 1}</td>
                           <td className="px-4 py-3">
                             {userItem.photoURL ? (
                               <img
@@ -567,9 +569,9 @@ function UsersSection() {
                             )}
                           </td>
                           <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.email || "-"}</td>
-                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.displayName || "-"}</td>
-                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatDateTime(userItem.lastSeenAt)}</td>
-                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatRouteLabel(userItem.lastUsedRoute)}</td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300 hidden sm:table-cell">{userItem.displayName || "-"}</td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300 hidden sm:table-cell">{formatDateTime(userItem.lastSeenAt)}</td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300 hidden sm:table-cell">{formatRouteLabel(userItem.lastUsedRoute)}</td>
                           <td className="px-4 py-3">
                             <button
                               type="button"
@@ -606,17 +608,20 @@ function UsersSection() {
                   <table className="min-w-full divide-y divide-blue-200 text-sm dark:divide-blue-900">
                     <thead className="bg-white/70 dark:bg-slate-900/70">
                       <tr>
-                        {['#', 'Photo', 'Email', 'Display name', 'Status', 'Last seen', 'Last used', 'Delete'].map((h) => (
-                          <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">
-                            {h}
-                          </th>
-                        ))}
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200 hidden sm:table-cell">#</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">Photo</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">Email</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200 hidden sm:table-cell">Display name</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">Status</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200 hidden sm:table-cell">Last seen</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200 hidden sm:table-cell">Last used</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">Delete</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-blue-200 bg-white dark:divide-blue-900 dark:bg-slate-950">
                       {[...recentActivityUsers, ...neverActiveUsers].map((userItem, index) => (
                         <tr key={userItem.uid} className="transition hover:bg-blue-50 dark:hover:bg-slate-900">
-                          <td className="px-4 py-3 font-medium text-gray-700 dark:text-slate-300">{index + 1}</td>
+                          <td className="px-4 py-3 font-medium text-gray-700 dark:text-slate-300 hidden sm:table-cell">{index + 1}</td>
                           <td className="px-4 py-3">
                             {userItem.photoURL ? (
                               <img
@@ -632,14 +637,14 @@ function UsersSection() {
                             )}
                           </td>
                           <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.email || "-"}</td>
-                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.displayName || "-"}</td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300 hidden sm:table-cell">{userItem.displayName || "-"}</td>
                           <td className="px-4 py-3 text-gray-700 dark:text-slate-300">
                             <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${userItem.isOnline ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300" : "bg-gray-100 text-gray-600 dark:bg-slate-900 dark:text-slate-300"}`}>
                               {userItem.isOnline ? "Online" : "Offline"}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.lastSeenAt ? formatDateTime(userItem.lastSeenAt) : "Never"}</td>
-                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatRouteLabel(userItem.lastUsedRoute)}</td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300 hidden sm:table-cell">{userItem.lastSeenAt ? formatDateTime(userItem.lastSeenAt) : "Never"}</td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300 hidden sm:table-cell">{formatRouteLabel(userItem.lastUsedRoute)}</td>
                           <td className="px-4 py-3">
                             <button
                               type="button"
@@ -965,11 +970,11 @@ function QBSection() {
                 <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">#</th>
                 <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Code</th>
                 <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Subject</th>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">QB1</th>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">QB2</th>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">AK1</th>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">AK2</th>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Sem + Ans</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200 hidden sm:table-cell">QB1</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200 hidden sm:table-cell">QB2</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200 hidden sm:table-cell">AK1</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200 hidden sm:table-cell">AK2</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200 hidden sm:table-cell">Sem + Ans</th>
                 <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Updated</th>
                 <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">Actions</th>
               </tr>
@@ -993,7 +998,7 @@ function QBSection() {
                     </td>
                   </tr>
                 ) : (
-                  <tr key={item.id} className="transition hover:bg-gray-50 dark:hover:bg-slate-900">
+                    <tr key={item.id} className="transition hover:bg-gray-50 dark:hover:bg-slate-900">
                     <td className="px-4 py-3 font-medium text-gray-500 dark:text-slate-400">{idx + 1}</td>
                     <td className="px-4 py-3">
                       <span className="rounded bg-gray-100 px-2 py-0.5 font-mono text-xs font-semibold text-gray-700 dark:bg-slate-800 dark:text-slate-200">
@@ -1001,11 +1006,11 @@ function QBSection() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gray-800 dark:text-slate-200">{item.subject_name}</td>
-                    <td className="px-4 py-3"><LinkCell value={item.qb1} /></td>
-                    <td className="px-4 py-3"><LinkCell value={item.qb2} /></td>
-                    <td className="px-4 py-3"><LinkCell value={item.ak1} /></td>
-                    <td className="px-4 py-3"><LinkCell value={item.ak2} /></td>
-                    <td className="px-4 py-3"><LinkCell value={item.semqbwithans} /></td>
+                    <td className="px-4 py-3 hidden sm:table-cell"><LinkCell value={item.qb1} /></td>
+                    <td className="px-4 py-3 hidden sm:table-cell"><LinkCell value={item.qb2} /></td>
+                    <td className="px-4 py-3 hidden sm:table-cell"><LinkCell value={item.ak1} /></td>
+                    <td className="px-4 py-3 hidden sm:table-cell"><LinkCell value={item.ak2} /></td>
+                    <td className="px-4 py-3 hidden sm:table-cell"><LinkCell value={item.semqbwithans} /></td>
                     <td className="px-4 py-3 text-gray-500 dark:text-slate-400">{formatDateTime(item.updated_at)}</td>
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
