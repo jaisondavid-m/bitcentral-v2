@@ -128,20 +128,22 @@ function ToolbarBtn({ children, onClick, title }) {
 // ─── PdfFrame ─────────────────────────────────────────────────────────────────
 
 /**
- * Root cause of "always loading":
+ * FIX: Previously the component detected mobile and immediately showed a
+ * static fallback without ever attempting to render the PDF. This caused the
+ * PDF to never open on mobile.
  *
- * iframe's onLoad fires when the *frame document* loads — but many browsers
- * (Chrome on Android, Samsung Internet, some desktop PDF plugins) intercept
- * the PDF response at the network level and render it natively *without*
- * triggering onLoad on the iframe element. Other browsers fire onLoad
- * immediately with an empty/error document before the PDF plugin has painted.
+ * New strategy:
+ * 1. Always attempt iframe rendering on ALL platforms (mobile + desktop).
+ * 2. Use a fallback timer (LOAD_TIMEOUT_MS). If onLoad fires → ready.
+ *    If it never fires → assume silent success (PDF rendered natively by browser).
+ * 3. If onError fires → show the "unable to preview" error UI with open/download links.
+ * 4. On mobile, after the iframe is visible, show an optional sticky banner
+ *    with "Open" and "Download" links as a convenience — but don't block the iframe.
  *
- * Fix: start a fallback timer when the URL mounts. If onLoad fires first,
- * great — clear the timer and go to "ready". If it never fires, the timer
- * clears the spinner after LOAD_TIMEOUT_MS so the user isn't stuck.
- * The iframe is always in the DOM and loading in the background either way.
+ * Many mobile browsers (Chrome Android, Safari iOS) CAN render PDFs in iframes
+ * when the server sends correct Content-Type headers. We let them try first.
  */
-const LOAD_TIMEOUT_MS = 6000;
+const LOAD_TIMEOUT_MS = 8000; // slightly longer for slower mobile connections
 
 function PdfFrame({ url, name, allowExternalActions }) {
   const [status, setStatus] = useState("loading"); // "loading" | "ready" | "error"
@@ -158,7 +160,7 @@ function PdfFrame({ url, name, allowExternalActions }) {
     clearTimeout(timerRef.current);
 
     timerRef.current = setTimeout(() => {
-      // Still loading after timeout → assume the PDF rendered silently
+      // Still loading after timeout → assume the PDF rendered silently (common on mobile)
       setStatus((prev) => (prev === "loading" ? "ready" : prev));
     }, LOAD_TIMEOUT_MS);
 
@@ -176,31 +178,9 @@ function PdfFrame({ url, name, allowExternalActions }) {
     setStatus("error");
   };
 
-  if (isMobile) {
-    return (
-      <div style={{
-        position: "absolute", inset: 0, display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center", gap: 12,
-        background: "#f8fafc", zIndex: 1, padding: 20,
-      }}>
-        <FileText size={36} color="#2563eb" />
-        <div style={{ fontSize: 15, fontWeight: 600, color: "#111827" }}>{name}</div>
-        <div style={{ fontSize: 13, color: "#6b7280", textAlign: "center", maxWidth: 320 }}>
-          PDFs often don't embed inline on mobile browsers. Open this file in a new tab or download it.
-        </div>
-        {allowExternalActions && (
-          <div style={{ display: "flex", gap: 8 }}>
-            <a href={src} target="_blank" rel="noreferrer" style={btnStyle("#2563eb", "#fff")}>Open</a>
-            <a href={getDownloadUrl(url)} download={name} style={btnStyle("#f0fdf4", "#15803d", "#bbf7d0")}>Download</a>
-          </div>
-        )}
-      </div>
-    );
-  }
-
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      {/* Spinner overlay — unmounts once ready/error so it can't block interaction */}
+      {/* Spinner overlay — shown while loading */}
       {status === "loading" && (
         <div style={{
           position: "absolute", inset: 0, zIndex: 2,
@@ -213,6 +193,7 @@ function PdfFrame({ url, name, allowExternalActions }) {
         </div>
       )}
 
+      {/* Error state — shown only if iframe explicitly fires onError */}
       {status === "error" && (
         <div style={{
           position: "absolute", inset: 0, zIndex: 2,
@@ -229,7 +210,7 @@ function PdfFrame({ url, name, allowExternalActions }) {
             </p>
           </div>
           {allowExternalActions && (
-            <div style={{ display: "flex", gap: 8 }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
               <a href={src} target="_blank" rel="noreferrer" style={btnStyle("#2563eb", "#fff")}>Open in new tab</a>
               <a href={getDownloadUrl(url)} download={name} style={btnStyle("#f0fdf4", "#15803d", "#bbf7d0")}>Download</a>
             </div>
@@ -239,8 +220,9 @@ function PdfFrame({ url, name, allowExternalActions }) {
 
       {/*
         The iframe is ALWAYS in the DOM regardless of status so the browser
-        starts fetching the PDF immediately. We hide it visually with opacity
-        and disable pointer events until it's ready.
+        starts fetching the PDF immediately. Hidden visually until ready.
+        This works on both desktop and mobile — mobile Chrome/Safari can render
+        PDFs natively inside iframes when content-type is correct.
       */}
       <iframe
         key={src}
@@ -257,15 +239,36 @@ function PdfFrame({ url, name, allowExternalActions }) {
           pointerEvents: status === "ready" ? "auto" : "none",
         }}
       />
+
+      {/*
+        Mobile convenience banner — shown after PDF loads.
+        Does NOT block the PDF; sits as a floating strip at the bottom.
+        Users who prefer to open externally can tap here.
+      */}
+      {isMobile && status === "ready" && allowExternalActions && (
+        <div style={{
+          position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 3,
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+          padding: "10px 16px",
+          background: "rgba(255,255,255,0.92)",
+          backdropFilter: "blur(6px)",
+          borderTop: "1px solid #e5e7eb",
+        }}>
+          <span style={{ fontSize: 12, color: "#6b7280" }}>Having trouble viewing?</span>
+          <a href={src} target="_blank" rel="noreferrer" style={btnStyle("#2563eb", "#fff")}>Open</a>
+          <a href={getDownloadUrl(url)} download={name} style={btnStyle("#f0fdf4", "#15803d", "#bbf7d0")}>Download</a>
+        </div>
+      )}
     </div>
   );
 }
 
 function btnStyle(bg, color, border) {
   return {
-    padding: "8px 16px", borderRadius: 8, background: bg, color,
+    padding: "7px 14px", borderRadius: 8, background: bg, color,
     border: border ? `1px solid ${border}` : "none",
-    fontSize: 14, fontWeight: 500, textDecoration: "none",
+    fontSize: 13, fontWeight: 500, textDecoration: "none",
+    display: "inline-block",
   };
 }
 
