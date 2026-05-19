@@ -1,10 +1,21 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-const LinkButton = ({ href, label, onClick }) => {
+const LinkButton = ({ href, label, onClick, onNavigate }) => {
+  const handleClick = () => {
+    // Check if href is an internal route (starts with /)
+    if (href.startsWith("/")) {
+      onNavigate?.(href);
+      return;
+    }
+    // Otherwise use the provided onClick or default to opening in new tab
+    onClick ? onClick() : window.open(href, "_blank", "noreferrer");
+  };
+
   return (
     <button
       type="button"
-      onClick={onClick || (() => window.open(href, "_blank", "noreferrer"))}
+      onClick={handleClick}
       className="inline-block rounded-md bg-blue-600 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700"
     >
       {label}
@@ -15,6 +26,7 @@ const LinkButton = ({ href, label, onClick }) => {
 const Divider = () => <hr className="my-2.5 border-blue-100" />;
 
 export default function SubjectCard({ subject, view = "all", onOpenPdf }) {
+  const navigate = useNavigate();
   const code = subject?.code || subject?.subject_code || "";
   const name = subject?.name || subject?.subject_name || "";
   const semqbwithans = subject?.semqbwithans || subject?.sem_qb_with_ans || "";
@@ -30,6 +42,11 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf }) {
 
   const openPdf = (url, name, allowExternalActions = true, allowDownload = true) => {
     if (!url) return;
+    // Check if url is an internal route
+    if (url.startsWith("/")) {
+      navigate(url);
+      return;
+    }
     if (onOpenPdf) {
       onOpenPdf({ url, name, allowExternalActions, allowDownload });
       return;
@@ -111,8 +128,8 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf }) {
           <Divider />
           <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-500">Module Test 1</p>
           <div className="flex flex-wrap gap-1.5">
-            {qb1 && <LinkButton href={qb1} label="Question Bank" onClick={() => openPdf(qb1, `${code} - Question Bank`, true, true)} />}
-            {ak1 && <LinkButton href={ak1} label="Answer Key" onClick={() => openPdf(ak1, `${code} - Answer Key`, true, false)} />}
+            {qb1 && <LinkButton href={qb1} label="Question Bank" onNavigate={navigate} onClick={() => openPdf(qb1, `${code} - Question Bank`, true, true)} />}
+            {ak1 && <LinkButton href={ak1} label="Answer Key" onNavigate={navigate} onClick={() => openPdf(ak1, `${code} - Answer Key`, true, false)} />}
           </div>
         </>
       )}
@@ -122,8 +139,8 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf }) {
           <Divider />
           <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-500">Module Test 2</p>
           <div className="flex flex-wrap gap-1.5">
-            {qb2 && <LinkButton href={qb2} label="Question Bank" onClick={() => openPdf(qb2, `${code} - Question Bank`, true, true)} />}
-            {ak2 && <LinkButton href={ak2} label="Answer Key" onClick={() => openPdf(ak2, `${code} - Answer Key`, true, false)} />}
+            {qb2 && <LinkButton href={qb2} label="Question Bank" onNavigate={navigate} onClick={() => openPdf(qb2, `${code} - Question Bank`, true, true)} />}
+            {ak2 && <LinkButton href={ak2} label="Answer Key" onNavigate={navigate} onClick={() => openPdf(ak2, `${code} - Answer Key`, true, false)} />}
           </div>
         </>
       )}
@@ -133,11 +150,11 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf }) {
           <Divider />
           <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-500">Semester</p>
           <div className="flex flex-wrap gap-1.5">
-            {qb1 && <LinkButton href={qb1} label="Question Bank" onClick={() => openPdf(qb1, `${code} - Question Bank`, true, true)} />}
-            {qb2 && <LinkButton href={qb2} label="Question Bank" onClick={() => openPdf(qb2, `${code} - Question Bank`, true, true)} />}
-            {ak1 && <LinkButton href={ak1} label="Answer Key" onClick={() => openPdf(ak1, `${code} - Answer Key`, true, false)} />}
-            {ak2 && <LinkButton href={ak2} label="Answer Key" onClick={() => openPdf(ak2, `${code} - Answer Key`, true, false)} />}
-            {semqbwithans && <LinkButton href={semqbwithans} label="Semester Question Bank + Answer Key" onClick={() => openPdf(semqbwithans, `${code} - Semester Question Bank + Answer Key`, true, false)} />}
+            {qb1 && <LinkButton href={qb1} label="Question Bank" onNavigate={navigate} onClick={() => openPdf(qb1, `${code} - Question Bank`, true, true)} />}
+            {qb2 && <LinkButton href={qb2} label="Question Bank" onNavigate={navigate} onClick={() => openPdf(qb2, `${code} - Question Bank`, true, true)} />}
+            {ak1 && <LinkButton href={ak1} label="Answer Key" onNavigate={navigate} onClick={() => openPdf(ak1, `${code} - Answer Key`, true, false)} />}
+            {ak2 && <LinkButton href={ak2} label="Answer Key" onNavigate={navigate} onClick={() => openPdf(ak2, `${code} - Answer Key`, true, false)} />}
+            {semqbwithans && <LinkButton href={semqbwithans} label="Semester Question Bank + Answer Key" onNavigate={navigate} onClick={() => openPdf(semqbwithans, `${code} - Semester Question Bank + Answer Key`, true, false)} />}
           </div>
         </>
       )}
@@ -147,11 +164,11 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf }) {
           <Divider />
           <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-500">All Materials</p>
           <div className="flex flex-wrap gap-1.5">
-            {qb1 && <LinkButton href={qb1} label="Question Bank" />}
-            {qb2 && <LinkButton href={qb2} label="Question Bank" />}
-            {ak1 && <LinkButton href={ak1} label="Answer Key" />}
-            {ak2 && <LinkButton href={ak2} label="Answer Key" />}
-            {semqbwithans && <LinkButton href={semqbwithans} label="Semester Question Bank + Answer Key" />}
+            {qb1 && <LinkButton href={qb1} label="Question Bank" onNavigate={navigate} />}
+            {qb2 && <LinkButton href={qb2} label="Question Bank" onNavigate={navigate} />}
+            {ak1 && <LinkButton href={ak1} label="Answer Key" onNavigate={navigate} />}
+            {ak2 && <LinkButton href={ak2} label="Answer Key" onNavigate={navigate} />}
+            {semqbwithans && <LinkButton href={semqbwithans} label="Semester Question Bank + Answer Key" onNavigate={navigate} />}
           </div>
         </>
       )}

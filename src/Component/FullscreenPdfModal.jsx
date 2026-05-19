@@ -256,6 +256,14 @@ function PdfFrame({ url, name, allowExternalActions, allowDownload }) {
       {!useCustomViewer && status === "ready" && (
         <div
           aria-hidden="true"
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          onTouchStart={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
           style={{
             position: "absolute",
             top: 0,
@@ -352,6 +360,7 @@ export default function FullscreenPdfModal({
   onClose,
   originalUrl,
   allowExternalActions = true,
+  allowDownload = true,
   siblings = [],
   siblingIndex = 0,
 }) {
@@ -359,7 +368,9 @@ export default function FullscreenPdfModal({
   const [currentIndex, setCurrentIndex] = useState(siblingIndex);
 
   const hasSiblings = siblings.length > 1;
-  const current = hasSiblings ? siblings[currentIndex] : { url, name, allowExternalActions };
+  const current = hasSiblings
+    ? siblings[currentIndex]
+    : { url, name, allowExternalActions, allowDownload };
   const activeUrl = current.url;
   const activeName = current.name;
   const activeAllow = current.allowExternalActions ?? true;

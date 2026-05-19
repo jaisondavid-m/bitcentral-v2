@@ -98,10 +98,10 @@ function FileUrlField({ label, fieldKey, value, onChange, onUpload, uploading })
       <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300">{label}</label>
       <div className="flex gap-2">
         <input
-          type="url"
+          type="text"
           value={value || ""}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="https://..."
+          placeholder="https://... or /route"
           className="min-w-0 flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
         />
         <label className="inline-flex shrink-0 cursor-pointer items-center rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100">
@@ -1005,7 +1005,7 @@ function QBSection() {
                       <div key={field} className="space-y-1">
                         <label className="block text-[10px] font-bold uppercase text-gray-400 sm:hidden">{label}</label>
                         <input
-                          type="url"
+                          type="text"
                           value={row[field]}
                           onChange={(e) => setBatchRows((prev) => prev.map((r, i) => i === idx ? { ...r, [field]: e.target.value } : r))}
                           placeholder={label}
@@ -1017,7 +1017,7 @@ function QBSection() {
                       <label className="block text-[10px] font-bold uppercase text-gray-400 sm:hidden">Sem QB + Ans</label>
                       <div className="flex gap-2">
                         <input
-                          type="url"
+                          type="text"
                           value={row.semqbwithans}
                           onChange={(e) => setBatchRows((prev) => prev.map((r, i) => i === idx ? { ...r, semqbwithans: e.target.value } : r))}
                           placeholder="Sem QB + Ans"

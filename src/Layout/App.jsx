@@ -21,6 +21,7 @@ import ExamHall from "../Pages/ExamHall.jsx";
 import S2 from "../Pages/S2.jsx";
 import FullScreenLoader from "../Component/FullScreenLoader.jsx";
 import { useAuth } from "../context/StudentContext.jsx";
+import AK22PH202 from "../Pages/answers/AK__22PH202.jsx";
 
 function App() {
   const { loading } = useAuth();
@@ -141,6 +142,7 @@ function App() {
           <Route path="/semester" element={<Semester />} />
           <Route path="/mess" element={<MessMenu />} />
           <Route path="*" element={<NotFound />} />
+          <Route path="/ak_22ph202" element={<AK22PH202 />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
