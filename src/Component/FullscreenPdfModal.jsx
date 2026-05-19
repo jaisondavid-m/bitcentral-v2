@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Document, Page, pdfjs } from "react-pdf";
 import {
   X,
   Download,
@@ -11,6 +12,11 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url
+).toString();
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -57,7 +63,7 @@ function getDownloadUrl(url) {
 
 // ─── Toolbar ─────────────────────────────────────────────────────────────────
 
-function Toolbar({ name, zoom, onZoomIn, onZoomOut, onResetZoom, onNewTab, onClose, downloadUrl, allowExternalActions }) {
+function Toolbar({ name, zoom, onZoomIn, onZoomOut, onResetZoom, onNewTab, onClose, downloadUrl, allowExternalActions, allowDownload }) {
   return (
     <header style={{
       display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -98,14 +104,16 @@ function Toolbar({ name, zoom, onZoomIn, onZoomOut, onResetZoom, onNewTab, onClo
         {allowExternalActions && (
           <>
             <ToolbarBtn onClick={onNewTab} title="Open in new tab"><ExternalLink size={15} /></ToolbarBtn>
-            <a href={downloadUrl} download={name} title="Download" style={{
-              display: "flex", alignItems: "center", justifyContent: "center",
-              width: 32, height: 32, borderRadius: 8, border: "1px solid #bbf7d0",
-              background: "#f0fdf4", color: "#15803d", cursor: "pointer",
-              textDecoration: "none", flexShrink: 0,
-            }}>
-              <Download size={15} />
-            </a>
+            {allowDownload && (
+              <a href={downloadUrl} download={name} title="Download" style={{
+                display: "flex", alignItems: "center", justifyContent: "center",
+                width: 32, height: 32, borderRadius: 8, border: "1px solid #bbf7d0",
+                background: "#f0fdf4", color: "#15803d", cursor: "pointer",
+                textDecoration: "none", flexShrink: 0,
+              }}>
+                <Download size={15} />
+              </a>
+            )}
           </>
         )}
       </div>
@@ -142,20 +150,26 @@ function ToolbarBtn({ children, onClick, title }) {
  * The iframe is always in the DOM and loading in the background either way.
  */
 const LOAD_TIMEOUT_MS = 6000;
+const NATIVE_TOOLBAR_MASK_HEIGHT = 52;
 
-function PdfFrame({ url, name, allowExternalActions }) {
+function PdfFrame({ url, name, allowExternalActions, allowDownload }) {
   const [status, setStatus] = useState("loading"); // "loading" | "ready" | "error"
+  const [numPages, setNumPages] = useState(0);
+  const [pageWidth, setPageWidth] = useState(0);
   const timerRef = useRef(null);
+  const customViewerRef = useRef(null);
   const src = getViewUrl(url);
+  const useCustomViewer = !allowDownload;
 
-  const isMobile =
-    typeof navigator !== "undefined" &&
-    /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
-
-  // Reset and arm the fallback timer whenever the URL changes
+  // Reset state whenever the URL (or viewer mode) changes.
   useEffect(() => {
     setStatus("loading");
+    setNumPages(0);
     clearTimeout(timerRef.current);
+
+    if (useCustomViewer) {
+      return () => clearTimeout(timerRef.current);
+    }
 
     timerRef.current = setTimeout(() => {
       // Still loading after timeout → assume the PDF rendered silently
@@ -163,7 +177,20 @@ function PdfFrame({ url, name, allowExternalActions }) {
     }, LOAD_TIMEOUT_MS);
 
     return () => clearTimeout(timerRef.current);
-  }, [src]);
+  }, [src, useCustomViewer]);
+
+  useEffect(() => {
+    if (!useCustomViewer) return undefined;
+
+    const updateWidth = () => {
+      const width = customViewerRef.current?.clientWidth || 0;
+      setPageWidth(width > 0 ? Math.max(320, width - 24) : 0);
+    };
+
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, [useCustomViewer, src]);
 
   const handleLoad = () => {
     clearTimeout(timerRef.current);
@@ -171,32 +198,16 @@ function PdfFrame({ url, name, allowExternalActions }) {
     setTimeout(() => setStatus("ready"), 150);
   };
 
+  const handleDocLoadSuccess = ({ numPages: pages }) => {
+    clearTimeout(timerRef.current);
+    setNumPages(pages || 0);
+    setStatus("ready");
+  };
+
   const handleError = () => {
     clearTimeout(timerRef.current);
     setStatus("error");
   };
-
-  if (isMobile) {
-    return (
-      <div style={{
-        position: "absolute", inset: 0, display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center", gap: 12,
-        background: "#f8fafc", zIndex: 1, padding: 20,
-      }}>
-        <FileText size={36} color="#2563eb" />
-        <div style={{ fontSize: 15, fontWeight: 600, color: "#111827" }}>{name}</div>
-        <div style={{ fontSize: 13, color: "#6b7280", textAlign: "center", maxWidth: 320 }}>
-          PDFs often don't embed inline on mobile browsers. Open this file in a new tab or download it.
-        </div>
-        {allowExternalActions && (
-          <div style={{ display: "flex", gap: 8 }}>
-            <a href={src} target="_blank" rel="noreferrer" style={btnStyle("#2563eb", "#fff")}>Open</a>
-            <a href={getDownloadUrl(url)} download={name} style={btnStyle("#f0fdf4", "#15803d", "#bbf7d0")}>Download</a>
-          </div>
-        )}
-      </div>
-    );
-  }
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -231,32 +242,92 @@ function PdfFrame({ url, name, allowExternalActions }) {
           {allowExternalActions && (
             <div style={{ display: "flex", gap: 8 }}>
               <a href={src} target="_blank" rel="noreferrer" style={btnStyle("#2563eb", "#fff")}>Open in new tab</a>
-              <a href={getDownloadUrl(url)} download={name} style={btnStyle("#f0fdf4", "#15803d", "#bbf7d0")}>Download</a>
+              {allowDownload && (
+                <a href={getDownloadUrl(url)} download={name} style={btnStyle("#f0fdf4", "#15803d", "#bbf7d0")}>Download</a>
+              )}
             </div>
           )}
         </div>
       )}
 
-      {/*
-        The iframe is ALWAYS in the DOM regardless of status so the browser
-        starts fetching the PDF immediately. We hide it visually with opacity
-        and disable pointer events until it's ready.
-      */}
-      <iframe
-        key={src}
-        src={src}
-        title={name}
-        onLoad={handleLoad}
-        onError={handleError}
-        style={{
-          position: "absolute", top: 0, left: 0,
-          width: "100%", height: "100%",
-          border: "none", display: "block",
-          opacity: status === "ready" ? 1 : 0,
-          transition: "opacity 0.2s",
-          pointerEvents: status === "ready" ? "auto" : "none",
-        }}
-      />
+      {!useCustomViewer && status === "ready" && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: NATIVE_TOOLBAR_MASK_HEIGHT,
+            background: "#111827",
+            zIndex: 3,
+            pointerEvents: "auto",
+            touchAction: "none",
+          }}
+        />
+      )}
+
+      {useCustomViewer ? (
+        <div
+          ref={customViewerRef}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            overflowY: "auto",
+            background: "#f3f4f6",
+            opacity: status === "ready" ? 1 : 0,
+            transition: "opacity 0.2s",
+            pointerEvents: status === "ready" ? "auto" : "none",
+          }}
+        >
+          <div style={{ padding: 12 }}>
+            <Document
+              file={src}
+              loading={null}
+              error={null}
+              onLoadSuccess={handleDocLoadSuccess}
+              onLoadError={handleError}
+            >
+              {Array.from({ length: numPages }, (_, index) => (
+                <div key={`page_${index + 1}`} style={{ margin: "0 auto 12px", width: "fit-content" }}>
+                  <Page
+                    pageNumber={index + 1}
+                    width={pageWidth || undefined}
+                    renderTextLayer={false}
+                    renderAnnotationLayer={false}
+                  />
+                </div>
+              ))}
+            </Document>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/*
+            The iframe is ALWAYS in the DOM regardless of status so the browser
+            starts fetching the PDF immediately. We hide it visually with opacity
+            and disable pointer events until it's ready.
+          */}
+          <iframe
+            key={src}
+            src={src}
+            title={name}
+            onLoad={handleLoad}
+            onError={handleError}
+            style={{
+              position: "absolute", top: 0, left: 0,
+              width: "100%", height: "100%",
+              border: "none", display: "block",
+              opacity: status === "ready" ? 1 : 0,
+              transition: "opacity 0.2s",
+              pointerEvents: status === "ready" ? "auto" : "none",
+            }}
+          />
+        </>
+      )}
     </div>
   );
 }
@@ -288,6 +359,7 @@ export default function FullscreenPdfModal({
   const activeUrl = current.url;
   const activeName = current.name;
   const activeAllow = current.allowExternalActions ?? true;
+  const activeAllowDownload = current.allowDownload ?? true;
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -321,6 +393,7 @@ export default function FullscreenPdfModal({
         downloadUrl={getDownloadUrl(originalUrl || activeUrl)}
         onClose={onClose}
         allowExternalActions={activeAllow}
+        allowDownload={activeAllowDownload}
       />
 
       {hasSiblings && (
@@ -351,7 +424,13 @@ export default function FullscreenPdfModal({
           transform: `scale(${zoom})`,
           transformOrigin: "top left",
         }}>
-          <PdfFrame key={activeUrl} url={activeUrl} name={activeName} allowExternalActions={activeAllow} />
+          <PdfFrame
+            key={activeUrl}
+            url={activeUrl}
+            name={activeName}
+            allowExternalActions={activeAllow}
+            allowDownload={activeAllowDownload}
+          />
         </div>
 
         {hasSiblings && (

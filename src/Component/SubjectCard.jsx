@@ -28,10 +28,10 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf }) {
   const hasSemester = semqbwithans;
   const hasMaterials = semqbwithans || qb1 || qb2 || ak1 || ak2;
 
-  const openPdf = (url, name, allowExternalActions = true) => {
+  const openPdf = (url, name, allowExternalActions = true, allowDownload = true) => {
     if (!url) return;
     if (onOpenPdf) {
-      onOpenPdf({ url, name, allowExternalActions });
+      onOpenPdf({ url, name, allowExternalActions, allowDownload });
       return;
     }
     window.open(url, "_blank", "noreferrer");
@@ -111,8 +111,8 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf }) {
           <Divider />
           <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-500">Module Test 1</p>
           <div className="flex flex-wrap gap-1.5">
-            {qb1 && <LinkButton href={qb1} label="Question Bank" onClick={() => openPdf(qb1, `${code} - Question Bank`, true)} />}
-            {ak1 && <LinkButton href={ak1} label="Answer Key" onClick={() => openPdf(ak1, `${code} - Answer Key`, false)} />}
+            {qb1 && <LinkButton href={qb1} label="Question Bank" onClick={() => openPdf(qb1, `${code} - Question Bank`, true, true)} />}
+            {ak1 && <LinkButton href={ak1} label="Answer Key" onClick={() => openPdf(ak1, `${code} - Answer Key`, true, false)} />}
           </div>
         </>
       )}
@@ -122,8 +122,8 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf }) {
           <Divider />
           <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-500">Module Test 2</p>
           <div className="flex flex-wrap gap-1.5">
-            {qb2 && <LinkButton href={qb2} label="Question Bank" onClick={() => openPdf(qb2, `${code} - Question Bank`, true)} />}
-            {ak2 && <LinkButton href={ak2} label="Answer Key" onClick={() => openPdf(ak2, `${code} - Answer Key`, false)} />}
+            {qb2 && <LinkButton href={qb2} label="Question Bank" onClick={() => openPdf(qb2, `${code} - Question Bank`, true, true)} />}
+            {ak2 && <LinkButton href={ak2} label="Answer Key" onClick={() => openPdf(ak2, `${code} - Answer Key`, true, false)} />}
           </div>
         </>
       )}
@@ -133,11 +133,11 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf }) {
           <Divider />
           <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-500">Semester</p>
           <div className="flex flex-wrap gap-1.5">
-            {qb1 && <LinkButton href={qb1} label="Question Bank" onClick={() => openPdf(qb1, `${code} - Question Bank`, true)} />}
-            {qb2 && <LinkButton href={qb2} label="Question Bank" onClick={() => openPdf(qb2, `${code} - Question Bank`, true)} />}
-            {ak1 && <LinkButton href={ak1} label="Answer Key" onClick={() => openPdf(ak1, `${code} - Answer Key`, false)} />}
-            {ak2 && <LinkButton href={ak2} label="Answer Key" onClick={() => openPdf(ak2, `${code} - Answer Key`, false)} />}
-            {semqbwithans && <LinkButton href={semqbwithans} label="Semester Question Bank + Answer Key" onClick={() => openPdf(semqbwithans, `${code} - Semester Question Bank + Answer Key`, false)} />}
+            {qb1 && <LinkButton href={qb1} label="Question Bank" onClick={() => openPdf(qb1, `${code} - Question Bank`, true, true)} />}
+            {qb2 && <LinkButton href={qb2} label="Question Bank" onClick={() => openPdf(qb2, `${code} - Question Bank`, true, true)} />}
+            {ak1 && <LinkButton href={ak1} label="Answer Key" onClick={() => openPdf(ak1, `${code} - Answer Key`, true, false)} />}
+            {ak2 && <LinkButton href={ak2} label="Answer Key" onClick={() => openPdf(ak2, `${code} - Answer Key`, true, false)} />}
+            {semqbwithans && <LinkButton href={semqbwithans} label="Semester Question Bank + Answer Key" onClick={() => openPdf(semqbwithans, `${code} - Semester Question Bank + Answer Key`, true, false)} />}
           </div>
         </>
       )}
