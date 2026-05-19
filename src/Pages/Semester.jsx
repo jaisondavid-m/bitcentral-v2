@@ -14,10 +14,35 @@ function normalizeSemesterYear(yearCode) {
   return year < 100 ? 2000 + year : year;
 }
 
+// Simple module-level cache to dedupe requests (avoids double calls in StrictMode)
+const semesterCache = new Map();
+
 async function fetchSubjects(yearCode) {
   const semesterYear = normalizeSemesterYear(yearCode);
-  const res = await api.get(`/semesters/${semesterYear}`);
-  return res.data.data || [];
+
+  if (semesterCache.has(semesterYear)) {
+    // Return the cached promise/result
+    return semesterCache.get(semesterYear);
+  }
+
+  const promise = (async () => {
+    const res = await api.get(`/semesters/${semesterYear}`);
+    return res.data.data || [];
+  })();
+
+  // Store the in-flight promise so concurrent callers share it
+  semesterCache.set(semesterYear, promise);
+
+  try {
+    const data = await promise;
+    // Optionally keep cached data (already the promise resolves to data)
+    semesterCache.set(semesterYear, Promise.resolve(data));
+    return data;
+  } catch (err) {
+    // Remove cache on error so subsequent attempts can retry
+    semesterCache.delete(semesterYear);
+    throw err;
+  }
 }
 
 function TabButton({ active, children, onClick }) {

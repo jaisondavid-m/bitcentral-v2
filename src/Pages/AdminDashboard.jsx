@@ -477,21 +477,50 @@ function UsersSection() {
   const [users, setUsers] = useState([]);
   const [usersLoaded, setUsersLoaded] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [batchFilter, setBatchFilter] = useState("");
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [deletingUid, setDeletingUid] = useState("");
   const [isUpdatingUsers, setIsUpdatingUsers] = useState(false);
   const [banner, setBanner] = useState({ type: "", message: "" });
 
+  function getBatchLabelFromEmail(email) {
+    if (!email) return "others";
+    // find first occurrence of exactly two digits not part of a longer digit sequence
+    const m = email.match(/(^|[^0-9])(\d{2})(?!\d)/);
+    if (!m) return "others";
+    const two = m[2];
+    if (!/^[0-9]{2}$/.test(two)) return "others";
+    // only allow these two-digit batches
+    const allowed = ["22", "23", "24", "25", "26"];
+    if (!allowed.includes(two)) return "others";
+    const start = 2000 + Number(two);
+    const end = start + 4;
+    return `${start}-${end}`;
+  }
+
+  const batchCounts = useMemo(() => {
+    const counts = {};
+    for (const u of users) {
+      const label = getBatchLabelFromEmail((u.email || "").toLowerCase());
+      counts[label] = (counts[label] || 0) + 1;
+    }
+    return counts;
+  }, [users]);
+
   const filteredUsers = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return users;
     return users.filter((user) => {
+      if (batchFilter) {
+        const label = getBatchLabelFromEmail((user.email || "").toLowerCase());
+        if (label !== batchFilter) return false;
+      }
+      if (!q) return true;
       const email = (user.email || "").toLowerCase();
       const name = (user.displayName || "").toLowerCase();
       const uid = (user.uid || "").toLowerCase();
       return email.includes(q) || name.includes(q) || uid.includes(q);
     });
-  }, [users, searchQuery]);
+  }, [users, searchQuery, batchFilter]);
 
   const sortedUsers = useMemo(() => {
     return [...filteredUsers].sort((left, right) => {
@@ -624,6 +653,36 @@ function UsersSection() {
           </div>
         ) : (
           <>
+            {/* Batch badges */}
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setBatchFilter("")}
+                className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${batchFilter === "" ? "bg-blue-600 text-white" : "bg-white border border-gray-200 text-gray-700"}`}
+              >
+                All
+                <span className="ml-1 rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-bold text-blue-700">{users.length}</span>
+              </button>
+              {Object.entries(batchCounts)
+                .sort((a, b) => b[1] - a[1])
+                .map(([label, count]) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => setBatchFilter(label)}
+                    className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${batchFilter === label ? "bg-blue-600 text-white" : "bg-white border border-gray-200 text-gray-700"}`}
+                  >
+                    {label}
+                    <span className="ml-1 rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-bold text-blue-700">{count}</span>
+                  </button>
+                ))}
+              {batchFilter && (
+                <button type="button" onClick={() => setBatchFilter("")} className="ml-auto text-xs text-gray-500 underline">
+                  Clear
+                </button>
+              )}
+            </div>
+
             {/* Search */}
             <div className="mb-4 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 dark:border-blue-900 dark:bg-slate-900">
               <Search className="h-4 w-4 shrink-0 text-gray-400" />
