@@ -136,18 +136,20 @@ function ToolbarBtn({ children, onClick, title }) {
 // ─── PdfFrame ─────────────────────────────────────────────────────────────────
 
 /**
- * Root cause of "always loading":
+ * FIX: Previously the component detected mobile and immediately showed a
+ * static fallback without ever attempting to render the PDF. This caused the
+ * PDF to never open on mobile.
  *
- * iframe's onLoad fires when the *frame document* loads — but many browsers
- * (Chrome on Android, Samsung Internet, some desktop PDF plugins) intercept
- * the PDF response at the network level and render it natively *without*
- * triggering onLoad on the iframe element. Other browsers fire onLoad
- * immediately with an empty/error document before the PDF plugin has painted.
+ * New strategy:
+ * 1. Always attempt iframe rendering on ALL platforms (mobile + desktop).
+ * 2. Use a fallback timer (LOAD_TIMEOUT_MS). If onLoad fires → ready.
+ *    If it never fires → assume silent success (PDF rendered natively by browser).
+ * 3. If onError fires → show the "unable to preview" error UI with open/download links.
+ * 4. On mobile, after the iframe is visible, show an optional sticky banner
+ *    with "Open" and "Download" links as a convenience — but don't block the iframe.
  *
- * Fix: start a fallback timer when the URL mounts. If onLoad fires first,
- * great — clear the timer and go to "ready". If it never fires, the timer
- * clears the spinner after LOAD_TIMEOUT_MS so the user isn't stuck.
- * The iframe is always in the DOM and loading in the background either way.
+ * Many mobile browsers (Chrome Android, Safari iOS) CAN render PDFs in iframes
+ * when the server sends correct Content-Type headers. We let them try first.
  */
 const LOAD_TIMEOUT_MS = 6000;
 const NATIVE_TOOLBAR_MASK_HEIGHT = 52;
@@ -172,7 +174,7 @@ function PdfFrame({ url, name, allowExternalActions, allowDownload }) {
     }
 
     timerRef.current = setTimeout(() => {
-      // Still loading after timeout → assume the PDF rendered silently
+      // Still loading after timeout → assume the PDF rendered silently (common on mobile)
       setStatus((prev) => (prev === "loading" ? "ready" : prev));
     }, LOAD_TIMEOUT_MS);
 
@@ -211,7 +213,7 @@ function PdfFrame({ url, name, allowExternalActions, allowDownload }) {
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      {/* Spinner overlay — unmounts once ready/error so it can't block interaction */}
+      {/* Spinner overlay — shown while loading */}
       {status === "loading" && (
         <div style={{
           position: "absolute", inset: 0, zIndex: 2,
@@ -224,6 +226,7 @@ function PdfFrame({ url, name, allowExternalActions, allowDownload }) {
         </div>
       )}
 
+      {/* Error state — shown only if iframe explicitly fires onError */}
       {status === "error" && (
         <div style={{
           position: "absolute", inset: 0, zIndex: 2,
@@ -240,7 +243,7 @@ function PdfFrame({ url, name, allowExternalActions, allowDownload }) {
             </p>
           </div>
           {allowExternalActions && (
-            <div style={{ display: "flex", gap: 8 }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
               <a href={src} target="_blank" rel="noreferrer" style={btnStyle("#2563eb", "#fff")}>Open in new tab</a>
               {allowDownload && (
                 <a href={getDownloadUrl(url)} download={name} style={btnStyle("#f0fdf4", "#15803d", "#bbf7d0")}>Download</a>
@@ -334,9 +337,10 @@ function PdfFrame({ url, name, allowExternalActions, allowDownload }) {
 
 function btnStyle(bg, color, border) {
   return {
-    padding: "8px 16px", borderRadius: 8, background: bg, color,
+    padding: "7px 14px", borderRadius: 8, background: bg, color,
     border: border ? `1px solid ${border}` : "none",
-    fontSize: 14, fontWeight: 500, textDecoration: "none",
+    fontSize: 13, fontWeight: 500, textDecoration: "none",
+    display: "inline-block",
   };
 }
 
