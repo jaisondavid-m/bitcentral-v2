@@ -7,6 +7,10 @@ import SearchBar from "../Component/SearchBar.jsx";
 import RpCard from "../Component/RpCard.jsx";
 import Leaderboard from "../Component/Leaderboard.jsx";
 
+function countSearchableCharacters(value) {
+  return Array.from(value).filter((character) => /[a-z0-9]/i.test(character)).length;
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -76,10 +80,16 @@ function RpsiteContent() {
     updateQuery(value.trim());
   };
 
+  const searchText = search.trim();
+  const debouncedSearchText = debouncedQuery.trim();
+  const hasSearchText = searchText.length > 0;
+  const hasMinimumSearchLength = countSearchableCharacters(searchText) >= 3;
+  const canSearch = countSearchableCharacters(debouncedSearchText) >= 3;
+
   const { data: students = [], isLoading, isFetching } = useQuery({
     queryKey: ["rp-search", debouncedQuery],
     queryFn: async ({ signal }) => {
-      if (!debouncedQuery) return [];
+      if (!canSearch) return [];
 
       if (resultCache.current.has(debouncedQuery)) {
         return resultCache.current.get(debouncedQuery);
@@ -102,7 +112,7 @@ function RpsiteContent() {
       resultCache.current.set(debouncedQuery, data);
       return data;
     },
-    enabled: !!debouncedQuery,
+    enabled: canSearch,
     keepPreviousData: true,
   });
 
@@ -117,11 +127,12 @@ function RpsiteContent() {
     refetchOnWindowFocus: false,
   });
 
-  const hasSearchText = search.trim().length > 0;
-  const isDebouncing = hasSearchText && search.trim() !== debouncedQuery;
-  const isSearching = hasSearchText && (isDebouncing || isFetching);
+  const isDebouncing = hasSearchText && searchText !== debouncedSearchText;
+  const isSearching = hasMinimumSearchLength && (isDebouncing || isFetching);
+  const showSearchHint = hasSearchText && !hasMinimumSearchLength;
+  const visibleStudents = hasMinimumSearchLength ? students : [];
   const showSkeletonGrid =
-    hasSearchText && (isLoading || isSearching) && students.length === 0;
+    hasMinimumSearchLength && (isLoading || isSearching) && visibleStudents.length === 0;
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-indigo-500/20 dark:bg-[#020617] dark:text-slate-200 dark:selection:bg-indigo-500/30">
@@ -183,7 +194,14 @@ function RpsiteContent() {
                 Fetching Records…
               </p>
             </div>
-          ) : students.length > 0 ? (
+          ) : showSearchHint ? (
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-14 dark:border-slate-800 dark:bg-slate-900/25">
+              <UserSearch className="mb-3 h-9 w-9 text-slate-500 dark:text-slate-600" />
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Enter at least 3 letters or digits to search
+              </p>
+            </div>
+          ) : visibleStudents.length > 0 ? (
             <div className="space-y-3">
               {isSearching && (
                 <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 dark:border-slate-700 dark:bg-slate-900 dark:text-blue-300">
@@ -192,10 +210,17 @@ function RpsiteContent() {
                 </div>
               )}
               <div className="animate-in fade-in slide-in-from-bottom-2 grid items-stretch gap-3.5 duration-500 sm:grid-cols-2 lg:grid-cols-3">
-                {students.map((student) => (
+                {visibleStudents.map((student) => (
                   <RpCard key={student.roll_no} student={student} />
                 ))}
               </div>
+            </div>
+          ) : hasSearchText ? (
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-14 dark:border-slate-800 dark:bg-slate-900/25">
+              <UserSearch className="mb-3 h-9 w-9 text-slate-500 dark:text-slate-600" />
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                No student found for that search
+              </p>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-14 dark:border-slate-800 dark:bg-slate-900/25">
