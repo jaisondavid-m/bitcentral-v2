@@ -27,11 +27,6 @@ const sections = [
       "The BIT CENTRAL name, branding, design, code, and original content are protected by applicable intellectual property laws. You may not reproduce or redistribute our materials without permission, except as allowed by law.",
   },
   {
-    title: "6. Third-Party Services and Advertising",
-    content:
-      "The site may integrate third-party services, including analytics and advertising providers such as Google AdSense. Those services are governed by their own terms and privacy practices.",
-  },
-  {
     title: "7. Service Availability",
     content:
       "We aim to keep the platform available and accurate, but we do not guarantee uninterrupted operation, error-free content, or that all features will always be available.",

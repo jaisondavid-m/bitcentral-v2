@@ -17,11 +17,6 @@ const sections = [
       "We use information to operate and maintain the platform, authenticate users, personalize your experience, respond to inquiries, improve performance, prevent abuse, and comply with legal obligations. We may also use aggregated data to understand general usage trends.",
   },
   {
-    title: "4. Google AdSense and Third-Party Services",
-    content:
-      "We may use Google AdSense and related advertising technologies. Third-party vendors, including Google, may use cookies or similar technologies to serve ads based on your prior visits to this and other websites. Google\'s use of advertising cookies allows it and its partners to serve ads to our users based on their visits to our site and/or other sites on the Internet.",
-  },
-  {
     title: "5. Cookies",
     content:
       "Cookies and similar technologies may be used to keep you signed in, remember preferences, analyze traffic, and support advertising. You can control cookies through your browser settings, but some parts of the site may not function properly if cookies are disabled.",
