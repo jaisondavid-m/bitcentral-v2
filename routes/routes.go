@@ -95,6 +95,7 @@ func SetupRouter(
 		admin.GET("/qb", qbHandler.List)
 		admin.POST("/qb", qbHandler.Create)
 		admin.POST("/qb/batch", qbHandler.BatchCreate)
+		admin.PUT("/qb/reorder", qbHandler.Reorder)
 		admin.PUT("/qb/:id", qbHandler.Update)
 		admin.DELETE("/qb/:id", qbHandler.Delete)
 		admin.PUT("/semesters/:year", semesterHandler.UpdateSemesterByYear)

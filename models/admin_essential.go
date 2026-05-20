@@ -45,3 +45,8 @@ type QBAnswerKeyBatchInput struct {
 	Year     int                `json:"year" binding:"required"`
 	Subjects []QBAnswerKeyInput `json:"subjects" binding:"required"`
 }
+
+type QBAnswerKeyReorderInput struct {
+	Year       int   `json:"year" binding:"required"`
+	SubjectIDs []int `json:"subject_ids" binding:"required"`
+}

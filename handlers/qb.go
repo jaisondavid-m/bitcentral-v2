@@ -169,6 +169,87 @@ func (h *QBHandler) BatchCreate(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Subjects added", "count": len(body.Subjects)})
 }
 
+// PUT /admin/qb/reorder
+func (h *QBHandler) Reorder(c *gin.Context) {
+	var body models.QBAnswerKeyReorderInput
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	if len(body.SubjectIDs) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "subject_ids cannot be empty"})
+		return
+	}
+
+	tx, err := h.DB.Begin()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	defer tx.Rollback()
+
+	rows, err := tx.Query(`SELECT id FROM semester_subjects WHERE year = ? ORDER BY idx FOR UPDATE`, body.Year)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	existingSet := make(map[int]struct{})
+	existingCount := 0
+	for rows.Next() {
+		var id int
+		if err := rows.Scan(&id); err != nil {
+			continue
+		}
+		existingSet[id] = struct{}{}
+		existingCount++
+	}
+
+	if existingCount == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "No subjects found for this year"})
+		return
+	}
+	if existingCount != len(body.SubjectIDs) {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "subject_ids must contain every subject for the selected year"})
+		return
+	}
+
+	seen := make(map[int]struct{}, len(body.SubjectIDs))
+	for _, id := range body.SubjectIDs {
+		if _, ok := existingSet[id]; !ok {
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "subject_ids must belong to the selected year"})
+			return
+		}
+		if _, ok := seen[id]; ok {
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "subject_ids must not contain duplicates"})
+			return
+		}
+		seen[id] = struct{}{}
+	}
+
+	for i, id := range body.SubjectIDs {
+		if _, err := tx.Exec(`UPDATE semester_subjects SET idx = ? WHERE id = ? AND year = ?`, -(i + 1), id, body.Year); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+			return
+		}
+	}
+
+	for i, id := range body.SubjectIDs {
+		if _, err := tx.Exec(`UPDATE semester_subjects SET idx = ? WHERE id = ? AND year = ?`, i, id, body.Year); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+			return
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Subjects reordered"})
+}
+
 // PUT /admin/qb/:id
 func (h *QBHandler) Update(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
