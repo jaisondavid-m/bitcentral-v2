@@ -17,6 +17,11 @@ const sections = [
       "We use information to operate and maintain the platform, authenticate users, personalize your experience, respond to inquiries, improve performance, prevent abuse, and comply with legal obligations. We may also use aggregated data to understand general usage trends.",
   },
   {
+    title: "4. Third-Party Services",
+    content:
+      "We may use third-party services for analytics and other site features. These services are governed by their own terms and privacy practices.",
+  },
+  {
     title: "5. Cookies",
     content:
       "Cookies and similar technologies may be used to keep you signed in, remember preferences, analyze traffic, and support advertising. You can control cookies through your browser settings, but some parts of the site may not function properly if cookies are disabled.",
@@ -37,7 +42,7 @@ const sections = [
       "Depending on your location and applicable law, you may have rights to access, correct, delete, or restrict the use of your personal information. You may also opt out of certain advertising-related cookies through browser settings or Google ad preferences.",
   },
   {
-    title: "9. Children\'s Privacy",
+    title: "9. Children's Privacy",
     content:
       "Our services are intended for students and related institutional users. We do not knowingly collect personal information from children without appropriate authorization where required by law.",
   },
