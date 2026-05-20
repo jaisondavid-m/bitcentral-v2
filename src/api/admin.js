@@ -81,6 +81,12 @@ export async function createQBAnswerKeysBatch(payload) {
   return response.data;
 }
 
+export async function reorderQBAnswerKeys(payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.put("/admin/qb/reorder", payload, { headers });
+  return response.data;
+}
+
 export async function deleteQBAnswerKey(id) {
   const headers = await getAdminHeaders();
   const response = await api.delete(`/admin/qb/${id}`, { headers });

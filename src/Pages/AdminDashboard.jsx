@@ -6,6 +6,7 @@ import {
   updateUsers,
   listQBAnswerKeys,
   createQBAnswerKeysBatch,
+  reorderQBAnswerKeys,
   updateQBAnswerKey,
   deleteQBAnswerKey,
   uploadAdminFile,
@@ -28,6 +29,7 @@ import {
   Clock,
   Wifi,
   WifiOff,
+  GripVertical,
 } from "lucide-react";
 
 function normalizeError(error, fallback) {
@@ -265,6 +267,20 @@ function LinkCell({ value, label }) {
       {label || "Open"} <ExternalLink className="h-3 w-3" />
     </a>
   );
+}
+
+function reorderList(items, fromId, toId) {
+  const fromIndex = items.findIndex((item) => item.id === fromId);
+  const toIndex = items.findIndex((item) => item.id === toId);
+
+  if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) {
+    return items;
+  }
+
+  const next = [...items];
+  const [moved] = next.splice(fromIndex, 1);
+  next.splice(toIndex, 0, moved);
+  return next;
 }
 
 /* -- Shell ------------------------------------------------------------------- */
@@ -760,7 +776,20 @@ function UsersSection() {
 }
 
 /* -- QB card (mobile) -------------------------------------------------------- */
-function QBCard({ item, index, onEdit, onDelete, deletingId }) {
+function QBCard({
+  item,
+  index,
+  onEdit,
+  onDelete,
+  deletingId,
+  draggable,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
+  isDragging,
+  isDropTarget,
+}) {
   const [expanded, setExpanded] = useState(false);
   const links = [
     { key: "qb1", label: "QB1" },
@@ -771,12 +800,22 @@ function QBCard({ item, index, onEdit, onDelete, deletingId }) {
   ];
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-blue-900 dark:bg-slate-950">
+    <div
+      draggable={draggable}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
+      className={`rounded-xl border border-gray-200 bg-white shadow-sm transition dark:border-blue-900 dark:bg-slate-950 ${
+        isDragging ? "opacity-50" : ""
+      } ${isDropTarget ? "ring-2 ring-inset ring-blue-400" : ""}`}
+    >
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
         className="flex w-full items-start gap-3 px-4 py-3 text-left"
       >
+        <GripVertical className="mt-0.5 h-4 w-4 shrink-0 text-gray-300 dark:text-slate-600" />
         <span className="mt-0.5 shrink-0 rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs font-bold text-gray-600 dark:bg-slate-800 dark:text-slate-300">
           {item.subject_code}
         </span>
@@ -831,6 +870,7 @@ function QBSection() {
   const [qbItems, setQbItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isReordering, setIsReordering] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [editItem, setEditItem] = useState(null);
   const [showBatchForm, setShowBatchForm] = useState(false);
@@ -840,6 +880,8 @@ function QBSection() {
   const [banner, setBanner] = useState({ type: "", message: "" });
   const [filterYear, setFilterYear] = useState(String(CURRENT_YEAR));
   const [searchQuery, setSearchQuery] = useState("");
+  const [draggedId, setDraggedId] = useState(null);
+  const [dropTargetId, setDropTargetId] = useState(null);
 
   function toNullable(value) {
     const trimmed = (value || "").trim();
@@ -872,6 +914,47 @@ function QBSection() {
         (item.subject_name || "").toLowerCase().includes(q)
     );
   }, [qbItems, searchQuery]);
+
+  const canReorder = Boolean(filterYear) && !searchQuery.trim() && !isLoading && !isSaving && !showBatchForm && !editItem;
+
+  async function persistOrder(nextItems) {
+    const previousItems = qbItems;
+    const subject_ids = nextItems.map((item) => item.id);
+
+    setQbItems(nextItems);
+    setIsReordering(true);
+    setBanner({ type: "", message: "" });
+
+    try {
+      await reorderQBAnswerKeys({ year: Number(filterYear), subject_ids });
+      setBanner({ type: "success", message: "Subject order updated" });
+    } catch (err) {
+      setQbItems(previousItems);
+      setBanner({ type: "error", message: normalizeError(err, "Failed to reorder subjects") });
+      await load();
+    } finally {
+      setIsReordering(false);
+      setDraggedId(null);
+      setDropTargetId(null);
+    }
+  }
+
+  async function handleDropOrder(targetId) {
+    if (!canReorder || draggedId == null || draggedId === targetId) {
+      setDraggedId(null);
+      setDropTargetId(null);
+      return;
+    }
+
+    const nextItems = reorderList(qbItems, draggedId, targetId);
+    if (nextItems === qbItems) {
+      setDraggedId(null);
+      setDropTargetId(null);
+      return;
+    }
+
+    await persistOrder(nextItems);
+  }
 
   async function handleCreateBatch() {
     const validRows = batchRows
@@ -1106,6 +1189,13 @@ function QBSection() {
           </button>
         </div>
 
+        <div className="mb-4 rounded-xl border border-dashed border-blue-200 bg-blue-50/60 px-4 py-3 text-sm text-blue-900 dark:border-blue-900 dark:bg-slate-900 dark:text-blue-100">
+          {canReorder
+            ? "Drag subjects by the grip icon to change their order. The new order is saved automatically."
+            : "Clear search and keep one year selected to reorder subjects."}
+          {isReordering && <span className="ml-2 font-semibold">Saving order...</span>}
+        </div>
+
         {/* Edit form inline */}
         {editItem && (
           <div className="mb-5 rounded-xl border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-900 dark:bg-slate-900">
@@ -1143,6 +1233,29 @@ function QBSection() {
                   onEdit={(i) => { setEditItem(i); setShowBatchForm(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                   onDelete={handleDelete}
                   deletingId={deletingId}
+                  draggable={canReorder}
+                  onDragStart={(event) => {
+                    if (!canReorder) return;
+                    setDraggedId(item.id);
+                    event.dataTransfer.effectAllowed = "move";
+                    event.dataTransfer.setData("text/plain", String(item.id));
+                  }}
+                  onDragOver={(event) => {
+                    if (!canReorder) return;
+                    event.preventDefault();
+                    setDropTargetId(item.id);
+                  }}
+                  onDrop={async (event) => {
+                    if (!canReorder) return;
+                    event.preventDefault();
+                    await handleDropOrder(item.id);
+                  }}
+                  onDragEnd={() => {
+                    setDraggedId(null);
+                    setDropTargetId(null);
+                  }}
+                  isDragging={draggedId === item.id}
+                  isDropTarget={dropTargetId === item.id}
                 />
               ))}
             </div>
@@ -1152,7 +1265,7 @@ function QBSection() {
               <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-blue-900">
                 <thead className="bg-gray-50 dark:bg-slate-900">
                   <tr>
-                    {["#", "Code", "Subject", "QB1", "QB2", "AK1", "AK2", "Sem + Ans", "Updated", "Actions"].map((h) => (
+                    {["#", "Move", "Code", "Subject", "QB1", "QB2", "AK1", "AK2", "Sem + Ans", "Updated", "Actions"].map((h) => (
                       <th key={h} className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">{h}</th>
                     ))}
                   </tr>
@@ -1160,8 +1273,42 @@ function QBSection() {
                 <tbody className="divide-y divide-gray-200 bg-white dark:divide-blue-900 dark:bg-slate-950">
                   {filtered.map((item, idx) =>
                     editItem?.id === item.id ? null : (
-                      <tr key={item.id} className="transition hover:bg-gray-50 dark:hover:bg-slate-900">
+                      <tr
+                        key={item.id}
+                        draggable={canReorder}
+                        onDragStart={(event) => {
+                          if (!canReorder) return;
+                          setDraggedId(item.id);
+                          event.dataTransfer.effectAllowed = "move";
+                          event.dataTransfer.setData("text/plain", String(item.id));
+                        }}
+                        onDragOver={(event) => {
+                          if (!canReorder) return;
+                          event.preventDefault();
+                          setDropTargetId(item.id);
+                        }}
+                        onDrop={async (event) => {
+                          if (!canReorder) return;
+                          event.preventDefault();
+                          await handleDropOrder(item.id);
+                        }}
+                        onDragEnd={() => {
+                          setDraggedId(null);
+                          setDropTargetId(null);
+                        }}
+                        className={`transition hover:bg-gray-50 dark:hover:bg-slate-900 ${draggedId === item.id ? "opacity-50" : ""} ${dropTargetId === item.id ? "ring-2 ring-inset ring-blue-400" : ""}`}
+                      >
                         <td className="px-4 py-3 font-medium text-gray-500 dark:text-slate-400">{idx + 1}</td>
+                        <td className="px-4 py-3">
+                          <button
+                            type="button"
+                            disabled={!canReorder}
+                            className="inline-flex cursor-grab items-center rounded-md border border-gray-200 bg-white px-2 py-1 text-gray-400 transition hover:bg-gray-50 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-500"
+                            aria-label={`Drag to reorder ${item.subject_code}`}
+                          >
+                            <GripVertical className="h-4 w-4" />
+                          </button>
+                        </td>
                         <td className="px-4 py-3">
                           <span className="rounded bg-gray-100 px-2 py-0.5 font-mono text-xs font-semibold text-gray-700 dark:bg-slate-800 dark:text-slate-200">
                             {item.subject_code}
