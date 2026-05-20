@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
@@ -321,6 +322,21 @@ func (h *SheetHandler) UniversalSearch(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Query param 'q' is required",
 			"example": "/search?q=Abishek  or  /search?q=7376231CS106",
+		})
+		return
+	}
+
+	searchableCount := 0
+	for _, character := range query {
+		if unicode.IsLetter(character) || unicode.IsDigit(character) {
+			searchableCount++
+		}
+	}
+
+	if searchableCount < 3 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Query param 'q' must contain at least 3 letters or digits",
+			"example": "/search?q=Abi  or  /search?q=737",
 		})
 		return
 	}
