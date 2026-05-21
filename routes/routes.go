@@ -57,6 +57,7 @@ func SetupRouter(
 	// Public routes
 	r.GET("/auth/login", handler.HandleLogin)
 	r.GET("/auth/callback", handler.HandleCallback)
+	r.GET("/cards", handlers.GetCards)
 	r.GET("/leaves", leaveHandler.GetAllLeaves)
 	r.GET("/exam-hall", examHallHandler.GetHall)
 
@@ -100,6 +101,13 @@ func SetupRouter(
 		admin.DELETE("/qb/:id", qbHandler.Delete)
 		admin.PUT("/semesters/:year", semesterHandler.UpdateSemesterByYear)
 		admin.POST("/upload", uploadHandler.Upload)
+
+		// Cards admin CRUD
+		admin.GET("/cards", handlers.GetCards)
+		admin.POST("/cards", handlers.CreateCard)
+		admin.PUT("/cards/:id", handlers.UpdateCard)
+		admin.DELETE("/cards/:id", handlers.DeleteCard)
+		admin.POST("/cards/upload-image", handlers.UploadCardImage)
 	}
 
 	r.POST("/presence/ping", presenceHandler.Ping)

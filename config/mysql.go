@@ -96,6 +96,7 @@ func InitMySQL() {
 	createUserPresenceTable()
 	createQBAnswerKeyTable()
 	createSemesterSubjectsTable()
+	createCardsTable()
 }
 
 // ✅ Create table with dynamic name
@@ -214,4 +215,25 @@ func createSemesterSubjectsTable() {
 		log.Printf("ℹ️ unique_year_code index not created (may already exist): %v", err)
 	}
 	log.Println("✅ semester_subjects table ready")
+}
+
+func createCardsTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS cards (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		img LONGTEXT,
+		name VARCHAR(255) NOT NULL,
+		keywords JSON,
+		link VARCHAR(1024),
+		btntext VARCHAR(255),
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+	) ENGINE=InnoDB;`
+
+	_, err := DB.Exec(query)
+	if err != nil {
+		log.Fatalf("❌ Failed to create cards table: %v", err)
+	}
+
+	log.Println("✅ cards table ready")
 }
