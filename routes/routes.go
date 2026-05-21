@@ -68,8 +68,6 @@ func SetupRouter(
 		api.GET("/search", handler.UniversalSearch)
 		api.GET("/rewards", handler.GetRewardsByRollNo)
 		api.GET("/averages", handler.GetOverallAverageFromSheet)
-
-		api.GET("/cards", handlers.GetCards)
 		api.GET("/semesters/:year", semesterHandler.GetSemesterByYear)
 		api.GET("/qb", qbHandler.List)
 
