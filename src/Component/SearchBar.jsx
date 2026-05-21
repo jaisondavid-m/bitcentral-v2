@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Loader2, Mic, MicOff, X } from "lucide-react";
 
-function SearchBar({ search, setSearch, isSearching = false, placeholder = "Search..."  }) {
+function SearchBar({ search, setSearch, isSearching = false, placeholder = "Search...", isDark = false }) {
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState("");
   const recognitionRef = useRef(null);
@@ -71,15 +71,13 @@ function SearchBar({ search, setSearch, isSearching = false, placeholder = "Sear
             setSearch(e.target.value);
             setError("");
           }}
-          className="block w-full rounded-xl border border-blue-200 bg-white px-3 py-2 pr-24 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition-all focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 sm:px-3.5 sm:py-2.5 sm:pr-24 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-700 dark:focus:ring-blue-900/40"
+          className={`block w-full rounded-xl px-3 py-2 pr-24 text-sm shadow-sm transition-all focus:outline-none sm:px-3.5 sm:py-2.5 sm:pr-24 ${isDark ? 'border border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-500 focus:border-blue-700 focus:ring-blue-900/40' : 'border border-blue-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100'}`}
         />
 
         {search && (
           <button
             onClick={handleClearSearch}
-            className={`absolute top-1/2 -translate-y-1/2 rounded-lg p-2 text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-300 ${
-              isSearching ? "right-20" : "right-12"
-            }`}
+            className={`absolute top-1/2 -translate-y-1/2 rounded-lg p-2 text-slate-400 transition-colors ${isDark ? 'hover:text-slate-300' : 'hover:text-slate-600'} ${isSearching ? "right-20" : "right-12"}`}
             aria-label="Clear search"
           >
             <X className="h-5 w-5" strokeWidth={2} />
@@ -87,18 +85,14 @@ function SearchBar({ search, setSearch, isSearching = false, placeholder = "Sear
         )}
 
         {isSearching && (
-          <div className="absolute right-12 top-1/2 -translate-y-1/2 text-blue-600 dark:text-blue-300">
+          <div className={`absolute right-12 top-1/2 -translate-y-1/2 ${isDark ? 'text-blue-300' : 'text-blue-600'}`}>
             <Loader2 className="h-4 w-4 animate-spin" />
           </div>
         )}
 
         <button
           onClick={toggleVoiceSearch}
-          className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 transition-all ${
-            isListening
-              ? "text-red-500 dark:text-red-400"
-                : "text-slate-500 hover:text-blue-700 dark:text-slate-400 dark:hover:text-blue-300"
-          }`}
+          className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 transition-all ${isListening ? (isDark ? 'text-red-400' : 'text-red-500') : (isDark ? 'text-slate-400 hover:text-blue-300' : 'text-slate-500 hover:text-blue-700')}`}
           aria-label="Voice search"
           title={isListening ? "Stop listening" : "Start voice search"}
         >
