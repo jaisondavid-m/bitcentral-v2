@@ -14,7 +14,6 @@ import {
   createCard,
   updateCard,
   deleteCard,
-  uploadCardImage,
 } from "../api/admin.js";
 import {
   AlertTriangle,
@@ -800,6 +799,10 @@ function CardForm({ initial, onSubmit, onCancel, isLoading }) {
   );
   const [uploading, setUploading] = useState(false);
 
+  useEffect(() => {
+    setForm(initial || { img: "", name: "", keywords: [], link: "", btntext: "" });
+  }, [initial]);
+
   const set = (key) => (val) =>
     setForm((prev) => ({ ...prev, [key]: typeof val === "string" ? val : val.target.value }));
 
@@ -810,12 +813,17 @@ function CardForm({ initial, onSubmit, onCancel, isLoading }) {
     fd.append("file", file);
     try {
       setUploading(true);
-      const res = await uploadCardImage(fd);
-      if (res?.success && res.data?.base64) setForm((p) => ({ ...p, img: res.data.base64 }));
+      const res = await uploadAdminFile(fd);
+      if (res?.success && res.url) {
+        setForm((p) => ({ ...p, img: res.url }));
+      } else if (res?.data?.base64) {
+        setForm((p) => ({ ...p, img: res.data.base64 }));
+      }
     } catch (err) {
-      console.error(err);
+      console.error("card image upload error", err);
     } finally {
       setUploading(false);
+      e.target.value = "";
     }
   };
 
@@ -833,45 +841,92 @@ function CardForm({ initial, onSubmit, onCancel, isLoading }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid gap-3 sm:grid-cols-2">
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300">Name</label>
-          <input value={form.name} onChange={(e)=>setForm({...form, name:e.target.value})} className="w-full rounded-lg border p-2" required />
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Name</label>
+          <input
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className="w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+            required
+          />
         </div>
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300">Button Text</label>
-          <input value={form.btntext} onChange={(e)=>setForm({...form, btntext:e.target.value})} className="w-full rounded-lg border p-2" />
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Button Text</label>
+          <input
+            value={form.btntext}
+            onChange={(e) => setForm({ ...form, btntext: e.target.value })}
+            className="w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+          />
         </div>
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300">Link</label>
-          <input value={form.link} onChange={(e)=>setForm({...form, link:e.target.value})} className="w-full rounded-lg border p-2" />
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Link</label>
+          <input
+            value={form.link}
+            onChange={(e) => setForm({ ...form, link: e.target.value })}
+            className="w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+          />
         </div>
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300">Keywords (comma-separated)</label>
-          <input value={Array.isArray(form.keywords)?form.keywords.join(", "):form.keywords} onChange={(e)=>setForm({...form, keywords:e.target.value})} className="w-full rounded-lg border p-2" />
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Keywords</label>
+          <input
+            value={Array.isArray(form.keywords) ? form.keywords.join(", ") : form.keywords}
+            onChange={(e) => setForm({ ...form, keywords: e.target.value })}
+            placeholder="Comma-separated keywords"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+          />
         </div>
       </div>
 
-      <div>
-        <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300">Image (URL or upload)</label>
-        <div className="flex gap-2">
-          <input value={form.img} onChange={(e)=>setForm({...form, img:e.target.value})} placeholder="data:image/... or https://..." className="flex-1 rounded-lg border p-2" />
-          <label className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm cursor-pointer">
-            {uploading ? <Loader className="h-4 w-4 animate-spin" /> : "Upload"}
+      <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/60">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Image</label>
+            <input
+              value={form.img}
+              onChange={(e) => setForm({ ...form, img: e.target.value })}
+              placeholder="Paste an image URL or upload a file"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+            />
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Uploading stores the image as a reusable asset, or you can paste a direct image URL.
+            </p>
+          </div>
+          <label className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-blue-700 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 dark:border-blue-900 dark:bg-slate-950 dark:text-blue-300 dark:hover:bg-slate-900">
+            {uploading ? <Loader className="h-4 w-4 animate-spin" /> : "Upload image"}
             <input type="file" accept="image/*" onChange={handleFile} className="sr-only" />
           </label>
         </div>
+
         {form.img && (
-          <div className="mt-2">
-            <img src={form.img} alt="preview" className="h-24 w-auto rounded-md border" />
+          <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            <div className="flex items-center justify-between border-b border-slate-100 px-3 py-2 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
+              <span>Preview</span>
+              <span className="truncate">{form.img}</span>
+            </div>
+            <img src={form.img} alt="Card preview" className="h-40 w-full object-cover" />
           </div>
         )}
       </div>
 
-      <div className="flex gap-2">
-        <button type="submit" className="rounded-lg bg-blue-600 px-4 py-2 text-white">{isLoading?"Saving...":"Save"}</button>
-        <button type="button" onClick={onCancel} className="rounded-lg border px-4 py-2">Cancel</button>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <button
+          type="submit"
+          className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={isLoading}
+        >
+          {isLoading ? <Loader className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+          {isLoading ? "Saving..." : "Save card"}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900"
+        >
+          <X className="h-4 w-4" />
+          Cancel
+        </button>
       </div>
     </form>
   );
@@ -884,6 +939,28 @@ function CardsSection() {
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [banner, setBanner] = useState({ type: "", message: "" });
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const visibleCards = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return cards;
+
+    return cards.filter((card) => {
+      const keywords = Array.isArray(card.keywords) ? card.keywords.join(" ") : "";
+      return [card.name, card.link, card.btntext, keywords].join(" ").toLowerCase().includes(query);
+    });
+  }, [cards, searchQuery]);
+
+  const cardStats = useMemo(() => {
+    const cardsWithImage = cards.filter((card) => Boolean(card.img)).length;
+    const totalKeywords = cards.reduce((count, card) => count + (Array.isArray(card.keywords) ? card.keywords.length : 0), 0);
+
+    return {
+      total: cards.length,
+      cardsWithImage,
+      totalKeywords,
+    };
+  }, [cards]);
 
   const load = async () => {
     setLoading(true);
@@ -932,44 +1009,205 @@ function CardsSection() {
   };
 
   return (
-    <section className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-blue-900 dark:bg-slate-950">
-      <div className="flex items-center justify-between p-4 sm:p-6 border-b dark:border-blue-900">
-        <div>
-          <h2 className="text-lg font-bold">Cards</h2>
-          <p className="text-sm text-gray-500">Manage homepage cards</p>
-        </div>
-        <div className="flex gap-2">
-          <button onClick={()=>{ setEditItem(null); setShowForm(true); }} className="rounded-lg bg-blue-600 px-4 py-2 text-white inline-flex items-center gap-2"><Plus/>Add Card</button>
-          <button onClick={load} className="rounded-lg border px-3 py-2">Refresh</button>
+    <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_20px_70px_rgba(15,23,42,0.08)] dark:border-slate-800 dark:bg-slate-950">
+      <div className="border-b border-slate-200 bg-gradient-to-r from-slate-950 via-slate-900 to-blue-950 px-5 py-6 text-white dark:border-slate-800 sm:px-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/75">
+              Homepage cards
+            </div>
+            <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">Cards</h2>
+            <p className="mt-2 max-w-xl text-sm leading-6 text-white/70">
+              Control the tiles shown on the homepage, update artwork, and keep the call-to-action links tidy.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 sm:w-full sm:max-w-xl">
+            <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-white/55">Total</p>
+              <p className="mt-1 text-2xl font-black">{cardStats.total}</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-white/55">With image</p>
+              <p className="mt-1 text-2xl font-black">{cardStats.cardsWithImage}</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-white/55">Keywords</p>
+              <p className="mt-1 text-2xl font-black">{cardStats.totalKeywords}</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="p-4 sm:p-6">
-        {banner.message && <Banner banner={banner} onDismiss={()=>setBanner({type:"",message:""})} />}
+      <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-800 sm:px-6">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex min-w-0 flex-1 items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900">
+            <Search className="h-4 w-4 shrink-0 text-slate-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search cards, links, or keywords..."
+              className="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
+            />
+            {searchQuery && (
+              <button type="button" onClick={() => setSearchQuery("")} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setEditItem(null);
+                setShowForm(true);
+              }}
+              className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
+            >
+              <Plus className="h-4 w-4" />
+              Add Card
+            </button>
+            <button
+              onClick={load}
+              className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+              Refresh
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="px-5 py-5 sm:px-6 sm:py-6">
+        {banner.message && <div className="mb-5"><Banner banner={banner} onDismiss={() => setBanner({ type: "", message: "" })} /></div>}
+
         {loading ? (
-          <div>Loading...</div>
+          <div className="flex h-40 items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900">
+            <Loader className="h-6 w-6 animate-spin text-blue-600" />
+          </div>
+        ) : visibleCards.length === 0 ? (
+          <div className="flex h-52 flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-6 text-center dark:border-slate-800 dark:bg-slate-900">
+            <div className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm dark:bg-slate-950 dark:text-slate-200">
+              No matching cards
+            </div>
+            <p className="mt-3 max-w-sm text-sm text-slate-500 dark:text-slate-400">
+              {searchQuery ? "Try a different search term or clear the filter." : "Add your first card to populate the homepage."}
+            </p>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {cards.map(card=> (
-              <div key={card.id} className="rounded-lg border p-3 bg-white dark:bg-slate-950">
-                {card.img ? <img src={card.img} alt="" className="h-28 w-full object-cover rounded-md" /> : <div className="h-28 w-full bg-gray-100" />}
-                <h3 className="mt-2 font-semibold">{card.name}</h3>
-                <p className="text-xs text-gray-500">{(card.keywords||[]).join(", ")}</p>
-                <div className="mt-3 flex gap-2">
-                  <button onClick={()=>{ setEditItem(card); setShowForm(true); }} className="inline-flex items-center gap-2 rounded-lg border px-3 py-1 text-sm"> <Edit2/> Edit</button>
-                  <button onClick={()=>onDeleteCard(card.id)} className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-1 text-sm text-white"> <Trash2/> Delete</button>
-                </div>
-              </div>
-            ))}
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {visibleCards.map((card) => {
+              const keywords = Array.isArray(card.keywords) ? card.keywords : [];
+
+              return (
+                <article key={card.id} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-950">
+                  <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-slate-100 via-slate-50 to-slate-200 dark:from-slate-900 dark:via-slate-950 dark:to-slate-800">
+                    {card.img ? (
+                      <img
+                        src={card.img}
+                        alt={card.name || "Card image"}
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center px-6 text-center">
+                        <div>
+                          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">No image yet</p>
+                          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Upload a banner or paste an image URL.</p>
+                        </div>
+                      </div>
+                    )}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/80 to-transparent px-4 pb-4 pt-10">
+                      <h3 className="text-lg font-bold text-white">{card.name}</h3>
+                      {card.btntext && <p className="text-sm text-white/75">{card.btntext}</p>}
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 p-4">
+                    <div className="flex flex-wrap gap-1.5">
+                      {keywords.length ? (
+                        keywords.map((keyword) => (
+                          <span key={keyword} className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600 dark:bg-slate-900 dark:text-slate-300">
+                            {keyword}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+                          No keywords
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm dark:border-slate-800 dark:bg-slate-900">
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wide text-slate-400">Link</p>
+                        <p className="truncate text-slate-700 dark:text-slate-200">{card.link || "Not set"}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setEditItem(card);
+                          setShowForm(true);
+                        }}
+                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => onDeleteCard(card.id)}
+                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-red-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         )}
 
         {showForm && (
-          <div className="fixed inset-0 z-40 flex items-start justify-center p-6">
-            <div className="absolute inset-0 bg-black/40" onClick={()=>{ setShowForm(false); setEditItem(null); }} />
-            <div className="relative z-50 w-full max-w-2xl rounded-lg bg-white p-6 dark:bg-slate-950">
-              <h3 className="text-lg font-semibold mb-2">{editItem?"Edit Card":"Add Card"}</h3>
-              <CardForm initial={editItem} onSubmit={editItem? onUpdate : onCreate} onCancel={()=>{ setShowForm(false); setEditItem(null); }} isLoading={false} />
+          <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-slate-950/60 px-4 py-6 backdrop-blur-sm sm:px-6">
+            <div
+              className="absolute inset-0"
+              onClick={() => {
+                setShowForm(false);
+                setEditItem(null);
+              }}
+            />
+            <div className="relative z-50 w-full max-w-3xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
+              <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800 sm:px-6">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Card editor</p>
+                  <h3 className="mt-1 text-lg font-bold text-slate-900 dark:text-slate-100">{editItem ? "Edit Card" : "Add Card"}</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowForm(false);
+                    setEditItem(null);
+                  }}
+                  className="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="p-5 sm:p-6">
+                <CardForm
+                  initial={editItem}
+                  onSubmit={editItem ? onUpdate : onCreate}
+                  onCancel={() => {
+                    setShowForm(false);
+                    setEditItem(null);
+                  }}
+                  isLoading={false}
+                />
+              </div>
             </div>
           </div>
         )}
