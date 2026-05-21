@@ -115,3 +115,39 @@ export async function uploadAdminFile(formData) {
   }
   return data;
 }
+
+export async function listAdminCards() {
+  const headers = await getAdminHeaders();
+  const response = await api.get(`/admin/cards`, { headers });
+  return response.data;
+}
+
+export async function createCard(payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.post(`/admin/cards`, payload, { headers });
+  return response.data;
+}
+
+export async function updateCard(id, payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.put(`/admin/cards/${id}`, payload, { headers });
+  return response.data;
+}
+
+export async function deleteCard(id) {
+  const headers = await getAdminHeaders();
+  const response = await api.delete(`/admin/cards/${id}`, { headers });
+  return response.data;
+}
+
+export async function uploadCardImage(formData) {
+  const headers = await getAdminHeaders();
+  // Let axios set Content-Type for multipart
+  const response = await api.post(`/admin/cards/upload-image`, formData, {
+    headers: {
+      ...headers,
+    },
+    timeout: 0,
+  });
+  return response.data;
+}

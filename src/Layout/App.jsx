@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import Login from "../Pages/Login.jsx";
 import Dashboard from "../Pages/Dashboard.jsx";
-import AdminDashboard, { AdminQBPage, AdminUsersPage } from "../Pages/AdminDashboard.jsx";
+import AdminDashboard, { AdminQBPage, AdminUsersPage, AdminCardsPage } from "../Pages/AdminDashboard.jsx";
 import Home from "../Pages/Home.jsx";
 import About from "../Pages/About.jsx";
 import PrivacyPolicy from "../Pages/PrivacyPolicy.jsx";
@@ -129,6 +129,14 @@ function App() {
             element={
               <AdminRoute>
                 <AdminQBPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/cards"
+            element={
+              <AdminRoute>
+                <AdminCardsPage />
               </AdminRoute>
             }
           />

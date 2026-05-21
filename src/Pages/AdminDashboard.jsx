@@ -10,6 +10,11 @@ import {
   updateQBAnswerKey,
   deleteQBAnswerKey,
   uploadAdminFile,
+  listAdminCards,
+  createCard,
+  updateCard,
+  deleteCard,
+  uploadCardImage,
 } from "../api/admin.js";
 import {
   AlertTriangle,
@@ -288,9 +293,11 @@ function AdminPageShell({ title, description, children }) {
   const location = useLocation();
 
   const navItems = [
-    { to: "/admin/users", label: "Users", icon: Users },
-    { to: "/admin/qb", label: "QB Handling", icon: BookOpen },
+    { to: "/admin/cards", label: "Cards", icon: Plus },
   ];
+
+  const activeItem = navItems.find((it) => location.pathname === it.to) || navItems[0];
+  const otherItems = navItems.filter((it) => it.to !== activeItem.to);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20 dark:bg-black sm:pb-6">
@@ -301,27 +308,38 @@ function AdminPageShell({ title, description, children }) {
             <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-slate-500">Admin</p>
             <h1 className="truncate text-base font-bold text-gray-900 dark:text-slate-100">{title}</h1>
           </div>
-          {/* Desktop nav */}
-          <nav className="hidden gap-2 sm:flex">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const active = location.pathname === item.to;
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition ${
-                    active
-                      ? "bg-blue-600 text-white"
-                      : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
+          {/* Desktop nav: show active item prominently, others below it */}
+          <div className="hidden sm:flex sm:flex-col sm:items-end">
+            <div>
+              {activeItem && (() => {
+                const ActiveIcon = activeItem.icon;
+                return (
+                  <Link
+                    to={activeItem.to}
+                    className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white"
+                  >
+                    <ActiveIcon className="h-4 w-4" />
+                    {activeItem.label}
+                  </Link>
+                );
+              })()}
+            </div>
+            <nav className="mt-2 flex gap-2">
+              {otherItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+                  >
+                    <Icon className="h-4 w-4" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
         </div>
         {/* Mobile sub-label */}
         <p className="mx-auto mt-0.5 max-w-6xl text-xs text-gray-500 dark:text-slate-400 sm:hidden">{description}</p>
@@ -769,6 +787,191 @@ function UsersSection() {
               )}
             </div>
           </>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/* -- Card form -------------------------------------------------------------- */
+function CardForm({ initial, onSubmit, onCancel, isLoading }) {
+  const [form, setForm] = useState(
+    initial || { img: "", name: "", keywords: [], link: "", btntext: "" }
+  );
+  const [uploading, setUploading] = useState(false);
+
+  const set = (key) => (val) =>
+    setForm((prev) => ({ ...prev, [key]: typeof val === "string" ? val : val.target.value }));
+
+  const handleFile = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append("file", file);
+    try {
+      setUploading(true);
+      const res = await uploadCardImage(fd);
+      if (res?.success && res.data?.base64) setForm((p) => ({ ...p, img: res.data.base64 }));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const payload = {
+      img: form.img || null,
+      name: (form.name || "").trim(),
+      keywords: Array.isArray(form.keywords) ? form.keywords : (form.keywords || "").split(",").map(s=>s.trim()).filter(Boolean),
+      link: (form.link || "").trim() || null,
+      btntext: (form.btntext || "").trim() || null,
+    };
+    if (!payload.name) return;
+    onSubmit(payload);
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div>
+          <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300">Name</label>
+          <input value={form.name} onChange={(e)=>setForm({...form, name:e.target.value})} className="w-full rounded-lg border p-2" required />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300">Button Text</label>
+          <input value={form.btntext} onChange={(e)=>setForm({...form, btntext:e.target.value})} className="w-full rounded-lg border p-2" />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300">Link</label>
+          <input value={form.link} onChange={(e)=>setForm({...form, link:e.target.value})} className="w-full rounded-lg border p-2" />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300">Keywords (comma-separated)</label>
+          <input value={Array.isArray(form.keywords)?form.keywords.join(", "):form.keywords} onChange={(e)=>setForm({...form, keywords:e.target.value})} className="w-full rounded-lg border p-2" />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300">Image (URL or upload)</label>
+        <div className="flex gap-2">
+          <input value={form.img} onChange={(e)=>setForm({...form, img:e.target.value})} placeholder="data:image/... or https://..." className="flex-1 rounded-lg border p-2" />
+          <label className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm cursor-pointer">
+            {uploading ? <Loader className="h-4 w-4 animate-spin" /> : "Upload"}
+            <input type="file" accept="image/*" onChange={handleFile} className="sr-only" />
+          </label>
+        </div>
+        {form.img && (
+          <div className="mt-2">
+            <img src={form.img} alt="preview" className="h-24 w-auto rounded-md border" />
+          </div>
+        )}
+      </div>
+
+      <div className="flex gap-2">
+        <button type="submit" className="rounded-lg bg-blue-600 px-4 py-2 text-white">{isLoading?"Saving...":"Save"}</button>
+        <button type="button" onClick={onCancel} className="rounded-lg border px-4 py-2">Cancel</button>
+      </div>
+    </form>
+  );
+}
+
+/* -- Cards Section --------------------------------------------------------- */
+function CardsSection() {
+  const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [editItem, setEditItem] = useState(null);
+  const [banner, setBanner] = useState({ type: "", message: "" });
+
+  const load = async () => {
+    setLoading(true);
+    setBanner({ type: "", message: "" });
+    try {
+      const res = await listAdminCards();
+      setCards(res.data || []);
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to load cards") });
+    } finally { setLoading(false); }
+  };
+
+  useEffect(()=>{ load(); }, []);
+
+  const onCreate = async (payload) => {
+    try {
+      const res = await createCard(payload);
+      if (res?.success) {
+        setCards((p)=>[...(p||[]), res.data]);
+        setShowForm(false);
+        setBanner({ type: "success", message: "Card added" });
+      }
+    } catch (err) { setBanner({ type: "error", message: normalizeError(err, "Create failed") }); }
+  };
+
+  const onUpdate = async (payload) => {
+    try {
+      const res = await updateCard(editItem.id, payload);
+      if (res?.success) {
+        setCards((prev)=>prev.map(c=> c.id===editItem.id? res.data : c));
+        setEditItem(null); setShowForm(false);
+        setBanner({ type: "success", message: "Card updated" });
+      }
+    } catch (err) { setBanner({ type: "error", message: normalizeError(err, "Update failed") }); }
+  };
+
+  const onDeleteCard = async (id) => {
+    if (!window.confirm("Delete this card?")) return;
+    try {
+      const res = await deleteCard(id);
+      if (res?.success) {
+        setCards((p)=>p.filter(c=>c.id!==id));
+        setBanner({ type: "success", message: "Deleted" });
+      }
+    } catch (err) { setBanner({ type: "error", message: normalizeError(err, "Delete failed") }); }
+  };
+
+  return (
+    <section className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-blue-900 dark:bg-slate-950">
+      <div className="flex items-center justify-between p-4 sm:p-6 border-b dark:border-blue-900">
+        <div>
+          <h2 className="text-lg font-bold">Cards</h2>
+          <p className="text-sm text-gray-500">Manage homepage cards</p>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={()=>{ setEditItem(null); setShowForm(true); }} className="rounded-lg bg-blue-600 px-4 py-2 text-white inline-flex items-center gap-2"><Plus/>Add Card</button>
+          <button onClick={load} className="rounded-lg border px-3 py-2">Refresh</button>
+        </div>
+      </div>
+
+      <div className="p-4 sm:p-6">
+        {banner.message && <Banner banner={banner} onDismiss={()=>setBanner({type:"",message:""})} />}
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {cards.map(card=> (
+              <div key={card.id} className="rounded-lg border p-3 bg-white dark:bg-slate-950">
+                {card.img ? <img src={card.img} alt="" className="h-28 w-full object-cover rounded-md" /> : <div className="h-28 w-full bg-gray-100" />}
+                <h3 className="mt-2 font-semibold">{card.name}</h3>
+                <p className="text-xs text-gray-500">{(card.keywords||[]).join(", ")}</p>
+                <div className="mt-3 flex gap-2">
+                  <button onClick={()=>{ setEditItem(card); setShowForm(true); }} className="inline-flex items-center gap-2 rounded-lg border px-3 py-1 text-sm"> <Edit2/> Edit</button>
+                  <button onClick={()=>onDeleteCard(card.id)} className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-1 text-sm text-white"> <Trash2/> Delete</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {showForm && (
+          <div className="fixed inset-0 z-40 flex items-start justify-center p-6">
+            <div className="absolute inset-0 bg-black/40" onClick={()=>{ setShowForm(false); setEditItem(null); }} />
+            <div className="relative z-50 w-full max-w-2xl rounded-lg bg-white p-6 dark:bg-slate-950">
+              <h3 className="text-lg font-semibold mb-2">{editItem?"Edit Card":"Add Card"}</h3>
+              <CardForm initial={editItem} onSubmit={editItem? onUpdate : onCreate} onCancel={()=>{ setShowForm(false); setEditItem(null); }} isLoading={false} />
+            </div>
+          </div>
         )}
       </div>
     </section>
@@ -1372,9 +1575,17 @@ function AdminQBPage() {
   );
 }
 
+function AdminCardsPage() {
+  return (
+    <AdminPageShell title="Cards" description="Manage homepage cards">
+      <CardsSection />
+    </AdminPageShell>
+  );
+}
+
 function AdminDashboard() {
   return <Navigate to="/admin/users" replace />;
 }
 
-export { AdminUsersPage, AdminQBPage };
+export { AdminUsersPage, AdminQBPage, AdminCardsPage };
 export default AdminDashboard;

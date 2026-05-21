@@ -1,4 +1,3 @@
-
 # BIT-CENTRAL
 
 A lightweight student resource portal for BITS Atharva students — centralized access to question banks, answer keys, semester bundles and related study materials.
