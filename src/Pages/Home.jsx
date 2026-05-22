@@ -73,20 +73,20 @@ function HomeContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 sm:py-8 dark:bg-black">
+    <main className="min-h-screen bg-gray-50 py-4 sm:py-8 dark:bg-black">
         <div className="mx-auto max-w-7xl px-3 sm:px-6">
-          <div className="mb-8">
+          <section className="mb-8" aria-label="Search resources">
             <SearchBar search={search} setSearch={setSearch} />
-          </div>
+          </section>
 
           {isPending ? (
-            <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
+            <section className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4" aria-label="Available resources">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((_, index) => (
                 <HomeCardSkeleton key={index} />
               ))}
-            </div>
+            </section>
           ) : filteredCards.length > 0 ? (
-            <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
+            <section className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4" aria-label="Available resources">
               {filteredCards.map((card, index) => (
                 <Card
                   key={card.id || index}
@@ -96,7 +96,7 @@ function HomeContent() {
                   btntext={card.btntext}
                 />
               ))}
-            </div>
+            </section>
           ) : (
             <div className="py-12 text-center">
               <p className="text-base text-gray-500 sm:text-lg dark:text-slate-300">No Site Found</p>
@@ -106,7 +106,7 @@ function HomeContent() {
             </div>
           )}
         </div>
-      </div>
+      </main>
   );
 }
 

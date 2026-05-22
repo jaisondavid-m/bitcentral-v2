@@ -26,8 +26,8 @@ export default function About() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black">
-      <div className="border-b border-gray-200 bg-white dark:border-blue-900 dark:bg-slate-950">
+    <main className="min-h-screen bg-gray-50 dark:bg-black">
+      <header className="border-b border-gray-200 bg-white dark:border-blue-900 dark:bg-slate-950">
         <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="mb-4 text-3xl font-bold text-blue-600 sm:text-4xl">
@@ -38,33 +38,33 @@ export default function About() {
             </p>
           </div>
         </div>
-      </div>
+      </header>
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mb-12 rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
+        <section className="mb-12 rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
           <h2 className="mb-4 text-2xl font-bold text-blue-600">Our Mission</h2>
           <p className="text-base leading-relaxed text-blue-700 dark:text-blue-300">
             BIT-CENTRAL streamlines student life at BIT Sathy by providing instant access to academic materials, 
             daily mess menus, and important campus resources—all in one secure, user-friendly platform.
           </p>
-        </div>
+        </section>
 
-        <div className="mb-12">
+        <section className="mb-12">
           <h2 className="mb-6 text-2xl font-bold text-blue-600">Platform Features</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {features.map((feature, index) => (
-              <div key={index} className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-blue-900 dark:bg-slate-950">
+              <article key={index} className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-blue-900 dark:bg-slate-950">
                 <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300">
                   {feature.icon}
                 </div>
                 <h3 className="mb-2 text-lg font-semibold text-blue-600">{feature.title}</h3>
                 <p className="text-sm text-blue-700 dark:text-blue-300">{feature.description}</p>
-              </div>
+              </article>
             ))}
           </div>
-        </div>
+        </section>
 
-        <div className="mb-12 rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
+        <section className="mb-12 rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
           <h2 className="mb-6 text-2xl font-bold text-blue-600">How It Works</h2>
           <div className="space-y-4">
             {[
@@ -83,9 +83,9 @@ export default function About() {
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        <div className="mb-12 rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
+        <section className="mb-12 rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
           <h2 className="mb-4 text-2xl font-bold text-blue-600">About the Developer</h2>
           <p className="mb-6 text-blue-700 dark:text-blue-300">
             Hi, I'm <span className="font-semibold text-blue-800">Jaison David M</span>, a 1st-year CSE student at Bannari Amman Institute of Technology. I build web apps and freelance services.
@@ -122,9 +122,9 @@ export default function About() {
               </div>
             </a>
           </div>
-        </div>
+        </section>
 
-        <div id="contact" className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
+        <section id="contact" className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
           <h2 className="mb-2 text-2xl font-bold text-blue-600">Get in Touch</h2>
           <p className="mb-6 text-blue-700 dark:text-blue-300">Have questions or feedback? Feel free to reach out.</p>
 
@@ -159,8 +159,8 @@ export default function About() {
               </div>
             </a>
           </div>
-        </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

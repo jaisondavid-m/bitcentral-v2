@@ -41,7 +41,7 @@ function Navbar() {
 
   return (
     <>
-      <div className="sticky top-0 left-0 right-0 z-40">
+      <header className="sticky top-0 left-0 right-0 z-40">
         <div className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 opacity-90 dark:from-black dark:via-slate-900 dark:to-blue-950">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,180,255,0.3),transparent)] animate-pulse"></div>
@@ -51,9 +51,9 @@ function Navbar() {
           
           <div className="relative max-w-7xl mx-auto">
             <div className="flex items-center justify-between px-4 py-3 md:px-6 lg:px-8">
-              <Link to="/home" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity">
+              <Link to="/home" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity" aria-label="Go to home">
                 <Star className="h-8 w-8 md:h-10 md:w-10 text-white drop-shadow-lg" fill="currentColor"/>
-                <h1 className="text-xl md:text-2xl font-bold text-white drop-shadow-lg">BIT-CENTRAL</h1>
+                <span className="text-xl md:text-2xl font-bold text-white drop-shadow-lg">BIT-CENTRAL</span>
               </Link>
               
               <nav className="hidden lg:block">
@@ -77,20 +77,20 @@ function Navbar() {
                   ))}
                   
                   <li>
-                    <button onClick={handleLogout} className="flex cursor-pointer items-center gap-2 text-sm font-medium text-white/90 hover:text-white hover:bg-red-500/20 px-4 py-2 rounded-full border border-white/20 hover:border-red-400/40 transition-all duration-300">
+                    <button onClick={handleLogout} className="flex cursor-pointer items-center gap-2 text-sm font-medium text-white/90 hover:text-white hover:bg-red-500/20 px-4 py-2 rounded-full border border-white/20 hover:border-red-400/40 transition-all duration-300" aria-label="Logout">
                       <LogOut/>
                     </button>
                   </li>
                 </ul>
               </nav>
               
-              <div className="lg:hidden">
+              <div className="lg:hidden" aria-label="Open navigation menu">
                 <Hamburger toggled={isOpen} toggle={setIsOpen} color="#ffffff" size={20}/>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </header>
       
       <AnimatePresence>
         {isOpen && (
@@ -124,7 +124,7 @@ function Navbar() {
                     <div className="flex items-center gap-2">
                       <h2 className="text-lg font-semibold text-white drop-shadow-lg">Menu</h2>
                     </div>
-                    <button onClick={() => setIsOpen(false)} className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all">
+                    <button onClick={() => setIsOpen(false)} className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all" aria-label="Close menu">
                       <X className="w-5 h-5" />
                     </button>
                   </div>

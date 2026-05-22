@@ -1,30 +1,47 @@
-import React, { useEffect } from "react"
-import { Routes, Route, Navigate } from "react-router-dom";
+import React, { Suspense, lazy, useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
-import Login from "../Pages/Login.jsx";
-import Dashboard from "../Pages/Dashboard.jsx";
-import AdminDashboard, { AdminQBPage, AdminUsersPage, AdminCardsPage } from "../Pages/AdminDashboard.jsx";
-import Home from "../Pages/Home.jsx";
-import About from "../Pages/About.jsx";
-import PrivacyPolicy from "../Pages/PrivacyPolicy.jsx";
-import Terms from "../Pages/Terms.jsx";
-import Rpsite from "../Pages/Rpsite.jsx";
-import Semester from "../Pages/Semester.jsx";
-import MessMenu from "../Pages/MessMenu.jsx";
 import ProtectedRoute from "../routes/ProtectedRoute.jsx";
 import AdminRoute from "../routes/AdminRoute.jsx";
 import ProtectedLayout from "../routes/ProtectedLayout.jsx";
-import PCDP from "../Pages/PCDP.jsx";
-import NotFound from "../Pages/NotFound.jsx";
-import LeaveDetails from "../Pages/LeaveDetails.jsx";
-import ExamHall from "../Pages/ExamHall.jsx";
-import S2 from "../Pages/S2.jsx";
 import FullScreenLoader from "../Component/FullScreenLoader.jsx";
 import { useAuth } from "../context/StudentContext.jsx";
-import AK22PH202 from "../Pages/answers/AK__22PH202.jsx";
+import SEO from "../components/SEO.jsx";
+import { ROUTE_SEO } from "../seo/routeSeo.js";
+
+const Login = lazy(() => import("../Pages/Login.jsx"));
+const Dashboard = lazy(() => import("../Pages/Dashboard.jsx"));
+const Home = lazy(() => import("../Pages/Home.jsx"));
+const About = lazy(() => import("../Pages/About.jsx"));
+const PrivacyPolicy = lazy(() => import("../Pages/PrivacyPolicy.jsx"));
+const Terms = lazy(() => import("../Pages/Terms.jsx"));
+const Rpsite = lazy(() => import("../Pages/Rpsite.jsx"));
+const Semester = lazy(() => import("../Pages/Semester.jsx"));
+const MessMenu = lazy(() => import("../Pages/MessMenu.jsx"));
+const PCDP = lazy(() => import("../Pages/PCDP.jsx"));
+const NotFound = lazy(() => import("../Pages/NotFound.jsx"));
+const LeaveDetails = lazy(() => import("../Pages/LeaveDetails.jsx"));
+const ExamHall = lazy(() => import("../Pages/ExamHall.jsx"));
+const AK22PH202 = lazy(() => import("../Pages/answers/AK__22PH202.jsx"));
+
+const AdminDashboard = lazy(() =>
+  import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.default }))
+);
+const AdminUsersPage = lazy(() =>
+  import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.AdminUsersPage }))
+);
+const AdminQBPage = lazy(() =>
+  import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.AdminQBPage }))
+);
+const AdminCardsPage = lazy(() =>
+  import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.AdminCardsPage }))
+);
 
 function App() {
   const { loading } = useAuth();
+  const location = useLocation();
+
+  const currentMeta = ROUTE_SEO[location.pathname] || ROUTE_SEO["*"];
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -91,69 +108,72 @@ function App() {
 
   return (
     <>
-      <Routes>
-        {/* Public */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/" element={<Navigate to="/home" />} />
+      <SEO pathname={location.pathname} meta={currentMeta} />
+      <Suspense fallback={<FullScreenLoader />}>
+        <Routes>
+          {/* Public */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/" element={<Navigate to="/home" />} />
 
-        {/* Protected Layout */}
-        <Route
-          element={
-            <ProtectedRoute>
-              <ProtectedLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/home" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          {/* Protected Layout */}
           <Route
-            path="/admin"
             element={
-              <AdminRoute>
-                <AdminDashboard />
-              </AdminRoute>
+              <ProtectedRoute>
+                <ProtectedLayout />
+              </ProtectedRoute>
             }
-          />
-          <Route
-            path="/admin/users"
-            element={
-              <AdminRoute>
-                <AdminUsersPage />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/admin/qb"
-            element={
-              <AdminRoute>
-                <AdminQBPage />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/admin/cards"
-            element={
-              <AdminRoute>
-                <AdminCardsPage />
-              </AdminRoute>
-            }
-          />
-          <Route path="/profile" element={<Dashboard />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/rpsite" element={<Rpsite />} />
-          <Route path="/pcdp" element={<PCDP />} />
-          <Route path="/exam-hall" element={<ExamHall />} />
-          {/* <Route path="/apsite" element={<Apsite />} /> */}
-          <Route path="/leavedetails" element={<LeaveDetails />} />
-          <Route path="/semester" element={<Semester />} />
-          <Route path="/mess" element={<MessMenu />} />
+          >
+            <Route path="/home" element={<Home />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <AdminDashboard />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <AdminRoute>
+                  <AdminUsersPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/qb"
+              element={
+                <AdminRoute>
+                  <AdminQBPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/cards"
+              element={
+                <AdminRoute>
+                  <AdminCardsPage />
+                </AdminRoute>
+              }
+            />
+            <Route path="/profile" element={<Dashboard />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/rpsite" element={<Rpsite />} />
+            <Route path="/pcdp" element={<PCDP />} />
+            <Route path="/exam-hall" element={<ExamHall />} />
+            {/* <Route path="/apsite" element={<Apsite />} /> */}
+            <Route path="/leavedetails" element={<LeaveDetails />} />
+            <Route path="/semester" element={<Semester />} />
+            <Route path="/mess" element={<MessMenu />} />
+            <Route path="*" element={<NotFound />} />
+            <Route path="/ak_22ph202" element={<AK22PH202 />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
-          <Route path="/ak_22ph202" element={<AK22PH202 />} />
-        </Route>
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+        </Routes>
+      </Suspense>
       <Analytics />
     </>
   );

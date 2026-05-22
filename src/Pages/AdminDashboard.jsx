@@ -475,7 +475,7 @@ function UserTable({ users, onDelete, deletingUid, showStatus }) {
               <td className="px-4 py-3 font-medium text-gray-500 dark:text-slate-400">{index + 1}</td>
               <td className="px-4 py-3">
                 {userItem.photoURL ? (
-                  <img src={userItem.photoURL} alt="" className="h-9 w-9 rounded-full border border-gray-200 object-cover dark:border-blue-900" loading="lazy" />
+                  <img src={userItem.photoURL} alt={userItem.displayName || userItem.email || "User profile photo"} className="h-9 w-9 rounded-full border border-gray-200 object-cover dark:border-blue-900" loading="lazy" decoding="async" />
                 ) : (
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-500 dark:bg-slate-800 dark:text-slate-300">
                     {(userItem.displayName || userItem.email || "U").charAt(0).toUpperCase()}
@@ -1111,6 +1111,8 @@ function CardsSection() {
                         src={card.img}
                         alt={card.name || "Card image"}
                         className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center px-6 text-center">

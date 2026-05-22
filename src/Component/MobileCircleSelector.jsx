@@ -71,6 +71,8 @@ export default function MobileCircleSelector({ cards = [], onSelect }) {
                     alt={c.name}
                     className="h-full w-full object-cover"
                     style={{ borderRadius: "9999px" }}
+                    loading="lazy"
+                    decoding="async"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-slate-100 text-center">

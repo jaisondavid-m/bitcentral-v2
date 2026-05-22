@@ -53,8 +53,7 @@ function Dashboard() {
   const isBitsathyEmail = user.email?.endsWith("@bitsathy.ac.in");
 
   return (
-    <>
-      <div className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 lg:px-8 dark:bg-black">
+    <main className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 lg:px-8 dark:bg-black">
         <div className="mx-auto max-w-4xl">
 
           {/* Profile Header */}
@@ -161,10 +160,8 @@ function Dashboard() {
               )}
             </button>
           </div>
-
         </div>
-      </div>
-    </>
+    </main>
   );
 }
 

@@ -55,7 +55,7 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 dark:bg-black">
+    <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4 dark:bg-black">
       <button
         type="button"
         onClick={toggleTheme}
@@ -113,7 +113,7 @@ function Login() {
 
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
