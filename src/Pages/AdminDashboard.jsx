@@ -47,6 +47,15 @@ function formatDateTime(value) {
   return date.toLocaleString();
 }
 
+function fileToDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error || new Error("Failed to read file"));
+    reader.readAsDataURL(file);
+  });
+}
+
 function formatRouteLabel(value) {
   if (!value) return "-";
   return value;
@@ -809,16 +818,10 @@ function CardForm({ initial, onSubmit, onCancel, isLoading }) {
   const handleFile = async (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
-    const fd = new FormData();
-    fd.append("file", file);
     try {
       setUploading(true);
-      const res = await uploadAdminFile(fd);
-      if (res?.success && res.url) {
-        setForm((p) => ({ ...p, img: res.url }));
-      } else if (res?.data?.base64) {
-        setForm((p) => ({ ...p, img: res.data.base64 }));
-      }
+      const base64 = await fileToDataURL(file);
+      setForm((p) => ({ ...p, img: base64 }));
     } catch (err) {
       console.error("card image upload error", err);
     } finally {
@@ -886,11 +889,11 @@ function CardForm({ initial, onSubmit, onCancel, isLoading }) {
             <input
               value={form.img}
               onChange={(e) => setForm({ ...form, img: e.target.value })}
-              placeholder="Paste an image URL or upload a file"
+              placeholder="Paste an image URL or upload a file to store as base64"
               className="w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
             />
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Uploading stores the image as a reusable asset, or you can paste a direct image URL.
+              Uploaded images are converted to base64 and saved in the database.
             </p>
           </div>
           <label className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-blue-700 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 dark:border-blue-900 dark:bg-slate-950 dark:text-blue-300 dark:hover:bg-slate-900">

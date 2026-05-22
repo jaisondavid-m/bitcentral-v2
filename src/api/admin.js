@@ -139,15 +139,3 @@ export async function deleteCard(id) {
   const response = await api.delete(`/admin/cards/${id}`, { headers });
   return response.data;
 }
-
-export async function uploadCardImage(formData) {
-  const headers = await getAdminHeaders();
-  // Let axios set Content-Type for multipart
-  const response = await api.post(`/admin/cards/upload-image`, formData, {
-    headers: {
-      ...headers,
-    },
-    timeout: 0,
-  });
-  return response.data;
-}
