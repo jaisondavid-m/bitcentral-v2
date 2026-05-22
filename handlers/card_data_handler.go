@@ -2,12 +2,9 @@ package handlers
 
 import (
 	"database/sql"
-	"encoding/base64"
 	"encoding/json"
-	"mime/multipart"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"server/config"
 	"server/models"
@@ -109,44 +106,4 @@ func DeleteCard(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"success": true})
-}
-
-// UploadCardImage accepts a multipart file and returns a base64 data URL
-func UploadCardImage(c *gin.Context) {
-	file, header, err := c.Request.FormFile("file")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "file is required"})
-		return
-	}
-	defer file.Close()
-
-	// read file bytes
-	buf := make([]byte, header.Size)
-	n, err := file.Read(buf)
-	if err != nil && err != multipart.ErrMessageTooLarge && err.Error() != "EOF" {
-		// try reading with alternative method
-		// fall back to reading remaining bytes
-	}
-	data := buf[:n]
-
-	// try to detect mime type from filename extension
-	mime := "application/octet-stream"
-	if idx := strings.LastIndex(header.Filename, "."); idx != -1 {
-		ext := strings.ToLower(header.Filename[idx+1:])
-		switch ext {
-		case "png":
-			mime = "image/png"
-		case "jpg", "jpeg":
-			mime = "image/jpeg"
-		case "gif":
-			mime = "image/gif"
-		case "webp":
-			mime = "image/webp"
-		}
-	}
-
-	b64 := base64.StdEncoding.EncodeToString(data)
-	dataURL := "data:" + mime + ";base64," + b64
-
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": gin.H{"base64": dataURL}})
 }

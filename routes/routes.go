@@ -105,7 +105,6 @@ func SetupRouter(
 		admin.POST("/cards", handlers.CreateCard)
 		admin.PUT("/cards/:id", handlers.UpdateCard)
 		admin.DELETE("/cards/:id", handlers.DeleteCard)
-		admin.POST("/cards/upload-image", handlers.UploadCardImage)
 	}
 
 	r.POST("/presence/ping", presenceHandler.Ping)
