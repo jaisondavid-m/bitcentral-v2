@@ -6,6 +6,7 @@ import api from "../api/axios.js";
 import SearchBar from "../Component/SearchBar.jsx";
 import RpCard from "../Component/RpCard.jsx";
 import Leaderboard from "../Component/Leaderboard.jsx";
+import { useAuth } from "../context/StudentContext.jsx";
 
 function countSearchableCharacters(value) {
   return Array.from(value).filter((character) => /[a-z0-9]/i.test(character)).length;
@@ -57,11 +58,13 @@ function RpCardSkeleton() {
 }
 
 function RpsiteContent() {
+  const { student, profile } = useAuth();
   const [search, setSearch] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAverages, setShowAverages] = useState(false);
   const resultCache = useRef(new Map());
+  const hasAppliedDefaultSearch = useRef(false);
 
   const updateQuery = useRef(
     debounce((value) => setDebouncedQuery(value), 300)
@@ -74,6 +77,22 @@ function RpsiteContent() {
       updateQuery.cancel();
     };
   }, [updateQuery]);
+
+  useEffect(() => {
+    if (hasAppliedDefaultSearch.current) return;
+
+    const defaultRollNo = profile?.roll_no || profile?.rollNo || student?.roll_no || student?.rollNo || "";
+    if (!defaultRollNo) return;
+
+    if (search.trim()) {
+      hasAppliedDefaultSearch.current = true;
+      return;
+    }
+
+    hasAppliedDefaultSearch.current = true;
+    setSearch(defaultRollNo);
+    setDebouncedQuery(defaultRollNo.trim());
+  }, [profile, student, search]);
 
   const handleSearchChange = (value) => {
     setSearch(value);
