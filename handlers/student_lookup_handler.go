@@ -125,7 +125,7 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 
 	var user models.User
 	if err := h.DB.QueryRow(
-		`SELECT uid, email, display_name, photo_url, creation_time, last_sign_in_time, COALESCE(last_seen_at, '')
+		`SELECT uid, email, display_name, photo_url, creation_time, last_sign_in_time, COALESCE(last_seen_at, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%Y-%m-%dT%H:%i:%sZ'), '')
 		 FROM users
 		 WHERE LOWER(TRIM(email)) = LOWER(TRIM(?))
 		 LIMIT 1`,
@@ -138,6 +138,8 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		&user.CreationTime,
 		&user.LastSignInTime,
 		&user.LastSeenAt,
+		&user.IsBlocked,
+		&user.BlockedAt,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -149,6 +151,15 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"error":   "Failed to load user profile",
+		})
+		return
+	}
+
+	if user.IsBlocked {
+		c.JSON(http.StatusForbidden, gin.H{
+			"success": false,
+			"status":  "blocked",
+			"message": "Your account is blocked. Contact support@bitsathy.in for more details.",
 		})
 		return
 	}
@@ -176,6 +187,8 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 			"creation_time":     user.CreationTime,
 			"last_sign_in_time": user.LastSignInTime,
 			"last_seen_at":      user.LastSeenAt,
+			"is_blocked":        user.IsBlocked,
+			"blocked_at":        user.BlockedAt,
 			"roll_no":           rollNo,
 		},
 	})

@@ -92,6 +92,7 @@ func SetupRouter(
 	{
 		admin.GET("/users", adminHandler.GetUsers)
 		admin.GET("/users/update", adminHandler.UpdateUsers)
+		admin.PUT("/users/:uid/block", adminHandler.UpdateUserBlockStatus)
 		admin.DELETE("/users/:uid", adminHandler.DeleteUser)
 		// admin.GET("/qb", qbHandler.List)
 		admin.GET("/qb", qbHandler.List)

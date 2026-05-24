@@ -133,6 +133,8 @@ func createUsersTable() {
 		creation_time VARCHAR(64),
 		last_sign_in_time VARCHAR(64),
 		last_seen_at VARCHAR(64),
+		blocked TINYINT(1) NOT NULL DEFAULT 0,
+		blocked_at DATETIME NULL,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 	) ENGINE=InnoDB;`
 
@@ -142,6 +144,14 @@ func createUsersTable() {
 
 	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN last_seen_at VARCHAR(64) NULL`); err != nil {
 		log.Printf("ℹ️ last_seen_at column not created (may already exist): %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN blocked TINYINT(1) NOT NULL DEFAULT 0`); err != nil {
+		log.Printf("ℹ️ blocked column not created (may already exist): %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN blocked_at DATETIME NULL`); err != nil {
+		log.Printf("ℹ️ blocked_at column not created (may already exist): %v", err)
 	}
 
 	log.Println("✅ users table ready")
