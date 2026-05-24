@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { logout } from "../Authentication/firebase.js";
 import { useAuth } from "../context/StudentContext.jsx";
 import { Navigate } from "react-router-dom";
-import profile from "../assets/profile.jpg";
+import profileAvatar from "../assets/profile.jpg";
 import { Loader, CheckCircle, AlertTriangle, GraduationCap, Calendar, Clock, LogOut } from "lucide-react";
 
 function Dashboard() {
-  const { user, student, loading } = useAuth();
+  const { user, student, profile, loading } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const formatAuthDate = (value) => {
@@ -51,6 +51,9 @@ function Dashboard() {
   if (!user) return <Navigate to="/login" />;
 
   const isBitsathyEmail = user.email?.endsWith("@bitsathy.ac.in");
+  const rollNo = profile?.roll_no || student?.roll_no || student?.rollNo || "-";
+  const displayName = profile?.display_name || user.displayName || "User";
+  const avatarUrl = profile?.photo_url || user.photoURL || profileAvatar;
 
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 lg:px-8 dark:bg-black">
@@ -61,7 +64,7 @@ function Dashboard() {
             <div className="bg-blue-600 px-6 py-8 sm:px-8">
               <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
                 <div className="relative">
-                  <img src={user.photoURL || profile} alt="Profile" className="h-20 w-20 rounded-full border-4 border-white object-cover shadow-md sm:h-24 sm:w-24" />
+                  <img src={avatarUrl} alt="Profile" className="h-20 w-20 rounded-full border-4 border-white object-cover shadow-md sm:h-24 sm:w-24" />
                   {user.emailVerified && (
                     <div className="absolute -right-1 bottom-1 flex h-7 w-7 items-center justify-center rounded-full bg-green-500 shadow-md ring-1 ring-white">
                       <CheckCircle className="h-4 w-4 text-white" />
@@ -69,7 +72,7 @@ function Dashboard() {
                   )}
                 </div>
                 <div className="flex-1 text-center sm:text-left">
-                  <h1 className="mb-1 text-2xl font-bold text-white sm:text-3xl">{user.displayName || "User"}</h1>
+                  <h1 className="mb-1 text-2xl font-bold text-white sm:text-3xl">{displayName}</h1>
                   <p className="break-all text-sm text-white/90 sm:text-base">{user.email}</p>
                 </div>
               </div>
@@ -94,6 +97,16 @@ function Dashboard() {
             {/* Department & Batch */}
             {student && (
               <>
+                <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-blue-900 dark:bg-slate-950">
+                  <div className="mb-2 flex items-center justify-between">
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">Roll No</h3>
+                    <div className="rounded-full bg-blue-100 p-2">
+                      <GraduationCap className="h-6 w-6 text-blue-600" />
+                    </div>
+                  </div>
+                  <p className="text-base font-bold leading-tight text-blue-900 sm:text-lg dark:text-blue-300">{rollNo}</p>
+                </div>
+
                 <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-blue-900 dark:bg-slate-950">
                   <div className="mb-2 flex items-center justify-between">
                     <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">Department</h3>

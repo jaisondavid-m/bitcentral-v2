@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { auth } from "../Authentication/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { pingPresence } from "../api/presence.js";
+import { getMeProfile } from "../api/axios.js";
 import {
   clearGuestSession,
   createGuestStudent,
@@ -54,6 +55,25 @@ const decodeCollegeEmail = (email) => {
   };
 };
 
+const toProfileStudent = (studentProfile, fallbackStudent = null) => {
+  if (!studentProfile) {
+    return fallbackStudent;
+  }
+
+  return {
+    ...fallbackStudent,
+    email: studentProfile.email || fallbackStudent?.email || null,
+    rollNo: studentProfile.roll_no || fallbackStudent?.rollNo || "",
+    roll_no: studentProfile.roll_no || fallbackStudent?.roll_no || "",
+    uid: studentProfile.uid || fallbackStudent?.uid || null,
+    displayName: studentProfile.display_name || fallbackStudent?.displayName || null,
+    photoURL: studentProfile.photo_url || fallbackStudent?.photoURL || null,
+    creationTime: studentProfile.creation_time || fallbackStudent?.creationTime || null,
+    lastSignInTime: studentProfile.last_sign_in_time || fallbackStudent?.lastSignInTime || null,
+    lastSeenAt: studentProfile.last_seen_at || fallbackStudent?.lastSeenAt || null,
+  };
+};
+
 function getPresenceRouteLabel(pathname = "") {
   const path = pathname.toLowerCase();
 
@@ -78,10 +98,38 @@ export const StudentContext = ({ children }) => {
   const initialGuestSession = readGuestSession();
   const [user, setUser] = useState(initialGuestSession ? createGuestUser(initialGuestSession) : null);
   const [student, setStudent] = useState(initialGuestSession ? createGuestStudent() : null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(!initialGuestSession);
   const currentRouteLabel = useMemo(() => getPresenceRouteLabel(location.pathname), [location.pathname]);
 
+  const hydrateAuthenticatedUser = async (currentUser) => {
+    if (!currentUser?.email) {
+      setStudent(null);
+      setProfile(null);
+      return;
+    }
+
+    clearGuestSession();
+    const decoded = decodeCollegeEmail(currentUser.email);
+    setStudent(decoded);
+
+    try {
+      const backendProfile = await getMeProfile();
+      if (backendProfile?.email) {
+        setProfile(backendProfile);
+        setStudent((prev) => toProfileStudent(backendProfile, decoded || prev));
+      } else {
+        setProfile(null);
+      }
+    } catch (error) {
+      setProfile(null);
+      console.error("Failed to load profile from /me", error);
+    }
+  };
+
   useEffect(() => {
+    let cancelled = false;
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       const guestSession = readGuestSession();
 
@@ -95,13 +143,17 @@ export const StudentContext = ({ children }) => {
       setUser(currentUser);
 
       if (currentUser?.email) {
-        clearGuestSession();
-        const decoded = decodeCollegeEmail(currentUser.email);
-        setStudent(decoded);
+        setLoading(true);
+        hydrateAuthenticatedUser(currentUser).finally(() => {
+          if (!cancelled) {
+            setLoading(false);
+          }
+        });
       } else {
         setStudent(null);
+        setProfile(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     const unsubscribeGuest = subscribeToGuestSessionChanges(() => {
@@ -117,15 +169,21 @@ export const StudentContext = ({ children }) => {
       const currentUser = auth.currentUser;
       setUser(currentUser);
       if (currentUser?.email) {
-        const decoded = decodeCollegeEmail(currentUser.email);
-        setStudent(decoded);
+        setLoading(true);
+        hydrateAuthenticatedUser(currentUser).finally(() => {
+          if (!cancelled) {
+            setLoading(false);
+          }
+        });
       } else {
         setStudent(null);
+        setProfile(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => {
+      cancelled = true;
       unsubscribe();
       unsubscribeGuest();
     };
@@ -168,7 +226,7 @@ export const StudentContext = ({ children }) => {
   }, [user?.uid, currentRouteLabel]);
 
   return (
-    <AuthContext.Provider value={{ user, student, loading }}>
+    <AuthContext.Provider value={{ user, student, profile, loading }}>
       {children}
     </AuthContext.Provider>
   );

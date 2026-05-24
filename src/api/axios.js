@@ -31,3 +31,9 @@ export async function getAuthenticatedHeaders() {
     Authorization: `Bearer ${idToken}`,
   };
 }
+
+export async function getMeProfile() {
+  const headers = await getAuthenticatedHeaders();
+  const response = await api.get("/me", { headers });
+  return response.data?.data || null;
+}
