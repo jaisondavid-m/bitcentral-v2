@@ -13,6 +13,7 @@ import {
   listAdminCards,
   createCard,
   updateCard,
+  reorderAdminCards,
   deleteCard,
 } from "../api/admin.js";
 import {
@@ -29,6 +30,7 @@ import {
   X,
   ChevronDown,
   ChevronUp,
+  Eye,
   ExternalLink,
   Clock,
   Wifi,
@@ -908,7 +910,7 @@ function CardForm({ initial, onSubmit, onCancel, isLoading }) {
               className="w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
             />
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Uploaded images are converted to base64 and saved in the database.
+                Uploaded images are converted to base64 and saved in the database. Use the View img button in the list to preview it.
             </p>
           </div>
           <label className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-blue-700 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 dark:border-blue-900 dark:bg-slate-950 dark:text-blue-300 dark:hover:bg-slate-900">
@@ -916,16 +918,6 @@ function CardForm({ initial, onSubmit, onCancel, isLoading }) {
             <input type="file" accept="image/*" onChange={handleFile} className="sr-only" />
           </label>
         </div>
-
-        {form.img && (
-          <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
-            <div className="flex items-center justify-between border-b border-slate-100 px-3 py-2 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
-              <span>Preview</span>
-              <span className="truncate">{form.img}</span>
-            </div>
-            <img src={form.img} alt="Card preview" className="h-40 w-full object-cover" />
-          </div>
-        )}
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row">
@@ -956,23 +948,34 @@ function CardsSection() {
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState(null);
+  const [viewCard, setViewCard] = useState(null);
+  const [isReordering, setIsReordering] = useState(false);
   const [banner, setBanner] = useState({ type: "", message: "" });
   const [searchQuery, setSearchQuery] = useState("");
 
+  const orderedCards = useMemo(() => {
+    return [...cards].sort((left, right) => {
+      const leftOrder = Number(left.card_order ?? 0);
+      const rightOrder = Number(right.card_order ?? 0);
+      if (leftOrder !== rightOrder) return leftOrder - rightOrder;
+      return Number(left.id ?? 0) - Number(right.id ?? 0);
+    });
+  }, [cards]);
+
   const visibleCards = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    if (!query) return cards;
-    return cards.filter((card) => {
+    if (!query) return orderedCards;
+    return orderedCards.filter((card) => {
       const keywords = Array.isArray(card.keywords) ? card.keywords.join(" ") : "";
       return [card.name, card.link, card.btntext, keywords].join(" ").toLowerCase().includes(query);
     });
-  }, [cards, searchQuery]);
+  }, [orderedCards, searchQuery]);
 
   const cardStats = useMemo(() => ({
-    total: cards.length,
-    cardsWithImage: cards.filter((card) => Boolean(card.img)).length,
-    totalKeywords: cards.reduce((count, card) => count + (Array.isArray(card.keywords) ? card.keywords.length : 0), 0),
-  }), [cards]);
+    total: orderedCards.length,
+    cardsWithImage: orderedCards.filter((card) => Boolean(card.img)).length,
+    totalKeywords: orderedCards.reduce((count, card) => count + (Array.isArray(card.keywords) ? card.keywords.length : 0), 0),
+  }), [orderedCards]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -990,6 +993,41 @@ function CardsSection() {
   useEffect(() => {
     load();
   }, [load]);
+
+  const persistCardOrder = async (nextCards) => {
+    const previousCards = cards;
+    const normalizedCards = nextCards.map((card, index) => ({
+      ...card,
+      card_order: index + 1,
+    }));
+
+    setCards(normalizedCards);
+    setIsReordering(true);
+    setBanner({ type: "", message: "" });
+
+    try {
+      await reorderAdminCards({ card_ids: normalizedCards.map((card) => card.id) });
+      setBanner({ type: "success", message: "Card order updated" });
+    } catch (err) {
+      setCards(previousCards);
+      setBanner({ type: "error", message: normalizeError(err, "Failed to reorder cards") });
+      await load();
+    } finally {
+      setIsReordering(false);
+    }
+  };
+
+  const moveCard = async (index, direction) => {
+    if (searchQuery.trim()) return;
+
+    const current = [...orderedCards];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= current.length) return;
+
+    const nextCards = [...current];
+    [nextCards[index], nextCards[targetIndex]] = [nextCards[targetIndex], nextCards[index]];
+    await persistCardOrder(nextCards);
+  };
 
   const onCreate = async (payload) => {
     try {
@@ -1023,7 +1061,7 @@ function CardsSection() {
     try {
       const res = await deleteCard(id);
       if (res?.success) {
-        setCards((current) => current.filter((card) => card.id !== id));
+        await load();
         setBanner({ type: "success", message: "Deleted" });
       }
     } catch (err) {
@@ -1064,17 +1102,82 @@ function CardsSection() {
           <div className="flex h-40 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 text-center dark:border-slate-800 dark:bg-slate-900"><p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{searchQuery ? "No matching cards" : "No cards yet"}</p><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{searchQuery ? "Try a different search term." : "Add a card to show it on the homepage."}</p></div>
         ) : (
           <div className="space-y-3">
-            {visibleCards.map((card) => {
+              {visibleCards.map((card, index) => {
               const keywords = Array.isArray(card.keywords) ? card.keywords : [];
+                const currentIndex = orderedCards.findIndex((item) => item.id === card.id);
               return (
                 <article key={card.id} className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950 sm:flex-row sm:items-start">
-                  <div className="h-20 w-full shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 dark:border-slate-800 dark:bg-slate-900 sm:w-28">
-                    {card.img ? <img src={card.img} alt={card.name || "Card image"} className="h-full w-full object-cover" loading="lazy" decoding="async" /> : <div className="flex h-full items-center justify-center text-xs text-slate-400">No image</div>}
-                  </div>
                   <div className="min-w-0 flex-1 space-y-3">
-                    <div className="flex items-start justify-between gap-3"><div className="min-w-0"><h3 className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">{card.name}</h3><p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{card.btntext || "No button text"}</p></div><span className="shrink-0 rounded-full border border-slate-200 px-2.5 py-1 text-[11px] font-medium text-slate-500 dark:border-slate-800 dark:text-slate-400">#{card.id}</span></div>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+                            Order {card.card_order ?? index + 1}
+                          </span>
+                          <span className="shrink-0 rounded-full border border-slate-200 px-2.5 py-1 text-[11px] font-medium text-slate-500 dark:border-slate-800 dark:text-slate-400">#{card.id}</span>
+                        </div>
+                        <h3 className="mt-2 truncate text-base font-semibold text-slate-900 dark:text-slate-100">{card.name}</h3>
+                        <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{card.btntext || "No button text"}</p>
+                      </div>
+                      <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+                        <button
+                          type="button"
+                          onClick={() => setViewCard(card)}
+                          disabled={!card.img}
+                          className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900"
+                        >
+                          <Eye className="h-4 w-4" />
+                          View img
+                        </button>
+
+                  {viewCard && (
+                    <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-slate-950/60 px-4 py-6 backdrop-blur-sm sm:px-6">
+                      <div className="absolute inset-0" onClick={() => setViewCard(null)} />
+                      <div className="relative z-50 w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
+                        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4 dark:border-slate-800 sm:px-6">
+                          <div>
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Card image</p>
+                            <h3 className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">{viewCard.name}</h3>
+                          </div>
+                          <button type="button" onClick={() => setViewCard(null)} className="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900">
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+
+                        <div className="p-4 sm:p-6">
+                          {viewCard.img ? (
+                            <img src={viewCard.img} alt={viewCard.name || "Card image"} className="max-h-[70vh] w-full rounded-2xl border border-slate-200 object-contain dark:border-slate-800" />
+                          ) : (
+                            <div className="flex h-56 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+                              No image attached
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                        <button
+                          type="button"
+                          onClick={() => moveCard(currentIndex, -1)}
+                          disabled={currentIndex <= 0 || isReordering || Boolean(searchQuery.trim())}
+                          className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900"
+                        >
+                          <ChevronUp className="h-4 w-4" />
+                          Up
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveCard(currentIndex, 1)}
+                          disabled={currentIndex < 0 || currentIndex >= orderedCards.length - 1 || isReordering || Boolean(searchQuery.trim())}
+                          className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900"
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                          Down
+                        </button>
+                      </div>
+                    </div>
                     <div className="flex flex-wrap gap-1.5">{keywords.length ? keywords.map((keyword) => <span key={keyword} className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600 dark:bg-slate-900 dark:text-slate-300">{keyword}</span>) : <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-500 dark:bg-slate-900 dark:text-slate-400">No keywords</span>}</div>
-                    <div className="grid gap-2 text-sm sm:grid-cols-2"><div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">Link</p><p className="truncate text-slate-700 dark:text-slate-200">{card.link || "Not set"}</p></div><div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">Preview</p><p className="truncate text-slate-700 dark:text-slate-200">{card.img ? "Image attached" : "No image attached"}</p></div></div>
+                    <div className="grid gap-2 text-sm sm:grid-cols-2"><div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">Link</p><p className="truncate text-slate-700 dark:text-slate-200">{card.link || "Not set"}</p></div><div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">Image</p><p className="truncate text-slate-700 dark:text-slate-200">{card.img ? "Hidden until viewed" : "No image attached"}</p></div></div>
                     <div className="flex gap-2"><button onClick={() => { setEditItem(card); setShowForm(true); }} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900 sm:flex-none"><Edit2 className="h-4 w-4" />Edit</button><button onClick={() => onDeleteCard(card.id)} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 sm:flex-none"><Trash2 className="h-4 w-4" />Delete</button></div>
                   </div>
                 </article>

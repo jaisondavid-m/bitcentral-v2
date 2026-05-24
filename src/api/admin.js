@@ -134,6 +134,12 @@ export async function updateCard(id, payload) {
   return response.data;
 }
 
+export async function reorderAdminCards(payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.put(`/admin/cards/reorder`, payload, { headers });
+  return response.data;
+}
+
 export async function deleteCard(id) {
   const headers = await getAdminHeaders();
   const response = await api.delete(`/admin/cards/${id}`, { headers });

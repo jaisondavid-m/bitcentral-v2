@@ -87,6 +87,10 @@ export const clearGuestSession = () => {
     return;
   }
 
+  if (!storage.getItem(GUEST_SESSION_KEY)) {
+    return;
+  }
+
   storage.removeItem(GUEST_SESSION_KEY);
   notifyGuestSessionChange();
 };

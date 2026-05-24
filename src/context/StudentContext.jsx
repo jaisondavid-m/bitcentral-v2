@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { auth } from "../Authentication/firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -101,13 +101,21 @@ export const StudentContext = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(!initialGuestSession);
   const currentRouteLabel = useMemo(() => getPresenceRouteLabel(location.pathname), [location.pathname]);
+  const hydratedEmailRef = useRef("");
 
   const hydrateAuthenticatedUser = async (currentUser) => {
     if (!currentUser?.email) {
       setStudent(null);
       setProfile(null);
+      hydratedEmailRef.current = "";
       return;
     }
+
+    if (hydratedEmailRef.current === currentUser.email) {
+      return;
+    }
+
+    hydratedEmailRef.current = currentUser.email;
 
     clearGuestSession();
     const decoded = decodeCollegeEmail(currentUser.email);
@@ -136,6 +144,8 @@ export const StudentContext = ({ children }) => {
       if (guestSession) {
         setUser(createGuestUser(guestSession));
         setStudent(createGuestStudent());
+        setProfile(null);
+        hydratedEmailRef.current = "";
         setLoading(false);
         return;
       }
@@ -152,6 +162,7 @@ export const StudentContext = ({ children }) => {
       } else {
         setStudent(null);
         setProfile(null);
+        hydratedEmailRef.current = "";
         setLoading(false);
       }
     });
@@ -162,6 +173,8 @@ export const StudentContext = ({ children }) => {
       if (guestSession) {
         setUser(createGuestUser(guestSession));
         setStudent(createGuestStudent());
+        setProfile(null);
+        hydratedEmailRef.current = "";
         setLoading(false);
         return;
       }
@@ -178,6 +191,7 @@ export const StudentContext = ({ children }) => {
       } else {
         setStudent(null);
         setProfile(null);
+        hydratedEmailRef.current = "";
         setLoading(false);
       }
     });
