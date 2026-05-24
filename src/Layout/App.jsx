@@ -6,7 +6,7 @@ import AdminRoute from "../routes/AdminRoute.jsx";
 import ProtectedLayout from "../routes/ProtectedLayout.jsx";
 import FullScreenLoader from "../Component/FullScreenLoader.jsx";
 import { useAuth } from "../context/StudentContext.jsx";
-import SEO from "../components/SEO.jsx";
+import SEO from "../Component/SEO.jsx";
 import { ROUTE_SEO } from "../seo/routeSeo.js";
 
 const Login = lazy(() => import("../Pages/Login.jsx"));
@@ -19,6 +19,7 @@ const Rpsite = lazy(() => import("../Pages/Rpsite.jsx"));
 const Semester = lazy(() => import("../Pages/Semester.jsx"));
 const MessMenu = lazy(() => import("../Pages/MessMenu.jsx"));
 const PCDP = lazy(() => import("../Pages/PCDP.jsx"));
+const FindMyWay = lazy(() => import("../Pages/FindMyWay.jsx"));
 const NotFound = lazy(() => import("../Pages/NotFound.jsx"));
 const LeaveDetails = lazy(() => import("../Pages/LeaveDetails.jsx"));
 const ExamHall = lazy(() => import("../Pages/ExamHall.jsx"));
@@ -127,6 +128,7 @@ function App() {
           >
             <Route path="/home" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/findmyway" element={<FindMyWay />} />
             <Route
               path="/admin"
               element={

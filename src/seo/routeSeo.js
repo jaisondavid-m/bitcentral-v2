@@ -60,6 +60,11 @@ export const ROUTE_SEO = {
     description: "Explore and download the PCDP app for personalized skill development.",
     keywords: ["PCDP", "skill development", "student app"],
   },
+  "/findmyway": {
+    title: "FindMyWay Install",
+    description: "Download the FindMyWay Android app to locate buildings, rooms, labs, and campus venues.",
+    keywords: ["FindMyWay", "campus navigation", "Android APK", "college location app"],
+  },
   "/exam-hall": {
     title: "Exam Hall Finder",
     description: "Search your exam hall details quickly by register number and course code.",
@@ -136,6 +141,7 @@ export const SITEMAP_ROUTES = [
   "/about",
   "/rpsite",
   "/pcdp",
+  "/findmyway",
   "/exam-hall",
   "/leavedetails",
   "/semester",

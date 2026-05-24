@@ -17,6 +17,7 @@ const routes = [
   "/about",
   "/rpsite",
   "/pcdp",
+  "/findmyway",
   "/exam-hall",
   "/leavedetails",
   "/semester",
