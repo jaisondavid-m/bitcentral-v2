@@ -20,7 +20,7 @@ import {
 	BellRing,
 } from "lucide-react";
 
-const APK_URL = "https://drive.google.com/file/d/1Q7iGNlFpbqWk2GmIDUmvBkI9aSquzBez/view";
+const APK_URL = "https://drive.google.com/file/d/1-hfrEbm5rTT3vOhETri4VdgkY6pk9qb0/view?usp=share_link";
 
 const highlights = [
 	{
