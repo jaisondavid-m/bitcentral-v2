@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { Link, Navigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   deleteAdminUser,
   listAdminUsers,
@@ -34,6 +34,7 @@ import {
   Wifi,
   WifiOff,
   GripVertical,
+  LayoutGrid,
 } from "lucide-react";
 
 function normalizeError(error, fallback) {
@@ -80,6 +81,36 @@ const EMPTY_QB_FORM = {
   ak2: "",
   semqbwithans: "",
 };
+
+const ADMIN_TABS = [
+  {
+    key: "users",
+    label: "Users",
+    href: "/admin/users",
+    icon: Users,
+    description: "Manage admin-visible user accounts and activity.",
+  },
+  {
+    key: "qb",
+    label: "QB Handling",
+    href: "/admin/qb",
+    icon: BookOpen,
+    description: "Create, edit, and organize question bank entries.",
+  },
+  {
+    key: "cards",
+    label: "Cards",
+    href: "/admin/cards",
+    icon: LayoutGrid,
+    description: "Control homepage cards, links, and images.",
+  },
+];
+
+function getAdminTabFromPath(pathname) {
+  if (pathname.startsWith("/admin/qb")) return "qb";
+  if (pathname.startsWith("/admin/cards")) return "cards";
+  return "users";
+}
 
 function Banner({ banner, onDismiss }) {
   if (!banner.message) return null;
@@ -297,85 +328,69 @@ function reorderList(items, fromId, toId) {
 }
 
 /* -- Shell ------------------------------------------------------------------- */
-function AdminPageShell({ title, description, children }) {
-  const location = useLocation();
-
-  const navItems = [
-    { to: "/admin/cards", label: "Cards", icon: Plus },
-  ];
-
-  const activeItem = navItems.find((it) => location.pathname === it.to) || navItems[0];
-  const otherItems = navItems.filter((it) => it.to !== activeItem.to);
+function AdminDashboardShell({ activeTab, children }) {
+  const activeItem = ADMIN_TABS.find((tab) => tab.key === activeTab) || ADMIN_TABS[0];
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 dark:bg-black sm:pb-6">
-      {/* Top header */}
-      <header className="sticky top-0 z-20 border-b border-gray-200 bg-white px-4 py-3 shadow-sm dark:border-blue-900 dark:bg-slate-950">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-slate-500">Admin</p>
-            <h1 className="truncate text-base font-bold text-gray-900 dark:text-slate-100">{title}</h1>
-          </div>
-          {/* Desktop nav: show active item prominently, others below it */}
-          <div className="hidden sm:flex sm:flex-col sm:items-end">
-            <div>
-              {activeItem && (() => {
-                const ActiveIcon = activeItem.icon;
-                return (
-                  <Link
-                    to={activeItem.to}
-                    className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white"
-                  >
-                    <ActiveIcon className="h-4 w-4" />
-                    {activeItem.label}
-                  </Link>
-                );
-              })()}
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.14),transparent_38%),linear-gradient(180deg,#f8fafc_0%,#eef4ff_100%)] dark:bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.18),rgba(2,6,23,1)_45%)]">
+      <header className="sticky top-0 z-20 border-b border-white/70 bg-white/80 backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/80">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-blue-600 dark:text-blue-400">Admin console</p>
+              <h1 className="mt-1 text-xl font-black tracking-tight text-slate-900 dark:text-white">{activeItem.label}</h1>
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">{activeItem.description}</p>
             </div>
-            <nav className="mt-2 flex gap-2">
-              {otherItems.map((item) => {
-                const Icon = item.icon;
+
+            <div className="hidden rounded-full border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:flex">
+              {ADMIN_TABS.map((tab) => {
+                const Icon = tab.icon;
+                const active = tab.key === activeTab;
+
                 return (
                   <Link
-                    key={item.to}
-                    to={item.to}
-                    className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+                    key={tab.key}
+                    to={tab.href}
+                    className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                      active
+                        ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                    }`}
                   >
                     <Icon className="h-4 w-4" />
-                    {item.label}
+                    {tab.label}
                   </Link>
                 );
               })}
-            </nav>
+            </div>
           </div>
         </div>
-        {/* Mobile sub-label */}
-        <p className="mx-auto mt-0.5 max-w-6xl text-xs text-gray-500 dark:text-slate-400 sm:hidden">{description}</p>
       </header>
 
-      {/* Page body */}
-      <main className="mx-auto max-w-6xl space-y-4 px-4 py-4">
-        {children}
-      </main>
+      <main className="mx-auto max-w-6xl px-4 py-4 pb-28 sm:px-6 lg:px-8">{children}</main>
 
-      {/* Mobile bottom tab bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 flex border-t border-gray-200 bg-white dark:border-blue-900 dark:bg-slate-950 sm:hidden">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const active = location.pathname === item.to;
-          return (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={`flex flex-1 flex-col items-center gap-1 py-3 text-[10px] font-semibold transition ${
-                active ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-slate-400"
-              }`}
-            >
-              <Icon className={`h-5 w-5 ${active ? "text-blue-600 dark:text-blue-400" : ""}`} />
-              {item.label}
-            </Link>
-          );
-        })}
+      <nav className="fixed inset-x-0 bottom-4 z-30 px-4 sm:hidden">
+        <div className="mx-auto grid max-w-2xl grid-cols-3 overflow-hidden rounded-full border border-white/70 bg-white/90 p-1 shadow-[0_20px_50px_rgba(15,23,42,0.18)] backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90">
+          {ADMIN_TABS.map((tab) => {
+            const Icon = tab.icon;
+            const active = tab.key === activeTab;
+
+            return (
+              <Link
+                key={tab.key}
+                to={tab.href}
+                className={`flex flex-col items-center gap-1 rounded-full px-3 py-2 text-xs font-semibold transition ${
+                  active
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25"
+                    : "text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-900"
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {tab.label}
+              </Link>
+            );
+          })}
+        </div>
       </nav>
     </div>
   );
@@ -947,25 +962,19 @@ function CardsSection() {
   const visibleCards = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return cards;
-
     return cards.filter((card) => {
       const keywords = Array.isArray(card.keywords) ? card.keywords.join(" ") : "";
       return [card.name, card.link, card.btntext, keywords].join(" ").toLowerCase().includes(query);
     });
   }, [cards, searchQuery]);
 
-  const cardStats = useMemo(() => {
-    const cardsWithImage = cards.filter((card) => Boolean(card.img)).length;
-    const totalKeywords = cards.reduce((count, card) => count + (Array.isArray(card.keywords) ? card.keywords.length : 0), 0);
+  const cardStats = useMemo(() => ({
+    total: cards.length,
+    cardsWithImage: cards.filter((card) => Boolean(card.img)).length,
+    totalKeywords: cards.reduce((count, card) => count + (Array.isArray(card.keywords) ? card.keywords.length : 0), 0),
+  }), [cards]);
 
-    return {
-      total: cards.length,
-      cardsWithImage,
-      totalKeywords,
-    };
-  }, [cards]);
-
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setBanner({ type: "", message: "" });
     try {
@@ -973,31 +982,40 @@ function CardsSection() {
       setCards(res.data || []);
     } catch (err) {
       setBanner({ type: "error", message: normalizeError(err, "Failed to load cards") });
-    } finally { setLoading(false); }
-  };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  useEffect(()=>{ load(); }, []);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const onCreate = async (payload) => {
     try {
       const res = await createCard(payload);
       if (res?.success) {
-        setCards((p)=>[...(p||[]), res.data]);
+        setCards((current) => [...(current || []), res.data]);
         setShowForm(false);
         setBanner({ type: "success", message: "Card added" });
       }
-    } catch (err) { setBanner({ type: "error", message: normalizeError(err, "Create failed") }); }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Create failed") });
+    }
   };
 
   const onUpdate = async (payload) => {
     try {
       const res = await updateCard(editItem.id, payload);
       if (res?.success) {
-        setCards((prev)=>prev.map(c=> c.id===editItem.id? res.data : c));
-        setEditItem(null); setShowForm(false);
+        setCards((current) => current.map((card) => (card.id === editItem.id ? res.data : card)));
+        setEditItem(null);
+        setShowForm(false);
         setBanner({ type: "success", message: "Card updated" });
       }
-    } catch (err) { setBanner({ type: "error", message: normalizeError(err, "Update failed") }); }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Update failed") });
+    }
   };
 
   const onDeleteCard = async (id) => {
@@ -1005,309 +1023,76 @@ function CardsSection() {
     try {
       const res = await deleteCard(id);
       if (res?.success) {
-        setCards((p)=>p.filter(c=>c.id!==id));
+        setCards((current) => current.filter((card) => card.id !== id));
         setBanner({ type: "success", message: "Deleted" });
       }
-    } catch (err) { setBanner({ type: "error", message: normalizeError(err, "Delete failed") }); }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Delete failed") });
+    }
   };
 
   return (
-    <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_20px_70px_rgba(15,23,42,0.08)] dark:border-slate-800 dark:bg-slate-950">
-      <div className="border-b border-slate-200 bg-gradient-to-r from-slate-950 via-slate-900 to-blue-950 px-5 py-6 text-white dark:border-slate-800 sm:px-6">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/75">
-              Homepage cards
-            </div>
-            <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">Cards</h2>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-white/70">
-              Control the tiles shown on the homepage, update artwork, and keep the call-to-action links tidy.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-3 sm:w-full sm:max-w-xl">
-            <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-white/55">Total</p>
-              <p className="mt-1 text-2xl font-black">{cardStats.total}</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-white/55">With image</p>
-              <p className="mt-1 text-2xl font-black">{cardStats.cardsWithImage}</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-white/55">Keywords</p>
-              <p className="mt-1 text-2xl font-black">{cardStats.totalKeywords}</p>
-            </div>
-          </div>
+    <section className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
+      <div className="flex flex-col gap-4 border-b border-slate-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 dark:border-slate-800">
+        <div>
+          <div className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">Homepage cards</div>
+          <h2 className="mt-2 text-lg font-bold text-slate-900 dark:text-slate-100">Cards</h2>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Manage the cards shown on the homepage.</p>
+        </div>
+        <div className="grid grid-cols-3 gap-2 sm:min-w-[280px]">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">Total</p><p className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">{cardStats.total}</p></div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">Images</p><p className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">{cardStats.cardsWithImage}</p></div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">Keywords</p><p className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">{cardStats.totalKeywords}</p></div>
         </div>
       </div>
-
-      <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-800 sm:px-6">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex min-w-0 flex-1 items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900">
-            <Search className="h-4 w-4 shrink-0 text-slate-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search cards, links, or keywords..."
-              className="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
-            />
-            {searchQuery && (
-              <button type="button" onClick={() => setSearchQuery("")} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-
-          <div className="flex gap-2">
-            <button
-              onClick={() => {
-                setEditItem(null);
-                setShowForm(true);
-              }}
-              className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
-            >
-              <Plus className="h-4 w-4" />
-              Add Card
-            </button>
-            <button
-              onClick={load}
-              className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900"
-            >
-              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-              Refresh
-            </button>
-          </div>
+      <div className="flex flex-col gap-3 border-b border-slate-200 px-4 py-4 sm:flex-row sm:items-center sm:px-6 dark:border-slate-800">
+        <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-900">
+          <Search className="h-4 w-4 shrink-0 text-slate-400" />
+          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search cards..." className="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500" />
+          {searchQuery && <button type="button" onClick={() => setSearchQuery("")} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><X className="h-4 w-4" /></button>}
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => { setEditItem(null); setShowForm(true); }} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 sm:flex-none"><Plus className="h-4 w-4" />Add Card</button>
+          <button onClick={load} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900 sm:flex-none"><RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />Refresh</button>
         </div>
       </div>
-
-      <div className="px-5 py-5 sm:px-6 sm:py-6">
-        {banner.message && <div className="mb-5"><Banner banner={banner} onDismiss={() => setBanner({ type: "", message: "" })} /></div>}
-
+      <div className="p-4 sm:p-6">
+        {banner.message && <div className="mb-4"><Banner banner={banner} onDismiss={() => setBanner({ type: "", message: "" })} /></div>}
         {loading ? (
-          <div className="flex h-40 items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900">
-            <Loader className="h-6 w-6 animate-spin text-blue-600" />
-          </div>
+          <div className="flex h-36 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900"><Loader className="h-5 w-5 animate-spin text-slate-600 dark:text-slate-300" /></div>
         ) : visibleCards.length === 0 ? (
-          <div className="flex h-52 flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-6 text-center dark:border-slate-800 dark:bg-slate-900">
-            <div className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm dark:bg-slate-950 dark:text-slate-200">
-              No matching cards
-            </div>
-            <p className="mt-3 max-w-sm text-sm text-slate-500 dark:text-slate-400">
-              {searchQuery ? "Try a different search term or clear the filter." : "Add your first card to populate the homepage."}
-            </p>
-          </div>
+          <div className="flex h-40 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 text-center dark:border-slate-800 dark:bg-slate-900"><p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{searchQuery ? "No matching cards" : "No cards yet"}</p><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{searchQuery ? "Try a different search term." : "Add a card to show it on the homepage."}</p></div>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="space-y-3">
             {visibleCards.map((card) => {
               const keywords = Array.isArray(card.keywords) ? card.keywords : [];
-
               return (
-                <article key={card.id} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-950">
-                  <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-slate-100 via-slate-50 to-slate-200 dark:from-slate-900 dark:via-slate-950 dark:to-slate-800">
-                    {card.img ? (
-                      <img
-                        src={card.img}
-                        alt={card.name || "Card image"}
-                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center px-6 text-center">
-                        <div>
-                          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">No image yet</p>
-                          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Upload a banner or paste an image URL.</p>
-                        </div>
-                      </div>
-                    )}
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/80 to-transparent px-4 pb-4 pt-10">
-                      <h3 className="text-lg font-bold text-white">{card.name}</h3>
-                      {card.btntext && <p className="text-sm text-white/75">{card.btntext}</p>}
-                    </div>
+                <article key={card.id} className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950 sm:flex-row sm:items-start">
+                  <div className="h-20 w-full shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 dark:border-slate-800 dark:bg-slate-900 sm:w-28">
+                    {card.img ? <img src={card.img} alt={card.name || "Card image"} className="h-full w-full object-cover" loading="lazy" decoding="async" /> : <div className="flex h-full items-center justify-center text-xs text-slate-400">No image</div>}
                   </div>
-
-                  <div className="space-y-4 p-4">
-                    <div className="flex flex-wrap gap-1.5">
-                      {keywords.length ? (
-                        keywords.map((keyword) => (
-                          <span key={keyword} className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600 dark:bg-slate-900 dark:text-slate-300">
-                            {keyword}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:bg-slate-900 dark:text-slate-400">
-                          No keywords
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm dark:border-slate-800 dark:bg-slate-900">
-                      <div>
-                        <p className="text-[11px] uppercase tracking-wide text-slate-400">Link</p>
-                        <p className="truncate text-slate-700 dark:text-slate-200">{card.link || "Not set"}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          setEditItem(card);
-                          setShowForm(true);
-                        }}
-                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900"
-                      >
-                        <Edit2 className="h-4 w-4" />
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => onDeleteCard(card.id)}
-                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-red-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        Delete
-                      </button>
-                    </div>
+                  <div className="min-w-0 flex-1 space-y-3">
+                    <div className="flex items-start justify-between gap-3"><div className="min-w-0"><h3 className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">{card.name}</h3><p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{card.btntext || "No button text"}</p></div><span className="shrink-0 rounded-full border border-slate-200 px-2.5 py-1 text-[11px] font-medium text-slate-500 dark:border-slate-800 dark:text-slate-400">#{card.id}</span></div>
+                    <div className="flex flex-wrap gap-1.5">{keywords.length ? keywords.map((keyword) => <span key={keyword} className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600 dark:bg-slate-900 dark:text-slate-300">{keyword}</span>) : <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-500 dark:bg-slate-900 dark:text-slate-400">No keywords</span>}</div>
+                    <div className="grid gap-2 text-sm sm:grid-cols-2"><div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">Link</p><p className="truncate text-slate-700 dark:text-slate-200">{card.link || "Not set"}</p></div><div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">Preview</p><p className="truncate text-slate-700 dark:text-slate-200">{card.img ? "Image attached" : "No image attached"}</p></div></div>
+                    <div className="flex gap-2"><button onClick={() => { setEditItem(card); setShowForm(true); }} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900 sm:flex-none"><Edit2 className="h-4 w-4" />Edit</button><button onClick={() => onDeleteCard(card.id)} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 sm:flex-none"><Trash2 className="h-4 w-4" />Delete</button></div>
                   </div>
                 </article>
               );
             })}
           </div>
         )}
-
         {showForm && (
-          <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-slate-950/60 px-4 py-6 backdrop-blur-sm sm:px-6">
-            <div
-              className="absolute inset-0"
-              onClick={() => {
-                setShowForm(false);
-                setEditItem(null);
-              }}
-            />
-            <div className="relative z-50 w-full max-w-3xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
-              <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800 sm:px-6">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Card editor</p>
-                  <h3 className="mt-1 text-lg font-bold text-slate-900 dark:text-slate-100">{editItem ? "Edit Card" : "Add Card"}</h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditItem(null);
-                  }}
-                  className="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <div className="p-5 sm:p-6">
-                <CardForm
-                  initial={editItem}
-                  onSubmit={editItem ? onUpdate : onCreate}
-                  onCancel={() => {
-                    setShowForm(false);
-                    setEditItem(null);
-                  }}
-                  isLoading={false}
-                />
-              </div>
+          <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-slate-950/55 px-4 py-6 backdrop-blur-sm sm:px-6">
+            <div className="absolute inset-0" onClick={() => { setShowForm(false); setEditItem(null); }} />
+            <div className="relative z-50 w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
+              <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4 dark:border-slate-800 sm:px-6"><div><p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Card editor</p><h3 className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">{editItem ? "Edit card" : "Add card"}</h3></div><button type="button" onClick={() => { setShowForm(false); setEditItem(null); }} className="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"><X className="h-4 w-4" /></button></div>
+              <div className="p-4 sm:p-6"><CardForm initial={editItem} onSubmit={editItem ? onUpdate : onCreate} onCancel={() => { setShowForm(false); setEditItem(null); }} isLoading={false} /></div>
             </div>
           </div>
         )}
       </div>
     </section>
-  );
-}
-
-/* -- QB card (mobile) -------------------------------------------------------- */
-function QBCard({
-  item,
-  index,
-  onEdit,
-  onDelete,
-  deletingId,
-  draggable,
-  onDragStart,
-  onDragOver,
-  onDrop,
-  onDragEnd,
-  isDragging,
-  isDropTarget,
-}) {
-  const [expanded, setExpanded] = useState(false);
-  const links = [
-    { key: "qb1", label: "QB1" },
-    { key: "qb2", label: "QB2" },
-    { key: "ak1", label: "AK1" },
-    { key: "ak2", label: "AK2" },
-    { key: "semqbwithans", label: "Sem+Ans" },
-  ];
-
-  return (
-    <div
-      draggable={draggable}
-      onDragStart={onDragStart}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
-      onDragEnd={onDragEnd}
-      className={`rounded-xl border border-gray-200 bg-white shadow-sm transition dark:border-blue-900 dark:bg-slate-950 ${
-        isDragging ? "opacity-50" : ""
-      } ${isDropTarget ? "ring-2 ring-inset ring-blue-400" : ""}`}
-    >
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        className="flex w-full items-start gap-3 px-4 py-3 text-left"
-      >
-        <GripVertical className="mt-0.5 h-4 w-4 shrink-0 text-gray-300 dark:text-slate-600" />
-        <span className="mt-0.5 shrink-0 rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs font-bold text-gray-600 dark:bg-slate-800 dark:text-slate-300">
-          {item.subject_code}
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">{item.subject_name}</p>
-          <p className="mt-0.5 text-xs text-gray-400">{item.year}</p>
-        </div>
-        {expanded ? <ChevronUp className="h-4 w-4 shrink-0 text-gray-400" /> : <ChevronDown className="h-4 w-4 shrink-0 text-gray-400" />}
-      </button>
-
-      {expanded && (
-        <div className="border-t border-gray-100 px-4 pb-4 pt-3 dark:border-blue-900">
-          {/* Links grid */}
-          <div className="mb-3 grid grid-cols-3 gap-2">
-            {links.map(({ key, label }) => (
-              <div key={key} className="rounded-lg border border-gray-100 bg-gray-50 p-2 dark:border-blue-900 dark:bg-slate-900">
-                <p className="text-[10px] font-bold uppercase text-gray-400 dark:text-slate-500">{label}</p>
-                <div className="mt-1">
-                  <LinkCell value={item[key]} label="Open" />
-                </div>
-              </div>
-            ))}
-          </div>
-          <p className="mb-3 text-xs text-gray-400">Updated: {formatDateTime(item.updated_at)}</p>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => onEdit(item)}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-            >
-              <Edit2 className="h-4 w-4" />
-              Edit
-            </button>
-            <button
-              type="button"
-              onClick={() => onDelete(item.id)}
-              disabled={deletingId === item.id}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
-            >
-              {deletingId === item.id ? <Loader className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-              Delete
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
   );
 }
 
@@ -1319,7 +1104,12 @@ function QBSection() {
   const [isReordering, setIsReordering] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [editItem, setEditItem] = useState(null);
+  const [viewItem, setViewItem] = useState(null);
   const [showBatchForm, setShowBatchForm] = useState(false);
+  const [batchYear, setBatchYear] = useState(String(CURRENT_YEAR));
+  const [batchPreviewItems, setBatchPreviewItems] = useState([]);
+  const [batchPreviewLoading, setBatchPreviewLoading] = useState(false);
+  const [batchPreviewError, setBatchPreviewError] = useState("");
   const [batchRows, setBatchRows] = useState([
     { subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" },
   ]);
@@ -1350,6 +1140,41 @@ function QBSection() {
   }, [filterYear]);
 
   useEffect(() => { load(); }, [load]);
+
+  const loadBatchPreview = useCallback(async () => {
+    if (!batchYear) return;
+
+    setBatchPreviewLoading(true);
+    setBatchPreviewError("");
+
+    try {
+      const result = await listQBAnswerKeys({ year: batchYear });
+      setBatchPreviewItems(result.data || []);
+    } catch (err) {
+      setBatchPreviewItems([]);
+      setBatchPreviewError(normalizeError(err, "Failed to load selected batch details"));
+    } finally {
+      setBatchPreviewLoading(false);
+    }
+  }, [batchYear]);
+
+  useEffect(() => {
+    loadBatchPreview();
+  }, [loadBatchPreview]);
+
+  const batchPreviewStats = useMemo(() => {
+    const total = batchPreviewItems.length;
+    const withLinks = batchPreviewItems.filter((item) => item.qb1 || item.qb2 || item.ak1 || item.ak2 || item.semqbwithans).length;
+    const latestItem = [...batchPreviewItems].sort((left, right) => {
+      return new Date(right.updated_at || 0).getTime() - new Date(left.updated_at || 0).getTime();
+    })[0] || null;
+
+    return {
+      total,
+      withLinks,
+      latestItem,
+    };
+  }, [batchPreviewItems]);
 
   const filtered = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -1405,7 +1230,7 @@ function QBSection() {
   async function handleCreateBatch() {
     const validRows = batchRows
       .map((row) => ({
-        year: Number(filterYear),
+        year: Number(batchYear),
         subject_code: row.subject_code.trim(),
         subject_name: row.subject_name.trim(),
         qb1: toNullable(row.qb1),
@@ -1416,17 +1241,18 @@ function QBSection() {
       }))
       .filter((row) => row.subject_code && row.subject_name);
 
-    if (!filterYear || validRows.length === 0) {
-      setBanner({ type: "error", message: "Select year and add at least one subject code + name" });
+    if (!batchYear || validRows.length === 0) {
+      setBanner({ type: "error", message: "Select a batch year and add at least one subject code + name" });
       return;
     }
 
     setIsSaving(true);
     setBanner({ type: "", message: "" });
     try {
-      await createQBAnswerKeysBatch({ year: Number(filterYear), subjects: validRows });
+      await createQBAnswerKeysBatch({ year: Number(batchYear), subjects: validRows });
       setBanner({ type: "success", message: "Subjects added successfully" });
       setShowBatchForm(false);
+      setBatchYear(String(CURRENT_YEAR));
       setBatchRows([{ subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
       await load();
     } catch (err) {
@@ -1466,6 +1292,33 @@ function QBSection() {
     }
   }
 
+  function openEdit(item) {
+    setEditItem({
+      id: item.id,
+      year: String(item.year || batchYear || CURRENT_YEAR),
+      subject_code: item.subject_code || "",
+      subject_name: item.subject_name || "",
+      qb1: item.qb1 || "",
+      qb2: item.qb2 || "",
+      ak1: item.ak1 || "",
+      ak2: item.ak2 || "",
+      semqbwithans: item.semqbwithans || "",
+    });
+    setShowBatchForm(false);
+    setViewItem(null);
+  }
+
+  function openView(item) {
+    setViewItem(item);
+    setEditItem(null);
+    setShowBatchForm(false);
+  }
+
+  function closePreviewModals() {
+    setViewItem(null);
+    setEditItem(null);
+  }
+
   return (
     <section className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-blue-900 dark:bg-slate-950">
       {/* Header */}
@@ -1494,83 +1347,173 @@ function QBSection() {
           </div>
         )}
 
-        {/* Batch add form */}
+
+        <div className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Batch year</h3>
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Select a year to review and manage its subjects.</p>
+            </div>
+            <div className="w-full sm:w-48">
+              <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Year</label>
+              <select
+                value={batchYear}
+                onChange={(e) => setBatchYear(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+              >
+                {YEAR_OPTIONS.map((year) => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Selected batch</p>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                  {batchPreviewLoading ? "Loading subjects..." : `${batchPreviewStats.total} subject${batchPreviewStats.total === 1 ? "" : "s"} in ${batchYear}`}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={loadBatchPreview}
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${batchPreviewLoading ? "animate-spin" : ""}`} />
+                Refresh
+              </button>
+            </div>
+
+            {batchPreviewError ? (
+              <p className="mt-3 text-sm text-red-600 dark:text-red-300">{batchPreviewError}</p>
+            ) : batchPreviewLoading ? (
+              <div className="mt-3 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                <Loader className="h-4 w-4 animate-spin" />
+                Loading batch details...
+              </div>
+            ) : batchPreviewItems.length === 0 ? (
+              <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">This batch is empty. You can add the first subject below.</p>
+            ) : (
+              <div className="mt-3 overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+                <div className="max-h-64 overflow-y-auto">
+                  <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
+                    <thead className="sticky top-0 bg-slate-50 dark:bg-slate-900">
+                      <tr>
+                        <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Code</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Subject</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                      {batchPreviewItems.slice(0, 10).map((item) => (
+                        <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-900">
+                          <td className="px-3 py-2 font-mono text-xs font-semibold text-slate-700 dark:text-slate-200">{item.subject_code}</td>
+                          <td className="px-3 py-2 text-slate-700 dark:text-slate-200">{item.subject_name}</td>
+                          <td className="px-3 py-2">
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                type="button"
+                                onClick={() => openView(item)}
+                                className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+                              >
+                                View
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => openEdit(item)}
+                                className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(item.id)}
+                                disabled={deletingId === item.id}
+                                className="rounded-md border border-red-200 bg-white px-2.5 py-1 text-xs font-medium text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-900 dark:bg-slate-950 dark:text-red-300 dark:hover:bg-slate-900"
+                              >
+                                {deletingId === item.id ? "Deleting..." : "Delete"}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {batchPreviewItems.length > 10 && (
+                  <div className="border-t border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+                    Showing first 10 subjects of {batchPreviewItems.length}.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          </div>
+
         {showBatchForm && !editItem && (
-          <div className="mb-5 rounded-xl border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-900 dark:bg-slate-900">
-            <h3 className="mb-3 text-sm font-bold text-gray-800 dark:text-slate-200">
-              Add subjects for year {filterYear || "--"}
-            </h3>
+          <div className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Add subjects</h3>
+                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Add one or more subjects for the selected year.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowBatchForm(false);
+                  setBatchRows([{ subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
+                }}
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+              >
+                Hide form
+              </button>
+            </div>
+
             <div className="space-y-3">
-              {batchRows.map((row, idx) => (
-                <div key={idx} className="rounded-xl border border-blue-200 bg-white p-3 dark:border-blue-900 dark:bg-slate-950">
-                  {/* Mobile: stacked labels; Desktop: 7-col grid */}
-                  <div className="grid gap-2 sm:grid-cols-7">
-                    <div className="space-y-1 sm:col-span-1">
-                      <label className="block text-[10px] font-bold uppercase text-gray-400 sm:hidden">Code</label>
-                      <input
-                        type="text"
-                        value={row.subject_code}
-                        onChange={(e) => setBatchRows((prev) => prev.map((r, i) => i === idx ? { ...r, subject_code: e.target.value } : r))}
-                        placeholder="Code"
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-                      />
-                    </div>
-                    <div className="space-y-1 sm:col-span-1">
-                      <label className="block text-[10px] font-bold uppercase text-gray-400 sm:hidden">Subject name</label>
-                      <input
-                        type="text"
-                        value={row.subject_name}
-                        onChange={(e) => setBatchRows((prev) => prev.map((r, i) => i === idx ? { ...r, subject_name: e.target.value } : r))}
-                        placeholder="Subject name"
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-                      />
-                    </div>
-                    {[
-                      ["qb1", "QB1"],
-                      ["qb2", "QB2"],
-                      ["ak1", "AK1"],
-                      ["ak2", "AK2"],
-                    ].map(([field, label]) => (
-                      <div key={field} className="space-y-1">
-                        <label className="block text-[10px] font-bold uppercase text-gray-400 sm:hidden">{label}</label>
-                        <input
-                          type="text"
-                          value={row[field]}
-                          onChange={(e) => setBatchRows((prev) => prev.map((r, i) => i === idx ? { ...r, [field]: e.target.value } : r))}
-                          placeholder={label}
-                          className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-                        />
-                      </div>
-                    ))}
-                    <div className="space-y-1">
-                      <label className="block text-[10px] font-bold uppercase text-gray-400 sm:hidden">Sem QB + Ans</label>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={row.semqbwithans}
-                          onChange={(e) => setBatchRows((prev) => prev.map((r, i) => i === idx ? { ...r, semqbwithans: e.target.value } : r))}
-                          placeholder="Sem QB + Ans"
-                          className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none ring-blue-500 focus:ring dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setBatchRows((prev) => prev.filter((_, i) => i !== idx))}
-                          disabled={batchRows.length === 1}
-                          className="shrink-0 rounded-lg border border-red-200 px-3 py-2.5 text-xs font-semibold text-red-600 disabled:opacity-40 dark:border-red-900"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
+              {batchRows.map((row, index) => (
+                <div key={`${index}-${row.subject_code}`} className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900">
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Subject {index + 1}</p>
+                    <button
+                      type="button"
+                      onClick={() => setBatchRows((current) => current.filter((_, currentIndex) => currentIndex !== index))}
+                      disabled={batchRows.length === 1}
+                      className="text-xs font-medium text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      Remove
+                    </button>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <input
+                      value={row.subject_code}
+                      onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, subject_code: e.target.value } : item))}
+                      placeholder="Subject code"
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    />
+                    <input
+                      value={row.subject_name}
+                      onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, subject_name: e.target.value } : item))}
+                      placeholder="Subject name"
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    />
+                    <input value={row.qb1} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, qb1: e.target.value } : item))} placeholder="QB1 link" className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
+                    <input value={row.qb2} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, qb2: e.target.value } : item))} placeholder="QB2 link" className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
+                    <input value={row.ak1} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, ak1: e.target.value } : item))} placeholder="AK1 link" className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
+                    <input value={row.ak2} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, ak2: e.target.value } : item))} placeholder="AK2 link" className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
+                    <input value={row.semqbwithans} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, semqbwithans: e.target.value } : item))} placeholder="Sem QB with answer link" className="sm:col-span-2 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
                   </div>
                 </div>
               ))}
 
-              <div className="flex flex-col gap-2 sm:flex-row">
+              <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
-                  onClick={() => setBatchRows((prev) => [...prev, { subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }])}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-blue-300 bg-white px-4 py-2.5 text-sm font-semibold text-blue-700 hover:bg-blue-50 dark:border-blue-900 dark:bg-slate-950 dark:text-blue-300"
+                  onClick={() => setBatchRows((current) => ([...current, { subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]))}
+                  className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   <Plus className="h-4 w-4" />
                   Add row
@@ -1579,15 +1522,19 @@ function QBSection() {
                   type="button"
                   onClick={handleCreateBatch}
                   disabled={isSaving}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
                 >
                   {isSaving ? <Loader className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
-                  Save batch
+                  {isSaving ? "Saving..." : "Save batch"}
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowBatchForm(false)}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
+                  onClick={() => {
+                    setShowBatchForm(false);
+                    setBatchRows([{ subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
+                    setBatchYear(String(CURRENT_YEAR));
+                  }}
+                  className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   <X className="h-4 w-4" />
                   Cancel
@@ -1597,204 +1544,150 @@ function QBSection() {
           </div>
         )}
 
-        {/* Filters */}
-        <div className="mb-4 flex flex-wrap gap-2">
-          <select
-            value={filterYear}
-            onChange={(e) => setFilterYear(e.target.value)}
-            className="rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-          >
-            <option value="">All years</option>
-            {YEAR_OPTIONS.map((y) => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
-          <div className="flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 dark:border-blue-900 dark:bg-slate-900">
-            <Search className="h-4 w-4 shrink-0 text-gray-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search code or name..."
-              className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400 dark:text-slate-100 dark:placeholder:text-slate-500"
-            />
-            {searchQuery && (
-              <button type="button" onClick={() => setSearchQuery("")} className="text-gray-400 hover:text-gray-600">
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={load}
-            disabled={isLoading}
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-60 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-100"
-          >
-            <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-            <span className="hidden sm:inline">Refresh</span>
-          </button>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-blue-900">
+            <thead className="bg-white/70 dark:bg-slate-900/70">
+              <tr>
+                {["#", "Move", "Code", "Subject", "QB1", "QB2", "AK1", "AK2", "Sem + Ans", "Updated", "Actions"].map((h) => (
+                  <th key={h} className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 bg-white dark:divide-blue-900 dark:bg-slate-950">
+              {filtered.map((item, idx) =>
+                editItem?.id === item.id ? null : (
+                  <tr
+                    key={item.id}
+                    draggable={canReorder}
+                    onDragStart={(event) => {
+                      if (!canReorder) return;
+                      setDraggedId(item.id);
+                      event.dataTransfer.effectAllowed = "move";
+                      event.dataTransfer.setData("text/plain", String(item.id));
+                    }}
+                    onDragOver={(event) => {
+                      if (!canReorder) return;
+                      event.preventDefault();
+                      setDropTargetId(item.id);
+                    }}
+                    onDrop={async (event) => {
+                      if (!canReorder) return;
+                      event.preventDefault();
+                      await handleDropOrder(item.id);
+                    }}
+                    onDragEnd={() => {
+                      setDraggedId(null);
+                      setDropTargetId(null);
+                    }}
+                    className={`transition hover:bg-gray-50 dark:hover:bg-slate-900 ${draggedId === item.id ? "opacity-50" : ""} ${dropTargetId === item.id ? "ring-2 ring-inset ring-blue-400" : ""}`}
+                  >
+                    <td className="px-4 py-3 font-medium text-gray-500 dark:text-slate-400">{idx + 1}</td>
+                    <td className="px-4 py-3">
+                      <button
+                        type="button"
+                        disabled={!canReorder}
+                        className="inline-flex cursor-grab items-center rounded-md border border-gray-200 bg-white px-2 py-1 text-gray-400 transition hover:bg-gray-50 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-500"
+                        aria-label={`Drag to reorder ${item.subject_code}`}
+                      >
+                        <GripVertical className="h-4 w-4" />
+                      </button>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="rounded bg-gray-100 px-2 py-0.5 font-mono text-xs font-semibold text-gray-700 dark:bg-slate-800 dark:text-slate-200">
+                        {item.subject_code}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-gray-800 dark:text-slate-200">{item.subject_name}</td>
+                    <td className="px-4 py-3"><LinkCell value={item.qb1} /></td>
+                    <td className="px-4 py-3"><LinkCell value={item.qb2} /></td>
+                    <td className="px-4 py-3"><LinkCell value={item.ak1} /></td>
+                    <td className="px-4 py-3"><LinkCell value={item.ak2} /></td>
+                    <td className="px-4 py-3"><LinkCell value={item.semqbwithans} /></td>
+                    <td className="px-4 py-3 text-gray-500 dark:text-slate-400">{formatDateTime(item.updated_at)}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => { setEditItem(item); setShowBatchForm(false); }}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-200"
+                        >
+                          <Edit2 className="h-3.5 w-3.5" />
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(item.id)}
+                          disabled={deletingId === item.id}
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
+                        >
+                          {deletingId === item.id ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
         </div>
 
-        <div className="mb-4 rounded-xl border border-dashed border-blue-200 bg-blue-50/60 px-4 py-3 text-sm text-blue-900 dark:border-blue-900 dark:bg-slate-900 dark:text-blue-100">
-          {canReorder
-            ? "Drag subjects by the grip icon to change their order. The new order is saved automatically."
-            : "Clear search and keep one year selected to reorder subjects."}
-          {isReordering && <span className="ml-2 font-semibold">Saving order...</span>}
-        </div>
+        {viewItem && (
+          <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-slate-950/60 px-4 py-6 backdrop-blur-sm sm:px-6">
+            <div className="absolute inset-0" onClick={closePreviewModals} />
+            <div className="relative z-50 w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
+              <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4 dark:border-slate-800 sm:px-6">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Subject details</p>
+                  <h3 className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">{viewItem.subject_code}</h3>
+                </div>
+                <button type="button" onClick={closePreviewModals} className="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
 
-        {/* Edit form inline */}
-        {editItem && (
-          <div className="mb-5 rounded-xl border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-900 dark:bg-slate-900">
-            <h4 className="mb-3 text-sm font-bold text-gray-800 dark:text-slate-200">
-              Edit: {editItem.subject_code} -- {editItem.subject_name}
-            </h4>
-            <QBForm
-              initial={{ ...editItem, year: String(editItem.year) }}
-              onSubmit={handleUpdate}
-              onCancel={() => setEditItem(null)}
-              isLoading={isSaving}
-            />
+              <div className="grid gap-3 p-4 sm:grid-cols-2 sm:p-6">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900">
+                  <p className="text-[10px] uppercase tracking-wide text-slate-400">Year</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{viewItem.year}</p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900">
+                  <p className="text-[10px] uppercase tracking-wide text-slate-400">Subject</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{viewItem.subject_name}</p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">QB1</p><LinkCell value={viewItem.qb1} /></div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">QB2</p><LinkCell value={viewItem.qb2} /></div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">AK1</p><LinkCell value={viewItem.ak1} /></div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">AK2</p><LinkCell value={viewItem.ak2} /></div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900 sm:col-span-2"><p className="text-[10px] uppercase tracking-wide text-slate-400">Sem QB with answer</p><LinkCell value={viewItem.semqbwithans} /></div>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Content */}
-        {isLoading ? (
-          <div className="flex h-32 items-center justify-center">
-            <Loader className="h-6 w-6 animate-spin text-blue-600" />
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="flex h-32 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 bg-gray-50 dark:border-blue-900 dark:bg-slate-900">
-            <BookOpen className="h-7 w-7 text-gray-400" />
-            <p className="text-sm text-gray-500 dark:text-slate-400">No subjects found</p>
-          </div>
-        ) : (
-          <>
-            {/* Mobile: expandable cards */}
-            <div className="space-y-2 sm:hidden">
-              {filtered.map((item, idx) => (
-                <QBCard
-                  key={item.id}
-                  item={item}
-                  index={idx}
-                  onEdit={(i) => { setEditItem(i); setShowBatchForm(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                  onDelete={handleDelete}
-                  deletingId={deletingId}
-                  draggable={canReorder}
-                  onDragStart={(event) => {
-                    if (!canReorder) return;
-                    setDraggedId(item.id);
-                    event.dataTransfer.effectAllowed = "move";
-                    event.dataTransfer.setData("text/plain", String(item.id));
-                  }}
-                  onDragOver={(event) => {
-                    if (!canReorder) return;
-                    event.preventDefault();
-                    setDropTargetId(item.id);
-                  }}
-                  onDrop={async (event) => {
-                    if (!canReorder) return;
-                    event.preventDefault();
-                    await handleDropOrder(item.id);
-                  }}
-                  onDragEnd={() => {
-                    setDraggedId(null);
-                    setDropTargetId(null);
-                  }}
-                  isDragging={draggedId === item.id}
-                  isDropTarget={dropTargetId === item.id}
+        {editItem && (
+          <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-slate-950/60 px-4 py-6 backdrop-blur-sm sm:px-6">
+            <div className="absolute inset-0" onClick={closePreviewModals} />
+            <div className="relative z-50 w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
+              <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4 dark:border-slate-800 sm:px-6">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Edit subject</p>
+                  <h3 className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">{editItem.subject_code}</h3>
+                </div>
+                <button type="button" onClick={closePreviewModals} className="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="p-4 sm:p-6">
+                <QBForm
+                  initial={editItem}
+                  onSubmit={handleUpdate}
+                  onCancel={closePreviewModals}
+                  isLoading={isSaving}
                 />
-              ))}
+              </div>
             </div>
-
-            {/* Desktop: table */}
-            <div className="hidden overflow-x-auto rounded-xl border border-gray-200 dark:border-blue-900 sm:block">
-              <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-blue-900">
-                <thead className="bg-gray-50 dark:bg-slate-900">
-                  <tr>
-                    {["#", "Move", "Code", "Subject", "QB1", "QB2", "AK1", "AK2", "Sem + Ans", "Updated", "Actions"].map((h) => (
-                      <th key={h} className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 bg-white dark:divide-blue-900 dark:bg-slate-950">
-                  {filtered.map((item, idx) =>
-                    editItem?.id === item.id ? null : (
-                      <tr
-                        key={item.id}
-                        draggable={canReorder}
-                        onDragStart={(event) => {
-                          if (!canReorder) return;
-                          setDraggedId(item.id);
-                          event.dataTransfer.effectAllowed = "move";
-                          event.dataTransfer.setData("text/plain", String(item.id));
-                        }}
-                        onDragOver={(event) => {
-                          if (!canReorder) return;
-                          event.preventDefault();
-                          setDropTargetId(item.id);
-                        }}
-                        onDrop={async (event) => {
-                          if (!canReorder) return;
-                          event.preventDefault();
-                          await handleDropOrder(item.id);
-                        }}
-                        onDragEnd={() => {
-                          setDraggedId(null);
-                          setDropTargetId(null);
-                        }}
-                        className={`transition hover:bg-gray-50 dark:hover:bg-slate-900 ${draggedId === item.id ? "opacity-50" : ""} ${dropTargetId === item.id ? "ring-2 ring-inset ring-blue-400" : ""}`}
-                      >
-                        <td className="px-4 py-3 font-medium text-gray-500 dark:text-slate-400">{idx + 1}</td>
-                        <td className="px-4 py-3">
-                          <button
-                            type="button"
-                            disabled={!canReorder}
-                            className="inline-flex cursor-grab items-center rounded-md border border-gray-200 bg-white px-2 py-1 text-gray-400 transition hover:bg-gray-50 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-500"
-                            aria-label={`Drag to reorder ${item.subject_code}`}
-                          >
-                            <GripVertical className="h-4 w-4" />
-                          </button>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className="rounded bg-gray-100 px-2 py-0.5 font-mono text-xs font-semibold text-gray-700 dark:bg-slate-800 dark:text-slate-200">
-                            {item.subject_code}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-gray-800 dark:text-slate-200">{item.subject_name}</td>
-                        <td className="px-4 py-3"><LinkCell value={item.qb1} /></td>
-                        <td className="px-4 py-3"><LinkCell value={item.qb2} /></td>
-                        <td className="px-4 py-3"><LinkCell value={item.ak1} /></td>
-                        <td className="px-4 py-3"><LinkCell value={item.ak2} /></td>
-                        <td className="px-4 py-3"><LinkCell value={item.semqbwithans} /></td>
-                        <td className="px-4 py-3 text-gray-500 dark:text-slate-400">{formatDateTime(item.updated_at)}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex gap-2">
-                            <button
-                              type="button"
-                              onClick={() => { setEditItem(item); setShowBatchForm(false); }}
-                              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-200"
-                            >
-                              <Edit2 className="h-3.5 w-3.5" />
-                              Edit
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDelete(item.id)}
-                              disabled={deletingId === item.id}
-                              className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
-                            >
-                              {deletingId === item.id ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </>
+          </div>
         )}
       </div>
     </section>
@@ -1802,32 +1695,27 @@ function QBSection() {
 }
 
 /* -- Pages ------------------------------------------------------------------- */
-function AdminUsersPage() {
+function AdminDashboard({ initialTab } = {}) {
+  const location = useLocation();
+  const activeTab = initialTab || getAdminTabFromPath(location.pathname);
+
   return (
-    <AdminPageShell title="Users" description="Manage admin-visible user accounts.">
-      <UsersSection />
-    </AdminPageShell>
+    <AdminDashboardShell activeTab={activeTab}>
+      {activeTab === "qb" ? <QBSection /> : activeTab === "cards" ? <CardsSection /> : <UsersSection />}
+    </AdminDashboardShell>
   );
+}
+
+function AdminUsersPage() {
+  return <AdminDashboard initialTab="users" />;
 }
 
 function AdminQBPage() {
-  return (
-    <AdminPageShell title="QB Handling" description="Create and edit question bank entries.">
-      <QBSection />
-    </AdminPageShell>
-  );
+  return <AdminDashboard initialTab="qb" />;
 }
 
 function AdminCardsPage() {
-  return (
-    <AdminPageShell title="Cards" description="Manage homepage cards">
-      <CardsSection />
-    </AdminPageShell>
-  );
-}
-
-function AdminDashboard() {
-  return <Navigate to="/admin/users" replace />;
+  return <AdminDashboard initialTab="cards" />;
 }
 
 export { AdminUsersPage, AdminQBPage, AdminCardsPage };

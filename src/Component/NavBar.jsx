@@ -21,13 +21,15 @@ function Navbar() {
 
   const navItems = [
     { to: "/home", label: "Home" },
-    ...(isAdmin ? [
-      { to: "/admin/users", label: "Users" },
-      { to: "/admin/qb", label: "QB Handling" },
-    ] : []),
+    ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
     { to: "/profile", label: "My Profile" },
     { to: "/about", label: "About" }
   ];
+
+  const isActiveNavItem = (item) => {
+    if (item.to === "/admin") return location.pathname.startsWith("/admin");
+    return location.pathname === item.to;
+  };
 
   const handleLogout = async () => {
     try {
@@ -70,7 +72,7 @@ function Navbar() {
                   </li>
                   {navItems.map((item) => (
                     <li key={item.to}>
-                      <Link to={item.to} className={`text-sm font-medium transition-all duration-300 ${location.pathname === item.to ? "text-white bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30" : "text-white/90 hover:text-white hover:bg-white/10 px-4 py-2 rounded-full"}`}>
+                      <Link to={item.to} className={`text-sm font-medium transition-all duration-300 ${isActiveNavItem(item) ? "text-white bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30" : "text-white/90 hover:text-white hover:bg-white/10 px-4 py-2 rounded-full"}`}>
                         {item.label}
                       </Link>
                     </li>
@@ -144,7 +146,7 @@ function Navbar() {
                       </li>
                       {navItems.map((item) => (
                         <li key={item.to}>
-                          <Link to={item.to} onClick={() => setIsOpen(false)} className={`block px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${ location.pathname === item.to ? "bg-white/25 backdrop-blur-md text-white border border-white/30 shadow-lg" : "text-white/90 hover:bg-white/15 hover:text-white border border-transparent" }`}>
+                          <Link to={item.to} onClick={() => setIsOpen(false)} className={`block px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${isActiveNavItem(item) ? "bg-white/25 backdrop-blur-md text-white border border-white/30 shadow-lg" : "text-white/90 hover:bg-white/15 hover:text-white border border-transparent" }`}>
                             {item.label}
                           </Link>
                         </li>
