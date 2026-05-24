@@ -695,7 +695,8 @@ func LookupHall(registerNo, courseCode string) (string, bool) {
 	registerNo = strings.TrimSpace(strings.ToUpper(registerNo))
 	courseCode = strings.TrimSpace(strings.ToUpper(courseCode))
 
-	allRecords := append(buildSeatingData01June2026FNAN())
+	allRecords := buildSeatingData01June2026FNAN()
+	
 	
 	for _, record := range allRecords {
 		if strings.ToUpper(record.CourseCode) != courseCode {
