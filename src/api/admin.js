@@ -45,6 +45,12 @@ export async function deleteAdminUser({ uid }) {
   return response.data;
 }
 
+export async function setAdminUserBlocked({ uid, blocked }) {
+  const headers = await getAdminHeaders();
+  const response = await api.put(`/admin/users/${uid}/block`, { blocked }, { headers });
+  return response.data;
+}
+
 export async function updateUsers() {
   const headers = await getAdminHeaders();
   const response = await api.get("/admin/users/update", {

@@ -4,6 +4,7 @@ import {
   deleteAdminUser,
   listAdminUsers,
   updateUsers,
+  setAdminUserBlocked,
   listQBAnswerKeys,
   createQBAnswerKeysBatch,
   reorderQBAnswerKeys,
@@ -62,6 +63,11 @@ function fileToDataURL(file) {
 function formatRouteLabel(value) {
   if (!value) return "-";
   return value;
+}
+
+function formatBlockedAt(value) {
+  if (!value) return "-";
+  return formatDateTime(value);
 }
 
 function parseDateValue(value) {
@@ -135,6 +141,67 @@ function Banner({ banner, onDismiss }) {
           <X className="h-4 w-4" />
         </button>
       )}
+    </div>
+  );
+}
+
+function ConfirmModal({ open, title, description, confirmLabel, cancelLabel = "Cancel", tone = "danger", busy = false, onConfirm, onCancel }) {
+  if (!open) return null;
+
+  const confirmClasses =
+    tone === "danger"
+      ? "bg-red-600 hover:bg-red-700 focus-visible:ring-red-500"
+      : "bg-emerald-600 hover:bg-emerald-700 focus-visible:ring-emerald-500";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 px-4 py-6 backdrop-blur-sm" onClick={onCancel}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirm-modal-title"
+        className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-950/20 dark:border-slate-800 dark:bg-slate-950"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+          <div className="min-w-0">
+            <h3 id="confirm-modal-title" className="text-base font-bold text-slate-900 dark:text-slate-100">
+              {title}
+            </h3>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-lg border border-slate-200 p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:hover:bg-slate-900 dark:hover:text-slate-100"
+            aria-label="Close confirmation dialog"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="space-y-4 px-5 py-4">
+          <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">This action will take effect immediately after you confirm.</p>
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={busy}
+              className="inline-flex items-center justify-center rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-800 dark:text-slate-200 dark:hover:bg-slate-900"
+            >
+              {cancelLabel}
+            </button>
+            <button
+              type="button"
+              onClick={onConfirm}
+              disabled={busy}
+              className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950 ${confirmClasses}`}
+            >
+              {busy ? <Loader className="h-4 w-4 animate-spin" /> : null}
+              {confirmLabel}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -399,8 +466,9 @@ function AdminDashboardShell({ activeTab, children }) {
 }
 
 /* -- User card (mobile) ------------------------------------------------------ */
-function UserCard({ userItem, index, onDelete, deletingUid, showStatus }) {
+function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showStatus }) {
   const [expanded, setExpanded] = useState(false);
+  const isBlocked = Boolean(userItem.isBlocked);
   return (
     <div className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-blue-900 dark:bg-slate-950">
       {/* Card header -- always visible */}
@@ -428,14 +496,21 @@ function UserCard({ userItem, index, onDelete, deletingUid, showStatus }) {
           <p className="truncate text-xs text-gray-500 dark:text-slate-400">{userItem.email || userItem.uid}</p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          {isBlocked && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-950 dark:text-red-300">
+              Blocked
+            </span>
+          )}
           {showStatus && (
             <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-              userItem.isOnline
-                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
-                : "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-400"
+              isBlocked
+                ? "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300"
+                : userItem.isOnline
+                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                  : "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-400"
             }`}>
-              {userItem.isOnline ? <Wifi className="h-2.5 w-2.5" /> : <WifiOff className="h-2.5 w-2.5" />}
-              {userItem.isOnline ? "Online" : "Offline"}
+              {isBlocked ? <AlertTriangle className="h-2.5 w-2.5" /> : userItem.isOnline ? <Wifi className="h-2.5 w-2.5" /> : <WifiOff className="h-2.5 w-2.5" />}
+              {isBlocked ? "Blocked" : userItem.isOnline ? "Online" : "Offline"}
             </span>
           )}
           {expanded ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
@@ -454,15 +529,28 @@ function UserCard({ userItem, index, onDelete, deletingUid, showStatus }) {
               <p className="font-semibold text-gray-500 dark:text-slate-400">Last route</p>
               <p className="mt-0.5 truncate text-gray-800 dark:text-slate-200">{formatRouteLabel(userItem.lastUsedRoute)}</p>
             </div>
+            <div>
+              <p className="font-semibold text-gray-500 dark:text-slate-400">Blocked at</p>
+              <p className="mt-0.5 text-gray-800 dark:text-slate-200">{isBlocked ? formatBlockedAt(userItem.blockedAt) : "-"}</p>
+            </div>
           </div>
           <button
             type="button"
             onClick={() => onDelete(userItem.uid)}
             disabled={deletingUid === userItem.uid}
-            className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-red-200 bg-white px-3 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-900 dark:bg-slate-950 dark:text-red-300 dark:hover:bg-slate-900"
           >
             {deletingUid === userItem.uid ? <Loader className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Delete user
+          </button>
+          <button
+            type="button"
+            onClick={() => onToggleBlock(userItem.uid, !isBlocked)}
+            className={`mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-white transition ${
+              isBlocked ? "bg-emerald-600 hover:bg-emerald-700" : "bg-red-600 hover:bg-red-700"
+            }`}
+          >
+            {isBlocked ? "Unblock user" : "Block user"}
           </button>
         </div>
       )}
@@ -471,10 +559,10 @@ function UserCard({ userItem, index, onDelete, deletingUid, showStatus }) {
 }
 
 /* -- Users table (desktop) --------------------------------------------------- */
-function UserTable({ users, onDelete, deletingUid, showStatus }) {
+function UserTable({ users, onDelete, onToggleBlock, deletingUid, showStatus }) {
   const cols = showStatus
-    ? ["#", "Photo", "Email", "Display name", "Status", "Last seen", "Last used", "Delete"]
-    : ["#", "Photo", "Email", "Display name", "Last seen", "Last used", "Delete"];
+    ? ["#", "Photo", "Email", "Display name", "Status", "Last seen", "Last used", "Blocked at", "Action"]
+    : ["#", "Photo", "Email", "Display name", "Last seen", "Last used", "Blocked at", "Action"];
 
   return (
     <div className="overflow-x-auto">
@@ -504,24 +592,40 @@ function UserTable({ users, onDelete, deletingUid, showStatus }) {
               {showStatus && (
                 <td className="px-4 py-3">
                   <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                    userItem.isOnline ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300" : "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-300"
+                    userItem.isBlocked
+                      ? "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300"
+                      : userItem.isOnline
+                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                        : "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-300"
                   }`}>
-                    {userItem.isOnline ? "Online" : "Offline"}
+                    {userItem.isBlocked ? "Blocked" : userItem.isOnline ? "Online" : "Offline"}
                   </span>
                 </td>
               )}
               <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.lastSeenAt ? formatDateTime(userItem.lastSeenAt) : "Never"}</td>
               <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatRouteLabel(userItem.lastUsedRoute)}</td>
+              <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatBlockedAt(userItem.blockedAt)}</td>
               <td className="px-4 py-3">
-                <button
-                  type="button"
-                  onClick={() => onDelete(userItem.uid)}
-                  disabled={deletingUid === userItem.uid}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
-                >
-                  {deletingUid === userItem.uid ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-                  Delete
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onToggleBlock(userItem.uid, !userItem.isBlocked)}
+                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-white transition ${
+                      userItem.isBlocked ? "bg-emerald-600 hover:bg-emerald-700" : "bg-red-600 hover:bg-red-700"
+                    }`}
+                  >
+                    {userItem.isBlocked ? "Unblock" : "Block"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onDelete(userItem.uid)}
+                    disabled={deletingUid === userItem.uid}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-60 dark:border-red-900 dark:bg-slate-950 dark:text-red-300 dark:hover:bg-slate-900"
+                  >
+                    {deletingUid === userItem.uid ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                    Delete
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
@@ -540,6 +644,8 @@ function UsersSection() {
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [deletingUid, setDeletingUid] = useState("");
   const [isUpdatingUsers, setIsUpdatingUsers] = useState(false);
+  const [confirmation, setConfirmation] = useState(null);
+  const [isConfirming, setIsConfirming] = useState(false);
   const [banner, setBanner] = useState({ type: "", message: "" });
 
   function getBatchLabelFromEmail(email) {
@@ -633,8 +739,12 @@ function UsersSection() {
     }
   };
 
-  const onDeleteUser = async (uid) => {
-    if (!window.confirm("Delete this user permanently?")) return;
+  const closeConfirmation = () => {
+    if (isConfirming) return;
+    setConfirmation(null);
+  };
+
+  const deleteUser = async (uid) => {
     setDeletingUid(uid);
     setBanner({ type: "", message: "" });
     try {
@@ -645,6 +755,61 @@ function UsersSection() {
       setBanner({ type: "error", message: normalizeError(error, "Failed to delete user") });
     } finally {
       setDeletingUid("");
+    }
+  };
+
+  const onDeleteUser = (uid) => {
+    setConfirmation({ type: "delete", uid });
+  };
+
+  const onConfirmDelete = async () => {
+    if (!confirmation || confirmation.type !== "delete") return;
+    setIsConfirming(true);
+    try {
+      await deleteUser(confirmation.uid);
+      setConfirmation(null);
+    } finally {
+      setIsConfirming(false);
+    }
+  };
+
+  const blockUser = async (uid, blocked) => {
+    setBanner({ type: "", message: "" });
+    try {
+      const result = await setAdminUserBlocked({ uid, blocked });
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.uid === uid
+            ? {
+                ...user,
+                isBlocked: blocked,
+                blockedAt: blocked ? result?.user?.blocked_at || new Date().toISOString() : "",
+              }
+            : user
+        )
+      );
+      setBanner({ type: "success", message: result?.message || (blocked ? "User blocked successfully" : "User unblocked successfully") });
+    } catch (error) {
+      setBanner({ type: "error", message: normalizeError(error, blocked ? "Failed to block user" : "Failed to unblock user") });
+    }
+  };
+
+  const onToggleBlock = async (uid, blocked) => {
+    if (blocked) {
+      setConfirmation({ type: "block", uid, blocked });
+      return;
+    }
+    await blockUser(uid, blocked);
+  };
+
+  const onConfirmBlock = async () => {
+    if (!confirmation || confirmation.type !== "block") return;
+    setIsConfirming(true);
+    try {
+      await blockUser(confirmation.uid, true);
+      setConfirmation(null);
+    } finally {
+      setIsConfirming(false);
     }
   };
 
@@ -705,6 +870,22 @@ function UsersSection() {
             <Banner banner={banner} onDismiss={() => setBanner({ type: "", message: "" })} />
           </div>
         )}
+
+        <ConfirmModal
+          open={Boolean(confirmation)}
+          title={confirmation?.type === "delete" ? "Delete this user?" : "Block this user?"}
+          description={
+            confirmation?.type === "delete"
+              ? "This permanently removes the user from the database and cannot be undone."
+              : "The user will be blocked from signing in and will see the support contact message."
+          }
+          confirmLabel={confirmation?.type === "delete" ? "Delete user" : "Block user"}
+          cancelLabel="Cancel"
+          tone="danger"
+          busy={isConfirming || Boolean(deletingUid)}
+          onConfirm={confirmation?.type === "delete" ? onConfirmDelete : onConfirmBlock}
+          onCancel={closeConfirmation}
+        />
 
         {isLoadingUsers && !usersLoaded ? (
           <div className="flex h-36 items-center justify-center">
@@ -775,12 +956,12 @@ function UsersSection() {
                   {/* Mobile: cards */}
                   <div className="space-y-2 p-3 sm:hidden">
                     {onlineUsers.map((u, i) => (
-                      <UserCard key={u.uid} userItem={u} index={i} onDelete={onDeleteUser} deletingUid={deletingUid} showStatus={false} />
+                      <UserCard key={u.uid} userItem={u} index={i} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus={false} />
                     ))}
                   </div>
                   {/* Desktop: table */}
                   <div className="hidden sm:block">
-                    <UserTable users={onlineUsers} onDelete={onDeleteUser} deletingUid={deletingUid} showStatus={false} />
+                    <UserTable users={onlineUsers} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus={false} />
                   </div>
                 </>
               )}
@@ -801,12 +982,12 @@ function UsersSection() {
                   {/* Mobile: cards */}
                   <div className="space-y-2 p-3 sm:hidden">
                     {[...recentActivityUsers, ...neverActiveUsers].map((u, i) => (
-                      <UserCard key={u.uid} userItem={u} index={i} onDelete={onDeleteUser} deletingUid={deletingUid} showStatus />
+                      <UserCard key={u.uid} userItem={u} index={i} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus />
                     ))}
                   </div>
                   {/* Desktop: table */}
                   <div className="hidden sm:block">
-                    <UserTable users={[...recentActivityUsers, ...neverActiveUsers]} onDelete={onDeleteUser} deletingUid={deletingUid} showStatus />
+                    <UserTable users={[...recentActivityUsers, ...neverActiveUsers]} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus />
                   </div>
                 </>
               )}

@@ -12,7 +12,7 @@ function Login() {
   const [error, setError] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { user, loading, accessDeniedMessage } = useAuth();
   
   useEffect(() => {
     if (location.state?.error === "unauthorized") {
@@ -20,6 +20,12 @@ function Login() {
       window.history.replaceState({}, document.title);
     }
   }, [location]);
+
+  useEffect(() => {
+    if (accessDeniedMessage) {
+      setError(accessDeniedMessage);
+    }
+  }, [accessDeniedMessage]);
   
   useEffect(() => {
     if (user && isAllowedEmail(user.email)) {
@@ -104,6 +110,12 @@ function Login() {
           )}
           
           <p className="mt-6 text-center text-xs text-gray-400 dark:text-slate-400">Secure authentication powered by Google</p>
+
+          {accessDeniedMessage && (
+            <p className="mt-3 text-center text-xs font-medium text-red-600 dark:text-red-300">
+              Contact support@bitsathy.in for more details.
+            </p>
+          )}
 
           {isGuestLoginEnabled && (
             <p className="mt-3 text-center text-[11px] text-blue-500 dark:text-blue-300">

@@ -4,6 +4,7 @@ import { auth } from "../Authentication/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { pingPresence } from "../api/presence.js";
 import { getMeProfile } from "../api/axios.js";
+import { logout } from "../Authentication/firebase.js";
 import {
   clearGuestSession,
   createGuestStudent,
@@ -100,6 +101,7 @@ export const StudentContext = ({ children }) => {
   const [student, setStudent] = useState(initialGuestSession ? createGuestStudent() : null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(!initialGuestSession);
+  const [accessDeniedMessage, setAccessDeniedMessage] = useState("");
   const currentRouteLabel = useMemo(() => getPresenceRouteLabel(location.pathname), [location.pathname]);
   const hydratedEmailRef = useRef("");
 
@@ -116,6 +118,7 @@ export const StudentContext = ({ children }) => {
     }
 
     hydratedEmailRef.current = currentUser.email;
+  setAccessDeniedMessage("");
 
     clearGuestSession();
     const decoded = decodeCollegeEmail(currentUser.email);
@@ -130,6 +133,17 @@ export const StudentContext = ({ children }) => {
         setProfile(null);
       }
     } catch (error) {
+      const status = error?.response?.status;
+      const message = error?.response?.data?.message || error?.message || "Failed to load profile from /me";
+      if (status === 403 || error?.response?.data?.status === "blocked") {
+        setAccessDeniedMessage(message);
+        setUser(null);
+        setStudent(null);
+        setProfile(null);
+        hydratedEmailRef.current = "";
+        logout().catch(() => {});
+        return;
+      }
       setProfile(null);
       console.error("Failed to load profile from /me", error);
     }
@@ -240,7 +254,7 @@ export const StudentContext = ({ children }) => {
   }, [user?.uid, currentRouteLabel]);
 
   return (
-    <AuthContext.Provider value={{ user, student, profile, loading }}>
+    <AuthContext.Provider value={{ user, student, profile, loading, accessDeniedMessage, setAccessDeniedMessage }}>
       {children}
     </AuthContext.Provider>
   );
