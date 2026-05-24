@@ -12,6 +12,11 @@ type User struct {
 	IsOnline       bool   `json:"isOnline"`
 }
 
+type UserWithRollNo struct {
+	User
+	RollNo string `json:"roll_no"`
+}
+
 type PSToken struct {
 	Token string `json:"token"`
 }

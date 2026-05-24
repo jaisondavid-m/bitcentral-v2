@@ -45,6 +45,7 @@ func main() {
 	leaderboardHandler := handlers.NewLeaderboardHandler(sheetHandler)
 	leaveHandler := handlers.NewLeaveHandler()
 	qbHandler := handlers.NewQBHandler()
+	studentLookupHandler := handlers.NewStudentLookupHandler()
 	uploadHandler := handlers.NewUploadHandler()
 
 	r := routes.SetupRouter(
@@ -58,6 +59,7 @@ func main() {
 		leaveHandler,
 		examHallHandler,
 		qbHandler,
+		studentLookupHandler,
 		uploadHandler,
 	)
 	r.Static("/pdfs", "./pdfs")

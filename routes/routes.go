@@ -21,6 +21,7 @@ func SetupRouter(
 	leaveHandler *handlers.LeaveHandler,
 	examHallHandler *handlers.ExamHallHandler,
 	qbHandler *handlers.QBHandler,
+	studentLookupHandler *handlers.StudentLookupHandler,
 	uploadHandler *handlers.UploadHandler,
 ) *gin.Engine {
 
@@ -57,16 +58,18 @@ func SetupRouter(
 	// Public routes
 	r.GET("/auth/login", handler.HandleLogin)
 	r.GET("/auth/callback", handler.HandleCallback)
-	r.GET("/cards", handlers.GetCards)
-	r.GET("/leaves", leaveHandler.GetAllLeaves)
-	r.GET("/exam-hall", examHallHandler.GetHall)
 
 	// Protected routes
 	api := r.Group("/")
 	api.Use(handler.RequireAuth())
 	{
+		api.GET("/cards", handlers.GetCards)
+		api.GET("/leaves", leaveHandler.GetAllLeaves)
+		api.GET("/exam-hall", examHallHandler.GetHall)
 		api.GET("/search", handler.UniversalSearch)
 		api.GET("/rewards", handler.GetRewardsByRollNo)
+		api.GET("/me", studentLookupHandler.GetMe)
+		api.GET("/student/roll-no", studentLookupHandler.GetRollNoByEmail)
 		api.GET("/averages", handler.GetOverallAverageFromSheet)
 		api.GET("/semesters/:year", semesterHandler.GetSemesterByYear)
 		api.GET("/qb", qbHandler.List)
