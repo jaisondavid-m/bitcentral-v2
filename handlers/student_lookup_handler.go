@@ -77,9 +77,9 @@ func (h *StudentLookupHandler) GetRollNoByEmail(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"success":  true,
-		"mailid":   mailID,
-		"roll_no":  rollNo,
+		"success": true,
+		"mailid":  mailID,
+		"roll_no": rollNo,
 	})
 }
 
@@ -169,14 +169,14 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"data": gin.H{
-			"uid":             user.UID,
-			"email":           user.Email,
-			"display_name":    user.DisplayName,
-			"photo_url":       user.PhotoURL,
-			"creation_time":   user.CreationTime,
+			"uid":               user.UID,
+			"email":             user.Email,
+			"display_name":      user.DisplayName,
+			"photo_url":         user.PhotoURL,
+			"creation_time":     user.CreationTime,
 			"last_sign_in_time": user.LastSignInTime,
-			"last_seen_at":    user.LastSeenAt,
-			"roll_no":         rollNo,
+			"last_seen_at":      user.LastSeenAt,
+			"roll_no":           rollNo,
 		},
 	})
 }

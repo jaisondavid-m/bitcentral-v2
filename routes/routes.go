@@ -107,6 +107,7 @@ func SetupRouter(
 		admin.GET("/cards", handlers.GetCards)
 		admin.POST("/cards", handlers.CreateCard)
 		admin.PUT("/cards/:id", handlers.UpdateCard)
+		admin.PUT("/cards/reorder", handlers.ReorderCards)
 		admin.DELETE("/cards/:id", handlers.DeleteCard)
 	}
 

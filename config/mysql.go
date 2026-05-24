@@ -221,6 +221,7 @@ func createCardsTable() {
 	query := `
 	CREATE TABLE IF NOT EXISTS cards (
 		id INT AUTO_INCREMENT PRIMARY KEY,
+		card_order INT NOT NULL DEFAULT 0,
 		img LONGTEXT,
 		name VARCHAR(255) NOT NULL,
 		keywords JSON,
@@ -233,6 +234,18 @@ func createCardsTable() {
 	_, err := DB.Exec(query)
 	if err != nil {
 		log.Fatalf("❌ Failed to create cards table: %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE cards ADD COLUMN card_order INT NOT NULL DEFAULT 0 AFTER id`); err != nil {
+		log.Printf("ℹ️ card_order column not created (may already exist): %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE cards ADD INDEX idx_cards_card_order (card_order)`); err != nil {
+		log.Printf("ℹ️ idx_cards_card_order not created (may already exist): %v", err)
+	}
+
+	if _, err := DB.Exec(`UPDATE cards SET card_order = id WHERE card_order = 0`); err != nil {
+		log.Printf("ℹ️ card_order backfill skipped: %v", err)
 	}
 
 	log.Println("✅ cards table ready")
