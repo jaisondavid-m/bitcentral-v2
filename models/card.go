@@ -8,4 +8,5 @@ type Card struct {
 	Keywords []string `json:"keywords"`
 	Link     string   `json:"link"`
 	BtnText  string   `json:"btntext"`
+	ClickCount int    `json:"click_count"`
 }

@@ -20,7 +20,7 @@ func NewCardHandler() *CardHandler {
 }
 
 func GetCards(c *gin.Context) {
-	rows, err := config.DB.Query(`SELECT id, card_order, img, name, keywords, link, btntext FROM cards ORDER BY card_order ASC, id ASC`)
+	rows, err := config.DB.Query(`SELECT id, card_order, img, name, keywords, link, btntext, click_count FROM cards ORDER BY card_order ASC, id ASC`)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -30,9 +30,10 @@ func GetCards(c *gin.Context) {
 	var cards []models.Card
 	for rows.Next() {
 		var id, order int
+		var clickCount int
 		var img, name, link, btntext string
 		var keywords sql.NullString
-		if err := rows.Scan(&id, &order, &img, &name, &keywords, &link, &btntext); err != nil {
+		if err := rows.Scan(&id, &order, &img, &name, &keywords, &link, &btntext, &clickCount); err != nil {
 			continue
 		}
 		var kw []string
@@ -47,6 +48,7 @@ func GetCards(c *gin.Context) {
 			Keywords: kw,
 			Link:     link,
 			BtnText:  btntext,
+			ClickCount: clickCount,
 		})
 	}
 
@@ -108,6 +110,30 @@ func UpdateCard(c *gin.Context) {
 	}
 	payload.ID = id
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": payload})
+}
+
+// Public: Track card click
+func TrackCardClick(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "invalid id"})
+		return
+	}
+
+	res, err := config.DB.Exec(`UPDATE cards SET click_count = click_count + 1 WHERE id = ?`, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	affected, _ := res.RowsAffected()
+	if affected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"success": false, "error": "card not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true})
 }
 
 // Admin: Reorder cards

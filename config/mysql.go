@@ -232,6 +232,7 @@ func createCardsTable() {
 	CREATE TABLE IF NOT EXISTS cards (
 		id INT AUTO_INCREMENT PRIMARY KEY,
 		card_order INT NOT NULL DEFAULT 0,
+		click_count INT NOT NULL DEFAULT 0,
 		img LONGTEXT,
 		name VARCHAR(255) NOT NULL,
 		keywords JSON,
@@ -248,6 +249,10 @@ func createCardsTable() {
 
 	if _, err := DB.Exec(`ALTER TABLE cards ADD COLUMN card_order INT NOT NULL DEFAULT 0 AFTER id`); err != nil {
 		log.Printf("ℹ️ card_order column not created (may already exist): %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE cards ADD COLUMN click_count INT NOT NULL DEFAULT 0 AFTER card_order`); err != nil {
+		log.Printf("ℹ️ click_count column not created (may already exist): %v", err)
 	}
 
 	if _, err := DB.Exec(`ALTER TABLE cards ADD INDEX idx_cards_card_order (card_order)`); err != nil {

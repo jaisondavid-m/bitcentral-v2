@@ -58,6 +58,7 @@ func SetupRouter(
 	// Public routes
 	r.GET("/auth/login", handler.HandleLogin)
 	r.GET("/auth/callback", handler.HandleCallback)
+	r.POST("/cards/:id/click", handlers.TrackCardClick)
 
 	// Protected routes
 	api := r.Group("/")
