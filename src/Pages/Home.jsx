@@ -90,6 +90,7 @@ function HomeContent() {
               {filteredCards.map((card, index) => (
                 <Card
                   key={card.id || index}
+                  id={card.id}
                   name={card.name}
                   link={card.link}
                   img={card.img}
