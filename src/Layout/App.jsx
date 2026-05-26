@@ -37,6 +37,9 @@ const AdminQBPage = lazy(() =>
 const AdminCardsPage = lazy(() =>
   import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.AdminCardsPage }))
 );
+const AdminMessPage = lazy(() =>
+  import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.AdminMessPage }))
+);
 
 function App() {
   const { loading } = useAuth();
@@ -158,6 +161,14 @@ function App() {
               element={
                 <AdminRoute>
                   <AdminCardsPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/mess"
+              element={
+                <AdminRoute>
+                  <AdminMessPage />
                 </AdminRoute>
               }
             />

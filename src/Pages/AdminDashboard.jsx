@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
+import api from "../api/axios";
 import {
   deleteAdminUser,
   listAdminUsers,
@@ -10,6 +11,7 @@ import {
   reorderQBAnswerKeys,
   updateQBAnswerKey,
   deleteQBAnswerKey,
+  uploadMessMenuCsv,
   uploadAdminFile,
   listAdminCards,
   createCard,
@@ -17,6 +19,7 @@ import {
   reorderAdminCards,
   deleteCard,
 } from "../api/admin.js";
+import { MealCard } from "../Component/MealCard.jsx";
 import {
   AlertTriangle,
   BookOpen,
@@ -38,6 +41,9 @@ import {
   WifiOff,
   GripVertical,
   LayoutGrid,
+  CalendarDays,
+  Upload,
+  Database,
 } from "lucide-react";
 
 function normalizeError(error, fallback) {
@@ -76,6 +82,10 @@ function parseDateValue(value) {
   return Number.isNaN(date.getTime()) ? 0 : date.getTime();
 }
 
+function todayIST() {
+  return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+}
+
 const CURRENT_YEAR = new Date().getFullYear();
 const YEAR_OPTIONS = Array.from({ length: 6 }, (_, i) => CURRENT_YEAR - i);
 
@@ -112,11 +122,19 @@ const ADMIN_TABS = [
     icon: LayoutGrid,
     description: "Control homepage cards, links, and images.",
   },
+  {
+    key: "mess",
+    label: "Mess Menu",
+    href: "/admin/mess",
+    icon: CalendarDays,
+    description: "Upload boys and girls CSV menus into the database.",
+  },
 ];
 
 function getAdminTabFromPath(pathname) {
   if (pathname.startsWith("/admin/qb")) return "qb";
   if (pathname.startsWith("/admin/cards")) return "cards";
+  if (pathname.startsWith("/admin/mess")) return "mess";
   return "users";
 }
 
@@ -2047,6 +2065,157 @@ function QBSection() {
   );
 }
 
+/* -- Mess Section ----------------------------------------------------------- */
+function MessSection() {
+  const [hostel, setHostel] = useState("boys");
+  const [selectedDate, setSelectedDate] = useState(todayIST());
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [banner, setBanner] = useState({ type: "", message: "" });
+
+  const loadPreview = useCallback(async () => {
+    if (!hostel || !selectedDate) return;
+
+    setLoading(true);
+    setBanner({ type: "", message: "" });
+
+    try {
+      const response = await api.get("/mess", { params: { hostel, date: selectedDate } });
+      setPreview(response.data || {});
+    } catch (err) {
+      setPreview(null);
+      setBanner({ type: "error", message: normalizeError(err, "Failed to load mess menu") });
+    } finally {
+      setLoading(false);
+    }
+  }, [hostel, selectedDate]);
+
+  useEffect(() => {
+    loadPreview();
+  }, [loadPreview]);
+
+  const fullMenu = preview?.full_menu || {};
+  const totalItems = useMemo(() => {
+    return ["breakfast", "lunch", "dinner"].reduce((sum, key) => sum + (fullMenu[key]?.length || 0), 0);
+  }, [fullMenu]);
+
+  const currentMeal = preview?.current_meal?.meal_type?.toLowerCase?.() || "breakfast";
+
+  async function handleUpload(event) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("hostel", hostel);
+    formData.append("file", file);
+
+    setUploading(true);
+    setBanner({ type: "", message: "" });
+
+    try {
+      const result = await uploadMessMenuCsv(formData);
+      setBanner({ type: "success", message: result?.message || "Mess menu uploaded successfully" });
+      await loadPreview();
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to upload mess CSV") });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <section className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-blue-900 dark:bg-slate-950">
+      <div className="flex flex-col gap-3 border-b border-gray-100 p-4 dark:border-blue-900 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div>
+          <h2 className="flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-slate-100">
+            <Database className="h-5 w-5 text-blue-600" />
+            Mess Menu
+          </h2>
+          <p className="mt-0.5 text-sm text-gray-500 dark:text-slate-400">Upload a CSV for boys or girls in the same date/day/meal/item format.</p>
+        </div>
+        <label className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto">
+          {uploading ? <Loader className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          {uploading ? "Uploading..." : "Upload CSV"}
+          <input type="file" accept=".csv,text/csv" onChange={handleUpload} className="sr-only" disabled={uploading} />
+        </label>
+      </div>
+
+      <div className="p-4 sm:p-6">
+        {banner.message && (
+          <div className="mb-4">
+            <Banner banner={banner} onDismiss={() => setBanner({ type: "", message: "" })} />
+          </div>
+        )}
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+            <p className="text-[10px] uppercase tracking-wide text-slate-400">Hostel</p>
+            <div className="mt-2 flex gap-2">
+              {["boys", "girls"].map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setHostel(value)}
+                  className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${hostel === value ? "bg-blue-600 text-white" : "bg-white text-slate-700 hover:bg-slate-100 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800"}`}
+                >
+                  {value === "boys" ? "Boys" : "Girls"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+            <p className="text-[10px] uppercase tracking-wide text-slate-400">Date</p>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+            />
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+            <p className="text-[10px] uppercase tracking-wide text-slate-400">Items</p>
+            <p className="mt-2 text-2xl font-black text-slate-900 dark:text-slate-100">{totalItems}</p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+            <p className="text-[10px] uppercase tracking-wide text-slate-400">Loaded day</p>
+            <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-100">{preview?.day || "-"}</p>
+            <button
+              type="button"
+              onClick={loadPreview}
+              className="mt-3 inline-flex rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800"
+            >
+              Refresh preview
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          {loading ? (
+            <div className="lg:col-span-3 rounded-2xl border border-dashed border-slate-300 bg-slate-50 py-16 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+              Loading mess menu preview...
+            </div>
+          ) : (
+            ["breakfast", "lunch", "dinner"].map((meal) => (
+              <MealCard
+                key={meal}
+                type={meal}
+                items={fullMenu[meal] || []}
+                isActive={currentMeal === meal}
+                isServingNow={preview?.current_meal?.meal_type?.toLowerCase?.() === meal}
+              />
+            ))
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* -- Pages ------------------------------------------------------------------- */
 function AdminDashboard({ initialTab } = {}) {
   const location = useLocation();
@@ -2054,7 +2223,7 @@ function AdminDashboard({ initialTab } = {}) {
 
   return (
     <AdminDashboardShell activeTab={activeTab}>
-      {activeTab === "qb" ? <QBSection /> : activeTab === "cards" ? <CardsSection /> : <UsersSection />}
+      {activeTab === "qb" ? <QBSection /> : activeTab === "cards" ? <CardsSection /> : activeTab === "mess" ? <MessSection /> : <UsersSection />}
     </AdminDashboardShell>
   );
 }
@@ -2071,5 +2240,9 @@ function AdminCardsPage() {
   return <AdminDashboard initialTab="cards" />;
 }
 
-export { AdminUsersPage, AdminQBPage, AdminCardsPage };
+function AdminMessPage() {
+  return <AdminDashboard initialTab="mess" />;
+}
+
+export { AdminUsersPage, AdminQBPage, AdminCardsPage, AdminMessPage };
 export default AdminDashboard;

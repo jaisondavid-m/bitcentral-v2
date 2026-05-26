@@ -99,6 +99,18 @@ export async function deleteQBAnswerKey(id) {
   return response.data;
 }
 
+export async function uploadMessMenuCsv(formData) {
+  const headers = await getAdminHeaders();
+  const response = await api.post("/admin/mess/upload", formData, {
+    headers: {
+      ...headers,
+      "Content-Type": "multipart/form-data",
+    },
+    timeout: 0,
+  });
+  return response.data;
+}
+
 export async function uploadAdminFile(formData) {
   const headers = await getAdminHeaders();
   // Let axios set Content-Type with boundary for multipart
