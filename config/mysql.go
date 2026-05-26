@@ -98,6 +98,38 @@ func InitMySQL() {
 	createSemesterSubjectsTable()
 	createCardsTable()
 	createMessMenuTables()
+	createAdminsTable()
+	createAllowedEmailsTable()
+}
+
+func createAdminsTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS admins (
+		uid VARCHAR(128) PRIMARY KEY,
+		created_by VARCHAR(128) NULL,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	) ENGINE=InnoDB;`
+
+	if _, err := DB.Exec(query); err != nil {
+		log.Fatalf("❌ Failed to create admins table: %v", err)
+	}
+	log.Println("✅ admins table ready")
+}
+
+func createAllowedEmailsTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS allowed_emails (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		value VARCHAR(255) NOT NULL,
+		type ENUM('email','domain') NOT NULL,
+		created_by VARCHAR(128) NULL,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	) ENGINE=InnoDB;`
+
+	if _, err := DB.Exec(query); err != nil {
+		log.Fatalf("❌ Failed to create allowed_emails table: %v", err)
+	}
+	log.Println("✅ allowed_emails table ready")
 }
 
 // ✅ Create table with dynamic name

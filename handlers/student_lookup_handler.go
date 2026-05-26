@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	"os"
 	"strings"
 
 	"server/config"
@@ -121,6 +122,29 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 			"error":   "Query param 'emailid' is required",
 		})
 		return
+	}
+
+	// Optional enforcement: restrict emails to internal domain unless explicitly allowed.
+	// Set ENFORCE_EMAIL_DOMAIN=true to enable. Super-admin can add exceptions via /admin/super/allowed
+	if strings.ToLower(strings.TrimSpace(os.Getenv("ENFORCE_EMAIL_DOMAIN"))) == "true" {
+		// allow internal domain by suffix
+		lower := strings.ToLower(strings.TrimSpace(emailID))
+		if !(strings.HasSuffix(lower, "@bitsathy.ac.in") || strings.HasSuffix(lower, "@bitsathy.in")) {
+			// check allowed_emails table for exact email or domain
+			domain := ""
+			if at := strings.LastIndex(lower, "@"); at >= 0 {
+				domain = lower[at+1:]
+			}
+			var count int
+			if h.DB != nil {
+				// check for email or domain entries
+				err := h.DB.QueryRow(`SELECT COUNT(*) FROM allowed_emails WHERE (type='email' AND LOWER(value)=?) OR (type='domain' AND LOWER(value)=?)`, lower, domain).Scan(&count)
+				if err != nil || count == 0 {
+					c.JSON(http.StatusForbidden, gin.H{"success": false, "message": "Access restricted. Contact admin to allow your email."})
+					return
+				}
+			}
+		}
 	}
 
 	var user models.User

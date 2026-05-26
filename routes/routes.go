@@ -117,6 +117,19 @@ func SetupRouter(
 		admin.DELETE("/cards/:id", handlers.DeleteCard)
 	}
 
+	// Super-admin routes: manage admins and allowed external emails/domains
+	super := r.Group("/admin/super")
+	super.Use(middleware.RequireSuperAdmin())
+	{
+		super.GET("/admins", adminHandler.ListAdmins)
+		super.POST("/admins", adminHandler.AddAdmin)
+		super.DELETE("/admins/:uid", adminHandler.RemoveAdmin)
+
+		super.GET("/allowed", adminHandler.ListAllowed)
+		super.POST("/allowed", adminHandler.AddAllowed)
+		super.DELETE("/allowed/:id", adminHandler.RemoveAllowed)
+	}
+
 	r.POST("/presence/ping", presenceHandler.Ping)
 
 	return r
