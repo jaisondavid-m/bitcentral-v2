@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import api from "../api/axios.js";
 import { useAuth } from "../context/StudentContext.jsx";
 
-const COURSE_CODES = ["22HS201"-""];
+const COURSE_CODES = ["22HS201"];
 
 const ExamHall = () => {
   const { user } = useAuth();

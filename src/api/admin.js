@@ -111,6 +111,27 @@ export async function uploadMessMenuCsv(formData) {
   return response.data;
 }
 
+export async function listMessMenuRows({ hostel, date }) {
+  const headers = await getAdminHeaders();
+  const params = new URLSearchParams();
+  if (hostel) params.set("hostel", hostel);
+  if (date) params.set("date", date);
+  const response = await api.get(`/admin/mess?${params.toString()}`, { headers });
+  return response.data;
+}
+
+export async function updateMessMenuRow(id, payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.put(`/admin/mess/${id}`, payload, { headers });
+  return response.data;
+}
+
+export async function deleteMessMenuRow(id) {
+  const headers = await getAdminHeaders();
+  const response = await api.delete(`/admin/mess/${id}`, { headers });
+  return response.data;
+}
+
 export async function uploadAdminFile(formData) {
   const headers = await getAdminHeaders();
   // Let axios set Content-Type with boundary for multipart

@@ -12,6 +12,9 @@ import {
   updateQBAnswerKey,
   deleteQBAnswerKey,
   uploadMessMenuCsv,
+  listMessMenuRows,
+  updateMessMenuRow,
+  deleteMessMenuRow,
   uploadAdminFile,
   listAdminCards,
   createCard,
@@ -44,6 +47,7 @@ import {
   CalendarDays,
   Upload,
   Database,
+  Download,
 } from "lucide-react";
 
 function normalizeError(error, fallback) {
@@ -84,6 +88,28 @@ function parseDateValue(value) {
 
 function todayIST() {
   return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+}
+
+const MESS_CSV_TEMPLATE = `date,day,meal_type,item
+2026-04-01,Wednesday,Breakfast,Raw rice pongal
+2026-04-01,Wednesday,Breakfast,Sambar
+2026-04-01,Wednesday,Breakfast,Coffee/Milk/Tea
+2026-04-01,Wednesday,Lunch,Rice
+2026-04-01,Wednesday,Lunch,Brinjal Sambar
+2026-04-01,Wednesday,Dinner,Chapatti
+2026-04-01,Wednesday,Dinner,Egg masala
+`;
+
+function downloadMessTemplate() {
+  const blob = new Blob([MESS_CSV_TEMPLATE], { type: "text/csv;charset=utf-8;" });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "mess-menu-template.csv";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
 }
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -457,7 +483,7 @@ function AdminDashboardShell({ activeTab, children }) {
       <main className="mx-auto max-w-6xl px-4 py-4 pb-28 sm:px-6 lg:px-8">{children}</main>
 
       <nav className="fixed inset-x-0 bottom-4 z-30 px-4 sm:hidden">
-        <div className="mx-auto grid max-w-2xl grid-cols-3 overflow-hidden rounded-full border border-white/70 bg-white/90 p-1 shadow-[0_20px_50px_rgba(15,23,42,0.18)] backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90">
+          <div className="mx-auto grid max-w-md grid-cols-4 gap-0 overflow-hidden rounded-full border border-white/70 bg-white/90 p-1 shadow-[0_18px_40px_rgba(15,23,42,0.16)] backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90">
           {ADMIN_TABS.map((tab) => {
             const Icon = tab.icon;
             const active = tab.key === activeTab;
@@ -466,14 +492,14 @@ function AdminDashboardShell({ activeTab, children }) {
               <Link
                 key={tab.key}
                 to={tab.href}
-                className={`flex flex-col items-center gap-1 rounded-full px-3 py-2 text-xs font-semibold transition ${
+                className={`flex flex-col items-center justify-center gap-0 rounded-lg px-2 py-2 text-xs font-semibold transition ${
                   active
                     ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25"
                     : "text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-900"
                 }`}
               >
-                <Icon className="h-4 w-4" />
-                {tab.label}
+                <Icon className="h-5 w-5" />
+                <span className="mt-0.5 leading-none">{tab.label}</span>
               </Link>
             );
           })}
@@ -2070,8 +2096,13 @@ function MessSection() {
   const [hostel, setHostel] = useState("boys");
   const [selectedDate, setSelectedDate] = useState(todayIST());
   const [preview, setPreview] = useState(null);
+  const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [rowsLoading, setRowsLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [savingRow, setSavingRow] = useState(false);
+  const [deletingRowId, setDeletingRowId] = useState(null);
+  const [editingRow, setEditingRow] = useState(null);
   const [banner, setBanner] = useState({ type: "", message: "" });
 
   const loadPreview = useCallback(async () => {
@@ -2091,9 +2122,27 @@ function MessSection() {
     }
   }, [hostel, selectedDate]);
 
+  const loadRows = useCallback(async () => {
+    if (!hostel || !selectedDate) return;
+
+    setRowsLoading(true);
+    setBanner({ type: "", message: "" });
+
+    try {
+      const result = await listMessMenuRows({ hostel, date: selectedDate });
+      setRows(result.data || []);
+    } catch (err) {
+      setRows([]);
+      setBanner({ type: "error", message: normalizeError(err, "Failed to load mess rows") });
+    } finally {
+      setRowsLoading(false);
+    }
+  }, [hostel, selectedDate]);
+
   useEffect(() => {
     loadPreview();
-  }, [loadPreview]);
+    loadRows();
+  }, [loadPreview, loadRows]);
 
   const fullMenu = preview?.full_menu || {};
   const totalItems = useMemo(() => {
@@ -2101,6 +2150,57 @@ function MessSection() {
   }, [fullMenu]);
 
   const currentMeal = preview?.current_meal?.meal_type?.toLowerCase?.() || "breakfast";
+
+  const editingForm = editingRow || {
+    hostel,
+    date: selectedDate,
+    day: preview?.day || "",
+    meal_type: "Breakfast",
+    item: "",
+    item_order: 1,
+  };
+
+  async function saveRow(event) {
+    event.preventDefault();
+    if (!editingRow) return;
+
+    setSavingRow(true);
+    setBanner({ type: "", message: "" });
+
+    try {
+      const result = await updateMessMenuRow(editingRow.id, {
+        hostel: editingForm.hostel,
+        date: editingForm.date,
+        day: editingForm.day,
+        meal_type: editingForm.meal_type,
+        item: editingForm.item,
+        item_order: Number(editingForm.item_order || 1),
+      });
+      setBanner({ type: "success", message: result?.message || "Menu item updated" });
+      setEditingRow(null);
+      await Promise.all([loadPreview(), loadRows()]);
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to update menu item") });
+    } finally {
+      setSavingRow(false);
+    }
+  }
+
+  async function handleDeleteRow(rowId) {
+    if (!window.confirm("Delete this menu item?")) return;
+    setDeletingRowId(rowId);
+    setBanner({ type: "", message: "" });
+
+    try {
+      const result = await deleteMessMenuRow(rowId);
+      setBanner({ type: "success", message: result?.message || "Menu item deleted" });
+      await Promise.all([loadPreview(), loadRows()]);
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to delete menu item") });
+    } finally {
+      setDeletingRowId(null);
+    }
+  }
 
   async function handleUpload(event) {
     const file = event.target.files?.[0];
@@ -2135,11 +2235,21 @@ function MessSection() {
           </h2>
           <p className="mt-0.5 text-sm text-gray-500 dark:text-slate-400">Upload a CSV for boys or girls in the same date/day/meal/item format.</p>
         </div>
-        <label className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto">
-          {uploading ? <Loader className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-          {uploading ? "Uploading..." : "Upload CSV"}
-          <input type="file" accept=".csv,text/csv" onChange={handleUpload} className="sr-only" disabled={uploading} />
-        </label>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+          <button
+            type="button"
+            onClick={downloadMessTemplate}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900 sm:w-auto"
+          >
+            <Download className="h-4 w-4" />
+            Download template
+          </button>
+          <label className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto">
+            {uploading ? <Loader className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+            {uploading ? "Uploading..." : "Upload CSV"}
+            <input type="file" accept=".csv,text/csv" onChange={handleUpload} className="sr-only" disabled={uploading} />
+          </label>
+        </div>
       </div>
 
       <div className="p-4 sm:p-6">
@@ -2209,6 +2319,188 @@ function MessSection() {
                 isServingNow={preview?.current_meal?.meal_type?.toLowerCase?.() === meal}
               />
             ))
+          )}
+        </div>
+
+        {editingRow && (
+          <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-slate-950/60 px-4 py-6 backdrop-blur-sm sm:px-6">
+            <div className="absolute inset-0" onClick={() => setEditingRow(null)} />
+            <div className="relative z-50 w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
+              <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4 dark:border-slate-800 sm:px-6">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Edit menu item</p>
+                  <h3 className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">{editingRow.item}</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingRow(null)}
+                  className="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <form onSubmit={saveRow} className="space-y-4 p-4 sm:p-6">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Hostel</label>
+                    <div className="flex gap-2">
+                      {['boys', 'girls'].map((value) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => setEditingRow((prev) => ({ ...prev, hostel: value }))}
+                          className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition ${editingForm.hostel === value ? 'bg-blue-600 text-white' : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900'}`}
+                        >
+                          {value === 'boys' ? 'Boys' : 'Girls'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Date</label>
+                    <input
+                      type="date"
+                      value={editingForm.date}
+                      onChange={(e) => setEditingRow((prev) => ({ ...prev, date: e.target.value }))}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Day</label>
+                    <input
+                      type="text"
+                      value={editingForm.day}
+                      onChange={(e) => setEditingRow((prev) => ({ ...prev, day: e.target.value }))}
+                      placeholder="Wednesday"
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Meal type</label>
+                    <select
+                      value={editingForm.meal_type}
+                      onChange={(e) => setEditingRow((prev) => ({ ...prev, meal_type: e.target.value }))}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    >
+                      <option>Breakfast</option>
+                      <option>Lunch</option>
+                      <option>Dinner</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Item</label>
+                    <input
+                      type="text"
+                      value={editingForm.item}
+                      onChange={(e) => setEditingRow((prev) => ({ ...prev, item: e.target.value }))}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Order</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={editingForm.item_order}
+                      onChange={(e) => setEditingRow((prev) => ({ ...prev, item_order: e.target.value }))}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setEditingRow(null)}
+                    className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={savingRow}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                  >
+                    {savingRow ? <Loader className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+                    {savingRow ? "Saving..." : "Save changes"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        <div className="mt-6 rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+          <div className="flex flex-col gap-2 border-b border-slate-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800 sm:px-6">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Menu items for {selectedDate}</h3>
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Edit or delete any item for the selected hostel and date.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => Promise.all([loadPreview(), loadRows()])}
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Refresh rows
+            </button>
+          </div>
+
+          {rowsLoading ? (
+            <div className="px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400 sm:px-6">Loading menu rows...</div>
+          ) : rows.length === 0 ? (
+            <div className="px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400 sm:px-6">No menu rows found for this hostel and date.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
+                <thead className="bg-slate-50 dark:bg-slate-900">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Order</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Meal</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Item</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Day</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                  {rows.map((row) => (
+                    <tr key={row.id} className="hover:bg-slate-50 dark:hover:bg-slate-900">
+                      <td className="px-4 py-3 font-mono text-xs font-semibold text-slate-700 dark:text-slate-200">{row.item_order}</td>
+                      <td className="px-4 py-3 text-slate-700 dark:text-slate-200">{row.meal_type}</td>
+                      <td className="px-4 py-3 text-slate-800 dark:text-slate-100">{row.item}</td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{row.day}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setEditingRow(row)}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+                          >
+                            <Edit2 className="h-3.5 w-3.5" />
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteRow(row.id)}
+                            disabled={deletingRowId === row.id}
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {deletingRowId === row.id ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>
