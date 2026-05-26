@@ -1,9 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Component, useEffect, useRef, useState, useMemo } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import {
   X,
-  Download,
-  ExternalLink,
   ZoomIn,
   ZoomOut,
   FileText,
@@ -13,57 +11,60 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url
-).toString();
+// ─── Worker setup ─────────────────────────────────────────────────────────────
+// react-pdf and pdfjs-dist must use the same worker version.
+// Pin the worker to the exact PDF.js API version exposed by react-pdf.
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-// ─── helpers ────────────────────────────────────────────────────────────────
+// ─── Error Boundary ───────────────────────────────────────────────────────────
 
-function getApiBase() {
-  return (import.meta.env.VITE_API_BASE_URL || window.location.origin).replace(/\/$/, "");
-}
+class PdfErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
 
-function normalizeUrl(url) {
-  return typeof url === "string" ? url.trim() : url;
-}
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
 
-function getDriveId(url) {
-  try {
-    const parsed = new URL(normalizeUrl(url));
-    if (!parsed.hostname.includes("drive.google.com")) return null;
-    const match = parsed.pathname.match(/(?:\/file\/d\/|\/d\/)([a-zA-Z0-9_-]+)/);
-    return match ? match[1] : parsed.searchParams.get("id");
-  } catch {
-    return null;
+  componentDidUpdate(prevProps) {
+    if (prevProps.url !== this.props.url) {
+      this.setState({ hasError: false });
+    }
+  }
+
+  render() {
+    if (this.state.hasError) return <ErrorState />;
+    return this.props.children;
   }
 }
 
-function getDrivePreviewUrl(id) {
-  return `https://drive.google.com/file/d/${id}/preview?rm=minimal`;
-}
+// ─── Shared UI ────────────────────────────────────────────────────────────────
 
-function getDriveProxyUrl(id, download = false) {
-  return `${getApiBase()}/pdf/${id}${download ? "?download=1" : ""}`;
-}
-
-function getViewUrl(url) {
-  const driveId = getDriveId(url);
-  if (!driveId) return normalizeUrl(url);
-  return import.meta.env.PROD ? getDriveProxyUrl(driveId) : getDrivePreviewUrl(driveId);
-}
-
-function getDownloadUrl(url) {
-  const driveId = getDriveId(url);
-  if (!driveId) return normalizeUrl(url);
-  return import.meta.env.PROD
-    ? getDriveProxyUrl(driveId, true)
-    : `https://drive.google.com/uc?export=download&id=${driveId}`;
+function ErrorState() {
+  return (
+    <div style={{
+      position: "absolute", inset: 0, zIndex: 2,
+      display: "flex", flexDirection: "column", alignItems: "center",
+      justifyContent: "center", gap: 16, background: "#f8fafc", padding: 32,
+    }}>
+      <AlertCircle size={40} color="#dc2626" />
+      <div style={{ textAlign: "center" }}>
+        <p style={{ fontSize: 15, fontWeight: 600, color: "#111827", margin: "0 0 6px" }}>
+          Unable to preview
+        </p>
+        <p style={{ fontSize: 13, color: "#6b7280", margin: 0 }}>
+          The file could not be loaded. The server may be blocking cross-origin requests.
+        </p>
+      </div>
+    </div>
+  );
 }
 
 // ─── Toolbar ─────────────────────────────────────────────────────────────────
 
-function Toolbar({ name, zoom, onZoomIn, onZoomOut, onResetZoom, onNewTab, onClose, downloadUrl, allowExternalActions, allowDownload }) {
+function Toolbar({ name, zoom, onZoomIn, onZoomOut, onResetZoom, onClose }) {
   return (
     <header style={{
       display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -89,33 +90,15 @@ function Toolbar({ name, zoom, onZoomIn, onZoomOut, onResetZoom, onNewTab, onClo
         </div>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 4, background: "#f3f4f6", borderRadius: 8, padding: "3px 6px" }}>
-          <ToolbarBtn onClick={onZoomOut} title="Zoom out"><ZoomOut size={15} /></ToolbarBtn>
-          <button onClick={onResetZoom} title="Reset zoom" style={{
-            fontSize: 12, fontWeight: 600, color: "#374151", background: "transparent",
-            border: "none", cursor: "pointer", padding: "0 4px", minWidth: 38, textAlign: "center",
-          }}>
-            {Math.round(zoom * 100)}%
-          </button>
-          <ToolbarBtn onClick={onZoomIn} title="Zoom in"><ZoomIn size={15} /></ToolbarBtn>
-        </div>
-
-        {allowExternalActions && (
-          <>
-            <ToolbarBtn onClick={onNewTab} title="Open in new tab"><ExternalLink size={15} /></ToolbarBtn>
-            {allowDownload && (
-              <a href={downloadUrl} download={name} title="Download" style={{
-                display: "flex", alignItems: "center", justifyContent: "center",
-                width: 32, height: 32, borderRadius: 8, border: "1px solid #bbf7d0",
-                background: "#f0fdf4", color: "#15803d", cursor: "pointer",
-                textDecoration: "none", flexShrink: 0,
-              }}>
-                <Download size={15} />
-              </a>
-            )}
-          </>
-        )}
+      <div style={{ display: "flex", alignItems: "center", gap: 4, background: "#f3f4f6", borderRadius: 8, padding: "3px 6px" }}>
+        <ToolbarBtn onClick={onZoomOut} title="Zoom out"><ZoomOut size={15} /></ToolbarBtn>
+        <button onClick={onResetZoom} title="Reset zoom" style={{
+          fontSize: 12, fontWeight: 600, color: "#374151", background: "transparent",
+          border: "none", cursor: "pointer", padding: "0 4px", minWidth: 38, textAlign: "center",
+        }}>
+          {Math.round(zoom * 100)}%
+        </button>
+        <ToolbarBtn onClick={onZoomIn} title="Zoom in"><ZoomIn size={15} /></ToolbarBtn>
       </div>
     </header>
   );
@@ -136,84 +119,82 @@ function ToolbarBtn({ children, onClick, title }) {
 // ─── PdfFrame ─────────────────────────────────────────────────────────────────
 
 /**
- * FIX: Previously the component detected mobile and immediately showed a
- * static fallback without ever attempting to render the PDF. This caused the
- * PDF to never open on mobile.
+ * Key fixes vs previous version:
  *
- * New strategy:
- * 1. Always attempt iframe rendering on ALL platforms (mobile + desktop).
- * 2. Use a fallback timer (LOAD_TIMEOUT_MS). If onLoad fires → ready.
- *    If it never fires → assume silent success (PDF rendered natively by browser).
- * 3. If onError fires → show the "unable to preview" error UI with open/download links.
- * 4. On mobile, after the iframe is visible, show an optional sticky banner
- *    with "Open" and "Download" links as a convenience — but don't block the iframe.
+ * 1. Pass the raw ArrayBuffer directly to { data: buffer } — do NOT convert to
+ *    Uint8Array first. Transferring a Uint8Array detaches the underlying buffer,
+ *    causing DataCloneError in the PDF.js worker postMessage.
  *
- * Many mobile browsers (Chrome Android, Safari iOS) CAN render PDFs in iframes
- * when the server sends correct Content-Type headers. We let them try first.
+ * 2. Memoize the `file` object with useMemo so react-pdf's <Document> does not
+ *    see a new object reference on every render (eliminates the "File prop changed"
+ *    warning and prevents redundant reloads).
+ *
+ * 3. Worker version mismatch is fixed at the import site above — using
+ *    import.meta.url resolution always picks the worker that ships with the
+ *    installed pdfjs-dist, so the versions stay in sync automatically.
  */
-const LOAD_TIMEOUT_MS = 6000;
-const NATIVE_TOOLBAR_MASK_HEIGHT = 52;
-
-function PdfFrame({ url, name, allowExternalActions, allowDownload }) {
-  const [status, setStatus] = useState("loading"); // "loading" | "ready" | "error"
+function PdfFrame({ url }) {
+  const [status, setStatus] = useState("loading");
+  const [pdfBuffer, setPdfBuffer] = useState(null); // raw ArrayBuffer
   const [numPages, setNumPages] = useState(0);
   const [pageWidth, setPageWidth] = useState(0);
-  const timerRef = useRef(null);
-  const customViewerRef = useRef(null);
-  const src = getViewUrl(url);
-  const useCustomViewer = !allowDownload;
+  const containerRef = useRef(null);
 
-  // Reset state whenever the URL (or viewer mode) changes.
+  // Fetch once per URL, store the raw ArrayBuffer (do NOT detach it).
   useEffect(() => {
+    let cancelled = false;
     setStatus("loading");
+    setPdfBuffer(null);
     setNumPages(0);
-    clearTimeout(timerRef.current);
 
-    if (useCustomViewer) {
-      return () => clearTimeout(timerRef.current);
-    }
+    fetch(url, { credentials: "omit" })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.arrayBuffer();
+      })
+      .then((buffer) => {
+        if (cancelled) return;
 
-    timerRef.current = setTimeout(() => {
-      // Still loading after timeout → assume the PDF rendered silently (common on mobile)
-      setStatus((prev) => (prev === "loading" ? "ready" : prev));
-    }, LOAD_TIMEOUT_MS);
+        // Validate PDF magic bytes (%PDF) before handing to react-pdf
+        const magic = String.fromCharCode(...new Uint8Array(buffer, 0, 4));
+        if (magic !== "%PDF") throw new Error("Not a PDF");
 
-    return () => clearTimeout(timerRef.current);
-  }, [src, useCustomViewer]);
+        setPdfBuffer(buffer);
+      })
+      .catch(() => {
+        if (!cancelled) setStatus("error");
+      });
+
+    return () => { cancelled = true; };
+  }, [url]);
+
+  // Memoize the file prop — react-pdf uses referential equality to decide
+  // whether to reload. A new object on every render causes redundant work.
+  const pdfFile = useMemo(
+    () => (pdfBuffer ? { data: pdfBuffer } : null),
+    [pdfBuffer]
+  );
 
   useEffect(() => {
-    if (!useCustomViewer) return undefined;
-
     const updateWidth = () => {
-      const width = customViewerRef.current?.clientWidth || 0;
-      setPageWidth(width > 0 ? Math.max(320, width - 24) : 0);
+      const w = containerRef.current?.clientWidth || 0;
+      setPageWidth(w > 0 ? Math.max(320, w - 24) : 0);
     };
-
     updateWidth();
     window.addEventListener("resize", updateWidth);
     return () => window.removeEventListener("resize", updateWidth);
-  }, [useCustomViewer, src]);
-
-  const handleLoad = () => {
-    clearTimeout(timerRef.current);
-    // Small delay: some browsers fire onLoad before the PDF plugin has painted
-    setTimeout(() => setStatus("ready"), 150);
-  };
+  }, []);
 
   const handleDocLoadSuccess = ({ numPages: pages }) => {
-    clearTimeout(timerRef.current);
     setNumPages(pages || 0);
     setStatus("ready");
   };
 
-  const handleError = () => {
-    clearTimeout(timerRef.current);
-    setStatus("error");
-  };
+  const handleError = () => setStatus("error");
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      {/* Spinner overlay — shown while loading */}
+      {/* Spinner */}
       {status === "loading" && (
         <div style={{
           position: "absolute", inset: 0, zIndex: 2,
@@ -226,130 +207,53 @@ function PdfFrame({ url, name, allowExternalActions, allowDownload }) {
         </div>
       )}
 
-      {/* Error state — shown only if iframe explicitly fires onError */}
-      {status === "error" && (
-        <div style={{
-          position: "absolute", inset: 0, zIndex: 2,
-          display: "flex", flexDirection: "column", alignItems: "center",
-          justifyContent: "center", gap: 16, background: "#f8fafc", padding: 32,
-        }}>
-          <AlertCircle size={40} color="#dc2626" />
-          <div style={{ textAlign: "center" }}>
-            <p style={{ fontSize: 15, fontWeight: 600, color: "#111827", margin: "0 0 6px" }}>
-              Unable to preview
-            </p>
-            <p style={{ fontSize: 13, color: "#6b7280", margin: 0 }}>
-              This file may require sign-in or may be restricted.
-            </p>
-          </div>
-          {allowExternalActions && (
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
-              <a href={src} target="_blank" rel="noreferrer" style={btnStyle("#2563eb", "#fff")}>Open in new tab</a>
-              {allowDownload && (
-                <a href={getDownloadUrl(url)} download={name} style={btnStyle("#f0fdf4", "#15803d", "#bbf7d0")}>Download</a>
-              )}
-            </div>
+      {/* Error */}
+      {status === "error" && <ErrorState />}
+
+      {/* Viewer */}
+      <div
+        ref={containerRef}
+        onContextMenu={(e) => e.preventDefault()}
+        style={{
+          position: "absolute",
+          top: 0, left: 0,
+          width: "100%", height: "100%",
+          overflowY: "auto",
+          background: "#f3f4f6",
+          opacity: status === "ready" ? 1 : 0,
+          transition: "opacity 0.2s",
+          pointerEvents: status === "ready" ? "auto" : "none",
+          userSelect: "none",
+          WebkitUserSelect: "none",
+        }}
+      >
+        <div style={{ padding: 12 }}>
+          {pdfFile && (
+            <PdfErrorBoundary url={url}>
+              <Document
+                file={pdfFile}
+                loading={null}
+                error={null}
+                onLoadSuccess={handleDocLoadSuccess}
+                onLoadError={handleError}
+              >
+                {Array.from({ length: numPages }, (_, i) => (
+                  <div key={`page_${i + 1}`} style={{ margin: "0 auto 12px", width: "fit-content" }}>
+                    <Page
+                      pageNumber={i + 1}
+                      width={pageWidth || undefined}
+                      renderTextLayer={false}
+                      renderAnnotationLayer={false}
+                    />
+                  </div>
+                ))}
+              </Document>
+            </PdfErrorBoundary>
           )}
         </div>
-      )}
-
-      {!useCustomViewer && status === "ready" && (
-        <div
-          aria-hidden="true"
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-          }}
-          onTouchStart={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-          }}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: NATIVE_TOOLBAR_MASK_HEIGHT,
-            background: "#111827",
-            zIndex: 3,
-            pointerEvents: "auto",
-            touchAction: "none",
-          }}
-        />
-      )}
-
-      {useCustomViewer ? (
-        <div
-          ref={customViewerRef}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            overflowY: "auto",
-            background: "#f3f4f6",
-            opacity: status === "ready" ? 1 : 0,
-            transition: "opacity 0.2s",
-            pointerEvents: status === "ready" ? "auto" : "none",
-          }}
-        >
-          <div style={{ padding: 12 }}>
-            <Document
-              file={src}
-              loading={null}
-              error={null}
-              onLoadSuccess={handleDocLoadSuccess}
-              onLoadError={handleError}
-            >
-              {Array.from({ length: numPages }, (_, index) => (
-                <div key={`page_${index + 1}`} style={{ margin: "0 auto 12px", width: "fit-content" }}>
-                  <Page
-                    pageNumber={index + 1}
-                    width={pageWidth || undefined}
-                    renderTextLayer={false}
-                    renderAnnotationLayer={false}
-                  />
-                </div>
-              ))}
-            </Document>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/*
-            The iframe is ALWAYS in the DOM regardless of status so the browser
-            starts fetching the PDF immediately. We hide it visually with opacity
-            and disable pointer events until it's ready.
-          */}
-          <iframe
-            key={src}
-            src={src}
-            title={name}
-            onLoad={handleLoad}
-            onError={handleError}
-            style={{
-              position: "absolute", top: 0, left: 0,
-              width: "100%", height: "100%",
-              border: "none", display: "block",
-              opacity: status === "ready" ? 1 : 0,
-              transition: "opacity 0.2s",
-              pointerEvents: status === "ready" ? "auto" : "none",
-            }}
-          />
-        </>
-      )}
+      </div>
     </div>
   );
-}
-
-function btnStyle(bg, color, border) {
-  return {
-    padding: "7px 14px", borderRadius: 8, background: bg, color,
-    border: border ? `1px solid ${border}` : "none",
-    fontSize: 13, fontWeight: 500, textDecoration: "none",
-    display: "inline-block",
-  };
 }
 
 // ─── Main Modal ───────────────────────────────────────────────────────────────
@@ -358,9 +262,6 @@ export default function FullscreenPdfModal({
   url,
   name,
   onClose,
-  originalUrl,
-  allowExternalActions = true,
-  allowDownload = true,
   siblings = [],
   siblingIndex = 0,
 }) {
@@ -368,22 +269,21 @@ export default function FullscreenPdfModal({
   const [currentIndex, setCurrentIndex] = useState(siblingIndex);
 
   const hasSiblings = siblings.length > 1;
-  const current = hasSiblings
-    ? siblings[currentIndex]
-    : { url, name, allowExternalActions, allowDownload };
+  const current = hasSiblings ? siblings[currentIndex] : { url, name };
   const activeUrl = current.url;
   const activeName = current.name;
-  const activeAllow = current.allowExternalActions ?? true;
-  const activeAllowDownload = current.allowDownload ?? true;
 
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
     const onKey = (e) => {
       if (e.key === "Escape") onClose();
+      if ((e.ctrlKey || e.metaKey) && ["s", "p", "u"].includes(e.key)) e.preventDefault();
       if (e.key === "ArrowLeft" && hasSiblings) setCurrentIndex((i) => Math.max(0, i - 1));
       if (e.key === "ArrowRight" && hasSiblings) setCurrentIndex((i) => Math.min(siblings.length - 1, i + 1));
     };
+
     window.addEventListener("keydown", onKey);
     return () => {
       window.removeEventListener("keydown", onKey);
@@ -404,11 +304,7 @@ export default function FullscreenPdfModal({
         onZoomIn={() => setZoom((z) => clampZoom(z + 0.25))}
         onZoomOut={() => setZoom((z) => clampZoom(z - 0.25))}
         onResetZoom={() => setZoom(1)}
-        onNewTab={() => window.open(getViewUrl(activeUrl), "_blank")}
-        downloadUrl={getDownloadUrl(originalUrl || activeUrl)}
         onClose={onClose}
-        allowExternalActions={activeAllow}
-        allowDownload={activeAllowDownload}
       />
 
       {hasSiblings && (
@@ -439,13 +335,7 @@ export default function FullscreenPdfModal({
           transform: `scale(${zoom})`,
           transformOrigin: "top left",
         }}>
-          <PdfFrame
-            key={activeUrl}
-            url={activeUrl}
-            name={activeName}
-            allowExternalActions={activeAllow}
-            allowDownload={activeAllowDownload}
-          />
+          <PdfFrame key={activeUrl} url={activeUrl} name={activeName} />
         </div>
 
         {hasSiblings && (
@@ -475,7 +365,7 @@ function NavArrow({ direction, disabled, onClick }) {
   return (
     <button onClick={onClick} disabled={disabled} style={{
       position: "absolute", top: "50%",
-      [direction === "left" ? "left" : "right"]: 12,
+      ...(direction === "left" ? { left: 12 } : { right: 12 }),
       transform: "translateY(-50%)", width: 36, height: 36, borderRadius: "50%",
       border: "1px solid #e5e7eb",
       background: disabled ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.9)",
