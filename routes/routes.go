@@ -88,6 +88,9 @@ func SetupRouter(
 	r.GET("/pdf/:id", uploadHandler.ProxyPDF)
 
 	// Admin routes
+
+	r.GET("/admin/super/check", adminHandler.CheckSuper)
+
 	admin := r.Group("/admin")
 	admin.Use(middleware.RequireAdmin())
 	{

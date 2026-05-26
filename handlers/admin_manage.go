@@ -3,7 +3,10 @@ package handlers
 import (
     "database/sql"
     "net/http"
+    "os"
     "strings"
+
+    "server/config"
 
     "github.com/gin-gonic/gin"
 )
@@ -127,4 +130,34 @@ func (h *AdminHandler) RemoveAllowed(c *gin.Context) {
         return
     }
     c.JSON(http.StatusOK, gin.H{"success": true, "message": "Allowed entry removed", "id": id})
+}
+
+// Check if provided bearer token belongs to configured super admin
+func (h *AdminHandler) CheckSuper(c *gin.Context) {
+    authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
+    token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
+    if token == "" {
+        c.JSON(http.StatusOK, gin.H{"is_super": false})
+        return
+    }
+
+    client, err := config.FirebaseAuthClient()
+    if err != nil || client == nil {
+        c.JSON(http.StatusOK, gin.H{"is_super": false})
+        return
+    }
+
+    decoded, err := client.VerifyIDToken(c.Request.Context(), token)
+    if err != nil || decoded == nil {
+        c.JSON(http.StatusOK, gin.H{"is_super": false})
+        return
+    }
+
+    superUID := strings.TrimSpace(os.Getenv("SUPER_ADMIN_FIREBASE_UID"))
+    if superUID != "" && decoded.UID == superUID {
+        c.JSON(http.StatusOK, gin.H{"is_super": true})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"is_super": false})
 }
