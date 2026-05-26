@@ -193,7 +193,10 @@ function PdfFrame({ url }) {
   const handleError = () => setStatus("error");
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+    <div
+  className="w-full md:w-1/2 mx-auto flex justify-center"
+  style={{ position: "relative", height: "100%" }}
+>
       {/* Spinner */}
       {status === "loading" && (
         <div style={{
