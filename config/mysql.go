@@ -97,6 +97,7 @@ func InitMySQL() {
 	createQBAnswerKeyTable()
 	createSemesterSubjectsTable()
 	createCardsTable()
+	createMessMenuTables()
 }
 
 // ✅ Create table with dynamic name
@@ -264,4 +265,53 @@ func createCardsTable() {
 	}
 
 	log.Println("✅ cards table ready")
+}
+
+func createMessMenuTables() {
+	query := `
+	CREATE TABLE IF NOT EXISTS mess_menu_items (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		hostel VARCHAR(10) NOT NULL,
+		menu_date DATE NOT NULL,
+		day VARCHAR(32) NOT NULL,
+		meal_type VARCHAR(20) NOT NULL,
+		item_order INT NOT NULL,
+		item VARCHAR(255) NOT NULL,
+		source_file VARCHAR(255),
+		uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		UNIQUE KEY unique_menu_row (hostel, menu_date, meal_type, item_order),
+		INDEX idx_mess_lookup (hostel, menu_date),
+		INDEX idx_mess_meal_order (hostel, menu_date, meal_type, item_order)
+	) ENGINE=InnoDB;`
+
+	if _, err := DB.Exec(query); err != nil {
+		log.Fatalf("❌ Failed to create mess_menu_items table: %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE mess_menu_items ADD COLUMN source_file VARCHAR(255) NULL AFTER item`); err != nil {
+		log.Printf("ℹ️ source_file column not created (may already exist): %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE mess_menu_items ADD COLUMN uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP AFTER source_file`); err != nil {
+		log.Printf("ℹ️ uploaded_at column not created (may already exist): %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE mess_menu_items ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER uploaded_at`); err != nil {
+		log.Printf("ℹ️ updated_at column not created (may already exist): %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE mess_menu_items ADD UNIQUE KEY unique_menu_row (hostel, menu_date, meal_type, item_order)`); err != nil {
+		log.Printf("ℹ️ unique_menu_row index not created (may already exist): %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE mess_menu_items ADD INDEX idx_mess_lookup (hostel, menu_date)`); err != nil {
+		log.Printf("ℹ️ idx_mess_lookup not created (may already exist): %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE mess_menu_items ADD INDEX idx_mess_meal_order (hostel, menu_date, meal_type, item_order)`); err != nil {
+		log.Printf("ℹ️ idx_mess_meal_order not created (may already exist): %v", err)
+	}
+
+	log.Println("✅ mess_menu_items table ready")
 }

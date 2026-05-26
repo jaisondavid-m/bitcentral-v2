@@ -41,7 +41,7 @@ func main() {
 	adminHandler := handlers.NewAdminHandler()
 	presenceHandler := handlers.NewPresenceHandler(adminHandler)
 	examHallHandler := handlers.NewExamHallHandler()
-	messHandler := handlers.NewMessHandler(sheetHandler)
+	messHandler := handlers.NewMessHandler()
 	leaderboardHandler := handlers.NewLeaderboardHandler(sheetHandler)
 	leaveHandler := handlers.NewLeaveHandler()
 	qbHandler := handlers.NewQBHandler()

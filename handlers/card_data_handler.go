@@ -41,13 +41,13 @@ func GetCards(c *gin.Context) {
 			_ = json.Unmarshal([]byte(keywords.String), &kw)
 		}
 		cards = append(cards, models.Card{
-			ID:       id,
-			Order:    order,
-			Image:    img,
-			Name:     name,
-			Keywords: kw,
-			Link:     link,
-			BtnText:  btntext,
+			ID:         id,
+			Order:      order,
+			Image:      img,
+			Name:       name,
+			Keywords:   kw,
+			Link:       link,
+			BtnText:    btntext,
 			ClickCount: clickCount,
 		})
 	}

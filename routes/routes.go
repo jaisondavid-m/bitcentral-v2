@@ -58,12 +58,12 @@ func SetupRouter(
 	// Public routes
 	r.GET("/auth/login", handler.HandleLogin)
 	r.GET("/auth/callback", handler.HandleCallback)
-	r.POST("/cards/:id/click", handlers.TrackCardClick)
 
 	// Protected routes
 	api := r.Group("/")
 	api.Use(handler.RequireAuth())
 	{
+		api.POST("/cards/:id/click", handlers.TrackCardClick)
 		api.GET("/cards", handlers.GetCards)
 		api.GET("/leaves", leaveHandler.GetAllLeaves)
 		api.GET("/exam-hall", examHallHandler.GetHall)
@@ -102,6 +102,7 @@ func SetupRouter(
 		admin.PUT("/qb/reorder", qbHandler.Reorder)
 		admin.PUT("/qb/:id", qbHandler.Update)
 		admin.DELETE("/qb/:id", qbHandler.Delete)
+		admin.POST("/mess/upload", messHandler.UploadCSV)
 		admin.PUT("/semesters/:year", semesterHandler.UpdateSemesterByYear)
 		admin.POST("/upload", uploadHandler.Upload)
 

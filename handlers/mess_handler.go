@@ -1,14 +1,19 @@
 package handlers
 
 import (
+	"database/sql"
+	"encoding/csv"
 	"fmt"
+	"io"
 	"net/http"
-	"os"
+	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"google.golang.org/api/sheets/v4"
+
+	"server/config"
 )
 
 // Meal timing windows (IST — adjust as needed)
@@ -18,18 +23,20 @@ var mealTimings = map[string][2]string{
 	"Dinner":    {"19:00", "20:30"},
 }
 
-// Hostel → Spreadsheet ID env var mapping
-var hostelSheetEnv = map[string]string{
-	"boys":  "BOYS_MESS_SPREADSHEET_ID",
-	"girls": "GIRLS_MESS_SPREADSHEET_ID",
-}
-
 type MessHandler struct {
-	sh *SheetHandler
+	DB *sql.DB
 }
 
-func NewMessHandler(sh *SheetHandler) *MessHandler {
-	return &MessHandler{sh: sh}
+type parsedMessRow struct {
+	Date     string
+	Day      string
+	MealType string
+	Item     string
+	Order    int
+}
+
+func NewMessHandler() *MessHandler {
+	return &MessHandler{DB: config.DB}
 }
 
 func currentMealType() string {
@@ -52,60 +59,94 @@ func currentMealType() string {
 	return "Breakfast"
 }
 
-func (h *MessHandler) fetchMessMenu(hostel, date string) (map[string][]string, string, error) {
-	if h.sh.getSheetsService() == nil {
-		return nil, "", fmt.Errorf("sheets service not initialized")
+func normalizeHostel(hostel string) (string, error) {
+	hostel = strings.ToLower(strings.TrimSpace(hostel))
+	switch hostel {
+	case "boys", "girls":
+		return hostel, nil
+	default:
+		return "", fmt.Errorf("unknown hostel '%s'; use 'boys' or 'girls'", hostel)
 	}
+}
 
-	envKey, ok := hostelSheetEnv[strings.ToLower(hostel)]
-	if !ok {
-		return nil, "", fmt.Errorf("unknown hostel '%s'; use 'boys' or 'girls'", hostel)
+func normalizeMeal(raw string) (string, error) {
+	switch strings.ToLower(strings.TrimSpace(raw)) {
+	case "breakfast":
+		return "Breakfast", nil
+	case "lunch":
+		return "Lunch", nil
+	case "dinner":
+		return "Dinner", nil
+	default:
+		return "", fmt.Errorf("invalid meal type %q", raw)
 	}
-	spreadsheetID := os.Getenv(envKey)
-	if spreadsheetID == "" {
-		return nil, "", fmt.Errorf("env var %s is not set", envKey)
-	}
+}
 
-	values, err := h.sh.fetchRangeValuesCached(spreadsheetID, "Sheet1!A1:D9999", sheetRangeCacheTTL)
+func normalizeCell(value string) string {
+	return strings.TrimSpace(strings.TrimPrefix(value, "\ufeff"))
+}
+
+func parseMessCSV(reader io.Reader) ([]parsedMessRow, error) {
+	csvReader := csv.NewReader(reader)
+	csvReader.FieldsPerRecord = -1
+	csvReader.TrimLeadingSpace = true
+	rows, err := csvReader.ReadAll()
 	if err != nil {
-		return nil, "", fmt.Errorf("sheets API error: %w", err)
+		return nil, err
 	}
 
-	menu := map[string][]string{
-		"Breakfast": {},
-		"Lunch":     {},
-		"Dinner":    {},
-	}
-	dayName := ""
+	parsed := make([]parsedMessRow, 0, len(rows))
+	sequence := make(map[string]int)
 
-	for _, row := range values {
+	for index, row := range rows {
+		if len(row) == 0 {
+			continue
+		}
+
+		dateRaw := normalizeCell(row[0])
+		if dateRaw == "" {
+			continue
+		}
+		if index == 0 && strings.EqualFold(dateRaw, "date") {
+			continue
+		}
+
 		if len(row) < 4 {
-			continue
+			return nil, fmt.Errorf("row %d must have at least 4 columns: date, day, meal type, item", index+1)
 		}
-		rowDate := strings.TrimSpace(fmt.Sprintf("%v", row[0]))
-		if rowDate != date {
-			continue
+
+		if _, err := time.Parse("2006-01-02", dateRaw); err != nil {
+			return nil, fmt.Errorf("invalid date %q at row %d", dateRaw, index+1)
 		}
-		if dayName == "" {
-			dayName = strings.TrimSpace(fmt.Sprintf("%v", row[1]))
+
+		day := normalizeCell(row[1])
+		mealType, err := normalizeMeal(row[2])
+		if err != nil {
+			return nil, fmt.Errorf("row %d: %w", index+1, err)
 		}
-		mealType := strings.TrimSpace(fmt.Sprintf("%v", row[2]))
-		item := strings.TrimSpace(fmt.Sprintf("%v", row[3]))
+
+		item := normalizeCell(strings.Join(row[3:], ","))
 		if item == "" {
 			continue
 		}
-		switch mealType {
-		case "Breakfast", "Lunch", "Dinner":
-			menu[mealType] = append(menu[mealType], item)
-		}
+
+		key := dateRaw + "|" + mealType
+		sequence[key]++
+		parsed = append(parsed, parsedMessRow{
+			Date:     dateRaw,
+			Day:      day,
+			MealType: mealType,
+			Item:     item,
+			Order:    sequence[key],
+		})
 	}
 
-	return menu, dayName, nil
+	return parsed, nil
 }
 
 func (h *MessHandler) GetMess(c *gin.Context) {
-	hostel := strings.ToLower(strings.TrimSpace(c.Query("hostel")))
-	if hostel == "" {
+	hostel, err := normalizeHostel(c.Query("hostel"))
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "'hostel' query param is required",
 			"example": "/mess?hostel=boys&date=2026-04-02",
@@ -113,47 +154,70 @@ func (h *MessHandler) GetMess(c *gin.Context) {
 		return
 	}
 
-	// Resolve date
 	loc, _ := time.LoadLocation("Asia/Kolkata")
 	now := time.Now().In(loc)
 
 	dateStr := strings.TrimSpace(c.Query("date"))
 	if dateStr == "" {
 		dateStr = now.Format("2006-01-02")
-	} else {
-		if _, err := time.Parse("2006-01-02", dateStr); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "invalid date format; use YYYY-MM-DD",
-			})
-			return
-		}
+	} else if _, err := time.Parse("2006-01-02", dateStr); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid date format; use YYYY-MM-DD"})
+		return
 	}
 
-	menu, dayName, err := h.fetchMessMenu(hostel, dateStr)
+	rows, err := h.DB.Query(`
+		SELECT day, meal_type, item, item_order
+		FROM mess_menu_items
+		WHERE hostel = ? AND menu_date = ?
+		ORDER BY FIELD(meal_type, 'Breakfast', 'Lunch', 'Dinner'), item_order ASC`, hostel, dateStr)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	defer rows.Close()
+
+	menu := map[string][]string{
+		"breakfast": {},
+		"lunch":     {},
+		"dinner":    {},
+	}
+	dayName := ""
+
+	for rows.Next() {
+		var day, mealType, item string
+		var order int
+		if err := rows.Scan(&day, &mealType, &item, &order); err != nil {
+			continue
+		}
+		if dayName == "" {
+			dayName = day
+		}
+		switch strings.ToLower(mealType) {
+		case "breakfast":
+			menu["breakfast"] = append(menu["breakfast"], item)
+		case "lunch":
+			menu["lunch"] = append(menu["lunch"], item)
+		case "dinner":
+			menu["dinner"] = append(menu["dinner"], item)
+		}
+	}
 
 	activeMeal := currentMealType()
 	window := mealTimings[activeMeal]
-
-	// Build the current-meal section
 	currentMealData := gin.H{
 		"meal_type":  activeMeal,
 		"start_time": window[0],
 		"end_time":   window[1],
-		"items":      menu[activeMeal],
+		"items":      menu[strings.ToLower(activeMeal)],
 	}
 
-	// Full day menu
 	fullMenu := gin.H{
-		"breakfast": menu["Breakfast"],
-		"lunch":     menu["Lunch"],
-		"dinner":    menu["Dinner"],
+		"breakfast": menu["breakfast"],
+		"lunch":     menu["lunch"],
+		"dinner":    menu["dinner"],
 	}
 
-	hasData := len(menu["Breakfast"]) > 0 || len(menu["Lunch"]) > 0 || len(menu["Dinner"]) > 0
+	hasData := len(menu["breakfast"]) > 0 || len(menu["lunch"]) > 0 || len(menu["dinner"]) > 0
 
 	c.JSON(http.StatusOK, gin.H{
 		"hostel":       hostel,
@@ -163,6 +227,106 @@ func (h *MessHandler) GetMess(c *gin.Context) {
 		"current_meal": currentMealData,
 		"full_menu":    fullMenu,
 		"data_found":   hasData,
+	})
+}
+
+func (h *MessHandler) UploadCSV(c *gin.Context) {
+	hostel, err := normalizeHostel(c.PostForm("hostel"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "hostel must be boys or girls"})
+		return
+	}
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "csv file is required"})
+		return
+	}
+
+	if ext := strings.ToLower(filepath.Ext(file.Filename)); ext != ".csv" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "only .csv files are supported"})
+		return
+	}
+
+	opened, err := file.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	defer opened.Close()
+
+	parsedRows, err := parseMessCSV(opened)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	if len(parsedRows) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "csv contains no valid menu rows"})
+		return
+	}
+
+	dateSet := make(map[string]struct{})
+	for _, row := range parsedRows {
+		dateSet[row.Date] = struct{}{}
+	}
+
+	dates := make([]string, 0, len(dateSet))
+	for date := range dateSet {
+		dates = append(dates, date)
+	}
+	sort.Strings(dates)
+
+	tx, err := h.DB.BeginTx(c.Request.Context(), nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	defer tx.Rollback()
+
+	for _, date := range dates {
+		if _, err := tx.Exec(`DELETE FROM mess_menu_items WHERE hostel = ? AND menu_date = ?`, hostel, date); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+			return
+		}
+	}
+
+	stmt, err := tx.Prepare(`
+		INSERT INTO mess_menu_items (hostel, menu_date, day, meal_type, item_order, item, source_file, uploaded_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	defer stmt.Close()
+
+	uploadedAt := time.Now()
+	for _, row := range parsedRows {
+		if _, err := stmt.Exec(hostel, row.Date, row.Day, row.MealType, row.Order, row.Item, file.Filename, uploadedAt); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+			return
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+
+	var firstDate, lastDate string
+	if len(dates) > 0 {
+		firstDate = dates[0]
+		lastDate = dates[len(dates)-1]
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success":         true,
+		"message":         "Mess menu uploaded successfully",
+		"hostel":          hostel,
+		"rows_inserted":   len(parsedRows),
+		"dates_covered":   len(dates),
+		"first_date":      firstDate,
+		"last_date":       lastDate,
+		"source_filename": file.Filename,
 	})
 }
 
@@ -181,6 +345,3 @@ func (h *MessHandler) GetMealTimings(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"timings": timings})
 }
-
-// Ensure sheets import is used (already used via SheetHandler).
-var _ = sheets.SpreadsheetsReadonlyScope
