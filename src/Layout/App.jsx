@@ -172,6 +172,14 @@ function App() {
                 </AdminRoute>
               }
             />
+            <Route
+              path="/admin/super"
+              element={
+                <AdminRoute>
+                  <AdminDashboard />
+                </AdminRoute>
+              }
+            />
             <Route path="/profile" element={<Dashboard />} />
             <Route path="/about" element={<About />} />
             <Route path="/rpsite" element={<Rpsite />} />

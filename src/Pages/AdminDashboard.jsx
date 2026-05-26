@@ -21,6 +21,8 @@ import {
   updateCard,
   reorderAdminCards,
   deleteCard,
+  addAdmin,
+  removeAdmin,
 } from "../api/admin.js";
 import { MealCard } from "../Component/MealCard.jsx";
 import {
@@ -49,6 +51,8 @@ import {
   Database,
   Download,
 } from "lucide-react";
+import SuperAdminPanel from "./SuperAdminPanel.jsx";
+import { checkSuperAdmin } from "../api/admin.js";
 
 function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
@@ -155,12 +159,20 @@ const ADMIN_TABS = [
     icon: CalendarDays,
     description: "Upload boys and girls CSV menus into the database.",
   },
+  {
+    key: "super",
+    label: "Super Admin",
+    href: "/admin/super",
+    icon: Database,
+    description: "Manage admins and allowed external emails/domains.",
+  },
 ];
 
 function getAdminTabFromPath(pathname) {
   if (pathname.startsWith("/admin/qb")) return "qb";
   if (pathname.startsWith("/admin/cards")) return "cards";
   if (pathname.startsWith("/admin/mess")) return "mess";
+  if (pathname.startsWith("/admin/super")) return "super";
   return "users";
 }
 
@@ -441,8 +453,12 @@ function reorderList(items, fromId, toId) {
 }
 
 /* -- Shell ------------------------------------------------------------------- */
-function AdminDashboardShell({ activeTab, children }) {
+function AdminDashboardShell({ activeTab, children, isSuper }) {
   const activeItem = ADMIN_TABS.find((tab) => tab.key === activeTab) || ADMIN_TABS[0];
+  const visibleTabs = ADMIN_TABS.filter((t) => {
+    if (t.key === "users" || t.key === "super") return Boolean(isSuper);
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.14),transparent_38%),linear-gradient(180deg,#f8fafc_0%,#eef4ff_100%)] dark:bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.18),rgba(2,6,23,1)_45%)]">
@@ -456,7 +472,7 @@ function AdminDashboardShell({ activeTab, children }) {
             </div>
 
             <div className="hidden rounded-full border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:flex">
-              {ADMIN_TABS.map((tab) => {
+              {visibleTabs.map((tab) => {
                 const Icon = tab.icon;
                 const active = tab.key === activeTab;
 
@@ -484,7 +500,7 @@ function AdminDashboardShell({ activeTab, children }) {
 
       <nav className="fixed inset-x-0 bottom-4 z-30 px-4 sm:hidden">
           <div className="mx-auto grid max-w-md grid-cols-4 gap-0 overflow-hidden rounded-full border border-white/70 bg-white/90 p-1 shadow-[0_18px_40px_rgba(15,23,42,0.16)] backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90">
-          {ADMIN_TABS.map((tab) => {
+          {visibleTabs.map((tab) => {
             const Icon = tab.icon;
             const active = tab.key === activeTab;
 
@@ -510,7 +526,7 @@ function AdminDashboardShell({ activeTab, children }) {
 }
 
 /* -- User card (mobile) ------------------------------------------------------ */
-function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showStatus }) {
+function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showStatus, isSuper, onToggleAdmin, adminActionUid }) {
   const [expanded, setExpanded] = useState(false);
   const isBlocked = Boolean(userItem.isBlocked);
   return (
@@ -587,6 +603,21 @@ function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showS
             {deletingUid === userItem.uid ? <Loader className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Delete user
           </button>
+          {isSuper && (
+            <button
+              type="button"
+              onClick={() => onToggleAdmin(userItem)}
+              disabled={adminActionUid === userItem.uid}
+              className={`mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                userItem.isAdmin
+                  ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200 dark:hover:bg-amber-950/60"
+                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+              }`}
+            >
+              {adminActionUid === userItem.uid ? <Loader className="h-4 w-4 animate-spin" /> : userItem.isAdmin ? <UserMinus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+              {userItem.isAdmin ? "Depromote" : "Promote to admin"}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => onToggleBlock(userItem.uid, !isBlocked)}
@@ -603,7 +634,7 @@ function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showS
 }
 
 /* -- Users table (desktop) --------------------------------------------------- */
-function UserTable({ users, onDelete, onToggleBlock, deletingUid, showStatus }) {
+function UserTable({ users, onDelete, onToggleBlock, deletingUid, showStatus, isSuper, onToggleAdmin, adminActionUid }) {
   const cols = showStatus
     ? ["#", "Photo", "Email", "Display name", "Status", "Last seen", "Last used", "Blocked at", "Action"]
     : ["#", "Photo", "Email", "Display name", "Last seen", "Last used", "Blocked at", "Action"];
@@ -651,6 +682,21 @@ function UserTable({ users, onDelete, onToggleBlock, deletingUid, showStatus }) 
               <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatBlockedAt(userItem.blockedAt)}</td>
               <td className="px-4 py-3">
                 <div className="flex flex-wrap gap-2">
+                  {isSuper && (
+                    <button
+                      type="button"
+                      onClick={() => onToggleAdmin(userItem)}
+                      disabled={adminActionUid === userItem.uid}
+                      className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition disabled:opacity-60 ${
+                        userItem.isAdmin
+                          ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200 dark:hover:bg-amber-950/60"
+                          : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-blue-900 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+                      }`}
+                    >
+                      {adminActionUid === userItem.uid ? <Loader className="h-3.5 w-3.5 animate-spin" /> : userItem.isAdmin ? <UserMinus className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+                      {userItem.isAdmin ? "Depromote" : "Promote"}
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => onToggleBlock(userItem.uid, !userItem.isBlocked)}
@@ -680,7 +726,7 @@ function UserTable({ users, onDelete, onToggleBlock, deletingUid, showStatus }) 
 }
 
 /* -- Users Section ----------------------------------------------------------- */
-function UsersSection() {
+function UsersSection({ isSuper }) {
   const [users, setUsers] = useState([]);
   const [usersLoaded, setUsersLoaded] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -691,6 +737,7 @@ function UsersSection() {
   const [confirmation, setConfirmation] = useState(null);
   const [isConfirming, setIsConfirming] = useState(false);
   const [banner, setBanner] = useState({ type: "", message: "" });
+  const [adminActionUid, setAdminActionUid] = useState("");
 
   function getBatchLabelFromEmail(email) {
     if (!email) return "others";
@@ -857,6 +904,35 @@ function UsersSection() {
     }
   };
 
+  const onToggleAdmin = (user) => {
+    if (!user?.uid) return;
+    setConfirmation({
+      type: "admin",
+      uid: user.uid,
+      isAdmin: Boolean(user.isAdmin),
+      label: user.displayName || user.email || user.uid,
+    });
+  };
+
+  const onConfirmAdminToggle = async () => {
+    if (!confirmation || confirmation.type !== "admin") return;
+    setIsConfirming(true);
+    setAdminActionUid(confirmation.uid);
+    setBanner({ type: "", message: "" });
+    try {
+      const isAdmin = Boolean(confirmation.isAdmin);
+      const res = isAdmin ? await removeAdmin(confirmation.uid) : await addAdmin(confirmation.uid);
+      setBanner({ type: "success", message: res?.message || (isAdmin ? "Admin removed" : "Admin added") });
+      await loadUsers();
+      setConfirmation(null);
+    } catch (error) {
+      setBanner({ type: "error", message: normalizeError(error, confirmation.isAdmin ? "Failed to depromote user" : "Failed to promote user") });
+    } finally {
+      setIsConfirming(false);
+      setAdminActionUid("");
+    }
+  };
+
   return (
     <section className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-blue-900 dark:bg-slate-950">
       {/* Section header */}
@@ -917,17 +993,21 @@ function UsersSection() {
 
         <ConfirmModal
           open={Boolean(confirmation)}
-          title={confirmation?.type === "delete" ? "Delete this user?" : "Block this user?"}
+          title={confirmation?.type === "delete" ? "Delete this user?" : confirmation?.type === "block" ? "Block this user?" : confirmation?.isAdmin ? "Depromote this user?" : "Promote this user?"}
           description={
             confirmation?.type === "delete"
               ? "This permanently removes the user from the database and cannot be undone."
-              : "The user will be blocked from signing in and will see the support contact message."
+              : confirmation?.type === "block"
+                ? "The user will be blocked from signing in and will see the support contact message."
+                : confirmation?.isAdmin
+                  ? `This will remove admin access from ${confirmation?.label || "this user"}.`
+                  : `This will add ${confirmation?.label || "this user"} to the admins table and grant admin access.`
           }
-          confirmLabel={confirmation?.type === "delete" ? "Delete user" : "Block user"}
+          confirmLabel={confirmation?.type === "delete" ? "Delete user" : confirmation?.type === "block" ? "Block user" : confirmation?.isAdmin ? "Depromote user" : "Promote user"}
           cancelLabel="Cancel"
-          tone="danger"
-          busy={isConfirming || Boolean(deletingUid)}
-          onConfirm={confirmation?.type === "delete" ? onConfirmDelete : onConfirmBlock}
+          tone={confirmation?.type === "admin" && !confirmation?.isAdmin ? "success" : "danger"}
+          busy={isConfirming || Boolean(deletingUid) || Boolean(adminActionUid)}
+          onConfirm={confirmation?.type === "delete" ? onConfirmDelete : confirmation?.type === "block" ? onConfirmBlock : onConfirmAdminToggle}
           onCancel={closeConfirmation}
         />
 
@@ -1000,12 +1080,12 @@ function UsersSection() {
                   {/* Mobile: cards */}
                   <div className="space-y-2 p-3 sm:hidden">
                     {onlineUsers.map((u, i) => (
-                      <UserCard key={u.uid} userItem={u} index={i} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus={false} />
+                      <UserCard key={u.uid} userItem={u} index={i} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus={false} isSuper={isSuper} onToggleAdmin={onToggleAdmin} adminActionUid={adminActionUid} />
                     ))}
                   </div>
                   {/* Desktop: table */}
                   <div className="hidden sm:block">
-                    <UserTable users={onlineUsers} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus={false} />
+                    <UserTable users={onlineUsers} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus={false} isSuper={isSuper} onToggleAdmin={onToggleAdmin} adminActionUid={adminActionUid} />
                   </div>
                 </>
               )}
@@ -1026,12 +1106,12 @@ function UsersSection() {
                   {/* Mobile: cards */}
                   <div className="space-y-2 p-3 sm:hidden">
                     {[...recentActivityUsers, ...neverActiveUsers].map((u, i) => (
-                      <UserCard key={u.uid} userItem={u} index={i} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus />
+                      <UserCard key={u.uid} userItem={u} index={i} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus isSuper={isSuper} onToggleAdmin={onToggleAdmin} adminActionUid={adminActionUid} />
                     ))}
                   </div>
                   {/* Desktop: table */}
                   <div className="hidden sm:block">
-                    <UserTable users={[...recentActivityUsers, ...neverActiveUsers]} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus />
+                    <UserTable users={[...recentActivityUsers, ...neverActiveUsers]} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus isSuper={isSuper} onToggleAdmin={onToggleAdmin} adminActionUid={adminActionUid} />
                   </div>
                 </>
               )}
@@ -2513,9 +2593,24 @@ function AdminDashboard({ initialTab } = {}) {
   const location = useLocation();
   const activeTab = initialTab || getAdminTabFromPath(location.pathname);
 
+  const [isSuper, setIsSuper] = useState(false);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await checkSuperAdmin();
+        if (!mounted) return;
+        setIsSuper(Boolean(res?.is_super));
+      } catch (err) {
+        if (mounted) setIsSuper(false);
+      }
+    })();
+    return () => { mounted = false };
+  }, []);
+
   return (
-    <AdminDashboardShell activeTab={activeTab}>
-      {activeTab === "qb" ? <QBSection /> : activeTab === "cards" ? <CardsSection /> : activeTab === "mess" ? <MessSection /> : <UsersSection />}
+    <AdminDashboardShell activeTab={activeTab} isSuper={isSuper}>
+      {activeTab === "qb" ? <QBSection /> : activeTab === "cards" ? <CardsSection /> : activeTab === "mess" ? <MessSection /> : activeTab === "super" ? <SuperAdminPanel /> : <UsersSection isSuper={isSuper} />}
     </AdminDashboardShell>
   );
 }
