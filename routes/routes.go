@@ -102,7 +102,10 @@ func SetupRouter(
 		admin.PUT("/qb/reorder", qbHandler.Reorder)
 		admin.PUT("/qb/:id", qbHandler.Update)
 		admin.DELETE("/qb/:id", qbHandler.Delete)
+		admin.GET("/mess", messHandler.ListAdmin)
 		admin.POST("/mess/upload", messHandler.UploadCSV)
+		admin.PUT("/mess/:id", messHandler.UpdateAdmin)
+		admin.DELETE("/mess/:id", messHandler.DeleteAdmin)
 		admin.PUT("/semesters/:year", semesterHandler.UpdateSemesterByYear)
 		admin.POST("/upload", uploadHandler.Upload)
 

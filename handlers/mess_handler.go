@@ -35,6 +35,27 @@ type parsedMessRow struct {
 	Order    int
 }
 
+type messMenuRow struct {
+	ID       int    `json:"id"`
+	Hostel   string `json:"hostel"`
+	Date     string `json:"date"`
+	Day      string `json:"day"`
+	MealType string `json:"meal_type"`
+	Item     string `json:"item"`
+	Order    int    `json:"item_order"`
+	Source   string `json:"source_file,omitempty"`
+	Updated  string `json:"updated_at,omitempty"`
+}
+
+type messMenuRowInput struct {
+	Hostel   string `json:"hostel"`
+	Date     string `json:"date"`
+	Day      string `json:"day"`
+	MealType string `json:"meal_type"`
+	Item     string `json:"item"`
+	Order    int    `json:"item_order"`
+}
+
 func NewMessHandler() *MessHandler {
 	return &MessHandler{DB: config.DB}
 }
@@ -228,6 +249,123 @@ func (h *MessHandler) GetMess(c *gin.Context) {
 		"full_menu":    fullMenu,
 		"data_found":   hasData,
 	})
+}
+
+func (h *MessHandler) ListAdmin(c *gin.Context) {
+	hostel, err := normalizeHostel(c.Query("hostel"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "hostel must be boys or girls"})
+		return
+	}
+
+	dateStr := strings.TrimSpace(c.Query("date"))
+	if dateStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "date is required"})
+		return
+	}
+	if _, err := time.Parse("2006-01-02", dateStr); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "invalid date format; use YYYY-MM-DD"})
+		return
+	}
+
+	rows, err := h.DB.Query(`
+		SELECT id, hostel, DATE_FORMAT(menu_date, '%Y-%m-%d') AS menu_date, day, meal_type, item, item_order, COALESCE(source_file, ''), COALESCE(DATE_FORMAT(updated_at, '%Y-%m-%dT%H:%i:%sZ'), '')
+		FROM mess_menu_items
+		WHERE hostel = ? AND menu_date = ?
+		ORDER BY FIELD(meal_type, 'Breakfast', 'Lunch', 'Dinner'), item_order ASC, id ASC`, hostel, dateStr)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	items := make([]messMenuRow, 0)
+	for rows.Next() {
+		var item messMenuRow
+		if err := rows.Scan(&item.ID, &item.Hostel, &item.Date, &item.Day, &item.MealType, &item.Item, &item.Order, &item.Source, &item.Updated); err != nil {
+			continue
+		}
+		items = append(items, item)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": items})
+}
+
+func (h *MessHandler) UpdateAdmin(c *gin.Context) {
+	id := strings.TrimSpace(c.Param("id"))
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "id is required"})
+		return
+	}
+
+	var input messMenuRowInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+
+	hostel, err := normalizeHostel(input.Hostel)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "hostel must be boys or girls"})
+		return
+	}
+	if _, err := time.Parse("2006-01-02", input.Date); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "invalid date format; use YYYY-MM-DD"})
+		return
+	}
+	mealType, err := normalizeMeal(input.MealType)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	item := strings.TrimSpace(input.Item)
+	if item == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "item is required"})
+		return
+	}
+	if input.Order < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "item_order must be 1 or greater"})
+		return
+	}
+
+	res, err := h.DB.Exec(`
+		UPDATE mess_menu_items
+		SET hostel = ?, menu_date = ?, day = ?, meal_type = ?, item_order = ?, item = ?
+		WHERE id = ?`, hostel, input.Date, strings.TrimSpace(input.Day), mealType, input.Order, item, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+
+	affected, _ := res.RowsAffected()
+	if affected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "menu row not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Menu item updated"})
+}
+
+func (h *MessHandler) DeleteAdmin(c *gin.Context) {
+	id := strings.TrimSpace(c.Param("id"))
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "id is required"})
+		return
+	}
+
+	res, err := h.DB.Exec(`DELETE FROM mess_menu_items WHERE id = ?`, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+
+	affected, _ := res.RowsAffected()
+	if affected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "menu row not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Menu item deleted"})
 }
 
 func (h *MessHandler) UploadCSV(c *gin.Context) {
