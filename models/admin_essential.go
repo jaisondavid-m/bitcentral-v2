@@ -10,6 +10,7 @@ type User struct {
 	LastSeenAt     string `json:"lastSeenAt"`
 	LastUsedRoute  string `json:"lastUsedRoute"`
 	IsOnline       bool   `json:"isOnline"`
+	IsAdmin        bool   `json:"isAdmin"`
 	IsBlocked      bool   `json:"isBlocked"`
 	BlockedAt      string `json:"blockedAt"`
 }

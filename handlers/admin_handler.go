@@ -30,6 +30,22 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		return
 	}
 
+	adminRows, err := h.DB.Query(`SELECT uid FROM admins`)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	defer adminRows.Close()
+
+	adminByUID := make(map[string]bool)
+	for adminRows.Next() {
+		var uid string
+		if err := adminRows.Scan(&uid); err != nil {
+			continue
+		}
+		adminByUID[uid] = true
+	}
+
 	presenceByUID, err := h.loadUserPresenceMap()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -62,6 +78,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 			LastSeenAt:     presenceByUID[u.UID].LastSeenAt,
 			LastUsedRoute:  presenceByUID[u.UID].LastUsedRoute,
 			IsOnline:       presenceByUID[u.UID].IsOnline,
+			IsAdmin:        adminByUID[u.UID],
 			IsBlocked:      statusByUID[u.UID].IsBlocked,
 			BlockedAt:      statusByUID[u.UID].BlockedAt,
 		})

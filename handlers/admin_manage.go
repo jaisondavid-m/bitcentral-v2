@@ -13,7 +13,15 @@ import (
 
 // Admin management: only accessible by super admin
 func (h *AdminHandler) ListAdmins(c *gin.Context) {
-    rows, err := h.DB.Query(`SELECT uid, created_by, DATE_FORMAT(created_at, '%Y-%m-%dT%H:%i:%sZ') FROM admins ORDER BY created_at DESC`)
+    rows, err := h.DB.Query(`
+        SELECT
+            a.uid,
+            a.created_by,
+            COALESCE(NULLIF(TRIM(u.display_name), ''), NULLIF(TRIM(u.email), ''), a.created_by) AS created_by_name,
+            DATE_FORMAT(a.created_at, '%Y-%m-%dT%H:%i:%sZ')
+        FROM admins a
+        LEFT JOIN users u ON u.uid = a.created_by
+        ORDER BY a.created_at DESC`)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
         return
@@ -22,11 +30,11 @@ func (h *AdminHandler) ListAdmins(c *gin.Context) {
 
     var list []gin.H
     for rows.Next() {
-        var uid, createdBy, createdAt sql.NullString
-        if err := rows.Scan(&uid, &createdBy, &createdAt); err != nil {
+        var uid, createdBy, createdByName, createdAt sql.NullString
+        if err := rows.Scan(&uid, &createdBy, &createdByName, &createdAt); err != nil {
             continue
         }
-        list = append(list, gin.H{"uid": uid.String, "created_by": createdBy.String, "created_at": createdAt.String})
+        list = append(list, gin.H{"uid": uid.String, "created_by": createdBy.String, "created_by_name": createdByName.String, "created_at": createdAt.String})
     }
 
     c.JSON(http.StatusOK, gin.H{"success": true, "admins": list})
@@ -73,7 +81,17 @@ func (h *AdminHandler) RemoveAdmin(c *gin.Context) {
 
 // Allowed emails/domains management
 func (h *AdminHandler) ListAllowed(c *gin.Context) {
-    rows, err := h.DB.Query(`SELECT id, value, type, created_by, DATE_FORMAT(created_at, '%Y-%m-%dT%H:%i:%sZ') FROM allowed_emails ORDER BY created_at DESC`)
+    rows, err := h.DB.Query(`
+        SELECT
+            a.id,
+            a.value,
+            a.type,
+            a.created_by,
+            COALESCE(NULLIF(TRIM(u.display_name), ''), NULLIF(TRIM(u.email), ''), a.created_by) AS created_by_name,
+            DATE_FORMAT(a.created_at, '%Y-%m-%dT%H:%i:%sZ')
+        FROM allowed_emails a
+        LEFT JOIN users u ON u.uid = a.created_by
+        ORDER BY a.created_at DESC`)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
         return
@@ -83,11 +101,11 @@ func (h *AdminHandler) ListAllowed(c *gin.Context) {
     var list []gin.H
     for rows.Next() {
         var id int
-        var value, typ, createdBy, createdAt sql.NullString
-        if err := rows.Scan(&id, &value, &typ, &createdBy, &createdAt); err != nil {
+        var value, typ, createdBy, createdByName, createdAt sql.NullString
+        if err := rows.Scan(&id, &value, &typ, &createdBy, &createdByName, &createdAt); err != nil {
             continue
         }
-        list = append(list, gin.H{"id": id, "value": value.String, "type": typ.String, "created_by": createdBy.String, "created_at": createdAt.String})
+        list = append(list, gin.H{"id": id, "value": value.String, "type": typ.String, "created_by": createdBy.String, "created_by_name": createdByName.String, "created_at": createdAt.String})
     }
 
     c.JSON(http.StatusOK, gin.H{"success": true, "allowed": list})
