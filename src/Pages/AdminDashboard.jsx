@@ -50,6 +50,7 @@ import {
   Upload,
   Database,
   Download,
+  UserMinus,
 } from "lucide-react";
 import SuperAdminPanel from "./SuperAdminPanel.jsx";
 import { checkSuperAdmin } from "../api/admin.js";
@@ -498,8 +499,18 @@ function AdminDashboardShell({ activeTab, children, isSuper }) {
 
       <main className="mx-auto max-w-6xl px-4 py-4 pb-28 sm:px-6 lg:px-8">{children}</main>
 
-      <nav className="fixed inset-x-0 bottom-4 z-30 px-4 sm:hidden">
-          <div className="mx-auto grid max-w-md grid-cols-4 gap-0 overflow-hidden rounded-full border border-white/70 bg-white/90 p-1 shadow-[0_18px_40px_rgba(15,23,42,0.16)] backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90">
+      <nav className="fixed inset-x-0 bottom-0 z-30 px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] sm:hidden">
+          <div
+            className={`mx-auto grid max-w-md gap-1 overflow-hidden rounded-2xl border border-white/70 bg-white/90 p-1 shadow-[0_18px_40px_rgba(15,23,42,0.16)] backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90 ${
+              visibleTabs.length >= 5
+                ? "grid-cols-5"
+                : visibleTabs.length === 4
+                  ? "grid-cols-4"
+                  : visibleTabs.length === 3
+                    ? "grid-cols-3"
+                    : "grid-cols-2"
+            }`}
+          >
           {visibleTabs.map((tab) => {
             const Icon = tab.icon;
             const active = tab.key === activeTab;
@@ -508,14 +519,14 @@ function AdminDashboardShell({ activeTab, children, isSuper }) {
               <Link
                 key={tab.key}
                 to={tab.href}
-                className={`flex flex-col items-center justify-center gap-0 rounded-lg px-2 py-2 text-xs font-semibold transition ${
+                className={`flex min-w-0 flex-col items-center justify-center gap-0 rounded-xl px-1.5 py-2 text-[10px] font-semibold leading-none transition ${
                   active
                     ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25"
                     : "text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-900"
                 }`}
               >
-                <Icon className="h-5 w-5" />
-                <span className="mt-0.5 leading-none">{tab.label}</span>
+                <Icon className="h-4 w-4" />
+                <span className="mt-0.5 truncate text-center">{tab.label}</span>
               </Link>
             );
           })}
