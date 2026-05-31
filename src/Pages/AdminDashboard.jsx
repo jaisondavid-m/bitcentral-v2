@@ -95,6 +95,13 @@ function todayIST() {
   return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
 }
 
+function dateKeyFromValue(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+}
+
 const MESS_CSV_TEMPLATE = `date,day,meal_type,item
 2026-04-01,Wednesday,Breakfast,Raw rice pongal
 2026-04-01,Wednesday,Breakfast,Sambar
@@ -741,6 +748,7 @@ function UsersSection({ isSuper }) {
   const [users, setUsers] = useState([]);
   const [usersLoaded, setUsersLoaded] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedVisitDate, setSelectedVisitDate] = useState(todayIST());
   const [batchFilter, setBatchFilter] = useState("");
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [deletingUid, setDeletingUid] = useState("");
@@ -804,6 +812,11 @@ function UsersSection({ isSuper }) {
   const recentActivityUsers = useMemo(() => sortedUsers.filter((u) => !u.isOnline && u.lastSeenAt), [sortedUsers]);
   const neverActiveUsers = useMemo(() => sortedUsers.filter((u) => !u.isOnline && !u.lastSeenAt), [sortedUsers]);
   const latestActiveUser = sortedUsers[0] || null;
+
+  const usersVisitedOnSelectedDate = useMemo(() => {
+    if (!selectedVisitDate) return [];
+    return users.filter((user) => dateKeyFromValue(user.lastSeenAt) === selectedVisitDate);
+  }, [users, selectedVisitDate]);
 
   const loadUsers = useCallback(async () => {
     setIsLoadingUsers(true);
@@ -976,7 +989,7 @@ function UsersSection({ isSuper }) {
 
       <div className="p-4 sm:p-6">
         {/* Stats */}
-        <div className="mb-4 grid grid-cols-2 gap-3">
+        <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950/30">
             <p className="text-xs font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">Online now</p>
             <p className="mt-2 text-3xl font-black text-emerald-800 dark:text-emerald-200">{onlineUsers.length}</p>
@@ -993,6 +1006,19 @@ function UsersSection({ isSuper }) {
             <p className="mt-0.5 truncate text-xs text-blue-600 dark:text-blue-400">
               {latestActiveUser?.lastUsedRoute ? formatRouteLabel(latestActiveUser.lastUsedRoute) : "No route"}
             </p>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/60">
+            <p className="text-xs font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">Visits on date</p>
+            <div className="mt-2 flex items-center gap-2">
+              <input
+                type="date"
+                value={selectedVisitDate}
+                onChange={(e) => setSelectedVisitDate(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+              />
+            </div>
+            <p className="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{usersVisitedOnSelectedDate.length}</p>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Users whose last visit was on {selectedVisitDate || "the selected date"}.</p>
           </div>
         </div>
 
