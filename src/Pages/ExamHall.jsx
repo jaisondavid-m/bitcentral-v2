@@ -116,7 +116,7 @@ const filteredCourses = useMemo(() => {
           </p>
         </div>
 
-        {/* Important note about PT I & PT II for 22HS201 */}
+        {/* note about PT I & PT II for 22HS201 */}
         <div className="mb-4 rounded-lg border border-yellow-100 bg-yellow-50 p-3 text-sm text-yellow-900 dark:border-yellow-700 dark:bg-yellow-900/10 dark:text-yellow-200">
           <strong className="block font-semibold">Notice:</strong>
           <ul className="mt-2 list-inside list-disc">

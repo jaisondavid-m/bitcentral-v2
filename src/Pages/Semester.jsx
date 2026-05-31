@@ -127,13 +127,13 @@ export default function Semester() {
 
   const tabMeta = {
     test1: {
-      title: "Module Test 1",
+      title: "PT-1 / Module Test 1",
       subtitle: "Question Bank and Answer Key",
       empty: "No Module Test 1 links are available for your year.",
       view: "test1",
     },
     test2: {
-      title: "Module Test 2",
+      title: "PT-2 / Module Test 2",
       subtitle: "Question Bank and Answer Key",
       empty: "No Module Test 2 links are available for your year.",
       view: "test2",
@@ -209,10 +209,10 @@ export default function Semester() {
 
         <div className="flex flex-wrap gap-2">
           <TabButton dark={isDark} active={activeTab === "test1"} onClick={() => setActiveTab("test1")}>
-            Module Test 1
+            PT-1 / Module Test 1
           </TabButton>
           <TabButton dark={isDark} active={activeTab === "test2"} onClick={() => setActiveTab("test2")}>
-            Module Test 2
+            PT-2 / Module Test 2
           </TabButton>
           <TabButton dark={isDark} active={activeTab === "semester"} onClick={() => setActiveTab("semester")}>
             Semester
