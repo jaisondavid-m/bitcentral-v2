@@ -118,7 +118,7 @@ const filteredCourses = useMemo(() => {
 
         {/* Important note about PT I & PT II for 22HS201 */}
         <div className="mb-4 rounded-lg border border-yellow-100 bg-yellow-50 p-3 text-sm text-yellow-900 dark:border-yellow-700 dark:bg-yellow-900/10 dark:text-yellow-200">
-          <strong className="block font-semibold">Noticce:</strong>
+          <strong className="block font-semibold">Notice:</strong>
           <ul className="mt-2 list-inside list-disc">
             <li>PT I - 01.06.2026 AN (01:30 PM to 03:00 PM) - for PBL students only</li>
             <li>PT II - 01.06.2026 FN (08:45 AM to 10:15 AM) - for All students</li>
