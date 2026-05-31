@@ -138,7 +138,7 @@ const filteredCourses = useMemo(() => {
           <input
             type="text"
             value={selectedCourse || courseSearch}
-            placeholder="e.g. 22CS601"
+            placeholder="e.g. 22HS201"
             onFocus={() => {
               setShowDropdown(true);
               setShowModal(false);
