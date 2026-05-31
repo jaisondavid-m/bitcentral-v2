@@ -1624,6 +1624,9 @@ function QBSection() {
   const [batchPreviewItems, setBatchPreviewItems] = useState([]);
   const [batchPreviewLoading, setBatchPreviewLoading] = useState(false);
   const [batchPreviewError, setBatchPreviewError] = useState("");
+  const [batchPreviewDraggedId, setBatchPreviewDraggedId] = useState(null);
+  const [batchPreviewDropTargetId, setBatchPreviewDropTargetId] = useState(null);
+  const [batchPreviewReordering, setBatchPreviewReordering] = useState(false);
   const [batchRows, setBatchRows] = useState([
     { subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" },
   ]);
@@ -1689,6 +1692,50 @@ function QBSection() {
       latestItem,
     };
   }, [batchPreviewItems]);
+
+  const canReorderPreview = Boolean(batchYear) && !batchPreviewLoading && !batchPreviewReordering && !showBatchForm && !editItem;
+
+  async function persistBatchPreviewOrder(nextItems) {
+    const previousItems = batchPreviewItems;
+    const subject_ids = nextItems.map((item) => item.id);
+
+    setBatchPreviewItems(nextItems);
+    setBatchPreviewReordering(true);
+
+    try {
+      await reorderQBAnswerKeys({ year: Number(batchYear), subject_ids });
+      setBanner({ type: "success", message: "Subject order updated" });
+      if (String(filterYear) === String(batchYear)) {
+        await load();
+      }
+      await loadBatchPreview();
+    } catch (err) {
+      setBatchPreviewItems(previousItems);
+      setBanner({ type: "error", message: normalizeError(err, "Failed to reorder subjects") });
+      await loadBatchPreview();
+    } finally {
+      setBatchPreviewReordering(false);
+      setBatchPreviewDraggedId(null);
+      setBatchPreviewDropTargetId(null);
+    }
+  }
+
+  async function handleBatchPreviewDrop(targetId) {
+    if (!canReorderPreview || batchPreviewDraggedId == null || batchPreviewDraggedId === targetId) {
+      setBatchPreviewDraggedId(null);
+      setBatchPreviewDropTargetId(null);
+      return;
+    }
+
+    const nextItems = reorderList(batchPreviewItems, batchPreviewDraggedId, targetId);
+    if (nextItems === batchPreviewItems) {
+      setBatchPreviewDraggedId(null);
+      setBatchPreviewDropTargetId(null);
+      return;
+    }
+
+    await persistBatchPreviewOrder(nextItems);
+  }
 
   const filtered = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -1842,7 +1889,8 @@ function QBSection() {
             <BookOpen className="h-5 w-5 text-blue-600" />
             QB Handling
           </h2>
-          <p className="mt-0.5 text-sm text-gray-500 dark:text-slate-400">Add multiple subjects for a year, then edit links later</p>
+          <p className="mt-0.5 text-sm text-gray-500 dark:text-slate-400">Add multiple subjects for a year, then drag the Move handle to change the order.</p>
+          {isReordering && <p className="mt-1 text-xs font-semibold text-blue-600 dark:text-blue-300">Saving new order...</p>}
         </div>
         <button
           type="button"
@@ -1889,6 +1937,10 @@ function QBSection() {
                 <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
                   {batchPreviewLoading ? "Loading subjects..." : `${batchPreviewStats.total} subject${batchPreviewStats.total === 1 ? "" : "s"} in ${batchYear}`}
                 </p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Drag the Move handle to change the order.</p>
+                {batchPreviewReordering && (
+                  <p className="mt-1 text-xs font-semibold text-blue-600 dark:text-blue-300">Saving new order...</p>
+                )}
               </div>
               <button
                 type="button"
@@ -1915,14 +1967,54 @@ function QBSection() {
                   <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
                     <thead className="sticky top-0 bg-slate-50 dark:bg-slate-900">
                       <tr>
+                        <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Move</th>
                         <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Code</th>
                         <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Subject</th>
                         <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                      {batchPreviewItems.slice(0, 10).map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-900">
+                      {batchPreviewItems.map((item, index) => (
+                        <tr
+                          key={item.id}
+                          onDragOver={(event) => {
+                            if (!canReorderPreview) return;
+                            event.preventDefault();
+                            setBatchPreviewDropTargetId(item.id);
+                          }}
+                          onDrop={async (event) => {
+                            if (!canReorderPreview) return;
+                            event.preventDefault();
+                            await handleBatchPreviewDrop(item.id);
+                          }}
+                          onDragEnd={() => {
+                            setBatchPreviewDraggedId(null);
+                            setBatchPreviewDropTargetId(null);
+                          }}
+                          className={`transition hover:bg-slate-50 dark:hover:bg-slate-900 ${batchPreviewDraggedId === item.id ? "opacity-50" : ""} ${batchPreviewDropTargetId === item.id ? "ring-2 ring-inset ring-blue-400" : ""}`}
+                        >
+                          <td className="px-3 py-2">
+                            <button
+                              type="button"
+                              draggable={canReorderPreview}
+                              onDragStart={(event) => {
+                                if (!canReorderPreview) return;
+                                setBatchPreviewDraggedId(item.id);
+                                event.dataTransfer.effectAllowed = "move";
+                                event.dataTransfer.setData("text/plain", String(item.id));
+                              }}
+                              onDragEnd={() => {
+                                setBatchPreviewDraggedId(null);
+                                setBatchPreviewDropTargetId(null);
+                              }}
+                              disabled={!canReorderPreview}
+                              title={canReorderPreview ? "Drag to reorder" : "Reordering is temporarily unavailable"}
+                              className="inline-flex cursor-grab items-center rounded-md border border-slate-200 bg-white px-2 py-1 text-slate-400 transition hover:bg-slate-50 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-500"
+                              aria-label={`Drag to reorder ${item.subject_code}`}
+                            >
+                              <GripVertical className="h-4 w-4" />
+                            </button>
+                          </td>
                           <td className="px-3 py-2 font-mono text-xs font-semibold text-slate-700 dark:text-slate-200">{item.subject_code}</td>
                           <td className="px-3 py-2 text-slate-700 dark:text-slate-200">{item.subject_name}</td>
                           <td className="px-3 py-2">
@@ -1956,11 +2048,9 @@ function QBSection() {
                     </tbody>
                   </table>
                 </div>
-                {batchPreviewItems.length > 10 && (
-                  <div className="border-t border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
-                    Showing first 10 subjects of {batchPreviewItems.length}.
-                  </div>
-                )}
+                <div className="border-t border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+                  Showing {batchPreviewItems.length} subject{batchPreviewItems.length === 1 ? "" : "s"}.
+                </div>
               </div>
             )}
           </div>
@@ -2072,13 +2162,6 @@ function QBSection() {
                 editItem?.id === item.id ? null : (
                   <tr
                     key={item.id}
-                    draggable={canReorder}
-                    onDragStart={(event) => {
-                      if (!canReorder) return;
-                      setDraggedId(item.id);
-                      event.dataTransfer.effectAllowed = "move";
-                      event.dataTransfer.setData("text/plain", String(item.id));
-                    }}
                     onDragOver={(event) => {
                       if (!canReorder) return;
                       event.preventDefault();
@@ -2099,6 +2182,17 @@ function QBSection() {
                     <td className="px-4 py-3">
                       <button
                         type="button"
+                        draggable={canReorder}
+                        onDragStart={(event) => {
+                          if (!canReorder) return;
+                          setDraggedId(item.id);
+                          event.dataTransfer.effectAllowed = "move";
+                          event.dataTransfer.setData("text/plain", String(item.id));
+                        }}
+                        onDragEnd={() => {
+                          setDraggedId(null);
+                          setDropTargetId(null);
+                        }}
                         disabled={!canReorder}
                         className="inline-flex cursor-grab items-center rounded-md border border-gray-200 bg-white px-2 py-1 text-gray-400 transition hover:bg-gray-50 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-500"
                         aria-label={`Drag to reorder ${item.subject_code}`}
