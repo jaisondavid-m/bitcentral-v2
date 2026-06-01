@@ -29,76 +29,76 @@ var mealTimings = map[string][2]string{
 var defaultMessMenus = map[string]map[string]map[string][]string{
 	"boys": {
 		"Monday": {
-			"breakfast": {"Coffee/Milk/Tea", "Idly podi with gingelly oil"},                                              // 100%, 75%
-			"lunch":     {"Rice", "Buttermilk"},                                                                           // 100%, 75%
-			"dinner":    {"Curd rice", "Banana", "Onion raita", "Parotta"},                                               // 100%, 100%, 75%, 50%
+			"breakfast": {"Curry Leaves podi uthappam", "Sambar", "Bread / Avul upma", "Malli chutney", "Idly podi with gingelly oil", "Coffee/Milk/Tea"},
+			"lunch":     {"Rice", "Dhall Fry (North Indian Style)", "Puli Rasam", "Payasam (Semiya)", "Paruppuvadai + Ash gourd kootu", "Buttermilk"},
+			"dinner":    {"Rumali rotti", "Veg Kuruma", "Tomato Rice", "Onion raita", "Curd rice", "Banana"},
 		},
 		"Tuesday": {
-			"breakfast": {"Idly podi with gingelly oil", "Coffee/Milk/Tea", "Kara Chutney"},                              // 100%, 100%, 50%
-			"lunch":     {"Rice", "Curd", "Appalam", "Dhall Rasam"},                                                      // 100%, 100%, 100%, 50%
-			"dinner":    {"Curd rice", "Coconut chutney", "Idly podi with gingelly oil", "Badham milk"},                  // 100%, 50%, 50%, 50%
+			"breakfast": {"Kambu Idly", "Lapsi Sweet", "Rava Kitchadi (White)", "Tomato kuruma", "Groundnut chutney", "Idly podi with gingelly oil", "Coffee/Milk/Tea"},
+			"lunch":     {"Rice", "Black Sundal kalambu", "Dhall Rasam", "Beetroot Poriyal", "Curd", "Appalam"},
+			"dinner":    {"Kal dosai (Potato masala)", "Noodles", "Kumbakonam Kadappa", "Coconut chutney", "Tomato Sauce", "Curd rice", "Rasna mango flavor"},
 		},
 		"Wednesday": {
-			"breakfast": {"Coffee/Milk/Tea", "Sambar", "Semiya biryani", "Meduvadai", "Veg chutney"},                    // 100%, 60%, 40%, 40%, 40%
-			"lunch":     {"Rice", "Buttermilk", "Vadagam"},                                                               // 100%, 50%, 50%
-			"dinner":    {"Chapatti", "Curd rice", "Boiled Egg", "Veg Salad / Onion raita"},                              // 100%, 100%, 75%, 50%
+			"breakfast": {"Venpongal", "Semiya Biryani", "Meduvadai", "Sambar", "Veg chutney", "Coffee/Milk/Tea"},
+			"lunch":     {"Rice", "Pattani Tomato Bath", "Mysore Rasam", "Curd rice", "Buttermilk", "Vadagam", "Pickle"},
+			"dinner":    {"Chapatti", "Mint Rice", "Egg pepper fry", "Aloo mutter", "Avul Sweet", "Curd rice", "Veg salad / Onion raita"},
 		},
 		"Thursday": {
-			"breakfast": {"Coffee/Milk/Tea", "Kambu idly", "Tomato kulambu", "Groundnut chutney"},                       // 100%, 50%, 50%, 50%
-			"lunch":     {"Rice", "Kambu Koozh + Vathal", "Tomato Rasam", "Beetroot Poriyal", "Buttermilk"},              // 100%, 100%, 50%, 50%, 50%
-			"dinner":    {"Noodles", "Curd rice", "Banana", "Tiffin Sambar", "Coconut Chutney", "Tomato Sauce"},          // 75%, 75%, 75%, 50%, 50%, 50%
+			"breakfast": {"Ragi / Plain Idly", "Sweet Pongal (Jaggery)", "Tomato Kulambu", "Wheat rava + Curd", "Groundnut chutney", "Coffee/Milk/Tea"},
+			"lunch":     {"Rice", "Avaramochai Brinjal Kulambu", "Tomato Rasam", "Carrot beans poriyal", "Curd", "Kambu Koozh + Vathal"},
+			"dinner":    {"Kara dosa", "Arisiparuppu Sadam", "Tiffin Sambar", "Coconut / Curry leaves Chutney", "Curd rice & Banana"},
 		},
 		"Friday": {
-			"breakfast": {"Coffee/Milk/Tea", "Idly podi with gingelly oil", "Tomato kulambu"},                            // 100%, 80%, 60%
-			"lunch":     {"Rice", "Buttermilk", "Brinjal Sambar", "Pineapple Rasam", "Potato Varuval", "Ada Pradhaman Payasam"}, // 100%, 80%, 40%×4
-			"dinner":    {"Curd rice", "Chapatti", "Malli Biryani", "Ragi Semiya sweet", "Egg masala", "Onion raita / Veg Salad"}, // 100%, 80%, 40%×4
+			"breakfast": {"Veg uthappam (Soya)", "White Rava Upma", "Tomato kulambu", "Kara chutney", "Idly podi with gingelly oil", "Coffee/Milk/Tea"},
+			"lunch":     {"Rice", "Brinjal Sambar", "Pineapple Rasam", "Potato Varuval", "Ada Pradhaman Payasam", "Buttermilk"},
+			"dinner":    {"Chapatti", "Malli Biryani", "Onion Tomato gravy", "Ragi Semiya sweet", "Egg masala", "Curd rice", "Onion raita / Veg Salad"},
 		},
 		"Saturday": {
-			"breakfast": {"Idly podi with gingelly oil", "Coffee/Milk/Tea", "Medhu Vadai"},                               // 100%, 100%, 80%
-			"lunch":     {"Rice", "Appalam", "Curd"},                                                                      // 100%, 100%, 100%
-			"dinner":    {"Banana", "Machine Dosa", "Curd rice"},                                                          // 100%, 60%, 60%
+			"breakfast": {"Idly", "Semiya Kitchadi", "Medhu Vadai", "Kumbakonam Kadappa", "Coconut chutney / Red chilli", "Idly podi with gingelly oil", "Coffee/Milk/Tea"},
+			"lunch":     {"Rice", "Milaguthakali Vathal - Pulikulambu", "Lemon Rasam", "Meal Maker Poriyal", "Appalam", "Curd"},
+			"dinner":    {"Pesarattu Dosa", "Kuruma", "Kara Chutney", "Karuveppilai sadam", "Idly podi with gingelly oil", "Banana"},
 		},
 		"Sunday": {
-			"breakfast": {"Bread", "Coffee/Milk/Tea", "Jam / Butter", "Coconut chutney"},                                 // 100%, 100%, 80%, 60%
-			"lunch":     {"Rice", "Onion raita", "Egg gravy", "Buttermilk"},                                              // 100%, 100%, 100%, 60%
-			"dinner":    {"Idly", "Brinjal Kosthu", "Curd rice & Rose milk", "Groundnut chutney"},                        // 80%, 40%, 40%, 40%
+			"breakfast": {"Bread", "Jam/Butter", "Thinai Pongal", "Coconut chutney", "Coffee/Milk/Tea"},
+			"lunch":     {"Soya Biryani", "Rice", "Onion raita", "Pacha Puli Rasam", "Egg gravy", "Buttermilk"},
+			"dinner":    {"Idly", "Brinjal Kosthu", "Black Sundal Rice", "Curd rice & Rose milk", "Groundnut chutney"},
 		},
 	},
 	"girls": {
 		"Monday": {
-			"breakfast": {"Tea/Coffee/Milk", "Idly", "White Kuruma"},                                                     // 100%, 75%, 50%
-			"lunch":     {"Rice", "Kambu Koozh+Vathal", "Butter Milk", "Bottle Gourd Kootu"},                             // 100%, 100%, 75%, 50%
-			"dinner":    {"Curd Rice", "Banana", "Pasiparuppu Sambar"},                                                   // 100%, 100%, 50%
+			"breakfast": {"Idly", "Rava upma", "White kuruma", "Kara chutney", "Idly podi with gingelly oil", "Tea/Coffee/Milk"},
+			"lunch":     {"Rice", "Arachuvecha (Onion+Drumstick) Kulambu", "Rasam", "Bottle gourd kootu", "Kambu Koozh+Vathal", "Buttermilk"},
+			"dinner":    {"Veg uthappam", "Sambar", "Karuveppilai sadam", "Coconut chutney", "Curd rice", "Banana"},
 		},
 		"Tuesday": {
-			"breakfast": {"Sambar", "Coconut chutney", "Tea/Coffee/Milk", "Medhu Vadai", "Ven pongal"},                   // 100%, 100%, 100%, 50%, 50%
-			"lunch":     {"Rice", "Appalam"},                                                                              // 100%, 75%
-			"dinner":    {"Curd Rice", "Chapathi", "Ragi/Aval Sweet"},                                                    // 75%, 50%, 50%
+			"breakfast": {"Seeragasamba kurunai Pongal", "Tomato Semiya", "Sambar", "Medhu Vadai", "Coconut Chutney", "Tea/Coffee/Milk"},
+			"lunch":     {"Rice", "Kollu paruppu", "Kollu Rasam", "Carrot Green Peas Poriyal", "Appalam", "Curd"},
+			"dinner":    {"Chapathi", "Pattani Paal Curry Kuruma", "Empty Biriyani", "Egg+Avul/Ragi semiya sweet", "Curd Rice", "Veg Salad/Onion Raitha"},
 		},
 		"Wednesday": {
-			"breakfast": {"Tea/Coffee/Milk", "Wheat rava upma+Curd", "Tomato Kulambu"},                                   // 100%, 75%, 50%
-			"lunch":     {"Rice", "Payasam", "Appalam", "Butter milk", "Dhall fry"},                                      // 100%, 75%, 50%, 50%, 50%
-			"dinner":    {"Curd Rice", "Badham Milk/Ragi Malt", "Idly", "Thatta payaru Sadham"},                          // 100%, 50%, 50%, 50%
+			"breakfast": {"Idly", "Tomato Kulambu", "Wheat Rava Upma+Curd", "Mint Chutney", "Tea/Coffee/Milk"},
+			"lunch":     {"Rice", "Ladiesfinger Morkulambu", "Milagu Rasam", "Potato Finger varuval", "Payasam", "Appalam", "Butter Milk"},
+			"dinner":    {"Set Dosa", "Vada curry", "Coconut rice", "Curd Rice", "Veg Chutney", "Badham Milk/Ragi Malt"},
 		},
 		"Thursday": {
-			"breakfast": {"Tea/Coffee/Milk", "Bread+Jam+Butter", "Groundnut chutney"},                                    // 100%, 75%, 50%
-			"lunch":     {"Rice", "Butter milk", "Sambar Sadham", "Onion Raitha", "Dhall Rasam", "Appalam"},              // 100%, 75%, 50%, 50%, 50%, 50%
-			"dinner":    {"Curd Rice", "Egg Pepper Fry/Masala", "Chapati+Jam", "Veg Salad/Onion Raita"},                  // 100%, 50%, 50%, 50%
+			"breakfast": {"Bread+Jam+Butter", "Onion Mini Uttappam", "Siruparuppu Sambar", "Kaara Chutney", "Tea/Coffee/Milk"},
+			"lunch":     {"Rice", "Tomato Rice (Kuska)", "Sambar Sadham", "Onion Raitha", "Rasam", "Vadagam+Butter Milk"},
+			"dinner":    {"Chapathi+Jam", "Mixed Veg Curry", "Beetroot sadham", "Curd Rice", "Egg Pepper Fry/Masala", "Veg Salad/Onion Raitha"},
 		},
 		"Friday": {
-			"breakfast": {"Tea/Coffee/Milk", "Coconut Chutney", "Idly"},                                                  // 100%, 100%, 80%
-			"lunch":     {"Rice", "Curd", "Vathal Puli Kulambu"},                                                         // 100%, 100%, 60%
-			"dinner":    {"Curd Rice", "Banana", "Plain salna", "Coconut Chutney"},                                       // 100%, 100%, 60%, 60%
+			"breakfast": {"Plain Idly", "Yellow pumpkin sambar", "Sweet pongal", "Medu Vadai", "Coconut chutney", "Tea/Coffee/Milk"},
+			"lunch":     {"Rice", "Kothavarai vathal kulambu", "Lemon Rasam", "Cabbage Poriyal", "Curd"},
+			"dinner":    {"Rumali Roti", "Veg butter masala", "Ghee rice", "Curd Rice", "Banana"},
 		},
 		"Saturday": {
-			"breakfast": {"Tea/Coffee/Milk", "Ragi Semiya", "Dosa", "Potato Masala", "Sambar"},                          // 100%, 60%, 40%, 40%, 40%
-			"lunch":     {"Rice", "Payasam+Poriyal", "Paruppu Vadai", "Kadhamba Sambar", "Rasam", "Butter Milk"},         // 100%, 80%, 80%, 60%, 60%, 60%
-			"dinner":    {"Curd Rice", "Idly", "Arisi Paruppu Sadham", "Egg Rice", "Vadagam"},                            // 80%, 60%, 40%, 40%, 40%
+			"breakfast": {"Machine Dosa", "Veg Paya", "Ragi Semiya", "Coconut chutney", "Tea/Coffee/Milk"},
+			"lunch":     {"Rice", "Drumstick Sambar", "Tomato Rasam", "Payasam", "Paruppuvadai+Poriyal", "Buttermilk"},
+			"dinner":    {"Idly", "Brinjal Gosthu", "Tomato rice", "Curd Rice", "Kara Chutney", "Lemon juice"},
 		},
 		"Sunday": {
-			"breakfast": {"Tea/Coffee/Milk", "Coconut Chutney", "Bread+Jam+Butter"},                                      // 100%, 100%, 60%
-			"lunch":     {"Rice", "Egg Gravy", "Butter Milk", "Pachapuli Rasam", "Onion Raitha"},                         // 100%, 100%, 100%, 60%, 60%
-			"dinner":    {"Curd Rice", "Sambar", "Onion Dosa", "Jeera Sadam/Sambar Sadam", "Coriander Chutney"},          // 80%, 60%, 40%, 40%, 40%
+			"breakfast": {"Bread", "Jam butter", "Semiya (Variety)", "Coconut Chutney", "Tea/Coffee/Milk"},
+			"lunch":     {"Rice", "Veg Biriyani", "Pachapuli Rasam", "Egg Gravy", "Onion Raitha", "Butter Milk"},
+			"dinner":    {"Onion Dosa", "Jeera Sadam/Sambar Sadam", "Sambar", "Curd Rice", "Banana+Tomato Sauce", "Coriander Chutney"},
 		},
 	},
 }
