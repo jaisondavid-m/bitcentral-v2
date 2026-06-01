@@ -6,7 +6,7 @@ const mealLabels = {
   dinner:    { title: 'Dinner',    icon: '🌙', time: '7:00 – 8:30 PM' },
 };
 
-export const MealCard = ({ type, items = [], isActive, isServingNow = false }) => {
+export const MealCard = ({ type, items = [], isActive, isServingNow = false, isDefaultMenu = false }) => {
   const config = mealLabels[type] ?? { title: type, icon: '🍽️', time: '' };
 
   return (
@@ -34,7 +34,11 @@ export const MealCard = ({ type, items = [], isActive, isServingNow = false }) =
             </p>
           </div>
         </div>
-        {isServingNow ? (
+        {isDefaultMenu ? (
+          <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${isActive ? 'border-amber-200/40 bg-amber-400/15 text-amber-100' : 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300'}`}>
+            Default menu
+          </span>
+        ) : isServingNow ? (
           <span className="rounded-full border border-white/30 bg-white/15 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">
             Serving now
           </span>
@@ -44,6 +48,12 @@ export const MealCard = ({ type, items = [], isActive, isServingNow = false }) =
           </span>
         )}
       </div>
+
+      {isDefaultMenu ? (
+        <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-[11px] font-medium text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-300 sm:px-5">
+          Showing the default menu template for this date and hostel.
+        </div>
+      ) : null}
 
       <div className="px-4 py-1.5 sm:px-5 sm:py-2">
         {items.length > 0 ? (

@@ -34,6 +34,7 @@ const MessMenu = () => {
   const [menu, setMenu] = useState({});
   const [dayLabel, setDayLabel] = useState("");
   const [currentMeal, setCurrentMeal] = useState(null);
+  const [isDefaultMenu, setIsDefaultMenu] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -53,6 +54,7 @@ const MessMenu = () => {
       const data = res?.data ?? {};
       setMenu(data?.full_menu ?? {});
       setDayLabel(data?.day ?? "");
+      setIsDefaultMenu(Boolean(data?.default_menu));
 
       const active = data?.current_meal?.meal_type?.toLowerCase?.();
       if (active && MEAL_ORDER.includes(active)) {
@@ -65,6 +67,7 @@ const MessMenu = () => {
       console.error("Error fetching menu:", err);
       setMenu({});
       setCurrentMeal(null);
+      setIsDefaultMenu(false);
       setError("Unable to load menu for the selected date.");
     } finally {
       setLoading(false);
@@ -89,6 +92,11 @@ const MessMenu = () => {
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
               <h1 className="mt-1 text-2xl font-bold leading-tight text-slate-800 dark:text-slate-100 sm:text-3xl">Mess Menu</h1>
+              {isDefaultMenu ? (
+                <p className="mt-1 inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300">
+                  Default menu template
+                </p>
+              ) : null}
             </div>
 
             <div className="w-full md:w-auto md:min-w-60">
@@ -165,11 +173,7 @@ const MessMenu = () => {
               </button>
             </div>
           ) : (
-            <MealCard
-              type={activeTab}
-              items={selectedItems}
-              isActive={true}
-            />
+            <MealCard type={activeTab} items={selectedItems} isActive={true} isDefaultMenu={isDefaultMenu} />
           )}
         </div>
       </div>
