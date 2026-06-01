@@ -5,6 +5,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { pingPresence } from "../api/presence.js";
 import { getMeProfile } from "../api/axios.js";
 import { logout } from "../Authentication/firebase.js";
+import { PING_ON } from "../config/runtimeFlags.js";
 import {
   clearGuestSession,
   createGuestStudent,
@@ -218,7 +219,7 @@ export const StudentContext = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (!user || typeof user.getIdToken !== "function") {
+    if (!PING_ON || !user || typeof user.getIdToken !== "function") {
       return undefined;
     }
 

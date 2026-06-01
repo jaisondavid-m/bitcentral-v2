@@ -51,6 +51,7 @@ Create a `.env` file or set environment variables for Vite. Common variables use
 - `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, etc. (Firebase config used by `src/Authentication/firebase.js`)
 - `VITE_ADMIN_FIREBASE_UID` — optional admin UID used for admin-only routes
 - `VITE_API_BASE` — optional base URL if the API is hosted separately (see `src/api/axios.js`)
+- `PING_ON` — set to `true` to enable presence pings and admin auto-refresh polling; any other value disables both
 
 ## Run locally
 

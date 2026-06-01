@@ -54,6 +54,7 @@ import {
 } from "lucide-react";
 import SuperAdminPanel from "./SuperAdminPanel.jsx";
 import { checkSuperAdmin } from "../api/admin.js";
+import { PING_ON } from "../config/runtimeFlags.js";
 
 function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
@@ -836,6 +837,10 @@ function UsersSection({ isSuper }) {
 
   useEffect(() => { loadUsers(); }, [loadUsers]);
   useEffect(() => {
+    if (!PING_ON) {
+      return undefined;
+    }
+
     const id = window.setInterval(loadUsers, 30000);
     return () => window.clearInterval(id);
   }, [loadUsers]);
