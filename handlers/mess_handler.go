@@ -23,6 +23,86 @@ var mealTimings = map[string][2]string{
 	"Dinner":    {"19:00", "20:30"},
 }
 
+// defaultMessMenus is auto-predicted from May 2026 mess menu data.
+// Items are selected based on recurrence frequency across all sampled weeks.
+// Prediction confidence shown as comments (% of weeks the item appeared).
+var defaultMessMenus = map[string]map[string]map[string][]string{
+	"boys": {
+		"Monday": {
+			"breakfast": {"Coffee/Milk/Tea", "Idly podi with gingelly oil"},                                              // 100%, 75%
+			"lunch":     {"Rice", "Buttermilk"},                                                                           // 100%, 75%
+			"dinner":    {"Curd rice", "Banana", "Onion raita", "Parotta"},                                               // 100%, 100%, 75%, 50%
+		},
+		"Tuesday": {
+			"breakfast": {"Idly podi with gingelly oil", "Coffee/Milk/Tea", "Kara Chutney"},                              // 100%, 100%, 50%
+			"lunch":     {"Rice", "Curd", "Appalam", "Dhall Rasam"},                                                      // 100%, 100%, 100%, 50%
+			"dinner":    {"Curd rice", "Coconut chutney", "Idly podi with gingelly oil", "Badham milk"},                  // 100%, 50%, 50%, 50%
+		},
+		"Wednesday": {
+			"breakfast": {"Coffee/Milk/Tea", "Sambar", "Semiya biryani", "Meduvadai", "Veg chutney"},                    // 100%, 60%, 40%, 40%, 40%
+			"lunch":     {"Rice", "Buttermilk", "Vadagam"},                                                               // 100%, 50%, 50%
+			"dinner":    {"Chapatti", "Curd rice", "Boiled Egg", "Veg Salad / Onion raita"},                              // 100%, 100%, 75%, 50%
+		},
+		"Thursday": {
+			"breakfast": {"Coffee/Milk/Tea", "Kambu idly", "Tomato kulambu", "Groundnut chutney"},                       // 100%, 50%, 50%, 50%
+			"lunch":     {"Rice", "Kambu Koozh + Vathal", "Tomato Rasam", "Beetroot Poriyal", "Buttermilk"},              // 100%, 100%, 50%, 50%, 50%
+			"dinner":    {"Noodles", "Curd rice", "Banana", "Tiffin Sambar", "Coconut Chutney", "Tomato Sauce"},          // 75%, 75%, 75%, 50%, 50%, 50%
+		},
+		"Friday": {
+			"breakfast": {"Coffee/Milk/Tea", "Idly podi with gingelly oil", "Tomato kulambu"},                            // 100%, 80%, 60%
+			"lunch":     {"Rice", "Buttermilk", "Brinjal Sambar", "Pineapple Rasam", "Potato Varuval", "Ada Pradhaman Payasam"}, // 100%, 80%, 40%×4
+			"dinner":    {"Curd rice", "Chapatti", "Malli Biryani", "Ragi Semiya sweet", "Egg masala", "Onion raita / Veg Salad"}, // 100%, 80%, 40%×4
+		},
+		"Saturday": {
+			"breakfast": {"Idly podi with gingelly oil", "Coffee/Milk/Tea", "Medhu Vadai"},                               // 100%, 100%, 80%
+			"lunch":     {"Rice", "Appalam", "Curd"},                                                                      // 100%, 100%, 100%
+			"dinner":    {"Banana", "Machine Dosa", "Curd rice"},                                                          // 100%, 60%, 60%
+		},
+		"Sunday": {
+			"breakfast": {"Bread", "Coffee/Milk/Tea", "Jam / Butter", "Coconut chutney"},                                 // 100%, 100%, 80%, 60%
+			"lunch":     {"Rice", "Onion raita", "Egg gravy", "Buttermilk"},                                              // 100%, 100%, 100%, 60%
+			"dinner":    {"Idly", "Brinjal Kosthu", "Curd rice & Rose milk", "Groundnut chutney"},                        // 80%, 40%, 40%, 40%
+		},
+	},
+	"girls": {
+		"Monday": {
+			"breakfast": {"Tea/Coffee/Milk", "Idly", "White Kuruma"},                                                     // 100%, 75%, 50%
+			"lunch":     {"Rice", "Kambu Koozh+Vathal", "Butter Milk", "Bottle Gourd Kootu"},                             // 100%, 100%, 75%, 50%
+			"dinner":    {"Curd Rice", "Banana", "Pasiparuppu Sambar"},                                                   // 100%, 100%, 50%
+		},
+		"Tuesday": {
+			"breakfast": {"Sambar", "Coconut chutney", "Tea/Coffee/Milk", "Medhu Vadai", "Ven pongal"},                   // 100%, 100%, 100%, 50%, 50%
+			"lunch":     {"Rice", "Appalam"},                                                                              // 100%, 75%
+			"dinner":    {"Curd Rice", "Chapathi", "Ragi/Aval Sweet"},                                                    // 75%, 50%, 50%
+		},
+		"Wednesday": {
+			"breakfast": {"Tea/Coffee/Milk", "Wheat rava upma+Curd", "Tomato Kulambu"},                                   // 100%, 75%, 50%
+			"lunch":     {"Rice", "Payasam", "Appalam", "Butter milk", "Dhall fry"},                                      // 100%, 75%, 50%, 50%, 50%
+			"dinner":    {"Curd Rice", "Badham Milk/Ragi Malt", "Idly", "Thatta payaru Sadham"},                          // 100%, 50%, 50%, 50%
+		},
+		"Thursday": {
+			"breakfast": {"Tea/Coffee/Milk", "Bread+Jam+Butter", "Groundnut chutney"},                                    // 100%, 75%, 50%
+			"lunch":     {"Rice", "Butter milk", "Sambar Sadham", "Onion Raitha", "Dhall Rasam", "Appalam"},              // 100%, 75%, 50%, 50%, 50%, 50%
+			"dinner":    {"Curd Rice", "Egg Pepper Fry/Masala", "Chapati+Jam", "Veg Salad/Onion Raita"},                  // 100%, 50%, 50%, 50%
+		},
+		"Friday": {
+			"breakfast": {"Tea/Coffee/Milk", "Coconut Chutney", "Idly"},                                                  // 100%, 100%, 80%
+			"lunch":     {"Rice", "Curd", "Vathal Puli Kulambu"},                                                         // 100%, 100%, 60%
+			"dinner":    {"Curd Rice", "Banana", "Plain salna", "Coconut Chutney"},                                       // 100%, 100%, 60%, 60%
+		},
+		"Saturday": {
+			"breakfast": {"Tea/Coffee/Milk", "Ragi Semiya", "Dosa", "Potato Masala", "Sambar"},                          // 100%, 60%, 40%, 40%, 40%
+			"lunch":     {"Rice", "Payasam+Poriyal", "Paruppu Vadai", "Kadhamba Sambar", "Rasam", "Butter Milk"},         // 100%, 80%, 80%, 60%, 60%, 60%
+			"dinner":    {"Curd Rice", "Idly", "Arisi Paruppu Sadham", "Egg Rice", "Vadagam"},                            // 80%, 60%, 40%, 40%, 40%
+		},
+		"Sunday": {
+			"breakfast": {"Tea/Coffee/Milk", "Coconut Chutney", "Bread+Jam+Butter"},                                      // 100%, 100%, 60%
+			"lunch":     {"Rice", "Egg Gravy", "Butter Milk", "Pachapuli Rasam", "Onion Raitha"},                         // 100%, 100%, 100%, 60%, 60%
+			"dinner":    {"Curd Rice", "Sambar", "Onion Dosa", "Jeera Sadam/Sambar Sadam", "Coriander Chutney"},          // 80%, 60%, 40%, 40%, 40%
+		},
+	},
+}
+
 type MessHandler struct {
 	DB *sql.DB
 }
@@ -105,6 +185,41 @@ func normalizeMeal(raw string) (string, error) {
 
 func normalizeCell(value string) string {
 	return strings.TrimSpace(strings.TrimPrefix(value, "\ufeff"))
+}
+
+func dayNameFromDate(dateStr string) string {
+	loc, _ := time.LoadLocation("Asia/Kolkata")
+	parsed, err := time.ParseInLocation("2006-01-02", dateStr, loc)
+	if err != nil {
+		return ""
+	}
+	return parsed.Weekday().String()
+}
+
+func cloneMessMenu(defaultMenu map[string][]string) map[string][]string {
+	menu := map[string][]string{
+		"breakfast": {},
+		"lunch":     {},
+		"dinner":    {},
+	}
+	for mealType, items := range defaultMenu {
+		menu[mealType] = append([]string{}, items...)
+	}
+	return menu
+}
+
+func fallbackMessMenu(hostel, dateStr string) (string, map[string][]string) {
+	dayName := dayNameFromDate(dateStr)
+	hostelMenus, ok := defaultMessMenus[hostel]
+	if !ok {
+		hostelMenus = defaultMessMenus["boys"]
+	}
+	defaultMenu, ok := hostelMenus[dayName]
+	if !ok {
+		defaultMenu = hostelMenus["Monday"]
+		dayName = "Monday"
+	}
+	return dayName, cloneMessMenu(defaultMenu)
 }
 
 func parseMessCSV(reader io.Reader) ([]parsedMessRow, error) {
@@ -203,6 +318,7 @@ func (h *MessHandler) GetMess(c *gin.Context) {
 		"dinner":    {},
 	}
 	dayName := ""
+	hasData := false
 
 	for rows.Next() {
 		var day, mealType, item string
@@ -210,6 +326,7 @@ func (h *MessHandler) GetMess(c *gin.Context) {
 		if err := rows.Scan(&day, &mealType, &item, &order); err != nil {
 			continue
 		}
+		hasData = true
 		if dayName == "" {
 			dayName = day
 		}
@@ -221,6 +338,14 @@ func (h *MessHandler) GetMess(c *gin.Context) {
 		case "dinner":
 			menu["dinner"] = append(menu["dinner"], item)
 		}
+	}
+
+	if !hasData {
+		dayName, menu = fallbackMessMenu(hostel, dateStr)
+	}
+
+	if dayName == "" {
+		dayName = dayNameFromDate(dateStr)
 	}
 
 	activeMeal := currentMealType()
@@ -238,8 +363,6 @@ func (h *MessHandler) GetMess(c *gin.Context) {
 		"dinner":    menu["dinner"],
 	}
 
-	hasData := len(menu["breakfast"]) > 0 || len(menu["lunch"]) > 0 || len(menu["dinner"]) > 0
-
 	c.JSON(http.StatusOK, gin.H{
 		"hostel":       hostel,
 		"date":         dateStr,
@@ -248,6 +371,7 @@ func (h *MessHandler) GetMess(c *gin.Context) {
 		"current_meal": currentMealData,
 		"full_menu":    fullMenu,
 		"data_found":   hasData,
+		"default_menu": !hasData,
 	})
 }
 
