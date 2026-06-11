@@ -8,6 +8,7 @@ import FullScreenLoader from "../Component/FullScreenLoader.jsx";
 import { useAuth } from "../context/StudentContext.jsx";
 import SEO from "../Component/SEO.jsx";
 import { ROUTE_SEO } from "../seo/routeSeo.js";
+import AnswerKey22HS006 from "../Pages/answers/AnswerKey22HS006.jsx";
 
 const Login = lazy(() => import("../Pages/Login.jsx"));
 const Dashboard = lazy(() => import("../Pages/Dashboard.jsx"));
@@ -191,6 +192,7 @@ function App() {
             <Route path="/mess" element={<MessMenu />} />
             <Route path="*" element={<NotFound />} />
             <Route path="/ak_22ph202" element={<AK22PH202 />} />
+            <Route path="/tamil_ak" element={<AnswerKey22HS006 />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
