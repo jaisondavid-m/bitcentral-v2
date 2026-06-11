@@ -3494,7 +3494,7 @@ const AnswerKey22HS006 = () => {
           <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between lg:gap-4">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <h1 className="text-lg font-bold text-slate-800 leading-tight sm:text-xl">22HS006 Answer Key</h1>
-              <p className="text-[11px] text-slate-500 sm:text-xs">History of Science & Technology | Bannari Amman Institute</p>
+              <p className="text-[11px] text-slate-500 sm:text-xs">Tamil & Technology | Bannari Amman Institute</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 lg:justify-end">
               <div className="flex self-start rounded-lg bg-slate-100 p-0.5">
@@ -3609,7 +3609,7 @@ const AnswerKey22HS006 = () => {
 
       {/* Footer */}
       <footer className="text-center py-8 text-xs text-slate-400 border-t border-slate-200 mt-4 bg-white">
-        22HS006 Answer Key • History of Science & Technology • Bannari Amman Institute of Technology
+        22HS006 Answer Key • Tamil & Technology • Bannari Amman Institute of Technology
       </footer>
     </div>
   );
