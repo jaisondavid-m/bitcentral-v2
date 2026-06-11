@@ -3444,7 +3444,7 @@ const unitNames = {
 };
 
 const AnswerKey22HS006 = () => {
-  const [language, setLanguage] = useState("english");
+  const [language, setLanguage] = useState("tamil");
   const [expanded, setExpanded] = useState({});
   const [selectedUnit, setSelectedUnit] = useState("All");
   const [selectedMarks, setSelectedMarks] = useState("All");
