@@ -3469,6 +3469,24 @@ const AnswerKey22HS006 = () => {
     return "bg-gray-100 text-gray-700";
   };
 
+  const renderLongAnswer = (text) => {
+    return String(text || "").split("\n").map((line, index) => {
+      const trimmed = line.trim();
+
+      if (!trimmed) {
+        return <div key={index} className="h-2" />;
+      }
+
+      const isSubtitle = trimmed.endsWith(":") && !trimmed.startsWith("•");
+
+      return (
+        <div key={index} className={`whitespace-pre-wrap ${isSubtitle ? "font-bold text-slate-900" : ""}`}>
+          {line}
+        </div>
+      );
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 font-sans">
       {/* STICKY HEADER */}
@@ -3559,7 +3577,9 @@ const AnswerKey22HS006 = () => {
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${getMarkColor(item.marks)}`}>{item.marks} Marks</span>
                     <span className="text-xs text-slate-400 truncate">{unitName}</span>
                   </div>
-                  <p className={`text-sm font-semibold text-slate-800 leading-snug ${language === "tamil" ? "font-normal" : ""}`}>{question}</p>
+                  <p className={`leading-snug text-slate-800 ${item.marks >= 16 ? "text-base font-medium" : "text-sm font-semibold"} ${language === "tamil" ? "font-normal" : ""}`}>
+                    {question}
+                  </p>
                 </div>
                 <span className={`flex-shrink-0 mt-1 ${c.text}`}>
                   {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
@@ -3572,8 +3592,8 @@ const AnswerKey22HS006 = () => {
                   {/* Answer */}
                   <div className="mb-4">
                     <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-2">✓ Answer</p>
-                    <div className={`text-sm text-slate-700 leading-relaxed whitespace-pre-line ${language === "tamil" ? "text-base" : ""}`}>
-                      {answer}
+                    <div className={`text-sm text-slate-700 leading-relaxed ${language === "tamil" ? "text-base" : ""} ${item.marks >= 16 ? "space-y-2" : "whitespace-pre-line"}`}>
+                      {item.marks >= 16 ? renderLongAnswer(answer) : answer}
                     </div>
                   </div>
 
