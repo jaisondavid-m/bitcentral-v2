@@ -3528,16 +3528,7 @@ const AnswerKey22HS006 = () => {
               </select>
               <div className="flex items-center gap-2 text-xs text-slate-500 whitespace-nowrap">
                 <span>{filtered.length} questions</span>
-                {units.slice(1).map(u => {
-                  const count = filtered.filter(q => q.unit === u).length;
-                  if (!count) return null;
-                  const c = unitColors[u];
-                  return (
-                    <span key={u} className={`text-xs px-2 py-0.5 rounded-full font-medium ${c.bg} ${c.text} border ${c.border}`}>
-                      {u}: {count}
-                    </span>
-                  );
-                })}
+                
               </div>
             </div>
           </div>
