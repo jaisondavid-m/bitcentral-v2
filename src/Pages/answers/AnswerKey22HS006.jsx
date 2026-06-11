@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const answerKey = [
   // ─── UNIT I ───
@@ -3560,7 +3561,9 @@ const AnswerKey22HS006 = () => {
                   </div>
                   <p className={`text-sm font-semibold text-slate-800 leading-snug ${language === "tamil" ? "font-normal" : ""}`}>{question}</p>
                 </div>
-                <span className={`flex-shrink-0 text-xl font-bold mt-1 ${c.text}`}>{isOpen ? "−" : "+"}</span>
+                <span className={`flex-shrink-0 mt-1 ${c.text}`}>
+                  {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                </span>
               </button>
 
               {/* Answer Section */}
