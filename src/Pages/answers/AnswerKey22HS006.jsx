@@ -3600,13 +3600,7 @@ const AnswerKey22HS006 = () => {
                     </div>
                   </div>
 
-                  {/* Exam Tip */}
-                  {item.marks >= 16 && (
-                    <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5">
-                      <p className="text-xs font-bold text-amber-700 mb-1">📝 Exam Tip</p>
-                      <p className="text-xs text-amber-700">Use headings and sub-points. Start with a definition, explain with examples, and end with a conclusion. Aim for 500–800 words.</p>
-                    </div>
-                  )}
+                 
                 </div>
               )}
             </div>
