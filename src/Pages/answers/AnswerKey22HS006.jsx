@@ -3172,7 +3172,7 @@ Keywords: Urukan Kadai, Silappathikaram, pearl, ruby, carnelian, sapphire, Silam
   {
     unit: "Unit IV", qNo: 16, marks: 2,
     questionEnglish: "List four benefits of ponds (kulams).",
-    questionTamil: "குளங்களின் நான்கு வன்மைகளை எழுதுக.",
+    questionTamil: "குளங்களின் நான்கு நன்மைகளை எழுதுக.",
     answerEnglish: "Four benefits of ponds (குளம்/ஏரி): (1) Irrigation supply – water for surrounding fields year-round; (2) Groundwater recharge – raises local water table; (3) Flood control – absorbs excess monsoon rainwater; (4) Drinking water and livestock – community water source for humans and animals.",
     answerTamil: "குளங்களின் நான்கு வன்மைகள்: (1) பாசன விநியோகம் – ஆண்டு முழுவதும் வயல்களுக்கு நீர்; (2) நிலத்தடி நீர் நிரப்பல் – உள்ளூர் நீர்மட்டத்தை உயர்த்தும்; (3) வெள்ள கட்டுப்பாடு – மழை நீரை உள்வாங்கும்; (4) குடிநீர் மற்றும் கால்நடை – சமூக நீர் ஆதாரம்.",
     keywordsEnglish: ["irrigation", "groundwater recharge", "flood control", "drinking water"],
