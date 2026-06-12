@@ -5,75 +5,157 @@ import { useAuth } from "../context/StudentContext.jsx";
 
 const COURSE_LABELS = {
   // Current
-  "22HS006": "Tamil and Technology",
+  "22HS006": "Tamils and Technology",
   "24MB201": "",
-  "24IS21":  "",
-  "24CS21":  "",
-  "22GE004": "",
+  "24IS21": "",
+  "24CS21": "",
+  "22GE004": "Basics of Electronics Engineering",
   "24MB202": "",
-  "24CS22":  "",
-  "24IS22":  "",
-  "22GE003": "Basics of Electrical Engineering",
-  "22CD206": "",
-  "22CT206": "",
-  "24MB203": "",
-  "22AI206": "Digital Computer Electronics",
+  "24CS22": "",
+  "24IS22": "",
+
+  "22CH203": "Engineering Chemistry II",
+  "24IS63": "",
+  "22CB205": "",
+  "24CS57": "",
+  "22GE002": "Computational Problem Solving",
+  "24CS69": "",
+  "22CB203": "",
+  "22HS201": "",
+  "22CB204": "",
+
   "22CS206": "Digital Computer Electronics",
   "22IT206": "Digital Computer Electronics",
+  "22AI206": "Digital Computer Electronics",
+  "22AM206": "Digital Computer Electronics",
+  "24MB203": "",
+  "22CD206": "",
+  "24IS23": "",
   "22IS206": "",
-  "24CS23":  "",
-  "22AM206": "",
+  "24CS23": "",
+
+  "22GE003": "Basics of Electrical Engineering",
+  "22CB202": "",
+  "24MB204": "",
+  "24CS24": "",
+  "24IS24": "",
+
   "22MA201": "Engineering Mathematics II",
+
+  "24MB205": "",
+  "24CS54": "",
+  "24IS55": "",
+
+  "24MB206": "",
+
+  "22PH202": "Electromagnetism and Modern Physics",
+
+  "24CS58": "",
+  "22CB201": "",
+
   // Arrear
   "22MA101": "Engineering Mathematics I",
   "22CB101": "",
   "24MB101": "",
-  "22HS003": "",
-  "24MB102": "",
-  "22HS001": "",
-  "24MB104": "",
-  "22CH103": "",
+
+  "22GE001": "Fundamentals of Computing",
+
+  "22CB104": "",
+
+  "22HS003": "Heritage of Tamils",
+
+  "22CH103": "Engineering Chemistry I",
   "22CB103": "",
   "24MB103": "",
-  "22PH102": "",
+
+  "22HS001": "Foundational English",
+
+  "24MB104": "",
+
+  "22PH102": "Engineering Physics",
+
   "22CB102": "",
   "24MB105": "",
+
   "22CB106": "",
-  "24MB106": "",
+  "24MB106": ""
 };
 
-const CURRENT_CODES = ["22HS006", "24MB201", "24IS21", "24CS21", "22GE004", "24MB202", "24CS22", "24IS22", "22GE003", "22CD206", "22CT206", "24MB203", "22AI206", "22CS206", "22IT206", "22IS206", "24CS23", "22AM206", "22MA201"];
-const ARREAR_CODES  = ["22MA101", "22CB101", "24MB101", "22HS003", "24MB102", "22HS001", "24MB104", "22CH103", "22CB103", "24MB103", "22PH102", "22CB102", "24MB105", "22CB106", "24MB106"];
+const CURRENT_CODES = [
+  "24MB201",
+  "22HS006",
+  "24IS21",
+  "24CS21",
+  "22GE004",
+  "24MB202",
+  "24IS22",
+  "24CS22",
+  "22CH203",
+  "24IS63",
+  "22CB205",
+  "24CS57",
+  "22GE002",
+  "24CS69",
+  "22CB203",
+  "22HS201",
+  "22CB204",
+  "22CS206", "22IT206", "22AI206", "22AM206", "24MB203", "22CD206", "24IS23", "22IS206", "24CS23", "22GE003", "22CB202", "24MB204", "24CS24", "24IS24",
+  "22MA201",
+  "24MB205",
+  "24CS54",
+  "24IS55",
+  "24MB206",
+  "22PH202",
+  "24CS58",
+  "22CB201"
+
+]
+const ARREAR_CODES = [
+  "22MA101",
+  "22CB101",
+  "24MB101",
+  "22GE001",
+  "22CB104",
+  "22HS003", "22CH103", "22CB103", "24MB103",
+  "22HS001",
+  "24MB104",
+  "22PH102",
+  "22CB102",
+  "24MB105",
+  "22CB106",
+  "24MB106"
+
+]
 
 const ExamHall = () => {
   const { user, profile, student } = useAuth();
 
-  const [activeTab, setActiveTab]           = useState("current");
-  const [courseSearch, setCourseSearch]     = useState("");
+  const [activeTab, setActiveTab] = useState("current");
+  const [courseSearch, setCourseSearch] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
-  const [showDropdown, setShowDropdown]     = useState(false);
-  const [focusedIndex, setFocusedIndex]     = useState(-1);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
   const wrapperRef = useRef(null);
 
   const [registerNo, setRegisterNo] = useState("");
 
   const hasAppliedDefaultRegisterNo = useRef(false);
 
-useEffect(() => {
-  if (hasAppliedDefaultRegisterNo.current) return;
+  useEffect(() => {
+    if (hasAppliedDefaultRegisterNo.current) return;
 
-  const defaultRollNo =
-    profile?.roll_no ||
-    profile?.rollNo ||
-    student?.roll_no ||
-    student?.rollNo ||
-    "";
+    const defaultRollNo =
+      profile?.roll_no ||
+      profile?.rollNo ||
+      student?.roll_no ||
+      student?.rollNo ||
+      "";
 
-  if (!defaultRollNo) return;
+    if (!defaultRollNo) return;
 
-  hasAppliedDefaultRegisterNo.current = true;
-  setRegisterNo(defaultRollNo);
-}, [profile, student]);
+    hasAppliedDefaultRegisterNo.current = true;
+    setRegisterNo(defaultRollNo);
+  }, [profile, student]);
 
   const courseCodes = activeTab === "current" ? CURRENT_CODES : ARREAR_CODES;
   const finalCourse = selectedCourse || courseSearch;
@@ -116,13 +198,13 @@ useEffect(() => {
   }, []);
 
   useEffect(() => {
-  if (!user?.uid || !registerNo) return;
+    if (!user?.uid || !registerNo) return;
 
-  localStorage.setItem(
-    `home-register-no-${user.uid}`,
-    JSON.stringify({ registerNo })
-  );
-}, [registerNo, user?.uid]);
+    localStorage.setItem(
+      `home-register-no-${user.uid}`,
+      JSON.stringify({ registerNo })
+    );
+  }, [registerNo, user?.uid]);
 
   const handleKeyDown = (e) => {
     if (e.key === "ArrowDown") {
