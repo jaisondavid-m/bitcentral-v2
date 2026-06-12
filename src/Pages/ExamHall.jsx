@@ -46,7 +46,7 @@ const CURRENT_CODES = ["22HS006", "24MB201", "24IS21", "24CS21", "22GE004", "24M
 const ARREAR_CODES  = ["22MA101", "22CB101", "24MB101", "22HS003", "24MB102", "22HS001", "24MB104", "22CH103", "22CB103", "24MB103", "22PH102", "22CB102", "24MB105", "22CB106", "24MB106"];
 
 const ExamHall = () => {
-  const { user } = useAuth();
+  const { user, profile, student } = useAuth();
 
   const [activeTab, setActiveTab]           = useState("current");
   const [courseSearch, setCourseSearch]     = useState("");
@@ -55,13 +55,25 @@ const ExamHall = () => {
   const [focusedIndex, setFocusedIndex]     = useState(-1);
   const wrapperRef = useRef(null);
 
-  const [registerNo, setRegisterNo] = useState(() => {
-    if (!user?.uid) return "";
-    const saved = JSON.parse(
-      localStorage.getItem(`home-register-no-${user.uid}`) || "{}"
-    );
-    return saved.registerNo || "";
-  });
+  const [registerNo, setRegisterNo] = useState("");
+
+  const hasAppliedDefaultRegisterNo = useRef(false);
+
+useEffect(() => {
+  if (hasAppliedDefaultRegisterNo.current) return;
+
+  const defaultRollNo =
+    profile?.roll_no ||
+    profile?.rollNo ||
+    student?.roll_no ||
+    student?.rollNo ||
+    "";
+
+  if (!defaultRollNo) return;
+
+  hasAppliedDefaultRegisterNo.current = true;
+  setRegisterNo(defaultRollNo);
+}, [profile, student]);
 
   const courseCodes = activeTab === "current" ? CURRENT_CODES : ARREAR_CODES;
   const finalCourse = selectedCourse || courseSearch;
@@ -102,6 +114,15 @@ const ExamHall = () => {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+
+  useEffect(() => {
+  if (!user?.uid || !registerNo) return;
+
+  localStorage.setItem(
+    `home-register-no-${user.uid}`,
+    JSON.stringify({ registerNo })
+  );
+}, [registerNo, user?.uid]);
 
   const handleKeyDown = (e) => {
     if (e.key === "ArrowDown") {
