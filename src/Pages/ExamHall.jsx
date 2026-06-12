@@ -199,7 +199,7 @@ const ExamHall = () => {
               type="text"
               value={registerNo}
               onChange={(e) => setRegisterNo(e.target.value)}
-              placeholder="e.g. 22BCE1234"
+              placeholder="e.g. 7376251CS221"
               className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm
                 text-slate-800 outline-none ring-0 transition-all
                 placeholder:text-slate-300
