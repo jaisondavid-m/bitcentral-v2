@@ -2767,9 +2767,6 @@ func buildSeatingData06June2026FN() []models.SeatingRecord {
 	}
 }
 
-
-//new
-
 // buildSeatingData22June2026FN returns seating records for 22-06-2026 FN session (09:00 AM to 12:00 PM)
 func buildSeatingData22June2026FN() []models.SeatingRecord {
 	return []models.SeatingRecord{
