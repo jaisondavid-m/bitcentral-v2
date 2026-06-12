@@ -165,7 +165,7 @@ const ExamHall = () => {
               Exam hall finder
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              VIT Chennai · Semester exams
+              BIT Sathy · Semester exams
             </p>
           </div>
         </div>
