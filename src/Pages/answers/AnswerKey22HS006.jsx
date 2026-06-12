@@ -919,7 +919,7 @@ IV. பாதுகாப்பிற்கான தொழில்நுட்
     keywordsEnglish: ["Indo-Saracenic", "British colonial", "domes", "minarets", "Madras High Court"],
     keywordsTamil: ["இந்தோ-சாரசனிக்", "பிரிட்டிஷ் காலம்", "குவிமாடங்கள்", "மினாரெட்கள்"],
   },
-  
+
   {
     unit: "Unit II", qNo: 16, marks: 16,
     questionEnglish: "Describe the architectural styles of the Pallava period.",
@@ -3495,21 +3495,22 @@ const AnswerKey22HS006 = () => {
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <h1 className="text-lg font-bold text-slate-800 leading-tight sm:text-xl">22HS006 Answer Key</h1>
               <p className="text-[11px] text-slate-500 sm:text-xs">Tamil & Technology | Bannari Amman Institute</p>
+
             </div>
             <div className="flex flex-wrap items-center gap-2 lg:justify-end">
               <div className="flex self-start rounded-lg bg-slate-100 p-0.5">
-              <button
-                onClick={() => setLanguage("english")}
-                className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-all ${language === "english" ? "bg-blue-600 text-white shadow" : "text-slate-600 hover:text-slate-800"}`}
-              >
-                English
-              </button>
-              <button
-                onClick={() => setLanguage("tamil")}
-                className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-all ${language === "tamil" ? "bg-blue-600 text-white shadow" : "text-slate-600 hover:text-slate-800"}`}
-              >
-                தமிழ்
-              </button>
+                <button
+                  onClick={() => setLanguage("english")}
+                  className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-all ${language === "english" ? "bg-blue-600 text-white shadow" : "text-slate-600 hover:text-slate-800"}`}
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => setLanguage("tamil")}
+                  className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-all ${language === "tamil" ? "bg-blue-600 text-white shadow" : "text-slate-600 hover:text-slate-800"}`}
+                >
+                  தமிழ்
+                </button>
               </div>
               <select
                 value={selectedUnit}
@@ -3527,9 +3528,12 @@ const AnswerKey22HS006 = () => {
               </select>
               <div className="flex items-center gap-2 text-xs text-slate-500 whitespace-nowrap">
                 <span>{filtered.length} questions</span>
-                
+
               </div>
             </div>
+          </div>
+          <div className="mt-2 text-[11px] text-amber-700 border border-amber-200 rounded-lg px-3 py-1.5">
+            AI-generated answers. Minor spelling mistakes or inaccuracies may be present.
           </div>
         </div>
       </div>
@@ -3599,7 +3603,7 @@ const AnswerKey22HS006 = () => {
                     </div>
                   </div>
 
-                 
+
                 </div>
               )}
             </div>
