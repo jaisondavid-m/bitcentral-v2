@@ -247,7 +247,7 @@ const ExamHall = () => {
     refetch();
   };
 
-  const placeholder = activeTab === "current" ? "e.g. 22HS201" : "e.g. 19CS101";
+  const placeholder = activeTab === "current" ? "e.g. 22HS006 (or) Tamil and Technolgy..." : "e.g.22HS006 (or) Tamil and Technolgy...";
 
   return (
     <div className="min-h-screen bg-blue-50 px-4 py-12 dark:bg-slate-950">
