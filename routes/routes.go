@@ -67,6 +67,7 @@ func SetupRouter(
 		api.GET("/cards", handlers.GetCards)
 		api.GET("/leaves", leaveHandler.GetAllLeaves)
 		api.GET("/exam-hall", examHallHandler.GetHall)
+		api.GET("/exam-hall/all", examHallHandler.GetAllHallsByRegNo)
 		api.GET("/search", handler.UniversalSearch)
 		api.GET("/rewards", handler.GetRewardsByRollNo)
 		api.GET("/me", studentLookupHandler.GetMe)
@@ -74,7 +75,6 @@ func SetupRouter(
 		api.GET("/averages", handler.GetOverallAverageFromSheet)
 		api.GET("/semesters/:year", semesterHandler.GetSemesterByYear)
 		api.GET("/qb", qbHandler.List)
-
 		api.GET("/mess", messHandler.GetMess)
 		api.GET("/mess/timings", messHandler.GetMealTimings)
 

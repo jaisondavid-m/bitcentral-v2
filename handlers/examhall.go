@@ -7661,3 +7661,47 @@ func LookupHall(registerNo, courseCode string) (string, bool) {
 
 	return "", false
 }
+
+// LookupAllByRegister returns all exam sessions for a given register number.
+func LookupAllByRegister(registerNo string) []models.ExamSession {
+	registerNo = strings.TrimSpace(strings.ToUpper(registerNo))
+
+	var allRecords []models.SeatingRecord
+	allRecords = append(allRecords, buildSeatingData13June2026AN()...)
+	allRecords = append(allRecords, buildSeatingData13June2026FN()...)
+	allRecords = append(allRecords, buildSeatingData15June2026FN()...)
+	allRecords = append(allRecords, buildSeatingData15June2026AN()...)
+	allRecords = append(allRecords, buildSeatingData09June2026AN()...)
+	allRecords = append(allRecords, buildSeatingData08June2026FN()...)
+	allRecords = append(allRecords, buildSeatingData07June2026AN()...)
+	allRecords = append(allRecords, buildSeatingData06June2026FN()...)
+	allRecords = append(allRecords, buildSeatingData22June2026FN()...)
+	allRecords = append(allRecords, buildSeatingData22June2026AN()...)
+	allRecords = append(allRecords, buildSeatingData24June2026FN()...)
+	allRecords = append(allRecords, buildSeatingData24June2026AN()...)
+	allRecords = append(allRecords, buildSeatingData29June2026FN()...)
+	allRecords = append(allRecords, buildSeatingData29June2026AN()...)
+	allRecords = append(allRecords, buildSeatingData01July2026FN()...)
+	allRecords = append(allRecords, buildSeatingData03July2026FN()...)
+
+	var results []models.ExamSession
+	seen := make(map[string]bool) // deduplicate hall+course combos
+
+	for _, record := range allRecords {
+		for _, reg := range record.RegisterNos {
+			if strings.ToUpper(reg) == registerNo {
+				key := record.HallNo + "|" + record.CourseCode
+				if !seen[key] {
+					seen[key] = true
+					results = append(results, models.ExamSession{
+						HallNo:     record.HallNo,
+						CourseCode: record.CourseCode,
+					})
+				}
+				break
+			}
+		}
+	}
+
+	return results
+}
