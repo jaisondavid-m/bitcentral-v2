@@ -50,17 +50,17 @@ func hallBlock(hallNo string) *string {
 	var label string
 	switch {
 	case strings.HasPrefix(upper, "AE"):
-		label = "AE Block"
+		label = "Research Block - Right Side"
 	case strings.HasPrefix(upper, "EW"):
-		label = "EW Block"
+		label = "AS Block"
 	case strings.HasPrefix(upper, "WW"):
-		label = "WW Block"
+		label = "IB Block"
 	case strings.HasPrefix(upper, "MH"):
-		label = "MH Block"
+		label = "Research Block - Left Side"
 	case strings.HasPrefix(upper, "ME") || strings.HasPrefix(upper, "MECH"):
-		label = "Mech Block"
+		label = "Mechanical Block"
 	case strings.HasPrefix(upper, "SF"):
-		label = "SF Block"
+		label = "SunFlower(SF) Block"
 	default:
 		return nil
 	}
