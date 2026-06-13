@@ -23,7 +23,7 @@ func NewQBHandler() *QBHandler {
 // GET /admin/qb?semester=3&year=2024
 func (h *QBHandler) List(c *gin.Context) {
 	query := `
-		SELECT id, year, code, name, qb1, qb2, ak1, ak2, sem_qb_with_ans, created_at, updated_at
+		SELECT id, year, code, name, qb1, qb2, ak1, ak2, s_qn, s_ak, created_at, updated_at
 		FROM semester_subjects
 		WHERE 1=1`
 	args := []any{}
@@ -58,7 +58,8 @@ func (h *QBHandler) List(c *gin.Context) {
 			&q.QB2,
 			&q.AK1,
 			&q.AK2,
-			&q.SemQBWithAns,
+			&q.S_QN,
+			&q.S_AK,
 			&q.CreatedAt,
 			&q.UpdatedAt,
 		); err != nil {
@@ -97,7 +98,8 @@ func (h *QBHandler) Create(c *gin.Context) {
 		body.QB2,
 		body.AK1,
 		body.AK2,
-		body.SemQBWithAns,
+		body.S_QN,
+		body.S_AK,
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
@@ -154,7 +156,8 @@ func (h *QBHandler) BatchCreate(c *gin.Context) {
 			subject.QB2,
 			subject.AK1,
 			subject.AK2,
-			subject.SemQBWithAns,
+			subject.S_QN,
+			subject.S_AK,
 		); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 			return
@@ -274,7 +277,8 @@ func (h *QBHandler) Update(c *gin.Context) {
 		body.QB2,
 		body.AK1,
 		body.AK2,
-		body.SemQBWithAns,
+		body.S_QN,
+		body.S_AK,
 		id,
 	)
 	if err != nil {

@@ -243,7 +243,8 @@ func createSemesterSubjectsTable() {
 		qb2 VARCHAR(1024),
 		ak1 VARCHAR(1024),
 		ak2 VARCHAR(1024),
-		sem_qb_with_ans VARCHAR(1024),
+		s_qn VARCHAR(1024),
+		s_ak VARCHAR(1024),
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		UNIQUE KEY unique_year_idx (year, idx)

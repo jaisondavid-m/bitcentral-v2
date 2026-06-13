@@ -33,7 +33,8 @@ type QBAnswerKey struct {
 	QB2          *string `json:"qb2"`
 	AK1          *string `json:"ak1"`
 	AK2          *string `json:"ak2"`
-	SemQBWithAns *string `json:"semqbwithans"`
+	S_QN         *string `json:"s_qn"`
+	S_AK         *string `json:"s_ak"`
 	CreatedAt    string  `json:"created_at"`
 	UpdatedAt    string  `json:"updated_at"`
 }
@@ -46,7 +47,8 @@ type QBAnswerKeyInput struct {
 	QB2          *string `json:"qb2"`
 	AK1          *string `json:"ak1"`
 	AK2          *string `json:"ak2"`
-	SemQBWithAns *string `json:"semqbwithans"`
+	S_QN         *string `json:"s_qn"`
+	S_AK         *string `json:"s_ak"`
 }
 
 type QBAnswerKeyBatchInput struct {
