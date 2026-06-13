@@ -42,6 +42,31 @@ func (h *ExamHallHandler) GetHall(c *gin.Context) {
     })
 }
 
+// hallBlock maps the prefix of a hall number to a human-readable block label.
+// Returns nil when the prefix is unrecognised so the JSON field is null.
+func hallBlock(hallNo string) *string {
+	upper := strings.ToUpper(strings.TrimSpace(hallNo))
+
+	var label string
+	switch {
+	case strings.HasPrefix(upper, "AE"):
+		label = "AE Block"
+	case strings.HasPrefix(upper, "EW"):
+		label = "EW Block"
+	case strings.HasPrefix(upper, "WW"):
+		label = "WW Block"
+	case strings.HasPrefix(upper, "MH"):
+		label = "MH Block"
+	case strings.HasPrefix(upper, "ME") || strings.HasPrefix(upper, "MECH"):
+		label = "Mech Block"
+	case strings.HasPrefix(upper, "SF"):
+		label = "SF Block"
+	default:
+		return nil
+	}
+
+	return &label
+}
 
 func (h *ExamHallHandler) GetAllHallsByRegNo(c *gin.Context) {
 	registerNo := c.Query("registerNo")
@@ -62,6 +87,11 @@ func (h *ExamHallHandler) GetAllHallsByRegNo(c *gin.Context) {
 			"registerNo": strings.TrimSpace(strings.ToUpper(registerNo)),
 		})
 		return
+	}
+
+	// Attach block label to every session
+	for i := range sessions {
+		sessions[i].Block = hallBlock(sessions[i].HallNo)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
