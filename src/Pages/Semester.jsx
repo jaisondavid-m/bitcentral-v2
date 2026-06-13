@@ -21,7 +21,6 @@ async function fetchSubjects(yearCode) {
   const semesterYear = normalizeSemesterYear(yearCode);
 
   if (semesterCache.has(semesterYear)) {
-    // Return the cached promise/result
     return semesterCache.get(semesterYear);
   }
 
@@ -30,16 +29,13 @@ async function fetchSubjects(yearCode) {
     return res.data.data || [];
   })();
 
-  // Store the in-flight promise so concurrent callers share it
   semesterCache.set(semesterYear, promise);
 
   try {
     const data = await promise;
-    // Optionally keep cached data (already the promise resolves to data)
     semesterCache.set(semesterYear, Promise.resolve(data));
     return data;
   } catch (err) {
-    // Remove cache on error so subsequent attempts can retry
     semesterCache.delete(semesterYear);
     throw err;
   }
@@ -71,7 +67,6 @@ export default function Semester() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  // Remove any legacy per-page override stored previously so page follows global theme
   useEffect(() => {
     try {
       window.localStorage.removeItem("semester-page-dark");
@@ -108,22 +103,36 @@ export default function Semester() {
         const ak2 = sub.ak2 || "";
         const semqbwithans = sub.semqbwithans || sub.sem_qb_with_ans || "";
 
-        if (activeTab === "test1") {
-          return Boolean(qb1 || ak1);
-        }
-
-        if (activeTab === "test2") {
-          return Boolean(qb2 || ak2);
-        }
-
-        if (activeTab === "semester") {
-          return Boolean(semqbwithans);
-        }
+        if (activeTab === "test1") return Boolean(qb1 || ak1);
+        if (activeTab === "test2") return Boolean(qb2 || ak2);
+        if (activeTab === "semester") return Boolean(semqbwithans);
 
         return Boolean(qb1 || qb2 || ak1 || ak2 || semqbwithans);
       }),
     [activeTab, filteredSubjects]
   );
+
+  // For the semester tab, normalize the subject so SubjectCard only sees
+  // semqbwithans mapped to qb1 (treated as "Question Bank"), with all other
+  // link fields cleared out.
+  const normalizedSubjects = useMemo(() => {
+    if (activeTab !== "semester") return visibleSubjects;
+
+    return visibleSubjects.map((sub) => {
+      const semqbwithans = sub.semqbwithans || sub.sem_qb_with_ans || "";
+      return {
+        ...sub,
+        // Map semqbwithans → qb1 so SubjectCard renders it as "Question Bank"
+        qb1: semqbwithans,
+        // Clear all other link fields so nothing extra appears
+        qb2: "",
+        ak1: "",
+        ak2: "",
+        semqbwithans: "",
+        sem_qb_with_ans: "",
+      };
+    });
+  }, [activeTab, visibleSubjects]);
 
   const tabMeta = {
     test1: {
@@ -140,9 +149,10 @@ export default function Semester() {
     },
     semester: {
       title: "Semester",
-      subtitle: "Full semester question paper with answers",
+      subtitle: "Question Bank with Answers",
       empty: "No semester bundle is available for your year.",
-      view: "semester",
+      // Use "test1" view so SubjectCard renders qb1 as "Question Bank"
+      view: "test1",
     },
   };
 
@@ -189,12 +199,12 @@ export default function Semester() {
   const mutedText = isDark ? "text-slate-400" : "text-slate-500";
 
   return (
-    <div className={`min-h-screen ${containerBg} px-4 py-4 sm:px-6 lg:px-8`}> 
+    <div className={`min-h-screen ${containerBg} px-4 py-4 sm:px-6 lg:px-8`}>
       <div className="mx-auto flex max-w-5xl flex-col gap-3">
         <div className={`rounded-2xl border ${cardBorder} ${cardBg} shadow-sm ${isDark ? "shadow-black/20" : "shadow-blue-100/30"}`}>
           <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3">
                 <h1 className={`flex items-center gap-2 text-lg font-bold ${isDark ? "text-slate-100" : "text-slate-900"} sm:text-xl`}>
                   <BookOpen className={`h-4 w-4 ${isDark ? "text-blue-300" : "text-blue-600"} sm:h-5 sm:w-5`} />
                   {activeMeta.title}
@@ -231,7 +241,7 @@ export default function Semester() {
               <div className={`rounded-2xl border border-dashed ${isDark ? "border-slate-700" : "border-blue-200"} ${isDark ? "bg-slate-900" : "bg-blue-50"} py-12 text-center text-sm ${mutedText}`}>
                 No subjects found for Year {student?.yearCode || "-"}
               </div>
-            ) : visibleSubjects.length === 0 ? (
+            ) : normalizedSubjects.length === 0 ? (
               <div className={`rounded-2xl border border-dashed ${isDark ? "border-slate-700" : "border-blue-200"} ${isDark ? "bg-slate-900" : "bg-blue-50"} py-12 text-center text-sm ${mutedText}`}>
                 {search.trim()
                   ? "No subjects match your search."
@@ -239,7 +249,7 @@ export default function Semester() {
               </div>
             ) : (
               <div className="grid gap-3 lg:grid-cols-2">
-                {visibleSubjects.map((subject, index) => (
+                {normalizedSubjects.map((subject, index) => (
                   <SubjectCard
                     key={subject.code || subject.subject_code || index}
                     subject={subject}
