@@ -20,7 +20,7 @@ function examEndTime(dateStr, timeStr) {
   let h = hh;
   if (meridiem === "PM" && hh !== 12) h = hh + 12;
   if (meridiem === "AM" && hh === 12) h = 0;
-  return new Date(`${yy}-${mm}-${dd}T${String(h).padStart(2,"0")}:${String(min).padStart(2,"0")}:00`);
+  return new Date(`${yy}-${mm}-${dd}T${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}:00`);
 }
 function isExamOver(s) { const e = examEndTime(s.date, s.time); return e ? e < new Date() : false; }
 
@@ -29,19 +29,19 @@ function fmt(dateStr) {
   const date = new Date(`${y}-${m}-${d}`);
   return {
     weekday: date.toLocaleDateString("en-GB", { weekday: "long" }),
-    short:   date.toLocaleDateString("en-GB", { weekday: "short" }),
+    short: date.toLocaleDateString("en-GB", { weekday: "short" }),
     day: d, month: date.toLocaleDateString("en-GB", { month: "short" }), year: y,
   };
 }
 function daysUntil(dateStr) {
   const [d, m, y] = dateStr.split("-");
-  const exam = new Date(`${y}-${m}-${d}`); exam.setHours(0,0,0,0);
-  const now  = new Date(); now.setHours(0,0,0,0);
+  const exam = new Date(`${y}-${m}-${d}`); exam.setHours(0, 0, 0, 0);
+  const now = new Date(); now.setHours(0, 0, 0, 0);
   const diff = Math.round((exam - now) / 86400000);
-  if (diff === 0) return { label:"Today",    urgent:true };
-  if (diff === 1) return { label:"Tomorrow", urgent:true };
-  if (diff <= 3)  return { label:`In ${diff} days`, urgent:true };
-  return { label:`In ${diff} days`, urgent:false };
+  if (diff === 0) return { label: "Today", urgent: true };
+  if (diff === 1) return { label: "Tomorrow", urgent: true };
+  if (diff <= 3) return { label: `In ${diff} days`, urgent: true };
+  return { label: `In ${diff} days`, urgent: false };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -59,108 +59,108 @@ async function generatePDF(registerNo, sessions) {
       const CW = PW - ML - MR; // 273mm
 
       // ── Colours ────────────────────────────────────────────────────────────
-      const N   = [15,  40,  80];   // navy
-      const NM  = [22,  75, 150];   // mid-navy
-      const BL  = [41, 120, 210];   // blue
-      const SK  = [235, 243, 255];  // sky (even row)
-      const OF  = [248, 250, 253];  // off-white (odd row)
-      const W   = [255, 255, 255];
-      const BD  = [200, 215, 235];  // border/divider
-      const IK  = [20,  30,  50];   // ink (dark text)
-      const SB  = [80, 100, 130];   // sub text
-      const MT  = [155, 175, 200];  // muted
-      const AM  = [175,  95,   0];  // amber
-      const AB  = [255, 243, 220];  // amber bg even
+      const N = [15, 40, 80];   // navy
+      const NM = [22, 75, 150];   // mid-navy
+      const BL = [41, 120, 210];   // blue
+      const SK = [235, 243, 255];  // sky (even row)
+      const OF = [248, 250, 253];  // off-white (odd row)
+      const W = [255, 255, 255];
+      const BD = [200, 215, 235];  // border/divider
+      const IK = [20, 30, 50];   // ink (dark text)
+      const SB = [80, 100, 130];   // sub text
+      const MT = [155, 175, 200];  // muted
+      const AM = [175, 95, 0];  // amber
+      const AB = [255, 243, 220];  // amber bg even
       const AB2 = [255, 249, 235];  // amber bg odd
-      const FT  = [30,  80, 210];   // FN text
-      const FB  = [220, 235, 255];  // FN bg
-      const AT2 = [100,  50, 200];  // AN text
-      const AG  = [238, 230, 255];  // AN bg
+      const FT = [30, 80, 210];   // FN text
+      const FB = [220, 235, 255];  // FN bg
+      const AT2 = [100, 50, 200];  // AN text
+      const AG = [238, 230, 255];  // AN bg
 
       const F = c => doc.setFillColor(...c);
       const T = c => doc.setTextColor(...c);
       const D = c => doc.setDrawColor(...c);
-      const R  = (x,y,w,h,s="F") => doc.rect(x,y,w,h,s);
-      const RR = (x,y,w,h,r,s="F") => doc.roundedRect(x,y,w,h,r,r,s);
-      const L  = (x1,y1,x2,y2) => doc.line(x1,y1,x2,y2);
+      const R = (x, y, w, h, s = "F") => doc.rect(x, y, w, h, s);
+      const RR = (x, y, w, h, r, s = "F") => doc.roundedRect(x, y, w, h, r, r, s);
+      const L = (x1, y1, x2, y2) => doc.line(x1, y1, x2, y2);
 
-      const sorted = [...sessions].sort((a,b)=>{
-        const ms=d=>{const[dd,mm,yy]=d.split("-");return new Date(`${yy}-${mm}-${dd}`).getTime();};
-        const diff=ms(a.date)-ms(b.date);
-        return diff!==0?diff:(a.session==="FN"?-1:1);
+      const sorted = [...sessions].sort((a, b) => {
+        const ms = d => { const [dd, mm, yy] = d.split("-"); return new Date(`${yy}-${mm}-${dd}`).getTime(); };
+        const diff = ms(a.date) - ms(b.date);
+        return diff !== 0 ? diff : (a.session === "FN" ? -1 : 1);
       });
-      const nT=sorted.length, nC=sorted.filter(s=>!s.is_arrear).length, nA=nT-nC;
-      const genDate=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"long",year:"numeric"});
+      const nT = sorted.length, nC = sorted.filter(s => !s.is_arrear).length, nA = nT - nC;
+      const genDate = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" });
 
       // ── Columns — must sum to CW (273mm) ──────────────────────────────────
       // Date(28) | Sess(14) | Hall(18) | Block(50) | Time(38) | Code(22) | Subject(103)
       const C = [
-        { lbl:"Date & Day",       x:ML,        w:28  },
-        { lbl:"Sess.",            x:ML+28,     w:14  },
-        { lbl:"Hall",             x:ML+42,     w:18  },
-        { lbl:"Block / Location", x:ML+60,     w:50  },
-        { lbl:"Exam Time",        x:ML+110,    w:38  },
-        { lbl:"Code",             x:ML+148,    w:22  },
-        { lbl:"Subject",          x:ML+170,    w:103 },
+        { lbl: "Date & Day", x: ML, w: 28 },
+        { lbl: "Sess.", x: ML + 28, w: 14 },
+        { lbl: "Hall", x: ML + 42, w: 18 },
+        { lbl: "Block / Location", x: ML + 60, w: 50 },
+        { lbl: "Exam Time", x: ML + 110, w: 38 },
+        { lbl: "Code", x: ML + 148, w: 22 },
+        { lbl: "Subject", x: ML + 170, w: 103 },
       ];
 
       // ── HEADER BAND ──────────────────────────────────────────────────────
-      F(N); R(0,0,PW,36);
-      F(BL); R(0,33,PW,3);
+      F(N); R(0, 0, PW, 36);
+      F(BL); R(0, 33, PW, 3);
 
-      F(NM); RR(ML,5,22,24,2);
-      doc.setFont("helvetica","bold"); doc.setFontSize(9); T(W);
-      doc.text("BIT",ML+11,14,{align:"center"});
+      F(NM); RR(ML, 5, 22, 24, 2);
+      doc.setFont("helvetica", "bold"); doc.setFontSize(9); T(W);
+      doc.text("BIT", ML + 11, 14, { align: "center" });
       doc.setFontSize(5.5); T(FB);
-      doc.text("SATHY",ML+11,19,{align:"center"});
+      doc.text("SATHY", ML + 11, 19, { align: "center" });
       doc.setFontSize(4.5); T(MT);
-      doc.text("AUTONOMOUS",ML+11,23.5,{align:"center"});
+      doc.text("AUTONOMOUS", ML + 11, 23.5, { align: "center" });
 
-      doc.setFont("helvetica","bold"); doc.setFontSize(13); T(W);
-      doc.text("Bannari Amman Institute of Technology",ML+26,13);
-      doc.setFont("helvetica","normal"); doc.setFontSize(7); T(FB);
-      doc.text("Sathyamangalam  ·  Autonomous Institution  ·  Anna University",ML+26,19.5);
-      doc.setFont("helvetica","bold"); doc.setFontSize(15); T(W);
-      doc.text("Semester Examination Hall Schedule",ML+26,29);
+      doc.setFont("helvetica", "bold"); doc.setFontSize(13); T(W);
+      doc.text("Bannari Amman Institute of Technology", ML + 26, 13);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(7); T(FB);
+      doc.text("Sathyamangalam  ·  Autonomous Institution  ·  Anna University", ML + 26, 19.5);
+      doc.setFont("helvetica", "bold"); doc.setFontSize(15); T(W);
+      doc.text("Semester Examination Hall Schedule", ML + 26, 29);
 
-      doc.setFont("helvetica","bold"); doc.setFontSize(8); T([120,190,255]);
-      doc.text("bitcentral",PW-MR,12,{align:"right"});
-      doc.setFont("helvetica","normal"); doc.setFontSize(6); T(MT);
-      doc.text("bitcentral.bitsathy.in",PW-MR,18,{align:"right"});
+      doc.setFont("helvetica", "bold"); doc.setFontSize(8); T([120, 190, 255]);
+      doc.text("bitcentral", PW - MR, 12, { align: "right" });
+      doc.setFont("helvetica", "normal"); doc.setFontSize(6); T(MT);
+      doc.text("bitcentral.bitsathy.in", PW - MR, 18, { align: "right" });
 
       // ── INFO STRIP ────────────────────────────────────────────────────────
-      F(OF); R(0,36,PW,18);
-      D(BD); doc.setLineWidth(0.3); L(0,54,PW,54);
+      F(OF); R(0, 36, PW, 18);
+      D(BD); doc.setLineWidth(0.3); L(0, 54, PW, 54);
 
-      doc.setFont("helvetica","bold"); doc.setFontSize(11); T(N);
-      doc.text(registerNo,ML+2,46);
-      doc.setFont("helvetica","normal"); doc.setFontSize(6.5); T(SB);
-      doc.text("Register Number",ML+2,51);
+      doc.setFont("helvetica", "bold"); doc.setFontSize(11); T(N);
+      doc.text(registerNo, ML + 2, 46);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(6.5); T(SB);
+      doc.text("Register Number", ML + 2, 51);
 
-      F(BD); R(ML+52,38,0.3,14);
+      F(BD); R(ML + 52, 38, 0.3, 14);
 
-      [{v:String(nT),l:"Total Exams",c:BL},{v:String(nC),l:"Current Sem",c:NM},{v:String(nA),l:"Arrear",c:AM}]
-        .forEach(({v,l,c},i)=>{
-          const sx=ML+58+i*36;
-          doc.setFont("helvetica","bold"); doc.setFontSize(12); T(c); doc.text(v,sx,46);
-          doc.setFont("helvetica","normal"); doc.setFontSize(6); T(SB); doc.text(l,sx,51);
+      [{ v: String(nT), l: "Total Exams", c: BL }, { v: String(nC), l: "Current Sem", c: NM }, { v: String(nA), l: "Arrear", c: AM }]
+        .forEach(({ v, l, c }, i) => {
+          const sx = ML + 58 + i * 36;
+          doc.setFont("helvetica", "bold"); doc.setFontSize(12); T(c); doc.text(v, sx, 46);
+          doc.setFont("helvetica", "normal"); doc.setFontSize(6); T(SB); doc.text(l, sx, 51);
         });
 
-      doc.setFont("helvetica","normal"); doc.setFontSize(6.5); T(SB);
-      doc.text("Generated on",PW-MR,46,{align:"right"});
-      doc.setFont("helvetica","bold"); doc.setFontSize(7.5); T(IK);
-      doc.text(genDate,PW-MR,51,{align:"right"});
+      doc.setFont("helvetica", "normal"); doc.setFontSize(6.5); T(SB);
+      doc.text("Generated on", PW - MR, 46, { align: "right" });
+      doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); T(IK);
+      doc.text(genDate, PW - MR, 51, { align: "right" });
 
       // ── TABLE ─────────────────────────────────────────────────────────────
       let y = 61;
-      doc.setFont("helvetica","bold"); doc.setFontSize(7); T(BL);
-      doc.text("UPCOMING EXAMINATIONS",ML,y-1);
+      doc.setFont("helvetica", "bold"); doc.setFontSize(7); T(BL);
+      doc.text("UPCOMING EXAMINATIONS", ML, y - 1);
 
       // Column header row
-      F(N); R(ML,y,CW,8);
-      doc.setFont("helvetica","bold"); doc.setFontSize(6.5); T([210,228,255]);
+      F(N); R(ML, y, CW, 8);
+      doc.setFont("helvetica", "bold"); doc.setFontSize(6.5); T([210, 228, 255]);
       // Vertically center header labels (baseline at y+5.5 centres 6.5pt text in 8mm band)
-      C.forEach(col => doc.text(col.lbl, col.x+2, y+5.5));
+      C.forEach(col => doc.text(col.lbl, col.x + 2, y + 5.5));
       y += 8;
 
       // ── ROW DRAWING ───────────────────────────────────────────────────────
@@ -170,56 +170,56 @@ async function generatePDF(registerNo, sessions) {
       // fontPt=font size, the baseline is placed so the glyph sits on MID
       // jsPDF baseline is ~72% from top of cap height; for centering:
       //   baseline = rowTop + rowH/2 + fontPt*0.352/2  (≈ half-ascent)
-      const cy = (rowTop, fpt) => rowTop + RH/2 + fpt * 0.18;
+      const cy = (rowTop, fpt) => rowTop + RH / 2 + fpt * 0.18;
 
       const footer = () => {
-        F(N); R(0,PH-10,PW,10);
-        F(BL); R(0,PH-11,PW,1);
-        doc.setFont("helvetica","bold"); doc.setFontSize(6.5); T(W);
-        doc.text("BIT Sathy — Semester Examinations",ML,PH-4);
-        doc.setFont("helvetica","normal"); doc.setFontSize(6); T([140,185,255]);
-        doc.text("bitcentral.bitsathy.in",ML,PH-0.8);
-        doc.setFont("helvetica","normal"); doc.setFontSize(6); T([180,210,255]);
-        doc.text("Created by Jaison David M",PW/2,PH-4,{align:"center"});
-        doc.setFont("helvetica","normal"); doc.setFontSize(5.5); T([100,170,255]);
-        doc.text("linkedin.com/in/jaison-david-m-a14072360",PW/2,PH-0.8,{align:"center"});
+        F(N); R(0, PH - 10, PW, 10);
+        F(BL); R(0, PH - 11, PW, 1);
+        doc.setFont("helvetica", "bold"); doc.setFontSize(6.5); T(W);
+        doc.text("BIT Sathy — Semester Examinations", ML, PH - 4);
+        doc.setFont("helvetica", "normal"); doc.setFontSize(6); T([140, 185, 255]);
+        doc.text("bitcentral.bitsathy.in", ML, PH - 0.8);
+        doc.setFont("helvetica", "normal"); doc.setFontSize(6); T([180, 210, 255]);
+        doc.text("Created by Jaison David M", PW / 2, PH - 4, { align: "center" });
+        doc.setFont("helvetica", "normal"); doc.setFontSize(5.5); T([100, 170, 255]);
+        doc.text("linkedin.com/in/jaison-david-m-a14072360", PW / 2, PH - 0.8, { align: "center" });
       };
 
       sorted.forEach((s, idx) => {
         if (y + RH > PH - 14) {
           footer();
           const pg = doc.internal.getNumberOfPages();
-          doc.setFont("helvetica","normal"); doc.setFontSize(6); T(MT);
-          doc.text(`Page ${pg}`, PW-MR, PH-4, {align:"right"});
+          doc.setFont("helvetica", "normal"); doc.setFontSize(6); T(MT);
+          doc.text(`Page ${pg}`, PW - MR, PH - 4, { align: "right" });
           doc.addPage();
           y = 14;
-          F(N); R(ML,y,CW,8);
-          doc.setFont("helvetica","bold"); doc.setFontSize(6.5); T([210,228,255]);
-          C.forEach(col => doc.text(col.lbl, col.x+2, y+5.5));
+          F(N); R(ML, y, CW, 8);
+          doc.setFont("helvetica", "bold"); doc.setFontSize(6.5); T([210, 228, 255]);
+          C.forEach(col => doc.text(col.lbl, col.x + 2, y + 5.5));
           y += 8;
         }
 
         const even = idx % 2 === 0;
-        const bg   = s.is_arrear ? (even ? AB : AB2) : (even ? SK : OF);
+        const bg = s.is_arrear ? (even ? AB : AB2) : (even ? SK : OF);
         F(bg); R(ML, y, CW, RH);
         // left accent stripe
         F(s.is_arrear ? AM : N); R(ML, y, 3, RH);
         // bottom hairline
-        D(BD); doc.setLineWidth(0.2); L(ML, y+RH, ML+CW, y+RH);
+        D(BD); doc.setLineWidth(0.2); L(ML, y + RH, ML + CW, y + RH);
 
         // vertical column separator lines (subtle)
-        D([215,228,248]); doc.setLineWidth(0.15);
-        [C[1],C[2],C[3],C[4],C[5],C[6]].forEach(col => L(col.x, y, col.x, y+RH));
+        D([215, 228, 248]); doc.setLineWidth(0.15);
+        [C[1], C[2], C[3], C[4], C[5], C[6]].forEach(col => L(col.x, y, col.x, y + RH));
 
         // ── DATE  (bold date + small weekday below, both centred) ────────────
-        const [dd,mm,yy] = s.date.split("-");
-        const wd = new Date(`${yy}-${mm}-${dd}`).toLocaleDateString("en-GB",{weekday:"short"});
+        const [dd, mm, yy] = s.date.split("-");
+        const wd = new Date(`${yy}-${mm}-${dd}`).toLocaleDateString("en-GB", { weekday: "short" });
         // date string centred in col width
-        const dateCX = C[0].x + 3 + C[0].w/2 - 3; // approx left-padded centre
-        doc.setFont("helvetica","bold"); doc.setFontSize(9); T(s.is_arrear ? AM : N);
-        doc.text(`${dd}/${mm}/${yy.slice(2)}`, C[0].x+3, cy(y,9)-2);
-        doc.setFont("helvetica","normal"); doc.setFontSize(6.5); T(SB);
-        doc.text(wd, C[0].x+3, cy(y,6.5)+3);
+        const dateCX = C[0].x + 3 + C[0].w / 2 - 3; // approx left-padded centre
+        doc.setFont("helvetica", "bold"); doc.setFontSize(9); T(s.is_arrear ? AM : N);
+        doc.text(`${dd}/${mm}/${yy.slice(2)}`, C[0].x + 3, cy(y, 9) - 2);
+        doc.setFont("helvetica", "normal"); doc.setFontSize(6.5); T(SB);
+        doc.text(wd, C[0].x + 3, cy(y, 6.5) + 3);
 
         // ── SESSION pill (centred in column) ─────────────────────────────────
         const fn = s.session === "FN";
@@ -227,83 +227,83 @@ async function generatePDF(registerNo, sessions) {
         const pillX = C[1].x + (C[1].w - pillW) / 2;
         const pillY = y + (RH - pillH) / 2;
         F(fn ? FB : AG); RR(pillX, pillY, pillW, pillH, 2);
-        doc.setFont("helvetica","bold"); doc.setFontSize(6.5); T(fn ? FT : AT2);
-        doc.text(s.session, pillX + pillW/2, pillY + pillH/2 + 2, {align:"center"});
+        doc.setFont("helvetica", "bold"); doc.setFontSize(6.5); T(fn ? FT : AT2);
+        doc.text(s.session, pillX + pillW / 2, pillY + pillH / 2 + 2, { align: "center" });
 
         // ── HALL — big, centred ───────────────────────────────────────────────
-        doc.setFont("helvetica","bold"); doc.setFontSize(12); T(s.is_arrear ? AM : N);
+        doc.setFont("helvetica", "bold"); doc.setFontSize(12); T(s.is_arrear ? AM : N);
         doc.text(s.hall_no, C[2].x + 2, cy(y, 12));
 
         // ── BLOCK — wrap, vertically centred block of text ───────────────────
-        doc.setFont("helvetica","normal"); doc.setFontSize(6.8); T(IK);
-        const blLines = doc.splitTextToSize(s.block||"—", C[3].w - 3);
+        doc.setFont("helvetica", "normal"); doc.setFontSize(6.8); T(IK);
+        const blLines = doc.splitTextToSize(s.block || "—", C[3].w - 3);
         const blSlice = blLines.slice(0, 3);
-        const lineH   = 6.8 * 0.352 * 1.45; // approx mm per line
-        const blBlockH= blSlice.length * lineH;
+        const lineH = 6.8 * 0.352 * 1.45; // approx mm per line
+        const blBlockH = blSlice.length * lineH;
         const blStart = y + (RH - blBlockH) / 2 + lineH * 0.7;
-        doc.text(blSlice, C[3].x + 2, blStart, {lineHeightFactor: 1.45});
+        doc.text(blSlice, C[3].x + 2, blStart, { lineHeightFactor: 1.45 });
 
         // ── TIME — start on top half, end on bottom half, centred ────────────
         const tp = s.time.split("–");
-        const start = (tp[0]||s.time).trim();
-        const end   = tp[1] ? ("– " + tp[1].trim()) : "";
+        const start = (tp[0] || s.time).trim();
+        const end = tp[1] ? ("– " + tp[1].trim()) : "";
         if (end) {
-          doc.setFont("helvetica","normal"); doc.setFontSize(7.5); T(IK);
-          doc.text(start, C[4].x + 2, y + RH/2 - 0.5);
-          doc.setFont("helvetica","normal"); doc.setFontSize(6.5); T(SB);
-          doc.text(end,   C[4].x + 2, y + RH/2 + 4.5);
+          doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); T(IK);
+          doc.text(start, C[4].x + 2, y + RH / 2 - 0.5);
+          doc.setFont("helvetica", "normal"); doc.setFontSize(6.5); T(SB);
+          doc.text(end, C[4].x + 2, y + RH / 2 + 4.5);
         } else {
-          doc.setFont("helvetica","normal"); doc.setFontSize(7.5); T(IK);
+          doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); T(IK);
           doc.text(start, C[4].x + 2, cy(y, 7.5));
         }
 
         // ── CODE — centred ────────────────────────────────────────────────────
-        doc.setFont("helvetica","bold"); doc.setFontSize(7.5); T(SB);
+        doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); T(SB);
         doc.text(s.course_code, C[5].x + 2, cy(y, 7.5));
 
         // ── SUBJECT — wrap, vertically centred ───────────────────────────────
-        doc.setFont("helvetica","normal"); doc.setFontSize(7.5); T(IK);
+        doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); T(IK);
         const subLines = doc.splitTextToSize(s.course_name, C[6].w - 4);
         const subSlice = subLines.slice(0, 3);
         const subLineH = 7.5 * 0.352 * 1.4;
-        const subBlockH= subSlice.length * subLineH;
+        const subBlockH = subSlice.length * subLineH;
         const subStart = y + (RH - subBlockH) / 2 + subLineH * 0.7;
-        doc.text(subSlice, C[6].x + 2, subStart, {lineHeightFactor: 1.4});
+        doc.text(subSlice, C[6].x + 2, subStart, { lineHeightFactor: 1.4 });
 
         // Arrear badge inside subject column end
         if (s.is_arrear) {
           const bx = PW - MR - 14;
           const by = y + (RH - 7) / 2;
           F(AB); RR(bx, by, 12, 7, 1.5);
-          doc.setFont("helvetica","bold"); doc.setFontSize(5.5); T(AM);
-          doc.text("ARREAR", bx + 6, by + 4.5, {align:"center"});
+          doc.setFont("helvetica", "bold"); doc.setFontSize(5.5); T(AM);
+          doc.text("ARREAR", bx + 6, by + 4.5, { align: "center" });
         }
 
         y += RH;
       });
 
       // table bottom border
-      D(N); doc.setLineWidth(0.5); L(ML, y, ML+CW, y);
+      D(N); doc.setLineWidth(0.5); L(ML, y, ML + CW, y);
 
       // ── LEGEND ───────────────────────────────────────────────────────────
       y += 7;
       if (y + 12 > PH - 14) { footer(); doc.addPage(); y = 14; }
-      doc.setFont("helvetica","bold"); doc.setFontSize(6.5); T(SB);
-      doc.text("LEGEND", ML, y+4);
-      [{c:N,l:"Current semester"},{c:AM,l:"Arrear exam"},{c:FT,l:"FN — Forenoon"},{c:AT2,l:"AN — Afternoon"}]
-        .forEach(({c,l},i) => {
-          const lx = ML+18+i*52;
+      doc.setFont("helvetica", "bold"); doc.setFontSize(6.5); T(SB);
+      doc.text("LEGEND", ML, y + 4);
+      [{ c: N, l: "Current semester" }, { c: AM, l: "Arrear exam" }, { c: FT, l: "FN — Forenoon" }, { c: AT2, l: "AN — Afternoon" }]
+        .forEach(({ c, l }, i) => {
+          const lx = ML + 18 + i * 52;
           F(c); RR(lx, y, 4.5, 4.5, 1);
-          doc.setFont("helvetica","normal"); doc.setFontSize(6.5); T(IK);
-          doc.text(l, lx+6.5, y+4);
+          doc.setFont("helvetica", "normal"); doc.setFontSize(6.5); T(IK);
+          doc.text(l, lx + 6.5, y + 4);
         });
 
       // FOOTER all pages
       const tot = doc.internal.getNumberOfPages();
-      for (let p=1; p<=tot; p++) {
+      for (let p = 1; p <= tot; p++) {
         doc.setPage(p); footer();
-        doc.setFont("helvetica","normal"); doc.setFontSize(6); T(MT);
-        doc.text(`Page ${p} of ${tot}`, PW-MR, PH-4, {align:"right"});
+        doc.setFont("helvetica", "normal"); doc.setFontSize(6); T(MT);
+        doc.text(`Page ${p} of ${tot}`, PW - MR, PH - 4, { align: "right" });
       }
 
       doc.save(`exam-schedule-${registerNo}.pdf`);
@@ -358,8 +358,8 @@ function UrgentPill({ label }) {
 }
 
 function ExamCard({ session: s }) {
-  const dt  = fmt(s.date);
-  const cd  = daysUntil(s.date);
+  const dt = fmt(s.date);
+  const cd = daysUntil(s.date);
   const arr = s.is_arrear;
 
   return (
@@ -489,16 +489,16 @@ export default function ExamHallDownload() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  const [sessions,   setSessions]   = useState(null);
-  const [loading,    setLoading]    = useState(false);
+  const [sessions, setSessions] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
-  const [error,      setError]      = useState("");
+  const [error, setError] = useState("");
   const [registerNo, setRegisterNo] = useState("");
   const hasFetched = useRef(false);
 
   useEffect(() => {
     if (hasFetched.current) return;
-    const roll = profile?.roll_no||profile?.rollNo||student?.roll_no||student?.rollNo||"";
+    const roll = profile?.roll_no || profile?.rollNo || student?.roll_no || student?.rollNo || "";
     if (!roll) return;
     hasFetched.current = true;
     setRegisterNo(roll);
@@ -515,17 +515,17 @@ export default function ExamHallDownload() {
   }, [profile, student]);
 
   const sorted = sessions
-    ? [...sessions].sort((a,b) => {
-        const ms = d => { const [dd,mm,yy]=d.split("-"); return new Date(`${yy}-${mm}-${dd}`).getTime(); };
-        const d = ms(a.date) - ms(b.date);
-        return d !== 0 ? d : (a.session === "FN" ? -1 : 1);
-      })
+    ? [...sessions].sort((a, b) => {
+      const ms = d => { const [dd, mm, yy] = d.split("-"); return new Date(`${yy}-${mm}-${dd}`).getTime(); };
+      const d = ms(a.date) - ms(b.date);
+      return d !== 0 ? d : (a.session === "FN" ? -1 : 1);
+    })
     : [];
 
   const nC = sessions?.filter(s => !s.is_arrear).length ?? 0;
-  const nA = sessions?.filter(s =>  s.is_arrear).length ?? 0;
+  const nA = sessions?.filter(s => s.is_arrear).length ?? 0;
 
-  const grouped = sorted.reduce((acc,s) => {
+  const grouped = sorted.reduce((acc, s) => {
     if (!acc[s.date]) acc[s.date] = [];
     acc[s.date].push(s);
     return acc;
@@ -539,7 +539,7 @@ export default function ExamHallDownload() {
 
           {/* ── BIT Header card ── */}
           <div className="overflow-hidden rounded-2xl shadow-sm ring-1 ring-blue-100 dark:ring-blue-900/30">
-            <div className="flex items-center gap-3 bg-[#0F2850] px-5 py-4">
+            <div className="flex items-center gap-3 bg-blue-600 dark:bg-[#0F2850] px-5 py-4">
               <div className="flex h-11 w-11 shrink-0 flex-col items-center
                 justify-center rounded-xl bg-blue-600">
                 <span className="text-[12px] font-black leading-none text-white">BIT</span>
@@ -604,62 +604,7 @@ export default function ExamHallDownload() {
             <div className="space-y-5">
 
               {/* Stats + Download */}
-              <div className="flex flex-wrap items-center justify-between gap-3
-                rounded-2xl border border-blue-100 bg-white p-3 shadow-sm
-                dark:border-blue-900/30 dark:bg-[#0F1C33]">
-                <div className="flex flex-wrap gap-2">
-                  {/* Total */}
-                  <div className="flex items-baseline gap-1.5 rounded-xl
-                    bg-blue-50 px-4 py-2 dark:bg-blue-950/50">
-                    <span className="text-xl font-black tabular-nums text-blue-700 dark:text-blue-300">
-                      {sorted.length}
-                    </span>
-                    <span className="text-xs font-semibold text-blue-500 dark:text-blue-400">
-                      Total
-                    </span>
-                  </div>
-                  {/* Current */}
-                  <div className="flex items-baseline gap-1.5 rounded-xl
-                    bg-blue-50 px-4 py-2 dark:bg-blue-950/50">
-                    <span className="text-xl font-black tabular-nums text-blue-600 dark:text-blue-400">
-                      {nC}
-                    </span>
-                    <span className="text-xs font-semibold text-blue-400 dark:text-blue-500">
-                      Current
-                    </span>
-                  </div>
-                  {/* Arrear */}
-                  <div className="flex items-baseline gap-1.5 rounded-xl
-                    bg-amber-50 px-4 py-2 dark:bg-amber-950/30">
-                    <span className="text-xl font-black tabular-nums text-amber-600 dark:text-amber-400">
-                      {nA}
-                    </span>
-                    <span className="text-xs font-semibold text-amber-500 dark:text-amber-500">
-                      Arrear
-                    </span>
-                  </div>
-                </div>
 
-                <button
-                  onClick={async () => {
-                    if (!sessions) return;
-                    setPdfLoading(true);
-                    try { await generatePDF(registerNo, sessions); }
-                    catch { setError("PDF failed. Please try again."); }
-                    finally { setPdfLoading(false); }
-                  }}
-                  disabled={pdfLoading}
-                  className="flex items-center gap-2 rounded-xl bg-[#0F2850] px-5 py-2.5
-                    text-sm font-bold text-white shadow-sm transition
-                    hover:bg-blue-900 active:scale-[0.97]
-                    disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {pdfLoading
-                    ? <Loader2 className="h-4 w-4 animate-spin" />
-                    : <FileDown className="h-4 w-4" />}
-                  {pdfLoading ? "Generating…" : "Download as PDF"}
-                </button>
-              </div>
 
               {/* Exam cards grouped by date */}
               {Object.entries(grouped).map(([date, exams]) => {
