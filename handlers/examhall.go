@@ -7663,42 +7663,126 @@ func LookupHall(registerNo, courseCode string) (string, bool) {
 }
 
 // LookupAllByRegister returns all exam sessions for a given register number.
+type sessionMeta struct {
+	Date    string
+	Session string
+	Time    string
+}
+
+// sessionIndex maps each build function's records to their date/session/time.
+// The order must match the append order in LookupAllByRegister.
+var sessionMetaList = []struct {
+	builder func() []models.SeatingRecord
+	meta    sessionMeta
+}{
+	{buildSeatingData13June2026AN, sessionMeta{"13-06-2026", "AN", "01:30 PM – 04:30 PM"}},
+	{buildSeatingData13June2026FN, sessionMeta{"13-06-2026", "FN", "09:00 AM – 12:00 PM"}},
+	{buildSeatingData15June2026FN, sessionMeta{"15-06-2026", "FN", "09:00 AM – 12:00 PM"}},
+	{buildSeatingData15June2026AN, sessionMeta{"15-06-2026", "AN", "01:30 PM – 04:30 PM"}},
+	{buildSeatingData09June2026AN, sessionMeta{"19-06-2026", "AN", "01:30 PM – 04:30 PM"}},
+	{buildSeatingData08June2026FN, sessionMeta{"19-06-2026", "FN", "09:00 AM – 12:00 PM"}},
+	{buildSeatingData07June2026AN, sessionMeta{"17-06-2026", "AN", "01:30 PM – 04:30 PM"}},
+	{buildSeatingData06June2026FN, sessionMeta{"17-06-2026", "FN", "09:00 AM – 12:00 PM"}},
+	{buildSeatingData22June2026FN, sessionMeta{"22-06-2026", "FN", "09:00 AM – 12:00 PM"}},
+	{buildSeatingData22June2026AN, sessionMeta{"22-06-2026", "AN", "01:30 PM – 04:30 PM"}},
+	{buildSeatingData24June2026FN, sessionMeta{"24-06-2026", "FN", "09:00 AM – 12:00 PM"}},
+	{buildSeatingData24June2026AN, sessionMeta{"24-06-2026", "AN", "01:30 PM – 04:30 PM"}},
+	{buildSeatingData29June2026FN, sessionMeta{"29-06-2026", "FN", "09:00 AM – 12:00 PM"}},
+	{buildSeatingData29June2026AN, sessionMeta{"29-06-2026", "AN", "01:30 PM – 04:30 PM"}},
+	{buildSeatingData01July2026FN, sessionMeta{"01-07-2026", "FN", "09:00 AM – 12:00 PM"}},
+	{buildSeatingData03July2026FN, sessionMeta{"03-07-2026", "FN", "09:00 AM – 12:00 PM"}},
+}
+
+// courseNameMap maps course codes to human-readable names.
+// Fill these in when you have the names.
+var courseNameMap = map[string]string{
+	"22HS006": "",
+	"22MA101": "",
+	"22CB101": "",
+	"24MB101": "",
+	"22GE004": "",
+	"24MB202": "",
+	"24CS22":  "",
+	"24IS22":  "",
+	"22HS003": "",
+	"24MB102": "",
+	"22HS001": "",
+	"24MB104": "",
+	"22GE003": "",
+	"22CH103": "",
+	"22CB103": "",
+	"24MB103": "",
+	"22CD206": "",
+	"22CT206": "",
+	"24MB203": "",
+	"22AI206": "",
+	"22CS206": "",
+	"22IT206": "",
+	"22AM206": "",
+	"22IS206": "",
+	"24IS23":  "",
+	"24CS23":  "",
+	"22MA201": "",
+	"24MB205": "",
+	"24CS54":  "",
+	"24IS55":  "",
+	"22PH102": "",
+	"22CB102": "",
+	"24MB105": "",
+	"22PH202": "",
+	"24MB206": "",
+	"22CB201": "",
+	"24CS58":  "",
+	"22CB106": "",
+	"24MB106": "",
+	"22CH203": "",
+	"22CB205": "",
+	"24CS57":  "",
+	"24IS63":  "",
+	"22GE001": "",
+	"22CB104": "",
+	"22GE002": "",
+	"22CB203": "",
+	"24CS69":  "",
+	"22HS201": "",
+	"22CB204": "",
+	"24CS21":  "",
+	"24IS21":  "",
+	"24CS24":  "",
+	"24IS24":  "",
+	"22CB202": "",
+	"24MB204": "",
+}
+
+// LookupAllByRegister returns all exam sessions for a given register number,
+// including date, session, time, and course name label.
 func LookupAllByRegister(registerNo string) []models.ExamSession {
 	registerNo = strings.TrimSpace(strings.ToUpper(registerNo))
 
-	var allRecords []models.SeatingRecord
-	allRecords = append(allRecords, buildSeatingData13June2026AN()...)
-	allRecords = append(allRecords, buildSeatingData13June2026FN()...)
-	allRecords = append(allRecords, buildSeatingData15June2026FN()...)
-	allRecords = append(allRecords, buildSeatingData15June2026AN()...)
-	allRecords = append(allRecords, buildSeatingData09June2026AN()...)
-	allRecords = append(allRecords, buildSeatingData08June2026FN()...)
-	allRecords = append(allRecords, buildSeatingData07June2026AN()...)
-	allRecords = append(allRecords, buildSeatingData06June2026FN()...)
-	allRecords = append(allRecords, buildSeatingData22June2026FN()...)
-	allRecords = append(allRecords, buildSeatingData22June2026AN()...)
-	allRecords = append(allRecords, buildSeatingData24June2026FN()...)
-	allRecords = append(allRecords, buildSeatingData24June2026AN()...)
-	allRecords = append(allRecords, buildSeatingData29June2026FN()...)
-	allRecords = append(allRecords, buildSeatingData29June2026AN()...)
-	allRecords = append(allRecords, buildSeatingData01July2026FN()...)
-	allRecords = append(allRecords, buildSeatingData03July2026FN()...)
-
 	var results []models.ExamSession
-	seen := make(map[string]bool) // deduplicate hall+course combos
+	seen := make(map[string]bool)
 
-	for _, record := range allRecords {
-		for _, reg := range record.RegisterNos {
-			if strings.ToUpper(reg) == registerNo {
-				key := record.HallNo + "|" + record.CourseCode
-				if !seen[key] {
-					seen[key] = true
-					results = append(results, models.ExamSession{
-						HallNo:     record.HallNo,
-						CourseCode: record.CourseCode,
-					})
+	for _, entry := range sessionMetaList {
+		records := entry.builder()
+		meta := entry.meta
+
+		for _, record := range records {
+			for _, reg := range record.RegisterNos {
+				if strings.ToUpper(reg) == registerNo {
+					key := record.HallNo + "|" + record.CourseCode + "|" + meta.Date + "|" + meta.Session
+					if !seen[key] {
+						seen[key] = true
+						results = append(results, models.ExamSession{
+							HallNo:     record.HallNo,
+							CourseCode: record.CourseCode,
+							CourseName: courseNameMap[strings.ToUpper(record.CourseCode)],
+							Date:       meta.Date,
+							Session:    meta.Session,
+							Time:       meta.Time,
+						})
+					}
+					break
 				}
-				break
 			}
 		}
 	}
