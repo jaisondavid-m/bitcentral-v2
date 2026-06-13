@@ -9,6 +9,7 @@ import { useAuth } from "../context/StudentContext.jsx";
 import SEO from "../Component/SEO.jsx";
 import { ROUTE_SEO } from "../seo/routeSeo.js";
 import AnswerKey22HS006 from "../Pages/answers/AnswerKey22HS006.jsx";
+import ExamHallDownload from "../Pages/ExamHallDownload.jsx";
 
 const Login = lazy(() => import("../Pages/Login.jsx"));
 const Dashboard = lazy(() => import("../Pages/Dashboard.jsx"));
@@ -185,7 +186,8 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/rpsite" element={<Rpsite />} />
             <Route path="/pcdp" element={<PCDP />} />
-            <Route path="/exam-hall" element={<ExamHall />} />
+            <Route path="/exam-hall" element={<ExamHallDownload />} />
+            {/* <Route path="/exam-hall-download" element={<ExamHallDownload />} /> */}
             {/* <Route path="/apsite" element={<Apsite />} /> */}
             <Route path="/leavedetails" element={<LeaveDetails />} />
             <Route path="/semester" element={<Semester />} />

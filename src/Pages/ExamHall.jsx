@@ -82,6 +82,7 @@ const COURSE_LABELS = {
 };
 
 const CURRENT_CODES = [
+  
   "24MB201",
   "22HS006",
   "24IS21",
