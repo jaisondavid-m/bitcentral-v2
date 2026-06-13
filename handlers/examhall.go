@@ -7619,7 +7619,6 @@ func buildSeatingData03July2026FN() []models.SeatingRecord {
 	}
 }
 
-
 // LookupHall returns the hall number for a given register number and course code.
 func LookupHall(registerNo, courseCode string) (string, bool) {
 	registerNo = strings.TrimSpace(strings.ToUpper(registerNo))
@@ -7779,6 +7778,7 @@ func LookupAllByRegister(registerNo string) []models.ExamSession {
 							Date:       meta.Date,
 							Session:    meta.Session,
 							Time:       meta.Time,
+							IsArrear:   meta.Session == "AN",
 						})
 					}
 					break

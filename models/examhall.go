@@ -13,4 +13,5 @@ type ExamSession struct {
 	Date       string `json:"date"`
 	Session    string `json:"session"`
 	Time       string `json:"time"`
+	IsArrear   bool   `json:"is_arrear"`
 }
