@@ -363,25 +363,25 @@ function ExamCard({ session: s }) {
   const arr = s.is_arrear;
 
   return (
-    <div className={`flex overflow-hidden rounded-2xl border bg-white shadow-sm
+    <div className={`flex overflow-hidden rounded-xl border bg-white shadow-sm
       transition-all duration-200 hover:shadow-md hover:-translate-y-px
       dark:bg-[#0F1C33]
       ${arr
         ? "border-amber-200 dark:border-amber-800/40"
         : "border-blue-100 dark:border-blue-900/30"}`}>
 
-      {/* Date sidebar */}
-      <div className={`flex w-[86px] shrink-0 flex-col items-center justify-center gap-0.5 py-5
+      {/* Date sidebar — narrower on mobile */}
+      <div className={`flex w-[68px] shrink-0 flex-col items-center justify-center gap-0.5 py-3
         ${arr ? "bg-amber-50 dark:bg-amber-900/20" : "bg-blue-50 dark:bg-[#0A1628]"}`}>
-        <span className={`text-[9px] font-bold uppercase tracking-[0.16em]
+        <span className={`text-[8px] font-bold uppercase tracking-[0.14em]
           ${arr ? "text-amber-400 dark:text-amber-500" : "text-blue-300 dark:text-blue-600"}`}>
           {dt.short}
         </span>
-        <span className={`text-[34px] font-black leading-none tabular-nums
+        <span className={`text-[26px] font-black leading-none tabular-nums
           ${arr ? "text-amber-700 dark:text-amber-300" : "text-blue-700 dark:text-blue-200"}`}>
           {dt.day}
         </span>
-        <span className={`text-[11px] font-semibold
+        <span className={`text-[10px] font-semibold leading-tight text-center
           ${arr ? "text-amber-500 dark:text-amber-500" : "text-blue-400 dark:text-blue-500"}`}>
           {dt.month} {dt.year}
         </span>
@@ -391,59 +391,63 @@ function ExamCard({ session: s }) {
       <div className={`w-px self-stretch
         ${arr ? "bg-amber-100 dark:bg-amber-900/30" : "bg-blue-100 dark:bg-blue-900/30"}`} />
 
-      {/* Content */}
-      <div className="flex flex-1 flex-col gap-2.5 px-4 py-3.5">
+      {/* Content — tighter padding */}
+      <div className="flex flex-1 flex-col gap-2 px-3 py-2.5 min-w-0">
 
-        {/* Row 1: tags + hall */}
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <div className="flex flex-wrap items-center gap-1.5">
+        {/* Row 1: session pill + hall badge on same line */}
+        <div className="flex items-center justify-between gap-1.5">
+          {/* Left: pills */}
+          <div className="flex flex-wrap items-center gap-1 min-w-0">
             <SessionPill session={s.session} />
             {arr && <ArrearPill />}
             {cd.urgent && <UrgentPill label={cd.label} />}
           </div>
 
-          <div className="flex flex-col items-end gap-0.5">
-            <div className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5
-              ${arr
-                ? "bg-amber-50 ring-1 ring-amber-200 dark:bg-amber-900/20 dark:ring-amber-700/50"
-                : "bg-blue-50 ring-1 ring-blue-200 dark:bg-blue-900/20 dark:ring-blue-700/50"}`}>
-              <MapPin className={`h-3.5 w-3.5 ${arr ? "text-amber-400" : "text-blue-400"}`} />
-              <span className="text-xs font-medium text-blue-300 dark:text-blue-600">Hall</span>
-              <span className={`text-lg font-black
-                ${arr ? "text-amber-700 dark:text-amber-300" : "text-blue-700 dark:text-blue-200"}`}>
-                {s.hall_no}
-              </span>
-            </div>
-            {s.block && (
-              <div className="flex items-center gap-1">
-                <Building2 className="h-3 w-3 text-blue-200 dark:text-blue-800" />
-                <span className="text-[10px] text-blue-400 dark:text-blue-600">{s.block}</span>
-              </div>
-            )}
+          {/* Right: hall badge — compact */}
+          <div className={`flex items-center gap-1 rounded-lg px-2 py-1 shrink-0
+            ${arr
+              ? "bg-amber-50 ring-1 ring-amber-200 dark:bg-amber-900/20 dark:ring-amber-700/50"
+              : "bg-blue-50 ring-1 ring-blue-200 dark:bg-blue-900/20 dark:ring-blue-700/50"}`}>
+            <MapPin className={`h-3 w-3 shrink-0 ${arr ? "text-amber-400" : "text-blue-400"}`} />
+            <span className={`text-xs font-medium ${arr ? "text-amber-300" : "text-blue-300"} dark:opacity-60`}>
+              Hall
+            </span>
+            <span className={`text-base font-black leading-none
+              ${arr ? "text-amber-700 dark:text-amber-300" : "text-blue-700 dark:text-blue-200"}`}>
+              {s.hall_no}
+            </span>
           </div>
         </div>
 
-        {/* Row 2: course */}
-        <div className="flex items-start gap-2">
-          <BookOpen className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-200 dark:text-blue-800" />
-          <div className="min-w-0">
-            <span className="mr-2 font-mono text-xs font-bold text-blue-400 dark:text-blue-500">
-              {s.course_code}
-            </span>
-            <span className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-              {s.course_name}
-            </span>
+        {/* Block location — single line, truncated */}
+        {s.block && (
+          <div className="flex items-center gap-1">
+            <Building2 className="h-3 w-3 shrink-0 text-blue-200 dark:text-blue-800" />
+            <span className="truncate text-[10px] text-blue-400 dark:text-blue-600">{s.block}</span>
           </div>
-        </div>
+        )}
+
+        {/* Row 2: course code + name */}
+<div className="flex items-start gap-1.5 min-w-0">
+  <BookOpen className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-200 dark:text-blue-800" />
+  <div className="min-w-0 flex flex-col gap-0.5">
+    <span className="font-mono text-[11px] font-bold text-blue-400 dark:text-blue-500">
+      {s.course_code}
+    </span>
+    <span className="text-[13px] font-semibold leading-snug text-blue-900 dark:text-blue-100">
+      {s.course_name}
+    </span>
+  </div>
+</div>
 
         {/* Row 3: time + countdown */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5 text-blue-200 dark:text-blue-800" />
-            <span className="text-xs text-blue-500 dark:text-blue-400">{s.time}</span>
+            <Clock className="h-3 w-3 shrink-0 text-blue-200 dark:text-blue-800" />
+            <span className="text-[11px] text-blue-500 dark:text-blue-400">{s.time}</span>
           </div>
           {!cd.urgent && (
-            <span className="text-[11px] font-medium text-blue-200 dark:text-blue-800">
+            <span className="text-[10px] font-medium text-blue-200 dark:text-blue-800 shrink-0">
               {cd.label}
             </span>
           )}
