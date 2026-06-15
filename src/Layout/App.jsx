@@ -187,7 +187,7 @@ function App() {
             <Route path="/rpsite" element={<Rpsite />} />
             <Route path="/pcdp" element={<PCDP />} />
             <Route path="/exam-hall" element={<ExamHallDownload />} />
-            {/* <Route path="/exam-hall-download" element={<ExamHallDownload />} /> */}
+            <Route path="/exam-hall-manual" element={<ExamHall />} />
             {/* <Route path="/apsite" element={<Apsite />} /> */}
             <Route path="/leavedetails" element={<LeaveDetails />} />
             <Route path="/semester" element={<Semester />} />
