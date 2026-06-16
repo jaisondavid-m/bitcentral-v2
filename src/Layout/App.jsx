@@ -122,6 +122,7 @@ function App() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/" element={<Navigate to="/home" />} />
+          <Route path="/about" element={<About />} />
 
           {/* Protected Layout */}
           <Route
@@ -183,7 +184,7 @@ function App() {
               }
             />
             <Route path="/profile" element={<Dashboard />} />
-            <Route path="/about" element={<About />} />
+            {/* <Route path="/about" element={<About />} /> */}
             <Route path="/rpsite" element={<Rpsite />} />
             <Route path="/pcdp" element={<PCDP />} />
             <Route path="/exam-hall" element={<ExamHallDownload />} />
