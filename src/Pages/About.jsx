@@ -1,5 +1,6 @@
 import React from 'react';
 import { Mail, Phone, MessageSquare, BookOpen, Utensils, Target, User, Github, Linkedin, Globe } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 
 export default function About() {
   const features = [
@@ -27,6 +28,26 @@ export default function About() {
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-black">
+      <Helmet>
+        <title>About BIT Central</title>
+        <meta
+          name="description"
+          content="BIT Central is developed by Jaison David M, CSE student at BIT Sathy."
+        />
+        <meta name="author" content="Jaison David M" />
+
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "BIT Central",
+            creator: {
+              "@type": "Person",
+              name: "Jaison David M",
+            },
+          })}
+        </script>
+      </Helmet>
       <header className="border-b border-gray-200 bg-white dark:border-blue-900 dark:bg-slate-950">
         <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -44,7 +65,7 @@ export default function About() {
         <section className="mb-12 rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
           <h2 className="mb-4 text-2xl font-bold text-blue-600">Our Mission</h2>
           <p className="text-base leading-relaxed text-blue-700 dark:text-blue-300">
-            BIT-CENTRAL streamlines student life at BIT Sathy by providing instant access to academic materials, 
+            BIT-CENTRAL streamlines student life at BIT Sathy by providing instant access to academic materials,
             daily mess menus, and important campus resources—all in one secure, user-friendly platform.
           </p>
         </section>
