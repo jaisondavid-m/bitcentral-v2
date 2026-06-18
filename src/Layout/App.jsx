@@ -26,7 +26,7 @@ const NotFound = lazy(() => import("../Pages/NotFound.jsx"));
 const LeaveDetails = lazy(() => import("../Pages/LeaveDetails.jsx"));
 const ExamHall = lazy(() => import("../Pages/ExamHall.jsx"));
 const AK22PH202 = lazy(() => import("../Pages/answers/AK__22PH202.jsx"));
-const DocsPage = lazy(() => import("../Pages/AboutDocs.jsx"));
+// const DocsPage = lazy(() => import("../Pages/AboutDocs.jsx"));
 
 const AdminDashboard = lazy(() =>
   import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.default }))
@@ -124,7 +124,7 @@ function App() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/" element={<Navigate to="/home" />} />
           <Route path="/about" element={<About />} />
-          <Route path="/docs/about" element={<DocsPage />} />
+          {/* <Route path="/docs/about" element={<DocsPage />} /> */}
 
           {/* Protected Layout */}
           <Route
