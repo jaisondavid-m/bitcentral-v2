@@ -26,6 +26,7 @@ const NotFound = lazy(() => import("../Pages/NotFound.jsx"));
 const LeaveDetails = lazy(() => import("../Pages/LeaveDetails.jsx"));
 const ExamHall = lazy(() => import("../Pages/ExamHall.jsx"));
 const AK22PH202 = lazy(() => import("../Pages/answers/AK__22PH202.jsx"));
+const DocsPage = lazy(() => import("../Pages/AboutDocs.jsx"));
 
 const AdminDashboard = lazy(() =>
   import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.default }))
@@ -49,64 +50,64 @@ function App() {
 
   const currentMeta = ROUTE_SEO[location.pathname] || ROUTE_SEO["*"];
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      const key = (e.key || "").toLowerCase();
+  // useEffect(() => {
+  //   const handleKeyDown = (e) => {
+  //     const key = (e.key || "").toLowerCase();
 
-      // Block F12
-      if (e.key === "F12") {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
+  //     // Block F12
+  //     if (e.key === "F12") {
+  //       e.preventDefault();
+  //       e.stopPropagation();
+  //       return false;
+  //     }
 
-      // Block Ctrl/Cmd + Shift + [I/J/C/K]
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (key === "i" || key === "j" || key === "c" || key === "k")) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
+  //     // Block Ctrl/Cmd + Shift + [I/J/C/K]
+  //     if ((e.ctrlKey || e.metaKey) && e.shiftKey && (key === "i" || key === "j" || key === "c" || key === "k")) {
+  //       e.preventDefault();
+  //       e.stopPropagation();
+  //       return false;
+  //     }
 
-      // Block Ctrl/Cmd + U (view source) and Ctrl/Cmd + S (save)
-      if ((e.ctrlKey || e.metaKey) && (key === "u" || key === "s")) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-    };
+  //     // Block Ctrl/Cmd + U (view source) and Ctrl/Cmd + S (save)
+  //     if ((e.ctrlKey || e.metaKey) && (key === "u" || key === "s")) {
+  //       e.preventDefault();
+  //       e.stopPropagation();
+  //       return false;
+  //     }
+  //   };
 
-    const handleContext = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    };
+  //   const handleContext = (e) => {
+  //     e.preventDefault();
+  //     e.stopPropagation();
+  //     return false;
+  //   };
 
-    // Best-effort devtools detection by measuring window sizes
-    const checkDevTools = () => {
-      try {
-        const threshold = 160; // heuristic
-        const widthDiff = window.outerWidth - window.innerWidth;
-        const heightDiff = window.outerHeight - window.innerHeight;
-        if (widthDiff > threshold || heightDiff > threshold) {
-          // alert("Developer tools detected. Please close it to continue.");
-        }
-      } catch (err) {
-        // ignore
-      }
-    };
+  //   // Best-effort devtools detection by measuring window sizes
+  //   const checkDevTools = () => {
+  //     try {
+  //       const threshold = 160; // heuristic
+  //       const widthDiff = window.outerWidth - window.innerWidth;
+  //       const heightDiff = window.outerHeight - window.innerHeight;
+  //       if (widthDiff > threshold || heightDiff > threshold) {
+  //         // alert("Developer tools detected. Please close it to continue.");
+  //       }
+  //     } catch (err) {
+  //       // ignore
+  //     }
+  //   };
 
-    document.addEventListener("keydown", handleKeyDown, true);
-    document.addEventListener("contextmenu", handleContext, true);
-    window.addEventListener("resize", checkDevTools);
-    const intervalId = setInterval(checkDevTools, 1500);
+  //   document.addEventListener("keydown", handleKeyDown, true);
+  //   document.addEventListener("contextmenu", handleContext, true);
+  //   window.addEventListener("resize", checkDevTools);
+  //   const intervalId = setInterval(checkDevTools, 1500);
 
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown, true);
-      document.removeEventListener("contextmenu", handleContext, true);
-      window.removeEventListener("resize", checkDevTools);
-      clearInterval(intervalId);
-    };
-  }, []);
+  //   return () => {
+  //     document.removeEventListener("keydown", handleKeyDown, true);
+  //     document.removeEventListener("contextmenu", handleContext, true);
+  //     window.removeEventListener("resize", checkDevTools);
+  //     clearInterval(intervalId);
+  //   };
+  // }, []);
 
   if (loading) {
     return <FullScreenLoader />;
@@ -123,6 +124,7 @@ function App() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/" element={<Navigate to="/home" />} />
           <Route path="/about" element={<About />} />
+          <Route path="/docs/about" element={<DocsPage />} />
 
           {/* Protected Layout */}
           <Route

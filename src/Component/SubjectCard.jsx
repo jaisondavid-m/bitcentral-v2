@@ -3,23 +3,23 @@ import { useNavigate } from "react-router-dom";
 
 const LinkButton = ({ href, label, onClick, onNavigate, dark = false }) => {
   const handleClick = () => {
-  const isInternalRoute = href?.startsWith("/") && !href.includes(".pdf");
+    const isInternalRoute = href?.startsWith("/") && !href.includes(".pdf");
 
-  if (isInternalRoute) {
-    onNavigate?.(href);
-    return;
-  }
+    if (isInternalRoute) {
+      onNavigate?.(href);
+      return;
+    }
 
-  // If custom click exists → still respect href fallback
-  if (onClick) {
-    onClick();
-    return;
-  }
+    // If custom click exists → still respect href fallback
+    if (onClick) {
+      onClick();
+      return;
+    }
 
-  if (href) {
-    window.open(href, "_blank", "noreferrer");
-  }
-};   
+    if (href) {
+      window.open(href, "_blank", "noreferrer");
+    }
+  };
 
   const cls = dark
     ? "inline-block rounded-md bg-blue-500 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-400"
@@ -165,10 +165,10 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf, dark = f
           <div className="flex flex-wrap gap-1.5">
             {semqbwithans && (
               <LinkButton
-  dark={dark}
-  href={semqbwithans}
-  label="Semester Question Bank"
-/>
+                dark={dark}
+                href={semqbwithans}
+                label="Semester Question Bank"
+              />
             )}
           </div>
         </>
