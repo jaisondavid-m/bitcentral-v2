@@ -55,6 +55,26 @@ func SetupRouter(
 		})
 	})
 
+	r.GET("/docs/about", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"developer": gin.H{
+				"name": "Jaison David M",
+				"bio":  "1st-year CSE student at Bannari Amman Institute of Technology. Builds web apps and freelance services.",
+				"links": gin.H{
+					"github":    "https://github.com/jaisondavid-m",
+					"linkedin":  "https://www.linkedin.com/in/jaison-david-m-a14072360/",
+					"freelance": "https://herostack.netlify.app/",
+				},
+			},
+
+			"contact": gin.H{
+				"email":         "developer@bitsathy.in",
+				"phone":         "+919843777817",
+				"feedback_form": "https://forms.gle/LSMMFVBHSPUvPKKK9",
+			},
+		})
+	})
+
 	// Public routes
 	r.GET("/auth/login", handler.HandleLogin)
 	r.GET("/auth/callback", handler.HandleCallback)
