@@ -111,28 +111,7 @@ export default function Semester() {
       }),
     [activeTab, filteredSubjects]
   );
-
-  // For the semester tab, normalize the subject so SubjectCard only sees
-  // semqbwithans mapped to qb1 (treated as "Question Bank"), with all other
-  // link fields cleared out.
-  const normalizedSubjects = useMemo(() => {
-    if (activeTab !== "semester") return visibleSubjects;
-
-    return visibleSubjects.map((sub) => {
-      const semqbwithans = sub.semqbwithans || sub.sem_qb_with_ans || "";
-      return {
-        ...sub,
-        // Map semqbwithans → qb1 so SubjectCard renders it as "Question Bank"
-        qb1: semqbwithans,
-        // Clear all other link fields so nothing extra appears
-        qb2: "",
-        ak1: "",
-        ak2: "",
-        semqbwithans: "",
-        sem_qb_with_ans: "",
-      };
-    });
-  }, [activeTab, visibleSubjects]);
+  
 
   const tabMeta = {
     test1: {
@@ -148,12 +127,11 @@ export default function Semester() {
       view: "test2",
     },
     semester: {
-      title: "Semester",
-      subtitle: "Question Bank with Answers",
-      empty: "No semester bundle is available for your year.",
-      // Use "test1" view so SubjectCard renders qb1 as "Question Bank"
-      view: "test1",
-    },
+  title: "Semester",
+  subtitle: "Question Bank with Answers",
+  empty: "No semester bundle is available for your year.",
+  view: "semester", 
+},
   };
 
   const activeMeta = tabMeta[activeTab];
@@ -241,7 +219,7 @@ export default function Semester() {
               <div className={`rounded-2xl border border-dashed ${isDark ? "border-slate-700" : "border-blue-200"} ${isDark ? "bg-slate-900" : "bg-blue-50"} py-12 text-center text-sm ${mutedText}`}>
                 No subjects found for Year {student?.yearCode || "-"}
               </div>
-            ) : normalizedSubjects.length === 0 ? (
+            ) : visibleSubjects.length === 0 ? (
               <div className={`rounded-2xl border border-dashed ${isDark ? "border-slate-700" : "border-blue-200"} ${isDark ? "bg-slate-900" : "bg-blue-50"} py-12 text-center text-sm ${mutedText}`}>
                 {search.trim()
                   ? "No subjects match your search."
@@ -249,7 +227,7 @@ export default function Semester() {
               </div>
             ) : (
               <div className="grid gap-3 lg:grid-cols-2">
-                {normalizedSubjects.map((subject, index) => (
+                {visibleSubjects.map((subject, index) => (
                   <SubjectCard
                     key={subject.code || subject.subject_code || index}
                     subject={subject}

@@ -145,7 +145,7 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf, dark = f
         </>
       )}
 
-      {view === "semester" && hasSemester && (
+      {view === "semester" && (qb1 || qb2 || ak1 || ak2 || semqbwithans) && (
         <>
           <Divider />
           <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-500">Semester</p>
