@@ -116,23 +116,23 @@ export default function Semester() {
   // semqbwithans mapped to qb1 (treated as "Question Bank"), with all other
   // link fields cleared out.
   const normalizedSubjects = useMemo(() => {
-    if (activeTab !== "semester") return visibleSubjects;
+  if (activeTab !== "semester") return visibleSubjects;
 
-    return visibleSubjects.map((sub) => {
-      const semqbwithans = sub.semqbwithans || sub.sem_qb_with_ans || "";
-      return {
-        ...sub,
-        // Map semqbwithans → qb1 so SubjectCard renders it as "Question Bank"
-        qb1: semqbwithans,
-        // Clear all other link fields so nothing extra appears
-        qb2: "",
-        ak1: "",
-        ak2: "",
-        semqbwithans: "",
-        sem_qb_with_ans: "",
-      };
-    });
-  }, [activeTab, visibleSubjects]);
+  return visibleSubjects.map((sub) => {
+    const semqbwithans = sub.semqbwithans || sub.sem_qb_with_ans || "";
+
+    return {
+      ...sub,
+      semqbwithans,        // keep real semester field
+      sem_qb_with_ans: semqbwithans,
+
+      qb1: "",
+      qb2: "",
+      ak1: "",
+      ak2: "",
+    };
+  });
+}, [activeTab, visibleSubjects]);
 
   const tabMeta = {
     test1: {
@@ -152,7 +152,7 @@ export default function Semester() {
       subtitle: "Question Bank with Answers",
       empty: "No semester bundle is available for your year.",
       // Use "test1" view so SubjectCard renders qb1 as "Question Bank"
-      view: "test1",
+      view: "semester",
     },
   };
 
