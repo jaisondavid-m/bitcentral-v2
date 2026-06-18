@@ -37,7 +37,8 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf, dark = f
 
   const hasTest1 = qb1 || ak1;
   const hasTest2 = qb2 || ak2;
-  const hasSemester = semqbwithans;
+  const isSemester = view === "semester";
+  const hasSemester = Boolean(semqbwithans);
   const hasMaterials = semqbwithans || qb1 || qb2 || ak1 || ak2;
 
   const openPdf = (url, name, allowExternalActions = true, allowDownload = true) => {
@@ -64,35 +65,35 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf, dark = f
   const section =
     view === "test1"
       ? {
-          label: titleByView.test1,
-          links: [qb1 && { href: qb1, label: "QB1" }, ak1 && { href: ak1, label: "AK1" }].filter(Boolean),
-        }
+        label: titleByView.test1,
+        links: [qb1 && { href: qb1, label: "QB1" }, ak1 && { href: ak1, label: "AK1" }].filter(Boolean),
+      }
       : view === "test2"
-      ? {
+        ? {
           label: titleByView.test2,
           links: [qb2 && { href: qb2, label: "QB2" }, ak2 && { href: ak2, label: "AK2" }].filter(Boolean),
         }
-      : view === "semester"
-      ? {
-          label: titleByView.semester,
-          links: [
-            qb1 && { href: qb1, label: "QB1" },
-            qb2 && { href: qb2, label: "QB2" },
-            ak1 && { href: ak1, label: "AK1" },
-            ak2 && { href: ak2, label: "AK2" },
-            semqbwithans && { href: semqbwithans, label: "Semester QB + AK" },
-          ].filter(Boolean),
-        }
-        : {
-          label: titleByView.all,
-          links: [
-            qb1 && { href: qb1, label: "Question Bank" },
-            qb2 && { href: qb2, label: "Question Bank" },
-            ak1 && { href: ak1, label: "Answer Key" },
-            ak2 && { href: ak2, label: "Answer Key" },
-            semqbwithans && { href: semqbwithans, label: "Semester Question Bank + Answer Key" },
-          ].filter(Boolean),
-        };
+        : view === "semester"
+          ? {
+            label: titleByView.semester,
+            links: [
+              qb1 && { href: qb1, label: "QB1" },
+              qb2 && { href: qb2, label: "QB2" },
+              ak1 && { href: ak1, label: "AK1" },
+              ak2 && { href: ak2, label: "AK2" },
+              semqbwithans && { href: semqbwithans, label: "Semester QB + AK" },
+            ].filter(Boolean),
+          }
+          : {
+            label: titleByView.all,
+            links: [
+              qb1 && { href: qb1, label: "Question Bank" },
+              qb2 && { href: qb2, label: "Question Bank" },
+              ak1 && { href: ak1, label: "Answer Key" },
+              ak2 && { href: ak2, label: "Answer Key" },
+              semqbwithans && { href: semqbwithans, label: "Semester Question Bank + Answer Key" },
+            ].filter(Boolean),
+          };
 
   return (
     <div className={`rounded-2xl border ${dark ? "border-slate-700" : "border-blue-100"} ${dark ? "bg-slate-900" : "bg-white"} p-3.5 shadow-sm transition hover:shadow-md ${dark ? "hover:shadow-black/30" : "hover:shadow-blue-100/30"}`}>
@@ -122,7 +123,7 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf, dark = f
           </div>
         </>
       )}
-      
+
       {view === "test1" && hasTest1 && (
         <>
           <Divider />
@@ -133,7 +134,7 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf, dark = f
           </div>
         </>
       )}
-      
+
       {view === "test2" && hasTest2 && (
         <>
           <Divider />
@@ -145,19 +146,35 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf, dark = f
         </>
       )}
 
-      {view === "semester" && (qb1 || qb2 || ak1 || ak2 || semqbwithans) && (
+      {isSemester && hasSemester && (
         <>
-          <Divider />
-          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-500">Semester</p>
+          <Divider dark={dark} />
+          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-500">
+            Semester
+          </p>
+
           <div className="flex flex-wrap gap-1.5">
-            {qb1 && <LinkButton dark={dark} href={qb1} label="Question Bank" onNavigate={navigate} />}
-            {qb2 && <LinkButton dark={dark} href={qb2} label="Question Bank" onNavigate={navigate} />}
-            {ak1 && <LinkButton dark={dark} href={ak1} label="Answer Key" onNavigate={navigate} onClick={() => openPdf(ak1, `${code} - Answer Key`, true, false)} />}
-            {ak2 && <LinkButton dark={dark} href={ak2} label="Answer Key" onNavigate={navigate} onClick={() => openPdf(ak2, `${code} - Answer Key`, true, false)} />}
-            {semqbwithans && <LinkButton dark={dark} href={semqbwithans} label="Semester Question Bank + Answer Key" onNavigate={navigate} onClick={() => openPdf(semqbwithans, `${code} - Semester Question Bank + Answer Key`, true, false)} />}
+            {semqbwithans && (
+              <LinkButton
+                dark={dark}
+                href={semqbwithans}
+                label="Semester Question Bank + Answer Key"
+                onNavigate={navigate}
+                onClick={() =>
+                  openPdf(
+                    semqbwithans,
+                    `${code} - Semester`,
+                    true,
+                    false
+                  )
+                }
+              />
+            )}
           </div>
         </>
       )}
+
+
 
       {view === "all" && section.links.length > 0 && (
         <>
