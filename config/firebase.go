@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"errors"
 	"sync"
 
 	firebase "firebase.google.com/go"
@@ -49,11 +50,21 @@ func InitFirebase() {
 
 func FirebaseAuthClient() (*auth.Client, error) {
 	if FirebaseApp == nil {
-		return nil, nil
+		log.Println("FirebaseApp is nil")
+		return nil, errors.New("firebase app nil")
 	}
 
 	firebaseAuthOnce.Do(func() {
+		log.Println("Creating Firebase Auth client...")
 		firebaseAuthClient, firebaseAuthErr = FirebaseApp.Auth(context.Background())
+
+		if firebaseAuthErr != nil {
+			log.Println("Firebase Auth error:", firebaseAuthErr)
+		}
+
+		if firebaseAuthClient == nil {
+			log.Println("Firebase Auth client is nil")
+		}
 	})
 
 	return firebaseAuthClient, firebaseAuthErr
