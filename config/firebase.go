@@ -22,14 +22,19 @@ func InitFirebase() {
 	credentialsJSON := os.Getenv("FIREBASE_CREDENTIALS_JSON")
 	credentialsFile := os.Getenv("FIREBASE_CREDENTIALS_FILE")
 
+	log.Println("Firebase JSON length:", len(credentialsJSON))
+	log.Println("Firebase File:", credentialsFile)
+
 	if credentialsJSON == "" && credentialsFile == "" {
 		log.Fatal("FIREBASE_CREDENTIALS_JSON or FIREBASE_CREDENTIALS_FILE must be set")
 	}
 
 	var opt option.ClientOption
 	if credentialsJSON != "" {
+		log.Println("Using FIREBASE_CREDENTIALS_JSON")
 		opt = option.WithCredentialsJSON([]byte(credentialsJSON))
 	} else {
+		log.Println("Using FIREBASE_CREDENTIALS_FILE")
 		opt = option.WithCredentialsFile(credentialsFile)
 	}
 
