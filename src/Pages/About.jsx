@@ -1,216 +1,80 @@
-import React from 'react';
-import { Mail, Phone, MessageSquare, BookOpen, Utensils, Target, User, Github, Linkedin, Globe } from "lucide-react";
-import { Helmet } from "react-helmet-async";
+import React from "react";
+import { Link } from "react-router-dom";
+import { Github, Globe, Linkedin } from "lucide-react";
+import PublicNav from "../Component/PublicNav.jsx";
 
 export default function About() {
-  const features = [
-    {
-      icon: <BookOpen className="h-7 w-7" />,
-      title: "Academic Resources",
-      description: "Access semester-wise question banks, answer keys, and study materials."
-    },
-    {
-      icon: <Utensils className="h-7 w-7" />,
-      title: "Mess Menu",
-      description: "Real-time hostel mess menu with daily updates for both hostels."
-    },
-    {
-      icon: <Target className="h-7 w-7" />,
-      title: "RP Site Integration",
-      description: "Direct access to the Reward Points system for tracking achievements."
-    },
-    {
-      icon: <User className="h-7 w-7" />,
-      title: "Smart Profile",
-      description: "Automatic department and batch detection from your college email."
-    }
-  ];
-
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-black">
-      <Helmet>
-        <title>
-          BIT Central - Student Portal for BIT Sathy | Academic Resources & Campus Services
-        </title>
-        <meta
-          name="description"
-          content="BIT Central is a student portal for Bannari Amman Institute of Technology students. Access academic resources, question banks, mess menus, campus information, attendance tools, and student services."
-        />
-        <meta name="author" content="Jaison David M" />
+    <main className="min-h-screen bg-slate-50 text-slate-900 dark:bg-black dark:text-white">
+      <PublicNav />
+      <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+        <p className="text-sm font-semibold uppercase tracking-widest text-blue-700 dark:text-blue-300">About BIT Central</p>
+        <h1 className="mt-3 text-3xl font-bold text-slate-950 sm:text-4xl dark:text-white">
+          BIT Central is a student portal for BIT Sathy
+        </h1>
+        <p className="mt-5 max-w-3xl leading-7 text-slate-700 dark:text-slate-300">
+          Summary: BIT Central helps students of Bannari Amman Institute of Technology find academic resources, question banks, answer keys, mess menu information, reward points access, exam hall tools, leave schedules, and campus resources from one web application.
+        </p>
+      </section>
 
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            "name": "BIT Central",
-            "applicationCategory": "EducationApplication",
-            "url": "https://bitcentral.bitsathy.in",
-            "description":
-              "Student portal for Bannari Amman Institute of Technology.",
-            "creator": {
-              "@type": "Person",
-              "name": "Jaison David M"
-            }
-          })}
-        </script>
-      </Helmet>
-      <header className="border-b border-gray-200 bg-white dark:border-blue-900 dark:bg-slate-950">
-        <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="mb-4 text-3xl font-bold text-blue-600 sm:text-4xl">
-              About BIT-CENTRAL
-            </h1>
-            <p className="mx-auto max-w-2xl text-base text-blue-700 sm:text-lg dark:text-blue-300">
-              Your one-stop platform for academic resources and campus information at Bannari Amman Institute of Technology
-            </p>
+      <section className="bg-white py-12 dark:bg-slate-950" aria-labelledby="mission-heading">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <h2 id="mission-heading" className="text-2xl font-bold text-slate-950 dark:text-white">
+            What BIT Central does
+          </h2>
+          <p className="mt-4 leading-7 text-slate-700 dark:text-slate-300">
+            BIT Central organizes important student information for the BIT Sathy community. The public pages explain the platform for students, parents, and search engines. The protected app gives signed-in students access to campus tools and resources connected to academic life at Bannari Amman Institute of Technology.
+          </p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <article className="rounded-lg border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-900">
+              <h3 className="font-semibold text-slate-950 dark:text-white">Who can use it?</h3>
+              <p className="mt-2 leading-7 text-slate-700 dark:text-slate-300">
+                Public pages are open to everyone. Protected student tools are intended for BIT Sathy students who sign in with an institutional Google account.
+              </p>
+            </article>
+            <article className="rounded-lg border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-900">
+              <h3 className="font-semibold text-slate-950 dark:text-white">What does it include?</h3>
+              <p className="mt-2 leading-7 text-slate-700 dark:text-slate-300">
+                Academic resources, question banks, answer keys, semester materials, mess menu updates, reward points links, exam hall support, and other campus service tools.
+              </p>
+            </article>
           </div>
         </div>
-      </header>
+      </section>
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <section className="mb-12 rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
-          <h2 className="mb-4 text-2xl font-bold text-blue-600">Our Mission</h2>
-          <p className="text-base leading-relaxed text-blue-700 dark:text-blue-300">
-            BIT-CENTRAL streamlines student life at BIT Sathy by providing instant access to academic materials,
-            daily mess menus, and important campus resources—all in one secure, user-friendly platform.
-          </p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 text-2xl font-bold text-blue-600">Platform Features</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {features.map((feature, index) => (
-              <article key={index} className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-blue-900 dark:bg-slate-950">
-                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300">
-                  {feature.icon}
-                </div>
-                <h3 className="mb-2 text-lg font-semibold text-blue-600">{feature.title}</h3>
-                <p className="text-sm text-blue-700 dark:text-blue-300">{feature.description}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12 rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
-          <h2 className="mb-6 text-2xl font-bold text-blue-600">How It Works</h2>
-          <div className="space-y-4">
-            {[
-              { step: "1", title: "Sign In with Google", description: "Use your @bitsathy.ac.in email to authenticate securely" },
-              { step: "2", title: "Automatic Profile Setup", description: "Your department and batch are automatically detected" },
-              { step: "3", title: "Access All Resources", description: "Browse question banks, check mess menus, and more" }
-            ].map((item, index) => (
-              <div key={index} className="flex gap-4 rounded-lg bg-gray-50 p-4 dark:bg-slate-900">
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 font-bold text-white">
-                  {item.step}
-                </div>
-                <div className="flex-1">
-                  <h3 className="mb-1 font-semibold text-blue-600">{item.title}</h3>
-                  <p className="text-sm text-blue-700 dark:text-blue-300">{item.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12 rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
-          <h2 className="mb-4 text-2xl font-bold text-blue-600">About the Developer</h2>
-          <p className="mb-6 text-blue-700 dark:text-blue-300">
-            Hi, I'm <span className="font-semibold text-blue-800">Jaison David M</span>, a 1st-year CSE student at Bannari Amman Institute of Technology. I build web apps and freelance services.
-          </p>
-
-          <div className="space-y-3">
-            <a href="https://github.com/jaisondavid-m" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:border-blue-900 dark:bg-slate-900 dark:hover:bg-slate-800">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-800 text-white">
-                <Github className="h-5 w-5" />
-              </div>
-              <div className="text-left">
-                <p className="text-xs text-blue-600">GitHub</p>
-                <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">@jaisondavid-m</p>
-              </div>
-            </a>
-
-            <a href="https://www.linkedin.com/in/jaison-david-m-a14072360/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:border-blue-900 dark:bg-slate-900 dark:hover:bg-slate-800">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white">
-                <Linkedin className="h-5 w-5" />
-              </div>
-              <div className="text-left">
-                <p className="text-xs text-blue-600">LinkedIn</p>
-                <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">Jaison David M</p>
-              </div>
-            </a>
-
-            <a href="https://herostack.netlify.app/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:border-blue-900 dark:bg-slate-900 dark:hover:bg-slate-800">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-600 text-white">
-                <Globe className="h-5 w-5" />
-              </div>
-              <div className="text-left">
-                <p className="text-xs text-blue-600">Freelance Website</p>
-                <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">HeroStack</p>
-              </div>
-            </a>
-          </div>
-        </section>
-
-        <section id="contact" className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
-          <h2 className="mb-2 text-2xl font-bold text-blue-600">Get in Touch</h2>
-          <p className="mb-6 text-blue-700 dark:text-blue-300">Have questions or feedback? Feel free to reach out.</p>
-
-          <div className="space-y-3">
-            <a href="mailto:developer@bitsathy.in" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 transition-colors hover:bg-gray-100 dark:border-blue-900 dark:bg-slate-900 dark:hover:bg-slate-800">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white">
-                <Mail className="h-5 w-5" />
-              </div>
-              <div className="text-left">
-                <p className="text-xs text-blue-600">Email</p>
-                <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">developer@bitsathy.in</p>
-              </div>
-            </a>
-
-            <a href="tel:+919843777817" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 transition-colors hover:bg-gray-100 dark:border-blue-900 dark:bg-slate-900 dark:hover:bg-slate-800">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white">
-                <Phone className="h-5 w-5" />
-              </div>
-              <div className="text-left">
-                <p className="text-xs text-blue-600">Phone</p>
-                <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">+91 98437 77817</p>
-              </div>
-            </a>
-
-            <a href="https://forms.gle/LSMMFVBHSPUvPKKK9" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 transition-colors hover:bg-gray-100 dark:border-blue-900 dark:bg-slate-900 dark:hover:bg-slate-800">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white">
-                <MessageSquare className="h-5 w-5" />
-              </div>
-              <div className="text-left">
-                <p className="text-xs text-blue-600">Feedback Form</p>
-                <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">Submit your feedback</p>
-              </div>
-            </a>
-          </div>
-          <h2>Frequently Asked Questions</h2>
-
-          <h3>What is BIT Central?</h3>
-          <p>
-            BIT Central is a student portal that provides academic resources,
-            mess menus, campus information, and student tools.
-          </p>
-
-          <h3>Who can use BIT Central?</h3>
-          <p>
-            Students of Bannari Amman Institute of Technology can access
-            the platform using their institutional email.
-          </p>
-        </section>
-      </div>
-      <button
-        onClick={() => window.history.back()}
-        className="fixed bottom-6 left-6 z-50 flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-0.5 hover:bg-blue-700 active:scale-95"
-        aria-label="Go back"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Back
-      </button>
+      <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8" aria-labelledby="developer-heading">
+        <h2 id="developer-heading" className="text-2xl font-bold text-slate-950 dark:text-white">
+          Developer and institution
+        </h2>
+        <p className="mt-4 leading-7 text-slate-700 dark:text-slate-300">
+          BIT Central was developed by Jaison David M, a CSE student at Bannari Amman Institute of Technology, Sathyamangalam. The application is built to improve access to student resources and campus information for the BIT Sathy community.
+        </p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <a href="https://github.com/jaisondavid-m" target="_blank" rel="noopener noreferrer" className="rounded-lg border border-slate-200 bg-white p-5 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900">
+            <Github className="h-6 w-6 text-slate-800 dark:text-slate-100" aria-hidden="true" />
+            <span className="mt-3 block font-semibold">GitHub</span>
+            <span className="mt-1 block text-sm text-slate-600 dark:text-slate-300">@jaisondavid-m</span>
+          </a>
+          <a href="https://www.linkedin.com/in/jaison-david-m-a14072360/" target="_blank" rel="noopener noreferrer" className="rounded-lg border border-slate-200 bg-white p-5 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900">
+            <Linkedin className="h-6 w-6 text-blue-700 dark:text-blue-300" aria-hidden="true" />
+            <span className="mt-3 block font-semibold">LinkedIn</span>
+            <span className="mt-1 block text-sm text-slate-600 dark:text-slate-300">Jaison David M</span>
+          </a>
+          <a href="https://www.bitsathy.ac.in/" target="_blank" rel="noopener noreferrer" className="rounded-lg border border-slate-200 bg-white p-5 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900">
+            <Globe className="h-6 w-6 text-blue-700 dark:text-blue-300" aria-hidden="true" />
+            <span className="mt-3 block font-semibold">Institution</span>
+            <span className="mt-1 block text-sm text-slate-600 dark:text-slate-300">Bannari Amman Institute of Technology</span>
+          </a>
+        </div>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link to="/features" className="rounded-md bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700">
+            View features
+          </Link>
+          <Link to="/faq" className="rounded-md border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900">
+            Read FAQ
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

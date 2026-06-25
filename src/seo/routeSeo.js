@@ -1,15 +1,19 @@
 export const SITE_URL = (import.meta.env.VITE_SITE_URL || "https://bitcentral.bitsathy.in").replace(/\/$/, "");
 
 export const SEO_DEFAULTS = {
-  siteName: "BIT CENTRAL",
-  title: "BIT CENTRAL",
+  siteName: "BIT Central",
+  title: "BIT Central Student Portal",
   description:
-    "BIT CENTRAL helps BIT students access academics, reward points, mess menu updates, leave schedules, and exam resources from one platform.",
+    "BIT Central is a student portal for Bannari Amman Institute of Technology that helps BIT Sathy students access academic resources, question banks, answer keys, mess menu updates, and campus services.",
   keywords: [
-    "BIT CENTRAL",
+    "BIT Central",
     "Bannari Amman Institute of Technology",
     "BIT Sathy",
+    "BIT Sathy student portal",
     "student portal",
+    "academic resources",
+    "question banks",
+    "answer keys",
     "semester resources",
     "reward points",
     "exam hall",
@@ -21,39 +25,159 @@ export const SEO_DEFAULTS = {
 
 export const ROUTE_SEO = {
   "/": {
-    title: "BIT CENTRAL",
-    description: "Central student platform for academic and campus resources.",
-    keywords: ["BIT CENTRAL", "student platform"],
+    title: "BIT Central - BIT Sathy Student Portal",
+    description:
+      "BIT Central is a public guide and student portal for BIT Sathy students, covering academic resources, question banks, answer keys, mess menu updates, student services, and campus tools.",
+    keywords: ["BIT Central", "BIT Sathy student portal", "academic resources", "question banks", "answer keys", "mess menu"],
+    pageType: "CollectionPage",
+    faq: true,
   },
 
   "/login": {
-    title: "Login",
-    description: "Sign in securely to access your BIT CENTRAL dashboard and campus tools.",
-    keywords: ["BIT CENTRAL login", "student sign in", "BITSATHY login"],
+    title: "Login to BIT Central",
+    description: "Sign in with a BIT Sathy institutional Google account to access protected BIT Central student tools.",
+    keywords: ["BIT Central login", "BIT Sathy login", "student sign in"],
+    noIndex: true,
   },
 
   "/home": {
-    title: "Home",
-    description: "Discover academic tools, exam support, reward points, and student services in one place.",
-    keywords: ["BIT CENTRAL home", "student dashboard", "campus tools"],
+    title: "Student Home",
+    description: "Protected BIT Central home page for academic tools, exam support, reward points, and student services.",
+    keywords: ["BIT Central home", "student dashboard", "campus tools"],
+    noIndex: true,
   },
 
   "/dashboard": {
-    title: "Profile Dashboard",
-    description: "View your student profile, department details, and account activity on BIT CENTRAL.",
+    title: "Student Profile Dashboard",
+    description: "Protected BIT Central dashboard for student profile, department details, and account activity.",
     keywords: ["student profile", "BIT dashboard", "account details"],
+    noIndex: true,
   },
 
   "/profile": {
     title: "My Profile",
-    description: "Manage your profile and review your account information on BIT CENTRAL.",
-    keywords: ["my profile", "student profile", "BIT CENTRAL"],
+    description: "Protected BIT Central profile page for student account information.",
+    keywords: ["my profile", "student profile", "BIT Central"],
+    noIndex: true,
   },
 
   "/about": {
-    title: "About",
-    description: "Learn about BIT CENTRAL, its mission, and available features for students.",
-    keywords: ["about BIT CENTRAL", "campus platform", "student resources"],
+    title: "About BIT Central",
+    description:
+      "Learn what BIT Central is, who can use it, who built it, and how it supports BIT Sathy students with academic resources and campus services.",
+    keywords: ["about BIT Central", "Bannari Amman Institute of Technology", "BIT Sathy", "student resources"],
+    pageType: "AboutPage",
+  },
+
+  "/features": {
+    title: "BIT Central Features",
+    description:
+      "Explore BIT Central features for BIT Sathy students, including question banks, answer keys, semester resources, mess menu updates, reward points, and campus tools.",
+    keywords: ["BIT Central features", "question banks", "answer keys", "mess menu", "campus resources"],
+    pageType: "CollectionPage",
+  },
+
+  "/faq": {
+    title: "BIT Central FAQ",
+    description:
+      "Answers to common questions about BIT Central, the BIT Sathy student portal for academic resources, question banks, answer keys, mess menu updates, and student services.",
+    keywords: ["BIT Central FAQ", "BIT Sathy student portal", "academic resources FAQ"],
+    pageType: "FAQPage",
+    faq: true,
+  },
+
+  "/contact": {
+    title: "Contact BIT Central",
+    description:
+      "Contact and feedback information for BIT Central, including suggestions for academic resources, question banks, answer keys, and student service updates.",
+    keywords: ["contact BIT Central", "BIT Sathy feedback", "student portal contact"],
+    pageType: "ContactPage",
+  },
+
+  "/privacy-policy": {
+    title: "Privacy Policy",
+    description:
+      "BIT Central privacy policy for students and visitors using public pages and protected student portal tools.",
+    keywords: ["BIT Central privacy policy", "student portal privacy", "BIT Sathy"],
+    pageType: "WebPage",
+  },
+
+  "/terms": {
+    title: "Terms of Service",
+    description:
+      "BIT Central terms of service for public information pages and protected BIT Sathy student portal tools.",
+    keywords: ["BIT Central terms", "student portal terms", "BIT Sathy"],
+    pageType: "WebPage",
+  },
+
+  "/rpsite": {
+    title: "Reward Points",
+    description: "Protected BIT Central reward points access page for signed-in BIT Sathy students.",
+    keywords: ["BIT Sathy reward points", "BIT Central"],
+    noIndex: true,
+  },
+
+  "/pcdp": {
+    title: "PCDP Setup",
+    description: "Protected BIT Central PCDP setup support page for signed-in BIT Sathy students.",
+    keywords: ["PCDP", "BIT Central"],
+    noIndex: true,
+  },
+
+  "/findmyway": {
+    title: "FindMyWay",
+    description: "Protected BIT Central FindMyWay installation support page for signed-in BIT Sathy students.",
+    keywords: ["FindMyWay", "BIT Sathy campus resources"],
+    noIndex: true,
+  },
+
+  "/exam-hall": {
+    title: "Exam Hall Utility",
+    description: "Protected BIT Central exam hall utility for signed-in BIT Sathy students.",
+    keywords: ["BIT Sathy exam hall", "exam hall utility"],
+    noIndex: true,
+  },
+
+  "/exam-hall-manual": {
+    title: "Exam Hall Manual Search",
+    description: "Protected BIT Central manual exam hall search for signed-in BIT Sathy students.",
+    keywords: ["BIT Sathy exam hall search"],
+    noIndex: true,
+  },
+
+  "/leavedetails": {
+    title: "Leave Schedule",
+    description: "Protected BIT Central leave schedule page for signed-in BIT Sathy students.",
+    keywords: ["BIT Sathy leave schedule"],
+    noIndex: true,
+  },
+
+  "/semester": {
+    title: "Semester Resources",
+    description: "Protected BIT Central semester resources page with academic materials for signed-in BIT Sathy students.",
+    keywords: ["semester resources", "question banks", "answer keys", "BIT Sathy"],
+    noIndex: true,
+  },
+
+  "/mess": {
+    title: "Mess Menu",
+    description: "Protected BIT Central mess menu page for signed-in BIT Sathy students.",
+    keywords: ["BIT Sathy mess menu", "hostel mess menu"],
+    noIndex: true,
+  },
+
+  "/ak_22ph202": {
+    title: "22PH202 Answer Key",
+    description: "Protected BIT Central answer key resource for signed-in BIT Sathy students.",
+    keywords: ["22PH202 answer key", "BIT Sathy answer key"],
+    noIndex: true,
+  },
+
+  "/tamil_ak": {
+    title: "22HS006 Answer Key",
+    description: "Protected BIT Central Tamil answer key resource for signed-in BIT Sathy students.",
+    keywords: ["22HS006 answer key", "BIT Sathy Tamil answer key"],
+    noIndex: true,
   },
 
   "/docs/about": {
@@ -64,28 +188,18 @@ export const ROUTE_SEO = {
 
   "*": {
     title: "404 - Page Not Found",
-    description: "The page you requested could not be found on BIT CENTRAL.",
-    keywords: ["404", "page not found", "BIT CENTRAL"],
+    description: "The page you requested could not be found on BIT Central.",
+    keywords: ["404", "page not found", "BIT Central"],
     noIndex: true,
   },
 };
 
 export const SITEMAP_ROUTES = [
   "/",
-  "/login",
-  "/home",
-  "/dashboard",
-  "/profile",
   "/about",
-  "/rpsite",
-  "/pcdp",
-  "/findmyway",
-  "/exam-hall",
-  "/leavedetails",
-  "/semester",
-  "/mess",
+  "/features",
+  "/faq",
+  "/contact",
   "/privacy-policy",
   "/terms",
-  "/ak_22ph202",
-  "/docs/about",
 ];

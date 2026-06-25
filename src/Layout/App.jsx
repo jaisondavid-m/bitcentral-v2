@@ -1,20 +1,18 @@
-import React, { Suspense, lazy, useEffect } from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import React, { Suspense, lazy } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
-import ProtectedRoute from "../routes/ProtectedRoute.jsx";
-import AdminRoute from "../routes/AdminRoute.jsx";
-import ProtectedLayout from "../routes/ProtectedLayout.jsx";
 import FullScreenLoader from "../Component/FullScreenLoader.jsx";
-import { useAuth } from "../context/StudentContext.jsx";
 import SEO from "../Component/SEO.jsx";
 import { ROUTE_SEO } from "../seo/routeSeo.js";
-import AnswerKey22HS006 from "../Pages/answers/AnswerKey22HS006.jsx";
-import ExamHallDownload from "../Pages/ExamHallDownload.jsx";
 
 const Login = lazy(() => import("../Pages/Login.jsx"));
+const LandingPage = lazy(() => import("../Pages/LandingPage.jsx"));
 const Dashboard = lazy(() => import("../Pages/Dashboard.jsx"));
 const Home = lazy(() => import("../Pages/Home.jsx"));
 const About = lazy(() => import("../Pages/About.jsx"));
+const Features = lazy(() => import("../Pages/Features.jsx"));
+const FAQ = lazy(() => import("../Pages/FAQ.jsx"));
+const Contact = lazy(() => import("../Pages/Contact.jsx"));
 const PrivacyPolicy = lazy(() => import("../Pages/PrivacyPolicy.jsx"));
 const Terms = lazy(() => import("../Pages/Terms.jsx"));
 const Rpsite = lazy(() => import("../Pages/Rpsite.jsx"));
@@ -25,8 +23,14 @@ const FindMyWay = lazy(() => import("../Pages/FindMyWay.jsx"));
 const NotFound = lazy(() => import("../Pages/NotFound.jsx"));
 const LeaveDetails = lazy(() => import("../Pages/LeaveDetails.jsx"));
 const ExamHall = lazy(() => import("../Pages/ExamHall.jsx"));
+const ExamHallDownload = lazy(() => import("../Pages/ExamHallDownload.jsx"));
 const AK22PH202 = lazy(() => import("../Pages/answers/AK__22PH202.jsx"));
+const AnswerKey22HS006 = lazy(() => import("../Pages/answers/AnswerKey22HS006.jsx"));
 // const DocsPage = lazy(() => import("../Pages/AboutDocs.jsx"));
+const AuthScope = lazy(() => import("../routes/AuthScope.jsx"));
+const ProtectedRoute = lazy(() => import("../routes/ProtectedRoute.jsx"));
+const AdminRoute = lazy(() => import("../routes/AdminRoute.jsx"));
+const ProtectedLayout = lazy(() => import("../routes/ProtectedLayout.jsx"));
 
 const AdminDashboard = lazy(() =>
   import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.default }))
@@ -45,7 +49,6 @@ const AdminMessPage = lazy(() =>
 );
 
 function App() {
-  const { loading } = useAuth();
   const location = useLocation();
 
   const currentMeta = ROUTE_SEO[location.pathname] || ROUTE_SEO["*"];
@@ -109,29 +112,37 @@ function App() {
   //   };
   // }, []);
 
-  if (loading) {
-    return <FullScreenLoader />;
-  }
-
   return (
     <>
       <SEO pathname={location.pathname} meta={currentMeta} />
       <Suspense fallback={<FullScreenLoader />}>
         <Routes>
           {/* Public */}
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/login"
+            element={
+              <AuthScope>
+                <Login />
+              </AuthScope>
+            }
+          />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<Terms />} />
-          <Route path="/" element={<Navigate to="/home" />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/about" element={<About />} />
+          <Route path="/features" element={<Features />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/contact" element={<Contact />} />
           {/* <Route path="/docs/about" element={<DocsPage />} /> */}
 
           {/* Protected Layout */}
           <Route
             element={
-              <ProtectedRoute>
-                <ProtectedLayout />
-              </ProtectedRoute>
+              <AuthScope>
+                <ProtectedRoute>
+                  <ProtectedLayout />
+                </ProtectedRoute>
+              </AuthScope>
             }
           >
             <Route path="/home" element={<Home />} />

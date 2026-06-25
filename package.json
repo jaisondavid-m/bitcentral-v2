@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "vite",
     "prebuild": "npm run seo:sitemap",
-    "build": "vite build",
+    "build": "vite build && node ./scripts/prerender-public.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
-    "seo:sitemap": "node ./scripts/generate-sitemap.mjs"
+    "seo:sitemap": "node ./scripts/generate-sitemap.mjs",
+    "seo:prerender": "node ./scripts/prerender-public.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.2",

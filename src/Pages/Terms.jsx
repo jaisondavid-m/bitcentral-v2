@@ -1,4 +1,6 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import PublicNav from "../Component/PublicNav.jsx";
 
 const sections = [
   {
@@ -27,22 +29,22 @@ const sections = [
       "The BIT CENTRAL name, branding, design, code, and original content are protected by applicable intellectual property laws. You may not reproduce or redistribute our materials without permission, except as allowed by law.",
   },
   {
-    title: "7. Service Availability",
+    title: "6. Service Availability",
     content:
       "We aim to keep the platform available and accurate, but we do not guarantee uninterrupted operation, error-free content, or that all features will always be available.",
   },
   {
-    title: "8. Limitation of Liability",
+    title: "7. Limitation of Liability",
     content:
       "To the maximum extent permitted by law, BIT CENTRAL and its operators are not liable for indirect, incidental, special, or consequential damages arising from your use of the service.",
   },
   {
-    title: "9. Changes to the Terms",
+    title: "8. Changes to the Terms",
     content:
       "We may update these Terms at any time. Continued use of the service after changes are posted means you accept the revised Terms.",
   },
   {
-    title: "10. Governing Contact",
+    title: "9. Governing Contact",
     content:
       "For questions about these Terms, contact the BIT CENTRAL team through the site or the official institutional support channel.",
   },
@@ -50,9 +52,10 @@ const sections = [
 
 function Terms() {
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-12 text-slate-800 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl">
-        <div className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200 sm:p-10">
+    <main className="min-h-screen bg-slate-50 text-slate-800 dark:bg-black dark:text-slate-100">
+      <PublicNav />
+      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="rounded-lg bg-white p-8 shadow-sm ring-1 ring-slate-200 sm:p-10 dark:bg-slate-950 dark:ring-slate-800">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">
             BIT CENTRAL
           </p>
@@ -61,8 +64,7 @@ function Terms() {
           </h1>
           <p className="mt-4 text-sm text-slate-500">Effective date: May 17, 2026</p>
           <p className="mt-6 text-base leading-7 text-slate-600">
-            These Terms are written to provide a clear, professional summary of how BIT CENTRAL may
-            be used and the responsibilities that apply when using the platform.
+            Summary: These terms explain responsible use of BIT Central, including public information pages and protected student tools for academic resources, question banks, answer keys, mess menu information, and campus services.
           </p>
 
           <div className="mt-10 space-y-8">
@@ -74,7 +76,7 @@ function Terms() {
             ))}
           </div>
 
-          <section className="mt-10 rounded-2xl bg-slate-100 p-6">
+          <section className="mt-10 rounded-lg bg-slate-100 p-6 dark:bg-slate-900">
             <h2 className="text-lg font-semibold text-slate-950">Contact Us</h2>
             <p className="mt-2 leading-7 text-slate-600">
               Questions about these Terms can be sent to{" "}
@@ -87,18 +89,14 @@ function Terms() {
               </a>.
             </p>
           </section>
+          <nav className="mt-8 flex flex-wrap gap-3" aria-label="Related public pages">
+            <Link className="font-medium text-blue-700 hover:underline" to="/about">About</Link>
+            <Link className="font-medium text-blue-700 hover:underline" to="/features">Features</Link>
+            <Link className="font-medium text-blue-700 hover:underline" to="/faq">FAQ</Link>
+            <Link className="font-medium text-blue-700 hover:underline" to="/contact">Contact</Link>
+          </nav>
         </div>
       </div>
-      <button
-        onClick={() => window.history.back()}
-        className="fixed bottom-6 left-6 z-50 flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-0.5 hover:bg-blue-700 active:scale-95"
-        aria-label="Go back"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Back
-      </button>
     </main>
   );
 }

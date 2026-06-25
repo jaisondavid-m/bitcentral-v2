@@ -9,35 +9,26 @@ const publicDir = path.join(projectRoot, "public");
 
 const siteUrl = (process.env.VITE_SITE_URL || "https://bitcentral.bitsathy.in").replace(/\/$/, "");
 const routes = [
-  "/",
-  "/login",
-  "/home",
-  "/dashboard",
-  "/profile",
-  "/about",
-  "/rpsite",
-  "/pcdp",
-  "/findmyway",
-  "/exam-hall",
-  "/leavedetails",
-  "/semester",
-  "/mess",
-  "/privacy-policy",
-  "/terms",
-  "/ak_22ph202",
+  { path: "/", priority: "1.0", changefreq: "weekly" },
+  { path: "/about", priority: "0.9", changefreq: "monthly" },
+  { path: "/features", priority: "0.9", changefreq: "monthly" },
+  { path: "/faq", priority: "0.9", changefreq: "monthly" },
+  { path: "/contact", priority: "0.7", changefreq: "monthly" },
+  { path: "/privacy-policy", priority: "0.5", changefreq: "yearly" },
+  { path: "/terms", priority: "0.5", changefreq: "yearly" },
 ];
 
 const now = new Date().toISOString();
 
 const urls = routes
   .map((route) => {
-    const loc = route === "/" ? `${siteUrl}/` : `${siteUrl}${route}`;
+    const loc = route.path === "/" ? `${siteUrl}/` : `${siteUrl}${route.path}`;
     return [
       "  <url>",
       `    <loc>${loc}</loc>`,
       `    <lastmod>${now}</lastmod>`,
-      "    <changefreq>weekly</changefreq>",
-      "    <priority>0.7</priority>",
+      `    <changefreq>${route.changefreq}</changefreq>`,
+      `    <priority>${route.priority}</priority>`,
       "  </url>",
     ].join("\n");
   })
