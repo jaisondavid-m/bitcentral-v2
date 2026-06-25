@@ -2,7 +2,8 @@ import React from "react";
 import { faqs } from "../content/publicContent.js";
 
 export default function FAQSection({ compact = false }) {
-  const items = compact ? faqs.slice(0, 3) : faqs;
+  const developerFaq = faqs.find((faq) => faq.question === "Who developed BIT Central?");
+  const items = compact ? [...faqs.slice(0, 3), developerFaq].filter(Boolean) : faqs;
 
   return (
     <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8" aria-labelledby="faq-heading">

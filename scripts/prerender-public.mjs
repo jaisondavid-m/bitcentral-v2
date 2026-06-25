@@ -36,7 +36,7 @@ const routes = [
     title: "BIT Central - BIT Sathy Student Portal",
     description: "BIT Central is a public guide and student portal for BIT Sathy students, covering academic resources, question banks, answer keys, mess menu updates, student services, and campus tools.",
     h1: "BIT Central",
-    body: "BIT Central helps students of Bannari Amman Institute of Technology find academic resources, question banks, answer keys, mess menu updates, reward points access, exam utilities, and campus services from one place.",
+    body: "BIT Central helps students of Bannari Amman Institute of Technology find academic resources, question banks, answer keys, mess menu updates, reward points access, exam utilities, and campus services from one place. BIT Central was developed by Jaison David M for the BIT Sathy student community.",
     faq: true,
   },
   {

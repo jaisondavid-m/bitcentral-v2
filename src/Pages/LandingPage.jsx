@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle2, LogIn } from "lucide-react";
 import PublicNav from "../Component/PublicNav.jsx";
 import FAQSection from "../Component/FAQSection.jsx";
-import { benefitList, contactMethods, featureList } from "../content/publicContent.js";
+import { benefitList, contactMethods, developerProfile, featureList } from "../content/publicContent.js";
 
 export default function LandingPage() {
   return (
@@ -52,6 +52,13 @@ export default function LandingPage() {
         <p className="mt-4 max-w-3xl leading-7 text-slate-700 dark:text-slate-300">
           BIT Central is a React and Vite web application built for the BIT Sathy student community. It organizes high-demand student resources such as academic PDFs, question banks, answer keys, mess menu updates, reward points links, exam hall support, leave schedules, and campus navigation tools.
         </p>
+        <p className="mt-4 max-w-3xl leading-7 text-slate-700 dark:text-slate-300">
+          BIT Central was developed by {developerProfile.name} for students of Bannari Amman Institute of Technology. The developer page explains the project creator, role, and institution details.
+        </p>
+        <Link to="/developer" className="mt-6 inline-flex items-center gap-2 rounded-md border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900">
+          Developer details
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </Link>
       </section>
 
       <section className="bg-white py-12 dark:bg-slate-950" aria-labelledby="features-heading">
