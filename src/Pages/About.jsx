@@ -67,6 +67,9 @@ export default function About() {
           </a>
         </div>
         <div className="mt-8 flex flex-wrap gap-3">
+          <Link to="/developer" className="rounded-md bg-slate-900 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200">
+            Developer details
+          </Link>
           <Link to="/features" className="rounded-md bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700">
             View features
           </Link>

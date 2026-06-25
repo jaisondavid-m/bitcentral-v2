@@ -10,6 +10,7 @@ const LandingPage = lazy(() => import("../Pages/LandingPage.jsx"));
 const Dashboard = lazy(() => import("../Pages/Dashboard.jsx"));
 const Home = lazy(() => import("../Pages/Home.jsx"));
 const About = lazy(() => import("../Pages/About.jsx"));
+const Developer = lazy(() => import("../Pages/Developer.jsx"));
 const Features = lazy(() => import("../Pages/Features.jsx"));
 const FAQ = lazy(() => import("../Pages/FAQ.jsx"));
 const Contact = lazy(() => import("../Pages/Contact.jsx"));
@@ -130,6 +131,7 @@ function App() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/" element={<LandingPage />} />
           <Route path="/about" element={<About />} />
+          <Route path="/developer" element={<Developer />} />
           <Route path="/features" element={<Features />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />

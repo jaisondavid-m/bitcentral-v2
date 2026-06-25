@@ -69,6 +69,14 @@ export const ROUTE_SEO = {
     pageType: "AboutPage",
   },
 
+  "/developer": {
+    title: "BIT Central Developer - Jaison David M",
+    description:
+      "BIT Central was developed by Jaison David M for the BIT Sathy student community at Bannari Amman Institute of Technology.",
+    keywords: ["BIT Central developer", "Jaison David M", "BIT Sathy", "Bannari Amman Institute of Technology"],
+    pageType: "ProfilePage",
+  },
+
   "/features": {
     title: "BIT Central Features",
     description:
@@ -197,6 +205,7 @@ export const ROUTE_SEO = {
 export const SITEMAP_ROUTES = [
   "/",
   "/about",
+  "/developer",
   "/features",
   "/faq",
   "/contact",

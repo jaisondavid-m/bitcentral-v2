@@ -11,6 +11,7 @@ const siteUrl = (process.env.VITE_SITE_URL || "https://bitcentral.bitsathy.in").
 const routes = [
   { path: "/", priority: "1.0", changefreq: "weekly" },
   { path: "/about", priority: "0.9", changefreq: "monthly" },
+  { path: "/developer", priority: "0.8", changefreq: "monthly" },
   { path: "/features", priority: "0.9", changefreq: "monthly" },
   { path: "/faq", priority: "0.9", changefreq: "monthly" },
   { path: "/contact", priority: "0.7", changefreq: "monthly" },

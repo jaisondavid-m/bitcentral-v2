@@ -1,7 +1,7 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
 import { SEO_DEFAULTS, SITE_URL } from "../seo/routeSeo.js";
-import { faqs } from "../content/publicContent.js";
+import { developerProfile, faqs } from "../content/publicContent.js";
 
 function toAbsoluteUrl(value) {
   if (!value) return SITE_URL;
@@ -108,8 +108,28 @@ export default function SEO({ pathname, meta = {} }) {
     },
     creator: {
       "@type": "Person",
-      name: "Jaison David M",
+      "@id": `${SITE_URL}/developer#person`,
+      name: developerProfile.name,
+      url: `${SITE_URL}/developer`,
     },
+  };
+
+  const developerSchema = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": `${SITE_URL}/developer#person`,
+    name: developerProfile.name,
+    url: `${SITE_URL}/developer`,
+    email: developerProfile.email,
+    telephone: developerProfile.phone,
+    jobTitle: developerProfile.role,
+    affiliation: {
+      "@type": "CollegeOrUniversity",
+      name: developerProfile.institution,
+      url: "https://www.bitsathy.ac.in/",
+    },
+    sameAs: developerProfile.sameAs,
+    knowsAbout: ["React", "Vite", "student portals", "academic resources", "BIT Central"],
   };
 
   const breadcrumbItems = createBreadcrumbList(pathname || "/", title);
@@ -181,6 +201,7 @@ export default function SEO({ pathname, meta = {} }) {
       <script type="application/ld+json">{JSON.stringify(organizationSchema)}</script>
       <script type="application/ld+json">{JSON.stringify(websiteSchema)}</script>
       <script type="application/ld+json">{JSON.stringify(webApplicationSchema)}</script>
+      <script type="application/ld+json">{JSON.stringify(developerSchema)}</script>
       <script type="application/ld+json">{JSON.stringify(webpageSchema)}</script>
       <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
       {meta.faq ? <script type="application/ld+json">{JSON.stringify(faqSchema)}</script> : null}

@@ -13,10 +13,26 @@ import {
 
 export const publicLinks = [
   { label: "About", href: "/about" },
+  { label: "Developer", href: "/developer" },
   { label: "Features", href: "/features" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
 ];
+
+export const developerProfile = {
+  name: "Jaison David M",
+  role: "Developer of BIT Central",
+  description:
+    "Jaison David M developed BIT Central as a student-focused web application for the Bannari Amman Institute of Technology community. BIT Central helps BIT Sathy students access academic resources, question banks, answer keys, mess menu information, reward points links, and campus service tools.",
+  institution: "Bannari Amman Institute of Technology, Sathyamangalam",
+  email: "developer@bitsathy.in",
+  phone: "+91 98437 77817",
+  sameAs: [
+    "https://github.com/jaisondavid-m",
+    "https://www.linkedin.com/in/jaison-david-m-a14072360/",
+    "https://herostack.netlify.app/",
+  ],
+};
 
 export const featureList = [
   {
@@ -89,6 +105,11 @@ export const faqs = [
     question: "Is BIT Central official?",
     answer:
       "BIT Central is a student-focused portal for the BIT Sathy community. Users should treat institutional systems and college announcements as the final authority for official academic, administrative, and policy decisions.",
+  },
+  {
+    question: "Who developed BIT Central?",
+    answer:
+      "BIT Central was developed by Jaison David M for the BIT Sathy student community. The project is built to help students of Bannari Amman Institute of Technology access academic resources, question banks, answer keys, mess menu information, reward points links, and campus service tools.",
   },
 ];
 

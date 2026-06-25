@@ -8,6 +8,18 @@ const projectRoot = path.resolve(__dirname, "..");
 const distDir = path.join(projectRoot, "dist");
 const siteUrl = (process.env.VITE_SITE_URL || "https://bitcentral.bitsathy.in").replace(/\/$/, "");
 const imageUrl = `${siteUrl}/CardImgs/cropped_circle_image.png`;
+const developer = {
+  name: "Jaison David M",
+  role: "Developer of BIT Central",
+  email: "developer@bitsathy.in",
+  phone: "+91 98437 77817",
+  institution: "Bannari Amman Institute of Technology, Sathyamangalam",
+  sameAs: [
+    "https://github.com/jaisondavid-m",
+    "https://www.linkedin.com/in/jaison-david-m-a14072360/",
+    "https://herostack.netlify.app/",
+  ],
+};
 
 const faqs = [
   ["What is BIT Central?", "BIT Central is a student portal for Bannari Amman Institute of Technology, also known as BIT Sathy. It brings academic resources, question banks, answer keys, mess menu information, campus tools, and student service links into one web application."],
@@ -15,6 +27,7 @@ const faqs = [
   ["How do I log in?", "Open the login page and sign in with your BIT Sathy Google account, typically an institutional email account connected to bitsathy.ac.in. After authentication, the portal opens the protected student dashboard and tools."],
   ["What resources are available?", "BIT Central includes academic resources such as question banks, answer keys, semester materials, exam hall utilities, reward points access, mess menu updates, leave schedule information, FindMyWay support, and campus service links."],
   ["Is BIT Central official?", "BIT Central is a student-focused portal for the BIT Sathy community. Users should treat institutional systems and college announcements as the final authority for official academic, administrative, and policy decisions."],
+  ["Who developed BIT Central?", "BIT Central was developed by Jaison David M for the BIT Sathy student community. The project is built to help students of Bannari Amman Institute of Technology access academic resources, question banks, answer keys, mess menu information, reward points links, and campus service tools."],
 ];
 
 const routes = [
@@ -32,6 +45,13 @@ const routes = [
     description: "Learn what BIT Central is, who can use it, who built it, and how it supports BIT Sathy students with academic resources and campus services.",
     h1: "BIT Central is a student portal for BIT Sathy",
     body: "BIT Central was developed by Jaison David M for students of Bannari Amman Institute of Technology. It organizes question banks, answer keys, semester resources, mess menu information, and student service tools.",
+  },
+  {
+    path: "/developer",
+    title: "BIT Central Developer - Jaison David M | BIT Central",
+    description: "BIT Central was developed by Jaison David M for the BIT Sathy student community at Bannari Amman Institute of Technology.",
+    h1: "BIT Central was developed by Jaison David M",
+    body: "Jaison David M developed BIT Central as a student-focused web application for the Bannari Amman Institute of Technology community. BIT Central helps BIT Sathy students access academic resources, question banks, answer keys, mess menu information, reward points links, and campus service tools.",
   },
   {
     path: "/features",
@@ -105,7 +125,23 @@ function schemaFor(route) {
       applicationCategory: "EducationApplication",
       operatingSystem: "Web",
       description: "BIT Central is a student portal for Bannari Amman Institute of Technology students.",
-      creator: { "@type": "Person", name: "Jaison David M" },
+      creator: { "@type": "Person", "@id": `${siteUrl}/developer#person`, name: developer.name, url: `${siteUrl}/developer` },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "@id": `${siteUrl}/developer#person`,
+      name: developer.name,
+      url: `${siteUrl}/developer`,
+      jobTitle: developer.role,
+      email: developer.email,
+      telephone: developer.phone,
+      affiliation: {
+        "@type": "CollegeOrUniversity",
+        name: developer.institution,
+        url: "https://www.bitsathy.ac.in/",
+      },
+      sameAs: developer.sameAs,
     },
     {
       "@context": "https://schema.org",
@@ -150,7 +186,7 @@ function routeHtml(indexHtml, route) {
     "<div class=\"seo-prerendered-content\">",
     `<h1>${escapeHtml(route.h1)}</h1>`,
     `<p>${escapeHtml(route.body)}</p>`,
-    "<nav><a href=\"/about\">About</a> <a href=\"/features\">Features</a> <a href=\"/faq\">FAQ</a> <a href=\"/contact\">Contact</a> <a href=\"/login\">Login</a></nav>",
+    "<nav><a href=\"/about\">About</a> <a href=\"/developer\">Developer</a> <a href=\"/features\">Features</a> <a href=\"/faq\">FAQ</a> <a href=\"/contact\">Contact</a> <a href=\"/login\">Login</a></nav>",
     faqHtml,
     "</div>",
   ].join("");
