@@ -29,22 +29,28 @@ export default function About() {
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-black">
       <Helmet>
-        <title>About BIT Central</title>
+        <title>
+          BIT Central - Student Portal for BIT Sathy | Academic Resources & Campus Services
+        </title>
         <meta
           name="description"
-          content="BIT Central is developed by Jaison David M, CSE student at BIT Sathy."
+          content="BIT Central is a student portal for Bannari Amman Institute of Technology students. Access academic resources, question banks, mess menus, campus information, attendance tools, and student services."
         />
         <meta name="author" content="Jaison David M" />
 
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "WebSite",
-            name: "BIT Central",
-            creator: {
+            "@type": "WebApplication",
+            "name": "BIT Central",
+            "applicationCategory": "EducationApplication",
+            "url": "https://bitcentral.bitsathy.in",
+            "description":
+              "Student portal for Bannari Amman Institute of Technology.",
+            "creator": {
               "@type": "Person",
-              name: "Jaison David M",
-            },
+              "name": "Jaison David M"
+            }
           })}
         </script>
       </Helmet>
@@ -180,6 +186,19 @@ export default function About() {
               </div>
             </a>
           </div>
+          <h2>Frequently Asked Questions</h2>
+
+          <h3>What is BIT Central?</h3>
+          <p>
+            BIT Central is a student portal that provides academic resources,
+            mess menus, campus information, and student tools.
+          </p>
+
+          <h3>Who can use BIT Central?</h3>
+          <p>
+            Students of Bannari Amman Institute of Technology can access
+            the platform using their institutional email.
+          </p>
         </section>
       </div>
       <button
