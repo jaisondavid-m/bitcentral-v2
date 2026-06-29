@@ -29,6 +29,7 @@ export default function PublicNav() {
           ))}
           <Link
             to="/login"
+            onClick={() => localStorage.setItem("visitedLogin", "true")}
             className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950"
           >
             <LogIn className="h-4 w-4" aria-hidden="true" />

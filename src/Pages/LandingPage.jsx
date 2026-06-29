@@ -1,11 +1,19 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, CheckCircle2, LogIn } from "lucide-react";
 import PublicNav from "../Component/PublicNav.jsx";
 import FAQSection from "../Component/FAQSection.jsx";
 import { benefitList, contactMethods, developerProfile, featureList } from "../content/publicContent.js";
 
 export default function LandingPage() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem("visitedLogin") === "true") {
+      navigate("/login", { replace: true });
+    }
+  }, [navigate])
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 dark:bg-black dark:text-white">
       <PublicNav />
@@ -23,7 +31,7 @@ export default function LandingPage() {
               BIT Central is a student portal for BIT Sathy that helps students find academic resources, question banks, answer keys, mess menu updates, exam utilities, reward points access, and campus service links from one place.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/login" className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700">
+              <Link to="/login" onClick={() => localStorage.setItem("visitedLogin", "true")} className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700">
                 <LogIn className="h-4 w-4" aria-hidden="true" />
                 Login to BIT Central
               </Link>
