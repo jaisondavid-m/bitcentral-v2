@@ -77,7 +77,7 @@ export default function Semester() {
 
   const [search, setSearch] = useState("");
   const [subjects, setSubjects] = useState([]);
-  const [activeTab, setActiveTab] = useState("semester");
+  const [activeTab, setActiveTab] = useState("test1");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activePdf, setActivePdf] = useState(null);
