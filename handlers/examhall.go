@@ -7689,7 +7689,7 @@ var sessionMetaList = []struct {
 	{buildSeatingData29June2026FN, sessionMeta{"29-06-2026", "FN", "09:00 AM – 12:00 PM"}},
 	{buildSeatingData29June2026AN, sessionMeta{"29-06-2026", "AN", "01:30 PM – 04:30 PM"}},
 	{buildSeatingData01July2026FN, sessionMeta{"01-07-2026", "FN", "09:00 AM – 12:00 PM"}},
-	{buildSeatingData03July2026FN, sessionMeta{"03-07-2026", "FN", "09:00 AM – 12:00 PM"}},
+	{buildSeatingData03July2026FN, sessionMeta{"03-07-2026", "FN", "09:00 AM – 10:30 AM"}},
 }
 
 // courseNameMap maps course codes to human-readable names.
