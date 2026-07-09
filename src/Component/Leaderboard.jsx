@@ -83,9 +83,11 @@ export default function Leaderboard({ onClose }) {
         if (student?.batch) {
             let yearToSet = "";
             if (student.batch.includes("2025")) {
-                yearToSet = "I";
-            } else if (student.batch.includes("2024")) {
                 yearToSet = "II";
+            } else if (student.batch.includes("2024")) {
+                yearToSet = "III";
+            } else if (student.batch.includes("2023")) {
+                yearToSet = "IV";
             }
 
             if (yearToSet) {

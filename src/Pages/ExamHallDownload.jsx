@@ -401,7 +401,7 @@ function ExamCard({ session: s }) {
           <div className="flex flex-wrap items-center gap-1 min-w-0">
             <SessionPill session={s.session} />
             {arr && <ArrearPill />}
-            {cd.urgent && <UrgentPill label={cd.label} />}
+            {/* {cd.urgent && <UrgentPill label={cd.label} />} */}
           </div>
 
           {/* Right: hall badge — compact */}
@@ -513,7 +513,7 @@ export default function ExamHallDownload() {
       .then(r => r.json())
       .then(data => {
         if (!data.success || !data.sessions?.length) { setError("No exam schedule found."); return; }
-        const up = data.sessions.filter(s => !isExamOver(s));
+        const up = data.sessions
         up.length === 0 ? setError("All exams done — nothing upcoming.") : setSessions(up);
       })
       .catch(() => setError("Could not reach the server. Try again."))
