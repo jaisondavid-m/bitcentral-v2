@@ -5,8 +5,8 @@ import "server/models"
 var Holidays = []models.Holiday{
 	// June 2026
 	{
-		FromDate: "2026-06-25(AN)",
-		ToDate:   "2026-06-29",
+		FromDate: "2026-06-26(AN)",
+		ToDate:   "2026-06-28",
 		Name:     "GP & Muharram",
 	},
 
