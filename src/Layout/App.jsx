@@ -21,6 +21,7 @@ const Semester = lazy(() => import("../Pages/Semester.jsx"));
 const MessMenu = lazy(() => import("../Pages/MessMenu.jsx"));
 const PCDP = lazy(() => import("../Pages/PCDP.jsx"));
 const FindMyWay = lazy(() => import("../Pages/FindMyWay.jsx"));
+const Apsite = lazy(() => import("../Pages/Apsite.jsx"));
 const NotFound = lazy(() => import("../Pages/NotFound.jsx"));
 const LeaveDetails = lazy(() => import("../Pages/LeaveDetails.jsx"));
 const ExamHall = lazy(() => import("../Pages/ExamHall.jsx"));
@@ -215,7 +216,7 @@ function App() {
             <Route path="/pcdp" element={<PCDP />} />
             <Route path="/exam-hall" element={<ExamHallDownload />} />
             <Route path="/exam-hall-manual" element={<ExamHall />} />
-            {/* <Route path="/apsite" element={<Apsite />} /> */}
+            <Route path="/apsite" element={<Apsite />} />
             <Route path="/leavedetails" element={<LeaveDetails />} />
             <Route path="/semester" element={<Semester />} />
             <Route path="/mess" element={<MessMenu />} />

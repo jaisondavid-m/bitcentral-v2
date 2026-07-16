@@ -139,6 +139,13 @@ export const ROUTE_SEO = {
     noIndex: true,
   },
 
+  "/apsite": {
+    title: "PS Rewards Breakdown",
+    description: "Look up and review PS activity reward breakdowns by user ID.",
+    keywords: ["PS rewards", "activity points", "reward breakdown"],
+    noIndex: true,
+  },
+
   "/exam-hall": {
     title: "Exam Hall Utility",
     description: "Protected BIT Central exam hall utility for signed-in BIT Sathy students.",
@@ -211,4 +218,5 @@ export const SITEMAP_ROUTES = [
   "/contact",
   "/privacy-policy",
   "/terms",
+  "/apsite",
 ];

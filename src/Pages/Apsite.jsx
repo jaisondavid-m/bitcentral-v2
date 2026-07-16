@@ -1,714 +1,277 @@
-import { Search, Loader2, AlertCircle, Award, BookOpen, TrendingUp, ShieldAlert } from "lucide-react";
-import { useMemo, useState, useEffect } from "react";
-import api from "../api/axios.js";
-import { useTheme } from "../context/ThemeContext.jsx";
+import { useMemo, useState } from "react";
+import { AlertCircle, ArrowRight, Loader2, Search, Sparkles } from "lucide-react";
 
-function parseNumber(value) {
-  const number = Number(value);
-  return Number.isFinite(number) ? number : 0;
+const PS_BREAKDOWN_URL = "https://api.bitcentral.bitsathy.in/ps/rewards/breakdown";
+
+function numberValue(value) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function parseIdentityValue(rawValue) {
-  if (!rawValue) return null;
-
-  try {
-    const parsed = JSON.parse(rawValue);
-    const normalized = typeof parsed === "string" ? JSON.parse(parsed) : parsed;
-
-    if (!normalized || typeof normalized !== "object") return null;
-
-    const rollNo = String(normalized.rollNo || "").trim();
-    const registerNo = String(normalized.registerNo || "").trim();
-    const savedAt = Number(normalized.savedAt) || 0;
-    const enrollment = rollNo || registerNo;
-
-    if (!enrollment) return null;
-
-    return { enrollment, savedAt };
-  } catch {
-    return null;
-  }
+function formatRollNo(value) {
+    return String(value || "").trim().toUpperCase();
 }
 
-function getDefaultEnrollmentFromStorage() {
-  if (typeof window === "undefined") return "";
+function getBreakdownCategories(payload) {
+    if (Array.isArray(payload?.data)) return payload.data;
+    if (Array.isArray(payload?.data?.data)) return payload.data.data;
+    if (Array.isArray(payload)) return payload;
+    return [];
+}
 
-  let bestMatch = { enrollment: "", savedAt: -1 };
+function getSectionPriority(categoryName) {
+    const normalized = String(categoryName || "").trim().toLowerCase();
+    const priorities = {
+        "personalized skills - technical": 0,
+        "personalized skills - non technical": 1,
+        "pbl training": 2,
+        "academics (t, l)": 3,
+    };
 
-  for (let i = 0; i < window.localStorage.length; i += 1) {
-    const key = window.localStorage.key(i);
-    if (!key || !key.startsWith("dashboard-identity-")) continue;
+    return priorities[normalized] ?? 99;
+}
 
-    const parsedIdentity = parseIdentityValue(window.localStorage.getItem(key));
-    if (!parsedIdentity) continue;
+function getOrderedCategories(payload) {
+    return getBreakdownCategories(payload).slice().sort((left, right) => {
+        const leftPriority = getSectionPriority(left?.category_name);
+        const rightPriority = getSectionPriority(right?.category_name);
+        if (leftPriority !== rightPriority) return leftPriority - rightPriority;
+        return String(left?.category_name || "").localeCompare(String(right?.category_name || ""));
+    });
+}
 
-    if (parsedIdentity.savedAt >= bestMatch.savedAt) {
-      bestMatch = parsedIdentity;
-    }
-  }
+function buildRequestUrl(userId) {
+    const normalized = String(userId || "").trim().toLowerCase();
+    if (!normalized) return null;
 
-  return bestMatch.enrollment;
+    const url = new URL(PS_BREAKDOWN_URL);
+    url.searchParams.set("user_id", normalized);
+    return url.toString();
 }
 
 function Apsite() {
-  const { theme } = useTheme();
-  const [enrollmentNo, setEnrollmentNo] = useState(() => getDefaultEnrollmentFromStorage());
-  const [searchedEnrollmentNo, setSearchedEnrollmentNo] = useState("");
-  const [rewards, setRewards] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+    const [userId, setUserId] = useState("");
+    const [submittedUserId, setSubmittedUserId] = useState("");
+    const [payload, setPayload] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [openSections, setOpenSections] = useState({});
 
-  // Perform the actual search
-  const performSearch = async (enrollment) => {
-    const normalizedEnrollmentNo = enrollment.trim().toLowerCase();
-    if (!normalizedEnrollmentNo) {
-      setErrorMessage("Please enter your enrollment no.");
-      setRewards([]);
-      return;
+    const totals = useMemo(() => {
+        const categories = getBreakdownCategories(payload);
+        return categories.reduce(
+            (acc, category) => {
+                acc.categories += 1;
+                acc.earned += numberValue(category?.total_earned);
+                acc.withheld += numberValue(category?.total_withheld);
+                acc.sources += Array.isArray(category?.sources) ? category.sources.length : 0;
+                return acc;
+            },
+            { categories: 0, earned: 0, withheld: 0, sources: 0 }
+        );
+    }, [payload]);
+
+    const overallActivityPoints = totals.earned;
+
+    const categories = useMemo(() => getOrderedCategories(payload), [payload]);
+
+    const hasResults = categories.length > 0;
+
+    function toggleSection(sectionName) {
+        setOpenSections((current) => ({
+            ...current,
+            [sectionName]: !current[sectionName],
+        }));
     }
-    setIsLoading(true);
-    setErrorMessage("");
-    setSearchedEnrollmentNo(normalizedEnrollmentNo);
-    try {
-      const { data: payload } = await api.get(`/rewards/${encodeURIComponent(normalizedEnrollmentNo)}`);
-      if (!payload?.success) {
-        throw new Error(payload?.message || "Unable to fetch rewards");
-      }
-      setRewards(Array.isArray(payload?.data) ? payload.data : []);
-    } catch (error) {
-      setRewards([]);
-      setErrorMessage(error?.response?.data?.message || error?.message || "Something went wrong while fetching rewards");
-    } finally {
-      setIsLoading(false);
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+
+        const normalized = formatRollNo(userId);
+        if (!normalized) {
+            setError("Enter a valid user ID.");
+            setPayload(null);
+            setSubmittedUserId("");
+            return;
+        }
+
+        const requestUrl = buildRequestUrl(normalized);
+        if (!requestUrl) {
+            setError("Unable to build request URL.");
+            return;
+        }
+
+        setLoading(true);
+        setError("");
+        setSubmittedUserId(normalized);
+
+        try {
+            const response = await fetch(requestUrl, {
+                method: "GET",
+                headers: {
+                    Accept: "application/json",
+                },
+            });
+
+            const text = await response.text();
+            let data = null;
+
+            try {
+                data = text ? JSON.parse(text) : null;
+            } catch {
+                data = null;
+            }
+
+            if (!response.ok) {
+                throw new Error(data?.message || `Request failed with status ${response.status}`);
+            }
+
+            if (!data?.success) {
+                throw new Error(data?.message || "Unable to fetch reward breakdown");
+            }
+
+            setPayload(data);
+            setOpenSections({});
+        } catch (fetchError) {
+            setPayload(null);
+            setError(fetchError?.message || "Something went wrong while fetching the breakdown.");
+        } finally {
+            setLoading(false);
+        }
     }
-  };
 
-  // Auto-load if enrollment exists in localStorage
-  useEffect(() => {
-    if (enrollmentNo && enrollmentNo.trim()) {
-      performSearch(enrollmentNo);
-    }
-  }, []);
+    return (
+        <main className="min-h-screen bg-slate-50 text-slate-900">
+            <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+                <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                    <div className="flex flex-col gap-4">
+                        {/* <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-blue-700">
+              <Sparkles className="h-3.5 w-3.5" />
+              PS Activity Breakdown
+            </div> */}
 
-  // Handle form submission
-  const handleSearch = async (event) => {
-    event.preventDefault();
-    performSearch(enrollmentNo);
-  };
+                        <div>
+                            <h1 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">Activity Points lookup</h1>
+                            <p className="mt-1 text-sm text-slate-500">Enter enrollment number and fetch the activity points breakdown.</p>
+                        </div>
+                        <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                            <strong>Notice:</strong> Activity points may sometimes be unavailable if the admin has not refreshed the authentication token, which expires every 3 hours.
+                        </div>
+                        <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
+                            <div className="relative flex-1">
+                                <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                <input
+                                    value={userId}
+                                    onChange={(event) => setUserId(event.target.value.toUpperCase())}
+                                    placeholder="2025UCS1023"
+                                    autoCapitalize="characters"
+                                    autoCorrect="off"
+                                    spellCheck={false}
+                                    className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-10 pr-4 text-sm font-semibold uppercase tracking-[0.14em] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-500/15"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+                            >
+                                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+                                {loading ? "Loading" : "Search"}
+                            </button>
+                        </form>
 
-  const totals = useMemo(() => {
-    return rewards.reduce(
-      (acc, item) => {
-        acc.earned += parseNumber(item?.total_earned);
-        acc.withheld += parseNumber(item?.total_withheld);
-        return acc;
-      },
-      { earned: 0, withheld: 0 }
-    );
-  }, [rewards]);
+                        {error && (
+                            <div className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+                                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-500" />
+                                <span>{error}</span>
+                            </div>
+                        )}
 
-  const totalActivityPoints = totals.earned;
+                        {hasResults && (
+                            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                                <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Overall activity points</span>
+                                <span className="text-xl font-black tracking-tight text-slate-900">{overallActivityPoints}</span>
+                            </div>
+                        )}
+                    </div>
+                </section>
 
-  return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+                <section className="mt-4 space-y-3">
+                    {!hasResults && !loading ? (
+                        <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-10 text-center text-sm text-slate-500 shadow-sm">
+                            No breakdown loaded yet.
+                        </div>
+                    ) : (
+                        categories.map((category, index) => {
+                            const sources = Array.isArray(category?.sources) ? category.sources : [];
+                            const categoryEarned = numberValue(category?.total_earned);
+                            const sectionName = String(category?.category_name || "Unnamed category");
+                            const isOpen = Boolean(openSections[sectionName]);
+                            const previewItems = sources.slice(0, 2).map((source) => source?.points_from).filter(Boolean);
+                            const previewText = previewItems.length > 0 ? previewItems.join(" • ") : "No preview available";
 
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(12px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
+                            return (
+                                <article key={`${sectionName}-${index}`} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                                    <button
+                                        type="button"
+                                        onClick={() => toggleSection(sectionName)}
+                                        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+                                    >
+                                        <div className="min-w-0">
+                                            <h3 className="truncate text-sm font-semibold text-slate-900">{sectionName}</h3>
+                                            {/* <p className="mt-0.5 truncate text-xs text-slate-500">Preview: {previewText}</p> */}
+                                        </div>
+                                        <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                                            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-700">{categoryEarned} points</span>
+                                            <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white transition-transform ${isOpen ? "rotate-180" : "rotate-0"}`}>
+                                                <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4 text-slate-500" aria-hidden="true">
+                                                    <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </button>
 
-        @keyframes shimmer {
-          0% {
-            background-position: -1000px 0;
-          }
-          100% {
-            background-position: 1000px 0;
-          }
-        }
+                                    {isOpen && (
+                                        <div className="border-t border-slate-100 px-4 py-3">
 
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.5;
-          }
-        }
-
-        .ap-root, .ap-root * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        .ap-root {
-          min-height:80vh;
-          background: #f0f6ff;
-          background-image:
-            radial-gradient(ellipse 80% 50% at 50% -10%, rgba(59,130,246,0.18) 0%, transparent 70%),
-            radial-gradient(ellipse 40% 30% at 90% 90%, rgba(99,179,237,0.1) 0%, transparent 60%);
-          font-family: 'Sora', sans-serif;
-          padding: 2.5rem 1.25rem;
-        }
-
-        .ap-container {
-          max-width: 860px;
-          margin: 0 auto;
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-        }
-
-        /* Header */
-        .ap-header {
-          text-align: center;
-          padding-bottom: 0.5rem;
-        }
-        .ap-header-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.4rem;
-          background: rgba(59,130,246,0.1);
-          border: 1px solid rgba(59,130,246,0.25);
-          color: #2563eb;
-          font-size: 0.72rem;
-          font-weight: 600;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          padding: 0.35rem 0.9rem;
-          border-radius: 999px;
-          margin-bottom: 0.85rem;
-        }
-        .ap-title {
-          font-size: clamp(1.6rem, 4vw, 2.4rem);
-          font-weight: 700;
-          color: #0f2d6b;
-          letter-spacing: -0.03em;
-          line-height: 1.15;
-        }
-        .ap-subtitle {
-          font-size: 0.9rem;
-          color: #6b8ab1;
-          margin-top: 0.5rem;
-          font-weight: 400;
-        }
-
-        /* Card */
-        .ap-card {
-          background: #ffffff;
-          border: 1px solid rgba(37,99,235,0.12);
-          border-radius: 20px;
-          box-shadow: 0 4px 24px rgba(37,99,235,0.07), 0 1px 3px rgba(0,0,0,0.04);
-          overflow: hidden;
-        }
-
-        /* Search section */
-        .ap-search-section {
-          padding: 1.75rem 2rem;
-        }
-        .ap-search-label {
-          display: block;
-          font-size: 0.78rem;
-          font-weight: 600;
-          color: #3b6fd4;
-          letter-spacing: 0.07em;
-          text-transform: uppercase;
-          margin-bottom: 0.75rem;
-        }
-        .ap-search-row {
-          display: flex;
-          gap: 0.6rem;
-          flex-wrap: wrap;
-        }
-        .ap-input-wrap {
-          position: relative;
-          flex: 1;
-          min-width: 200px;
-        }
-        .ap-input-icon {
-          position: absolute;
-          left: 1rem;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #93b4e0;
-          width: 16px;
-          height: 16px;
-          pointer-events: none;
-        }
-        .ap-input {
-          width: 100%;
-          border: 1.5px solid #dbeafe;
-          border-radius: 12px;
-          background: #f8fbff;
-          padding: 0.75rem 1rem 0.75rem 2.75rem;
-          font-size: 0.88rem;
-          color: #1e3a6e;
-          font-family: 'DM Mono', monospace;
-          outline: none;
-          transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
-        }
-        .ap-input::placeholder { color: #aac3e8; }
-        .ap-input:focus {
-          border-color: #3b82f6;
-          background: #fff;
-          box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
-        }
-        .ap-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.45rem;
-          background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-          color: white;
-          font-family: 'Sora', sans-serif;
-          font-size: 0.85rem;
-          font-weight: 600;
-          padding: 0.75rem 1.5rem;
-          border: none;
-          border-radius: 12px;
-          cursor: pointer;
-          transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
-          box-shadow: 0 4px 12px rgba(37,99,235,0.3);
-          white-space: nowrap;
-        }
-        .ap-btn:hover:not(:disabled) {
-          opacity: 0.92;
-          transform: translateY(-1px);
-          box-shadow: 0 6px 18px rgba(37,99,235,0.35);
-        }
-        .ap-btn:active:not(:disabled) { transform: translateY(0); }
-        .ap-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        .ap-error {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          margin-top: 0.9rem;
-          background: #fff1f2;
-          border: 1px solid #fecdd3;
-          color: #be123c;
-          font-size: 0.82rem;
-          padding: 0.55rem 0.9rem;
-          border-radius: 10px;
-          font-weight: 500;
-        }
-
-        /* Stats bar */
-        .ap-stats {
-          background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 60%, #3b82f6 100%);
-          padding: 1.25rem 2rem;
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 1rem;
-          animation: fadeInUp 0.6s ease-out;
-        }
-        .ap-stat {
-          display: flex;
-          flex-direction: column;
-          gap: 0.2rem;
-        }
-        .ap-stat + .ap-stat {
-          border-left: 1px solid rgba(255,255,255,0.15);
-          padding-left: 1rem;
-        }
-        .ap-stat-label {
-          font-size: 0.68rem;
-          font-weight: 600;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: rgba(255,255,255,0.65);
-        }
-        .ap-stat-value {
-          font-size: 1.1rem;
-          font-weight: 700;
-          color: #fff;
-          font-family: 'DM Mono', monospace;
-        }
-        .ap-stat-sub {
-          font-size: 0.72rem;
-          color: rgba(255,255,255,0.55);
-          font-family: 'DM Mono', monospace;
-        }
-
-        /* Results section */
-        .ap-results {
-          padding: 1.5rem 2rem;
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-          animation: fadeInUp 0.6s ease-out 0.2s both;
-        }
-        .ap-results-title {
-          font-size: 0.75rem;
-          font-weight: 600;
-          color: #6b8ab1;
-          letter-spacing: 0.07em;
-          text-transform: uppercase;
-          padding-bottom: 0.5rem;
-          border-bottom: 1px solid #e8f0fe;
-        }
-
-        .ap-empty {
-          text-align: center;
-          padding: 2.5rem 1rem;
-          color: #93b4e0;
-          font-size: 0.88rem;
-        }
-
-        /* Category card */
-        .ap-category {
-          border: 1px solid #dbeafe;
-          border-radius: 14px;
-          overflow: hidden;
-          transition: box-shadow 0.18s;
-          animation: fadeInUp 0.6s ease-out;
-        }
-        .ap-category:hover {
-          box-shadow: 0 4px 20px rgba(37,99,235,0.09);
-        }
-        .ap-category:nth-child(1) { animation-delay: 0.2s; }
-        .ap-category:nth-child(2) { animation-delay: 0.3s; }
-        .ap-category:nth-child(3) { animation-delay: 0.4s; }
-        .ap-category:nth-child(4) { animation-delay: 0.5s; }
-        .ap-category:nth-child(5) { animation-delay: 0.6s; }
-        .ap-category:nth-child(n+6) { animation-delay: 0.7s; }
-        .ap-category-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 0.6rem;
-          background: #f0f6ff;
-          border-bottom: 1px solid #dbeafe;
-          padding: 0.85rem 1.1rem;
-        }
-        .ap-category-name {
-          font-size: 0.9rem;
-          font-weight: 700;
-          color: #1e3a6e;
-          display: flex;
-          align-items: center;
-          gap: 0.45rem;
-        }
-        .ap-category-name-dot {
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background: #3b82f6;
-          flex-shrink: 0;
-        }
-        .ap-badges {
-          display: flex;
-          gap: 0.45rem;
-          flex-wrap: wrap;
-        }
-        .ap-badge {
-          font-size: 0.72rem;
-          font-weight: 600;
-          padding: 0.28rem 0.7rem;
-          border-radius: 999px;
-          font-family: 'DM Mono', monospace;
-        }
-        .ap-badge-earned {
-          background: #dcfce7;
-          color: #166534;
-          border: 1px solid #bbf7d0;
-        }
-        .ap-badge-withheld {
-          background: #fef9c3;
-          color: #854d0e;
-          border: 1px solid #fde68a;
-        }
-
-        /* Table */
-        .ap-table-wrap { overflow-x: auto; }
-        table.ap-table {
-          width: 100%;
-          border-collapse: collapse;
-          font-size: 0.83rem;
-        }
-        .ap-table thead tr {
-          background: #f8fbff;
-        }
-        .ap-table th {
-          padding: 0.6rem 1.1rem;
-          text-align: left;
-          font-size: 0.7rem;
-          font-weight: 600;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          color: #7aa0cc;
-          border-bottom: 1px solid #e8f0fe;
-        }
-        .ap-table th:not(:first-child) { text-align: right; }
-        .ap-table td {
-          padding: 0.7rem 1.1rem;
-          color: #2d4a7a;
-          border-bottom: 1px solid #f0f6ff;
-          vertical-align: middle;
-        }
-        .ap-table td:not(:first-child) {
-          text-align: right;
-          font-family: 'DM Mono', monospace;
-          font-weight: 500;
-        }
-        .ap-table tbody tr:last-child td { border-bottom: none; }
-        .ap-table tbody tr:hover td { background: #f8fbff; }
-        .ap-table .td-earned { color: #16a34a; }
-        .ap-table .td-withheld { color: #b45309; }
-        .ap-table .td-empty { text-align: center; color: #93b4e0; font-style: italic; }
-
-        /* Skeleton loaders */
-        .ap-skeleton {
-          background: linear-gradient(90deg, #e8f0fe 25%, #dbeafe 50%, #e8f0fe 75%);
-          background-size: 200% 100%;
-          animation: shimmer 2s infinite;
-          border-radius: 8px;
-        }
-        .ap-skeleton-stat {
-          background: rgba(255,255,255,0.15);
-          height: 2.4rem;
-          border-radius: 8px;
-          animation: pulse 1.5s ease-in-out infinite;
-        }
-        .ap-skeleton-card {
-          border: 1px solid #dbeafe;
-          border-radius: 14px;
-          overflow: hidden;
-          animation: fadeInUp 0.6s ease-out;
-        }
-        .ap-skeleton-header {
-          background: #f0f6ff;
-          border-bottom: 1px solid #dbeafe;
-          padding: 0.85rem 1.1rem;
-          height: 3.2rem;
-        }
-        .ap-skeleton-row {
-          height: 2.2rem;
-          margin: 0.5rem 1.1rem;
-          border-radius: 6px;
-          background: #e8f0fe;
-          animation: shimmer 2s infinite;
-        }
-
-        .ap-root.ap-dark {
-          background: #020617;
-          background-image:
-            radial-gradient(ellipse 80% 50% at 50% -10%, rgba(37,99,235,0.2) 0%, transparent 70%),
-            radial-gradient(ellipse 45% 30% at 90% 90%, rgba(14,116,244,0.18) 0%, transparent 60%);
-        }
-        .ap-root.ap-dark .ap-card,
-        .ap-root.ap-dark .ap-category,
-        .ap-root.ap-dark .ap-skeleton-card {
-          background: #0f172a;
-          border-color: #1e3a8a;
-        }
-        .ap-root.ap-dark .ap-title { color: #dbeafe; }
-        .ap-root.ap-dark .ap-subtitle,
-        .ap-root.ap-dark .ap-results-title,
-        .ap-root.ap-dark .ap-table th,
-        .ap-root.ap-dark .ap-empty,
-        .ap-root.ap-dark .ap-search-label { color: #93c5fd; }
-        .ap-root.ap-dark .ap-category-name,
-        .ap-root.ap-dark .ap-table td,
-        .ap-root.ap-dark .ap-input { color: #e2e8f0; }
-        .ap-root.ap-dark .ap-category-header,
-        .ap-root.ap-dark .ap-table thead tr,
-        .ap-root.ap-dark .ap-skeleton-header {
-          background: #0b1228;
-          border-color: #1e3a8a;
-        }
-        .ap-root.ap-dark .ap-input {
-          background: #0b1228;
-          border-color: #1e3a8a;
-        }
-        .ap-root.ap-dark .ap-input::placeholder { color: #64748b; }
-        .ap-root.ap-dark .ap-input:focus {
-          background: #111c3a;
-          border-color: #2563eb;
-        }
-        .ap-root.ap-dark .ap-table td,
-        .ap-root.ap-dark .ap-table th,
-        .ap-root.ap-dark .ap-table .td-empty,
-        .ap-root.ap-dark .ap-results-title {
-          border-color: #1e3a8a;
-        }
-        .ap-root.ap-dark .ap-table tbody tr:hover td {
-          background: #101a35;
-        }
-
-        @media (max-width: 600px) {
-          .ap-search-section { padding: 1.25rem 1.1rem; }
-          .ap-stats { grid-template-columns: 1fr; }
-          .ap-stat + .ap-stat { border-left: none; border-top: 1px solid rgba(255,255,255,0.15); padding-left: 0; padding-top: 0.75rem; }
-          .ap-results { padding: 1.1rem; }
-        }
-      `}</style>
-
-      <div className={`ap-root ${theme === "dark" ? "ap-dark" : ""}`}>
-        <div className="ap-container">
-
-          {/* Header */}
-          <header className="ap-header">
-            <h1 className="ap-title">Activity Points Checker</h1>
-            <p className="ap-subtitle">Look up earned activity points by enrollment number</p>
-          </header>
-
-          {/* Search Card */}
-          <div className="ap-card">
-            <div className="ap-search-section">
-              <label className="ap-search-label">
-                <BookOpen size={11} style={{ display: "inline", marginRight: "0.35rem", verticalAlign: "middle" }} />
-                Enrollment Number
-              </label>
-              <form onSubmit={handleSearch}>
-                <div className="ap-search-row">
-                  <div className="ap-input-wrap">
-                    <Search className="ap-input-icon" />
-                    <input
-                      type="text"
-                      value={enrollmentNo}
-                      onChange={(e) => setEnrollmentNo(e.target.value)}
-                      placeholder="e.g. 2025UCS1023"
-                      className="ap-input"
-                    />
-                  </div>
-                  <button type="submit" disabled={isLoading} className="ap-btn">
-                    {isLoading
-                      ? <><Loader2 size={15} style={{ animation: "spin 1s linear infinite" }} /> Searching…</>
-                      : <><Search size={15} /> Search</>
-                    }
-                  </button>
-                </div>
-
-                {errorMessage && (
-                  <div className="ap-error">
-                    <AlertCircle size={14} />
-                    {errorMessage}
-                  </div>
-                )}
-              </form>
+                                            <div className="overflow-x-auto">
+                                                <table className="min-w-full border-separate border-spacing-0 text-left text-sm">
+                                                    {/* <thead>
+                            <tr className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
+                              <th className="border-b border-slate-100 px-0 py-2.5 font-semibold">Points from</th>
+                              <th className="border-b border-slate-100 px-0 py-2.5 text-right font-semibold">Earned</th>
+                            </tr>
+                          </thead> */}
+                                                    <tbody>
+                                                        {sources.length > 0 ? (
+                                                            sources.map((source, sourceIndex) => (
+                                                                <tr key={`${sectionName}-${sourceIndex}`} className="border-b border-slate-50 last:border-b-0">
+                                                                    <td className="max-w-[40rem] border-b border-slate-50 px-0 py-3 align-top text-slate-700">
+                                                                        <p className="break-words leading-6">{source?.points_from || "-"}</p>
+                                                                    </td>
+                                                                    <td className="border-b border-slate-50 px-0 py-3 text-right align-top font-semibold text-slate-900">
+                                                                        {numberValue(source?.earned)}
+                                                                    </td>
+                                                                </tr>
+                                                            ))
+                                                        ) : (
+                                                            <tr>
+                                                                <td colSpan={2} className="px-0 py-5 text-center text-slate-500">No source rows.</td>
+                                                            </tr>
+                                                        )}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    )}
+                                </article>
+                            );
+                        })
+                    )}
+                </section>
             </div>
-
-            {/* Stats bar + results */}
-            {searchedEnrollmentNo && !errorMessage && (
-              <>
-                {isLoading ? (
-                  <>
-                    <div className="ap-stats">
-                      <div className="ap-stat">
-                        <span className="ap-stat-label">Enrollment</span>
-                        <div className="ap-skeleton-stat"></div>
-                      </div>
-                      <div className="ap-stat">
-                        <span className="ap-stat-label">Total Activity Points</span>
-                        <div className="ap-skeleton-stat"></div>
-                      </div>
-                    </div>
-                    <div className="ap-results">
-                      <p className="ap-results-title">Category Breakdown</p>
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="ap-skeleton-card" style={{ animationDelay: `${i * 0.1}s` }}>
-                          <div className="ap-skeleton-header" />
-                          <div className="ap-skeleton-row" />
-                          <div className="ap-skeleton-row" style={{ marginTop: '0.75rem', marginBottom: '0.75rem' }} />
-                          <div className="ap-skeleton-row" style={{ marginBottom: '0.5rem' }} />
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="ap-stats">
-                  <div className="ap-stat">
-                    <span className="ap-stat-label">Enrollment</span>
-                    <span className="ap-stat-value" style={{ fontSize: "0.9rem", letterSpacing: "0.04em" }}>
-                      {searchedEnrollmentNo.toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="ap-stat">
-                    <span className="ap-stat-label">Total Activity Points</span>
-                    <span className="ap-stat-value">{totalActivityPoints}</span>
-                    <span className="ap-stat-sub">Withheld: {totals.withheld}</span>
-                  </div>
-                </div>
-
-                <div className="ap-results">
-                  <p className="ap-results-title">
-                    <TrendingUp size={11} style={{ display: "inline", marginRight: "0.35rem", verticalAlign: "middle" }} />
-                    Category Breakdown
-                  </p>
-
-                  {rewards.length === 0 ? (
-                    <div className="ap-empty">No reward data found for this enrollment number.</div>
-                  ) : (
-                    rewards.map((category) => {
-                      const sources = Array.isArray(category?.sources) ? category.sources : [];
-                      return (
-                        <div key={category?.category_name} className="ap-category">
-                          <div className="ap-category-header">
-                            <div className="ap-category-name">
-                              <span className="ap-category-name-dot" />
-                              {category?.category_name || "Unnamed Category"}
-                            </div>
-                            <div className="ap-badges">
-                              <span className="ap-badge ap-badge-earned">
-                                ✦ Earned: {parseNumber(category?.total_earned)}
-                              </span>
-                              <span className="ap-badge ap-badge-withheld">
-                                ⚐ Withheld: {parseNumber(category?.total_withheld)}
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="ap-table-wrap">
-                            <table className="ap-table">
-                              <thead>
-                                <tr>
-                                  <th>Activity Source</th>
-                                  <th>Earned</th>
-                                  <th>Withheld</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {sources.length === 0 ? (
-                                  <tr>
-                                    <td colSpan={3} className="td-empty">No source rows.</td>
-                                  </tr>
-                                ) : (
-                                  sources.map((source, i) => (
-                                    <tr key={`${category?.category_name}-${i}`}>
-                                      <td>{source?.points_from || "—"}</td>
-                                      <td className="td-earned">{parseNumber(source?.earned)}</td>
-                                      <td className="td-withheld">{parseNumber(source?.withheld)}</td>
-                                    </tr>
-                                  ))
-                                )}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-                  </>
-                )}
-              </>
-            )}
-          </div>
-
-        </div>
-      </div>
-
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-      `}</style>
-    </>
-  );
+        </main>
+    );
 }
 
 export default Apsite;
