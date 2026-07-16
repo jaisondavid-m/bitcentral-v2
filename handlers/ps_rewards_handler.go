@@ -56,8 +56,8 @@ func (h *AdminHandler) loadPSToken() (models.PSToken, error) {
 func (h *AdminHandler) savePSToken(token, updatedBy string) error {
 	table := psTokenTableName()
 	query := fmt.Sprintf(`
-		INSERT INTO %s (token_key, token, updated_by)
-		VALUES (?, ?, ?)
+		INSERT INTO %s (token_key, token, updated_at, updated_by)
+		VALUES (?, ?, CURRENT_TIMESTAMP, ?)
 		ON DUPLICATE KEY UPDATE
 			token = VALUES(token),
 			updated_by = VALUES(updated_by),
