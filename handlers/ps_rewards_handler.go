@@ -184,7 +184,7 @@ func (h *AdminHandler) FetchPSRewardsBreakdown(c *gin.Context) {
 		if resp.StatusCode >= http.StatusBadRequest {
 			c.PureJSON(resp.StatusCode, gin.H{
 				"success": false,
-				"message": "PS API request failed",
+				"message": "Activity points are temporarily unavailable. The admin needs to refresh the token.",
 				"status":  resp.StatusCode,
 				"data":    parsed,
 			})
@@ -204,7 +204,7 @@ func (h *AdminHandler) FetchPSRewardsBreakdown(c *gin.Context) {
 	if resp.StatusCode >= http.StatusBadRequest {
 		c.PureJSON(resp.StatusCode, gin.H{
 			"success": false,
-			"message": "PS API request failed",
+			"message": "Activity points are temporarily unavailable. The admin needs to refresh the token.",
 			"status":  resp.StatusCode,
 			"body":    responseBody,
 		})
