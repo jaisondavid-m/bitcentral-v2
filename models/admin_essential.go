@@ -21,7 +21,10 @@ type UserWithRollNo struct {
 }
 
 type PSToken struct {
-	Token string `json:"token"`
+	Token     string `json:"token"`
+	UpdatedAt string `json:"updated_at,omitempty"`
+	UpdatedBy string `json:"updated_by,omitempty"`
+	TokenKey  string `json:"token_key,omitempty"`
 }
 
 type QBAnswerKey struct {
