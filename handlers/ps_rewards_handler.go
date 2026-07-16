@@ -111,10 +111,9 @@ func (h *AdminHandler) UpdatePSToken(c *gin.Context) {
 }
 
 func (h *AdminHandler) FetchPSRewardsBreakdown(c *gin.Context) {
-	activityID := strings.TrimSpace(c.Query("id"))
 	userID := strings.TrimSpace(c.Query("user_id"))
-	if activityID == "" || userID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "id and user_id are required"})
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "user_id is required"})
 		return
 	}
 
@@ -135,7 +134,7 @@ func (h *AdminHandler) FetchPSRewardsBreakdown(c *gin.Context) {
 	}
 
 	query := requestURL.Query()
-	query.Set("id", activityID)
+	query.Set("id", "1")
 	query.Set("user_id", userID)
 	requestURL.RawQuery = query.Encode()
 
