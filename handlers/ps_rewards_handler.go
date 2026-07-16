@@ -67,10 +67,27 @@ func (h *AdminHandler) savePSToken(token, updatedBy string) error {
 	return err
 }
 
+func normalizePSTokenValue(token string) string {
+	token = strings.TrimSpace(token)
+	if token == "" {
+		return ""
+	}
+
+	parts := strings.Split(token, ";")
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if strings.HasPrefix(part, "PS=") {
+			return strings.TrimSpace(strings.TrimPrefix(part, "PS="))
+		}
+	}
+
+	return token
+}
+
 func (h *AdminHandler) GetPSToken(c *gin.Context) {
 	token, err := h.loadPSToken()
 	if err != nil && err != sql.ErrNoRows {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		c.PureJSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
 	}
 
@@ -78,58 +95,58 @@ func (h *AdminHandler) GetPSToken(c *gin.Context) {
 		token = models.PSToken{Token: "", UpdatedAt: "", UpdatedBy: "", TokenKey: psRewardsTokenKey}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": token})
+	c.PureJSON(http.StatusOK, gin.H{"success": true, "data": token})
 }
 
 func (h *AdminHandler) UpdatePSToken(c *gin.Context) {
 	var body models.PSToken
 	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "token is required"})
+		c.PureJSON(http.StatusBadRequest, gin.H{"success": false, "message": "token is required"})
 		return
 	}
 
 	token := strings.TrimSpace(body.Token)
 	if token == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "token is required"})
+		c.PureJSON(http.StatusBadRequest, gin.H{"success": false, "message": "token is required"})
 		return
 	}
 
 	updatedBy, _ := c.Get("actor_uid")
 	updatedByString, _ := updatedBy.(string)
 	if err := h.savePSToken(token, updatedByString); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		c.PureJSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
 	}
 
 	current, err := h.loadPSToken()
 	if err != nil && err != sql.ErrNoRows {
-		c.JSON(http.StatusOK, gin.H{"success": true, "message": "Token saved"})
+		c.PureJSON(http.StatusOK, gin.H{"success": true, "message": "Token saved"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Token saved", "data": current})
+	c.PureJSON(http.StatusOK, gin.H{"success": true, "message": "Token saved", "data": current})
 }
 
 func (h *AdminHandler) FetchPSRewardsBreakdown(c *gin.Context) {
 	userID := strings.TrimSpace(c.Query("user_id"))
 	if userID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "user_id is required"})
+		c.PureJSON(http.StatusBadRequest, gin.H{"success": false, "message": "user_id is required"})
 		return
 	}
 
 	token, err := h.loadPSToken()
 	if err == sql.ErrNoRows || strings.TrimSpace(token.Token) == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "PS token is not configured"})
+		c.PureJSON(http.StatusBadRequest, gin.H{"success": false, "message": "PS token is not configured"})
 		return
 	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		c.PureJSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
 	}
 
 	requestURL, err := url.Parse("https://ps.bitsathy.ac.in/api/ps_v2/activity/rewards/breakdown")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "failed to build request URL"})
+		c.PureJSON(http.StatusInternalServerError, gin.H{"success": false, "message": "failed to build request URL"})
 		return
 	}
 
@@ -140,30 +157,32 @@ func (h *AdminHandler) FetchPSRewardsBreakdown(c *gin.Context) {
 
 	req, err := http.NewRequestWithContext(c.Request.Context(), http.MethodGet, requestURL.String(), nil)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		c.PureJSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
 	}
-	req.Header.Set("Cookie", fmt.Sprintf("PS=%s;", token.Token))
+	if psValue := normalizePSTokenValue(token.Token); psValue != "" {
+		req.AddCookie(&http.Cookie{Name: "PS", Value: psValue})
+	}
 	req.Header.Set("Accept", "application/json, text/plain, */*")
 
 	client := &http.Client{Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"success": false, "message": err.Error()})
+		c.PureJSON(http.StatusBadGateway, gin.H{"success": false, "message": err.Error()})
 		return
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"success": false, "message": err.Error()})
+		c.PureJSON(http.StatusBadGateway, gin.H{"success": false, "message": err.Error()})
 		return
 	}
 
 	var parsed any
 	if json.Unmarshal(body, &parsed) == nil {
 		if resp.StatusCode >= http.StatusBadRequest {
-			c.JSON(resp.StatusCode, gin.H{
+			c.PureJSON(resp.StatusCode, gin.H{
 				"success": false,
 				"message": "PS API request failed",
 				"status":  resp.StatusCode,
@@ -172,7 +191,7 @@ func (h *AdminHandler) FetchPSRewardsBreakdown(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
+		c.PureJSON(http.StatusOK, gin.H{
 			"success": true,
 			"status":  resp.StatusCode,
 			"data":    parsed,
@@ -183,7 +202,7 @@ func (h *AdminHandler) FetchPSRewardsBreakdown(c *gin.Context) {
 
 	responseBody := strings.TrimSpace(string(body))
 	if resp.StatusCode >= http.StatusBadRequest {
-		c.JSON(resp.StatusCode, gin.H{
+		c.PureJSON(resp.StatusCode, gin.H{
 			"success": false,
 			"message": "PS API request failed",
 			"status":  resp.StatusCode,
@@ -192,7 +211,7 @@ func (h *AdminHandler) FetchPSRewardsBreakdown(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.PureJSON(http.StatusOK, gin.H{
 		"success": true,
 		"status":  resp.StatusCode,
 		"body":    responseBody,
