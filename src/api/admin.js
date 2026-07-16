@@ -99,6 +99,27 @@ export async function deleteQBAnswerKey(id) {
   return response.data;
 }
 
+export async function getPSToken() {
+  const headers = await getAdminHeaders();
+  const response = await api.get("/admin/ps-token", { headers });
+  return response.data;
+}
+
+export async function savePSToken(token) {
+  const headers = await getAdminHeaders();
+  const response = await api.put("/admin/ps-token", { token }, { headers });
+  return response.data;
+}
+
+export async function fetchPSRewardsBreakdown(userId) {
+  const headers = await getAdminHeaders();
+  const response = await api.get("/admin/ps/rewards/breakdown", {
+    headers,
+    params: { user_id: userId },
+  });
+  return response.data;
+}
+
 export async function uploadMessMenuCsv(formData) {
   const headers = await getAdminHeaders();
   const response = await api.post("/admin/mess/upload", formData, {

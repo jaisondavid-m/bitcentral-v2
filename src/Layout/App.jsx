@@ -42,6 +42,9 @@ const AdminUsersPage = lazy(() =>
 const AdminQBPage = lazy(() =>
   import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.AdminQBPage }))
 );
+const AdminPSRewardsPage = lazy(() =>
+  import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.AdminPSRewardsPage }))
+);
 const AdminCardsPage = lazy(() =>
   import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.AdminCardsPage }))
 );
@@ -171,6 +174,14 @@ function App() {
               element={
                 <AdminRoute>
                   <AdminQBPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/ps-rewards"
+              element={
+                <AdminRoute>
+                  <AdminPSRewardsPage />
                 </AdminRoute>
               }
             />

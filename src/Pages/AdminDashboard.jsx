@@ -53,6 +53,7 @@ import {
   UserMinus,
 } from "lucide-react";
 import SuperAdminPanel from "./SuperAdminPanel.jsx";
+import AdminPSRewardsPage from "./AdminPSRewards.jsx";
 import { checkSuperAdmin } from "../api/admin.js";
 import { PING_ON } from "../config/runtimeFlags.js";
 
@@ -155,6 +156,13 @@ const ADMIN_TABS = [
     description: "Create, edit, and organize question bank entries.",
   },
   {
+    key: "ps",
+    label: "PS Rewards",
+    href: "/admin/ps-rewards",
+    icon: Clock,
+    description: "Store the PS cookie token and fetch rewards breakdown responses.",
+  },
+  {
     key: "cards",
     label: "Cards",
     href: "/admin/cards",
@@ -179,6 +187,7 @@ const ADMIN_TABS = [
 
 function getAdminTabFromPath(pathname) {
   if (pathname.startsWith("/admin/qb")) return "qb";
+  if (pathname.startsWith("/admin/ps-rewards")) return "ps";
   if (pathname.startsWith("/admin/cards")) return "cards";
   if (pathname.startsWith("/admin/mess")) return "mess";
   if (pathname.startsWith("/admin/super")) return "super";
@@ -2746,7 +2755,7 @@ function AdminDashboard({ initialTab } = {}) {
 
   return (
     <AdminDashboardShell activeTab={activeTab} isSuper={isSuper}>
-      {activeTab === "qb" ? <QBSection /> : activeTab === "cards" ? <CardsSection /> : activeTab === "mess" ? <MessSection /> : activeTab === "super" ? <SuperAdminPanel /> : <UsersSection isSuper={isSuper} />}
+      {activeTab === "qb" ? <QBSection /> : activeTab === "ps" ? <AdminPSRewardsPage /> : activeTab === "cards" ? <CardsSection /> : activeTab === "mess" ? <MessSection /> : activeTab === "super" ? <SuperAdminPanel /> : <UsersSection isSuper={isSuper} />}
     </AdminDashboardShell>
   );
 }
@@ -2759,6 +2768,10 @@ function AdminQBPage() {
   return <AdminDashboard initialTab="qb" />;
 }
 
+function AdminPSRewardsPageRoute() {
+  return <AdminDashboard initialTab="ps" />;
+}
+
 function AdminCardsPage() {
   return <AdminDashboard initialTab="cards" />;
 }
@@ -2767,5 +2780,5 @@ function AdminMessPage() {
   return <AdminDashboard initialTab="mess" />;
 }
 
-export { AdminUsersPage, AdminQBPage, AdminCardsPage, AdminMessPage };
+export { AdminUsersPage, AdminQBPage, AdminPSRewardsPageRoute as AdminPSRewardsPage, AdminCardsPage, AdminMessPage };
 export default AdminDashboard;
