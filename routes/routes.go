@@ -97,6 +97,7 @@ func SetupRouter(
 		api.GET("/qb", qbHandler.List)
 		api.GET("/mess", messHandler.GetMess)
 		api.GET("/mess/timings", messHandler.GetMealTimings)
+		api.GET("/ps/rewards/breakdown", adminHandler.FetchPSRewardsBreakdown)
 
 		api.GET("/top10", leaderboardHandler.GetTop10Students)
 	}
