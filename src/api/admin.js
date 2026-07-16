@@ -1,5 +1,6 @@
 import api from "./axios";
 import { auth } from "../Authentication/firebase.js";
+import { getAuthenticatedHeaders } from "./axios.js";
 
 async function getAdminHeaders() {
   const currentUser = auth.currentUser;
@@ -112,8 +113,8 @@ export async function savePSToken(token) {
 }
 
 export async function fetchPSRewardsBreakdown(userId) {
-  const headers = await getAdminHeaders();
-  const response = await api.get("/admin/ps/rewards/breakdown", {
+  const headers = await getAuthenticatedHeaders();
+  const response = await api.get("/ps/rewards/breakdown", {
     headers,
     params: { user_id: userId },
   });
