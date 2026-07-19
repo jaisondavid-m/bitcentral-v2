@@ -72,14 +72,18 @@ function LeaveDetailsContent() {
     return new Date(dateStr).toLocaleDateString("en-GB", { weekday: "long" });
   };
 
-  const getDurationDays = (from, to) => {
+  const getDurationDays = (from, to, fromHalfDay) => {
     const diffTime = Math.abs(new Date(to) - new Date(from));
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    if (fromHalfDay === "AN") {
+      days -= 0.5;
+    }
+    return days;
   };
 
   const LeaveCard = ({ leave, category }) => {
     const isExpanded = expandedId === leave.from_date;
-    const duration = getDurationDays(leave.from_date, leave.to_date);
+    const duration = getDurationDays(leave.from_date, leave.to_date, leave.from_half_day);
     const isCurrent = category === "current";
     const isUpcoming = category === "upcoming";
 
@@ -129,7 +133,7 @@ function LeaveDetailsContent() {
               <div className="mt-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                 <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
                 <span>
-                  {formatDate(leave.from_date)} {duration > 1 && `• ${duration} days`}
+                  {formatDate(leave.from_date)}{leave.from_half_day ? ` (${leave.from_half_day})` : ""} {(duration > 1 || duration === 0.5) && `• ${duration} ${duration === 1 ? "day" : "days"}`}
                 </span>
               </div>
             </div>
@@ -163,6 +167,15 @@ function LeaveDetailsContent() {
                 {duration} {duration === 1 ? "day" : "days"}
               </p>
             </div>
+
+            {leave.from_half_day === "AN" && (
+              <div className="bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 rounded px-3 py-2 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                <p className="text-xs text-amber-700 dark:text-amber-300 font-medium">
+                  Leave starts Afternoon (AN) — First half day is College (CLG)
+                </p>
+              </div>
+            )}
 
             {leave.remarks && (
               <div>
