@@ -12,8 +12,8 @@ var Holidays = []models.Holiday{
 
 	// July 2026
 	{
-		FromDate: "2026-07-24(AN)",
-		ToDate:   "2026-07-28",
+		FromDate: "2026-07-22(AN)",
+		ToDate:   "2026-07-26",
 		Name:     "GP",
 	},
 
