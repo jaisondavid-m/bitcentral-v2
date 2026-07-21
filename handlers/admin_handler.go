@@ -26,7 +26,11 @@ func NewAdminHandler() *AdminHandler {
 func (h *AdminHandler) GetUsers(c *gin.Context) {
 	client, err := config.FirebaseAuthClient()
 	if err != nil || client == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to initialize Firebase auth"})
+		msg := "Failed to initialize Firebase auth"
+		if err != nil {
+			msg = "Failed to initialize Firebase auth: " + err.Error()
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": msg})
 		return
 	}
 
@@ -92,7 +96,11 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 func (h *AdminHandler) UpdateUsers(c *gin.Context) {
 	client, err := config.FirebaseAuthClient()
 	if err != nil || client == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to initialize Firebase auth"})
+		msg := "Failed to initialize Firebase auth"
+		if err != nil {
+			msg = "Failed to initialize Firebase auth: " + err.Error()
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": msg})
 		return
 	}
 	iter := client.Users(context.Background(), "")
@@ -284,7 +292,11 @@ func (h *AdminHandler) UpdateUserBlockStatus(c *gin.Context) {
 
 	client, err := config.FirebaseAuthClient()
 	if err != nil || client == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to initialize Firebase auth"})
+		msg := "Failed to initialize Firebase auth"
+		if err != nil {
+			msg = "Failed to initialize Firebase auth: " + err.Error()
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": msg})
 		return
 	}
 
@@ -351,7 +363,11 @@ func (h *AdminHandler) DeleteUser(c *gin.Context) {
 
 	client, err := config.FirebaseAuthClient()
 	if err != nil || client == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to initialize Firebase auth"})
+		msg := "Failed to initialize Firebase auth"
+		if err != nil {
+			msg = "Failed to initialize Firebase auth: " + err.Error()
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": msg})
 		return
 	}
 	if err := client.DeleteUser(context.Background(), uid); err != nil {

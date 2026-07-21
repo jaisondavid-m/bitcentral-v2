@@ -45,9 +45,13 @@ func RequireAdmin() gin.HandlerFunc {
 
 		client, err := config.FirebaseAuthClient()
 		if err != nil || client == nil {
+			msg := "Failed to initialize Firebase auth"
+			if err != nil {
+				msg = "Failed to initialize Firebase auth: " + err.Error()
+			}
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"success": false,
-				"message": "Failed to initialize Firebase auth",
+				"message": msg,
 			})
 			c.Abort()
 			return
@@ -117,7 +121,11 @@ func RequireSuperAdmin() gin.HandlerFunc {
 
 		client, err := config.FirebaseAuthClient()
 		if err != nil || client == nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to initialize Firebase auth"})
+			msg := "Failed to initialize Firebase auth"
+			if err != nil {
+				msg = "Failed to initialize Firebase auth: " + err.Error()
+			}
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": msg})
 			c.Abort()
 			return
 		}

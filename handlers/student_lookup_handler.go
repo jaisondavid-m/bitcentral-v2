@@ -17,7 +17,10 @@ import (
 func emailFromToken(token string) (string, error) {
 	client, err := config.FirebaseAuthClient()
 	if err != nil || client == nil {
-		return "", errors.New("failed to initialize Firebase auth")
+		if err != nil {
+			return "", errors.New("failed to initialize Firebase auth: " + err.Error())
+		}
+		return "", errors.New("failed to initialize Firebase auth: client is nil")
 	}
 
 	decodedToken, err := client.VerifyIDToken(context.Background(), token)
@@ -103,7 +106,7 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		resolvedEmail, err := emailFromToken(token)
 		if err != nil {
 			status := http.StatusUnauthorized
-			if err.Error() == "failed to initialize Firebase auth" {
+			if strings.HasPrefix(err.Error(), "failed to initialize Firebase auth") {
 				status = http.StatusInternalServerError
 			}
 			c.JSON(status, gin.H{
