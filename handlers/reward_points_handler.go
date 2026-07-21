@@ -360,6 +360,13 @@ func (h *SheetHandler) UniversalSearch(c *gin.Context) {
 	}
 
 	if len(results) == 0 {
+		if len(errs) > 0 {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error":   "Unable to access Google Sheet",
+				"details": errs,
+			})
+			return
+		}
 		c.JSON(http.StatusNotFound, gin.H{
 			"query":   query,
 			"message": "No student found with that name or roll number",
@@ -404,18 +411,31 @@ func (h *SheetHandler) GetOverallAverageFromSheet(c *gin.Context) {
 	yearAverages := gin.H{}
 	var total float64
 	var count int
+	var firstErr error
 
 	for _, yd := range yearData {
 		values, err := h.fetchRangeValuesCached(spreadsheetID, yd.rang, sheetRangeCacheTTL)
 		val := "0"
 		if err == nil && len(values) > 0 && len(values[0]) > 0 {
 			val = fmt.Sprintf("%v", values[0][0])
+		} else if err != nil {
+			if firstErr == nil {
+				firstErr = err
+			}
 		}
 		yearAverages[yd.key] = val
 		if f, err := strconv.ParseFloat(val, 64); err == nil && f > 0 {
 			total += f
 			count++
 		}
+	}
+
+	if firstErr != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":  "Unable to access Google Sheet",
+			"detail": firstErr.Error(),
+		})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
