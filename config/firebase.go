@@ -33,6 +33,11 @@ func InitFirebase() {
 	var opt option.ClientOption
 	if credentialsJSON != "" {
 		log.Println("Using FIREBASE_CREDENTIALS_JSON")
+
+		if !json.Valid([]byte(credentialsJSON)) {
+			log.Fatal("FIREBASE_CREDENTIALS_JSON is not valid JSON — check for accidental escaping/truncation")
+		}
+
 		opt = option.WithCredentialsJSON([]byte(credentialsJSON))
 	} else {
 		log.Println("Using FIREBASE_CREDENTIALS_FILE")
