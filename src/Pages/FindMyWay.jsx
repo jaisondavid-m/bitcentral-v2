@@ -15,6 +15,7 @@ import {
 	Smartphone,
 	Sparkles,
 	Clock3,
+	User,
 	Users,
 	Waypoints,
 	BellRing,
@@ -117,9 +118,15 @@ function FindMyWay() {
 			<header className="border-b border-gray-200 bg-white dark:border-blue-900 dark:bg-slate-950">
 				<div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
 					<div className="text-center">
-						<div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300">
-							<Sparkles className="h-4 w-4" />
-							Android available now, iOS coming soon
+						<div className="mb-4 inline-flex flex-wrap items-center justify-center gap-2">
+							<div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300">
+								<Sparkles className="h-4 w-4" />
+								Android available now, iOS coming soon
+							</div>
+							<div className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-slate-100/60 px-3 py-1.5 text-xs font-medium text-slate-500 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-400">
+								<User className="h-3.5 w-3.5 opacity-70" />
+								<span>Sudhir Sivakumar</span>
+							</div>
 						</div>
 						<h1 className="mb-4 text-3xl font-bold text-blue-600 sm:text-4xl">FindMyWay installation</h1>
 						<p className="mx-auto max-w-2xl text-base text-blue-700 sm:text-lg dark:text-blue-300">
