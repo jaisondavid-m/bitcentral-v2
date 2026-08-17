@@ -119,7 +119,7 @@ export default function RpCard({ student }) {
       setTotalCount(total);
       setCurrentPage(pageNumber);
     } catch (err) {
-      setError(err?.response?.data?.message || err?.message || "Failed to load points.");
+      setError(err?.response?.data?.error || err?.response?.data?.message || err?.message || "Failed to load points.");
     } finally {
       setLoading(false);
     }
