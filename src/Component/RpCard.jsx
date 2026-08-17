@@ -319,8 +319,8 @@ export default function RpCard({ student }) {
                             <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{e?.activity_name || "—"}</td>
                             <td
                               className={`px-4 py-3 text-right font-semibold tabular-nums ${e?.type === "negative"
-                                  ? "text-red-400"
-                                  : "text-emerald-400"
+                                ? "text-red-400"
+                                : "text-emerald-400"
                                 }`}
                             >
                               {e?.type === "negative" ? "-" : "+"}
