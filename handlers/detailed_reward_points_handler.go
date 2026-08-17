@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"google.golang.org/api/sheets/v4"
 )
 
 type RewardActivity struct {
@@ -73,6 +74,25 @@ func cloneRewardMap(src map[string][]RewardActivity) map[string][]RewardActivity
 	return out
 }
 
+func (h *SheetHandler) getActualTabName(svc *sheets.Service, spreadsheetID, expectedTab string) string {
+	spreadsheet, err := svc.Spreadsheets.Get(spreadsheetID).Fields("sheets.properties.title").Do()
+	if err != nil {
+		log.Printf("[WARNING] Failed to fetch spreadsheet metadata for ID %s: %v. Defaulting to %q", spreadsheetID, err, expectedTab)
+		return expectedTab
+	}
+
+	normExpected := strings.ToLower(strings.TrimSpace(expectedTab))
+	for _, sheet := range spreadsheet.Sheets {
+		if sheet.Properties != nil {
+			title := sheet.Properties.Title
+			if strings.ToLower(strings.TrimSpace(title)) == normExpected {
+				return title
+			}
+		}
+	}
+	return expectedTab
+}
+
 func (h *SheetHandler) buildRewardsIndexForSheet(spreadsheetID string, sourceLabel string) (map[string][]RewardActivity, error) {
 	if spreadsheetID == "" {
 		return make(map[string][]RewardActivity), nil
@@ -85,16 +105,23 @@ func (h *SheetHandler) buildRewardsIndexForSheet(spreadsheetID string, sourceLab
 
 	ranges := make([]string, 0, len(rewardSheetTabs))
 	for _, tab := range rewardSheetTabs {
-		ranges = append(ranges, fmt.Sprintf("%s!A2:J", tab))
+		actualTab := h.getActualTabName(svc, spreadsheetID, tab)
+		r := fmt.Sprintf("'%s'!A2:J", actualTab)
+		log.Printf("[DEBUG] Spreadsheet ID: %q (%s) | Requested Tab: %q | Actual Tab Resolved: %q | Constructed Range: %q",
+			spreadsheetID, sourceLabel, tab, actualTab, r)
+		ranges = append(ranges, r)
 	}
 
 	resp, err := svc.Spreadsheets.Values.BatchGet(spreadsheetID).Ranges(ranges...).Do()
 	if err != nil {
+		log.Printf("[ERROR] BatchGet failed for Spreadsheet ID %q (%s) with ranges %v: %v",
+			spreadsheetID, sourceLabel, ranges, err)
 		return nil, err
 	}
 
 	index := make(map[string][]RewardActivity)
 	for i, vr := range resp.ValueRanges {
+		// Use the actual resolved name or the requested tab name for tab matching logic
 		tabName := rewardSheetTabs[i]
 		for _, row := range vr.Values {
 			rollNorm := normalizeRollNo(safeGet(row, 3))
@@ -244,7 +271,7 @@ func (h *SheetHandler) GetRewardsByRollNo(c *gin.Context) {
 	}
 	if rawQuery == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Query param 'roll_no' is required",
+			"error": "Query param 'roll_no' is required",
 		})
 		return
 	}
@@ -315,4 +342,5 @@ func (h *SheetHandler) GetRewardsByRollNo(c *gin.Context) {
 			"sheet_errors": data.SheetErrors,
 		})
 	}
+
 }
