@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -106,12 +107,20 @@ func (h *SheetHandler) buildRewardsIndex() (map[string][]RewardActivity, error) 
 
 	index1, err := h.buildRewardsIndexForSheet(spreadsheetID1)
 	if err != nil {
+		log.Printf("Error: failed to build index for sheet 1 (%s): %v", spreadsheetID1, err)
 		return nil, fmt.Errorf("failed to build index for sheet 1: %w", err)
 	}
 
-	index2, err := h.buildRewardsIndexForSheet(spreadsheetID2)
-	if err != nil {
-		return nil, fmt.Errorf("failed to build index for sheet 2: %w", err)
+	var index2 map[string][]RewardActivity
+	if spreadsheetID2 != "" {
+		var err2 error
+		index2, err2 = h.buildRewardsIndexForSheet(spreadsheetID2)
+		if err2 != nil {
+			log.Printf("Warning: failed to build index for sheet 2 (%s): %v. Proceeding with sheet 1 only.", spreadsheetID2, err2)
+			index2 = make(map[string][]RewardActivity)
+		}
+	} else {
+		index2 = make(map[string][]RewardActivity)
 	}
 
 	merged := make(map[string][]RewardActivity)
