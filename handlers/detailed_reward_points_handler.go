@@ -51,8 +51,10 @@ func cloneRewardMap(src map[string][]RewardActivity) map[string][]RewardActivity
 	return out
 }
 
-func (h *SheetHandler) buildRewardsIndex() (map[string][]RewardActivity, error) {
-	spreadsheetID := os.Getenv("RP_Detailed_sheet")
+func (h *SheetHandler) buildRewardsIndexForSheet(spreadsheetID string) (map[string][]RewardActivity, error) {
+	if spreadsheetID == "" {
+		return make(map[string][]RewardActivity), nil
+	}
 	svc := h.getSheetsService()
 
 	if svc == nil {
@@ -77,7 +79,7 @@ func (h *SheetHandler) buildRewardsIndex() (map[string][]RewardActivity, error) 
 			if rollNorm == "" {
 				continue
 			}
-			points := safeGet(row,7)
+			points := safeGet(row, 7)
 
 			rewardType := "positive"
 
@@ -89,12 +91,61 @@ func (h *SheetHandler) buildRewardsIndex() (map[string][]RewardActivity, error) 
 				RewardPoints: points,
 				ActivityType: safeGet(row, 8),
 				ActivityName: safeGet(row, 9),
-				Type: rewardType,
+				Type:         rewardType,
 			})
 		}
 	}
 
 	return index, nil
+}
+
+func (h *SheetHandler) buildRewardsIndex() (map[string][]RewardActivity, error) {
+	spreadsheetID1 := os.Getenv("RP_Detailed_sheet")
+	spreadsheetID2 := os.Getenv("RP_Detailed_sheet_2")
+
+	index1, err := h.buildRewardsIndexForSheet(spreadsheetID1)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build index for sheet 1: %w", err)
+	}
+
+	index2, err := h.buildRewardsIndexForSheet(spreadsheetID2)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build index for sheet 2: %w", err)
+	}
+
+	merged := make(map[string][]RewardActivity)
+
+	allRolls := make(map[string]bool)
+	for r := range index1 {
+		allRolls[r] = true
+	}
+	for r := range index2 {
+		allRolls[r] = true
+	}
+
+	for r := range allRolls {
+		s1 := index1[r]
+		s2 := index2[r]
+
+		// Reverse s1 in-place (oldest-to-newest -> newest-to-oldest)
+		for i, j := 0, len(s1)-1; i < j; i, j = i+1, j-1 {
+			s1[i], s1[j] = s1[j], s1[i]
+		}
+
+		// Reverse s2 in-place (oldest-to-newest -> newest-to-oldest)
+		for i, j := 0, len(s2)-1; i < j; i, j = i+1, j-1 {
+			s2[i], s2[j] = s2[j], s2[i]
+		}
+
+		// Concatenate: s1 first, then s2
+		combined := make([]RewardActivity, 0, len(s1)+len(s2))
+		combined = append(combined, s1...)
+		combined = append(combined, s2...)
+
+		merged[r] = combined
+	}
+
+	return merged, nil
 }
 
 func (h *SheetHandler) getRewardsIndex() (map[string][]RewardActivity, error) {
@@ -166,11 +217,6 @@ if len(matched) == 0 {
         "message": "No reward activities found for this roll number",
     })
     return
-}
-
-// Reverse to return most recent first
-for i, j := 0, len(matched)-1; i < j; i, j = i+1, j-1 {
-    matched[i], matched[j] = matched[j], matched[i]
 }
 
 c.JSON(http.StatusOK, matched)
