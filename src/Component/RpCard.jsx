@@ -78,7 +78,8 @@ export default function RpCard({ student }) {
       averageTone = "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-300";
     }
   }
-  const fetchPoints = async (pageNumber = 1) => {
+  const fetchPoints = async (pageArg = 1) => {
+    const pageNumber = typeof pageArg === "number" ? pageArg : 1;
     setOpen(true);
     setLoading(true);
     setError("");
@@ -179,7 +180,7 @@ export default function RpCard({ student }) {
           {/* CTA */}
           <button
             type="button"
-            onClick={fetchPoints}
+            onClick={() => fetchPoints(1)}
             className="
               flex w-full items-center justify-between
               rounded-xl bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700
