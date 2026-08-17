@@ -19,6 +19,7 @@ type RewardActivity struct {
 	ActivityType string `json:"activity_type"`
 	ActivityName string `json:"activity_name"`
 	Type         string `json:"type"`
+	SheetSource  string `json:"sheet_source,omitempty"`
 }
 
 var rewardSheetTabs = []string{
@@ -29,12 +30,31 @@ var rewardSheetTabs = []string{
 
 const rewardsCacheTTL = 5 * time.Minute
 
+type RewardsData struct {
+	Index       map[string][]RewardActivity
+	SheetErrors map[string]string
+}
+
 var (
 	rewardsCacheMu      sync.RWMutex
 	rewardsCacheBuildMu sync.Mutex
-	rewardsByRollCache  map[string][]RewardActivity
+	rewardsCacheData    *RewardsData
 	rewardsCacheExpiry  time.Time
 )
+
+func cloneRewardsData(src *RewardsData) *RewardsData {
+	if src == nil {
+		return nil
+	}
+	out := &RewardsData{
+		Index:       cloneRewardMap(src.Index),
+		SheetErrors: make(map[string]string),
+	}
+	for k, v := range src.SheetErrors {
+		out.SheetErrors[k] = v
+	}
+	return out
+}
 
 func normalizeRollNo(s string) string {
 	return strings.ToUpper(strings.ReplaceAll(strings.TrimSpace(s), " ", ""))
@@ -53,7 +73,7 @@ func cloneRewardMap(src map[string][]RewardActivity) map[string][]RewardActivity
 	return out
 }
 
-func (h *SheetHandler) buildRewardsIndexForSheet(spreadsheetID string) (map[string][]RewardActivity, error) {
+func (h *SheetHandler) buildRewardsIndexForSheet(spreadsheetID string, sourceLabel string) (map[string][]RewardActivity, error) {
 	if spreadsheetID == "" {
 		return make(map[string][]RewardActivity), nil
 	}
@@ -94,6 +114,7 @@ func (h *SheetHandler) buildRewardsIndexForSheet(spreadsheetID string) (map[stri
 				ActivityType: safeGet(row, 8),
 				ActivityName: safeGet(row, 9),
 				Type:         rewardType,
+				SheetSource:  sourceLabel,
 			})
 		}
 	}
@@ -101,26 +122,38 @@ func (h *SheetHandler) buildRewardsIndexForSheet(spreadsheetID string) (map[stri
 	return index, nil
 }
 
-func (h *SheetHandler) buildRewardsIndex() (map[string][]RewardActivity, error) {
+func (h *SheetHandler) buildRewardsIndex() (map[string][]RewardActivity, map[string]string, error) {
 	spreadsheetID1 := os.Getenv("RP_Detailed_sheet")
 	spreadsheetID2 := os.Getenv("RP_Detailed_sheet_2")
 
-	index1, err := h.buildRewardsIndexForSheet(spreadsheetID1)
-	if err != nil {
-		log.Printf("Error: failed to build index for sheet 1 (%s): %v", spreadsheetID1, err)
-		return nil, fmt.Errorf("failed to build index for sheet 1: %w", err)
+	sheetErrors := make(map[string]string)
+
+	var index1 map[string][]RewardActivity
+	var err1 error
+	if spreadsheetID1 != "" {
+		index1, err1 = h.buildRewardsIndexForSheet(spreadsheetID1, "Sheet 1")
+		if err1 != nil {
+			log.Printf("Error: failed to build index for sheet 1 (%s): %v", spreadsheetID1, err1)
+			sheetErrors["Sheet 1"] = err1.Error()
+			index1 = make(map[string][]RewardActivity)
+		}
+	} else {
+		index1 = make(map[string][]RewardActivity)
+		sheetErrors["Sheet 1"] = "Spreadsheet ID is empty"
 	}
 
 	var index2 map[string][]RewardActivity
+	var err2 error
 	if spreadsheetID2 != "" {
-		var err2 error
-		index2, err2 = h.buildRewardsIndexForSheet(spreadsheetID2)
+		index2, err2 = h.buildRewardsIndexForSheet(spreadsheetID2, "Sheet 2")
 		if err2 != nil {
-			log.Printf("Warning: failed to build index for sheet 2 (%s): %v. Proceeding with sheet 1 only.", spreadsheetID2, err2)
+			log.Printf("Error: failed to build index for sheet 2 (%s): %v", spreadsheetID2, err2)
+			sheetErrors["Sheet 2"] = err2.Error()
 			index2 = make(map[string][]RewardActivity)
 		}
 	} else {
 		index2 = make(map[string][]RewardActivity)
+		sheetErrors["Sheet 2"] = "Spreadsheet ID is empty"
 	}
 
 	merged := make(map[string][]RewardActivity)
@@ -155,15 +188,15 @@ func (h *SheetHandler) buildRewardsIndex() (map[string][]RewardActivity, error) 
 		merged[r] = combined
 	}
 
-	return merged, nil
+	return merged, sheetErrors, nil
 }
 
-func (h *SheetHandler) getRewardsIndex() (map[string][]RewardActivity, error) {
+func (h *SheetHandler) getRewardsIndex() (*RewardsData, error) {
 	now := time.Now()
 
 	rewardsCacheMu.RLock()
-	if rewardsByRollCache != nil && now.Before(rewardsCacheExpiry) {
-		cached := cloneRewardMap(rewardsByRollCache)
+	if rewardsCacheData != nil && now.Before(rewardsCacheExpiry) {
+		cached := cloneRewardsData(rewardsCacheData)
 		rewardsCacheMu.RUnlock()
 		return cached, nil
 	}
@@ -173,17 +206,17 @@ func (h *SheetHandler) getRewardsIndex() (map[string][]RewardActivity, error) {
 	defer rewardsCacheBuildMu.Unlock()
 
 	rewardsCacheMu.RLock()
-	if rewardsByRollCache != nil && time.Now().Before(rewardsCacheExpiry) {
-		cached := cloneRewardMap(rewardsByRollCache)
+	if rewardsCacheData != nil && time.Now().Before(rewardsCacheExpiry) {
+		cached := cloneRewardsData(rewardsCacheData)
 		rewardsCacheMu.RUnlock()
 		return cached, nil
 	}
 	rewardsCacheMu.RUnlock()
 
-	index, err := h.buildRewardsIndex()
+	index, sheetErrors, err := h.buildRewardsIndex()
 	if err != nil {
 		rewardsCacheMu.RLock()
-		stale := cloneRewardMap(rewardsByRollCache)
+		stale := cloneRewardsData(rewardsCacheData)
 		rewardsCacheMu.RUnlock()
 		if stale != nil {
 			return stale, nil
@@ -191,12 +224,17 @@ func (h *SheetHandler) getRewardsIndex() (map[string][]RewardActivity, error) {
 		return nil, err
 	}
 
+	data := &RewardsData{
+		Index:       index,
+		SheetErrors: sheetErrors,
+	}
+
 	rewardsCacheMu.Lock()
-	rewardsByRollCache = index
+	rewardsCacheData = data
 	rewardsCacheExpiry = time.Now().Add(rewardsCacheTTL)
 	rewardsCacheMu.Unlock()
 
-	return cloneRewardMap(index), nil
+	return cloneRewardsData(data), nil
 }
 
 func (h *SheetHandler) GetRewardsByRollNo(c *gin.Context) {
@@ -212,7 +250,7 @@ func (h *SheetHandler) GetRewardsByRollNo(c *gin.Context) {
 	}
 
 	queryNorm := normalizeRollNo(rawQuery)
-	index, err := h.getRewardsIndex()
+	data, err := h.getRewardsIndex()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to read reward sheet data",
@@ -220,9 +258,9 @@ func (h *SheetHandler) GetRewardsByRollNo(c *gin.Context) {
 		return
 	}
 
-	matched := index[queryNorm]
+	matched := data.Index[queryNorm]
 
-	if len(matched) == 0 {
+	if len(matched) == 0 && len(data.SheetErrors) == 0 {
 		c.JSON(http.StatusNotFound, gin.H{
 			"message": "No reward activities found for this roll number",
 		})
@@ -265,14 +303,16 @@ func (h *SheetHandler) GetRewardsByRollNo(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"data":  paginated,
-			"total": total,
-			"page":  page,
-			"limit": limit,
+			"data":         paginated,
+			"total":        total,
+			"page":         page,
+			"limit":        limit,
+			"sheet_errors": data.SheetErrors,
 		})
 	} else {
-		c.JSON(http.StatusOK, matched)
+		c.JSON(http.StatusOK, gin.H{
+			"data":         matched,
+			"sheet_errors": data.SheetErrors,
+		})
 	}
-
-
 }
