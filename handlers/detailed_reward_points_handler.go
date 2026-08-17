@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -210,16 +211,59 @@ func (h *SheetHandler) GetRewardsByRollNo(c *gin.Context) {
 		return
 	}
 
-  matched := index[queryNorm]
+	matched := index[queryNorm]
 
-if len(matched) == 0 {
-    c.JSON(http.StatusNotFound, gin.H{
-        "message": "No reward activities found for this roll number",
-    })
-    return
-}
+	if len(matched) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "No reward activities found for this roll number",
+		})
+		return
+	}
 
-c.JSON(http.StatusOK, matched)
+	pageStr := c.Query("page")
+	limitStr := c.Query("limit")
+
+	page := 1
+	limit := 0
+
+	if pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+	if limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			limit = l
+		}
+	}
+
+	if limit > 0 {
+		total := len(matched)
+		startIndex := (page - 1) * limit
+		if startIndex < 0 {
+			startIndex = 0
+		}
+		endIndex := startIndex + limit
+
+		var paginated []RewardActivity
+		if startIndex >= total {
+			paginated = []RewardActivity{}
+		} else {
+			if endIndex > total {
+				endIndex = total
+			}
+			paginated = matched[startIndex:endIndex]
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"data":  paginated,
+			"total": total,
+			"page":  page,
+			"limit": limit,
+		})
+	} else {
+		c.JSON(http.StatusOK, matched)
+	}
 
 
 }
