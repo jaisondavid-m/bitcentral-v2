@@ -116,8 +116,8 @@ func (h *SheetHandler) buildRewardsIndex() (map[string][]RewardActivity, error) 
 		var err2 error
 		index2, err2 = h.buildRewardsIndexForSheet(spreadsheetID2)
 		if err2 != nil {
-			log.Printf("Warning: failed to build index for sheet 2 (%s): %v. Proceeding with sheet 1 only.", spreadsheetID2, err2)
-			index2 = make(map[string][]RewardActivity)
+			log.Printf("Error: failed to build index for sheet 2 (%s): %v", spreadsheetID2, err2)
+			return nil, fmt.Errorf("failed to build index for sheet 2: %w", err2)
 		}
 	} else {
 		index2 = make(map[string][]RewardActivity)
