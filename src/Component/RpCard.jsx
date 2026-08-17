@@ -22,7 +22,6 @@ export default function RpCard({ student }) {
   const [points, setPoints] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [sheetErrors, setSheetErrors] = useState(null);
   const pointsCache = React.useRef(new Map());
 
   if (!student) return null;
@@ -85,13 +84,11 @@ export default function RpCard({ student }) {
     setLoading(true);
     setError("");
     setPoints([]);
-    setSheetErrors(null);
     const cacheKey = `${rollNo}_${pageNumber}`;
     if (pointsCache.current.has(cacheKey)) {
       const cached = pointsCache.current.get(cacheKey);
       setPoints(cached.data);
       setTotalCount(cached.total);
-      setSheetErrors(cached.sheetErrors || null);
       setCurrentPage(pageNumber);
       setLoading(false);
       return;
@@ -108,21 +105,18 @@ export default function RpCard({ student }) {
       const d = res?.data;
       let data = [];
       let total = 0;
-      let sErrors = null;
       if (d && typeof d === "object" && !Array.isArray(d)) {
         data = Array.isArray(d.data) ? d.data : [];
         total = typeof d.total === "number" ? d.total : data.length;
-        sErrors = d.sheet_errors || null;
       } else {
         data = Array.isArray(d) ? d : [];
         total = data.length;
       }
 
       // Store in cache
-      pointsCache.current.set(cacheKey, { data, total, sheetErrors: sErrors });
+      pointsCache.current.set(cacheKey, { data, total });
       setPoints(data);
       setTotalCount(total);
-      setSheetErrors(sErrors);
       setCurrentPage(pageNumber);
     } catch (err) {
       setError(err?.response?.data?.message || err?.message || "Failed to load points.");
@@ -239,149 +233,104 @@ export default function RpCard({ student }) {
                   <Loader2 className="h-5 w-5 animate-spin" />
                   <span className="text-xs">Fetching points…</span>
                 </div>
+              ) : error ? (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-400">
+                  {error}
+                </div>
+              ) : points.length === 0 ? (
+                <div className="flex flex-col items-center justify-center gap-2 py-20 text-slate-500 dark:text-slate-600">
+                  <span className="text-3xl font-light">—</span>
+                  <span className="text-xs">No records found for this roll number.</span>
+                </div>
               ) : (
                 <>
-                  {/* Debug Info Section */}
-                  <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40 p-4">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 font-mono">
-                      Sheets Debug Info (Only for Debugging)
-                    </p>
-                    <div className="space-y-2">
-                      <div className="flex items-start gap-2 text-xs">
-                        <span className={sheetErrors?.["Sheet 1"] ? "text-red-500" : "text-emerald-500"}>
-                          ●
+                  {yearKey && (
+                    <div className={`mb-4 rounded-xl border px-4 py-3 text-sm ${averageTone}`}>
+                      {isAveragesLoading ? (
+                        <span className="inline-flex items-center gap-2 text-xs font-medium">
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          Checking year average...
                         </span>
-                        <div>
-                          <span className="font-semibold text-slate-700 dark:text-slate-300">Sheet 1:</span>{" "}
-                          {sheetErrors?.["Sheet 1"] ? (
-                            <span className="text-red-600 dark:text-red-400 font-mono text-[11px] break-all">{sheetErrors["Sheet 1"]}</span>
-                          ) : (
-                            <span className="text-emerald-600 dark:text-emerald-400 font-medium">Connected / Loaded successfully</span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-2 text-xs">
-                        <span className={sheetErrors?.["Sheet 2"] ? "text-red-500" : "text-emerald-500"}>
-                          ●
-                        </span>
-                        <div>
-                          <span className="font-semibold text-slate-700 dark:text-slate-300">Sheet 2:</span>{" "}
-                          {sheetErrors?.["Sheet 2"] ? (
-                            <span className="text-red-600 dark:text-red-400 font-mono text-[11px] break-all">{sheetErrors["Sheet 2"]}</span>
-                          ) : (
-                            <span className="text-emerald-600 dark:text-emerald-400 font-medium">Connected / Loaded successfully</span>
-                          )}
-                        </div>
-                      </div>
+                      ) : averageMessage ? (
+                        <>
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] opacity-70">
+                            Year average
+                          </p>
+                          <p className="mt-1 font-medium">{averageMessage}</p>
+                        </>
+                      ) : (
+                        <p className="text-xs font-medium">Year average is not available.</p>
+                      )}
                     </div>
+                  )}
+
+                  {/* Mobile cards */}
+                  <div className="space-y-2 sm:hidden">
+                    {points.map((e, i) => (
+                      <div
+                        key={`${e?.date}-${e?.activity_name}-${i}`}
+                        className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 dark:border-slate-800 dark:bg-slate-800/40"
+                      >
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <span className="text-[12px] font-medium text-slate-800 dark:text-slate-200 leading-snug flex-1">
+                            {e?.activity_name || "—"}
+                          </span>
+                          <span
+                            className={`shrink-0 text-sm font-semibold tabular-nums ${e?.type === "negative"
+                              ? "text-red-400"
+                              : "text-emerald-400"
+                              }`}
+                          >
+                            {e?.type === "negative" ? "-" : "+"}
+                            {e?.reward_points || "0"}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          {e?.activity_type && (
+                            <span className="rounded-full bg-slate-100 px-2 py-px text-[10px] font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                              {e.activity_type}
+                            </span>
+                          )}
+                          {e?.date && (
+                            <span className="text-[10px] text-slate-500">{e.date}</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
-                  {error ? (
-                    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-400">
-                      {error}
-                    </div>
-                  ) : points.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center gap-2 py-20 text-slate-500 dark:text-slate-600">
-                      <span className="text-3xl font-light">—</span>
-                      <span className="text-xs">No records found for this roll number.</span>
-                    </div>
-                  ) : (
-                    <>
-                      {yearKey && (
-                        <div className={`mb-4 rounded-xl border px-4 py-3 text-sm ${averageTone}`}>
-                          {isAveragesLoading ? (
-                            <span className="inline-flex items-center gap-2 text-xs font-medium">
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                              Checking year average...
-                            </span>
-                          ) : averageMessage ? (
-                            <>
-                              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] opacity-70">
-                                Year average
-                              </p>
-                              <p className="mt-1 font-medium">{averageMessage}</p>
-                            </>
-                          ) : (
-                            <p className="text-xs font-medium">Year average is not available.</p>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Mobile cards */}
-                      <div className="space-y-2 sm:hidden">
+                  {/* Desktop table */}
+                  <div className="hidden sm:block rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="bg-slate-100 dark:bg-slate-800/60">
+                          {["Date", "Activity type", "Activity name", "Points"].map((h) => (
+                            <th key={h} className="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-500 last:text-right">
+                              {h}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800/70">
                         {points.map((e, i) => (
-                          <div
-                            key={`${e?.date}-${e?.activity_name}-${i}`}
-                            className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 dark:border-slate-800 dark:bg-slate-800/40"
-                          >
-                            <div className="flex items-start justify-between gap-2 mb-2">
-                              <span className="text-[12px] font-medium text-slate-800 dark:text-slate-200 leading-snug flex-1">
-                                {e?.activity_name || "—"}
-                              </span>
-                              <span
-                                className={`shrink-0 text-sm font-semibold tabular-nums ${e?.type === "negative"
-                                  ? "text-red-400"
-                                  : "text-emerald-400"
-                                  }`}
-                              >
-                                {e?.type === "negative" ? "-" : "+"}
-                                {e?.reward_points || "0"}
-                              </span>
-                            </div>
-                            <div className="flex flex-wrap items-center gap-2">
-                              {e?.activity_type && (
-                                <span className="rounded-full bg-slate-100 px-2 py-px text-[10px] font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-                                  {e.activity_type}
-                                </span>
-                              )}
-                              {e?.sheet_source && (
-                                <span className="rounded-full bg-blue-50 px-2 py-px text-[10px] font-mono font-medium text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
-                                  {e.sheet_source}
-                                </span>
-                              )}
-                              {e?.date && (
-                                <span className="text-[10px] text-slate-500">{e.date}</span>
-                              )}
-                            </div>
-                          </div>
+                          <tr key={`${e?.date}-${e?.activity_name}-${i}`} className="text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td className="px-4 py-3 whitespace-nowrap text-slate-500">{e?.date || "—"}</td>
+                            <td className="px-4 py-3 whitespace-nowrap text-slate-700 dark:text-slate-300">{e?.activity_type || "—"}</td>
+                            <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{e?.activity_name || "—"}</td>
+                            <td
+                              className={`px-4 py-3 text-right font-semibold tabular-nums ${e?.type === "negative"
+                                ? "text-red-400"
+                                : "text-emerald-400"
+                                }`}
+                            >
+                              {e?.type === "negative" ? "-" : "+"}
+                              {e?.reward_points || "0"}
+                            </td>
+                          </tr>
                         ))}
-                      </div>
-
-                      {/* Desktop table */}
-                      <div className="hidden sm:block rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-                        <table className="w-full text-left text-xs">
-                          <thead>
-                            <tr className="bg-slate-100 dark:bg-slate-800/60">
-                              {["Date", "Activity type", "Activity name", "Source Sheet", "Points"].map((h) => (
-                                <th key={h} className="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-500 last:text-right">
-                                  {h}
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-200 dark:divide-slate-800/70">
-                            {points.map((e, i) => (
-                              <tr key={`${e?.date}-${e?.activity_name}-${i}`} className="text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                                <td className="px-4 py-3 whitespace-nowrap text-slate-500">{e?.date || "—"}</td>
-                                <td className="px-4 py-3 whitespace-nowrap text-slate-700 dark:text-slate-300">{e?.activity_type || "—"}</td>
-                                <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{e?.activity_name || "—"}</td>
-                                <td className="px-4 py-3 whitespace-nowrap text-slate-500 font-mono text-[10px]">{e?.sheet_source || "—"}</td>
-                                <td
-                                  className={`px-4 py-3 text-right font-semibold tabular-nums ${e?.type === "negative"
-                                    ? "text-red-400"
-                                    : "text-emerald-400"
-                                    }`}
-                                >
-                                  {e?.type === "negative" ? "-" : "+"}
-                                  {e?.reward_points || "0"}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </>
-                  )}
+                      </tbody>
+                    </table>
+                  </div>
                 </>
               )}
             </div>
