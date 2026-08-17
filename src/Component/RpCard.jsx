@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { GraduationCap, MapPin, User, Loader2, X, ChevronRight } from "lucide-react";
+import { GraduationCap, MapPin, User, Loader2, X, ChevronRight, ChevronLeft } from "lucide-react";
 import api from "../api/axios.js";
 
 const Meta = ({ icon: Icon, children }) => (
@@ -20,6 +20,8 @@ export default function RpCard({ student }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [points, setPoints] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const pointsCache = React.useRef(new Map());
 
   if (!student) return null;
@@ -76,26 +78,45 @@ export default function RpCard({ student }) {
       averageTone = "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-300";
     }
   }
-  const fetchPoints = async () => {
+  const fetchPoints = async (pageNumber = 1) => {
     setOpen(true);
     setLoading(true);
     setError("");
     setPoints([]);
-    if (pointsCache.current.has(rollNo)) {
-      const cached = pointsCache.current.get(rollNo);
-      setPoints(cached);
+    const cacheKey = `${rollNo}_${pageNumber}`;
+    if (pointsCache.current.has(cacheKey)) {
+      const cached = pointsCache.current.get(cacheKey);
+      setPoints(cached.data);
+      setTotalCount(cached.total);
+      setCurrentPage(pageNumber);
       setLoading(false);
       return;
     }
 
     try {
-      const res = await api.get("/rewards", { params: { roll_no: rollNo } });
+      const res = await api.get("/rewards", {
+        params: {
+          roll_no: rollNo,
+          page: pageNumber,
+          limit: 10,
+        },
+      });
       const d = res?.data;
-      const data = Array.isArray(d) ? d : Array.isArray(d?.data) ? d.data : [];
+      let data = [];
+      let total = 0;
+      if (d && typeof d === "object" && !Array.isArray(d)) {
+        data = Array.isArray(d.data) ? d.data : [];
+        total = typeof d.total === "number" ? d.total : data.length;
+      } else {
+        data = Array.isArray(d) ? d : [];
+        total = data.length;
+      }
 
       // Store in cache
-      pointsCache.current.set(rollNo, data);
+      pointsCache.current.set(cacheKey, { data, total });
       setPoints(data);
+      setTotalCount(total);
+      setCurrentPage(pageNumber);
     } catch (err) {
       setError(err?.response?.data?.message || err?.message || "Failed to load points.");
     } finally {
@@ -312,6 +333,55 @@ export default function RpCard({ student }) {
                 </>
               )}
             </div>
+
+            {/* Pagination Footer */}
+            {!loading && !error && points.length > 0 && totalCount > 10 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200 dark:border-slate-800 px-5 py-4 bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
+                <div className="text-[12px] text-slate-500 dark:text-slate-400">
+                  Showing <span className="font-semibold text-slate-800 dark:text-slate-200">{(currentPage - 1) * 10 + 1}</span> to{" "}
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{Math.min(currentPage * 10, totalCount)}</span> of{" "}
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{totalCount}</span> entries
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={currentPage === 1}
+                    onClick={() => fetchPoints(currentPage - 1)}
+                    className="
+                      inline-flex items-center gap-1 px-3 py-1.5 rounded-lg
+                      border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950
+                      text-[12px] font-medium text-slate-700 dark:text-slate-300
+                      transition-all duration-200
+                      hover:bg-slate-50 dark:hover:bg-slate-900
+                      disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-slate-950
+                    "
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    <span>Prev</span>
+                  </button>
+                  <div className="px-3 py-1 text-[12px] font-medium text-slate-500 dark:text-slate-400">
+                    Page <span className="text-slate-800 dark:text-slate-200 font-semibold">{currentPage}</span> of{" "}
+                    <span className="text-slate-800 dark:text-slate-200 font-semibold">{Math.ceil(totalCount / 10)}</span>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={currentPage * 10 >= totalCount}
+                    onClick={() => fetchPoints(currentPage + 1)}
+                    className="
+                      inline-flex items-center gap-1 px-3 py-1.5 rounded-lg
+                      border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950
+                      text-[12px] font-medium text-slate-700 dark:text-slate-300
+                      transition-all duration-200
+                      hover:bg-slate-50 dark:hover:bg-slate-900
+                      disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-slate-950
+                    "
+                  >
+                    <span>Next</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
