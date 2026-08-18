@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { AlertCircle, ArrowRight, Loader2, Search, Sparkles } from "lucide-react";
 
-const PS_BREAKDOWN_URL = "https://api.bitcentral.bitsathy.in/ps/rewards/breakdown";
+const PS_BREAKDOWN_URL = `${import.meta.env.VITE_API_BASE_URL}/ps/rewards/breakdown`;
 
 function numberValue(value) {
     const parsed = Number(value);
