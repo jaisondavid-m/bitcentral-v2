@@ -229,11 +229,10 @@ func (h *AdminHandler) FetchStudentReportDetails(c *gin.Context) {
 		return
 	}
 
-	token, err := h.loadPSToken()
-	psCookieValue := "81d4a44b25d448ef0a0fb052e48c0e000bbe3470417774e879479524e96ea0b7"
-	if err == nil && strings.TrimSpace(token.Token) != "" {
+	cookieHeader := "PS=97924ce41faeefb11b713ebd4fbb4a1fc2012dd5910e2eff8c2d44e7491b12f8; Device-Identifier=B9B6863D-9947-4B2E-920B-D60D67B79BD1;"
+	if token, err := h.loadPSToken(); err == nil && strings.TrimSpace(token.Token) != "" {
 		if norm := normalizePSTokenValue(token.Token); norm != "" {
-			psCookieValue = norm
+			cookieHeader = fmt.Sprintf("PS=%s; Device-Identifier=B9B6863D-9947-4B2E-920B-D60D67B79BD1;", norm)
 		}
 	}
 
@@ -253,7 +252,6 @@ func (h *AdminHandler) FetchStudentReportDetails(c *gin.Context) {
 		return
 	}
 
-	cookieHeader := fmt.Sprintf("PS=%s; Device-Identifier=CD88A67C-FBCF-4A59-AD73-5760CCD63773;", psCookieValue)
 	req.Header.Set("Cookie", cookieHeader)
 	req.Header.Set("Accept", "application/json, text/plain, */*")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
