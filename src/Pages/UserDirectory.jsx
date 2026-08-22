@@ -18,19 +18,20 @@ import {
   GraduationCap,
   Building2,
   Code2,
-  UserCheck,
-  Sparkles
+  UserCheck
 } from "lucide-react";
 import api, { getAuthenticatedHeaders } from "../api/axios.js";
 
-// Role calculation rule helper
+// Role calculation rule helper:
+// user_id = Roll Number
+// id = User ID
 export const getUserRole = (user) => {
-  const userId = (user.user_id || "").toLowerCase();
-  const id = (user.id || "").toLowerCase();
+  const rollNo = (user.user_id || "").toLowerCase(); // user_id is Roll Number
+  const userId = (user.id || "").toLowerCase();       // id is User ID
   const email = (user.email || "").trim().toLowerCase();
 
-  // 1. Tester: user_id or id contains "test"
-  if (userId.includes("test") || id.includes("test")) {
+  // 1. Tester: Roll Number (user_id) or User ID (id) contains "test"
+  if (rollNo.includes("test") || userId.includes("test")) {
     return {
       role: "Tester",
       badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
@@ -185,7 +186,7 @@ export default function UserDirectory() {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search by User ID, ID, Name, or Email..."
+                placeholder="Search by Roll Number, User ID, Name, or Email..."
                 className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all"
               />
               {searchTerm && (
@@ -228,8 +229,8 @@ export default function UserDirectory() {
                   className="bg-transparent text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer"
                 >
                   <option value="name" className="dark:bg-slate-800">Sort by Name</option>
-                  <option value="user_id" className="dark:bg-slate-800">Sort by User ID</option>
-                  <option value="id" className="dark:bg-slate-800">Sort by ID</option>
+                  <option value="user_id" className="dark:bg-slate-800">Sort by Roll Number</option>
+                  <option value="id" className="dark:bg-slate-800">Sort by User ID</option>
                   <option value="email" className="dark:bg-slate-800">Sort by Email</option>
                   <option value="role" className="dark:bg-slate-800">Sort by Role</option>
                 </select>
@@ -377,18 +378,18 @@ export default function UserDirectory() {
                         </div>
                       </div>
 
-                      {/* Details Box: User ID & ID */}
+                      {/* Details Box: Roll Number (user_id) & User ID (id) */}
                       <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/60 text-xs">
-                        {/* User ID */}
+                        {/* Roll Number (user_id) */}
                         <div className="min-w-0">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">User ID</span>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Roll Number</span>
                           <div className="flex items-center justify-between gap-1 mt-0.5 font-mono text-slate-700 dark:text-slate-300">
                             <span className="truncate font-semibold">{user.user_id || "-"}</span>
                             {user.user_id && (
                               <button
-                                onClick={() => handleCopy(user.user_id, "User ID")}
+                                onClick={() => handleCopy(user.user_id, "Roll Number")}
                                 className="text-slate-400 hover:text-blue-500 transition-colors p-0.5 shrink-0"
-                                title="Copy User ID"
+                                title="Copy Roll Number"
                               >
                                 <Copy className="w-3 h-3" />
                               </button>
@@ -396,16 +397,16 @@ export default function UserDirectory() {
                           </div>
                         </div>
 
-                        {/* ID */}
+                        {/* User ID (id) */}
                         <div className="min-w-0 border-l border-slate-200/60 dark:border-slate-700/60 pl-2">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">ID</span>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">User ID</span>
                           <div className="flex items-center justify-between gap-1 mt-0.5 font-mono font-bold text-blue-600 dark:text-blue-400">
                             <span className="truncate">{user.id || "-"}</span>
                             {user.id && (
                               <button
-                                onClick={() => handleCopy(user.id, "ID")}
+                                onClick={() => handleCopy(user.id, "User ID")}
                                 className="text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors p-0.5 shrink-0"
-                                title="Copy ID"
+                                title="Copy User ID"
                               >
                                 <Copy className="w-3 h-3" />
                               </button>
