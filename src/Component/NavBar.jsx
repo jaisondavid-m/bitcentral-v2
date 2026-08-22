@@ -21,7 +21,6 @@ function Navbar() {
 
   const navItems = [
     { to: "/home", label: "Home" },
-    { to: "/user-directory", label: "User Directory" },
     ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
     { to: "/profile", label: "My Profile" },
     { to: "/about", label: "About" }
