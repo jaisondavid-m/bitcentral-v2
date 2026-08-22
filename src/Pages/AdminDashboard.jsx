@@ -2747,15 +2747,14 @@ function MessSection() {
 function SponsorsSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [count, setCount] = useState(2);
-  const [skip, setSkip] = useState(1);
   const [data, setData] = useState({ total_amount_raised: 0, count: 0, orders: [] });
 
-  const fetchSponsors = useCallback(async (cVal, sVal) => {
+  const fetchSponsors = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const res = await getAdminSponsors({ count: cVal, skip: sVal });
+      // Always load all records (count=100, skip=0)
+      const res = await getAdminSponsors({ count: 100, skip: 0 });
       if (res?.success) {
         setData(res);
       } else {
@@ -2769,45 +2768,27 @@ function SponsorsSection() {
   }, []);
 
   useEffect(() => {
-    fetchSponsors(count, skip);
-  }, [count, skip, fetchSponsors]);
+    fetchSponsors();
+  }, [fetchSponsors]);
 
   return (
     <section className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div>
           <h2 className="text-xl font-bold text-slate-950 dark:text-white flex items-center gap-2">
-            <Heart className="h-5 w-5 text-rose-500 fill-rose-500" /> Sponsored Users & Razorpay Orders
+            <Heart className="h-5 w-5 text-rose-500 fill-rose-500" /> Sponsored Users & Razorpay Payments
           </h2>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Live contribution data fetched directly via Razorpay API (<code className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">https://api.razorpay.com/v1/orders</code>)
+            Live contribution history fetched directly from Razorpay
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Count:</label>
-            <input
-              type="number"
-              value={count}
-              onChange={(e) => setCount(Math.max(1, parseInt(e.target.value) || 1))}
-              className="w-16 rounded-lg border border-slate-300 px-2 py-1 text-xs font-bold dark:border-slate-700 dark:bg-slate-950 dark:text-white"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Skip:</label>
-            <input
-              type="number"
-              value={skip}
-              onChange={(e) => setSkip(Math.max(0, parseInt(e.target.value) || 0))}
-              className="w-16 rounded-lg border border-slate-300 px-2 py-1 text-xs font-bold dark:border-slate-700 dark:bg-slate-950 dark:text-white"
-            />
-          </div>
+        <div>
           <button
             type="button"
-            onClick={() => fetchSponsors(count, skip)}
+            onClick={fetchSponsors}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-700 disabled:opacity-50 cursor-pointer shadow-sm"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
           </button>
@@ -2815,25 +2796,18 @@ function SponsorsSection() {
       </div>
 
       {/* Metrics Row */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Funds Raised</span>
-          <div className="mt-2 text-2xl font-black text-emerald-600 dark:text-emerald-400">
-            ₹{data.total_amount_raised || 0}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 shadow-sm">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Funds Raised</span>
+          <div className="mt-2 text-3xl font-black text-emerald-600 dark:text-emerald-400">
+            ₹{Number(data.total_amount_raised || 0).toLocaleString("en-IN")}
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Orders Fetched</span>
-          <div className="mt-2 text-2xl font-black text-slate-900 dark:text-white">
-            {data.orders?.length || 0} orders
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Endpoint Query</span>
-          <div className="mt-2 text-xs font-mono text-blue-600 dark:text-blue-400 truncate">
-            /v1/orders?count={count}&skip={skip}
+        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 shadow-sm">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Payments Recorded</span>
+          <div className="mt-2 text-3xl font-black text-slate-900 dark:text-white">
+            {data.orders?.length || 0} sponsors
           </div>
         </div>
       </div>
@@ -2856,7 +2830,7 @@ function SponsorsSection() {
           </div>
         ) : (data.orders || []).length === 0 ? (
           <div className="p-12 text-center text-xs text-slate-500 dark:text-slate-400">
-            No sponsored order records found for count={count} skip={skip}.
+            No sponsored payment records found.
           </div>
         ) : (
           <div className="overflow-x-auto">
