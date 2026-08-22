@@ -59,6 +59,9 @@ export default function StudentReportModal({ studentId, onClose }) {
   const points = data.points || {};
   const academics = data.academics || {};
 
+  const leaveList = data.leave || academics.leave || basic.leave || [];
+  const biometricList = data.biometric || academics.biometric || basic.biometric || [];
+
   const attendanceObj = basic.attendance || academics.summary || {};
   const attendancePct = parseFloat(basic.attendance_percentage || attendanceObj.attendance_percentage || "0").toFixed(1);
 
@@ -520,7 +523,7 @@ export default function StudentReportModal({ studentId, onClose }) {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
-                          {(academics.leave || []).map((lv, idx) => (
+                          {leaveList.map((lv, idx) => (
                             <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                               <td className="p-3">
                                 <span className="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-[11px]">
@@ -528,14 +531,14 @@ export default function StudentReportModal({ studentId, onClose }) {
                                 </span>
                               </td>
                               <td className="p-3 font-mono text-slate-700 dark:text-slate-300">
-                                {lv.from_date} <br />
-                                <span className="text-slate-400">to {lv.to_date}</span>
+                                {lv.from_date || lv.from_leave} <br />
+                                <span className="text-slate-400">to {lv.to_date || lv.to_leave}</span>
                               </td>
-                              <td className="p-3 font-bold text-slate-800 dark:text-slate-200">{lv.duration} days</td>
+                              <td className="p-3 font-bold text-slate-800 dark:text-slate-200">{lv.duration || "1"} days</td>
                               <td className="p-3 text-slate-600 dark:text-slate-400">{lv.remarks || "-"}</td>
                               <td className="p-3 font-mono text-[11px] text-slate-500">
-                                Out: {lv.gate_out || "-"} <br />
-                                In: {lv.gate_in || "-"}
+                                Out: {lv.gate_out && lv.gate_out !== "-" ? lv.gate_out : "-"} <br />
+                                In: {lv.gate_in && lv.gate_in !== "-" ? lv.gate_in : "-"}
                               </td>
                             </tr>
                           ))}
@@ -548,11 +551,11 @@ export default function StudentReportModal({ studentId, onClose }) {
                   <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
                     <h3 className="font-bold text-base text-slate-900 dark:text-slate-100 flex items-center gap-2">
                       <Clock className="w-4 h-4 text-emerald-500" />
-                      Recent Biometric Logs
+                      Recent Biometric Logs ({biometricList.length})
                     </h3>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                      {(academics.biometric || []).slice(0, 18).map((bio, idx) => (
+                      {biometricList.map((bio, idx) => (
                         <div key={idx} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
                           <div>
                             <span className="font-bold text-slate-800 dark:text-slate-200 block">{bio.device_name}</span>

@@ -32,7 +32,11 @@ import {
   UserCheck,
   Zap,
   ChevronRight,
-  BarChart3
+  BarChart3,
+  Fingerprint,
+  FileCheck2,
+  LogOut,
+  LogIn
 } from "lucide-react";
 import api, { getAuthenticatedHeaders } from "../api/axios.js";
 
@@ -47,6 +51,8 @@ export default function StudentReportDetails() {
   const [activeTab, setActiveTab] = useState("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [resultFilter, setResultFilter] = useState("ALL"); // ALL, Cleared, Not Cleared
+  const [leaveSearch, setLeaveSearch] = useState("");
+  const [bioSearch, setBioSearch] = useState("");
   const [copiedText, setCopiedText] = useState(null);
 
   // Fetch student report details from proxy endpoint
@@ -78,12 +84,19 @@ export default function StudentReportDetails() {
   const points = data.points || {};
   const academics = data.academics || {};
 
+  // Extract arrays across possible locations in data structure
+  const leaveList = useMemo(() => data.leave || academics.leave || basic.leave || [], [data, academics, basic]);
+  const biometricList = useMemo(() => data.biometric || academics.biometric || basic.biometric || [], [data, academics, basic]);
+  const attendanceList = useMemo(() => academics.attendance || academics.rows || data.attendance || [], [academics, data]);
+  const coursesList = useMemo(() => personalized.courses || personalized.ps_course || [], [personalized]);
+  const assessmentList = useMemo(() => personalized.assessment_data || personalized.assessment_logs || [], [personalized]);
+
   const attendanceObj = basic.attendance || academics.summary || {};
   const attendancePct = parseFloat(basic.attendance_percentage || attendanceObj.attendance_percentage || "0").toFixed(1);
 
   // Assessment logs filtering
   const filteredAssessments = useMemo(() => {
-    let list = personalized.assessment_data || personalized.assessment_logs || [];
+    let list = assessmentList;
     if (resultFilter !== "ALL") {
       list = list.filter((item) => item.result === resultFilter);
     }
@@ -97,7 +110,32 @@ export default function StudentReportDetails() {
       );
     }
     return list;
-  }, [personalized.assessment_data, personalized.assessment_logs, resultFilter, searchTerm]);
+  }, [assessmentList, resultFilter, searchTerm]);
+
+  // Leave records filtering
+  const filteredLeaves = useMemo(() => {
+    if (!leaveSearch.trim()) return leaveList;
+    const q = leaveSearch.toLowerCase();
+    return leaveList.filter(
+      (lv) =>
+        (lv.leave_type || lv.type || "").toLowerCase().includes(q) ||
+        (lv.remarks || "").toLowerCase().includes(q) ||
+        (lv.from_date || "").includes(q) ||
+        (lv.to_date || "").includes(q)
+    );
+  }, [leaveList, leaveSearch]);
+
+  // Biometric records filtering
+  const filteredBiometrics = useMemo(() => {
+    if (!bioSearch.trim()) return biometricList;
+    const q = bioSearch.toLowerCase();
+    return biometricList.filter(
+      (bio) =>
+        (bio.device_name || "").toLowerCase().includes(q) ||
+        (bio.date || "").includes(q) ||
+        (bio.time || "").includes(q)
+    );
+  }, [biometricList, bioSearch]);
 
   // Copy helper
   const handleCopy = (text, label) => {
@@ -316,7 +354,7 @@ export default function StudentReportDetails() {
                 </div>
 
                 {/* Right Stat Widget Gauge */}
-                <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-5 w-full lg:w-auto shrink-0 justify-around lg:justify-start">
+                <div className="flex items-center gap-6 bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-5 w-full lg:w-auto shrink-0 justify-around lg:justify-start">
                   <div className="text-center space-y-1">
                     <span className="text-[11px] font-bold text-indigo-200 uppercase tracking-wider block">
                       Overall Attendance
@@ -335,6 +373,19 @@ export default function StudentReportDetails() {
                       <span>Absent: {attendanceObj.absent || attendanceObj.absent_days || "0"}d</span>
                     </div>
                   </div>
+
+                  <div className="hidden sm:block border-l border-white/15 h-20" />
+
+                  <div className="hidden sm:flex flex-col justify-between text-xs space-y-2">
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase block">Total Leaves</span>
+                      <strong className="text-indigo-300 text-sm font-bold">{leaveList.length} Records</strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase block">Biometric Punches</span>
+                      <strong className="text-emerald-300 text-sm font-bold">{biometricList.length} Logs</strong>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -344,7 +395,7 @@ export default function StudentReportDetails() {
                   { id: "overview", label: "Overview & Academics", icon: Activity },
                   { id: "skills", label: "Personalized Skills & Courses", icon: BookOpen },
                   { id: "points", label: "Points & Leaderboard Ranks", icon: Award },
-                  { id: "leaves", label: "Leaves & Biometrics", icon: Calendar },
+                  { id: "leaves", label: `Leaves (${leaveList.length}) & Biometrics (${biometricList.length})`, icon: Calendar },
                 ].map((tab) => {
                   const Icon = tab.icon;
                   const isActive = activeTab === tab.id;
@@ -415,7 +466,7 @@ export default function StudentReportDetails() {
                       </p>
                     </div>
                     <span className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 shrink-0">
-                      Total {(academics.attendance || academics.rows || []).length} Recorded Days
+                      Total {attendanceList.length} Recorded Days
                     </span>
                   </div>
 
@@ -430,7 +481,7 @@ export default function StudentReportDetails() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
-                        {(academics.attendance || academics.rows || []).map((row, i) => {
+                        {attendanceList.map((row, i) => {
                           const isPresent = row.status === "Present" || row.overall === "Present";
                           const isHalfDay = row.overall?.includes("Half Day");
                           return (
@@ -484,21 +535,21 @@ export default function StudentReportDetails() {
                   <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm text-center">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Total Assessments</span>
                     <span className="text-3xl font-black text-slate-900 dark:text-slate-100 mt-1 block">
-                      {personalized.summary?.assessments || "0"}
+                      {personalized.summary?.assessments || assessmentList.length}
                     </span>
                   </div>
 
                   <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm text-center">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Cleared Assessments</span>
                     <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1 block">
-                      {personalized.summary?.cleared || "0"}
+                      {personalized.summary?.cleared || assessmentList.filter(a => a.result === "Cleared").length}
                     </span>
                   </div>
 
                   <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm text-center">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Registered Courses</span>
                     <span className="text-3xl font-black text-blue-600 dark:text-blue-400 mt-1 block">
-                      {personalized.summary?.registered || "0"}
+                      {personalized.summary?.registered || coursesList.length}
                     </span>
                   </div>
                 </div>
@@ -508,7 +559,7 @@ export default function StudentReportDetails() {
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 flex items-center gap-2">
                       <BookOpen className="w-5 h-5 text-purple-500" />
-                      Assessment History
+                      Assessment History ({filteredAssessments.length})
                     </h3>
 
                     <div className="flex flex-wrap items-center gap-3">
@@ -541,9 +592,9 @@ export default function StudentReportDetails() {
                   </div>
 
                   {/* Assessment Records Table */}
-                  <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800">
+                  <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800 max-h-96 overflow-y-auto">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 uppercase font-semibold text-[10px] tracking-wider">
+                      <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 uppercase font-semibold text-[10px] tracking-wider sticky top-0 z-10">
                         <tr>
                           <th className="p-3.5">Date</th>
                           <th className="p-3.5">Course Name</th>
@@ -564,7 +615,7 @@ export default function StudentReportDetails() {
                             const isCleared = item.result === "Cleared";
                             return (
                               <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                                <td className="p-3.5 font-mono text-slate-700 dark:text-slate-300">{item.date}</td>
+                                <td className="p-3.5 font-mono text-slate-700 dark:text-slate-300 whitespace-nowrap">{item.date}</td>
                                 <td className="p-3.5 font-bold text-slate-900 dark:text-slate-100">{item.course_name}</td>
                                 <td className="p-3.5">
                                   <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold text-[11px] border ${
@@ -576,7 +627,7 @@ export default function StudentReportDetails() {
                                     {item.result}
                                   </span>
                                 </td>
-                                <td className="p-3.5 text-slate-500 dark:text-slate-400 font-mono text-[11px]">
+                                <td className="p-3.5 text-slate-500 dark:text-slate-400 font-mono text-[11px] whitespace-nowrap">
                                   {item.start_time} - {item.end_time}
                                 </td>
                                 <td className="p-3.5 text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
@@ -593,15 +644,15 @@ export default function StudentReportDetails() {
                 </div>
 
                 {/* Courses Progress Cards */}
-                {(personalized.courses || personalized.ps_course || []).length > 0 && (
+                {coursesList.length > 0 && (
                   <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
                     <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 flex items-center gap-2">
                       <Layers className="w-5 h-5 text-indigo-500" />
-                      Courses Clearance Progress
+                      Courses Clearance Progress ({coursesList.length})
                     </h3>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                      {(personalized.courses || personalized.ps_course || []).map((crs, idx) => {
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[500px] overflow-y-auto pr-1">
+                      {coursesList.map((crs, idx) => {
                         const cleared = parseInt(crs.cleared || crs.levels_cleared || "0");
                         const total = parseInt(crs.levels || "1");
                         const pct = Math.min(100, Math.round((cleared / (total || 1)) * 100));
@@ -684,12 +735,12 @@ export default function StudentReportDetails() {
                 <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
                   <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-emerald-500" />
-                    Points Transactions History
+                    Points Transactions History ({(points.transactions || []).length})
                   </h3>
 
-                  <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800">
+                  <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800 max-h-96 overflow-y-auto">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 uppercase font-semibold text-[10px] tracking-wider">
+                      <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 uppercase font-semibold text-[10px] tracking-wider sticky top-0 z-10">
                         <tr>
                           <th className="p-3.5">Date</th>
                           <th className="p-3.5">Title & Description</th>
@@ -706,7 +757,7 @@ export default function StudentReportDetails() {
                               <div className="text-[11px] text-slate-500 truncate max-w-sm">{tx.description}</div>
                             </td>
                             <td className="p-3.5 text-slate-600 dark:text-slate-400">{tx.category_name}</td>
-                            <td className="p-3.5 font-bold font-mono text-emerald-600 dark:text-emerald-400 text-sm">
+                            <td className="p-3.5 font-bold font-mono text-emerald-600 dark:text-emerald-400 text-sm whitespace-nowrap">
                               +{parseFloat(tx.points || "0").toFixed(1)} {tx.points_name}
                             </td>
                           </tr>
@@ -721,16 +772,35 @@ export default function StudentReportDetails() {
             {/* TAB 4: LEAVES & BIOMETRICS */}
             {activeTab === "leaves" && (
               <div className="space-y-6 animate-in fade-in duration-200">
-                {/* Leaves Table */}
+                {/* Leaves & Gate Out Table Section */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
-                  <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-blue-500" />
-                    Leave & Gate Out Records
-                  </h3>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                        <FileCheck2 className="w-5 h-5 text-blue-500" />
+                        Leave & Gate Pass Requests ({filteredLeaves.length})
+                      </h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Official leave applications, reasons, durations, and gate logs
+                      </p>
+                    </div>
 
-                  <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800">
+                    {/* Search Leave Input */}
+                    <div className="relative w-full sm:w-64">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input
+                        type="text"
+                        value={leaveSearch}
+                        onChange={(e) => setLeaveSearch(e.target.value)}
+                        placeholder="Search leave reason or date..."
+                        className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800 max-h-96 overflow-y-auto">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 uppercase font-semibold text-[10px] tracking-wider">
+                      <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 uppercase font-semibold text-[10px] tracking-wider sticky top-0 z-10">
                         <tr>
                           <th className="p-3.5">Leave Type</th>
                           <th className="p-3.5">From - To Date</th>
@@ -740,52 +810,99 @@ export default function StudentReportDetails() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
-                        {(academics.leave || []).map((lv, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                            <td className="p-3.5">
-                              <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-[11px] border border-blue-500/20">
-                                {lv.leave_type || lv.type}
-                              </span>
-                            </td>
-                            <td className="p-3.5 font-mono text-slate-700 dark:text-slate-300">
-                              {lv.from_date} <br />
-                              <span className="text-slate-400 text-[11px]">to {lv.to_date}</span>
-                            </td>
-                            <td className="p-3.5 font-bold text-slate-900 dark:text-slate-100">{lv.duration} days</td>
-                            <td className="p-3.5 text-slate-600 dark:text-slate-400 max-w-xs">{lv.remarks || "-"}</td>
-                            <td className="p-3.5 font-mono text-[11px] text-slate-500">
-                              Gate Out: <strong className="text-slate-700 dark:text-slate-300">{lv.gate_out || "-"}</strong> <br />
-                              Gate In: <strong className="text-slate-700 dark:text-slate-300">{lv.gate_in || "-"}</strong>
+                        {filteredLeaves.length === 0 ? (
+                          <tr>
+                            <td colSpan={5} className="p-8 text-center text-slate-400 italic">
+                              No leave records found.
                             </td>
                           </tr>
-                        ))}
+                        ) : (
+                          filteredLeaves.map((lv, idx) => (
+                            <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                              <td className="p-3.5">
+                                <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-[11px] border border-blue-500/20 whitespace-nowrap">
+                                  {lv.leave_type || lv.type || "Leave"}
+                                </span>
+                              </td>
+                              <td className="p-3.5 font-mono text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                                <span className="font-semibold">{lv.from_date || lv.from_leave}</span> <br />
+                                <span className="text-slate-400 text-[11px]">to {lv.to_date || lv.to_leave}</span>
+                              </td>
+                              <td className="p-3.5 font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">
+                                {lv.duration || "1"} days
+                              </td>
+                              <td className="p-3.5 text-slate-600 dark:text-slate-400 max-w-xs">{lv.remarks || "-"}</td>
+                              <td className="p-3.5 font-mono text-[11px] text-slate-500 whitespace-nowrap">
+                                <div className="flex items-center gap-1 text-slate-700 dark:text-slate-300">
+                                  <LogOut className="w-3 h-3 text-amber-500" />
+                                  <span>Out: <strong>{lv.gate_out && lv.gate_out !== "-" ? lv.gate_out : "-"}</strong></span>
+                                </div>
+                                <div className="flex items-center gap-1 text-slate-700 dark:text-slate-300 mt-0.5">
+                                  <LogIn className="w-3 h-3 text-emerald-500" />
+                                  <span>In: <strong>{lv.gate_in && lv.gate_in !== "-" ? lv.gate_in : "-"}</strong></span>
+                                </div>
+                              </td>
+                            </tr>
+                          ))
+                        )}
                       </tbody>
                     </table>
                   </div>
                 </div>
 
-                {/* Biometrics Punch Grid */}
+                {/* Biometrics Punch Grid & Search */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
-                  <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-emerald-500" />
-                    Biometric Fingerprint Punch Logs
-                  </h3>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                        <Fingerprint className="w-5 h-5 text-emerald-500" />
+                        Biometric Fingerprint Punch Logs ({filteredBiometrics.length})
+                      </h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Attendance punch logs recorded across campus biometrics devices & gates
+                      </p>
+                    </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {(academics.biometric || []).map((bio, idx) => (
-                      <div key={idx} className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-                        <div>
-                          <span className="font-bold text-slate-800 dark:text-slate-200 block truncate max-w-[140px]" title={bio.device_name}>
-                            {bio.device_name}
-                          </span>
-                          <span className="text-slate-400 font-mono text-[11px]">{bio.date}</span>
-                        </div>
-                        <span className="font-mono font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-xl text-xs border border-emerald-500/20">
-                          {bio.time}
-                        </span>
-                      </div>
-                    ))}
+                    {/* Biometrics Search Input */}
+                    <div className="relative w-full sm:w-64">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input
+                        type="text"
+                        value={bioSearch}
+                        onChange={(e) => setBioSearch(e.target.value)}
+                        placeholder="Filter by device or date..."
+                        className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
                   </div>
+
+                  {filteredBiometrics.length === 0 ? (
+                    <div className="p-8 text-center text-slate-400 italic bg-slate-50 dark:bg-slate-800/40 rounded-2xl">
+                      No biometric log entries found matching filter.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[500px] overflow-y-auto pr-1">
+                      {filteredBiometrics.map((bio, idx) => (
+                        <div
+                          key={idx}
+                          className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all"
+                        >
+                          <div className="space-y-0.5 min-w-0 pr-2">
+                            <span className="font-bold text-slate-800 dark:text-slate-200 block truncate" title={bio.device_name}>
+                              {bio.device_name}
+                            </span>
+                            <span className="text-slate-400 font-mono text-[11px] flex items-center gap-1">
+                              <Calendar className="w-3 h-3 text-slate-400" />
+                              {bio.date}
+                            </span>
+                          </div>
+                          <span className="font-mono font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1.5 rounded-xl text-xs border border-emerald-500/20 shrink-0">
+                            {bio.time}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
