@@ -18,9 +18,11 @@ import {
   GraduationCap,
   Building2,
   Code2,
-  UserCheck
+  UserCheck,
+  Eye
 } from "lucide-react";
 import api, { getAuthenticatedHeaders } from "../api/axios.js";
+import StudentReportModal from "../Component/StudentReportModal.jsx";
 
 // Role calculation rule helper:
 // user_id = Roll Number
@@ -75,6 +77,7 @@ export default function UserDirectory() {
   const [sortBy, setSortBy] = useState("name"); // name, user_id, id, email, role
   const [sortOrder, setSortOrder] = useState("asc");
   const [copiedText, setCopiedText] = useState(null);
+  const [selectedStudentId, setSelectedStudentId] = useState(null);
 
   // Debounce search input
   useEffect(() => {
@@ -442,6 +445,15 @@ export default function UserDirectory() {
                         No email available
                       </div>
                     )}
+
+                    {/* View Details Action Button */}
+                    <button
+                      onClick={() => setSelectedStudentId(user.id || user.user_id)}
+                      className="w-full mt-3 py-2 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm group-hover:border-indigo-400 cursor-pointer"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>View Details</span>
+                    </button>
                   </div>
                 );
               })}
@@ -501,6 +513,14 @@ export default function UserDirectory() {
               </div>
             )}
           </>
+        )}
+
+        {/* Student Report Modal */}
+        {selectedStudentId && (
+          <StudentReportModal
+            studentId={selectedStudentId}
+            onClose={() => setSelectedStudentId(null)}
+          />
         )}
       </div>
     </div>
