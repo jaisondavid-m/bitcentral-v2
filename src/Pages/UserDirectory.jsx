@@ -170,8 +170,8 @@ export default function UserDirectory() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-6 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="w-full max-w-[1600px] mx-auto space-y-6">
-        
+      <div className="max-w-7xl mx-auto space-y-6">
+
         {/* Toast Notification */}
         {copiedText && (
           <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-3 rounded-xl shadow-2xl text-sm font-semibold animate-bounce border border-slate-700 dark:border-slate-200">
@@ -497,11 +497,10 @@ export default function UserDirectory() {
                         <button
                           key={pageNum}
                           onClick={() => setCurrentPage(pageNum)}
-                          className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
-                            currentPage === pageNum
+                          className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${currentPage === pageNum
                               ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
                               : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-                          }`}
+                            }`}
                         >
                           {pageNum}
                         </button>

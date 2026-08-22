@@ -170,7 +170,7 @@ export default function StudentReportDetails() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-6 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="w-full max-w-[1600px] mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
 
         {/* Copy Notification Toast */}
         {copiedText && (
@@ -403,11 +403,10 @@ export default function StudentReportDetails() {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
-                        isActive
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${isActive
                           ? "bg-white text-slate-900 shadow-md scale-105"
                           : "bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white"
-                      }`}
+                        }`}
                     >
                       <Icon className="w-4 h-4" />
                       <span>{tab.label}</span>
@@ -488,13 +487,12 @@ export default function StudentReportDetails() {
                             <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                               <td className="p-3.5 font-mono font-semibold text-slate-900 dark:text-slate-100">{row.date}</td>
                               <td className="p-3.5">
-                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold text-[11px] border ${
-                                  isPresent
+                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold text-[11px] border ${isPresent
                                     ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
                                     : isHalfDay
-                                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                                    : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
-                                }`}>
+                                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                                      : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
+                                  }`}>
                                   {isPresent ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                                   {row.status || row.overall || "N/A"}
                                 </span>
@@ -505,11 +503,10 @@ export default function StudentReportDetails() {
                                   {(row.sessions || []).map((s, sIdx) => (
                                     <span
                                       key={sIdx}
-                                      className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-[11px] shadow-xs ${
-                                        s === "P"
+                                      className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-[11px] shadow-xs ${s === "P"
                                           ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300"
                                           : "bg-red-100 text-red-700 dark:bg-red-950/80 dark:text-red-300"
-                                      }`}
+                                        }`}
                                       title={`Session ${sIdx + 1}: ${s === "P" ? "Present" : "Absent"}`}
                                     >
                                       {s}
@@ -618,11 +615,10 @@ export default function StudentReportDetails() {
                                 <td className="p-3.5 font-mono text-slate-700 dark:text-slate-300 whitespace-nowrap">{item.date}</td>
                                 <td className="p-3.5 font-bold text-slate-900 dark:text-slate-100">{item.course_name}</td>
                                 <td className="p-3.5">
-                                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold text-[11px] border ${
-                                    isCleared
+                                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold text-[11px] border ${isCleared
                                       ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
                                       : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
-                                  }`}>
+                                    }`}>
                                     {isCleared ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                                     {item.result}
                                   </span>

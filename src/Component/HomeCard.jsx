@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ExternalLink, ArrowRight } from "lucide-react";
 import api from "../api/axios.js";
 
 export function Card({ id, name, link, img, btntext }) {
@@ -25,7 +24,7 @@ export function Card({ id, name, link, img, btntext }) {
       },
       body: "{}",
       keepalive: true,
-    }).catch(() => {});
+    }).catch(() => { });
   };
 
   const handleNavigate = () => {
@@ -37,53 +36,24 @@ export function Card({ id, name, link, img, btntext }) {
       window.open(link, "_blank");
     }
   };
-
-  const isExternal = !link?.startsWith("/");
-
   return (
-    <article
-      onClick={handleNavigate}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 shadow-sm hover:shadow-xl hover:border-blue-500/40 dark:hover:border-blue-500/40 transition-all duration-200 hover:-translate-y-1 cursor-pointer"
-      aria-label={`Open ${name}`}
-    >
-      <div className="aspect-video w-full overflow-hidden bg-slate-100 dark:bg-slate-800/60 relative">
+    <article onClick={handleNavigate} className="group flex flex-col overflow-hidden rounded-lg border border-blue-200 bg-white shadow-sm transition-all hover:shadow-md cursor-pointer sm:rounded-xl dark:border-blue-900 dark:bg-slate-950 dark:shadow-blue-950/30" aria-label={`Open ${name}`}>
+      <div className="hidden sm:flex aspect-video w-full overflow-hidden bg-slate-100 items-center justify-center dark:bg-slate-900">
         {img ? (
-          <img
-            src={img}
-            alt={name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            loading="lazy"
-            decoding="async"
-          />
+          <img src={img} alt={name} className="h-full w-full object-cover transition-transform group-hover:scale-105" loading="lazy" decoding="async" />
         ) : (
-          <div className="h-full w-full flex items-center justify-center p-4 text-center">
-            <span className="text-sm font-bold text-slate-400 dark:text-slate-500">{name}</span>
-          </div>
-        )}
-
-        {isExternal && (
-          <div className="absolute top-2.5 right-2.5 p-1.5 rounded-lg bg-slate-900/60 backdrop-blur-md text-white border border-white/20 opacity-80 group-hover:opacity-100 transition-opacity">
-            <ExternalLink className="w-3.5 h-3.5" />
-          </div>
+          <p className="text-center text-lg font-semibold text-slate-500 dark:text-slate-300">{name}</p>
         )}
       </div>
 
-      <div className="flex flex-1 flex-col p-4 space-y-3 justify-between">
-        <h3 className="line-clamp-2 text-sm font-bold text-slate-900 dark:text-slate-100 tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-          {name}
-        </h3>
-        
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleNavigate();
-          }}
-          className="w-full py-2 px-3 rounded-xl bg-slate-100 group-hover:bg-blue-600 dark:bg-slate-800 dark:group-hover:bg-blue-600 text-slate-700 group-hover:text-white dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60 text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-          aria-label={`${btntext || "Open"} ${name}`}
-        >
-          <span>{btntext || "Open Portal"}</span>
-          <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+      <div className="flex flex-1 flex-col p-3 sm:p-4">
+        <h3 className="mb-2 line-clamp-2 text-sm font-semibold text-slate-900 sm:text-base sm:min-h-[3rem] dark:text-slate-100">{name}</h3>
+        <div className="flex-1" />
+
+        <button onClick={(e) => { e.stopPropagation(); handleNavigate(); }} className="mt-2 inline-flex items-center cursor-pointer justify-center rounded-lg border border-slate-300 bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-3 sm:rounded-xl sm:px-4 sm:py-2 sm:text-sm dark:border-blue-900 dark:focus:ring-offset-slate-950" aria-label={`${btntext || "View"} ${name}`}>
+          {btntext || "View"}
         </button>
+
       </div>
     </article>
   );

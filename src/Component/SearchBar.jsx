@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Loader2, Mic, MicOff, Search, X } from "lucide-react";
+import { Loader2, Mic, MicOff, X } from "lucide-react";
 
-function SearchBar({ search, setSearch, isSearching = false, placeholder = "Search student resources, question banks, or tools...", isDark = false }) {
+function SearchBar({ search, setSearch, isSearching = false, placeholder = "Search...", isDark = false }) {
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState("");
   const recognitionRef = useRef(null);
@@ -61,10 +61,8 @@ function SearchBar({ search, setSearch, isSearching = false, placeholder = "Sear
   }, [setSearch]);
 
   return (
-    <div className="w-full">
-      <div className="relative mx-auto max-w-xl">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-
+    <div>
+      <div className="relative mx-auto max-w-md">
         <input
           type="text"
           placeholder={placeholder}
@@ -73,54 +71,54 @@ function SearchBar({ search, setSearch, isSearching = false, placeholder = "Sear
             setSearch(e.target.value);
             setError("");
           }}
-          className="w-full pl-11 pr-24 py-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+          className={`block w-full rounded-xl px-3 py-2 pr-24 text-sm shadow-sm transition-all focus:outline-none sm:px-3.5 sm:py-2.5 sm:pr-24 ${isDark ? 'border border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-500 focus:border-blue-700 focus:ring-blue-900/40' : 'border border-blue-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100'}`}
         />
 
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-          {search && (
-            <button
-              onClick={handleClearSearch}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-              aria-label="Clear search"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-
-          {isSearching && (
-            <div className="p-1.5 text-blue-500">
-              <Loader2 className="w-4 h-4 animate-spin" />
-            </div>
-          )}
-
+        {search && (
           <button
-            onClick={toggleVoiceSearch}
-            className={`p-1.5 rounded-lg transition-all ${
-              isListening
-                ? "bg-red-500/10 text-red-500 animate-pulse"
-                : "text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-            }`}
-            aria-label="Voice search"
-            title={isListening ? "Listening... click to stop" : "Start voice search"}
+            onClick={handleClearSearch}
+            className={`absolute top-1/2 -translate-y-1/2 rounded-lg p-2 text-slate-400 transition-colors ${isDark ? 'hover:text-slate-300' : 'hover:text-slate-600'} ${isSearching ? "right-20" : "right-12"}`}
+            aria-label="Clear search"
           >
-            {isListening ? (
-              <MicOff className="w-4 h-4" />
-            ) : (
-              <Mic className="w-4 h-4" />
-            )}
+            <X className="h-5 w-5" strokeWidth={2} />
           </button>
-        </div>
+        )}
+
+        {isSearching && (
+          <div className={`absolute right-12 top-1/2 -translate-y-1/2 ${isDark ? 'text-blue-300' : 'text-blue-600'}`}>
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </div>
+        )}
+
+        <button
+          onClick={toggleVoiceSearch}
+          className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 transition-all ${isListening ? (isDark ? 'text-red-400' : 'text-red-500') : (isDark ? 'text-slate-400 hover:text-blue-300' : 'text-slate-500 hover:text-blue-700')}`}
+          aria-label="Voice search"
+          title={isListening ? "Stop listening" : "Start voice search"}
+        >
+          {isListening ? (
+            <MicOff className="h-5 w-5" strokeWidth={2} />
+          ) : (
+            <Mic className="h-5 w-5" strokeWidth={2} />
+          )}
+        </button>
       </div>
 
       {isListening && (
-        <p className="mt-2 text-center text-xs font-semibold text-red-500 animate-pulse">
-          🎤 Listening to voice input... Speak now
+        <p className="mt-2 text-center text-xs text-red-500 sm:text-sm">
+          🎤 Listening...
         </p>
       )}
 
       {error && (
-        <p className="mt-2 text-center text-xs text-red-500 font-medium">
+        <p className="mt-2 text-center text-xs text-red-500 sm:text-sm">
           {error}
+        </p>
+      )}
+
+      {isSearching && !isListening && !error && (
+        <p className="mt-2 text-center text-xs text-blue-600 dark:text-blue-300 sm:text-sm">
+          Searching...
         </p>
       )}
     </div>

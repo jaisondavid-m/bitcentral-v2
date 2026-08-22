@@ -73,41 +73,41 @@ function HomeContent() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-6 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="w-full max-w-[1600px] mx-auto space-y-6">
-          <section className="mb-8" aria-label="Search resources">
-            <SearchBar search={search} setSearch={setSearch} />
-          </section>
+    <main className="min-h-screen bg-gray-50 py-4 sm:py-8 dark:bg-black">
+      <div className="mx-auto max-w-7xl px-3 sm:px-6">
+        <section className="mb-8" aria-label="Search resources">
+          <SearchBar search={search} setSearch={setSearch} />
+        </section>
 
-          {isPending ? (
-            <section className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4" aria-label="Available resources">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((_, index) => (
-                <HomeCardSkeleton key={index} />
-              ))}
-            </section>
-          ) : filteredCards.length > 0 ? (
-            <section className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4" aria-label="Available resources">
-              {filteredCards.map((card, index) => (
-                <Card
-                  key={card.id || index}
-                  id={card.id}
-                  name={card.name}
-                  link={card.link}
-                  img={card.img}
-                  btntext={card.btntext}
-                />
-              ))}
-            </section>
-          ) : (
-            <div className="py-12 text-center">
-              <p className="text-base text-gray-500 sm:text-lg dark:text-slate-300">No Site Found</p>
-              {search && (
-                <p className="mt-2 text-xs text-gray-400 sm:text-sm dark:text-slate-400">Try adjusting your search</p>
-              )}
-            </div>
-          )}
-        </div>
-      </main>
+        {isPending ? (
+          <section className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4" aria-label="Available resources">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((_, index) => (
+              <HomeCardSkeleton key={index} />
+            ))}
+          </section>
+        ) : filteredCards.length > 0 ? (
+          <section className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4" aria-label="Available resources">
+            {filteredCards.map((card, index) => (
+              <Card
+                key={card.id || index}
+                id={card.id}
+                name={card.name}
+                link={card.link}
+                img={card.img}
+                btntext={card.btntext}
+              />
+            ))}
+          </section>
+        ) : (
+          <div className="py-12 text-center">
+            <p className="text-base text-gray-500 sm:text-lg dark:text-slate-300">No Site Found</p>
+            {search && (
+              <p className="mt-2 text-xs text-gray-400 sm:text-sm dark:text-slate-400">Try adjusting your search</p>
+            )}
+          </div>
+        )}
+      </div>
+    </main>
   );
 }
 
