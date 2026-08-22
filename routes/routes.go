@@ -23,6 +23,7 @@ func SetupRouter(
 	qbHandler *handlers.QBHandler,
 	studentLookupHandler *handlers.StudentLookupHandler,
 	uploadHandler *handlers.UploadHandler,
+	trackerUserHandler *handlers.TrackerUserHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -98,6 +99,7 @@ func SetupRouter(
 		api.GET("/mess", messHandler.GetMess)
 		api.GET("/mess/timings", messHandler.GetMealTimings)
 		api.GET("/ps/rewards/breakdown", adminHandler.FetchPSRewardsBreakdown)
+		api.GET("/tracker-users", trackerUserHandler.GetTrackerUsers)
 
 		api.GET("/top10", leaderboardHandler.GetTop10Students)
 	}

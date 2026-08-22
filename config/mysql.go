@@ -100,6 +100,7 @@ func InitMySQL() {
 	createMessMenuTables()
 	createAdminsTable()
 	createAllowedEmailsTable()
+	createTrackerUsersTable()
 }
 
 func createAdminsTable() {
@@ -347,3 +348,25 @@ func createMessMenuTables() {
 
 	log.Println("✅ mess_menu_items table ready")
 }
+
+func createTrackerUsersTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS tracker_users (
+		user_id VARCHAR(128) NULL,
+		id VARCHAR(128) PRIMARY KEY,
+		name VARCHAR(255) NULL,
+		email VARCHAR(255) NULL,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		INDEX idx_tracker_users_user_id (user_id),
+		INDEX idx_tracker_users_name (name),
+		INDEX idx_tracker_users_email (email)
+	) ENGINE=InnoDB;`
+
+	if _, err := DB.Exec(query); err != nil {
+		log.Printf("ℹ️ tracker_users table notice: %v", err)
+	} else {
+		log.Println("✅ tracker_users table ready")
+	}
+}
+

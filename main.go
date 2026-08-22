@@ -47,6 +47,7 @@ func main() {
 	qbHandler := handlers.NewQBHandler()
 	studentLookupHandler := handlers.NewStudentLookupHandler()
 	uploadHandler := handlers.NewUploadHandler()
+	trackerUserHandler := handlers.NewTrackerUserHandler()
 
 	r := routes.SetupRouter(
 		sheetHandler,
@@ -61,6 +62,7 @@ func main() {
 		qbHandler,
 		studentLookupHandler,
 		uploadHandler,
+		trackerUserHandler,
 	)
 	r.Static("/pdfs", "./pdfs")
 
