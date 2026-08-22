@@ -230,7 +230,7 @@ func (h *AdminHandler) FetchStudentReportDetails(c *gin.Context) {
 		return
 	}
 
-	cookieHeader := "PS=97924ce41faeefb11b713ebd4fbb4a1fc2012dd5910e2eff8c2d44e7491b12f8; Device-Identifier=B9B6863D-9947-4B2E-920B-D60D67B79BD1;"
+	cookieHeader := "PS=cc1d0f436efeea00cbaaa2ec081e8d58fb31b9994e573663f83c603acbeeb889; Device-Identifier=B9B6863D-9947-4B2E-920B-D60D67B79BD1;"
 
 	requestURL, err := url.Parse("https://ps.bitsathy.ac.in/api/ps_app_v3/profile/student-report/details")
 	if err != nil {
