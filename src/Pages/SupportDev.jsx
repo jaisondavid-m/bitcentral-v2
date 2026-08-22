@@ -22,32 +22,31 @@ const RAZORPAY_PAGE_URL = "https://pages.razorpay.com/X8K4y93";
 
 export default function SupportDev() {
   const [user] = useAuthState(auth);
+  const [loading, setLoading] = useState(true);
   const [leaderboard, setLeaderboard] = useState({
-    total_raised: 1830,
-    total_supporters: 10,
-    sponsors: [
-      { name: "Anonymous BITSian", amount: 500 },
-      { name: "Tech Enthusiast", amount: 250 },
-      { name: "BIT Alumni Supporter", amount: 100 },
-      { name: "Priya Sharma", amount: 150 },
-      { name: "Dev Campus", amount: 200 },
-      { name: "Code Warriors", amount: 75 },
-      { name: "Future Innovators", amount: 180 },
-      { name: "Student Union", amount: 120 },
-      { name: "Tech Club BIT", amount: 75 },
-      { name: "Sathy Coder", amount: 180 },
-    ],
+    total_raised: 0,
+    total_supporters: 0,
+    sponsors: [],
   });
 
   useEffect(() => {
     (async () => {
       try {
+        setLoading(true);
         const data = await getSponsorsLeaderboard();
-        if (data?.success) {
-          setLeaderboard(data);
+        if (data?.success && Array.isArray(data.sponsors)) {
+          const sorted = [...data.sponsors].sort(
+            (a, b) => (Number(b.amount) || 0) - (Number(a.amount) || 0)
+          );
+          setLeaderboard({
+            ...data,
+            sponsors: sorted,
+          });
         }
       } catch (err) {
-        // Fallback default mock data preserved
+        setLeaderboard({ total_raised: 0, total_supporters: 0, sponsors: [] });
+      } finally {
+        setLoading(false);
       }
     })();
   }, []);
@@ -76,7 +75,7 @@ export default function SupportDev() {
             transition={{ duration: 0.5 }}
             className="lg:col-span-7 space-y-6"
           >
-            {/* Pill Badge with BiDonateHeart */}
+            {/* Pill Badge */}
             <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100/80 px-3.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60">
               <BiDonateHeart className="h-4 w-4 text-rose-500" />
               Student-built · Free forever
@@ -89,6 +88,7 @@ export default function SupportDev() {
                 <span className="text-blue-600 dark:text-blue-400">
                   Running
                 </span>
+                <FaHandHoldingHeart className="h-8 w-8 text-rose-500 inline-block shrink-0 ml-1" />
               </h1>
 
               <p className="mt-3 text-sm sm:text-base text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl">
@@ -162,7 +162,7 @@ export default function SupportDev() {
             </div>
           </motion.div>
 
-          {/* Right Column: Enhanced Top Donors Leaderboard Card */}
+          {/* Right Column: Top Donors Leaderboard Card */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -171,7 +171,7 @@ export default function SupportDev() {
           >
             <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900">
               
-              {/* Leaderboard Header (Total removed from header) */}
+              {/* Leaderboard Header */}
               <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
                 <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
                   <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -182,50 +182,82 @@ export default function SupportDev() {
                 </span>
               </div>
 
-              {/* Top Donors List with Gold, Silver, Bronze medals */}
-              <div className="mt-3.5 space-y-2 max-h-[480px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                {(leaderboard.sponsors || []).slice(0, 10).map((sponsor, idx) => {
-                  const rank = idx + 1;
-                  let rowStyle = "bg-slate-50/80 hover:bg-slate-100 dark:bg-slate-950/60 dark:hover:bg-slate-950 border border-transparent";
-                  let badgeStyle = "text-slate-400 font-bold px-2 text-[11px]";
-                  let badgeContent = `#${rank}`;
-
-                  if (rank === 1) {
-                    rowStyle = "border border-amber-300/80 bg-gradient-to-r from-amber-500/10 via-amber-100/40 to-yellow-50/30 dark:border-amber-700/60 dark:from-amber-950/40 dark:to-slate-900 shadow-sm";
-                    badgeStyle = "bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black px-2.5 py-0.5 rounded-lg shadow-xs text-xs";
-                    badgeContent = "🥇 #1";
-                  } else if (rank === 2) {
-                    rowStyle = "border border-slate-300/80 bg-gradient-to-r from-slate-200/40 via-slate-100/50 to-slate-50/30 dark:border-slate-700/60 dark:from-slate-800/40 dark:to-slate-900 shadow-xs";
-                    badgeStyle = "bg-slate-300 text-slate-900 dark:bg-slate-700 dark:text-slate-100 font-bold px-2.5 py-0.5 rounded-lg shadow-xs text-xs";
-                    badgeContent = "🥈 #2";
-                  } else if (rank === 3) {
-                    rowStyle = "border border-orange-300/70 bg-gradient-to-r from-orange-100/30 via-orange-50/40 to-amber-50/20 dark:border-amber-900/50 dark:from-orange-950/30 dark:to-slate-900 shadow-xs";
-                    badgeStyle = "bg-amber-700 text-white font-bold px-2 py-0.5 rounded-lg shadow-xs text-xs";
-                    badgeContent = "🥉 #3";
-                  }
-
-                  return (
+              {/* List / Skeleton Loading / Empty State */}
+              <div className="mt-3.5 space-y-2 max-h-[480px] min-h-[220px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex flex-col justify-start">
+                {loading ? (
+                  /* Skeleton Loading State */
+                  Array.from({ length: 5 }).map((_, idx) => (
                     <div
                       key={idx}
-                      className={`flex items-center justify-between rounded-xl p-2.5 text-xs transition-all duration-200 ${rowStyle}`}
+                      className="flex items-center justify-between rounded-xl bg-slate-100/70 p-3 dark:bg-slate-800/50 animate-pulse"
                     >
-                      <div className="flex items-center gap-2.5">
-                        <span className={`inline-flex items-center justify-center ${badgeStyle}`}>
-                          {badgeContent}
-                        </span>
-                        <span className="font-bold text-slate-900 dark:text-slate-100 truncate max-w-[150px]">
-                          {sponsor.name}
-                        </span>
-                      </div>
-
                       <div className="flex items-center gap-3">
-                        <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">
-                          ₹{Number(sponsor.amount || 0).toLocaleString("en-IN")}
-                        </span>
+                        <div className="h-5 w-8 rounded bg-slate-200 dark:bg-slate-700"></div>
+                        <div className="h-4 w-28 rounded bg-slate-200 dark:bg-slate-700"></div>
                       </div>
+                      <div className="h-4 w-12 rounded bg-slate-200 dark:bg-slate-700"></div>
                     </div>
-                  );
-                })}
+                  ))
+                ) : leaderboard.sponsors.length === 0 ? (
+                  /* Empty State (No Donors Yet) */
+                  <div className="flex flex-col items-center justify-center py-10 text-center space-y-3">
+                    <div className="rounded-full bg-rose-50 p-3 text-rose-500 dark:bg-rose-950/60 dark:text-rose-400">
+                      <Heart className="h-6 w-6 fill-current animate-bounce" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                        Be the first patron! 🚀
+                      </h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-[220px] mx-auto">
+                        Your support keeps open student infrastructure running.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  /* Real Donors List */
+                  leaderboard.sponsors.slice(0, 10).map((sponsor, idx) => {
+                    const rank = idx + 1;
+                    let rowStyle = "bg-slate-50/80 hover:bg-slate-100 dark:bg-slate-950/60 dark:hover:bg-slate-950 border border-transparent";
+                    let badgeStyle = "text-slate-400 font-bold px-2 text-[11px]";
+                    let badgeContent = `#${rank}`;
+
+                    if (rank === 1) {
+                      rowStyle = "border border-amber-300/80 bg-gradient-to-r from-amber-500/10 via-amber-100/40 to-yellow-50/30 dark:border-amber-700/60 dark:from-amber-950/40 dark:to-slate-900 shadow-sm";
+                      badgeStyle = "bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black px-2.5 py-0.5 rounded-lg shadow-xs text-xs";
+                      badgeContent = "🥇 #1";
+                    } else if (rank === 2) {
+                      rowStyle = "border border-slate-300/80 bg-gradient-to-r from-slate-200/40 via-slate-100/50 to-slate-50/30 dark:border-slate-700/60 dark:from-slate-800/40 dark:to-slate-900 shadow-xs";
+                      badgeStyle = "bg-slate-300 text-slate-900 dark:bg-slate-700 dark:text-slate-100 font-bold px-2.5 py-0.5 rounded-lg shadow-xs text-xs";
+                      badgeContent = "🥈 #2";
+                    } else if (rank === 3) {
+                      rowStyle = "border border-orange-300/70 bg-gradient-to-r from-orange-100/30 via-orange-50/40 to-amber-50/20 dark:border-amber-900/50 dark:from-orange-950/30 dark:to-slate-900 shadow-xs";
+                      badgeStyle = "bg-amber-700 text-white font-bold px-2 py-0.5 rounded-lg shadow-xs text-xs";
+                      badgeContent = "🥉 #3";
+                    }
+
+                    return (
+                      <div
+                        key={idx}
+                        className={`flex items-center justify-between rounded-xl p-2.5 text-xs transition-all duration-200 ${rowStyle}`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <span className={`inline-flex items-center justify-center ${badgeStyle}`}>
+                            {badgeContent}
+                          </span>
+                          <span className="font-bold text-slate-900 dark:text-slate-100 truncate max-w-[150px]">
+                            {sponsor.name}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">
+                            ₹{Number(sponsor.amount || 0).toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
 
             </div>
