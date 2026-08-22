@@ -208,6 +208,21 @@ export const ROUTE_SEO = {
     noIndex: true,
   },
 
+  "/support-dev": {
+    title: "Support BIT Central Developer",
+    description:
+      "Support Jaison David M in maintaining server hosting, database costs, and developing free student tools for the BIT Sathy community.",
+    keywords: ["support developer", "BIT Central donation", "Razorpay support", "BIT Sathy student portal"],
+    pageType: "WebPage",
+  },
+
+  "/payment-successful": {
+    title: "Thank You for Supporting BIT Central!",
+    description: "Verified contribution acknowledgment page with inspirational quotes for BIT Central supporters.",
+    keywords: ["payment successful", "BIT Central patron", "donator honor"],
+    noIndex: true,
+  },
+
   "/docs/about": {
     title: "About BIT CENTRAL Documentation",
     description: "Learn about BIT CENTRAL features, mission, and system design.",
@@ -229,6 +244,7 @@ export const SITEMAP_ROUTES = [
   "/features",
   "/faq",
   "/contact",
+  "/support-dev",
   "/privacy-policy",
   "/terms",
   "/apsite",

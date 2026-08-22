@@ -23,6 +23,7 @@ function Navbar() {
     { to: "/home", label: "Home" },
     ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
     { to: "/profile", label: "My Profile" },
+    { to: "/support-dev", label: "Support ❤️" },
     { to: "/about", label: "About" }
   ];
 

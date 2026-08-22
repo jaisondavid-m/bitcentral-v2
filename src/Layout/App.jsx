@@ -28,6 +28,8 @@ const ExamHall = lazy(() => import("../Pages/ExamHall.jsx"));
 const ExamHallDownload = lazy(() => import("../Pages/ExamHallDownload.jsx"));
 const UserDirectory = lazy(() => import("../Pages/UserDirectory.jsx"));
 const StudentReportDetails = lazy(() => import("../Pages/StudentReportDetails.jsx"));
+const SupportDev = lazy(() => import("../Pages/SupportDev.jsx"));
+const PaymentSuccessful = lazy(() => import("../Pages/PaymentSuccessful.jsx"));
 const AK22PH202 = lazy(() => import("../Pages/answers/AK__22PH202.jsx"));
 const AnswerKey22HS006 = lazy(() => import("../Pages/answers/AnswerKey22HS006.jsx"));
 // const DocsPage = lazy(() => import("../Pages/AboutDocs.jsx"));
@@ -141,6 +143,9 @@ function App() {
           <Route path="/features" element={<Features />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/support-dev" element={<SupportDev />} />
+          <Route path="/payment-successful" element={<PaymentSuccessful />} />
+          <Route path="/payment-successfull" element={<PaymentSuccessful />} />
           {/* <Route path="/docs/about" element={<DocsPage />} /> */}
 
           {/* Protected Layout */}
