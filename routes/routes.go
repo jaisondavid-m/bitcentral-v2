@@ -24,6 +24,7 @@ func SetupRouter(
 	studentLookupHandler *handlers.StudentLookupHandler,
 	uploadHandler *handlers.UploadHandler,
 	trackerUserHandler *handlers.TrackerUserHandler,
+	sponsorsHandler *handlers.SponsorsHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -108,6 +109,9 @@ func SetupRouter(
 	// Serve uploaded files
 	r.Static("/uploads", "./uploads")
 
+	// Public/Protected Leaderboard & Sponsors API
+	r.GET("/sponsors/leaderboard", sponsorsHandler.GetSponsorsLeaderboard)
+
 	// Proxy PDF by Google Drive ID (keeps original links hidden)
 	r.GET("/pdf/:id", uploadHandler.ProxyPDF)
 
@@ -118,6 +122,7 @@ func SetupRouter(
 	admin := r.Group("/admin")
 	admin.Use(middleware.RequireAdmin())
 	{
+		admin.GET("/sponsors", sponsorsHandler.GetSponsorsAdmin)
 		admin.GET("/users", adminHandler.GetUsers)
 		admin.GET("/users/update", adminHandler.UpdateUsers)
 		admin.PUT("/users/:uid/block", adminHandler.UpdateUserBlockStatus)
