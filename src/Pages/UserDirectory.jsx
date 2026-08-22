@@ -19,7 +19,8 @@ import {
   Building2,
   Code2,
   UserCheck,
-  Eye
+  Eye,
+  ExternalLink
 } from "lucide-react";
 import api, { getAuthenticatedHeaders } from "../api/axios.js";
 import StudentReportModal from "../Component/StudentReportModal.jsx";
@@ -448,11 +449,18 @@ export default function UserDirectory() {
 
                     {/* View Details Action Button */}
                     <button
-                      onClick={() => setSelectedStudentId(user.id || user.user_id)}
+                      onClick={() => {
+                        const sId = user.id || user.user_id;
+                        if (sId) {
+                          window.open(`/student-report/${encodeURIComponent(sId)}`, "_blank");
+                        } else {
+                          setSelectedStudentId(user.id || user.user_id);
+                        }
+                      }}
                       className="w-full mt-3 py-2 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm group-hover:border-indigo-400 cursor-pointer"
                     >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>View Details</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>View Full Details Page</span>
                     </button>
                   </div>
                 );

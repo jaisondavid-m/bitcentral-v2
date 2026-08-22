@@ -40,6 +40,12 @@ export const ROUTE_SEO = {
     noIndex: true,
   },
 
+  "/student-report": {
+    title: "Student Detailed Report - BIT Central",
+    description: "Detailed student profile report, attendance, personalized skills, assessment logs, points, and academic details.",
+    keywords: ["student report", "BIT Central student profile", "attendance report", "PS skills"],
+  },
+
   "/home": {
     title: "Student Home",
     description: "Protected BIT Central home page for academic tools, exam support, reward points, and student services.",

@@ -27,6 +27,7 @@ const LeaveDetails = lazy(() => import("../Pages/LeaveDetails.jsx"));
 const ExamHall = lazy(() => import("../Pages/ExamHall.jsx"));
 const ExamHallDownload = lazy(() => import("../Pages/ExamHallDownload.jsx"));
 const UserDirectory = lazy(() => import("../Pages/UserDirectory.jsx"));
+const StudentReportDetails = lazy(() => import("../Pages/StudentReportDetails.jsx"));
 const AK22PH202 = lazy(() => import("../Pages/answers/AK__22PH202.jsx"));
 const AnswerKey22HS006 = lazy(() => import("../Pages/answers/AnswerKey22HS006.jsx"));
 // const DocsPage = lazy(() => import("../Pages/AboutDocs.jsx"));
@@ -222,6 +223,8 @@ function App() {
             <Route path="/semester" element={<Semester />} />
             <Route path="/mess" element={<MessMenu />} />
             <Route path="/user-directory" element={<UserDirectory />} />
+            <Route path="/student-report/:id" element={<StudentReportDetails />} />
+            <Route path="/student-report" element={<StudentReportDetails />} />
             <Route path="*" element={<NotFound />} />
             <Route path="/ak_22ph202" element={<AK22PH202 />} />
             <Route path="/tamil_ak" element={<AnswerKey22HS006 />} />
