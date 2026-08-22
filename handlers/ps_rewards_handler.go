@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -230,11 +231,6 @@ func (h *AdminHandler) FetchStudentReportDetails(c *gin.Context) {
 	}
 
 	cookieHeader := "PS=97924ce41faeefb11b713ebd4fbb4a1fc2012dd5910e2eff8c2d44e7491b12f8; Device-Identifier=B9B6863D-9947-4B2E-920B-D60D67B79BD1;"
-	if token, err := h.loadPSToken(); err == nil && strings.TrimSpace(token.Token) != "" {
-		if norm := normalizePSTokenValue(token.Token); norm != "" {
-			cookieHeader = fmt.Sprintf("PS=%s; Device-Identifier=B9B6863D-9947-4B2E-920B-D60D67B79BD1;", norm)
-		}
-	}
 
 	requestURL, err := url.Parse("https://ps.bitsathy.ac.in/api/ps_app_v3/profile/student-report/details")
 	if err != nil {
@@ -246,8 +242,11 @@ func (h *AdminHandler) FetchStudentReportDetails(c *gin.Context) {
 	query.Set("id", id)
 	requestURL.RawQuery = query.Encode()
 
+	log.Printf("[FetchStudentReportDetails] Fetching student report for ID: %s | URL: %s", id, requestURL.String())
+
 	req, err := http.NewRequestWithContext(c.Request.Context(), http.MethodGet, requestURL.String(), nil)
 	if err != nil {
+		log.Printf("[FetchStudentReportDetails] Error building request: %v", err)
 		c.PureJSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
 	}
@@ -259,6 +258,7 @@ func (h *AdminHandler) FetchStudentReportDetails(c *gin.Context) {
 	client := &http.Client{Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
+		log.Printf("[FetchStudentReportDetails] HTTP request failed for ID %s: %v", id, err)
 		c.PureJSON(http.StatusBadGateway, gin.H{"success": false, "message": err.Error()})
 		return
 	}
@@ -266,13 +266,17 @@ func (h *AdminHandler) FetchStudentReportDetails(c *gin.Context) {
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		log.Printf("[FetchStudentReportDetails] Failed to read response body for ID %s: %v", id, err)
 		c.PureJSON(http.StatusBadGateway, gin.H{"success": false, "message": err.Error()})
 		return
 	}
 
+	log.Printf("[FetchStudentReportDetails] Response Status for ID %s: %d | Body Length: %d bytes", id, resp.StatusCode, len(body))
+
 	var parsed any
 	if json.Unmarshal(body, &parsed) == nil {
 		if resp.StatusCode >= http.StatusBadRequest {
+			log.Printf("[FetchStudentReportDetails] Upstream returned error status %d for ID %s", resp.StatusCode, id)
 			c.PureJSON(resp.StatusCode, gin.H{
 				"success": false,
 				"message": "Student report is temporarily unavailable.",
