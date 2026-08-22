@@ -11,7 +11,6 @@ import {
   ArrowRight,
   Quote,
   Star,
-  ShieldCheck,
   ChevronLeft,
   ChevronRight,
   BookOpen,
