@@ -181,6 +181,13 @@ export const ROUTE_SEO = {
     noIndex: true,
   },
 
+  "/user-directory": {
+    title: "User Directory",
+    description: "Search and explore user directory records across User ID, ID, Name, and Email.",
+    keywords: ["user directory", "tracker users", "student search", "user search"],
+    noIndex: true,
+  },
+
   "/ak_22ph202": {
     title: "22PH202 Answer Key",
     description: "Protected BIT Central answer key resource for signed-in BIT Sathy students.",
