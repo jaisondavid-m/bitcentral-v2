@@ -251,3 +251,9 @@ export async function removeAllowed(id) {
   const res = await api.delete(`/admin/super/allowed/${id}`, { headers });
   return res.data;
 }
+
+export async function getAdminSponsors({ count = 10, skip = 0 } = {}) {
+  const headers = await getAdminHeaders();
+  const response = await api.get(`/admin/sponsors?count=${count}&skip=${skip}`, { headers });
+  return response.data;
+}

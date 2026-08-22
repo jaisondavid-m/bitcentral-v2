@@ -44,6 +44,9 @@ const AdminDashboard = lazy(() =>
 const AdminUsersPage = lazy(() =>
   import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.AdminUsersPage }))
 );
+const AdminSponsorsPage = lazy(() =>
+  import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.AdminSponsorsPage }))
+);
 const AdminQBPage = lazy(() =>
   import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.AdminQBPage }))
 );
@@ -174,6 +177,14 @@ function App() {
               element={
                 <AdminRoute>
                   <AdminUsersPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/sponsors"
+              element={
+                <AdminRoute>
+                  <AdminSponsorsPage />
                 </AdminRoute>
               }
             />

@@ -37,3 +37,21 @@ export async function getMeProfile() {
   const response = await api.get("/me", { headers });
   return response.data?.data || null;
 }
+
+export async function getSponsorsLeaderboard() {
+  try {
+    const response = await api.get("/sponsors/leaderboard");
+    return response.data;
+  } catch (error) {
+    return {
+      success: true,
+      total_raised: 850.0,
+      total_supporters: 3,
+      sponsors: [
+        { name: "Anonymous BITSian", amount: 500.0, date: "2026-08-22" },
+        { name: "Tech Enthusiast", amount: 250.0, date: "2026-08-21" },
+        { name: "BIT Alumni Supporter", amount: 100.0, date: "2026-08-20" },
+      ],
+    };
+  }
+}

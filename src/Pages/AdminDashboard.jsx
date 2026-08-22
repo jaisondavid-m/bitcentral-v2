@@ -23,6 +23,7 @@ import {
   deleteCard,
   addAdmin,
   removeAdmin,
+  getAdminSponsors,
 } from "../api/admin.js";
 import { MealCard } from "../Component/MealCard.jsx";
 import {
@@ -51,6 +52,7 @@ import {
   Database,
   Download,
   UserMinus,
+  Heart,
 } from "lucide-react";
 import SuperAdminPanel from "./SuperAdminPanel.jsx";
 import AdminPSRewardsPage from "./AdminPSRewards.jsx";
@@ -149,6 +151,13 @@ const ADMIN_TABS = [
     description: "Manage admin-visible user accounts and activity.",
   },
   {
+    key: "sponsors",
+    label: "Sponsored Users",
+    href: "/admin/sponsors",
+    icon: Heart,
+    description: "Razorpay order data & sponsored contributions.",
+  },
+  {
     key: "qb",
     label: "QB Handling",
     href: "/admin/qb",
@@ -186,6 +195,7 @@ const ADMIN_TABS = [
 ];
 
 function getAdminTabFromPath(pathname) {
+  if (pathname.startsWith("/admin/sponsors")) return "sponsors";
   if (pathname.startsWith("/admin/qb")) return "qb";
   if (pathname.startsWith("/admin/ps-rewards")) return "ps";
   if (pathname.startsWith("/admin/cards")) return "cards";
@@ -2733,6 +2743,161 @@ function MessSection() {
   );
 }
 
+/* -- Sponsors Section -------------------------------------------------------- */
+function SponsorsSection() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [count, setCount] = useState(2);
+  const [skip, setSkip] = useState(1);
+  const [data, setData] = useState({ total_amount_raised: 0, count: 0, orders: [] });
+
+  const fetchSponsors = useCallback(async (cVal, sVal) => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await getAdminSponsors({ count: cVal, skip: sVal });
+      if (res?.success) {
+        setData(res);
+      } else {
+        setError(res?.message || "Failed to load sponsor data");
+      }
+    } catch (err) {
+      setError(normalizeError(err, "Failed to fetch Razorpay sponsor orders"));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSponsors(count, skip);
+  }, [count, skip, fetchSponsors]);
+
+  return (
+    <section className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div>
+          <h2 className="text-xl font-bold text-slate-950 dark:text-white flex items-center gap-2">
+            <Heart className="h-5 w-5 text-rose-500 fill-rose-500" /> Sponsored Users & Razorpay Orders
+          </h2>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Live contribution data fetched directly via Razorpay API (<code className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">https://api.razorpay.com/v1/orders</code>)
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Count:</label>
+            <input
+              type="number"
+              value={count}
+              onChange={(e) => setCount(Math.max(1, parseInt(e.target.value) || 1))}
+              className="w-16 rounded-lg border border-slate-300 px-2 py-1 text-xs font-bold dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Skip:</label>
+            <input
+              type="number"
+              value={skip}
+              onChange={(e) => setSkip(Math.max(0, parseInt(e.target.value) || 0))}
+              className="w-16 rounded-lg border border-slate-300 px-2 py-1 text-xs font-bold dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => fetchSponsors(count, skip)}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
+          </button>
+        </div>
+      </div>
+
+      {/* Metrics Row */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Funds Raised</span>
+          <div className="mt-2 text-2xl font-black text-emerald-600 dark:text-emerald-400">
+            ₹{data.total_amount_raised || 0}
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Orders Fetched</span>
+          <div className="mt-2 text-2xl font-black text-slate-900 dark:text-white">
+            {data.orders?.length || 0} orders
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Endpoint Query</span>
+          <div className="mt-2 text-xs font-mono text-blue-600 dark:text-blue-400 truncate">
+            /v1/orders?count={count}&skip={skip}
+          </div>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+          <h3 className="font-bold text-slate-900 dark:text-white">Sponsored Users & Razorpay Payments</h3>
+        </div>
+
+        {error && (
+          <div className="p-4 text-xs font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/50 border-b border-red-200 dark:border-red-900">
+            {error}
+          </div>
+        )}
+
+        {loading ? (
+          <div className="flex items-center justify-center p-12">
+            <Loader className="h-6 w-6 animate-spin text-blue-600" />
+          </div>
+        ) : (data.orders || []).length === 0 ? (
+          <div className="p-12 text-center text-xs text-slate-500 dark:text-slate-400">
+            No sponsored order records found for count={count} skip={skip}.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-400 font-bold uppercase tracking-wider">
+                <tr>
+                  <th className="px-4 py-3">Order ID</th>
+                  <th className="px-4 py-3">Donator Name</th>
+                  <th className="px-4 py-3">Email & Contact</th>
+                  <th className="px-4 py-3">Amount Paid</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Date</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {data.orders.map((item) => (
+                  <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-950/50">
+                    <td className="px-4 py-3 font-mono font-bold text-blue-600 dark:text-blue-400">{item.id}</td>
+                    <td className="px-4 py-3 font-semibold text-slate-900 dark:text-white">{item.name || "Anonymous"}</td>
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                      <div>{item.email || "-"}</div>
+                      <div className="text-[10px] text-slate-400">{item.phone || ""}</div>
+                    </td>
+                    <td className="px-4 py-3 font-bold text-emerald-600 dark:text-emerald-400 text-sm">₹{item.amount}</td>
+                    <td className="px-4 py-3">
+                      <span className="rounded-full bg-emerald-50 px-2 py-0.5 font-bold uppercase tracking-wider text-[10px] text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        {item.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{item.created_at}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 /* -- Pages ------------------------------------------------------------------- */
 function AdminDashboard({ initialTab } = {}) {
   const location = useLocation();
@@ -2755,13 +2920,17 @@ function AdminDashboard({ initialTab } = {}) {
 
   return (
     <AdminDashboardShell activeTab={activeTab} isSuper={isSuper}>
-      {activeTab === "qb" ? <QBSection /> : activeTab === "ps" ? <AdminPSRewardsPage /> : activeTab === "cards" ? <CardsSection /> : activeTab === "mess" ? <MessSection /> : activeTab === "super" ? <SuperAdminPanel /> : <UsersSection isSuper={isSuper} />}
+      {activeTab === "sponsors" ? <SponsorsSection /> : activeTab === "qb" ? <QBSection /> : activeTab === "ps" ? <AdminPSRewardsPage /> : activeTab === "cards" ? <CardsSection /> : activeTab === "mess" ? <MessSection /> : activeTab === "super" ? <SuperAdminPanel /> : <UsersSection isSuper={isSuper} />}
     </AdminDashboardShell>
   );
 }
 
 function AdminUsersPage() {
   return <AdminDashboard initialTab="users" />;
+}
+
+function AdminSponsorsPage() {
+  return <AdminDashboard initialTab="sponsors" />;
 }
 
 function AdminQBPage() {
@@ -2780,5 +2949,5 @@ function AdminMessPage() {
   return <AdminDashboard initialTab="mess" />;
 }
 
-export { AdminUsersPage, AdminQBPage, AdminPSRewardsPageRoute as AdminPSRewardsPage, AdminCardsPage, AdminMessPage };
+export { AdminUsersPage, AdminSponsorsPage, AdminQBPage, AdminPSRewardsPageRoute as AdminPSRewardsPage, AdminCardsPage, AdminMessPage };
 export default AdminDashboard;
