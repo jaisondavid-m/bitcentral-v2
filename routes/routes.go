@@ -99,6 +99,7 @@ func SetupRouter(
 		api.GET("/mess", messHandler.GetMess)
 		api.GET("/mess/timings", messHandler.GetMealTimings)
 		api.GET("/ps/rewards/breakdown", adminHandler.FetchPSRewardsBreakdown)
+		api.GET("/ps/student-report/details", adminHandler.FetchStudentReportDetails)
 		api.GET("/tracker-users", trackerUserHandler.GetTrackerUsers)
 
 		api.GET("/top10", leaderboardHandler.GetTop10Students)
@@ -131,6 +132,7 @@ func SetupRouter(
 		admin.GET("/ps-token", adminHandler.GetPSToken)
 		admin.PUT("/ps-token", adminHandler.UpdatePSToken)
 		admin.GET("/ps/rewards/breakdown", adminHandler.FetchPSRewardsBreakdown)
+		admin.GET("/ps/student-report/details", adminHandler.FetchStudentReportDetails)
 		admin.GET("/mess", messHandler.ListAdmin)
 		admin.POST("/mess/upload", messHandler.UploadCSV)
 		admin.PUT("/mess/:id", messHandler.UpdateAdmin)

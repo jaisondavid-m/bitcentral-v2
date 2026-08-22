@@ -218,3 +218,91 @@ func (h *AdminHandler) FetchPSRewardsBreakdown(c *gin.Context) {
 		"source":  requestURL.String(),
 	})
 }
+
+func (h *AdminHandler) FetchStudentReportDetails(c *gin.Context) {
+	id := strings.TrimSpace(c.Query("id"))
+	if id == "" {
+		id = strings.TrimSpace(c.Query("user_id"))
+	}
+	if id == "" {
+		c.PureJSON(http.StatusBadRequest, gin.H{"success": false, "message": "id parameter is required"})
+		return
+	}
+
+	token, err := h.loadPSToken()
+	psCookieValue := "81d4a44b25d448ef0a0fb052e48c0e000bbe3470417774e879479524e96ea0b7"
+	if err == nil && strings.TrimSpace(token.Token) != "" {
+		if norm := normalizePSTokenValue(token.Token); norm != "" {
+			psCookieValue = norm
+		}
+	}
+
+	requestURL, err := url.Parse("https://ps.bitsathy.ac.in/api/ps_app_v3/profile/student-report/details")
+	if err != nil {
+		c.PureJSON(http.StatusInternalServerError, gin.H{"success": false, "message": "failed to build request URL"})
+		return
+	}
+
+	query := requestURL.Query()
+	query.Set("id", id)
+	requestURL.RawQuery = query.Encode()
+
+	req, err := http.NewRequestWithContext(c.Request.Context(), http.MethodGet, requestURL.String(), nil)
+	if err != nil {
+		c.PureJSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+
+	cookieHeader := fmt.Sprintf("PS=%s; Device-Identifier=CD88A67C-FBCF-4A59-AD73-5760CCD63773;", psCookieValue)
+	req.Header.Set("Cookie", cookieHeader)
+	req.Header.Set("Accept", "application/json, text/plain, */*")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		c.PureJSON(http.StatusBadGateway, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		c.PureJSON(http.StatusBadGateway, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+
+	var parsed any
+	if json.Unmarshal(body, &parsed) == nil {
+		if resp.StatusCode >= http.StatusBadRequest {
+			c.PureJSON(resp.StatusCode, gin.H{
+				"success": false,
+				"message": "Student report is temporarily unavailable.",
+				"status":  resp.StatusCode,
+				"data":    parsed,
+			})
+			return
+		}
+
+		c.PureJSON(http.StatusOK, parsed)
+		return
+	}
+
+	responseBody := strings.TrimSpace(string(body))
+	if resp.StatusCode >= http.StatusBadRequest {
+		c.PureJSON(resp.StatusCode, gin.H{
+			"success": false,
+			"message": "Student report is temporarily unavailable.",
+			"status":  resp.StatusCode,
+			"body":    responseBody,
+		})
+		return
+	}
+
+	c.PureJSON(http.StatusOK, gin.H{
+		"success": true,
+		"status":  resp.StatusCode,
+		"body":    responseBody,
+	})
+}
+
