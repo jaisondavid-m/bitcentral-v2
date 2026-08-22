@@ -73,8 +73,8 @@ function HomeContent() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 py-4 sm:py-8 dark:bg-black">
-        <div className="mx-auto max-w-7xl px-3 sm:px-6">
+    <main className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-6 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+      <div className="w-full max-w-[1600px] mx-auto space-y-6">
           <section className="mb-8" aria-label="Search resources">
             <SearchBar search={search} setSearch={setSearch} />
           </section>

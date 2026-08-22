@@ -170,7 +170,7 @@ export default function UserDirectory() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-6 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="w-full max-w-[1600px] mx-auto space-y-6">
         
         {/* Toast Notification */}
         {copiedText && (
