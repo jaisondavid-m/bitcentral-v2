@@ -5,3 +5,5 @@ oauth_credentials.json
 token.json"sa-key.json" 
 tmp/main.exe
 *.exe
+tmp/
+*.exe
