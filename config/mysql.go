@@ -356,6 +356,9 @@ func createTrackerUsersTable() {
 		id VARCHAR(128) PRIMARY KEY,
 		name VARCHAR(255) NULL,
 		email VARCHAR(255) NULL,
+		batch VARCHAR(64) NULL,
+		phone VARCHAR(64) NULL,
+		department VARCHAR(255) NULL,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		INDEX idx_tracker_users_user_id (user_id),
@@ -368,5 +371,10 @@ func createTrackerUsersTable() {
 	} else {
 		log.Println("✅ tracker_users table ready")
 	}
+
+	// Safe column additions for existing tables
+	DB.Exec(`ALTER TABLE tracker_users ADD COLUMN batch VARCHAR(64) NULL`)
+	DB.Exec(`ALTER TABLE tracker_users ADD COLUMN phone VARCHAR(64) NULL`)
+	DB.Exec(`ALTER TABLE tracker_users ADD COLUMN department VARCHAR(255) NULL`)
 }
 

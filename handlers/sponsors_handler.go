@@ -23,8 +23,8 @@ func NewSponsorsHandler() *SponsorsHandler {
 type RazorpayPaymentItem struct {
 	ID         string                 `json:"id"`
 	Entity     string                 `json:"entity"`
-	Amount     int64                  `json:"amount"`      // in paise
-	AmountPaid int64                  `json:"amount_paid"` // in paise
+	Amount     int64                  `json:"amount"`
+	AmountPaid int64                  `json:"amount_paid"`
 	Currency   string                 `json:"currency"`
 	Status     string                 `json:"status"`
 	Email      string                 `json:"email"`

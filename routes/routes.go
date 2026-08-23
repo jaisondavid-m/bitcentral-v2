@@ -102,6 +102,8 @@ func SetupRouter(
 		api.GET("/ps/rewards/breakdown", adminHandler.FetchPSRewardsBreakdown)
 		api.GET("/ps/student-report/details", adminHandler.FetchStudentReportDetails)
 		api.GET("/tracker-users", trackerUserHandler.GetTrackerUsers)
+		api.GET("/v2/profile", trackerUserHandler.GetProfileV2)
+		api.GET("/profile/v2", trackerUserHandler.GetProfileV2)
 
 		api.GET("/top10", leaderboardHandler.GetTop10Students)
 	}
