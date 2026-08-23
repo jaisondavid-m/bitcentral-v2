@@ -38,6 +38,12 @@ export async function getMeProfile() {
   return response.data?.data || null;
 }
 
+export async function getV2Profile() {
+  const headers = await getAuthenticatedHeaders();
+  const response = await api.get("/v2/profile", { headers });
+  return response.data?.data || null;
+}
+
 export async function getSponsorsLeaderboard() {
   try {
     const response = await api.get("/sponsors/leaderboard");

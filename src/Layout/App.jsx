@@ -8,6 +8,7 @@ import { ROUTE_SEO } from "../seo/routeSeo.js";
 const Login = lazy(() => import("../Pages/Login.jsx"));
 const LandingPage = lazy(() => import("../Pages/LandingPage.jsx"));
 const Dashboard = lazy(() => import("../Pages/Dashboard.jsx"));
+const ProfileV2 = lazy(() => import("../Pages/ProfileV2.jsx"));
 const Home = lazy(() => import("../Pages/Home.jsx"));
 const About = lazy(() => import("../Pages/About.jsx"));
 const Developer = lazy(() => import("../Pages/Developer.jsx"));
@@ -228,7 +229,8 @@ function App() {
                 </AdminRoute>
               }
             />
-            <Route path="/profile" element={<Dashboard />} />
+            <Route path="/profile" element={<ProfileV2 />} />
+            <Route path="/profile/v2" element={<ProfileV2 />} />
             {/* <Route path="/about" element={<About />} /> */}
             <Route path="/rpsite" element={<Rpsite />} />
             <Route path="/pcdp" element={<PCDP />} />

@@ -67,6 +67,13 @@ export const ROUTE_SEO = {
     noIndex: true,
   },
 
+  "/profile/v2": {
+    title: "My Profile V2",
+    description: "Protected BIT Central profile v2 page for student account information.",
+    keywords: ["my profile", "student profile", "BIT Central"],
+    noIndex: true,
+  },
+
   "/about": {
     title: "About BIT Central",
     description:
