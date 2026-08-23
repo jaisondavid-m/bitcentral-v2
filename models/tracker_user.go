@@ -24,4 +24,3 @@ type TrackerUserProfileV2 struct {
 	CreationTime   string `json:"creation_time"`
 	LastSignInTime string `json:"last_sign_in_time"`
 }
-
