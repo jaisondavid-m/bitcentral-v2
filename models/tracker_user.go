@@ -14,7 +14,9 @@ type TrackerUser struct {
 // TrackerUserProfileV2 defines response payload for v2 profile endpoint
 type TrackerUserProfileV2 struct {
 	UserID         string `json:"user_id"`
+	UID            string `json:"uid"`
 	RegisterNo     string `json:"register_no"`
+	RollNo         string `json:"roll_no"`
 	Name           string `json:"name"`
 	Email          string `json:"email"`
 	Batch          string `json:"batch"`
