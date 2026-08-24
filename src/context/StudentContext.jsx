@@ -62,8 +62,11 @@ const toProfileStudent = (studentProfile, fallbackStudent = null) => {
     return fallbackStudent;
   }
 
+  const profileData = studentProfile.data || studentProfile;
+
   return {
     ...fallbackStudent,
+    user_id: profileData.user_id || studentProfile.user_id || fallbackStudent?.user_id || "",
     email: studentProfile.email || fallbackStudent?.email || null,
     rollNo: studentProfile.roll_no || fallbackStudent?.rollNo || "",
     roll_no: studentProfile.roll_no || fallbackStudent?.roll_no || "",

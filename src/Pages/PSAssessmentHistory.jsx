@@ -35,18 +35,16 @@ export default function PSAssessmentHistory() {
   const navigate = useNavigate();
   const { student, profile, user } = useAuth() || {};
 
-  // Default User ID (e.g. 2025UCS1023) from query param / auth context, prioritizing user_id over register number
+  // Extract User ID (e.g. 2025UCS1023) from query params or auth profile (user_id), ignoring register_no / roll_no
   const defaultUserId =
-    searchParams.get("user_id") ||
     searchParams.get("id") ||
+    searchParams.get("user_id") ||
+    profile?.user_id ||
+    profile?.data?.user_id ||
     student?.user_id ||
     student?.userId ||
-    student?.rollNo ||
-    student?.roll_no ||
-    profile?.user_id ||
-    profile?.uid ||
-    user?.uid ||
     "2025UCS1023";
+
   const [userIdInput, setUserIdInput] = useState(defaultUserId);
   const [activeUserId, setActiveUserId] = useState(defaultUserId);
 
@@ -57,7 +55,7 @@ export default function PSAssessmentHistory() {
   const [sortBy, setSortBy] = useState("newest"); // newest | oldest | name
   const [copiedId, setCopiedId] = useState(false);
 
-  // Fetch from PS API via backend proxy (/ps/assessments)
+  // Fetch from PS API via backend proxy (/ps/assessments?id=2025UCS1023)
   const {
     data: apiResponse,
     isLoading,
@@ -71,7 +69,7 @@ export default function PSAssessmentHistory() {
       try {
         const headers = await getAuthenticatedHeaders().catch(() => ({}));
         const res = await api.get("/ps/assessments", {
-          params: activeUserId ? { user_id: activeUserId, id: activeUserId } : {},
+          params: activeUserId ? { id: activeUserId } : {},
           headers,
         });
         return res.data;
