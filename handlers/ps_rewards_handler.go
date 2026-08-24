@@ -221,7 +221,7 @@ func (h *AdminHandler) FetchPSRewardsBreakdown(c *gin.Context) {
 }
 
 // resolveAndAuthorizeStudentID resolves the authenticated student ID from Bearer token
-// and ensures that non-admin students can ONLY access their own details.
+// and ensures admins can view any student details while students can ONLY access their own details.
 func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int, error) {
 	requestedID := strings.TrimSpace(c.Query("id"))
 	if requestedID == "" {
@@ -231,20 +231,22 @@ func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int
 	authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
 	token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
 
-	var authenticatedID string
+	var authenticatedUID string
 	var authenticatedEmail string
+	var authenticatedID string
 
 	if token != "" {
-		if email, err := emailFromToken(token); err == nil && email != "" {
+		if uid, email, err := userFromToken(token); err == nil {
+			authenticatedUID = uid
 			authenticatedEmail = strings.ToLower(strings.TrimSpace(email))
-			if h.DB != nil {
+			if h.DB != nil && authenticatedEmail != "" {
 				var rollNo string
 				_ = h.DB.QueryRow(`SELECT rollno FROM student_email WHERE LOWER(TRIM(emailid)) = ? LIMIT 1`, authenticatedEmail).Scan(&rollNo)
 				if rollNo != "" {
 					authenticatedID = strings.TrimSpace(rollNo)
 				}
 			}
-			if authenticatedID == "" {
+			if authenticatedID == "" && authenticatedEmail != "" {
 				parts := strings.Split(authenticatedEmail, "@")
 				if len(parts) > 0 {
 					authenticatedID = strings.TrimSpace(parts[0])
@@ -253,10 +255,42 @@ func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int
 		}
 	}
 
+	// Check if authenticated user is admin
+	isAdmin := false
+	adminUID := strings.TrimSpace(os.Getenv("ADMIN_FIREBASE_UID"))
+	superAdminUID := strings.TrimSpace(os.Getenv("SUPER_ADMIN_FIREBASE_UID"))
+
+	if authenticatedUID != "" {
+		if (adminUID != "" && authenticatedUID == adminUID) || (superAdminUID != "" && authenticatedUID == superAdminUID) {
+			isAdmin = true
+		}
+	}
+
+	if !isAdmin && h.DB != nil {
+		if authenticatedUID != "" {
+			var count int
+			_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins WHERE uid = ?`, authenticatedUID).Scan(&count)
+			if count > 0 {
+				isAdmin = true
+			}
+		}
+		if !isAdmin && authenticatedEmail != "" {
+			var count int
+			_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins a JOIN users u ON a.uid = u.uid WHERE LOWER(TRIM(u.email)) = ?`, authenticatedEmail).Scan(&count)
+			if count > 0 {
+				isAdmin = true
+			}
+		}
+	}
+
 	// If requestedID is provided:
 	if requestedID != "" {
 		// 1. If user is authenticated via Bearer token:
-		if authenticatedID != "" {
+		if authenticatedID != "" || authenticatedEmail != "" || authenticatedUID != "" {
+			if isAdmin {
+				return requestedID, http.StatusOK, nil
+			}
+
 			parts := strings.Split(authenticatedEmail, "@")
 			emailPrefix := ""
 			if len(parts) > 0 {
@@ -268,20 +302,17 @@ func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int
 				(emailPrefix != "" && strings.EqualFold(requestedID, emailPrefix)) ||
 				(authenticatedEmail == "jaisondavidm.cs25@bitsathy.ac.in" && (strings.EqualFold(requestedID, "2025UCS1023") || strings.EqualFold(requestedID, "7376251CS221")))
 
-			if !isOwnID {
-				// Check if authenticated user is admin
-				isAdmin := false
-				if h.DB != nil && authenticatedEmail != "" {
-					var count int
-					_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins a JOIN users u ON a.uid = u.uid WHERE LOWER(TRIM(u.email)) = ?`, authenticatedEmail).Scan(&count)
-					if count > 0 {
-						isAdmin = true
-					}
+			if !isOwnID && h.DB != nil && authenticatedEmail != "" {
+				var trackerUserID, trackerID string
+				_ = h.DB.QueryRow(`SELECT COALESCE(user_id, ''), COALESCE(id, '') FROM tracker_users WHERE LOWER(TRIM(email)) = ? LIMIT 1`, authenticatedEmail).Scan(&trackerUserID, &trackerID)
+				if (trackerUserID != "" && strings.EqualFold(requestedID, trackerUserID)) ||
+					(trackerID != "" && strings.EqualFold(requestedID, trackerID)) {
+					isOwnID = true
 				}
+			}
 
-				if !isAdmin {
-					return "", http.StatusForbidden, fmt.Errorf("unauthorized: you can only view your own details")
-				}
+			if !isOwnID {
+				return "", http.StatusForbidden, fmt.Errorf("unauthorized: you can only view your own details")
 			}
 			return requestedID, http.StatusOK, nil
 		}
@@ -707,6 +738,3 @@ func (h *AdminHandler) FetchBiometricDetails(c *gin.Context) {
 		"biometric": biometricList,
 	})
 }
-
-
-

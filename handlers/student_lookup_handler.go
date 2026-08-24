@@ -15,25 +15,26 @@ import (
 )
 
 func emailFromToken(token string) (string, error) {
+	_, email, err := userFromToken(token)
+	return email, err
+}
+
+func userFromToken(token string) (string, string, error) {
 	client, err := config.FirebaseAuthClient()
 	if err != nil || client == nil {
 		if err != nil {
-			return "", errors.New("failed to initialize Firebase auth: " + err.Error())
+			return "", "", errors.New("failed to initialize Firebase auth: " + err.Error())
 		}
-		return "", errors.New("failed to initialize Firebase auth: client is nil")
+		return "", "", errors.New("failed to initialize Firebase auth: client is nil")
 	}
 
 	decodedToken, err := client.VerifyIDToken(context.Background(), token)
 	if err != nil || decodedToken == nil {
-		return "", errors.New("unauthorized")
+		return "", "", errors.New("unauthorized")
 	}
 
-	emailClaim, ok := decodedToken.Claims["email"].(string)
-	if !ok || strings.TrimSpace(emailClaim) == "" {
-		return "", errors.New("unauthorized")
-	}
-
-	return strings.TrimSpace(emailClaim), nil
+	emailClaim, _ := decodedToken.Claims["email"].(string)
+	return decodedToken.UID, strings.TrimSpace(emailClaim), nil
 }
 
 type StudentLookupHandler struct {
