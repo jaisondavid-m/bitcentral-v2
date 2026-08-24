@@ -33,10 +33,20 @@ const FALLBACK_ASSESSMENT_DATA = [
 export default function PSAssessmentHistory() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { student } = useAuth() || {};
+  const { student, profile, user } = useAuth() || {};
 
-  // Default User ID is 2025UCS1023 as specified in request, or from query param / auth context
-  const defaultUserId = searchParams.get("id") || student?.rollNo || student?.roll_no || "2025UCS1023";
+  // Default User ID (e.g. 2025UCS1023) from query param / auth context, prioritizing user_id over register number
+  const defaultUserId =
+    searchParams.get("user_id") ||
+    searchParams.get("id") ||
+    student?.user_id ||
+    student?.userId ||
+    student?.rollNo ||
+    student?.roll_no ||
+    profile?.user_id ||
+    profile?.uid ||
+    user?.uid ||
+    "2025UCS1023";
   const [userIdInput, setUserIdInput] = useState(defaultUserId);
   const [activeUserId, setActiveUserId] = useState(defaultUserId);
 
@@ -61,7 +71,7 @@ export default function PSAssessmentHistory() {
       try {
         const headers = await getAuthenticatedHeaders().catch(() => ({}));
         const res = await api.get("/ps/assessments", {
-          params: activeUserId ? { id: activeUserId } : {},
+          params: activeUserId ? { user_id: activeUserId, id: activeUserId } : {},
           headers,
         });
         return res.data;
@@ -168,7 +178,7 @@ export default function PSAssessmentHistory() {
 
         {/* Analytics Summary Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-          
+
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs space-y-1">
             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
               Total Tests
@@ -226,7 +236,7 @@ export default function PSAssessmentHistory() {
         {/* Filter Toolbar Card */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            
+
             {/* Title & Record count */}
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900">
@@ -242,7 +252,7 @@ export default function PSAssessmentHistory() {
 
           {/* Search and Filters Controls */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-            
+
             {/* Search Input */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -346,20 +356,18 @@ export default function PSAssessmentHistory() {
                 return (
                   <div
                     key={index}
-                    className={`group relative bg-white dark:bg-slate-900 border rounded-3xl p-5 shadow-xs transition-all duration-300 hover:shadow-md flex flex-col justify-between space-y-4 ${
-                      isCleared
+                    className={`group relative bg-white dark:bg-slate-900 border rounded-3xl p-5 shadow-xs transition-all duration-300 hover:shadow-md flex flex-col justify-between space-y-4 ${isCleared
                         ? "border-slate-200/90 dark:border-slate-800 hover:border-emerald-400/80 dark:hover:border-emerald-500/50"
                         : "border-slate-200/90 dark:border-slate-800 hover:border-rose-400/80 dark:hover:border-rose-500/50"
-                    }`}
+                      }`}
                   >
                     {/* Top Bar: Result Badge & Attendance */}
                     <div className="flex items-center justify-between gap-2">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border shadow-2xs ${
-                          isCleared
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border shadow-2xs ${isCleared
                             ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-400 dark:border-emerald-800"
                             : "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-400 dark:border-rose-800"
-                        }`}
+                          }`}
                       >
                         {isCleared ? (
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -370,11 +378,10 @@ export default function PSAssessmentHistory() {
                       </span>
 
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-bold border ${
-                          isPresent
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-bold border ${isPresent
                             ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-900"
                             : "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-900"
-                        }`}
+                          }`}
                       >
                         <span>{item.attendance}</span>
                       </span>
@@ -443,11 +450,10 @@ export default function PSAssessmentHistory() {
                           </td>
                           <td className="p-3.5">
                             <span
-                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-extrabold text-[11px] border ${
-                                isCleared
+                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-extrabold text-[11px] border ${isCleared
                                   ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-400 dark:border-emerald-800"
                                   : "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-400 dark:border-rose-800"
-                              }`}
+                                }`}
                             >
                               {isCleared ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                               {item.result}
@@ -455,11 +461,10 @@ export default function PSAssessmentHistory() {
                           </td>
                           <td className="p-3.5">
                             <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-md font-bold text-[11px] border ${
-                                isPresent
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-md font-bold text-[11px] border ${isPresent
                                   ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-900"
                                   : "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-900"
-                              }`}
+                                }`}
                             >
                               {item.attendance}
                             </span>
