@@ -46,6 +46,20 @@ export const ROUTE_SEO = {
     keywords: ["student report", "BIT Central student profile", "attendance report", "PS skills"],
   },
 
+  "/ps-assessment-history": {
+    title: "PS Assessment History - BIT Central",
+    description: "View PS assessment details including cleared/not cleared results, timing, venue, and course names for student ID 2025UCS1023.",
+    keywords: ["PS Assessment History", "PS skills", "assessment logs", "BIT Central"],
+    noIndex: true,
+  },
+
+  "/ps-assessment": {
+    title: "PS Assessment History - BIT Central",
+    description: "View PS assessment details including cleared/not cleared results, timing, venue, and course names for student ID 2025UCS1023.",
+    keywords: ["PS Assessment History", "PS skills", "assessment logs", "BIT Central"],
+    noIndex: true,
+  },
+
   "/home": {
     title: "Student Home",
     description: "Protected BIT Central home page for academic tools, exam support, reward points, and student services.",
@@ -241,6 +255,18 @@ export const ROUTE_SEO = {
     description: "The page you requested could not be found on BIT Central.",
     keywords: ["404", "page not found", "BIT Central"],
     noIndex: true,
+  },
+  "/ps-points": {
+    title: "PS Point Details - BIT Central",
+    description: "Track your Activity Points, Opportunity Points, and Responsive Score on BIT Central.",
+    keywords: ["PS Points", "Activity Points", "Opportunity Points", "Responsive Score"],
+    pageType: "CollectionPage",
+  },
+  "/ps-biometrics": {
+    title: "PS Biometric Details - BIT Central",
+    description: "View fingerprint punch-in logs and daily attendance session records on BIT Central.",
+    keywords: ["PS Biometric", "Biometric Scans", "Daily Attendance", "Punch In Log"],
+    pageType: "CollectionPage",
   },
 };
 

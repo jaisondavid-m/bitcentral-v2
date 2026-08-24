@@ -29,6 +29,9 @@ const ExamHall = lazy(() => import("../Pages/ExamHall.jsx"));
 const ExamHallDownload = lazy(() => import("../Pages/ExamHallDownload.jsx"));
 const UserDirectory = lazy(() => import("../Pages/UserDirectory.jsx"));
 const StudentReportDetails = lazy(() => import("../Pages/StudentReportDetails.jsx"));
+const PSAssessmentHistory = lazy(() => import("../Pages/PSAssessmentHistory.jsx"));
+const PSPointDetails = lazy(() => import("../Pages/PSPointDetails.jsx"));
+const PSBiometricDetails = lazy(() => import("../Pages/PSBiometricDetails.jsx"));
 const SupportDev = lazy(() => import("../Pages/SupportDev.jsx"));
 const PaymentSuccessful = lazy(() => import("../Pages/PaymentSuccessful.jsx"));
 const AK22PH202 = lazy(() => import("../Pages/answers/AK__22PH202.jsx"));
@@ -243,6 +246,12 @@ function App() {
             <Route path="/user-directory" element={<UserDirectory />} />
             <Route path="/student-report/:id" element={<StudentReportDetails />} />
             <Route path="/student-report" element={<StudentReportDetails />} />
+            <Route path="/ps-assessment-history" element={<PSAssessmentHistory />} />
+            <Route path="/ps-assessment" element={<PSAssessmentHistory />} />
+            <Route path="/ps-points" element={<PSPointDetails />} />
+            <Route path="/ps-point-details" element={<PSPointDetails />} />
+            <Route path="/ps-biometrics" element={<PSBiometricDetails />} />
+            <Route path="/ps-biometric-details" element={<PSBiometricDetails />} />
             <Route path="*" element={<NotFound />} />
             <Route path="/ak_22ph202" element={<AK22PH202 />} />
             <Route path="/tamil_ak" element={<AnswerKey22HS006 />} />

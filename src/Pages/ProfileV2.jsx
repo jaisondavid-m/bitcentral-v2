@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { logout } from "../Authentication/firebase.js";
-import { useAuth } from "../context/StudentContext.jsx";
+import { useAuth, decodeCollegeEmail } from "../context/StudentContext.jsx";
 import { Navigate } from "react-router-dom";
 import profileAvatar from "../assets/profile.jpg";
 import { getV2Profile } from "../api/axios.js";
@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 function ProfileV2() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, student, profile, loading: authLoading } = useAuth();
   const [profileV2, setProfileV2] = useState(null);
   const [fetchingProfile, setFetchingProfile] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -98,17 +98,71 @@ function ProfileV2() {
 
   const isBitsathyEmail = user.email?.endsWith("@bitsathy.ac.in");
 
-  // Fields mapped from backend v2 profile
-  const name = profileV2?.name || user.displayName || "User";
-  const email = profileV2?.email || user.email;
-  const avatarUrl = profileV2?.photo_url || user.photoURL || profileAvatar;
-  const registerNo = profileV2?.register_no || "-";
-  const userId = profileV2?.user_id || "-";
-  const department = profileV2?.department || "-";
-  const batch = profileV2?.batch || "-";
-  const phone = profileV2?.phone || "-";
-  const creationTime = profileV2?.creation_time || user?.metadata?.createdAt || user?.metadata?.creationTime;
-  const lastSignInTime = profileV2?.last_sign_in_time || user?.metadata?.lastLoginAt || user?.metadata?.lastSignInTime;
+  // Fallback decoded email info
+  const decoded = decodeCollegeEmail(user?.email);
+
+  // Robust field mapping supporting tracker_users, /me profile, student context, and email decoding
+  const name =
+    profileV2?.name ||
+    profileV2?.display_name ||
+    profile?.display_name ||
+    user?.displayName ||
+    "User";
+
+  const email = profileV2?.email || profile?.email || user?.email || "";
+
+  const avatarUrl =
+    profileV2?.photo_url ||
+    profile?.photo_url ||
+    user?.photoURL ||
+    profileAvatar;
+
+  const registerNo =
+    profileV2?.register_no ||
+    profileV2?.roll_no ||
+    profileV2?.user_id ||
+    profile?.roll_no ||
+    student?.roll_no ||
+    student?.rollNo ||
+    "-";
+
+  const userId =
+    profileV2?.user_id ||
+    profileV2?.uid ||
+    profile?.uid ||
+    user?.uid ||
+    "-";
+
+  const department =
+    profileV2?.department ||
+    student?.department ||
+    decoded?.department ||
+    "-";
+
+  const batch =
+    profileV2?.batch ||
+    student?.batch ||
+    decoded?.batch ||
+    "-";
+
+  const phone =
+    profileV2?.phone ||
+    profile?.phone ||
+    "-";
+
+  const creationTime =
+    profileV2?.creation_time ||
+    profile?.creation_time ||
+    user?.metadata?.createdAt ||
+    user?.metadata?.creationTime ||
+    "";
+
+  const lastSignInTime =
+    profileV2?.last_sign_in_time ||
+    profile?.last_sign_in_time ||
+    user?.metadata?.lastLoginAt ||
+    user?.metadata?.lastSignInTime ||
+    "";
 
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 lg:px-8 dark:bg-black">
