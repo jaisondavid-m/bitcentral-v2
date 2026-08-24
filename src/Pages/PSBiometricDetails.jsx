@@ -4,17 +4,13 @@ import {
   Fingerprint,
   Calendar,
   Clock,
-  CheckCircle2,
   Search,
   RefreshCw,
-  Building
+  Building,
+  LoaderCircle
 } from "lucide-react";
 import api, { getAuthenticatedHeaders } from "../api/axios";
 import { useAuth } from "../context/StudentContext";
-
-const FALLBACK_BIOMETRIC_LOGS = [
-  { date: "-", device_name: "Loading..", time: "00:00:00" },
-];
 
 export default function PSBiometricDetails() {
   const { rollNo: studentRollNo } = useAuth();
@@ -37,7 +33,7 @@ export default function PSBiometricDetails() {
         });
         return res.data;
       } catch (err) {
-        console.warn("Biometric API fetch failed, using fallback dataset.", err);
+        console.warn("Biometric API fetch failed.", err);
         return null;
       }
     },
@@ -46,10 +42,10 @@ export default function PSBiometricDetails() {
 
   const biometricLogs = useMemo(() => {
     const list = apiResponse?.biometric;
-    if (list && Array.isArray(list) && list.length > 0) {
+    if (list && Array.isArray(list)) {
       return list;
     }
-    return FALLBACK_BIOMETRIC_LOGS;
+    return [];
   }, [apiResponse]);
 
   const uniqueDaysCount = useMemo(() => {
@@ -85,6 +81,39 @@ export default function PSBiometricDetails() {
     });
     return Array.from(map.entries());
   }, [filteredBiometricLogs]);
+
+  // Loading state screen
+  if (isLoading || (isFetching && !apiResponse)) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-4 sm:py-8 px-3 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
+          <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-xs">
+            <div className="flex items-center gap-3">
+              <LoaderCircle className="w-5 h-5 text-blue-500 animate-spin" />
+              <span className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300">
+                Fetching Biometric Logs...
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 shadow-xs animate-pulse space-y-2">
+                <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
+                <div className="h-6 bg-slate-200 dark:bg-slate-800 rounded w-1/3"></div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-6 shadow-xs animate-pulse space-y-3">
+            <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/4"></div>
+            <div className="h-10 bg-slate-200 dark:bg-slate-800 rounded w-full"></div>
+            <div className="h-10 bg-slate-200 dark:bg-slate-800 rounded w-full"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-4 sm:py-8 px-3 sm:px-6 lg:px-8">
@@ -220,7 +249,7 @@ export default function PSBiometricDetails() {
 
           {groupedLogs.length === 0 && (
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-12 text-center text-slate-400 text-xs shadow-xs">
-              No biometric records match "{searchTerm}".
+              {searchTerm ? `No biometric records match "${searchTerm}".` : "No biometric logs available."}
             </div>
           )}
         </div>
