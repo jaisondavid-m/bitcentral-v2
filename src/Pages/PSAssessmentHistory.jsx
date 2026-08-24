@@ -90,17 +90,39 @@ export default function PSAssessmentHistory() {
     batch: "2025 - 2029"
   };
 
+  // Derive student batch start year (e.g. 2025 for 2025UCS1023) to filter legacy/dummy records
+  const studentStartYear = useMemo(() => {
+    if (activeUserId && /^20\d{2}/.test(activeUserId)) {
+      return parseInt(activeUserId.slice(0, 4), 10);
+    }
+    const batchStr = studentBasic?.batch || student?.batch;
+    if (batchStr) {
+      const match = batchStr.match(/20\d{2}/);
+      if (match) return parseInt(match[0], 10);
+    }
+    return null;
+  }, [activeUserId, studentBasic, student]);
+
   const rawAssessmentList = useMemo(() => {
     const listFromApi = parsedData.assessments || parsedData.data?.personalized_skills?.assessment_data || parsedData.data?.personalized_skills?.assessment_logs;
+    let list = [];
     if (listFromApi && Array.isArray(listFromApi) && listFromApi.length > 0) {
-      return listFromApi;
+      list = listFromApi;
+    } else if (activeUserId === "2025UCS1023" || !listFromApi) {
+      list = FALLBACK_ASSESSMENT_DATA;
     }
-    // Fallback to static sample if activeUserId is 2025UCS1023 or API returned empty/null
-    if (activeUserId === "2025UCS1023" || !listFromApi) {
-      return FALLBACK_ASSESSMENT_DATA;
+
+    // Filter out dummy/legacy assessments dated before student's start year (e.g. 2023 for a 2025 student)
+    if (studentStartYear) {
+      list = list.filter((item) => {
+        if (!item.date) return true;
+        const itemYear = new Date(item.date).getFullYear();
+        return isNaN(itemYear) || itemYear >= studentStartYear;
+      });
     }
-    return [];
-  }, [parsedData, activeUserId]);
+
+    return list;
+  }, [parsedData, activeUserId, studentStartYear]);
 
   // Apply search, filters & sorting
   const filteredAssessments = useMemo(() => {
