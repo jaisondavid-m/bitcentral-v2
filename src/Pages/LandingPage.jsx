@@ -2,17 +2,12 @@ import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, CheckCircle2, LogIn } from "lucide-react";
 import PublicNav from "../Component/PublicNav.jsx";
+import PublicFooter from "../Component/PublicFooter.jsx";
 import FAQSection from "../Component/FAQSection.jsx";
 import { benefitList, contactMethods, developerProfile, featureList } from "../content/publicContent.js";
 
 export default function LandingPage() {
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (localStorage.getItem("visitedLogin") === "true") {
-      navigate("/login", { replace: true });
-    }
-  }, [navigate])
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 dark:bg-black dark:text-white">
@@ -140,6 +135,7 @@ export default function LandingPage() {
           </Link>
         </div>
       </section>
+      <PublicFooter />
     </main>
   );
 }

@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import PublicNav from "../Component/PublicNav.jsx";
+import PublicFooter from "../Component/PublicFooter.jsx";
 import { benefitList, featureList } from "../content/publicContent.js";
 
 export default function Features() {
@@ -54,6 +55,7 @@ export default function Features() {
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </section>
+      <PublicFooter />
     </main>
   );
 }

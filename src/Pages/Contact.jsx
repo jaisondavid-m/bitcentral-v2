@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import PublicNav from "../Component/PublicNav.jsx";
+import PublicFooter from "../Component/PublicFooter.jsx";
 import { contactMethods } from "../content/publicContent.js";
 
 export default function Contact() {
@@ -42,6 +43,7 @@ export default function Contact() {
           </Link>
         </div>
       </section>
+      <PublicFooter />
     </main>
   );
 }

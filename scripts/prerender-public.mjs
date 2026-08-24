@@ -76,6 +76,13 @@ const routes = [
     body: "Students can share feedback, suggest updates, report missing question banks or answer keys, and find public information related to Bannari Amman Institute of Technology.",
   },
   {
+    path: "/support-dev",
+    title: "Support BIT Central Developer | BIT Central",
+    description: "Support the developer of BIT Central to help maintain servers, update academic question banks, answer keys, and student services for BIT Sathy.",
+    h1: "Support BIT Central Developer",
+    body: "Support Jaison David M in developing and maintaining BIT Central, providing academic resources, question banks, answer keys, mess menu updates, and campus tools for Bannari Amman Institute of Technology.",
+  },
+  {
     path: "/privacy-policy",
     title: "Privacy Policy | BIT Central",
     description: "BIT Central privacy policy for students and visitors using public pages and protected student portal tools.",

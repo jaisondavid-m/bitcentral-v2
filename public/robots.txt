@@ -1,3 +1,6 @@
+User-agent: Mediapartners-Google
+Allow: /
+
 User-agent: *
 Allow: /
 Disallow: /dashboard
@@ -6,7 +9,7 @@ Disallow: /admin
 Disallow: /semester
 Disallow: /mess
 Disallow: /exam-hall
-Disallow: /exam-hall-manual
+Disallow: /exam-hall-manual 
 Disallow: /leavedetails
 Disallow: /rpsite
 Disallow: /pcdp

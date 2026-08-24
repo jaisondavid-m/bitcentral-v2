@@ -13,6 +13,7 @@ import {
 import { BiDonateHeart } from "react-icons/bi";
 import { FaHandHoldingHeart } from "react-icons/fa6";
 import PublicNav from "../Component/PublicNav.jsx";
+import PublicFooter from "../Component/PublicFooter.jsx";
 import Navbar from "../Component/NavBar.jsx";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../Authentication/firebase.js";
@@ -267,9 +268,7 @@ export default function SupportDev() {
       </main>
 
       {/* Footer */}
-      <footer className="shrink-0 py-3 text-center text-xs text-slate-400 dark:text-slate-500">
-        BIT-CENTRAL © 2026 · Built for Bannari Amman Institute of Technology
-      </footer>
+      <PublicFooter />
     </div>
   );
 }

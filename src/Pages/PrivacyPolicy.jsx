@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import PublicNav from "../Component/PublicNav.jsx";
+import PublicFooter from "../Component/PublicFooter.jsx";
 
 const sections = [
   {
@@ -21,12 +22,12 @@ const sections = [
   {
     title: "4. Third-Party Services",
     content:
-      "We may use third-party services for analytics and other site features. These services are governed by their own terms and privacy practices.",
+      "We may use third-party services for analytics, hosting, authentication, and advertising features. These services are governed by their own terms and privacy practices.",
   },
   {
-    title: "5. Cookies",
+    title: "5. Cookies & Google AdSense Advertising",
     content:
-      "Cookies and similar technologies may be used to keep you signed in, remember preferences, analyze traffic, and support advertising. You can control cookies through your browser settings, but some parts of the site may not function properly if cookies are disabled.",
+      "Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to BIT Central or other websites. Google's use of advertising cookies enables it and its partners to serve ads to users based on their visit to our site and/or other sites on the Internet. Users may opt out of personalized advertising by visiting Google Ads Settings (https://www.google.com/settings/ads) or by visiting www.aboutads.info.",
   },
   {
     title: "6. Data Sharing",
@@ -39,9 +40,9 @@ const sections = [
       "We keep information only as long as necessary for the purposes described in this policy or as required by law. We use reasonable administrative, technical, and organizational safeguards, but no system is completely secure.",
   },
   {
-    title: "8. Your Choices",
+    title: "8. Your Choices & Opt-Outs",
     content:
-      "Depending on your location and applicable law, you may have rights to access, correct, delete, or restrict the use of your personal information. You may also opt out of certain advertising-related cookies through browser settings or Google ad preferences.",
+      "Depending on your location and applicable law, you may have rights to access, correct, delete, or restrict the use of your personal information. You may also opt out of targeted advertising cookies through your browser settings, Google Ad Settings, or your regional digital advertising choice tools.",
   },
   {
     title: "9. Children's Privacy",
@@ -67,7 +68,7 @@ function PrivacyPolicy() {
           <h1 className="mt-3 text-3xl font-bold text-slate-950 sm:text-4xl">
             Privacy Policy
           </h1>
-          <p className="mt-4 text-sm text-slate-500">Effective date: May 17, 2026</p>
+          <p className="mt-4 text-sm text-slate-500">Effective date: August 24, 2026</p>
           <p className="mt-6 text-base leading-7 text-slate-600">
             Summary: This policy explains what BIT Central may collect from students and visitors, how the student portal uses that information, and how users can contact the developer about privacy questions.
           </p>
@@ -78,33 +79,34 @@ function PrivacyPolicy() {
           <div className="mt-10 space-y-8">
             {sections.map((section) => (
               <section key={section.title}>
-                <h2 className="text-lg font-semibold text-slate-950">{section.title}</h2>
-                <p className="mt-2 leading-7 text-slate-600">{section.content}</p>
+                <h2 className="text-lg font-semibold text-slate-950 dark:text-white">{section.title}</h2>
+                <p className="mt-2 leading-7 text-slate-600 dark:text-slate-300">{section.content}</p>
               </section>
             ))}
           </div>
 
           <section className="mt-10 rounded-lg bg-slate-100 p-6 dark:bg-slate-900">
-            <h2 className="text-lg font-semibold text-slate-950">Contact Us</h2>
-            <p className="mt-2 leading-7 text-slate-600">
+            <h2 className="text-lg font-semibold text-slate-950 dark:text-white">Contact Us</h2>
+            <p className="mt-2 leading-7 text-slate-600 dark:text-slate-300">
               If you have questions about this Privacy Policy, contact the developer at{" "}
-              <a className="font-medium text-blue-700 hover:underline" href="mailto:developer@bitsathy.in">
+              <a className="font-medium text-blue-700 hover:underline dark:text-blue-400" href="mailto:developer@bitsathy.in">
                 developer@bitsathy.in
               </a>{" "}
               or call{" "}
-              <a className="font-medium text-blue-700 hover:underline" href="tel:+919843777817">
+              <a className="font-medium text-blue-700 hover:underline dark:text-blue-400" href="tel:+919843777817">
                 +91 98437 77817
               </a>.
             </p>
           </section>
           <nav className="mt-8 flex flex-wrap gap-3" aria-label="Related public pages">
-            <Link className="font-medium text-blue-700 hover:underline" to="/about">About</Link>
-            <Link className="font-medium text-blue-700 hover:underline" to="/features">Features</Link>
-            <Link className="font-medium text-blue-700 hover:underline" to="/faq">FAQ</Link>
-            <Link className="font-medium text-blue-700 hover:underline" to="/contact">Contact</Link>
+            <Link className="font-medium text-blue-700 hover:underline dark:text-blue-400" to="/about">About</Link>
+            <Link className="font-medium text-blue-700 hover:underline dark:text-blue-400" to="/features">Features</Link>
+            <Link className="font-medium text-blue-700 hover:underline dark:text-blue-400" to="/faq">FAQ</Link>
+            <Link className="font-medium text-blue-700 hover:underline dark:text-blue-400" to="/contact">Contact</Link>
           </nav>
         </div>
       </div>
+      <PublicFooter />
     </main>
   );
 }

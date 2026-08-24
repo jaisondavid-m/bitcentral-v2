@@ -1,6 +1,7 @@
 import React from "react";
 import { Github, Linkedin, Mail, Phone, UserRound } from "lucide-react";
 import PublicNav from "../Component/PublicNav.jsx";
+import PublicFooter from "../Component/PublicFooter.jsx";
 import { developerProfile } from "../content/publicContent.js";
 
 const developerLinks = [
@@ -60,6 +61,7 @@ export default function Developer() {
           </div>
         </div>
       </section>
+      <PublicFooter />
     </main>
   );
 }
