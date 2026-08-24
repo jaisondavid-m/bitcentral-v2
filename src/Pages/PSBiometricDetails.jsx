@@ -7,38 +7,14 @@ import {
   CheckCircle2,
   Search,
   RefreshCw,
-  Building,
-  Layers
+  Building
 } from "lucide-react";
 import api, { getAuthenticatedHeaders } from "../api/axios";
 import { useAuth } from "../context/StudentContext";
 
 const FALLBACK_BIOMETRIC_LOGS = [
-  { date: "2026-08-22", device_name: "RUBY 2", time: "12:30:11" },
-  { date: "2026-08-22", device_name: "RUBY 2", time: "12:25:34" },
-  { date: "2026-08-22", device_name: "FT HKV 3", time: "08:31:00" },
-  { date: "2026-08-21", device_name: "student finger SF I", time: "23:38:00" },
-  { date: "2026-08-21", device_name: "RUBY 2", time: "19:48:48" },
-  { date: "2026-08-21", device_name: "Student finger HKV2", time: "12:41:00" },
-  { date: "2026-08-21", device_name: "Student finger HKV2", time: "08:28:00" }
+  { date: "-", device_name: "Loading..", time: "00:00:00" },
 ];
-
-const getDeviceStyle = (deviceName = "") => {
-  const name = deviceName.toUpperCase();
-  if (name.includes("RUBY")) {
-    return "bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30";
-  }
-  if (name.includes("HKV")) {
-    return "bg-blue-500/10 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30";
-  }
-  if (name.includes("SF") || name.includes("FINGER")) {
-    return "bg-purple-500/10 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30";
-  }
-  if (name.includes("OUTING") || name.includes("FACE")) {
-    return "bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30";
-  }
-  return "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700";
-};
 
 export default function PSBiometricDetails() {
   const { rollNo: studentRollNo } = useAuth();
@@ -76,14 +52,15 @@ export default function PSBiometricDetails() {
     return FALLBACK_BIOMETRIC_LOGS;
   }, [apiResponse]);
 
-  const summaryData = useMemo(() => {
-    return apiResponse?.academics?.summary || {
-      attendance_percentage: "92.65",
-      present_days: "31.50",
-      absent_days: "2.50",
-      total_days: "34"
-    };
-  }, [apiResponse]);
+  const uniqueDaysCount = useMemo(() => {
+    const valid = biometricLogs.filter(b => b.date && b.date !== "-");
+    return new Set(valid.map(b => b.date)).size;
+  }, [biometricLogs]);
+
+  const uniqueDevicesCount = useMemo(() => {
+    const valid = biometricLogs.filter(b => b.device_name && b.device_name !== "Loading..");
+    return new Set(valid.map(b => b.device_name)).size;
+  }, [biometricLogs]);
 
   const filteredBiometricLogs = useMemo(() => {
     if (!searchTerm.trim()) return biometricLogs;
@@ -121,10 +98,10 @@ export default function PSBiometricDetails() {
             </div>
             <div>
               <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">
-                Biometric Details
+                Biometric Logs
               </h1>
               <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
-                Fingerprint scan logs & summary
+                Fingerprint scan records & device history
               </p>
             </div>
           </div>
@@ -140,53 +117,41 @@ export default function PSBiometricDetails() {
           </button>
         </div>
 
-        {/* Stats Summary Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
+        {/* Stats Summary Cards (Biometric Metrics Only) */}
+        <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1">
             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-              Attendance %
+              Total Scans
             </span>
             <div className="text-xl sm:text-2xl font-black text-blue-600 dark:text-blue-400">
-              {summaryData.attendance_percentage || summaryData.percentage || "92.65"}%
-            </div>
-            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3 shrink-0" /> Good Standing
-            </span>
-          </div>
-
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1">
-            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-              Present Days
-            </span>
-            <div className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
-              {summaryData.present || summaryData.present_days || "31.50"}
-            </div>
-            <span className="text-[10px] text-slate-400 font-medium truncate block">
-              Out of {summaryData.total || summaryData.total_days || "34"} days
-            </span>
-          </div>
-
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1">
-            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-              Absent Days
-            </span>
-            <div className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400">
-              {summaryData.absent || summaryData.absent_days || "2.50"}
-            </div>
-            <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium block">
-              Days missed
-            </span>
-          </div>
-
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1">
-            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-              Biometric Logs
-            </span>
-            <div className="text-xl sm:text-2xl font-black text-purple-600 dark:text-purple-400">
-              {biometricLogs.length}
+              {biometricLogs.filter(b => b.date !== "-").length}
             </div>
             <span className="text-[10px] text-slate-400 font-medium block">
-              Scan records
+              Punch-in records
+            </span>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1">
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+              Active Days
+            </span>
+            <div className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
+              {uniqueDaysCount}
+            </div>
+            <span className="text-[10px] text-slate-400 font-medium block">
+              Scanned dates
+            </span>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1">
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+              Devices Used
+            </span>
+            <div className="text-xl sm:text-2xl font-black text-purple-600 dark:text-purple-400">
+              {uniqueDevicesCount}
+            </div>
+            <span className="text-[10px] text-slate-400 font-medium block">
+              Scanner units
             </span>
           </div>
         </div>
