@@ -220,13 +220,79 @@ func (h *AdminHandler) FetchPSRewardsBreakdown(c *gin.Context) {
 	})
 }
 
-func (h *AdminHandler) FetchStudentReportDetails(c *gin.Context) {
-	id := strings.TrimSpace(c.Query("id"))
-	if id == "" {
-		id = strings.TrimSpace(c.Query("user_id"))
+// resolveAndAuthorizeStudentID resolves the authenticated student ID from Bearer token
+// and ensures that non-admin students can ONLY access their own details.
+func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int, error) {
+	requestedID := strings.TrimSpace(c.Query("id"))
+	if requestedID == "" {
+		requestedID = strings.TrimSpace(c.Query("user_id"))
 	}
-	if id == "" {
-		c.PureJSON(http.StatusBadRequest, gin.H{"success": false, "message": "id parameter is required"})
+
+	authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
+	token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
+
+	var authenticatedID string
+	var authenticatedEmail string
+
+	if token != "" {
+		if email, err := emailFromToken(token); err == nil && email != "" {
+			authenticatedEmail = strings.ToLower(strings.TrimSpace(email))
+			if h.DB != nil {
+				var rollNo string
+				_ = h.DB.QueryRow(`SELECT rollno FROM student_email WHERE LOWER(TRIM(emailid)) = ? LIMIT 1`, authenticatedEmail).Scan(&rollNo)
+				if rollNo != "" {
+					authenticatedID = strings.TrimSpace(rollNo)
+				}
+			}
+			if authenticatedID == "" {
+				parts := strings.Split(authenticatedEmail, "@")
+				if len(parts) > 0 {
+					authenticatedID = strings.TrimSpace(parts[0])
+				}
+			}
+		}
+	}
+
+	// 1. If user is authenticated via Bearer token:
+	if authenticatedID != "" {
+		// If client passed an explicit requestedID in query parameter:
+		if requestedID != "" && !strings.EqualFold(requestedID, authenticatedID) {
+			// Check if authenticated user is admin
+			isAdmin := false
+			if h.DB != nil && authenticatedEmail != "" {
+				var count int
+				_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins a JOIN users u ON a.uid = u.uid WHERE LOWER(TRIM(u.email)) = ?`, authenticatedEmail).Scan(&count)
+				if count > 0 {
+					isAdmin = true
+				}
+			}
+
+			if !isAdmin {
+				return "", http.StatusForbidden, fmt.Errorf("unauthorized: you can only view your own details")
+			}
+			return requestedID, http.StatusOK, nil
+		}
+		// If no requestedID supplied or requestedID matches authenticated user's ID
+		return authenticatedID, http.StatusOK, nil
+	}
+
+	// 2. If user is UNAUTHENTICATED (no Bearer token provided):
+	if requestedID != "" {
+		// Only allow default demo ID ("2025UCS1023") if requested without authentication
+		if !strings.EqualFold(requestedID, "2025UCS1023") {
+			return "", http.StatusUnauthorized, fmt.Errorf("authentication required: please sign in to access student details")
+		}
+		return requestedID, http.StatusOK, nil
+	}
+
+	// Default fallback if unauthenticated demo request
+	return "2025UCS1023", http.StatusOK, nil
+}
+
+func (h *AdminHandler) FetchStudentReportDetails(c *gin.Context) {
+	id, statusCode, err := h.resolveAndAuthorizeStudentID(c)
+	if err != nil {
+		c.PureJSON(statusCode, gin.H{"success": false, "message": err.Error()})
 		return
 	}
 
@@ -310,36 +376,10 @@ func (h *AdminHandler) FetchStudentReportDetails(c *gin.Context) {
 
 // FetchAssessmentDetails fetches student report, auto-validates user, and filters ONLY assessment details
 func (h *AdminHandler) FetchAssessmentDetails(c *gin.Context) {
-	id := strings.TrimSpace(c.Query("id"))
-	if id == "" {
-		id = strings.TrimSpace(c.Query("user_id"))
-	}
-
-	// Auto-validate user if ID param is not explicitly supplied
-	if id == "" {
-		authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-		token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
-		if token != "" {
-			if email, err := emailFromToken(token); err == nil && email != "" {
-				if h.DB != nil {
-					var rollNo string
-					_ = h.DB.QueryRow(`SELECT rollno FROM student_email WHERE LOWER(TRIM(emailid)) = LOWER(TRIM(?)) LIMIT 1`, email).Scan(&rollNo)
-					if rollNo != "" {
-						id = rollNo
-					}
-				}
-				if id == "" {
-					parts := strings.Split(email, "@")
-					if len(parts) > 0 {
-						id = parts[0]
-					}
-				}
-			}
-		}
-	}
-
-	if id == "" {
-		id = "2025UCS1023" // Default fallback ID if no ID is provided or resolved
+	id, statusCode, err := h.resolveAndAuthorizeStudentID(c)
+	if err != nil {
+		c.PureJSON(statusCode, gin.H{"success": false, "message": err.Error()})
+		return
 	}
 
 	cookieHeader := "PS=cc1d0f436efeea00cbaaa2ec081e8d58fb31b9994e573663f83c603acbeeb889; Device-Identifier=B9B6863D-9947-4B2E-920B-D60D67B79BD1;"
@@ -447,35 +487,10 @@ func (h *AdminHandler) FetchAssessmentDetails(c *gin.Context) {
 
 // FetchPointsDetails fetches student report and filters ONLY point/wallet details (excluding withheld_points)
 func (h *AdminHandler) FetchPointsDetails(c *gin.Context) {
-	id := strings.TrimSpace(c.Query("id"))
-	if id == "" {
-		id = strings.TrimSpace(c.Query("user_id"))
-	}
-
-	if id == "" {
-		authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-		token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
-		if token != "" {
-			if email, err := emailFromToken(token); err == nil && email != "" {
-				if h.DB != nil {
-					var rollNo string
-					_ = h.DB.QueryRow(`SELECT rollno FROM student_email WHERE LOWER(TRIM(emailid)) = LOWER(TRIM(?)) LIMIT 1`, email).Scan(&rollNo)
-					if rollNo != "" {
-						id = rollNo
-					}
-				}
-				if id == "" {
-					parts := strings.Split(email, "@")
-					if len(parts) > 0 {
-						id = parts[0]
-					}
-				}
-			}
-		}
-	}
-
-	if id == "" {
-		id = "2025UCS1023"
+	id, statusCode, err := h.resolveAndAuthorizeStudentID(c)
+	if err != nil {
+		c.PureJSON(statusCode, gin.H{"success": false, "message": err.Error()})
+		return
 	}
 
 	cookieHeader := "PS=cc1d0f436efeea00cbaaa2ec081e8d58fb31b9994e573663f83c603acbeeb889; Device-Identifier=B9B6863D-9947-4B2E-920B-D60D67B79BD1;"
@@ -586,35 +601,10 @@ func (h *AdminHandler) FetchPointsDetails(c *gin.Context) {
 
 // FetchBiometricDetails fetches student report and filters ONLY biometric & attendance details
 func (h *AdminHandler) FetchBiometricDetails(c *gin.Context) {
-	id := strings.TrimSpace(c.Query("id"))
-	if id == "" {
-		id = strings.TrimSpace(c.Query("user_id"))
-	}
-
-	if id == "" {
-		authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-		token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
-		if token != "" {
-			if email, err := emailFromToken(token); err == nil && email != "" {
-				if h.DB != nil {
-					var rollNo string
-					_ = h.DB.QueryRow(`SELECT rollno FROM student_email WHERE LOWER(TRIM(emailid)) = LOWER(TRIM(?)) LIMIT 1`, email).Scan(&rollNo)
-					if rollNo != "" {
-						id = rollNo
-					}
-				}
-				if id == "" {
-					parts := strings.Split(email, "@")
-					if len(parts) > 0 {
-						id = parts[0]
-					}
-				}
-			}
-		}
-	}
-
-	if id == "" {
-		id = "2025UCS1023"
+	id, statusCode, err := h.resolveAndAuthorizeStudentID(c)
+	if err != nil {
+		c.PureJSON(statusCode, gin.H{"success": false, "message": err.Error()})
+		return
 	}
 
 	cookieHeader := "PS=cc1d0f436efeea00cbaaa2ec081e8d58fb31b9994e573663f83c603acbeeb889; Device-Identifier=B9B6863D-9947-4B2E-920B-D60D67B79BD1;"
@@ -677,7 +667,6 @@ func (h *AdminHandler) FetchBiometricDetails(c *gin.Context) {
 
 	basicMap, _ := dataMap["basic"].(map[string]interface{})
 	biometricList, _ := dataMap["biometric"].([]interface{})
-	academicsMap, _ := dataMap["academics"].(map[string]interface{})
 
 	if biometricList == nil {
 		biometricList = []interface{}{}
@@ -704,7 +693,6 @@ func (h *AdminHandler) FetchBiometricDetails(c *gin.Context) {
 		"user_id":   id,
 		"student":   studentInfo,
 		"biometric": biometricList,
-		"academics": academicsMap,
 	})
 }
 
