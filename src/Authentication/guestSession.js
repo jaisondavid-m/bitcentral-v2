@@ -6,6 +6,9 @@ export const GUEST_EMAIL = "guest@bitsathy.ac.in";
 export const GUEST_DEPARTMENT = "Computer Science and Engineering";
 export const GUEST_BATCH = "2025 - 2029";
 
+// 2 days in milliseconds: 2 * 24 * 60 * 60 * 1000 = 172,800,000 ms
+export const GUEST_SESSION_MAX_AGE_MS = 2 * 24 * 60 * 60 * 1000;
+
 const envGuestFlag = String(import.meta.env.VITE_ENABLE_GUEST_LOGIN || "")
   .trim()
   .toLowerCase();
@@ -18,7 +21,7 @@ const getStorage = () => {
   }
 
   try {
-    return window.sessionStorage;
+    return window.localStorage;
   } catch (error) {
     return null;
   }
@@ -43,19 +46,33 @@ export const readGuestSession = () => {
   }
 
   try {
-    const rawSession = storage.getItem(GUEST_SESSION_KEY);
+    let rawSession = storage.getItem(GUEST_SESSION_KEY);
+    if (!rawSession && typeof window !== "undefined" && window.sessionStorage) {
+      rawSession = window.sessionStorage.getItem(GUEST_SESSION_KEY);
+    }
+
     if (!rawSession) {
       return null;
     }
 
     const parsedSession = JSON.parse(rawSession);
     if (!parsedSession || typeof parsedSession !== "object") {
+      clearGuestSession();
+      return null;
+    }
+
+    const createdAt = Number(parsedSession.createdAt) || Date.now();
+    const now = Date.now();
+
+    // Automatically expire guest session after 2 days (48 hours)
+    if (now - createdAt > GUEST_SESSION_MAX_AGE_MS) {
+      clearGuestSession();
       return null;
     }
 
     return {
-      createdAt: Number(parsedSession.createdAt) || Date.now(),
-      lastLoginAt: Number(parsedSession.lastLoginAt) || Number(parsedSession.createdAt) || Date.now(),
+      createdAt,
+      lastLoginAt: Number(parsedSession.lastLoginAt) || createdAt,
     };
   } catch (error) {
     return null;
@@ -78,22 +95,35 @@ export const activateGuestSession = () => {
     lastLoginAt: now,
   };
 
-  storage.setItem(GUEST_SESSION_KEY, JSON.stringify(guestSession));
+  try {
+    storage.setItem(GUEST_SESSION_KEY, JSON.stringify(guestSession));
+    if (typeof window !== "undefined" && window.sessionStorage) {
+      window.sessionStorage.removeItem(GUEST_SESSION_KEY);
+    }
+  } catch (error) {
+    // ignore
+  }
+
   notifyGuestSessionChange();
   return guestSession;
 };
 
 export const clearGuestSession = () => {
-  const storage = getStorage();
-  if (!storage) {
+  if (typeof window === "undefined") {
     return;
   }
 
-  if (!storage.getItem(GUEST_SESSION_KEY)) {
-    return;
+  try {
+    if (window.localStorage) {
+      window.localStorage.removeItem(GUEST_SESSION_KEY);
+    }
+    if (window.sessionStorage) {
+      window.sessionStorage.removeItem(GUEST_SESSION_KEY);
+    }
+  } catch (error) {
+    // ignore
   }
 
-  storage.removeItem(GUEST_SESSION_KEY);
   notifyGuestSessionChange();
 };
 

@@ -214,10 +214,19 @@ export const StudentContext = ({ children }) => {
       }
     });
 
+    const checkGuestExpiration = () => {
+      readGuestSession();
+    };
+
+    const intervalId = setInterval(checkGuestExpiration, 60000);
+    window.addEventListener("focus", checkGuestExpiration);
+
     return () => {
       cancelled = true;
       unsubscribe();
       unsubscribeGuest();
+      clearInterval(intervalId);
+      window.removeEventListener("focus", checkGuestExpiration);
     };
   }, []);
 
