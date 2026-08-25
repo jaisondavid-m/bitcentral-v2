@@ -34,6 +34,7 @@ const PSPointDetails = lazy(() => import("../Pages/PSPointDetails.jsx"));
 const PSBiometricDetails = lazy(() => import("../Pages/PSBiometricDetails.jsx"));
 const SupportDev = lazy(() => import("../Pages/SupportDev.jsx"));
 const PaymentSuccessful = lazy(() => import("../Pages/PaymentSuccessful.jsx"));
+const WifiDetails = lazy(() => import("../Pages/WifiDetails.jsx"));
 const AK22PH202 = lazy(() => import("../Pages/answers/AK__22PH202.jsx"));
 const AnswerKey22HS006 = lazy(() => import("../Pages/answers/AnswerKey22HS006.jsx"));
 // const DocsPage = lazy(() => import("../Pages/AboutDocs.jsx"));
@@ -151,6 +152,7 @@ function App() {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/support-dev" element={<SupportDev />} />
+          <Route path="/wifi-details" element={<WifiDetails />} />
           <Route path="/payment-successful" element={<PaymentSuccessful />} />
           <Route path="/payment-successfull" element={<PaymentSuccessful />} />
           {/* <Route path="/docs/about" element={<DocsPage />} /> */}
@@ -243,6 +245,7 @@ function App() {
             <Route path="/leavedetails" element={<LeaveDetails />} />
             <Route path="/semester" element={<Semester />} />
             <Route path="/mess" element={<MessMenu />} />
+            <Route path="/wifi-details" element={<WifiDetails />} />
             <Route path="/user-directory" element={<UserDirectory />} />
             <Route path="/student-report/:id" element={<StudentReportDetails />} />
             <Route path="/student-report" element={<StudentReportDetails />} />

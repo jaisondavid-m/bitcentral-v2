@@ -61,6 +61,13 @@ const routes = [
     body: "BIT Central includes academic resources, question banks, answer keys, semester PDFs, mess menu updates, reward points access, exam hall utilities, leave schedules, and campus resources.",
   },
   {
+    path: "/wifi-details",
+    title: "BIT Sathy Wi-Fi Passwords & Setup Guide | BIT Central",
+    description: "Default Wi-Fi passwords for BIT Sathy campus networks, Sapphire Hostel, Ruby Hostel, Emerald Hostel, and step-by-step password change instructions.",
+    h1: "BIT Sathy Wi-Fi Passwords & Setup Guide",
+    body: "Reference guide for default Wi-Fi passwords across BIT Sathy campus and hostel blocks (Sapphire, Ruby, Emerald) with step-by-step instructions on changing router passwords.",
+  },
+  {
     path: "/faq",
     title: "BIT Central FAQ | BIT Central",
     description: "Answers to common questions about BIT Central, the BIT Sathy student portal for academic resources, question banks, answer keys, mess menu updates, and student services.",

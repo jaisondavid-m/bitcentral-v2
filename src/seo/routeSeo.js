@@ -237,6 +237,13 @@ export const ROUTE_SEO = {
     pageType: "WebPage",
   },
 
+  "/wifi-details": {
+    title: "BIT Sathy Wi-Fi Passwords & Setup Guide",
+    description: "Default Wi-Fi passwords for BIT Sathy campus networks, Sapphire Hostel, Ruby Hostel, Emerald Hostel, and step-by-step password change instructions.",
+    keywords: ["BIT Sathy Wi-Fi", "Sapphire Hostel Wi-Fi", "Ruby Hostel Wi-Fi", "Emerald Hostel Wi-Fi", "Wi-Fi password change", "BIT Sathy hostel Wi-Fi"],
+    pageType: "WebPage",
+  },
+
   "/payment-successful": {
     title: "Thank You for Supporting BIT Central!",
     description: "Verified contribution acknowledgment page with inspirational quotes for BIT Central supporters.",
@@ -275,6 +282,7 @@ export const SITEMAP_ROUTES = [
   "/about",
   "/developer",
   "/features",
+  "/wifi-details",
   "/faq",
   "/contact",
   "/support-dev",
