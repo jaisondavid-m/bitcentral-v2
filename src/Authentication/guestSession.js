@@ -6,9 +6,11 @@ export const GUEST_EMAIL = "guest@bitsathy.ac.in";
 export const GUEST_DEPARTMENT = "Computer Science and Engineering";
 export const GUEST_BATCH = "2025 - 2029";
 
-export const isGuestLoginEnabled = String(import.meta.env.VITE_ENABLE_GUEST_LOGIN || "")
+const envGuestFlag = String(import.meta.env.VITE_ENABLE_GUEST_LOGIN || "")
   .trim()
-  .toLowerCase() === "true";
+  .toLowerCase();
+
+export const isGuestLoginEnabled = envGuestFlag === "false" ? false : true;
 
 const getStorage = () => {
   if (typeof window === "undefined") {

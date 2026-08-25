@@ -119,7 +119,7 @@ function Login() {
 
           {isGuestLoginEnabled && (
             <p className="mt-3 text-center text-[11px] text-blue-500 dark:text-blue-300">
-              Guest login is enabled temporarily through the environment flag.
+              Guest login mode allows instant preview of student tools.
             </p>
           )}
 
