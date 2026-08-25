@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Wifi, Copy, Check, Lock, ShieldAlert, KeyRound, Server, ChevronRight, HelpCircle, ExternalLink } from "lucide-react";
-import PublicNav from "../Component/PublicNav.jsx";
-import PublicFooter from "../Component/PublicFooter.jsx";
 
 const wifiNetworks = [
   {
@@ -105,8 +103,6 @@ export default function WifiDetails() {
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 dark:bg-black dark:text-white">
-      <PublicNav />
-
       {/* Hero Header */}
       <section className="border-b border-slate-200 bg-white py-12 dark:border-slate-800 dark:bg-slate-950">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
@@ -136,7 +132,7 @@ export default function WifiDetails() {
                     Connected to Wi-Fi
                   </div>
                   <a
-                    href="http://1.1.1.1"
+                    href="http://1.1.11"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-emerald-700 hover:shadow focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-emerald-600 dark:hover:bg-emerald-500"
@@ -261,8 +257,6 @@ export default function WifiDetails() {
           </div>
         </div>
       </section>
-
-      <PublicFooter />
     </main>
   );
 }

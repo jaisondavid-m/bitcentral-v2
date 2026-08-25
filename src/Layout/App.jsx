@@ -152,7 +152,6 @@ function App() {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/support-dev" element={<SupportDev />} />
-          <Route path="/wifi-details" element={<WifiDetails />} />
           <Route path="/payment-successful" element={<PaymentSuccessful />} />
           <Route path="/payment-successfull" element={<PaymentSuccessful />} />
           {/* <Route path="/docs/about" element={<DocsPage />} /> */}
@@ -238,6 +237,7 @@ function App() {
             <Route path="/profile/v2" element={<ProfileV2 />} />
             {/* <Route path="/about" element={<About />} /> */}
             <Route path="/rpsite" element={<Rpsite />} />
+            <Route path="/wifi-details" element={<WifiDetails />} />
             <Route path="/pcdp" element={<PCDP />} />
             <Route path="/exam-hall" element={<ExamHallDownload />} />
             <Route path="/exam-hall-manual" element={<ExamHall />} />
