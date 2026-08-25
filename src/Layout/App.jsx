@@ -245,7 +245,6 @@ function App() {
             <Route path="/leavedetails" element={<LeaveDetails />} />
             <Route path="/semester" element={<Semester />} />
             <Route path="/mess" element={<MessMenu />} />
-            <Route path="/wifi-details" element={<WifiDetails />} />
             <Route path="/user-directory" element={<UserDirectory />} />
             <Route path="/student-report/:id" element={<StudentReportDetails />} />
             <Route path="/student-report" element={<StudentReportDetails />} />
