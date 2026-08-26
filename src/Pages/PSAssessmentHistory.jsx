@@ -30,6 +30,33 @@ const FALLBACK_ASSESSMENT_DATA = [
   { attendance: "Present", course_name: "Ist Year Mock Test", date: "2025-09-10", start_time: "08:45:00", end_time: "09:45:00", result: "Not Cleared", status: "1", venue: "Vedhanayagam Auditorium" },
 ];
 
+function isFutureAssessment(item) {
+  if (!item || !item.date) return false;
+
+  const dateStr = String(item.date).trim();
+  let timeStr = String(item.start_time || item.end_time || "").trim();
+
+  if (timeStr && !/\d{1,2}:\d{2}/.test(timeStr)) {
+    timeStr = "";
+  }
+
+  let targetDateTime;
+  if (timeStr) {
+    targetDateTime = new Date(`${dateStr}T${timeStr}`);
+  } else {
+    targetDateTime = new Date(`${dateStr}T23:59:59`);
+  }
+
+  if (isNaN(targetDateTime.getTime())) {
+    targetDateTime = new Date(dateStr);
+    if (isNaN(targetDateTime.getTime())) return false;
+    targetDateTime.setHours(23, 59, 59, 999);
+  }
+
+  const now = new Date();
+  return targetDateTime > now;
+}
+
 export default function PSAssessmentHistory() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -132,23 +159,40 @@ export default function PSAssessmentHistory() {
 
     // Filter by Result
     if (resultFilter !== "ALL") {
-      list = list.filter((item) => (item.result || "").toLowerCase() === resultFilter.toLowerCase());
+      list = list.filter((item) => {
+        const isFuture = isFutureAssessment(item);
+        if (resultFilter === "Upcoming") return isFuture;
+        if (isFuture) return false;
+        return (item.result || "").toLowerCase() === resultFilter.toLowerCase();
+      });
     }
 
     // Filter by Attendance
     if (attendanceFilter !== "ALL") {
-      list = list.filter((item) => (item.attendance || "").toLowerCase() === attendanceFilter.toLowerCase());
+      list = list.filter((item) => {
+        const isFuture = isFutureAssessment(item);
+        if (attendanceFilter === "Scheduled" || attendanceFilter === "Upcoming") return isFuture;
+        if (isFuture) return false;
+        return (item.attendance || "").toLowerCase() === attendanceFilter.toLowerCase();
+      });
     }
 
     // Search query
     if (searchTerm.trim()) {
       const q = searchTerm.toLowerCase();
-      list = list.filter(
-        (item) =>
+      list = list.filter((item) => {
+        const isFuture = isFutureAssessment(item);
+        const displayResult = isFuture ? "upcoming" : (item.result || "").toLowerCase();
+        const displayAttendance = isFuture ? "scheduled" : (item.attendance || "").toLowerCase();
+
+        return (
           (item.course_name || "").toLowerCase().includes(q) ||
           (item.venue || "").toLowerCase().includes(q) ||
-          (item.date || "").includes(q)
-      );
+          (item.date || "").includes(q) ||
+          displayResult.includes(q) ||
+          displayAttendance.includes(q)
+        );
+      });
     }
 
     // Sorting
@@ -169,13 +213,18 @@ export default function PSAssessmentHistory() {
   // Statistics calculation
   const stats = useMemo(() => {
     const total = rawAssessmentList.length;
-    const cleared = rawAssessmentList.filter((item) => item.result === "Cleared").length;
-    const notCleared = rawAssessmentList.filter((item) => item.result === "Not Cleared").length;
-    const presentCount = rawAssessmentList.filter((item) => item.attendance === "Present").length;
-    const absentCount = rawAssessmentList.filter((item) => item.attendance === "Absent").length;
-    const passRate = total > 0 ? ((cleared / total) * 100).toFixed(1) : "0.0";
+    const futureList = rawAssessmentList.filter(isFutureAssessment);
+    const pastList = rawAssessmentList.filter((item) => !isFutureAssessment(item));
 
-    return { total, cleared, notCleared, presentCount, absentCount, passRate };
+    const cleared = pastList.filter((item) => item.result === "Cleared").length;
+    const notCleared = pastList.filter((item) => item.result === "Not Cleared").length;
+    const presentCount = pastList.filter((item) => item.attendance === "Present").length;
+    const absentCount = pastList.filter((item) => item.attendance === "Absent").length;
+    const upcomingCount = futureList.length;
+
+    const passRate = pastList.length > 0 ? ((cleared / pastList.length) * 100).toFixed(1) : "0.0";
+
+    return { total, cleared, notCleared, presentCount, absentCount, upcomingCount, passRate };
   }, [rawAssessmentList]);
 
   // Handle User ID Change form submit
@@ -299,6 +348,7 @@ export default function PSAssessmentHistory() {
                 <option value="ALL" className="bg-white dark:bg-slate-900">All Results</option>
                 <option value="Cleared" className="bg-white dark:bg-slate-900">Cleared Only</option>
                 <option value="Not Cleared" className="bg-white dark:bg-slate-900">Not Cleared Only</option>
+                <option value="Upcoming" className="bg-white dark:bg-slate-900">Upcoming Only</option>
               </select>
             </div>
 
@@ -314,6 +364,7 @@ export default function PSAssessmentHistory() {
                 <option value="ALL" className="bg-white dark:bg-slate-900">All Attendance</option>
                 <option value="Present" className="bg-white dark:bg-slate-900">Present Only</option>
                 <option value="Absent" className="bg-white dark:bg-slate-900">Absent Only</option>
+                <option value="Scheduled" className="bg-white dark:bg-slate-900">Scheduled / Upcoming</option>
               </select>
             </div>
 
@@ -372,40 +423,52 @@ export default function PSAssessmentHistory() {
             {/* MOBILE CARDS VIEW (Visible only on mobile screens < md) */}
             <div className="grid grid-cols-1 gap-4 block md:hidden">
               {filteredAssessments.map((item, index) => {
-                const isCleared = item.result === "Cleared";
-                const isPresent = item.attendance === "Present";
+                const isFuture = isFutureAssessment(item);
+                const isCleared = !isFuture && item.result === "Cleared";
+                const isPresent = !isFuture && item.attendance === "Present";
 
                 return (
                   <div
                     key={index}
-                    className={`group relative bg-white dark:bg-slate-900 border rounded-3xl p-5 shadow-xs transition-all duration-300 hover:shadow-md flex flex-col justify-between space-y-4 ${isCleared
+                    className={`group relative bg-white dark:bg-slate-900 border rounded-3xl p-5 shadow-xs transition-all duration-300 hover:shadow-md flex flex-col justify-between space-y-4 ${
+                      isFuture
+                        ? "border-amber-200/90 dark:border-amber-900/50 hover:border-amber-400"
+                        : isCleared
                         ? "border-slate-200/90 dark:border-slate-800 hover:border-emerald-400/80 dark:hover:border-emerald-500/50"
                         : "border-slate-200/90 dark:border-slate-800 hover:border-rose-400/80 dark:hover:border-rose-500/50"
-                      }`}
+                    }`}
                   >
                     {/* Top Bar: Result Badge & Attendance */}
                     <div className="flex items-center justify-between gap-2">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border shadow-2xs ${isCleared
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border shadow-2xs ${
+                          isFuture
+                            ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-400 dark:border-amber-800"
+                            : isCleared
                             ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-400 dark:border-emerald-800"
                             : "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-400 dark:border-rose-800"
-                          }`}
+                        }`}
                       >
-                        {isCleared ? (
+                        {isFuture ? (
+                          <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                        ) : isCleared ? (
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                         ) : (
                           <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                         )}
-                        <span>{item.result}</span>
+                        <span>{isFuture ? "Upcoming" : item.result}</span>
                       </span>
 
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-bold border ${isPresent
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-bold border ${
+                          isFuture
+                            ? "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                            : isPresent
                             ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-900"
                             : "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-900"
-                          }`}
+                        }`}
                       >
-                        <span>{item.attendance}</span>
+                        <span>{isFuture ? "Scheduled" : item.attendance}</span>
                       </span>
                     </div>
 
@@ -460,8 +523,10 @@ export default function PSAssessmentHistory() {
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                     {filteredAssessments.map((item, idx) => {
-                      const isCleared = item.result === "Cleared";
-                      const isPresent = item.attendance === "Present";
+                      const isFuture = isFutureAssessment(item);
+                      const isCleared = !isFuture && item.result === "Cleared";
+                      const isPresent = !isFuture && item.attendance === "Present";
+
                       return (
                         <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                           <td className="p-3.5 font-mono text-slate-700 dark:text-slate-300 font-semibold whitespace-nowrap">
@@ -472,23 +537,35 @@ export default function PSAssessmentHistory() {
                           </td>
                           <td className="p-3.5">
                             <span
-                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-extrabold text-[11px] border ${isCleared
+                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-extrabold text-[11px] border ${
+                                isFuture
+                                  ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-400 dark:border-amber-800"
+                                  : isCleared
                                   ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-400 dark:border-emerald-800"
                                   : "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-400 dark:border-rose-800"
-                                }`}
+                              }`}
                             >
-                              {isCleared ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
-                              {item.result}
+                              {isFuture ? (
+                                <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                              ) : isCleared ? (
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                              ) : (
+                                <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                              )}
+                              {isFuture ? "Upcoming" : item.result}
                             </span>
                           </td>
                           <td className="p-3.5">
                             <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-md font-bold text-[11px] border ${isPresent
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-md font-bold text-[11px] border ${
+                                isFuture
+                                  ? "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                                  : isPresent
                                   ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-900"
                                   : "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-900"
-                                }`}
+                              }`}
                             >
-                              {item.attendance}
+                              {isFuture ? "Scheduled" : item.attendance}
                             </span>
                           </td>
                           <td className="p-3.5 text-slate-600 dark:text-slate-400 font-mono text-[11px] whitespace-nowrap">

@@ -40,6 +40,33 @@ import {
 } from "lucide-react";
 import api, { getAuthenticatedHeaders } from "../api/axios.js";
 
+function isFutureAssessment(item) {
+  if (!item || !item.date) return false;
+
+  const dateStr = String(item.date).trim();
+  let timeStr = String(item.start_time || item.end_time || "").trim();
+
+  if (timeStr && !/\d{1,2}:\d{2}/.test(timeStr)) {
+    timeStr = "";
+  }
+
+  let targetDateTime;
+  if (timeStr) {
+    targetDateTime = new Date(`${dateStr}T${timeStr}`);
+  } else {
+    targetDateTime = new Date(`${dateStr}T23:59:59`);
+  }
+
+  if (isNaN(targetDateTime.getTime())) {
+    targetDateTime = new Date(dateStr);
+    if (isNaN(targetDateTime.getTime())) return false;
+    targetDateTime.setHours(23, 59, 59, 999);
+  }
+
+  const now = new Date();
+  return targetDateTime > now;
+}
+
 export default function StudentReportDetails() {
   const { id: paramId } = useParams();
   const [searchParams] = useSearchParams();
@@ -608,19 +635,22 @@ export default function StudentReportDetails() {
                           </tr>
                         ) : (
                           filteredAssessments.map((item, idx) => {
-                            const isCleared = item.result === "Cleared";
+                            const isFuture = isFutureAssessment(item);
+                            const isCleared = !isFuture && item.result === "Cleared";
                             return (
                               <tr key={idx} className="hover:bg-slate-50 transition-colors">
                                 <td className="p-3.5 font-mono text-slate-700 whitespace-nowrap">{item.date}</td>
                                 <td className="p-3.5 font-bold text-slate-900">{item.course_name}</td>
                                 <td className="p-3.5">
                                   <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold text-[11px] border ${
-                                    isCleared
+                                    isFuture
+                                      ? "bg-amber-50 text-amber-700 border-amber-200"
+                                      : isCleared
                                       ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                                       : "bg-red-50 text-red-700 border-red-200"
                                   }`}>
-                                    {isCleared ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
-                                    {item.result}
+                                    {isFuture ? <Clock className="w-3.5 h-3.5 text-amber-600" /> : isCleared ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                                    {isFuture ? "Upcoming" : item.result}
                                   </span>
                                 </td>
                                 <td className="p-3.5 text-slate-500 font-mono text-[11px] whitespace-nowrap">
