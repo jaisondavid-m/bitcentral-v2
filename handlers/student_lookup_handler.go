@@ -205,9 +205,26 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		return
 	}
 
+	var trackerID, trackerUserID string
+	if h.DB != nil {
+		_ = h.DB.QueryRow(
+			`SELECT COALESCE(id, ''), COALESCE(user_id, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
+			emailID,
+		).Scan(&trackerID, &trackerUserID)
+	}
+
+	userID := trackerID
+	if userID == "" {
+		userID = trackerUserID
+	}
+	if userID == "" {
+		userID = rollNo
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"data": gin.H{
+			"user_id":           userID,
 			"uid":               user.UID,
 			"email":             user.Email,
 			"display_name":      user.DisplayName,

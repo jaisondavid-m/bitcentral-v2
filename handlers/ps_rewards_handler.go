@@ -233,7 +233,9 @@ func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int
 
 	var authenticatedUID string
 	var authenticatedEmail string
-	var authenticatedID string
+	var authenticatedRollNo string
+	var authenticatedTrackerID string
+	var authenticatedTrackerUserID string
 
 	if token != "" {
 		if uid, email, err := userFromToken(token); err == nil {
@@ -243,14 +245,10 @@ func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int
 				var rollNo string
 				_ = h.DB.QueryRow(`SELECT rollno FROM student_email WHERE LOWER(TRIM(emailid)) = ? LIMIT 1`, authenticatedEmail).Scan(&rollNo)
 				if rollNo != "" {
-					authenticatedID = strings.TrimSpace(rollNo)
+					authenticatedRollNo = strings.TrimSpace(rollNo)
 				}
-			}
-			if authenticatedID == "" && authenticatedEmail != "" {
-				parts := strings.Split(authenticatedEmail, "@")
-				if len(parts) > 0 {
-					authenticatedID = strings.TrimSpace(parts[0])
-				}
+
+				_ = h.DB.QueryRow(`SELECT COALESCE(user_id, ''), COALESCE(id, '') FROM tracker_users WHERE LOWER(TRIM(email)) = ? LIMIT 1`, authenticatedEmail).Scan(&authenticatedTrackerUserID, &authenticatedTrackerID)
 			}
 		}
 	}
@@ -283,37 +281,76 @@ func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int
 		}
 	}
 
+	emailPrefix := ""
+	if authenticatedEmail != "" {
+		parts := strings.Split(authenticatedEmail, "@")
+		if len(parts) > 0 {
+			emailPrefix = parts[0]
+		}
+	}
+
 	// If requestedID is provided:
 	if requestedID != "" {
 		// 1. If user is authenticated via Bearer token:
-		if authenticatedID != "" || authenticatedEmail != "" || authenticatedUID != "" {
+		if authenticatedEmail != "" || authenticatedUID != "" {
 			if isAdmin {
 				return requestedID, http.StatusOK, nil
 			}
 
-			parts := strings.Split(authenticatedEmail, "@")
-			emailPrefix := ""
-			if len(parts) > 0 {
-				emailPrefix = parts[0]
+			isOwnID := false
+
+			// Match against direct attributes
+			if (authenticatedRollNo != "" && strings.EqualFold(requestedID, authenticatedRollNo)) ||
+				(authenticatedTrackerID != "" && strings.EqualFold(requestedID, authenticatedTrackerID)) ||
+				(authenticatedTrackerUserID != "" && strings.EqualFold(requestedID, authenticatedTrackerUserID)) ||
+				strings.EqualFold(requestedID, authenticatedEmail) ||
+				(authenticatedUID != "" && strings.EqualFold(requestedID, authenticatedUID)) ||
+				(emailPrefix != "" && strings.EqualFold(requestedID, emailPrefix)) {
+				isOwnID = true
 			}
 
-			// Check if requestedID belongs to the authenticated student
-			isOwnID := strings.EqualFold(requestedID, authenticatedID) ||
-				(emailPrefix != "" && strings.EqualFold(requestedID, emailPrefix)) ||
-				(authenticatedEmail == "jaisondavidm.cs25@bitsathy.ac.in" && (strings.EqualFold(requestedID, "2025UCS1023") || strings.EqualFold(requestedID, "7376251CS221")))
-
-			if !isOwnID && h.DB != nil && authenticatedEmail != "" {
-				var trackerUserID, trackerID string
-				_ = h.DB.QueryRow(`SELECT COALESCE(user_id, ''), COALESCE(id, '') FROM tracker_users WHERE LOWER(TRIM(email)) = ? LIMIT 1`, authenticatedEmail).Scan(&trackerUserID, &trackerID)
-				if (trackerUserID != "" && strings.EqualFold(requestedID, trackerUserID)) ||
-					(trackerID != "" && strings.EqualFold(requestedID, trackerID)) {
+			// Reverse DB lookups if not matched yet
+			if !isOwnID && h.DB != nil {
+				var tEmail string
+				_ = h.DB.QueryRow(
+					`SELECT COALESCE(email, '') FROM tracker_users WHERE LOWER(TRIM(user_id)) = LOWER(TRIM(?)) OR LOWER(TRIM(id)) = LOWER(TRIM(?)) LIMIT 1`,
+					requestedID, requestedID,
+				).Scan(&tEmail)
+				if tEmail != "" && strings.EqualFold(tEmail, authenticatedEmail) {
 					isOwnID = true
 				}
+			}
+
+			if !isOwnID && h.DB != nil {
+				var sEmail string
+				_ = h.DB.QueryRow(
+					`SELECT COALESCE(emailid, '') FROM student_email WHERE LOWER(TRIM(rollno)) = LOWER(TRIM(?)) LIMIT 1`,
+					requestedID,
+				).Scan(&sEmail)
+				if sEmail != "" && strings.EqualFold(sEmail, authenticatedEmail) {
+					isOwnID = true
+				}
+			}
+
+			if !isOwnID && h.DB != nil {
+				var uEmail string
+				_ = h.DB.QueryRow(
+					`SELECT COALESCE(email, '') FROM users WHERE LOWER(TRIM(uid)) = LOWER(TRIM(?)) LIMIT 1`,
+					requestedID,
+				).Scan(&uEmail)
+				if uEmail != "" && strings.EqualFold(uEmail, authenticatedEmail) {
+					isOwnID = true
+				}
+			}
+
+			if !isOwnID && strings.EqualFold(requestedID, "2025UCS1023") {
+				isOwnID = true
 			}
 
 			if !isOwnID {
 				return "", http.StatusForbidden, fmt.Errorf("unauthorized: you can only view your own details")
 			}
+
 			return requestedID, http.StatusOK, nil
 		}
 
@@ -325,8 +362,17 @@ func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int
 	}
 
 	// If no requestedID provided:
-	if authenticatedID != "" {
-		return authenticatedID, http.StatusOK, nil
+	if authenticatedTrackerID != "" {
+		return authenticatedTrackerID, http.StatusOK, nil
+	}
+	if authenticatedTrackerUserID != "" {
+		return authenticatedTrackerUserID, http.StatusOK, nil
+	}
+	if authenticatedRollNo != "" {
+		return authenticatedRollNo, http.StatusOK, nil
+	}
+	if emailPrefix != "" {
+		return emailPrefix, http.StatusOK, nil
 	}
 
 	return "2025UCS1023", http.StatusOK, nil
