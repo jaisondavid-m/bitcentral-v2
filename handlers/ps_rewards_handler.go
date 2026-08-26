@@ -129,9 +129,9 @@ func (h *AdminHandler) UpdatePSToken(c *gin.Context) {
 }
 
 func (h *AdminHandler) FetchPSRewardsBreakdown(c *gin.Context) {
-	userID := strings.TrimSpace(c.Query("user_id"))
-	if userID == "" {
-		c.PureJSON(http.StatusBadRequest, gin.H{"success": false, "message": "user_id is required"})
+	userID, statusCode, err := h.resolveAndAuthorizeStudentID(c)
+	if err != nil {
+		c.PureJSON(statusCode, gin.H{"success": false, "message": err.Error()})
 		return
 	}
 
@@ -253,6 +253,10 @@ func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int
 		}
 	}
 
+	if authenticatedEmail == "" && authenticatedUID == "" {
+		return "", http.StatusUnauthorized, fmt.Errorf("authentication required: please sign in to access student details")
+	}
+
 	// Check if authenticated user is admin
 	isAdmin := false
 	adminUID := strings.TrimSpace(os.Getenv("ADMIN_FIREBASE_UID"))
@@ -291,73 +295,60 @@ func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int
 
 	// If requestedID is provided:
 	if requestedID != "" {
-		// 1. If user is authenticated via Bearer token:
-		if authenticatedEmail != "" || authenticatedUID != "" {
-			if isAdmin {
-				return requestedID, http.StatusOK, nil
-			}
-
-			isOwnID := false
-
-			// Match against direct attributes
-			if (authenticatedRollNo != "" && strings.EqualFold(requestedID, authenticatedRollNo)) ||
-				(authenticatedTrackerID != "" && strings.EqualFold(requestedID, authenticatedTrackerID)) ||
-				(authenticatedTrackerUserID != "" && strings.EqualFold(requestedID, authenticatedTrackerUserID)) ||
-				strings.EqualFold(requestedID, authenticatedEmail) ||
-				(authenticatedUID != "" && strings.EqualFold(requestedID, authenticatedUID)) ||
-				(emailPrefix != "" && strings.EqualFold(requestedID, emailPrefix)) {
-				isOwnID = true
-			}
-
-			// Reverse DB lookups if not matched yet
-			if !isOwnID && h.DB != nil {
-				var tEmail string
-				_ = h.DB.QueryRow(
-					`SELECT COALESCE(email, '') FROM tracker_users WHERE LOWER(TRIM(user_id)) = LOWER(TRIM(?)) OR LOWER(TRIM(id)) = LOWER(TRIM(?)) LIMIT 1`,
-					requestedID, requestedID,
-				).Scan(&tEmail)
-				if tEmail != "" && strings.EqualFold(tEmail, authenticatedEmail) {
-					isOwnID = true
-				}
-			}
-
-			if !isOwnID && h.DB != nil {
-				var sEmail string
-				_ = h.DB.QueryRow(
-					`SELECT COALESCE(emailid, '') FROM student_email WHERE LOWER(TRIM(rollno)) = LOWER(TRIM(?)) LIMIT 1`,
-					requestedID,
-				).Scan(&sEmail)
-				if sEmail != "" && strings.EqualFold(sEmail, authenticatedEmail) {
-					isOwnID = true
-				}
-			}
-
-			if !isOwnID && h.DB != nil {
-				var uEmail string
-				_ = h.DB.QueryRow(
-					`SELECT COALESCE(email, '') FROM users WHERE LOWER(TRIM(uid)) = LOWER(TRIM(?)) LIMIT 1`,
-					requestedID,
-				).Scan(&uEmail)
-				if uEmail != "" && strings.EqualFold(uEmail, authenticatedEmail) {
-					isOwnID = true
-				}
-			}
-
-			if !isOwnID && strings.EqualFold(requestedID, "2025UCS1023") {
-				isOwnID = true
-			}
-
-			if !isOwnID {
-				return "", http.StatusForbidden, fmt.Errorf("unauthorized: you can only view your own details")
-			}
-
+		if isAdmin {
 			return requestedID, http.StatusOK, nil
 		}
 
-		// 2. If user is UNAUTHENTICATED (no Bearer token provided):
-		if !strings.EqualFold(requestedID, "2025UCS1023") {
-			return "", http.StatusUnauthorized, fmt.Errorf("authentication required: please sign in to access student details")
+		isOwnID := false
+
+		// Match against direct attributes
+		if (authenticatedRollNo != "" && strings.EqualFold(requestedID, authenticatedRollNo)) ||
+			(authenticatedTrackerID != "" && strings.EqualFold(requestedID, authenticatedTrackerID)) ||
+			(authenticatedTrackerUserID != "" && strings.EqualFold(requestedID, authenticatedTrackerUserID)) ||
+			strings.EqualFold(requestedID, authenticatedEmail) ||
+			(authenticatedUID != "" && strings.EqualFold(requestedID, authenticatedUID)) ||
+			(emailPrefix != "" && strings.EqualFold(requestedID, emailPrefix)) {
+			isOwnID = true
 		}
+
+		// Reverse DB lookups if not matched yet
+		if !isOwnID && h.DB != nil {
+			var tEmail string
+			_ = h.DB.QueryRow(
+				`SELECT COALESCE(email, '') FROM tracker_users WHERE LOWER(TRIM(user_id)) = LOWER(TRIM(?)) OR LOWER(TRIM(id)) = LOWER(TRIM(?)) LIMIT 1`,
+				requestedID, requestedID,
+			).Scan(&tEmail)
+			if tEmail != "" && strings.EqualFold(tEmail, authenticatedEmail) {
+				isOwnID = true
+			}
+		}
+
+		if !isOwnID && h.DB != nil {
+			var sEmail string
+			_ = h.DB.QueryRow(
+				`SELECT COALESCE(emailid, '') FROM student_email WHERE LOWER(TRIM(rollno)) = LOWER(TRIM(?)) LIMIT 1`,
+				requestedID,
+			).Scan(&sEmail)
+			if sEmail != "" && strings.EqualFold(sEmail, authenticatedEmail) {
+				isOwnID = true
+			}
+		}
+
+		if !isOwnID && h.DB != nil {
+			var uEmail string
+			_ = h.DB.QueryRow(
+				`SELECT COALESCE(email, '') FROM users WHERE LOWER(TRIM(uid)) = LOWER(TRIM(?)) LIMIT 1`,
+				requestedID,
+			).Scan(&uEmail)
+			if uEmail != "" && strings.EqualFold(uEmail, authenticatedEmail) {
+				isOwnID = true
+			}
+		}
+
+		if !isOwnID {
+			return "", http.StatusForbidden, fmt.Errorf("unauthorized: you can only view your own details")
+		}
+
 		return requestedID, http.StatusOK, nil
 	}
 
@@ -375,7 +366,7 @@ func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int
 		return emailPrefix, http.StatusOK, nil
 	}
 
-	return "2025UCS1023", http.StatusOK, nil
+	return "", http.StatusBadRequest, fmt.Errorf("unable to resolve your student ID")
 }
 
 func (h *AdminHandler) FetchStudentReportDetails(c *gin.Context) {
