@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   Award,
@@ -10,16 +11,37 @@ import api, { getAuthenticatedHeaders } from "../api/axios";
 import { useAuth } from "../context/StudentContext";
 
 export default function PSPointDetails() {
-  const { rollNo: studentRollNo } = useAuth();
-  const activeUserId = studentRollNo || "2025UCS1023";
+  const [searchParams] = useSearchParams();
+  const { student, profile, rollNo: studentRollNo } = useAuth() || {};
+
+  // User ID for /ps/points (e.g. 2025UCS1023)
+  const activeUserId =
+    searchParams.get("id") ||
+    searchParams.get("user_id") ||
+    profile?.user_id ||
+    student?.user_id ||
+    studentRollNo ||
+    "2025UCS1023";
+
+  // Register No for Universal Search (e.g. 7376251CS221)
+  const registerNo =
+    searchParams.get("registerNo") ||
+    searchParams.get("roll_no") ||
+    profile?.register_no ||
+    profile?.roll_no ||
+    student?.register_no ||
+    student?.roll_no ||
+    student?.rollNo ||
+    "7376251CS221";
+
   const [searchTerm, setSearchTerm] = useState("");
 
   const {
     data: apiResponse,
-    isLoading,
+    isLoading: isPsLoading,
     isError,
     refetch,
-    isFetching,
+    isFetching: isPsFetching,
   } = useQuery({
     queryKey: ["ps-points-details", activeUserId],
     queryFn: async () => {
@@ -38,13 +60,66 @@ export default function PSPointDetails() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const {
+    data: searchResponse,
+    isLoading: isSearchLoading,
+    isFetching: isSearchFetching,
+  } = useQuery({
+    queryKey: ["universal-search-reward-points", registerNo],
+    queryFn: async () => {
+      try {
+        const headers = await getAuthenticatedHeaders().catch(() => ({}));
+        const res = await api.get("/search", {
+          params: { q: registerNo },
+          headers,
+        });
+        return res.data;
+      } catch (err) {
+        console.warn("Universal search fetch failed.", err);
+        return null;
+      }
+    },
+    enabled: !!registerNo,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const rewardPointsCard = useMemo(() => {
+    const students = searchResponse?.data;
+    if (!students || !Array.isArray(students) || students.length === 0) {
+      return {
+        id: "reward-points-card",
+        name: "Reward Points",
+        points_name: "Reward Points",
+        points: 0,
+        rank: "0",
+      };
+    }
+
+    const normalizedRegister = registerNo.toUpperCase().replace(/\s+/g, "");
+    const matching = students.filter(
+      (s) => s.roll_no && s.roll_no.toUpperCase().replace(/\s+/g, "") === normalizedRegister
+    );
+    const targetStudents = matching.length > 0 ? matching : students;
+
+    const totalPts = targetStudents.reduce((acc, s) => {
+      const val = parseFloat(s.cumulative_reward_points || s.balance_points || 0);
+      return acc + (isNaN(val) ? 0 : val);
+    }, 0);
+
+    return {
+      id: "reward-points-card",
+      name: "Reward Points",
+      points_name: "Reward Points",
+      points: totalPts,
+      rank: "0",
+    };
+  }, [searchResponse, registerNo]);
+
   const walletList = useMemo(() => {
     const list = apiResponse?.wallets;
-    if (list && Array.isArray(list)) {
-      return list;
-    }
-    return [];
-  }, [apiResponse]);
+    const existingList = Array.isArray(list) ? list : [];
+    return [rewardPointsCard, ...existingList];
+  }, [apiResponse, rewardPointsCard]);
 
   const filteredWallets = useMemo(() => {
     if (!searchTerm.trim()) return walletList;
@@ -56,8 +131,11 @@ export default function PSPointDetails() {
     );
   }, [walletList, searchTerm]);
 
+  const isLoading = isPsLoading && isSearchLoading;
+  const isFetching = (isPsFetching && !apiResponse) && (isSearchFetching && !searchResponse);
+
   // Loading state skeleton/spinner
-  if (isLoading || (isFetching && !apiResponse)) {
+  if (isLoading || (isFetching && !apiResponse && !searchResponse)) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto space-y-6">
@@ -99,6 +177,8 @@ export default function PSPointDetails() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {filteredWallets.map((wallet) => {
             const pointsVal = parseFloat(wallet.points || 0);
+            const hasRank = wallet.rank !== undefined && wallet.rank !== null && wallet.rank !== "";
+
             return (
               <div
                 key={wallet.id || wallet.name}
@@ -123,7 +203,7 @@ export default function PSPointDetails() {
                     </span>
                   </div>
 
-                  {wallet.rank && (
+                  {hasRank && (
                     <div className="text-right">
                       <span className="text-[10px] text-slate-400 font-medium block uppercase tracking-wider">
                         Rank
@@ -148,3 +228,4 @@ export default function PSPointDetails() {
     </div>
   );
 }
+
