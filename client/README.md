@@ -136,7 +136,9 @@ Powered by a modern **React 19** frontend and a robust **Go (Gin Framework)** ba
 
 ```
 bitcentral/
+├── .gitignore                   # Root Git ignore rules (binaries, secrets, build logs)
 ├── client/                      # React Frontend Application
+│   ├── .env.example             # Example environment variables template
 │   ├── public/                  # Static public assets & pre-rendered HTML
 │   ├── scripts/                 # Sitemap generation & pre-rendering scripts
 │   ├── src/
@@ -156,10 +158,11 @@ bitcentral/
 │   └── vite.config.js
 │
 └── server/                      # Go Backend API Server
+    ├── .env.example             # Example environment variables template
     ├── config/                  # MySQL & Firebase Admin initialization
     ├── handlers/                # HTTP request handlers (Leave, Mess, Exam, QB, Cards...)
     ├── middleware/              # Auth middleware & CORS handling
-    ├── models/                  # GORM / Database structures
+    ├── models/                  # Database models & structures
     ├── pdfs/                    # Static PDF storage directory
     ├── routes/                  # Gin router definition & API endpoint registration
     ├── main.go                  # Server entry point
@@ -182,14 +185,16 @@ VITE_FIREBASE_PROJECT_ID=your_project_id
 VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
 VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 VITE_FIREBASE_APP_ID=your_app_id
+VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
 
 # Backend API Endpoint
-VITE_API_BASE=http://localhost:8080
+VITE_API_BASE_URL=http://localhost:8080
 
 # Admin Access Control
 VITE_ADMIN_FIREBASE_UID=your_admin_firebase_uid
 
-# Presence Pinging (Set to "true" to enable live user tracking and admin refresh)
+# Optional Features
+VITE_ENABLE_GUEST_LOGIN=false
 PING_ON=true
 ```
 
@@ -202,11 +207,37 @@ Create a `.env` file in the `server/` folder:
 PORT=8080
 
 # MySQL Database Configuration
-DB_USER=root
-DB_PASSWORD=your_password
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_NAME=bitcentral
+MYSQL_USER=root
+MYSQL_PASSWORD=your_password
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+MYSQL_DATABASE=bitcentral
+MYSQL_TOKEN_TABLE=ps_tokens
+MYSQL_SSL_ENABLED=false
+MYSQL_SSL_CA_PATH=
+
+# Firebase Configuration
+FIREBASE_CREDENTIALS_FILE=./firebase-service-account.json
+FIREBASE_CREDENTIALS_JSON=
+
+# Google OAuth & Sheets Integration
+CLIENT_ID=your_google_client_id
+CLIENT_SECRET=your_google_client_secret
+REDIRECT_URL=http://localhost:8080/auth/callback
+SPREADSHEET_ID=your_spreadsheet_id
+RP_Detailed_sheet=your_rp_detailed_sheet_id
+BOYS_MESS_SPREADSHEET_ID=your_boys_mess_sheet_id
+GIRLS_MESS_SPREADSHEET_ID=your_girls_mess_sheet_id
+
+# Admin & Payment Integration
+ADMIN_DASHBOARD_SECRET=your_admin_secret
+RAZORPAY_KEY_ID=your_razorpay_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+
+# PS API Cookie & Self Ping Configuration
+PS_COOKIE_HEADER="PS=your_ps_cookie_value; Device-Identifier=your_device_id;"
+PS_REWARDS_BREAKDOWN_BASE_URL=https://ps.bitsathy.ac.in/api/ps_v2/activity/rewards/breakdown
+SELF_PING_INTERVAL_MS=600000
 
 # Optional Debug Flag (Set "true" to bypass MySQL/Firebase init during dev testing)
 SKIP_SERVICE_INIT=false
