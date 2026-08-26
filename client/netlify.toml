@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/*"
+  to = "https://bitcentral.bitsathy.in/:splat"
+  status = 301
+  force = true
