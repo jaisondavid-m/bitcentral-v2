@@ -43,7 +43,9 @@ export default function PSAssessmentHistory() {
     profile?.data?.user_id ||
     student?.user_id ||
     student?.userId ||
-    "2025UCS1023";
+    profile?.roll_no ||
+    student?.roll_no ||
+    "";
 
   const [userIdInput, setUserIdInput] = useState(defaultUserId);
   const [activeUserId, setActiveUserId] = useState(defaultUserId);

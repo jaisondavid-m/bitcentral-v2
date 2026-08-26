@@ -20,8 +20,10 @@ export default function PSPointDetails() {
     searchParams.get("user_id") ||
     profile?.user_id ||
     student?.user_id ||
+    profile?.roll_no ||
+    student?.roll_no ||
     studentRollNo ||
-    "2025UCS1023";
+    "";
 
   // Register No for Universal Search (e.g. 7376251CS221)
   const registerNo =

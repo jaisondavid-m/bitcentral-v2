@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   Fingerprint,
@@ -13,8 +14,17 @@ import api, { getAuthenticatedHeaders } from "../api/axios";
 import { useAuth } from "../context/StudentContext";
 
 export default function PSBiometricDetails() {
-  const { rollNo: studentRollNo } = useAuth();
-  const activeUserId = studentRollNo || "2025UCS1023";
+  const [searchParams] = useSearchParams();
+  const { student, profile, rollNo: studentRollNo } = useAuth() || {};
+  const activeUserId =
+    searchParams.get("id") ||
+    searchParams.get("user_id") ||
+    profile?.user_id ||
+    student?.user_id ||
+    profile?.roll_no ||
+    student?.roll_no ||
+    studentRollNo ||
+    "";
   const [searchTerm, setSearchTerm] = useState("");
 
   const {
