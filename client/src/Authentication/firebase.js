@@ -10,12 +10,12 @@ const apiKey = rawApiKey ? String(rawApiKey).replace(/^"|"$/g, '').trim() : '';
 
 const firebaseConfig = {
   apiKey,
-  authDomain: 'first-auth-app-project.firebaseapp.com',
-  projectId: 'first-auth-app-project',
-  storageBucket: 'first-auth-app-project.firebasestorage.app',
-  messagingSenderId: '956639761791',
-  appId: '1:956639761791:web:b453f88c306ba35cba364a',
-  measurementId: 'G-T3C10RN98R',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN ,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET ,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID ,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID ,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID ,
 };
 
 if (!apiKey) {
