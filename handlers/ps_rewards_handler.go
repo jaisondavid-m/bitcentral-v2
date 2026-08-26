@@ -222,6 +222,17 @@ func (h *AdminHandler) FetchPSRewardsBreakdown(c *gin.Context) {
 
 // resolveAndAuthorizeStudentID resolves the authenticated student ID from Bearer token
 // and ensures admins can view any student details while students can ONLY access their own details.
+func getPSCookieHeader() string {
+	cookie := strings.TrimSpace(os.Getenv("PS_COOKIE_HEADER"))
+	if cookie == "" {
+		cookie = strings.TrimSpace(os.Getenv("PS_COOKIE"))
+	}
+	if cookie == "" {
+		cookie = "PS=cc1d0f436efeea00cbaaa2ec081e8d58fb31b9994e573663f83c603acbeeb889; Device-Identifier=B9B6863D-9947-4B2E-920B-D60D67B79BD1;"
+	}
+	return cookie
+}
+
 func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int, error) {
 	requestedID := strings.TrimSpace(c.Query("id"))
 	if requestedID == "" {
@@ -376,7 +387,7 @@ func (h *AdminHandler) FetchStudentReportDetails(c *gin.Context) {
 		return
 	}
 
-	cookieHeader := "PS=cc1d0f436efeea00cbaaa2ec081e8d58fb31b9994e573663f83c603acbeeb889; Device-Identifier=B9B6863D-9947-4B2E-920B-D60D67B79BD1;"
+	cookieHeader := getPSCookieHeader()
 
 	requestURL, err := url.Parse("https://ps.bitsathy.ac.in/api/ps_app_v3/profile/student-report/details")
 	if err != nil {
@@ -462,7 +473,7 @@ func (h *AdminHandler) FetchAssessmentDetails(c *gin.Context) {
 		return
 	}
 
-	cookieHeader := "PS=cc1d0f436efeea00cbaaa2ec081e8d58fb31b9994e573663f83c603acbeeb889; Device-Identifier=B9B6863D-9947-4B2E-920B-D60D67B79BD1;"
+	cookieHeader := getPSCookieHeader()
 
 	requestURL, err := url.Parse("https://ps.bitsathy.ac.in/api/ps_app_v3/profile/student-report/details")
 	if err != nil {
@@ -573,7 +584,7 @@ func (h *AdminHandler) FetchPointsDetails(c *gin.Context) {
 		return
 	}
 
-	cookieHeader := "PS=cc1d0f436efeea00cbaaa2ec081e8d58fb31b9994e573663f83c603acbeeb889; Device-Identifier=B9B6863D-9947-4B2E-920B-D60D67B79BD1;"
+	cookieHeader := getPSCookieHeader()
 
 	requestURL, err := url.Parse("https://ps.bitsathy.ac.in/api/ps_app_v3/profile/student-report/details")
 	if err != nil {
@@ -687,7 +698,7 @@ func (h *AdminHandler) FetchBiometricDetails(c *gin.Context) {
 		return
 	}
 
-	cookieHeader := "PS=cc1d0f436efeea00cbaaa2ec081e8d58fb31b9994e573663f83c603acbeeb889; Device-Identifier=B9B6863D-9947-4B2E-920B-D60D67B79BD1;"
+	cookieHeader := getPSCookieHeader()
 
 	requestURL, err := url.Parse("https://ps.bitsathy.ac.in/api/ps_app_v3/profile/student-report/details")
 	if err != nil {
