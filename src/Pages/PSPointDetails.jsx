@@ -104,7 +104,9 @@ export default function PSPointDetails() {
     const targetStudents = matching.length > 0 ? matching : students;
 
     const totalPts = targetStudents.reduce((acc, s) => {
-      const val = parseFloat(s.cumulative_reward_points || s.balance_points || 0);
+      const rawVal = s.balance_points ?? s.cumulative_reward_points ?? 0;
+      const cleanVal = String(rawVal).replace(/,/g, "").trim();
+      const val = parseFloat(cleanVal);
       return acc + (isNaN(val) ? 0 : val);
     }, 0);
 
@@ -133,11 +135,12 @@ export default function PSPointDetails() {
     );
   }, [walletList, searchTerm]);
 
-  const isLoading = isPsLoading && isSearchLoading;
-  const isFetching = (isPsFetching && !apiResponse) && (isSearchFetching && !searchResponse);
+  const isPsPending = isPsLoading || (isPsFetching && !apiResponse);
+  const isSearchPending = registerNo ? (isSearchLoading || (isSearchFetching && !searchResponse)) : false;
+  const isPageLoading = isPsPending || isSearchPending || !apiResponse || (registerNo ? !searchResponse : false);
 
-  // Loading state skeleton/spinner
-  if (isLoading || (isFetching && !apiResponse && !searchResponse)) {
+  // Loading state skeleton/spinner until both endpoints are loaded
+  if (isPageLoading) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto space-y-6">
@@ -178,7 +181,10 @@ export default function PSPointDetails() {
         {/* Wallet Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {filteredWallets.map((wallet) => {
-            const pointsVal = parseFloat(wallet.points || 0);
+            const pointsVal = typeof wallet.points === "number" ? wallet.points : parseFloat(String(wallet.points || 0).replace(/,/g, ""));
+            const formattedPoints = isNaN(pointsVal)
+              ? "0.00"
+              : pointsVal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             const hasRank = wallet.rank !== undefined && wallet.rank !== null && wallet.rank !== "";
 
             return (
@@ -201,7 +207,7 @@ export default function PSPointDetails() {
                   <div>
                     <span className="text-xs text-slate-400 font-medium block uppercase tracking-wider">Points</span>
                     <span className="text-2xl font-black text-amber-600 dark:text-amber-400">
-                      {pointsVal.toFixed(2)}
+                      {formattedPoints}
                     </span>
                   </div>
 
