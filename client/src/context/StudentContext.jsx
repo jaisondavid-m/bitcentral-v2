@@ -1,0 +1,277 @@
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { auth } from "../Authentication/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { pingPresence } from "../api/presence.js";
+import { getMeProfile } from "../api/axios.js";
+import { logout } from "../Authentication/firebase.js";
+import { PING_ON } from "../config/runtimeFlags.js";
+import {
+  clearGuestSession,
+  createGuestStudent,
+  createGuestUser,
+  readGuestSession,
+  subscribeToGuestSessionChanges,
+} from "../Authentication/guestSession.js";
+
+const AuthContext = createContext();
+
+const departmentMap = {
+  cs: "Computer Science and Engineering",
+  ad: "Artificial Intelligence & Data Science",
+  al: "Artificial Intelligence & Machine Learning",
+  ec: "Electronics and Communication Engineering",
+  ee: "Electrical and Electronics Engineering",
+  ct: "Computer Technology",
+  bt: "Biotechnology",
+  cb: "Computer Science and Business Systems",
+  mz: "Mechatronics",
+  it: "Information Technology",
+};
+
+const decodeCollegeEmail = (email) => {
+  if (!email || !email.endsWith("@bitsathy.ac.in")) return null;
+
+  const usernamePart = email.split("@")[0];
+  const parts = usernamePart.split(".");          
+  if (parts.length < 2) return null;
+
+  const deptYear = parts[1];                        
+  const deptCode = deptYear.slice(0, 2);           
+  const yearCode = deptYear.slice(2);              
+
+  const department = departmentMap[deptCode] || "Unknown Department";
+  const startYear = 2000 + Number(yearCode);
+  const endYear = startYear + 4;
+
+  return {
+    email,
+    usernamePart,
+    deptYear,
+    yearCode,
+    deptCode,
+    department,
+    startYear,
+    endYear,
+    batch: `${startYear} - ${endYear}`,
+  };
+};
+
+const toProfileStudent = (studentProfile, fallbackStudent = null) => {
+  if (!studentProfile) {
+    return fallbackStudent;
+  }
+
+  const profileData = studentProfile.data || studentProfile;
+
+  return {
+    ...fallbackStudent,
+    user_id: profileData.user_id || studentProfile.user_id || fallbackStudent?.user_id || "",
+    email: studentProfile.email || fallbackStudent?.email || null,
+    rollNo: studentProfile.roll_no || fallbackStudent?.rollNo || "",
+    roll_no: studentProfile.roll_no || fallbackStudent?.roll_no || "",
+    uid: studentProfile.uid || fallbackStudent?.uid || null,
+    displayName: studentProfile.display_name || fallbackStudent?.displayName || null,
+    photoURL: studentProfile.photo_url || fallbackStudent?.photoURL || null,
+    creationTime: studentProfile.creation_time || fallbackStudent?.creationTime || null,
+    lastSignInTime: studentProfile.last_sign_in_time || fallbackStudent?.lastSignInTime || null,
+    lastSeenAt: studentProfile.last_seen_at || fallbackStudent?.lastSeenAt || null,
+  };
+};
+
+function getPresenceRouteLabel(pathname = "") {
+  const path = pathname.toLowerCase();
+
+  if (!path || path === "/" || path === "/home") return "Home";
+  if (path.startsWith("/dashboard") || path.startsWith("/profile")) return "Dashboard";
+  if (path.startsWith("/semester")) return "Semester";
+  if (path.startsWith("/mess")) return "Mess Menu";
+  if (path.startsWith("/exam-hall")) return "Exam Hall";
+  if (path.startsWith("/pcdp")) return "PCDP";
+  if (path.startsWith("/rpsite")) return "RP Site";
+  if (path.startsWith("/leavedetails")) return "Leave Details";
+  if (path.startsWith("/privacy-policy")) return "Privacy Policy";
+  if (path.startsWith("/terms")) return "Terms";
+  if (path.startsWith("/login")) return "Login";
+  if (path.startsWith("/admin")) return "Admin";
+
+  return "Other";
+}
+
+export const StudentContext = ({ children }) => {
+  const location = useLocation();
+  const initialGuestSession = readGuestSession();
+  const [user, setUser] = useState(initialGuestSession ? createGuestUser(initialGuestSession) : null);
+  const [student, setStudent] = useState(initialGuestSession ? createGuestStudent() : null);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(!initialGuestSession);
+  const [accessDeniedMessage, setAccessDeniedMessage] = useState("");
+  const currentRouteLabel = useMemo(() => getPresenceRouteLabel(location.pathname), [location.pathname]);
+  const hydratedEmailRef = useRef("");
+
+  const hydrateAuthenticatedUser = async (currentUser) => {
+    if (!currentUser?.email) {
+      setStudent(null);
+      setProfile(null);
+      hydratedEmailRef.current = "";
+      return;
+    }
+
+    if (hydratedEmailRef.current === currentUser.email) {
+      return;
+    }
+
+    hydratedEmailRef.current = currentUser.email;
+  setAccessDeniedMessage("");
+
+    clearGuestSession();
+    const decoded = decodeCollegeEmail(currentUser.email);
+    setStudent(decoded);
+
+    try {
+      const backendProfile = await getMeProfile();
+      if (backendProfile?.email) {
+        setProfile(backendProfile);
+        setStudent((prev) => toProfileStudent(backendProfile, decoded || prev));
+      } else {
+        setProfile(null);
+      }
+    } catch (error) {
+      const status = error?.response?.status;
+      const message = error?.response?.data?.message || error?.message || "Failed to load profile from /me";
+      if (status === 403 || error?.response?.data?.status === "blocked") {
+        setAccessDeniedMessage(message);
+        setUser(null);
+        setStudent(null);
+        setProfile(null);
+        hydratedEmailRef.current = "";
+        logout().catch(() => {});
+        return;
+      }
+      setProfile(null);
+      console.error("Failed to load profile from /me", error);
+    }
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      const guestSession = readGuestSession();
+
+      if (guestSession) {
+        setUser(createGuestUser(guestSession));
+        setStudent(createGuestStudent());
+        setProfile(null);
+        hydratedEmailRef.current = "";
+        setLoading(false);
+        return;
+      }
+
+      setUser(currentUser);
+
+      if (currentUser?.email) {
+        setLoading(true);
+        hydrateAuthenticatedUser(currentUser).finally(() => {
+          if (!cancelled) {
+            setLoading(false);
+          }
+        });
+      } else {
+        setStudent(null);
+        setProfile(null);
+        hydratedEmailRef.current = "";
+        setLoading(false);
+      }
+    });
+
+    const unsubscribeGuest = subscribeToGuestSessionChanges(() => {
+      const guestSession = readGuestSession();
+
+      if (guestSession) {
+        setUser(createGuestUser(guestSession));
+        setStudent(createGuestStudent());
+        setProfile(null);
+        hydratedEmailRef.current = "";
+        setLoading(false);
+        return;
+      }
+
+      const currentUser = auth.currentUser;
+      setUser(currentUser);
+      if (currentUser?.email) {
+        setLoading(true);
+        hydrateAuthenticatedUser(currentUser).finally(() => {
+          if (!cancelled) {
+            setLoading(false);
+          }
+        });
+      } else {
+        setStudent(null);
+        setProfile(null);
+        hydratedEmailRef.current = "";
+        setLoading(false);
+      }
+    });
+
+    const checkGuestExpiration = () => {
+      readGuestSession();
+    };
+
+    const intervalId = setInterval(checkGuestExpiration, 60000);
+    window.addEventListener("focus", checkGuestExpiration);
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+      unsubscribeGuest();
+      clearInterval(intervalId);
+      window.removeEventListener("focus", checkGuestExpiration);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!PING_ON || !user || typeof user.getIdToken !== "function") {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    const sendPresencePing = async () => {
+      try {
+        if (cancelled) return;
+        await pingPresence(user, currentRouteLabel);
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Failed to update presence", error);
+        }
+      }
+    };
+
+    sendPresencePing();
+    const intervalId = window.setInterval(sendPresencePing, 30000);
+
+    const handleFocus = () => {
+      sendPresencePing();
+    };
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleFocus);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleFocus);
+    };
+  }, [user?.uid, currentRouteLabel]);
+
+  return (
+    <AuthContext.Provider value={{ user, student, profile, loading, accessDeniedMessage, setAccessDeniedMessage }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);
+export { decodeCollegeEmail };
