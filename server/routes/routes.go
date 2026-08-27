@@ -221,9 +221,6 @@ func SetupRouter(
 		admin.DELETE("/academic/question-papers/:id", academicHandler.DeleteQuestionPaper)
 	}
 
-	// Public Student Course Content API
-	r.GET("/academic/courses/:id/content", academicHandler.GetCourseContent)
-
 	// Super-admin routes: manage admins and allowed external emails/domains
 	super := r.Group("/admin/super")
 	super.Use(middleware.RequireSuperAdmin())
