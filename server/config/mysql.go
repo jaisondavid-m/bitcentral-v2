@@ -561,6 +561,19 @@ func createAcademicTables() {
 		}
 	}
 
+	// Safe column additions & schema updates for existing tables
+	DB.Exec(`ALTER TABLE academic_batches ADD COLUMN department_id INT NOT NULL DEFAULT 0 AFTER id`)
+	DB.Exec(`ALTER TABLE academic_curriculum ADD COLUMN department_id INT NOT NULL DEFAULT 0 AFTER id`)
+	DB.Exec(`ALTER TABLE academic_exams ADD COLUMN department_id INT NOT NULL DEFAULT 0 AFTER academic_year`)
+
+	// Clean up legacy program_id column if present from prior initialization
+	DB.Exec(`ALTER TABLE academic_batches DROP FOREIGN KEY fk_batch_prog`)
+	DB.Exec(`ALTER TABLE academic_batches DROP COLUMN program_id`)
+	DB.Exec(`ALTER TABLE academic_curriculum DROP FOREIGN KEY fk_curr_prog`)
+	DB.Exec(`ALTER TABLE academic_curriculum DROP COLUMN program_id`)
+	DB.Exec(`ALTER TABLE academic_exams DROP FOREIGN KEY fk_exam_prog`)
+	DB.Exec(`ALTER TABLE academic_exams DROP COLUMN program_id`)
+
 	log.Println("✅ Academic tables ready")
 }
 
