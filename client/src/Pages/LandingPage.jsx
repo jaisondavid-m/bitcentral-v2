@@ -4,10 +4,30 @@ import { ArrowRight, CheckCircle2, LogIn } from "lucide-react";
 import PublicNav from "../Component/PublicNav.jsx";
 import PublicFooter from "../Component/PublicFooter.jsx";
 import FAQSection from "../Component/FAQSection.jsx";
+import FullScreenLoader from "../Component/FullScreenLoader.jsx";
 import { benefitList, contactMethods, developerProfile, featureList } from "../content/publicContent.js";
+import { useAuth } from "../context/StudentContext.jsx";
+import { isAllowedEmail } from "../Authentication/authRules.js";
+import { hasValidAuthCookie } from "../utils/cookieAuth.js";
 
 export default function LandingPage() {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
 
+  useEffect(() => {
+    if (loading) return;
+
+    const validCookieToken = hasValidAuthCookie();
+    const isLoggedInUser = Boolean(user && isAllowedEmail(user.email));
+
+    if (isLoggedInUser || validCookieToken) {
+      navigate("/home", { replace: true });
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return <FullScreenLoader />;
+  }
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 dark:bg-black dark:text-white">
