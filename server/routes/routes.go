@@ -85,6 +85,7 @@ func SetupRouter(
 	// Public routes
 	r.GET("/auth/login", handler.HandleLogin)
 	r.GET("/auth/callback", handler.HandleCallback)
+	r.GET("/me", studentLookupHandler.GetMe)
 
 	// Protected routes
 	api := r.Group("/")
@@ -97,7 +98,6 @@ func SetupRouter(
 		api.GET("/exam-hall/all", examHallHandler.GetAllHallsByRegNo)
 		api.GET("/search", handler.UniversalSearch)
 		api.GET("/rewards", handler.GetRewardsByRollNo)
-		api.GET("/me", studentLookupHandler.GetMe)
 		api.GET("/student/roll-no", studentLookupHandler.GetRollNoByEmail)
 		api.GET("/averages", handler.GetOverallAverageFromSheet)
 		api.GET("/semesters/:year", semesterHandler.GetSemesterByYear)
