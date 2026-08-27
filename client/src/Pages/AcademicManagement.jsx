@@ -1323,6 +1323,103 @@ function EmptyState({ label }) {
   );
 }
 
+function SearchableCourseSelect({ courses, value, onChange, placeholder = "Search and select course..." }) {
+  const [search, setSearch] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+
+  const selectedCourse = useMemo(() => courses.find((c) => Number(c.id) === Number(value)), [courses, value]);
+
+  const filteredCourses = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    if (!q) return courses;
+    return courses.filter(
+      (c) => (c.code || "").toLowerCase().includes(q) || (c.name || "").toLowerCase().includes(q)
+    );
+  }, [courses, search]);
+
+  return (
+    <div className="relative mt-1">
+      <div className="relative flex items-center">
+        <Search className="absolute left-3 h-4 w-4 text-slate-400 pointer-events-none" />
+        <input
+          type="text"
+          placeholder={selectedCourse ? `${selectedCourse.code} - ${selectedCourse.name}` : placeholder}
+          value={search}
+          onFocus={() => setIsOpen(true)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setIsOpen(true);
+          }}
+          className="w-full rounded-xl border border-slate-200 bg-white pl-9 pr-8 py-2 text-sm font-medium text-slate-800 outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+        />
+        {value || search ? (
+          <button
+            type="button"
+            onClick={() => {
+              onChange("");
+              setSearch("");
+              setIsOpen(true);
+            }}
+            className="absolute right-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        ) : null}
+      </div>
+
+      {selectedCourse && !search && (
+        <div className="mt-1 flex items-center justify-between rounded-lg bg-blue-50/80 px-3 py-1.5 text-xs text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
+          <span className="truncate">
+            Selected: <strong className="font-mono font-bold">{selectedCourse.code}</strong> - {selectedCourse.name}
+          </span>
+          <button type="button" onClick={() => setIsOpen(true)} className="ml-2 font-semibold hover:underline">
+            Change
+          </button>
+        </div>
+      )}
+
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+          <div className="absolute left-0 right-0 z-20 mt-1 max-h-56 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-800 dark:bg-slate-950">
+            {filteredCourses.length > 0 ? (
+              filteredCourses.map((c) => {
+                const isSelected = Number(c.id) === Number(value);
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => {
+                      onChange(c.id);
+                      setSearch("");
+                      setIsOpen(false);
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition ${
+                      isSelected
+                        ? "bg-blue-600 text-white font-semibold"
+                        : "text-slate-800 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-900"
+                    }`}
+                  >
+                    <div className="truncate">
+                      <span className={`font-mono font-bold mr-2 ${isSelected ? "text-blue-100" : "text-blue-600 dark:text-blue-400"}`}>
+                        {c.code}
+                      </span>
+                      <span>{c.name}</span>
+                    </div>
+                    {isSelected && <CheckCircle className="h-3.5 w-3.5 shrink-0 ml-2 text-white" />}
+                  </button>
+                );
+              })
+            ) : (
+              <div className="p-3 text-center text-xs text-slate-400">No courses match your search "{search}"</div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 // -----------------------------------------------------------------------------
 // DYNAMIC ACADEMIC FORM MODAL
 // -----------------------------------------------------------------------------
@@ -1697,19 +1794,12 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
         <>
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Target Course</label>
-            <select
-              required
-              value={formData.course_id || ""}
-              onChange={set("course_id")}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
-            >
-              <option value="">Select Course</option>
-              {options.courses.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.code} - {c.name}
-                </option>
-              ))}
-            </select>
+            <SearchableCourseSelect
+              courses={options.courses}
+              value={formData.course_id}
+              onChange={(val) => setFormData((p) => ({ ...p, course_id: val }))}
+              placeholder="Search by code or title (e.g. 22CH103, Chemistry)..."
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -1900,20 +1990,13 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
       {type === "add-exam-schedule" && (
         <>
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Course</label>
-            <select
-              required
-              value={formData.course_id || ""}
-              onChange={set("course_id")}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
-            >
-              <option value="">Select Course</option>
-              {options.courses.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.code} - {c.name}
-                </option>
-              ))}
-            </select>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Select Course</label>
+            <SearchableCourseSelect
+              courses={options.courses}
+              value={formData.course_id}
+              onChange={(val) => setFormData((p) => ({ ...p, course_id: val }))}
+              placeholder="Search by code or title (e.g. 22CS007, Agile)..."
+            />
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Exam Date</label>
@@ -1966,20 +2049,13 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
       {type === "question-papers" && (
         <>
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Course</label>
-            <select
-              required
-              value={formData.course_id || ""}
-              onChange={set("course_id")}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
-            >
-              <option value="">Select Course</option>
-              {options.courses.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.code} - {c.name}
-                </option>
-              ))}
-            </select>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Course</label>
+            <SearchableCourseSelect
+              courses={options.courses}
+              value={formData.course_id}
+              onChange={(val) => setFormData((p) => ({ ...p, course_id: val }))}
+              placeholder="Search by code or title (e.g. 22CS007, Agile)..."
+            />
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Upload Question Bank PDF (PDF Only)</label>
