@@ -170,6 +170,25 @@ export default function SupportDev() {
         phone: donorPhone,
         contact: donorPhone,
       },
+      config: {
+        display: {
+          blocks: {
+            upi_qr: {
+              name: "Pay via UPI / QR Code",
+              instruments: [
+                {
+                  method: "upi",
+                  flows: ["qr", "intent", "collect"],
+                },
+              ],
+            },
+          },
+          sequence: ["block.upi_qr"],
+          preferences: {
+            show_default_blocks: true,
+          },
+        },
+      },
       theme: {
         color: "#2563eb",
       },
