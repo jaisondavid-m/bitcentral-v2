@@ -82,17 +82,34 @@ func SetupRouter(
 		})
 	})
 
-	// Public routes
+	// Public & Student routes (MySQL / Firebase Auth)
 	r.GET("/auth/login", handler.HandleLogin)
 	r.GET("/auth/callback", handler.HandleCallback)
 	r.GET("/me", studentLookupHandler.GetMe)
 
-	// Protected routes
+	r.POST("/cards/:id/click", handlers.TrackCardClick)
+	r.GET("/cards", handlers.GetCards)
+	r.GET("/semesters/:year", semesterHandler.GetSemesterByYear)
+	r.GET("/qb", qbHandler.List)
+	r.GET("/mess", messHandler.GetMess)
+	r.GET("/mess/timings", messHandler.GetMealTimings)
+	r.GET("/tracker-users", trackerUserHandler.GetTrackerUsers)
+	r.GET("/v2/profile", trackerUserHandler.GetProfileV2)
+	r.GET("/profile/v2", trackerUserHandler.GetProfileV2)
+	r.GET("/top10", leaderboardHandler.GetTop10Students)
+
+	// Public / Student Read-only Academic API (MySQL)
+	r.GET("/academic/options", academicHandler.GetAcademicOptions)
+	r.GET("/academic/departments", academicHandler.ListDepartments)
+	r.GET("/academic/regulations", academicHandler.ListRegulations)
+	r.GET("/academic/batches", academicHandler.ListBatches)
+	r.GET("/academic/semesters", academicHandler.ListSemesters)
+	r.GET("/academic/courses", academicHandler.ListCourses)
+
+	// Google Sheets API routes (Requires Sheets OAuth)
 	api := r.Group("/")
 	api.Use(handler.RequireAuth())
 	{
-		api.POST("/cards/:id/click", handlers.TrackCardClick)
-		api.GET("/cards", handlers.GetCards)
 		api.GET("/leaves", leaveHandler.GetAllLeaves)
 		api.GET("/exam-hall", examHallHandler.GetHall)
 		api.GET("/exam-hall/all", examHallHandler.GetAllHallsByRegNo)
@@ -100,28 +117,11 @@ func SetupRouter(
 		api.GET("/rewards", handler.GetRewardsByRollNo)
 		api.GET("/student/roll-no", studentLookupHandler.GetRollNoByEmail)
 		api.GET("/averages", handler.GetOverallAverageFromSheet)
-		api.GET("/semesters/:year", semesterHandler.GetSemesterByYear)
-		api.GET("/qb", qbHandler.List)
-		api.GET("/mess", messHandler.GetMess)
-		api.GET("/mess/timings", messHandler.GetMealTimings)
 		api.GET("/ps/rewards/breakdown", adminHandler.FetchPSRewardsBreakdown)
 		api.GET("/ps/student-report/details", adminHandler.FetchStudentReportDetails)
 		api.GET("/ps/assessments", adminHandler.FetchAssessmentDetails)
 		api.GET("/ps/points", adminHandler.FetchPointsDetails)
 		api.GET("/ps/biometrics", adminHandler.FetchBiometricDetails)
-		api.GET("/tracker-users", trackerUserHandler.GetTrackerUsers)
-		api.GET("/v2/profile", trackerUserHandler.GetProfileV2)
-		api.GET("/profile/v2", trackerUserHandler.GetProfileV2)
-
-		api.GET("/top10", leaderboardHandler.GetTop10Students)
-
-		// Public / Student Read-only Academic API
-		api.GET("/academic/options", academicHandler.GetAcademicOptions)
-		api.GET("/academic/departments", academicHandler.ListDepartments)
-		api.GET("/academic/regulations", academicHandler.ListRegulations)
-		api.GET("/academic/batches", academicHandler.ListBatches)
-		api.GET("/academic/semesters", academicHandler.ListSemesters)
-		api.GET("/academic/courses", academicHandler.ListCourses)
 	}
 
 	// Serve uploaded files
