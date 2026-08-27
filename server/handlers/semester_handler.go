@@ -44,11 +44,24 @@ func (h *SemesterHandler) GetSemesterByYear(c *gin.Context) {
 		    UPPER(department) = 'ALL' OR
 		    department = '' OR
 		    LOWER(department) = LOWER(?) OR
-		    (LOWER(?) = 'cs' AND LOWER(department) = 'cse')
+		    FIND_IN_SET(UPPER(?), REPLACE(UPPER(department), ' ', '')) > 0 OR
+		    LOWER(department) LIKE CONCAT('%', LOWER(?), '%') OR
+		    (LOWER(?) = 'cs' AND (LOWER(department) LIKE '%cs%' OR LOWER(department) LIKE '%cse%')) OR
+		    (LOWER(?) = 'ad' AND (LOWER(department) LIKE '%ad%' OR LOWER(department) LIKE '%ai%')) OR
+		    (LOWER(?) = 'al' AND (LOWER(department) LIKE '%al%' OR LOWER(department) LIKE '%aiml%')) OR
+		    (LOWER(?) = 'ec' AND (LOWER(department) LIKE '%ec%' OR LOWER(department) LIKE '%ece%')) OR
+		    (LOWER(?) = 'ee' AND (LOWER(department) LIKE '%ee%' OR LOWER(department) LIKE '%eee%')) OR
+		    (LOWER(?) = 'me' AND (LOWER(department) LIKE '%me%' OR LOWER(department) LIKE '%mech%')) OR
+		    (LOWER(?) = 'ce' AND (LOWER(department) LIKE '%ce%' OR LOWER(department) LIKE '%civil%')) OR
+		    (LOWER(?) = 'ag' AND (LOWER(department) LIKE '%ag%' OR LOWER(department) LIKE '%agri%')) OR
+		    (LOWER(?) = 'bm' AND (LOWER(department) LIKE '%bm%' OR LOWER(department) LIKE '%bme%')) OR
+		    (LOWER(?) = 'cb' AND (LOWER(department) LIKE '%cb%' OR LOWER(department) LIKE '%csbs%')) OR
+		    (LOWER(?) = 'cd' AND (LOWER(department) LIKE '%cd%' OR LOWER(department) LIKE '%csd%')) OR
+		    (LOWER(?) = 'mb' AND (LOWER(department) LIKE '%mb%' OR LOWER(department) LIKE '%mba%'))
 		  )
 		ORDER BY idx`
 
-	rows, err := h.DB.Query(query, year, deptParam, deptParam, deptParam)
+	rows, err := h.DB.Query(query, year, deptParam, deptParam, deptParam, deptParam, deptParam, deptParam, deptParam, deptParam, deptParam, deptParam, deptParam, deptParam, deptParam, deptParam, deptParam, deptParam)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
