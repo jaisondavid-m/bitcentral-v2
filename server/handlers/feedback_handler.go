@@ -126,8 +126,7 @@ func (h *FeedbackHandler) GetUserMessages(c *gin.Context) {
 		return
 	}
 
-	// Mark admin messages as read by user
-	_, _ = h.DB.Exec(`UPDATE feedback_messages SET is_read_by_user = 1 WHERE user_uid = ? AND sender_type = 'admin'`, uid)
+	shouldMarkRead := c.Query("mark_read") == "true"
 
 	rows, err := h.DB.Query(`
 		SELECT id, user_uid, sender_type, sender_name, sender_email, message, is_read_by_admin, is_read_by_user, created_at
@@ -139,6 +138,10 @@ func (h *FeedbackHandler) GetUserMessages(c *gin.Context) {
 		return
 	}
 	defer rows.Close()
+
+	if shouldMarkRead {
+		_, _ = h.DB.Exec(`UPDATE feedback_messages SET is_read_by_user = 1 WHERE user_uid = ? AND sender_type = 'admin'`, uid)
+	}
 
 	messages := []FeedbackMessage{}
 	for rows.Next() {

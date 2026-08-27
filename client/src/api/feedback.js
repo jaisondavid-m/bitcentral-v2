@@ -17,9 +17,10 @@ export async function sendFeedbackMessage(message, senderName) {
   return response.data?.data || null;
 }
 
-export async function getFeedbackMessages() {
+export async function getFeedbackMessages(markRead = false) {
   const headers = await getAuthenticatedHeaders();
-  const response = await api.get("/feedback/messages", { headers });
+  const url = markRead ? "/feedback/messages?mark_read=true" : "/feedback/messages";
+  const response = await api.get(url, { headers });
   return response.data?.data || [];
 }
 
