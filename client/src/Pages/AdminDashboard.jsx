@@ -54,6 +54,8 @@ import {
   UserMinus,
   Heart,
   GraduationCap,
+  ArrowLeft,
+  ArrowRight,
 } from "lucide-react";
 import SuperAdminPanel from "./SuperAdminPanel.jsx";
 import AdminPSRewardsPage from "./AdminPSRewards.jsx";
@@ -150,60 +152,77 @@ const ADMIN_TABS = [
     label: "Academic Management",
     href: "/admin/academic",
     icon: GraduationCap,
-    description: "Manage departments, programs, regulations, courses, curriculum, materials, exams, and question papers.",
+    gradient: "from-blue-600 to-indigo-600",
+    badge: "Academic Core",
+    description: "Manage departments, regulations, batches, semesters, courses, materials (PDF), exams & question banks.",
   },
   {
     key: "users",
     label: "Users",
     href: "/admin/users",
     icon: Users,
-    description: "Manage admin-visible user accounts and activity.",
+    gradient: "from-violet-600 to-purple-600",
+    badge: "User Directory",
+    description: "Manage registered user accounts, system roles, permissions, and account status.",
   },
   {
     key: "sponsors",
     label: "Sponsored Users",
     href: "/admin/sponsors",
     icon: Heart,
-    description: "Razorpay order data & sponsored contributions.",
+    gradient: "from-rose-500 to-pink-600",
+    badge: "Contributions",
+    description: "Live contribution history & Razorpay payment logs for sponsored students.",
   },
   {
     key: "qb",
     label: "QB Handling",
     href: "/admin/qb",
     icon: BookOpen,
-    description: "Create, edit, and organize question bank entries.",
+    gradient: "from-emerald-500 to-teal-600",
+    badge: "Question Papers",
+    description: "Create, edit, search, and organize general question bank entries and answer keys.",
   },
   {
     key: "ps",
     label: "PS Rewards",
     href: "/admin/ps-rewards",
     icon: Clock,
-    description: "Store the PS cookie token and fetch rewards breakdown responses.",
+    gradient: "from-amber-500 to-orange-600",
+    badge: "PS Integration",
+    description: "Store PS cookie credentials and inspect live rewards breakdown responses.",
   },
   {
     key: "cards",
     label: "Cards",
     href: "/admin/cards",
     icon: LayoutGrid,
-    description: "Control homepage cards, links, and images.",
+    gradient: "from-cyan-500 to-blue-600",
+    badge: "Banners & Links",
+    description: "Control home page feature cards, custom quick links, banners, and card ordering.",
   },
   {
     key: "mess",
     label: "Mess Menu",
     href: "/admin/mess",
     icon: CalendarDays,
-    description: "Upload boys and girls CSV menus into the database.",
+    gradient: "from-fuchsia-500 to-pink-600",
+    badge: "Food & Meals",
+    description: "Upload and schedule boys & girls mess menu CSV files for weekly meals.",
   },
   {
     key: "super",
     label: "Super Admin",
     href: "/admin/super",
     icon: Database,
-    description: "Manage admins and allowed external emails/domains.",
+    gradient: "from-slate-800 to-slate-950",
+    badge: "Super Privileges",
+    description: "Manage super-admin privileges, domain restrictions, and administrative access.",
   },
 ];
 
 function getAdminTabFromPath(pathname) {
+  if (pathname === "/admin" || pathname === "/admin/") return "overview";
   if (pathname.startsWith("/admin/academic")) return "academic";
   if (pathname.startsWith("/admin/sponsors")) return "sponsors";
   if (pathname.startsWith("/admin/qb")) return "qb";
@@ -211,7 +230,8 @@ function getAdminTabFromPath(pathname) {
   if (pathname.startsWith("/admin/cards")) return "cards";
   if (pathname.startsWith("/admin/mess")) return "mess";
   if (pathname.startsWith("/admin/super")) return "super";
-  return "users";
+  if (pathname.startsWith("/admin/users")) return "users";
+  return "overview";
 }
 
 function Banner({ banner, onDismiss }) {
@@ -490,85 +510,133 @@ function reorderList(items, fromId, toId) {
   return next;
 }
 
-/* -- Shell ------------------------------------------------------------------- */
-function AdminDashboardShell({ activeTab, children, isSuper }) {
-  const activeItem = ADMIN_TABS.find((tab) => tab.key === activeTab) || ADMIN_TABS[0];
+/* -- Admin Overview Grid (8 Big Cards) --------------------------------------- */
+function AdminOverviewGrid({ isSuper }) {
   const visibleTabs = ADMIN_TABS.filter((t) => {
     if (t.key === "users" || t.key === "super") return Boolean(isSuper);
     return true;
   });
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.14),transparent_38%),linear-gradient(180deg,#f8fafc_0%,#eef4ff_100%)] dark:bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.18),rgba(2,6,23,1)_45%)]">
-      <header className="sticky top-0 z-20 border-b border-white/70 bg-white/80 backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/80">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div className="min-w-0">
-              <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-blue-600 dark:text-blue-400">Admin console</p>
-              <h1 className="mt-1 text-xl font-black tracking-tight text-slate-900 dark:text-white">{activeItem.label}</h1>
-              <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">{activeItem.description}</p>
+    <div className="space-y-8 py-2">
+      {/* Header Banner */}
+      <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-sm backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/80 sm:p-8">
+        <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-blue-500/10 blur-3xl" />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between relative z-10">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+              <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" /> Admin Control Center
             </div>
+            <h1 className="mt-3 text-2xl font-black text-slate-900 dark:text-white sm:text-3xl">
+              System Management Overview
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+              Select an administrative section below to manage college academic structures, user directory, sponsored contributions, question banks, mess schedules, and system security.
+            </p>
+          </div>
 
-            <div className="hidden rounded-full border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:flex">
-              {visibleTabs.map((tab) => {
-                const Icon = tab.icon;
-                const active = tab.key === activeTab;
-
-                return (
-                  <Link
-                    key={tab.key}
-                    to={tab.href}
-                    className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                      active
-                        ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
-                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                    {tab.label}
-                  </Link>
-                );
-              })}
+          <div className="hidden sm:block">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/80 px-6 py-4 text-center dark:border-slate-800 dark:bg-slate-900/80 shadow-sm">
+              <span className="text-3xl font-black text-blue-600 dark:text-blue-400">{visibleTabs.length}</span>
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">Active Modules</p>
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
-      <main className="mx-auto max-w-6xl px-4 py-4 pb-28 sm:px-6 lg:px-8">{children}</main>
+      {/* 8 Big Cards Grid */}
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {visibleTabs.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <Link
+              key={tab.key}
+              to={tab.href}
+              className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-blue-500/50"
+            >
+              {/* Background Accent Glow */}
+              <div className={`absolute -right-8 -top-8 h-28 w-28 rounded-full bg-gradient-to-br ${tab.gradient} opacity-10 blur-2xl transition group-hover:opacity-25`} />
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] sm:hidden">
-          <div
-            className={`mx-auto grid max-w-md gap-1 overflow-hidden rounded-2xl border border-white/70 bg-white/90 p-1 shadow-[0_18px_40px_rgba(15,23,42,0.16)] backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90 ${
-              visibleTabs.length >= 5
-                ? "grid-cols-5"
-                : visibleTabs.length === 4
-                  ? "grid-cols-4"
-                  : visibleTabs.length === 3
-                    ? "grid-cols-3"
-                    : "grid-cols-2"
-            }`}
-          >
-          {visibleTabs.map((tab) => {
-            const Icon = tab.icon;
-            const active = tab.key === activeTab;
+              <div>
+                {/* Header Row inside card */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${tab.gradient} text-white shadow-md shadow-blue-500/10 transition transform group-hover:scale-110`}>
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                    {tab.badge}
+                  </span>
+                </div>
 
-            return (
+                {/* Card Title & Description */}
+                <h3 className="mt-5 text-lg font-bold text-slate-900 transition group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
+                  {tab.label}
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400 line-clamp-3">
+                  {tab.description}
+                </p>
+              </div>
+
+              {/* Bottom Action Arrow */}
+              <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 text-xs font-bold text-blue-600 dark:border-slate-800/80 dark:text-blue-400">
+                <span>Open Module</span>
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-50 transition transform group-hover:translate-x-1 group-hover:bg-blue-600 group-hover:text-white dark:bg-blue-950 dark:group-hover:bg-blue-500">
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* -- Shell ------------------------------------------------------------------- */
+function AdminDashboardShell({ activeTab, children }) {
+  const activeItem = ADMIN_TABS.find((tab) => tab.key === activeTab) || ADMIN_TABS[0];
+  const Icon = activeItem?.icon;
+
+  return (
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.12),transparent_40%),linear-gradient(180deg,#f8fafc_0%,#eef4ff_100%)] dark:bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.16),rgba(2,6,23,1)_45%)]">
+      {activeTab !== "overview" && (
+        <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/80">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
+            {/* Minimal Left Breadcrumb Navigation */}
+            <div className="flex items-center gap-3">
               <Link
-                key={tab.key}
-                to={tab.href}
-                className={`flex min-w-0 flex-col items-center justify-center gap-0 rounded-xl px-1.5 py-2 text-[10px] font-semibold leading-none transition ${
-                  active
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25"
-                    : "text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-900"
-                }`}
+                to="/admin"
+                className="group flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm transition hover:border-blue-300 hover:bg-slate-50 hover:text-blue-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-700 dark:hover:bg-slate-800"
               >
-                <Icon className="h-4 w-4" />
-                <span className="mt-0.5 truncate text-center">{tab.label}</span>
+                <ArrowLeft className="h-4 w-4 text-blue-600 transition transform group-hover:-translate-x-0.5" />
+                <span>Admin Dashboard</span>
               </Link>
-            );
-          })}
-        </div>
-      </nav>
+
+              <span className="text-slate-300 dark:text-slate-700">/</span>
+
+              <div className="flex items-center gap-2">
+                {Icon && (
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                )}
+                <h1 className="text-base font-black tracking-tight text-slate-900 dark:text-white">
+                  {activeItem.label}
+                </h1>
+              </div>
+            </div>
+
+            {/* Right Status Badge */}
+            <div className="hidden sm:flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live System
+              </span>
+            </div>
+          </div>
+        </header>
+      )}
+
+      <main className="mx-auto max-w-7xl px-4 py-5 pb-16 sm:px-6 lg:px-8">{children}</main>
     </div>
   );
 }
@@ -1651,6 +1719,7 @@ function QBSection() {
   const [isSaving, setIsSaving] = useState(false);
   const [isReordering, setIsReordering] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [deleteConfirmItem, setDeleteConfirmItem] = useState(null);
   const [editItem, setEditItem] = useState(null);
   const [viewItem, setViewItem] = useState(null);
   const [showBatchForm, setShowBatchForm] = useState(false);
@@ -1872,14 +1941,17 @@ function QBSection() {
     }
   }
 
-  async function handleDelete(id) {
-    if (!window.confirm("Delete this subject permanently?")) return;
+  async function executeDelete() {
+    if (!deleteConfirmItem) return;
+    const id = deleteConfirmItem.id;
     setDeletingId(id);
     setBanner({ type: "", message: "" });
     try {
       await deleteQBAnswerKey(id);
       setQbItems((prev) => prev.filter((item) => item.id !== id));
-      setBanner({ type: "success", message: "Subject deleted" });
+      setBatchPreviewItems((prev) => prev.filter((item) => item.id !== id));
+      setBanner({ type: "success", message: "Subject deleted successfully" });
+      setDeleteConfirmItem(null);
     } catch (err) {
       setBanner({ type: "error", message: normalizeError(err, "Failed to delete subject") });
     } finally {
@@ -2056,24 +2128,27 @@ function QBSection() {
                               <button
                                 type="button"
                                 onClick={() => openView(item)}
-                                className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+                                className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
                               >
+                                <Eye className="h-3.5 w-3.5 text-blue-600" />
                                 View
                               </button>
                               <button
                                 type="button"
                                 onClick={() => openEdit(item)}
-                                className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+                                className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
                               >
+                                <Edit2 className="h-3.5 w-3.5 text-amber-600" />
                                 Edit
                               </button>
                               <button
                                 type="button"
-                                onClick={() => handleDelete(item.id)}
+                                onClick={() => setDeleteConfirmItem(item)}
                                 disabled={deletingId === item.id}
-                                className="rounded-md border border-red-200 bg-white px-2.5 py-1 text-xs font-medium text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-900 dark:bg-slate-950 dark:text-red-300 dark:hover:bg-slate-900"
+                                className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50/50 px-2.5 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-900/60"
                               >
-                                {deletingId === item.id ? "Deleting..." : "Delete"}
+                                {deletingId === item.id ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                                Delete
                               </button>
                             </div>
                           </td>
@@ -2258,9 +2333,9 @@ function QBSection() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleDelete(item.id)}
+                          onClick={() => setDeleteConfirmItem(item)}
                           disabled={deletingId === item.id}
-                          className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50/50 px-2.5 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-100 disabled:opacity-60 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400"
                         >
                           {deletingId === item.id ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                           Delete
@@ -2331,6 +2406,16 @@ function QBSection() {
             </div>
           </div>
         )}
+
+        <ConfirmModal
+          open={Boolean(deleteConfirmItem)}
+          title="Delete Subject"
+          description={`Are you sure you want to delete "${deleteConfirmItem?.subject_code || ''} - ${deleteConfirmItem?.subject_name || ''}"? This action cannot be undone.`}
+          confirmLabel="Delete Subject"
+          busy={Boolean(deletingId)}
+          onConfirm={executeDelete}
+          onCancel={() => setDeleteConfirmItem(null)}
+        />
       </div>
     </section>
   );
@@ -2347,6 +2432,7 @@ function MessSection() {
   const [uploading, setUploading] = useState(false);
   const [savingRow, setSavingRow] = useState(false);
   const [deletingRowId, setDeletingRowId] = useState(null);
+  const [deleteConfirmRow, setDeleteConfirmRow] = useState(null);
   const [editingRow, setEditingRow] = useState(null);
   const [banner, setBanner] = useState({ type: "", message: "" });
 
@@ -2431,14 +2517,16 @@ function MessSection() {
     }
   }
 
-  async function handleDeleteRow(rowId) {
-    if (!window.confirm("Delete this menu item?")) return;
+  async function executeDeleteRow() {
+    if (!deleteConfirmRow) return;
+    const rowId = deleteConfirmRow.id;
     setDeletingRowId(rowId);
     setBanner({ type: "", message: "" });
 
     try {
       const result = await deleteMessMenuRow(rowId);
       setBanner({ type: "success", message: result?.message || "Menu item deleted" });
+      setDeleteConfirmRow(null);
       await Promise.all([loadPreview(), loadRows()]);
     } catch (err) {
       setBanner({ type: "error", message: normalizeError(err, "Failed to delete menu item") });
@@ -2732,9 +2820,9 @@ function MessSection() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleDeleteRow(row.id)}
+                            onClick={() => setDeleteConfirmRow(row)}
                             disabled={deletingRowId === row.id}
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50/50 px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400"
                           >
                             {deletingRowId === row.id ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                             Delete
@@ -2749,6 +2837,16 @@ function MessSection() {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        open={Boolean(deleteConfirmRow)}
+        title="Delete Mess Menu Item"
+        description={`Are you sure you want to delete "${deleteConfirmRow?.item}" from the mess menu? This action cannot be undone.`}
+        confirmLabel="Delete Item"
+        busy={Boolean(deletingRowId)}
+        onConfirm={executeDeleteRow}
+        onCancel={() => setDeleteConfirmRow(null)}
+      />
     </section>
   );
 }
@@ -2904,7 +3002,9 @@ function AdminDashboard({ initialTab } = {}) {
 
   return (
     <AdminDashboardShell activeTab={activeTab} isSuper={isSuper}>
-      {activeTab === "academic" ? (
+      {activeTab === "overview" ? (
+        <AdminOverviewGrid isSuper={isSuper} />
+      ) : activeTab === "academic" ? (
         <AcademicManagement />
       ) : activeTab === "sponsors" ? (
         <SponsorsSection />
