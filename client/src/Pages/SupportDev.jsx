@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Heart,
   ShieldCheck,
@@ -7,8 +7,14 @@ import {
   Code2,
   Users,
   Lock,
-  ArrowRight,
   Sparkles,
+  CheckCircle2,
+  User,
+  Mail,
+  Phone,
+  CreditCard,
+  Loader2,
+  X,
 } from "lucide-react";
 import { BiDonateHeart } from "react-icons/bi";
 import { FaHandHoldingHeart } from "react-icons/fa6";
@@ -17,10 +23,22 @@ import PublicFooter from "../Component/PublicFooter.jsx";
 import Navbar from "../Component/NavBar.jsx";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../Authentication/firebase.js";
-import { getSponsorsLeaderboard } from "../api/axios.js";
+import { getSponsorsLeaderboard, getMeProfile } from "../api/axios.js";
 import { processLeaderboardData } from "../utils/sponsorUtils.js";
 
-
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
 
 export default function SupportDev() {
   const [user] = useAuthState(auth);
@@ -31,39 +49,150 @@ export default function SupportDev() {
     sponsors: [],
   });
 
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Form State with Default Prefilled Details
+  const [donorName, setDonorName] = useState("jaison david");
+  const [donorEmail, setDonorEmail] = useState("jaisondavidm.cs25@bitsathy.ac.in");
+  const [donorPhone, setDonorPhone] = useState("9843777817");
+
+  // Editable Amount State (User types custom amount)
+  const [amount, setAmount] = useState("");
+
+  // Payment Status State
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const fetchLeaderboard = async () => {
+    try {
+      setLoading(true);
+      const data = await getSponsorsLeaderboard();
+      if (data?.success && Array.isArray(data.sponsors)) {
+        const sorted = processLeaderboardData(data.sponsors);
+        setLeaderboard({
+          ...data,
+          total_supporters: sorted.length,
+          sponsors: sorted,
+        });
+      }
+    } catch (err) {
+      setLeaderboard({ total_raised: 0, total_supporters: 0, sponsors: [] });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
+    fetchLeaderboard();
+  }, []);
+
+  // Fetch Display Name from /me Route when Authenticated
+  useEffect(() => {
+    let isMounted = true;
     (async () => {
       try {
-        setLoading(true);
-        const data = await getSponsorsLeaderboard();
-        if (data?.success && Array.isArray(data.sponsors)) {
-          const sorted = processLeaderboardData(data.sponsors);
-
-          setLeaderboard({
-            ...data,
-            total_supporters: sorted.length,
-            sponsors: sorted,
-          });
+        if (auth.currentUser) {
+          const meData = await getMeProfile();
+          if (isMounted && meData) {
+            const displayNameFromMe =
+              meData.display_name ||
+              meData.displayName ||
+              meData.name ||
+              meData.full_name;
+            if (displayNameFromMe) {
+              setDonorName(displayNameFromMe);
+            }
+            if (meData.email) {
+              setDonorEmail(meData.email);
+            }
+            if (meData.phone || meData.phone_no) {
+              setDonorPhone(meData.phone || meData.phone_no);
+            }
+          } else if (isMounted && auth.currentUser.displayName) {
+            setDonorName(auth.currentUser.displayName);
+          }
         }
       } catch (err) {
-        setLeaderboard({ total_raised: 0, total_supporters: 0, sponsors: [] });
-      } finally {
-        setLoading(false);
+        if (isMounted && auth.currentUser?.displayName) {
+          setDonorName(auth.currentUser.displayName);
+        }
       }
     })();
-  }, []);
 
-  const paymentFormRef = useRef(null);
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
 
-  useEffect(() => {
-    if (!paymentFormRef.current) return;
-    paymentFormRef.current.innerHTML = "";
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/payment-button.js";
-    script.setAttribute("data-payment_button_id", "pl_TUlix4nQCJh453");
-    script.async = true;
-    paymentFormRef.current.appendChild(script);
-  }, []);
+  const effectiveAmount = Number(amount);
+
+  const handlePayment = async (e) => {
+    e?.preventDefault();
+    setErrorMessage("");
+
+    if (!effectiveAmount || effectiveAmount < 1) {
+      setErrorMessage("Please enter a valid contribution amount greater than ₹0.");
+      return;
+    }
+
+    setIsProcessing(true);
+
+    const isLoaded = await loadRazorpayScript();
+    if (!isLoaded) {
+      setErrorMessage("Razorpay SDK failed to load. Please check your network connection.");
+      setIsProcessing(false);
+      return;
+    }
+
+    const key = import.meta.env.VITE_RAZORPAY_KEY_ID || "";
+    if (!key) {
+      setErrorMessage("Razorpay Key ID is missing. Please add VITE_RAZORPAY_KEY_ID to client/.env");
+      setIsProcessing(false);
+      return;
+    }
+
+    const options = {
+      key: key,
+      amount: Math.round(effectiveAmount * 100), // amount in paise
+      currency: "INR",
+      name: "BIT CENTRAL",
+      description: "Support BIT-CENTRAL Community Platform",
+      prefill: {
+        name: donorName,
+        email: donorEmail,
+        contact: donorPhone,
+      },
+      notes: {
+        name: donorName,
+        email: donorEmail,
+        phone: donorPhone,
+        contact: donorPhone,
+      },
+      theme: {
+        color: "#2563eb",
+      },
+      handler: function (response) {
+        setIsProcessing(false);
+        setPaymentSuccess(true);
+        fetchLeaderboard();
+      },
+      modal: {
+        ondismiss: function () {
+          setIsProcessing(false);
+        },
+      },
+    };
+
+    try {
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      setErrorMessage("Failed to open Razorpay payment window.");
+      setIsProcessing(false);
+    }
+  };
 
   const formattedTotal = Number(leaderboard.total_raised || 0).toLocaleString("en-IN");
 
@@ -76,9 +205,9 @@ export default function SupportDev() {
 
       {/* Main Container */}
       <main className="flex-1 flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
-        <div className="w-full max-w-6xl grid gap-8 lg:grid-cols-12 lg:items-center">
+        <div className="w-full max-w-6xl grid gap-8 lg:grid-cols-12 lg:items-start">
 
-          {/* Left Column: Hero, Features, Stats & Donate CTA */}
+          {/* Left Column: Hero & Clean CTA */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -154,14 +283,42 @@ export default function SupportDev() {
               </div>
             </div>
 
-            {/* Main Action Button */}
-            <div className="space-y-3 pt-2">
-              <form ref={paymentFormRef} className="flex justify-center" />
+            {/* Main Action Button Card */}
+            <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900 space-y-4">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Heart className="h-4 w-4 text-rose-500 fill-rose-500" />
+                    Support Our Platform
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Your contributions fund server infrastructure and free tools for all students.
+                  </p>
+                </div>
+                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1 shrink-0">
+                  <Sparkles className="h-3.5 w-3.5" /> Razorpay Secured
+                </span>
+              </div>
 
-              <p className="text-center text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">
-                <Lock className="h-3.5 w-3.5 text-slate-400" />
-                Secure 256-bit SSL · UPI, GPay, PhonePe, Cards
-              </p>
+              <div className="flex items-center justify-between pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPaymentSuccess(false);
+                    setErrorMessage("");
+                    setIsModalOpen(true);
+                  }}
+                  className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-md shadow-blue-600/25 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-1.5 cursor-pointer w-fit"
+                >
+                  <Heart className="h-3.5 w-3.5 fill-white text-white" />
+                  <span>Donate Now</span>
+                </button>
+
+                <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                  <Lock className="h-3 w-3 text-slate-400 shrink-0" />
+                  Secure 256-bit SSL
+                </p>
+              </div>
             </div>
           </motion.div>
 
@@ -186,7 +343,7 @@ export default function SupportDev() {
               </div>
 
               {/* List / Skeleton Loading / Empty State */}
-              <div className="mt-3.5 space-y-2 max-h-[480px] min-h-[220px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex flex-col justify-start">
+              <div className="mt-3.5 space-y-2 max-h-[540px] min-h-[220px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex flex-col justify-start">
                 {loading ? (
                   /* Skeleton Loading State */
                   Array.from({ length: 5 }).map((_, idx) => (
@@ -208,8 +365,9 @@ export default function SupportDev() {
                       <Heart className="h-6 w-6 fill-current animate-bounce" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                        Be the first patron! 🚀
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center justify-center gap-1">
+                        <span>Be the first patron!</span>
+                        <Sparkles className="h-4 w-4 text-amber-500" />
                       </h4>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-[220px] mx-auto">
                         Your support keeps open student infrastructure running.
@@ -227,15 +385,15 @@ export default function SupportDev() {
                     if (rank === 1) {
                       rowStyle = "border border-amber-300/80 bg-gradient-to-r from-amber-500/10 via-amber-100/40 to-yellow-50/30 dark:border-amber-700/60 dark:from-amber-950/40 dark:to-slate-900 shadow-sm";
                       badgeStyle = "bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black px-2.5 py-0.5 rounded-lg shadow-xs text-xs";
-                      badgeContent = "🥇 #1";
+                      badgeContent = "#1";
                     } else if (rank === 2) {
                       rowStyle = "border border-slate-300/80 bg-gradient-to-r from-slate-200/40 via-slate-100/50 to-slate-50/30 dark:border-slate-700/60 dark:from-slate-800/40 dark:to-slate-900 shadow-xs";
                       badgeStyle = "bg-slate-300 text-slate-900 dark:bg-slate-700 dark:text-slate-100 font-bold px-2.5 py-0.5 rounded-lg shadow-xs text-xs";
-                      badgeContent = "🥈 #2";
+                      badgeContent = "#2";
                     } else if (rank === 3) {
                       rowStyle = "border border-orange-300/70 bg-gradient-to-r from-orange-100/30 via-orange-50/40 to-amber-50/20 dark:border-amber-900/50 dark:from-orange-950/30 dark:to-slate-900 shadow-xs";
                       badgeStyle = "bg-amber-700 text-white font-bold px-2 py-0.5 rounded-lg shadow-xs text-xs";
-                      badgeContent = "🥉 #3";
+                      badgeContent = "#3";
                     }
 
                     return (
@@ -268,6 +426,165 @@ export default function SupportDev() {
 
         </div>
       </main>
+
+      {/* Donation Modal Popup */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="relative w-full max-w-[420px] rounded-2xl border border-slate-200/80 bg-white p-5 shadow-2xl dark:border-slate-800 dark:bg-slate-900 space-y-4"
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3.5 dark:border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-rose-100/70 dark:bg-rose-950/60 flex items-center justify-center shrink-0">
+                    <Heart className="h-5 w-5 fill-rose-600 text-rose-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white leading-tight">
+                      Make a Contribution
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      Support BIT-CENTRAL development & servers
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Amount Input Section */}
+              <div className="space-y-1.5 pt-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase">
+                    ENTER CONTRIBUTION AMOUNT (₹)
+                  </label>
+                  <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">
+                    Direct via Razorpay
+                  </span>
+                </div>
+
+                <div className="relative rounded-xl border border-blue-100 bg-blue-50/40 dark:border-blue-900/40 dark:bg-blue-950/20 px-3.5 py-2.5 flex items-center shadow-xs">
+                  <span className="text-blue-600 dark:text-blue-400 font-bold text-base mr-2 select-none">
+                    ₹
+                  </span>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="0"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="w-full text-base font-bold text-slate-900 dark:text-white bg-transparent focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Donor Information Section */}
+              <div className="space-y-2 pt-1">
+                <label className="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase block">
+                  DONOR INFORMATION (PREFILLED FOR LEADERBOARD)
+                </label>
+
+                <div className="space-y-2">
+                  {/* Name Input */}
+                  <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
+                    <User className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      value={donorName}
+                      onChange={(e) => setDonorName(e.target.value)}
+                      className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Phone Input */}
+                  <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
+                    <Phone className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
+                    <input
+                      type="text"
+                      placeholder="Phone"
+                      value={donorPhone}
+                      onChange={(e) => setDonorPhone(e.target.value)}
+                      className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Email Input */}
+                  <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
+                    <Mail className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      value={donorEmail}
+                      onChange={(e) => setDonorEmail(e.target.value)}
+                      className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Error Alert */}
+              {errorMessage && (
+                <div className="rounded-xl bg-rose-50 p-3 text-xs text-rose-600 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-900">
+                  {errorMessage}
+                </div>
+              )}
+
+              {/* Success Alert */}
+              {paymentSuccess && (
+                <div className="rounded-xl bg-emerald-50 p-4 text-xs text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900 flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
+                  <span>
+                    Thank you, <strong>{donorName}</strong>! Your payment was successful and leaderboard updated.
+                  </span>
+                </div>
+              )}
+
+              {/* Submit Payment Button */}
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={handlePayment}
+                  disabled={isProcessing}
+                  className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm shadow-md shadow-blue-600/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Opening Razorpay...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Heart className="h-4 w-4 fill-white text-white" />
+                      <span>
+                        {effectiveAmount > 0
+                          ? `Donate ₹${effectiveAmount} via Razorpay`
+                          : "Donate via Razorpay"}
+                      </span>
+                    </>
+                  )}
+                </button>
+
+                <p className="text-center text-[11px] text-slate-400 font-medium flex items-center justify-center gap-1.5 pt-3">
+                  <Lock className="h-3 w-3 text-slate-400" />
+                  Secure 256-bit SSL · UPI, GPay, PhonePe, Cards
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Footer */}
       <PublicFooter />
