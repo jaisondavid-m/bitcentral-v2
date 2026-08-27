@@ -111,6 +111,7 @@ type Exam struct {
 	ExamType       string         `json:"exam_type"` // PT-1, PT-2, Model Exam, Semester-End Exam, Practical Exam, Other
 	AcademicYear   string         `json:"academic_year"`
 	DepartmentID   int            `json:"department_id"`
+	DepartmentIDs  []int          `json:"department_ids,omitempty"`
 	DepartmentName string         `json:"department_name,omitempty"`
 	SemesterID     int            `json:"semester_id"`
 	SemesterName   string         `json:"semester_name,omitempty"`
