@@ -1997,6 +1997,8 @@ function QBSection() {
   const [banner, setBanner] = useState({ type: "", message: "" });
   const [filterYear, setFilterYear] = useState(String(CURRENT_YEAR));
   const [searchQuery, setSearchQuery] = useState("");
+  const [draggedId, setDraggedId] = useState(null);
+  const [dropTargetId, setDropTargetId] = useState(null);
   const [extractedDepts, setExtractedDepts] = useState([]);
   const [extractedYears, setExtractedYears] = useState([]);
 
