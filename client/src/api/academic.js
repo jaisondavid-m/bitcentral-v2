@@ -52,34 +52,7 @@ export async function deleteDepartment(id) {
   return res.data;
 }
 
-// -----------------------------------------------------------------------------
-// 2. PROGRAMS
-// -----------------------------------------------------------------------------
 
-export async function listPrograms(params = {}) {
-  const headers = await getAdminHeaders();
-  const query = new URLSearchParams(params).toString();
-  const res = await api.get(`/admin/academic/programs${query ? `?${query}` : ""}`, { headers });
-  return res.data;
-}
-
-export async function createProgram(payload) {
-  const headers = await getAdminHeaders();
-  const res = await api.post("/admin/academic/programs", payload, { headers });
-  return res.data;
-}
-
-export async function updateProgram(id, payload) {
-  const headers = await getAdminHeaders();
-  const res = await api.put(`/admin/academic/programs/${id}`, payload, { headers });
-  return res.data;
-}
-
-export async function deleteProgram(id) {
-  const headers = await getAdminHeaders();
-  const res = await api.delete(`/admin/academic/programs/${id}`, { headers });
-  return res.data;
-}
 
 // -----------------------------------------------------------------------------
 // 3. REGULATIONS

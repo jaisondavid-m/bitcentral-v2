@@ -391,20 +391,6 @@ func createAcademicTables() {
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 		) ENGINE=InnoDB;`,
 
-		`CREATE TABLE IF NOT EXISTS academic_programs (
-			id INT AUTO_INCREMENT PRIMARY KEY,
-			department_id INT NOT NULL,
-			name VARCHAR(255) NOT NULL,
-			code VARCHAR(50) NOT NULL UNIQUE,
-			degree_type VARCHAR(50) NOT NULL DEFAULT 'B.E.',
-			duration_years INT NOT NULL DEFAULT 4,
-			status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
-			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-			INDEX idx_prog_dept (department_id),
-			CONSTRAINT fk_prog_dept FOREIGN KEY (department_id) REFERENCES academic_departments(id) ON DELETE CASCADE
-		) ENGINE=InnoDB;`,
-
 		`CREATE TABLE IF NOT EXISTS academic_regulations (
 			id INT AUTO_INCREMENT PRIMARY KEY,
 			name VARCHAR(255) NOT NULL,
@@ -417,7 +403,7 @@ func createAcademicTables() {
 
 		`CREATE TABLE IF NOT EXISTS academic_batches (
 			id INT AUTO_INCREMENT PRIMARY KEY,
-			program_id INT NOT NULL,
+			department_id INT NOT NULL,
 			regulation_id INT NOT NULL,
 			start_year INT NOT NULL,
 			end_year INT NOT NULL,
@@ -425,9 +411,9 @@ func createAcademicTables() {
 			status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-			INDEX idx_batch_prog (program_id),
+			INDEX idx_batch_dept (department_id),
 			INDEX idx_batch_reg (regulation_id),
-			CONSTRAINT fk_batch_prog FOREIGN KEY (program_id) REFERENCES academic_programs(id) ON DELETE CASCADE,
+			CONSTRAINT fk_batch_dept FOREIGN KEY (department_id) REFERENCES academic_departments(id) ON DELETE CASCADE,
 			CONSTRAINT fk_batch_reg FOREIGN KEY (regulation_id) REFERENCES academic_regulations(id) ON DELETE CASCADE
 		) ENGINE=InnoDB;`,
 
@@ -457,7 +443,6 @@ func createAcademicTables() {
 		`CREATE TABLE IF NOT EXISTS academic_curriculum (
 			id INT AUTO_INCREMENT PRIMARY KEY,
 			department_id INT NOT NULL,
-			program_id INT NOT NULL,
 			regulation_id INT NOT NULL,
 			semester_id INT NOT NULL,
 			course_id INT NOT NULL,
@@ -466,14 +451,12 @@ func createAcademicTables() {
 			status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-			UNIQUE KEY unique_curr (program_id, regulation_id, semester_id, course_id),
+			UNIQUE KEY unique_curr (department_id, regulation_id, semester_id, course_id),
 			INDEX idx_curr_dept (department_id),
-			INDEX idx_curr_prog (program_id),
 			INDEX idx_curr_reg (regulation_id),
 			INDEX idx_curr_sem (semester_id),
 			INDEX idx_curr_course (course_id),
 			CONSTRAINT fk_curr_dept FOREIGN KEY (department_id) REFERENCES academic_departments(id) ON DELETE CASCADE,
-			CONSTRAINT fk_curr_prog FOREIGN KEY (program_id) REFERENCES academic_programs(id) ON DELETE CASCADE,
 			CONSTRAINT fk_curr_reg FOREIGN KEY (regulation_id) REFERENCES academic_regulations(id) ON DELETE CASCADE,
 			CONSTRAINT fk_curr_sem FOREIGN KEY (semester_id) REFERENCES academic_semesters(id) ON DELETE CASCADE,
 			CONSTRAINT fk_curr_course FOREIGN KEY (course_id) REFERENCES academic_courses(id) ON DELETE CASCADE
@@ -500,7 +483,7 @@ func createAcademicTables() {
 			name VARCHAR(255) NOT NULL,
 			exam_type VARCHAR(50) NOT NULL,
 			academic_year VARCHAR(50) NOT NULL,
-			program_id INT NOT NULL,
+			department_id INT NOT NULL,
 			regulation_id INT NOT NULL,
 			semester_id INT NOT NULL,
 			start_date DATE,
@@ -509,10 +492,10 @@ func createAcademicTables() {
 			status ENUM('scheduled', 'ongoing', 'completed', 'cancelled') NOT NULL DEFAULT 'scheduled',
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-			INDEX idx_exam_prog (program_id),
+			INDEX idx_exam_dept (department_id),
 			INDEX idx_exam_reg (regulation_id),
 			INDEX idx_exam_sem (semester_id),
-			CONSTRAINT fk_exam_prog FOREIGN KEY (program_id) REFERENCES academic_programs(id) ON DELETE CASCADE,
+			CONSTRAINT fk_exam_dept FOREIGN KEY (department_id) REFERENCES academic_departments(id) ON DELETE CASCADE,
 			CONSTRAINT fk_exam_reg FOREIGN KEY (regulation_id) REFERENCES academic_regulations(id) ON DELETE CASCADE,
 			CONSTRAINT fk_exam_sem FOREIGN KEY (semester_id) REFERENCES academic_semesters(id) ON DELETE CASCADE
 		) ENGINE=InnoDB;`,

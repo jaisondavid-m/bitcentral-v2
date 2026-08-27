@@ -118,7 +118,6 @@ func SetupRouter(
 		// Public / Student Read-only Academic API
 		api.GET("/academic/options", academicHandler.GetAcademicOptions)
 		api.GET("/academic/departments", academicHandler.ListDepartments)
-		api.GET("/academic/programs", academicHandler.ListPrograms)
 		api.GET("/academic/regulations", academicHandler.ListRegulations)
 		api.GET("/academic/batches", academicHandler.ListBatches)
 		api.GET("/academic/semesters", academicHandler.ListSemesters)
@@ -183,11 +182,6 @@ func SetupRouter(
 		admin.POST("/academic/departments", academicHandler.CreateDepartment)
 		admin.PUT("/academic/departments/:id", academicHandler.UpdateDepartment)
 		admin.DELETE("/academic/departments/:id", academicHandler.DeleteDepartment)
-
-		admin.GET("/academic/programs", academicHandler.ListPrograms)
-		admin.POST("/academic/programs", academicHandler.CreateProgram)
-		admin.PUT("/academic/programs/:id", academicHandler.UpdateProgram)
-		admin.DELETE("/academic/programs/:id", academicHandler.DeleteProgram)
 
 		admin.GET("/academic/regulations", academicHandler.ListRegulations)
 		admin.POST("/academic/regulations", academicHandler.CreateRegulation)

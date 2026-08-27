@@ -12,20 +12,6 @@ type Department struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-type Program struct {
-	ID             int       `json:"id"`
-	DepartmentID   int       `json:"department_id"`
-	DepartmentName string    `json:"department_name,omitempty"`
-	DepartmentCode string    `json:"department_code,omitempty"`
-	Name           string    `json:"name"`
-	Code           string    `json:"code"`
-	DegreeType     string    `json:"degree_type"`    // B.E., B.Tech, M.E., M.Tech, etc.
-	DurationYears  int       `json:"duration_years"` // Default 4
-	Status         string    `json:"status"`         // active, inactive
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
-}
-
 type Regulation struct {
 	ID          int       `json:"id"`
 	Name        string    `json:"name"`
@@ -38,8 +24,8 @@ type Regulation struct {
 
 type Batch struct {
 	ID             int       `json:"id"`
-	ProgramID      int       `json:"program_id"`
-	ProgramName    string    `json:"program_name,omitempty"`
+	DepartmentID   int       `json:"department_id"`
+	DepartmentName string    `json:"department_name,omitempty"`
 	RegulationID   int       `json:"regulation_id"`
 	RegulationName string    `json:"regulation_name,omitempty"`
 	StartYear      int       `json:"start_year"`
@@ -77,8 +63,6 @@ type Curriculum struct {
 	ID             int       `json:"id"`
 	DepartmentID   int       `json:"department_id"`
 	DepartmentName string    `json:"department_name,omitempty"`
-	ProgramID      int       `json:"program_id"`
-	ProgramName    string    `json:"program_name,omitempty"`
 	RegulationID   int       `json:"regulation_id"`
 	RegulationName string    `json:"regulation_name,omitempty"`
 	SemesterID     int       `json:"semester_id"`
@@ -117,8 +101,8 @@ type Exam struct {
 	Name           string    `json:"name"`
 	ExamType       string    `json:"exam_type"` // Internal Assessment, Model Examination, End Semester Examination, Practical Examination, Other
 	AcademicYear   string    `json:"academic_year"`
-	ProgramID      int       `json:"program_id"`
-	ProgramName    string    `json:"program_name,omitempty"`
+	DepartmentID   int       `json:"department_id"`
+	DepartmentName string    `json:"department_name,omitempty"`
 	RegulationID   int       `json:"regulation_id"`
 	RegulationName string    `json:"regulation_name,omitempty"`
 	SemesterID     int       `json:"semester_id"`
