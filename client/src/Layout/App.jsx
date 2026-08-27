@@ -153,7 +153,14 @@ function App() {
           />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<Terms />} />
-          <Route path="/" element={<LandingPage />} />
+          <Route
+            path="/"
+            element={
+              <AuthScope>
+                <LandingPage />
+              </AuthScope>
+            }
+          />
           <Route path="/about" element={<About />} />
           <Route path="/developer" element={<Developer />} />
           <Route path="/features" element={<Features />} />
