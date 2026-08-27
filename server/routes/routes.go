@@ -122,11 +122,6 @@ func SetupRouter(
 		api.GET("/academic/batches", academicHandler.ListBatches)
 		api.GET("/academic/semesters", academicHandler.ListSemesters)
 		api.GET("/academic/courses", academicHandler.ListCourses)
-		api.GET("/academic/curriculum", academicHandler.ListCurriculum)
-		api.GET("/academic/materials", academicHandler.ListMaterials)
-		api.GET("/academic/exams", academicHandler.ListExams)
-		api.GET("/academic/exam-schedules", academicHandler.ListExamSchedules)
-		api.GET("/academic/question-papers", academicHandler.ListQuestionPapers)
 	}
 
 	// Serve uploaded files
@@ -181,6 +176,7 @@ func SetupRouter(
 		admin.GET("/academic/departments", academicHandler.ListDepartments)
 		admin.POST("/academic/departments", academicHandler.CreateDepartment)
 		admin.PUT("/academic/departments/:id", academicHandler.UpdateDepartment)
+		admin.PUT("/academic/departments/:id/current-semester", academicHandler.SetDepartmentCurrentSemester)
 		admin.DELETE("/academic/departments/:id", academicHandler.DeleteDepartment)
 
 		admin.GET("/academic/regulations", academicHandler.ListRegulations)
@@ -200,33 +196,9 @@ func SetupRouter(
 
 		admin.GET("/academic/courses", academicHandler.ListCourses)
 		admin.POST("/academic/courses", academicHandler.CreateCourse)
+		admin.POST("/academic/courses/bulk-upload", academicHandler.BulkUploadCourses)
 		admin.PUT("/academic/courses/:id", academicHandler.UpdateCourse)
 		admin.DELETE("/academic/courses/:id", academicHandler.DeleteCourse)
-
-		admin.GET("/academic/curriculum", academicHandler.ListCurriculum)
-		admin.POST("/academic/curriculum", academicHandler.AssignCurriculum)
-		admin.PUT("/academic/curriculum/:id", academicHandler.UpdateCurriculum)
-		admin.DELETE("/academic/curriculum/:id", academicHandler.DeleteCurriculum)
-
-		admin.GET("/academic/materials", academicHandler.ListMaterials)
-		admin.POST("/academic/materials", academicHandler.CreateMaterial)
-		admin.PUT("/academic/materials/:id", academicHandler.UpdateMaterial)
-		admin.DELETE("/academic/materials/:id", academicHandler.DeleteMaterial)
-
-		admin.GET("/academic/exams", academicHandler.ListExams)
-		admin.POST("/academic/exams", academicHandler.CreateExam)
-		admin.PUT("/academic/exams/:id", academicHandler.UpdateExam)
-		admin.DELETE("/academic/exams/:id", academicHandler.DeleteExam)
-
-		admin.GET("/academic/exam-schedules", academicHandler.ListExamSchedules)
-		admin.POST("/academic/exam-schedules", academicHandler.CreateExamSchedule)
-		admin.PUT("/academic/exam-schedules/:id", academicHandler.UpdateExamSchedule)
-		admin.DELETE("/academic/exam-schedules/:id", academicHandler.DeleteExamSchedule)
-
-		admin.GET("/academic/question-papers", academicHandler.ListQuestionPapers)
-		admin.POST("/academic/question-papers", academicHandler.CreateQuestionPaper)
-		admin.PUT("/academic/question-papers/:id", academicHandler.UpdateQuestionPaper)
-		admin.DELETE("/academic/question-papers/:id", academicHandler.DeleteQuestionPaper)
 	}
 
 	// Super-admin routes: manage admins and allowed external emails/domains

@@ -386,9 +386,12 @@ func createAcademicTables() {
 			name VARCHAR(255) NOT NULL,
 			code VARCHAR(50) NOT NULL UNIQUE,
 			description TEXT,
+			current_semester_id INT NULL,
 			status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			INDEX idx_dept_curr_sem (current_semester_id),
+			CONSTRAINT fk_dept_curr_sem FOREIGN KEY (current_semester_id) REFERENCES academic_semesters(id) ON DELETE SET NULL
 		) ENGINE=InnoDB;`,
 
 		`CREATE TABLE IF NOT EXISTS academic_regulations (
@@ -429,15 +432,25 @@ func createAcademicTables() {
 
 		`CREATE TABLE IF NOT EXISTS academic_courses (
 			id INT AUTO_INCREMENT PRIMARY KEY,
-			code VARCHAR(50) NOT NULL UNIQUE,
+			department_id INT NOT NULL,
+			regulation_id INT NOT NULL,
+			semester_id INT NOT NULL,
+			code VARCHAR(50) NOT NULL,
 			name VARCHAR(255) NOT NULL,
 			short_name VARCHAR(100),
 			credits INT NOT NULL DEFAULT 3,
 			course_type VARCHAR(50) NOT NULL DEFAULT 'Theory',
+			is_elective TINYINT(1) NOT NULL DEFAULT 0,
 			description TEXT,
 			status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			INDEX idx_course_dept (department_id),
+			INDEX idx_course_reg (regulation_id),
+			INDEX idx_course_sem (semester_id),
+			CONSTRAINT fk_course_dept FOREIGN KEY (department_id) REFERENCES academic_departments(id) ON DELETE CASCADE,
+			CONSTRAINT fk_course_reg FOREIGN KEY (regulation_id) REFERENCES academic_regulations(id) ON DELETE CASCADE,
+			CONSTRAINT fk_course_sem FOREIGN KEY (semester_id) REFERENCES academic_semesters(id) ON DELETE CASCADE
 		) ENGINE=InnoDB;`,
 
 		`CREATE TABLE IF NOT EXISTS academic_curriculum (
@@ -562,9 +575,19 @@ func createAcademicTables() {
 	}
 
 	// Safe column additions & schema updates for existing tables
+	DB.Exec(`ALTER TABLE academic_departments ADD COLUMN current_semester_id INT NULL AFTER description`)
 	DB.Exec(`ALTER TABLE academic_batches ADD COLUMN department_id INT NOT NULL DEFAULT 0 AFTER id`)
+	DB.Exec(`ALTER TABLE academic_courses ADD COLUMN department_id INT NOT NULL DEFAULT 0 AFTER id`)
+	DB.Exec(`ALTER TABLE academic_courses ADD COLUMN regulation_id INT NOT NULL DEFAULT 0 AFTER department_id`)
+	DB.Exec(`ALTER TABLE academic_courses ADD COLUMN semester_id INT NOT NULL DEFAULT 0 AFTER regulation_id`)
+	DB.Exec(`ALTER TABLE academic_courses ADD COLUMN is_elective TINYINT(1) NOT NULL DEFAULT 0 AFTER course_type`)
 	DB.Exec(`ALTER TABLE academic_curriculum ADD COLUMN department_id INT NOT NULL DEFAULT 0 AFTER id`)
 	DB.Exec(`ALTER TABLE academic_exams ADD COLUMN department_id INT NOT NULL DEFAULT 0 AFTER academic_year`)
+
+	// Drop single-column UNIQUE index on code if present, so courses can be mapped per dept/reg/sem
+	DB.Exec(`ALTER TABLE academic_courses DROP INDEX code`)
+	DB.Exec(`ALTER TABLE academic_courses DROP INDEX code_2`)
+	DB.Exec(`ALTER TABLE academic_courses DROP INDEX uq_course_code`)
 
 	// Clean up legacy program_id column if present from prior initialization
 	DB.Exec(`ALTER TABLE academic_batches DROP FOREIGN KEY fk_batch_prog`)

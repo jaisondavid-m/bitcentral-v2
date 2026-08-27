@@ -46,16 +46,20 @@ export async function updateDepartment(id, payload) {
   return res.data;
 }
 
+export async function setDepartmentCurrentSemester(id, currentSemesterId) {
+  const headers = await getAdminHeaders();
+  const res = await api.put(`/admin/academic/departments/${id}/current-semester`, { current_semester_id: currentSemesterId }, { headers });
+  return res.data;
+}
+
 export async function deleteDepartment(id) {
   const headers = await getAdminHeaders();
   const res = await api.delete(`/admin/academic/departments/${id}`, { headers });
   return res.data;
 }
 
-
-
 // -----------------------------------------------------------------------------
-// 3. REGULATIONS
+// 2. REGULATIONS
 // -----------------------------------------------------------------------------
 
 export async function listRegulations(params = {}) {
@@ -84,7 +88,7 @@ export async function deleteRegulation(id) {
 }
 
 // -----------------------------------------------------------------------------
-// 4. BATCHES
+// 3. BATCHES
 // -----------------------------------------------------------------------------
 
 export async function listBatches(params = {}) {
@@ -113,7 +117,7 @@ export async function deleteBatch(id) {
 }
 
 // -----------------------------------------------------------------------------
-// 5. SEMESTERS
+// 4. SEMESTERS
 // -----------------------------------------------------------------------------
 
 export async function listSemesters(params = {}) {
@@ -142,7 +146,7 @@ export async function deleteSemester(id) {
 }
 
 // -----------------------------------------------------------------------------
-// 6. COURSES
+// 5. COURSES (MAPPED TO DEPARTMENT, REGULATION, AND SEMESTER)
 // -----------------------------------------------------------------------------
 
 export async function listCourses(params = {}) {
@@ -170,147 +174,13 @@ export async function deleteCourse(id) {
   return res.data;
 }
 
-// -----------------------------------------------------------------------------
-// 7. CURRICULUM
-// -----------------------------------------------------------------------------
-
-export async function listCurriculum(params = {}) {
+export async function bulkUploadCourses(formData) {
   const headers = await getAdminHeaders();
-  const query = new URLSearchParams(params).toString();
-  const res = await api.get(`/admin/academic/curriculum${query ? `?${query}` : ""}`, { headers });
-  return res.data;
-}
-
-export async function assignCurriculum(payload) {
-  const headers = await getAdminHeaders();
-  const res = await api.post("/admin/academic/curriculum", payload, { headers });
-  return res.data;
-}
-
-export async function updateCurriculum(id, payload) {
-  const headers = await getAdminHeaders();
-  const res = await api.put(`/admin/academic/curriculum/${id}`, payload, { headers });
-  return res.data;
-}
-
-export async function deleteCurriculum(id) {
-  const headers = await getAdminHeaders();
-  const res = await api.delete(`/admin/academic/curriculum/${id}`, { headers });
-  return res.data;
-}
-
-// -----------------------------------------------------------------------------
-// 8. MATERIALS
-// -----------------------------------------------------------------------------
-
-export async function listMaterials(params = {}) {
-  const headers = await getAdminHeaders();
-  const query = new URLSearchParams(params).toString();
-  const res = await api.get(`/admin/academic/materials${query ? `?${query}` : ""}`, { headers });
-  return res.data;
-}
-
-export async function createMaterial(payload) {
-  const headers = await getAdminHeaders();
-  const res = await api.post("/admin/academic/materials", payload, { headers });
-  return res.data;
-}
-
-export async function updateMaterial(id, payload) {
-  const headers = await getAdminHeaders();
-  const res = await api.put(`/admin/academic/materials/${id}`, payload, { headers });
-  return res.data;
-}
-
-export async function deleteMaterial(id) {
-  const headers = await getAdminHeaders();
-  const res = await api.delete(`/admin/academic/materials/${id}`, { headers });
-  return res.data;
-}
-
-// -----------------------------------------------------------------------------
-// 9. EXAMS
-// -----------------------------------------------------------------------------
-
-export async function listExams(params = {}) {
-  const headers = await getAdminHeaders();
-  const query = new URLSearchParams(params).toString();
-  const res = await api.get(`/admin/academic/exams${query ? `?${query}` : ""}`, { headers });
-  return res.data;
-}
-
-export async function createExam(payload) {
-  const headers = await getAdminHeaders();
-  const res = await api.post("/admin/academic/exams", payload, { headers });
-  return res.data;
-}
-
-export async function updateExam(id, payload) {
-  const headers = await getAdminHeaders();
-  const res = await api.put(`/admin/academic/exams/${id}`, payload, { headers });
-  return res.data;
-}
-
-export async function deleteExam(id) {
-  const headers = await getAdminHeaders();
-  const res = await api.delete(`/admin/academic/exams/${id}`, { headers });
-  return res.data;
-}
-
-// -----------------------------------------------------------------------------
-// 10. EXAM SCHEDULES
-// -----------------------------------------------------------------------------
-
-export async function listExamSchedules(params = {}) {
-  const headers = await getAdminHeaders();
-  const query = new URLSearchParams(params).toString();
-  const res = await api.get(`/admin/academic/exam-schedules${query ? `?${query}` : ""}`, { headers });
-  return res.data;
-}
-
-export async function createExamSchedule(payload) {
-  const headers = await getAdminHeaders();
-  const res = await api.post("/admin/academic/exam-schedules", payload, { headers });
-  return res.data;
-}
-
-export async function updateExamSchedule(id, payload) {
-  const headers = await getAdminHeaders();
-  const res = await api.put(`/admin/academic/exam-schedules/${id}`, payload, { headers });
-  return res.data;
-}
-
-export async function deleteExamSchedule(id) {
-  const headers = await getAdminHeaders();
-  const res = await api.delete(`/admin/academic/exam-schedules/${id}`, { headers });
-  return res.data;
-}
-
-// -----------------------------------------------------------------------------
-// 11. QUESTION PAPERS
-// -----------------------------------------------------------------------------
-
-export async function listQuestionPapers(params = {}) {
-  const headers = await getAdminHeaders();
-  const query = new URLSearchParams(params).toString();
-  const res = await api.get(`/admin/academic/question-papers${query ? `?${query}` : ""}`, { headers });
-  return res.data;
-}
-
-export async function createQuestionPaper(payload) {
-  const headers = await getAdminHeaders();
-  const res = await api.post("/admin/academic/question-papers", payload, { headers });
-  return res.data;
-}
-
-export async function updateQuestionPaper(id, payload) {
-  const headers = await getAdminHeaders();
-  const res = await api.put(`/admin/academic/question-papers/${id}`, payload, { headers });
-  return res.data;
-}
-
-export async function deleteQuestionPaper(id) {
-  const headers = await getAdminHeaders();
-  const res = await api.delete(`/admin/academic/question-papers/${id}`, { headers });
+  const res = await api.post("/admin/academic/courses/bulk-upload", formData, {
+    headers: {
+      ...headers,
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return res.data;
 }

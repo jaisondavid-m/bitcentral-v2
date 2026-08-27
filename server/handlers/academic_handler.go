@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"encoding/csv"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -31,13 +32,18 @@ func (h *AcademicHandler) GetAcademicOptions(c *gin.Context) {
 	semIDStr := c.Query("semester_id")
 
 	// 1. Departments
-	deptRows, err := h.DB.Query("SELECT id, name, code FROM academic_departments WHERE status = 'active' ORDER BY name ASC")
+	deptRows, err := h.DB.Query(`
+		SELECT d.id, d.name, d.code, d.current_semester_id, COALESCE(s.semester_name, ''), COALESCE(s.semester_number, 0)
+		FROM academic_departments d
+		LEFT JOIN academic_semesters s ON d.current_semester_id = s.id
+		WHERE d.status = 'active' ORDER BY d.name ASC
+	`)
 	var departments []models.Department
 	if err == nil {
 		defer deptRows.Close()
 		for deptRows.Next() {
 			var d models.Department
-			deptRows.Scan(&d.ID, &d.Name, &d.Code)
+			deptRows.Scan(&d.ID, &d.Name, &d.Code, &d.CurrentSemesterID, &d.CurrentSemesterName, &d.CurrentSemesterNumber)
 			departments = append(departments, d)
 		}
 	}
@@ -75,40 +81,47 @@ func (h *AcademicHandler) GetAcademicOptions(c *gin.Context) {
 		semesters = []models.Semester{}
 	}
 
-	// 4. Courses (master list or narrowed by curriculum if department & regulation & semester provided)
-	var courses []models.Course
-	if deptIDStr != "" && regIDStr != "" && semIDStr != "" {
-		dID, _ := strconv.Atoi(deptIDStr)
-		rID, _ := strconv.Atoi(regIDStr)
-		sID, _ := strconv.Atoi(semIDStr)
+	// 4. Courses (filtered if params passed)
+	query := `
+		SELECT c.id, c.department_id, COALESCE(d.name, ''), c.regulation_id, COALESCE(r.name, ''),
+		       c.semester_id, COALESCE(s.semester_name, ''), c.code, c.name, COALESCE(c.short_name, ''),
+		       c.is_elective
+		FROM academic_courses c
+		LEFT JOIN academic_departments d ON c.department_id = d.id
+		LEFT JOIN academic_regulations r ON c.regulation_id = r.id
+		LEFT JOIN academic_semesters s ON c.semester_id = s.id
+		WHERE c.status = 'active'
+	`
+	var where []string
+	var args []interface{}
 
-		cRows, err := h.DB.Query(`
-			SELECT c.id, c.code, c.name, COALESCE(c.short_name,''), c.credits, c.course_type
-			FROM academic_curriculum cu
-			JOIN academic_courses c ON cu.course_id = c.id
-			WHERE cu.department_id = ? AND cu.regulation_id = ? AND cu.semester_id = ? AND c.status = 'active'
-			ORDER BY cu.course_order ASC, c.code ASC
-		`, dID, rID, sID)
-		if err == nil {
-			defer cRows.Close()
-			for cRows.Next() {
-				var cr models.Course
-				cRows.Scan(&cr.ID, &cr.Code, &cr.Name, &cr.ShortName, &cr.Credits, &cr.CourseType)
-				courses = append(courses, cr)
-			}
-		}
+	if deptIDStr != "" {
+		where = append(where, "c.department_id = ?")
+		args = append(args, deptIDStr)
+	}
+	if regIDStr != "" {
+		where = append(where, "c.regulation_id = ?")
+		args = append(args, regIDStr)
+	}
+	if semIDStr != "" {
+		where = append(where, "c.semester_id = ?")
+		args = append(args, semIDStr)
 	}
 
-	// Fallback to all active master courses if filtered set is empty or no filter was passed
-	if len(courses) == 0 {
-		cRows, err := h.DB.Query("SELECT id, code, name, COALESCE(short_name,''), credits, course_type FROM academic_courses WHERE status = 'active' ORDER BY code ASC")
-		if err == nil {
-			defer cRows.Close()
-			for cRows.Next() {
-				var cr models.Course
-				cRows.Scan(&cr.ID, &cr.Code, &cr.Name, &cr.ShortName, &cr.Credits, &cr.CourseType)
-				courses = append(courses, cr)
-			}
+	if len(where) > 0 {
+		query += " AND " + strings.Join(where, " AND ")
+	}
+	query += " ORDER BY c.code ASC"
+
+	cRows, err := h.DB.Query(query, args...)
+	var courses []models.Course
+	if err == nil {
+		defer cRows.Close()
+		for cRows.Next() {
+			var cr models.Course
+			cRows.Scan(&cr.ID, &cr.DepartmentID, &cr.DepartmentName, &cr.RegulationID, &cr.RegulationName,
+				&cr.SemesterID, &cr.SemesterName, &cr.Code, &cr.Name, &cr.ShortName, &cr.IsElective)
+			courses = append(courses, cr)
 		}
 	}
 	if courses == nil {
@@ -130,13 +143,17 @@ func (h *AcademicHandler) GetAcademicOptions(c *gin.Context) {
 
 func (h *AcademicHandler) ListDepartments(c *gin.Context) {
 	status := c.Query("status")
-	query := "SELECT id, name, code, COALESCE(description, ''), status, created_at, updated_at FROM academic_departments"
+	query := `
+		SELECT d.id, d.name, d.code, COALESCE(d.description, ''), d.current_semester_id, COALESCE(s.semester_name, ''), COALESCE(s.semester_number, 0), d.status, d.created_at, d.updated_at
+		FROM academic_departments d
+		LEFT JOIN academic_semesters s ON d.current_semester_id = s.id
+	`
 	var args []interface{}
 	if status != "" {
-		query += " WHERE status = ?"
+		query += " WHERE d.status = ?"
 		args = append(args, status)
 	}
-	query += " ORDER BY name ASC"
+	query += " ORDER BY d.name ASC"
 
 	rows, err := h.DB.Query(query, args...)
 	if err != nil {
@@ -148,7 +165,7 @@ func (h *AcademicHandler) ListDepartments(c *gin.Context) {
 	var result []models.Department
 	for rows.Next() {
 		var d models.Department
-		if err := rows.Scan(&d.ID, &d.Name, &d.Code, &d.Description, &d.Status, &d.CreatedAt, &d.UpdatedAt); err == nil {
+		if err := rows.Scan(&d.ID, &d.Name, &d.Code, &d.Description, &d.CurrentSemesterID, &d.CurrentSemesterName, &d.CurrentSemesterNumber, &d.Status, &d.CreatedAt, &d.UpdatedAt); err == nil {
 			result = append(result, d)
 		}
 	}
@@ -174,8 +191,8 @@ func (h *AcademicHandler) CreateDepartment(c *gin.Context) {
 		payload.Status = "active"
 	}
 
-	res, err := h.DB.Exec("INSERT INTO academic_departments (name, code, description, status) VALUES (?, ?, ?, ?)",
-		payload.Name, payload.Code, payload.Description, payload.Status)
+	res, err := h.DB.Exec("INSERT INTO academic_departments (name, code, description, current_semester_id, status) VALUES (?, ?, ?, ?, ?)",
+		payload.Name, payload.Code, payload.Description, payload.CurrentSemesterID, payload.Status)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
@@ -203,14 +220,36 @@ func (h *AcademicHandler) UpdateDepartment(c *gin.Context) {
 		return
 	}
 
-	_, err = h.DB.Exec("UPDATE academic_departments SET name = ?, code = ?, description = ?, status = ? WHERE id = ?",
-		payload.Name, payload.Code, payload.Description, payload.Status, id)
+	_, err = h.DB.Exec("UPDATE academic_departments SET name = ?, code = ?, description = ?, current_semester_id = ?, status = ? WHERE id = ?",
+		payload.Name, payload.Code, payload.Description, payload.CurrentSemesterID, payload.Status, id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
 	}
 	payload.ID = id
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Department updated successfully", "data": payload})
+}
+
+func (h *AcademicHandler) SetDepartmentCurrentSemester(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid Department ID"})
+		return
+	}
+	var body struct {
+		CurrentSemesterID *int `json:"current_semester_id"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+
+	_, err = h.DB.Exec("UPDATE academic_departments SET current_semester_id = ? WHERE id = ?", body.CurrentSemesterID, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Department current semester updated successfully"})
 }
 
 func (h *AcademicHandler) DeleteDepartment(c *gin.Context) {
@@ -565,35 +604,54 @@ func (h *AcademicHandler) DeleteSemester(c *gin.Context) {
 }
 
 // -----------------------------------------------------------------------------
-// 5. COURSES (MASTER LIST)
+// 5. COURSES (MAPPED DIRECTLY TO DEPARTMENT, REGULATION, AND SEMESTER)
 // -----------------------------------------------------------------------------
 
 func (h *AcademicHandler) ListCourses(c *gin.Context) {
+	deptID := c.Query("department_id")
+	regID := c.Query("regulation_id")
+	semID := c.Query("semester_id")
 	search := strings.TrimSpace(c.Query("search"))
-	courseType := c.Query("course_type")
 	status := c.Query("status")
 
-	query := "SELECT id, code, name, COALESCE(short_name, ''), credits, course_type, COALESCE(description, ''), status, created_at, updated_at FROM academic_courses"
+	query := `
+		SELECT c.id, c.department_id, COALESCE(d.name, ''), c.regulation_id, COALESCE(r.name, ''),
+		       c.semester_id, COALESCE(s.semester_name, ''), COALESCE(s.semester_number, 0),
+		       c.code, c.name, COALESCE(c.short_name, ''), c.is_elective,
+		       COALESCE(c.description, ''), c.status, c.created_at, c.updated_at
+		FROM academic_courses c
+		LEFT JOIN academic_departments d ON c.department_id = d.id
+		LEFT JOIN academic_regulations r ON c.regulation_id = r.id
+		LEFT JOIN academic_semesters s ON c.semester_id = s.id
+	`
 	var where []string
 	var args []interface{}
 
+	if deptID != "" {
+		where = append(where, "c.department_id = ?")
+		args = append(args, deptID)
+	}
+	if regID != "" {
+		where = append(where, "c.regulation_id = ?")
+		args = append(args, regID)
+	}
+	if semID != "" {
+		where = append(where, "c.semester_id = ?")
+		args = append(args, semID)
+	}
 	if search != "" {
-		where = append(where, "(code LIKE ? OR name LIKE ? OR short_name LIKE ?)")
+		where = append(where, "(c.code LIKE ? OR c.name LIKE ? OR c.short_name LIKE ?)")
 		searchTerm := "%" + search + "%"
 		args = append(args, searchTerm, searchTerm, searchTerm)
 	}
-	if courseType != "" {
-		where = append(where, "course_type = ?")
-		args = append(args, courseType)
-	}
 	if status != "" {
-		where = append(where, "status = ?")
+		where = append(where, "c.status = ?")
 		args = append(args, status)
 	}
 	if len(where) > 0 {
 		query += " WHERE " + strings.Join(where, " AND ")
 	}
-	query += " ORDER BY code ASC"
+	query += " ORDER BY s.semester_number ASC, c.code ASC"
 
 	rows, err := h.DB.Query(query, args...)
 	if err != nil {
@@ -605,7 +663,9 @@ func (h *AcademicHandler) ListCourses(c *gin.Context) {
 	var result []models.Course
 	for rows.Next() {
 		var cr models.Course
-		if err := rows.Scan(&cr.ID, &cr.Code, &cr.Name, &cr.ShortName, &cr.Credits, &cr.CourseType, &cr.Description, &cr.Status, &cr.CreatedAt, &cr.UpdatedAt); err == nil {
+		if err := rows.Scan(&cr.ID, &cr.DepartmentID, &cr.DepartmentName, &cr.RegulationID, &cr.RegulationName,
+			&cr.SemesterID, &cr.SemesterName, &cr.SemesterNumber,
+			&cr.Code, &cr.Name, &cr.ShortName, &cr.IsElective, &cr.Description, &cr.Status, &cr.CreatedAt, &cr.UpdatedAt); err == nil {
 			result = append(result, cr)
 		}
 	}
@@ -623,26 +683,26 @@ func (h *AcademicHandler) CreateCourse(c *gin.Context) {
 	}
 	payload.Code = strings.TrimSpace(strings.ToUpper(payload.Code))
 	payload.Name = strings.TrimSpace(payload.Name)
-	if payload.Code == "" || payload.Name == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Course code and course name are required"})
+	if payload.Code == "" || payload.Name == "" || payload.DepartmentID <= 0 || payload.RegulationID <= 0 || payload.SemesterID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Department, Regulation, Semester, Course Code, and Course Name are required"})
 		return
-	}
-	if payload.CourseType == "" {
-		payload.CourseType = "Theory"
 	}
 	if payload.Status == "" {
 		payload.Status = "active"
 	}
 
-	res, err := h.DB.Exec("INSERT INTO academic_courses (code, name, short_name, credits, course_type, description, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
-		payload.Code, payload.Name, payload.ShortName, payload.Credits, payload.CourseType, payload.Description, payload.Status)
+	res, err := h.DB.Exec(`
+		INSERT INTO academic_courses (department_id, regulation_id, semester_id, code, name, short_name, is_elective, description, status)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`, payload.DepartmentID, payload.RegulationID, payload.SemesterID, payload.Code, payload.Name, payload.ShortName, payload.IsElective, payload.Description, payload.Status)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
 	}
 	id, _ := res.LastInsertId()
 	payload.ID = int(id)
-	c.JSON(http.StatusCreated, gin.H{"success": true, "message": "Course created successfully", "data": payload})
+	c.JSON(http.StatusCreated, gin.H{"success": true, "message": "Course mapped successfully", "data": payload})
 }
 
 func (h *AcademicHandler) UpdateCourse(c *gin.Context) {
@@ -658,13 +718,17 @@ func (h *AcademicHandler) UpdateCourse(c *gin.Context) {
 	}
 	payload.Code = strings.TrimSpace(strings.ToUpper(payload.Code))
 	payload.Name = strings.TrimSpace(payload.Name)
-	if payload.Code == "" || payload.Name == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Course code and course name are required"})
+	if payload.Code == "" || payload.Name == "" || payload.DepartmentID <= 0 || payload.RegulationID <= 0 || payload.SemesterID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Department, Regulation, Semester, Course Code, and Course Name are required"})
 		return
 	}
 
-	_, err = h.DB.Exec("UPDATE academic_courses SET code = ?, name = ?, short_name = ?, credits = ?, course_type = ?, description = ?, status = ? WHERE id = ?",
-		payload.Code, payload.Name, payload.ShortName, payload.Credits, payload.CourseType, payload.Description, payload.Status, id)
+	_, err = h.DB.Exec(`
+		UPDATE academic_courses
+		SET department_id = ?, regulation_id = ?, semester_id = ?, code = ?, name = ?, short_name = ?, is_elective = ?, description = ?, status = ?
+		WHERE id = ?
+	`, payload.DepartmentID, payload.RegulationID, payload.SemesterID, payload.Code, payload.Name, payload.ShortName, payload.IsElective, payload.Description, payload.Status, id)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
@@ -687,726 +751,177 @@ func (h *AcademicHandler) DeleteCourse(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Course deleted successfully"})
 }
 
-// -----------------------------------------------------------------------------
-// 6. CURRICULUM (COURSE ASSIGNMENT)
-// -----------------------------------------------------------------------------
-
-func (h *AcademicHandler) ListCurriculum(c *gin.Context) {
-	deptID := c.Query("department_id")
-	regID := c.Query("regulation_id")
-	semID := c.Query("semester_id")
-	status := c.Query("status")
-
-	query := `
-		SELECT cu.id, cu.department_id, d.name, cu.regulation_id, r.name,
-		       cu.semester_id, s.semester_name, s.semester_number, cu.course_id, c.code, c.name, c.credits, c.course_type,
-		       cu.is_elective, cu.course_order, cu.status, cu.created_at, cu.updated_at
-		FROM academic_curriculum cu
-		JOIN academic_departments d ON cu.department_id = d.id
-		JOIN academic_regulations r ON cu.regulation_id = r.id
-		JOIN academic_semesters s ON cu.semester_id = s.id
-		JOIN academic_courses c ON cu.course_id = c.id
-	`
-	var where []string
-	var args []interface{}
-
-	if deptID != "" {
-		where = append(where, "cu.department_id = ?")
-		args = append(args, deptID)
-	}
-	if regID != "" {
-		where = append(where, "cu.regulation_id = ?")
-		args = append(args, regID)
-	}
-	if semID != "" {
-		where = append(where, "cu.semester_id = ?")
-		args = append(args, semID)
-	}
-	if status != "" {
-		where = append(where, "cu.status = ?")
-		args = append(args, status)
-	}
-
-	if len(where) > 0 {
-		query += " WHERE " + strings.Join(where, " AND ")
-	}
-	query += " ORDER BY s.semester_number ASC, cu.course_order ASC, c.code ASC"
-
-	rows, err := h.DB.Query(query, args...)
+func (h *AcademicHandler) BulkUploadCourses(c *gin.Context) {
+	file, err := c.FormFile("file")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "CSV file is required"})
 		return
 	}
-	defer rows.Close()
 
-	var result []models.Curriculum
-	for rows.Next() {
-		var cu models.Curriculum
-		if err := rows.Scan(&cu.ID, &cu.DepartmentID, &cu.DepartmentName, &cu.RegulationID, &cu.RegulationName,
-			&cu.SemesterID, &cu.SemesterName, &cu.SemesterNumber, &cu.CourseID, &cu.CourseCode, &cu.CourseName, &cu.CourseCredits, &cu.CourseType,
-			&cu.IsElective, &cu.CourseOrder, &cu.Status, &cu.CreatedAt, &cu.UpdatedAt); err == nil {
-			result = append(result, cu)
+	f, err := file.Open()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Failed to open uploaded file"})
+		return
+	}
+	defer f.Close()
+
+	reader := csv.NewReader(f)
+	reader.TrimLeadingSpace = true
+
+	rows, err := reader.ReadAll()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Failed to parse CSV file: " + err.Error()})
+		return
+	}
+
+	if len(rows) <= 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "CSV file is empty or only contains header row"})
+		return
+	}
+
+	// 1. Fetch Department Lookup Map (UPPER(code) -> id)
+	deptMap := make(map[string]int)
+	dRows, err := h.DB.Query("SELECT id, UPPER(code) FROM academic_departments")
+	if err == nil {
+		defer dRows.Close()
+		for dRows.Next() {
+			var id int
+			var code string
+			dRows.Scan(&id, &code)
+			deptMap[code] = id
 		}
 	}
-	if result == nil {
-		result = []models.Curriculum{}
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": result})
-}
 
-func (h *AcademicHandler) AssignCurriculum(c *gin.Context) {
-	var payload models.Curriculum
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	if payload.DepartmentID <= 0 || payload.RegulationID <= 0 || payload.SemesterID <= 0 || payload.CourseID <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Department, Regulation, Semester, and Course are required"})
-		return
-	}
-	if payload.Status == "" {
-		payload.Status = "active"
-	}
-
-	res, err := h.DB.Exec(`
-		INSERT INTO academic_curriculum (department_id, regulation_id, semester_id, course_id, is_elective, course_order, status)
-		VALUES (?, ?, ?, ?, ?, ?, ?)
-	`, payload.DepartmentID, payload.RegulationID, payload.SemesterID, payload.CourseID, payload.IsElective, payload.CourseOrder, payload.Status)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	id, _ := res.LastInsertId()
-	payload.ID = int(id)
-	c.JSON(http.StatusCreated, gin.H{"success": true, "message": "Course assigned to curriculum successfully", "data": payload})
-}
-
-func (h *AcademicHandler) UpdateCurriculum(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
-		return
-	}
-	var payload models.Curriculum
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-
-	_, err = h.DB.Exec(`
-		UPDATE academic_curriculum
-		SET department_id = ?, regulation_id = ?, semester_id = ?, course_id = ?, is_elective = ?, course_order = ?, status = ?
-		WHERE id = ?
-	`, payload.DepartmentID, payload.RegulationID, payload.SemesterID, payload.CourseID, payload.IsElective, payload.CourseOrder, payload.Status, id)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	payload.ID = id
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Curriculum assignment updated successfully", "data": payload})
-}
-
-func (h *AcademicHandler) DeleteCurriculum(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
-		return
-	}
-	_, err = h.DB.Exec("DELETE FROM academic_curriculum WHERE id = ?", id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Course removed from curriculum"})
-}
-
-// -----------------------------------------------------------------------------
-// 7. MATERIALS MANAGEMENT
-// -----------------------------------------------------------------------------
-
-func (h *AcademicHandler) ListMaterials(c *gin.Context) {
-	courseID := c.Query("course_id")
-	materialType := c.Query("material_type")
-	unit := c.Query("unit")
-	status := c.Query("status")
-
-	query := `
-		SELECT m.id, m.course_id, c.code, c.name, m.title, COALESCE(m.description, ''), m.material_type, m.file_url, COALESCE(m.unit, ''), m.item_order, m.status, m.created_at, m.updated_at
-		FROM academic_materials m
-		JOIN academic_courses c ON m.course_id = c.id
-	`
-	var where []string
-	var args []interface{}
-
-	if courseID != "" {
-		where = append(where, "m.course_id = ?")
-		args = append(args, courseID)
-	}
-	if materialType != "" {
-		where = append(where, "m.material_type = ?")
-		args = append(args, materialType)
-	}
-	if unit != "" {
-		where = append(where, "m.unit = ?")
-		args = append(args, unit)
-	}
-	if status != "" {
-		where = append(where, "m.status = ?")
-		args = append(args, status)
-	}
-
-	if len(where) > 0 {
-		query += " WHERE " + strings.Join(where, " AND ")
-	}
-	query += " ORDER BY m.item_order ASC, m.created_at DESC"
-
-	rows, err := h.DB.Query(query, args...)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	defer rows.Close()
-
-	var result []models.Material
-	for rows.Next() {
-		var m models.Material
-		if err := rows.Scan(&m.ID, &m.CourseID, &m.CourseCode, &m.CourseName, &m.Title, &m.Description, &m.MaterialType, &m.FileURL, &m.Unit, &m.ItemOrder, &m.Status, &m.CreatedAt, &m.UpdatedAt); err == nil {
-			result = append(result, m)
+	// 2. Fetch Regulation Lookup Map (year -> id)
+	regMap := make(map[int]int)
+	rRows, err := h.DB.Query("SELECT id, year FROM academic_regulations")
+	if err == nil {
+		defer rRows.Close()
+		for rRows.Next() {
+			var id, year int
+			rRows.Scan(&id, &year)
+			regMap[year] = id
 		}
 	}
-	if result == nil {
-		result = []models.Material{}
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": result})
-}
 
-func (h *AcademicHandler) CreateMaterial(c *gin.Context) {
-	var payload models.Material
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	payload.Title = strings.TrimSpace(payload.Title)
-	payload.FileURL = strings.TrimSpace(payload.FileURL)
-	if payload.CourseID <= 0 || payload.Title == "" || payload.FileURL == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Course, title, and file/link URL are required"})
-		return
-	}
-	if payload.MaterialType == "" {
-		payload.MaterialType = "Notes"
-	}
-	if payload.Status == "" {
-		payload.Status = "published"
+	// 3. Fetch Semester Lookup Map (semester_number -> id)
+	semMap := make(map[int]int)
+	sRows, err := h.DB.Query("SELECT id, semester_number FROM academic_semesters")
+	if err == nil {
+		defer sRows.Close()
+		for sRows.Next() {
+			var id, num int
+			sRows.Scan(&id, &num)
+			semMap[num] = id
+		}
 	}
 
-	res, err := h.DB.Exec(`
-		INSERT INTO academic_materials (course_id, title, description, material_type, file_url, unit, item_order, status)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-	`, payload.CourseID, payload.Title, payload.Description, payload.MaterialType, payload.FileURL, payload.Unit, payload.ItemOrder, payload.Status)
+	var successCount int
+	var failedCount int
+	var errorMessages []string
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	id, _ := res.LastInsertId()
-	payload.ID = int(id)
-	c.JSON(http.StatusCreated, gin.H{"success": true, "message": "Material created successfully", "data": payload})
-}
+	// Process data rows (skip header line 0)
+	for idx, row := range rows[1:] {
+		lineNum := idx + 2
+		if len(row) < 5 {
+			failedCount++
+			errorMessages = append(errorMessages, fmt.Sprintf("Line %d: Incomplete columns (expected at least 5)", lineNum))
+			continue
+		}
 
-func (h *AcademicHandler) UpdateMaterial(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
-		return
-	}
-	var payload models.Material
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	payload.Title = strings.TrimSpace(payload.Title)
-	payload.FileURL = strings.TrimSpace(payload.FileURL)
-	if payload.CourseID <= 0 || payload.Title == "" || payload.FileURL == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Course, title, and file/link URL are required"})
-		return
-	}
+		deptCode := strings.TrimSpace(strings.ToUpper(row[0]))
+		regYearStr := strings.TrimSpace(row[1])
+		semNumStr := strings.TrimSpace(row[2])
+		courseCode := strings.TrimSpace(strings.ToUpper(row[3]))
+		courseName := strings.TrimSpace(row[4])
+		shortName := ""
+		if len(row) > 5 {
+			shortName = strings.TrimSpace(row[5])
+		}
+		isElectiveStr := ""
+		if len(row) > 6 {
+			isElectiveStr = strings.ToLower(strings.TrimSpace(row[6]))
+		}
+		description := ""
+		if len(row) > 7 {
+			description = strings.TrimSpace(row[7])
+		}
 
-	_, err = h.DB.Exec(`
-		UPDATE academic_materials
-		SET course_id = ?, title = ?, description = ?, material_type = ?, file_url = ?, unit = ?, item_order = ?, status = ?
-		WHERE id = ?
-	`, payload.CourseID, payload.Title, payload.Description, payload.MaterialType, payload.FileURL, payload.Unit, payload.ItemOrder, payload.Status, id)
+		if deptCode == "" || regYearStr == "" || semNumStr == "" || courseCode == "" || courseName == "" {
+			failedCount++
+			errorMessages = append(errorMessages, fmt.Sprintf("Line %d: Department code, regulation year, semester number, course code, and course name are required", lineNum))
+			continue
+		}
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	payload.ID = id
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Material updated successfully", "data": payload})
-}
+		deptID, ok := deptMap[deptCode]
+		if !ok {
+			failedCount++
+			errorMessages = append(errorMessages, fmt.Sprintf("Line %d: Department code '%s' not found", lineNum, deptCode))
+			continue
+		}
 
-func (h *AcademicHandler) DeleteMaterial(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
-		return
-	}
-	_, err = h.DB.Exec("DELETE FROM academic_materials WHERE id = ?", id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Material deleted successfully"})
-}
+		regYear, _ := strconv.Atoi(regYearStr)
+		regID, ok := regMap[regYear]
+		if !ok {
+			failedCount++
+			errorMessages = append(errorMessages, fmt.Sprintf("Line %d: Regulation for year %d not found", lineNum, regYear))
+			continue
+		}
 
-// -----------------------------------------------------------------------------
-// 8. EXAMS
-// -----------------------------------------------------------------------------
+		semNum, _ := strconv.Atoi(semNumStr)
+		semID, ok := semMap[semNum]
+		if !ok {
+			failedCount++
+			errorMessages = append(errorMessages, fmt.Sprintf("Line %d: Semester %d not found", lineNum, semNum))
+			continue
+		}
 
-func (h *AcademicHandler) ListExams(c *gin.Context) {
-	academicYear := c.Query("academic_year")
-	deptID := c.Query("department_id")
-	regID := c.Query("regulation_id")
-	semID := c.Query("semester_id")
-	examType := c.Query("exam_type")
-	status := c.Query("status")
+		isElective := isElectiveStr == "true" || isElectiveStr == "1" || isElectiveStr == "yes"
 
-	query := `
-		SELECT e.id, e.name, e.exam_type, e.academic_year, e.department_id, d.name, e.regulation_id, r.name,
-		       e.semester_id, s.semester_name,
-		       DATE_FORMAT(e.start_date, '%Y-%m-%d'), DATE_FORMAT(e.end_date, '%Y-%m-%d'),
-		       COALESCE(e.description, ''), e.status, e.created_at, e.updated_at
-		FROM academic_exams e
-		JOIN academic_departments d ON e.department_id = d.id
-		JOIN academic_regulations r ON e.regulation_id = r.id
-		JOIN academic_semesters s ON e.semester_id = s.id
-	`
-	var where []string
-	var args []interface{}
+		// Check if course mapping already exists
+		var existingID int
+		err := h.DB.QueryRow("SELECT id FROM academic_courses WHERE department_id = ? AND regulation_id = ? AND semester_id = ? AND code = ?",
+			deptID, regID, semID, courseCode).Scan(&existingID)
 
-	if academicYear != "" {
-		where = append(where, "e.academic_year = ?")
-		args = append(args, academicYear)
-	}
-	if deptID != "" {
-		where = append(where, "e.department_id = ?")
-		args = append(args, deptID)
-	}
-	if regID != "" {
-		where = append(where, "e.regulation_id = ?")
-		args = append(args, regID)
-	}
-	if semID != "" {
-		where = append(where, "e.semester_id = ?")
-		args = append(args, semID)
-	}
-	if examType != "" {
-		where = append(where, "e.exam_type = ?")
-		args = append(args, examType)
-	}
-	if status != "" {
-		where = append(where, "e.status = ?")
-		args = append(args, status)
-	}
-
-	if len(where) > 0 {
-		query += " WHERE " + strings.Join(where, " AND ")
-	}
-	query += " ORDER BY e.created_at DESC"
-
-	rows, err := h.DB.Query(query, args...)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	defer rows.Close()
-
-	var result []models.Exam
-	for rows.Next() {
-		var e models.Exam
-		var sDate, eDate sql.NullString
-		if err := rows.Scan(&e.ID, &e.Name, &e.ExamType, &e.AcademicYear, &e.DepartmentID, &e.DepartmentName, &e.RegulationID, &e.RegulationName,
-			&e.SemesterID, &e.SemesterName, &sDate, &eDate, &e.Description, &e.Status, &e.CreatedAt, &e.UpdatedAt); err == nil {
-			if sDate.Valid {
-				e.StartDate = &sDate.String
+		if err == nil && existingID > 0 {
+			// Update existing mapping
+			_, uErr := h.DB.Exec(`
+				UPDATE academic_courses SET name = ?, short_name = ?, is_elective = ?, description = ?, status = 'active'
+				WHERE id = ?
+			`, courseName, shortName, isElective, description, existingID)
+			if uErr != nil {
+				failedCount++
+				errorMessages = append(errorMessages, fmt.Sprintf("Line %d: Failed to update course: %v", lineNum, uErr))
+			} else {
+				successCount++
 			}
-			if eDate.Valid {
-				e.EndDate = &eDate.String
+		} else {
+			// Insert new course mapping
+			_, iErr := h.DB.Exec(`
+				INSERT INTO academic_courses (department_id, regulation_id, semester_id, code, name, short_name, is_elective, description, status)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active')
+			`, deptID, regID, semID, courseCode, courseName, shortName, isElective, description)
+			if iErr != nil {
+				failedCount++
+				errorMessages = append(errorMessages, fmt.Sprintf("Line %d: Failed to insert course: %v", lineNum, iErr))
+			} else {
+				successCount++
 			}
-			result = append(result, e)
 		}
 	}
-	if result == nil {
-		result = []models.Exam{}
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": result})
-}
 
-func (h *AcademicHandler) CreateExam(c *gin.Context) {
-	var payload models.Exam
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	payload.Name = strings.TrimSpace(payload.Name)
-	if payload.Name == "" || payload.AcademicYear == "" || payload.DepartmentID <= 0 || payload.RegulationID <= 0 || payload.SemesterID <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Exam name, academic year, department, regulation, and semester are required"})
-		return
-	}
-	if payload.ExamType == "" {
-		payload.ExamType = "End Semester Examination"
-	}
-	if payload.Status == "" {
-		payload.Status = "scheduled"
+	if errorMessages == nil {
+		errorMessages = []string{}
 	}
 
-	var startDate, endDate interface{}
-	if payload.StartDate != nil && *payload.StartDate != "" {
-		startDate = *payload.StartDate
-	} else {
-		startDate = nil
-	}
-	if payload.EndDate != nil && *payload.EndDate != "" {
-		endDate = *payload.EndDate
-	} else {
-		endDate = nil
-	}
-
-	res, err := h.DB.Exec(`
-		INSERT INTO academic_exams (name, exam_type, academic_year, department_id, regulation_id, semester_id, start_date, end_date, description, status)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-	`, payload.Name, payload.ExamType, payload.AcademicYear, payload.DepartmentID, payload.RegulationID, payload.SemesterID, startDate, endDate, payload.Description, payload.Status)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	id, _ := res.LastInsertId()
-	payload.ID = int(id)
-	c.JSON(http.StatusCreated, gin.H{"success": true, "message": "Exam created successfully", "data": payload})
-}
-
-func (h *AcademicHandler) UpdateExam(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
-		return
-	}
-	var payload models.Exam
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-
-	var startDate, endDate interface{}
-	if payload.StartDate != nil && *payload.StartDate != "" {
-		startDate = *payload.StartDate
-	} else {
-		startDate = nil
-	}
-	if payload.EndDate != nil && *payload.EndDate != "" {
-		endDate = *payload.EndDate
-	} else {
-		endDate = nil
-	}
-
-	_, err = h.DB.Exec(`
-		UPDATE academic_exams
-		SET name = ?, exam_type = ?, academic_year = ?, department_id = ?, regulation_id = ?, semester_id = ?, start_date = ?, end_date = ?, description = ?, status = ?
-		WHERE id = ?
-	`, payload.Name, payload.ExamType, payload.AcademicYear, payload.DepartmentID, payload.RegulationID, payload.SemesterID, startDate, endDate, payload.Description, payload.Status, id)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	payload.ID = id
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Exam updated successfully", "data": payload})
-}
-
-func (h *AcademicHandler) DeleteExam(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
-		return
-	}
-	_, err = h.DB.Exec("DELETE FROM academic_exams WHERE id = ?", id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Exam deleted successfully"})
-}
-
-// -----------------------------------------------------------------------------
-// 9. EXAM SCHEDULES
-// -----------------------------------------------------------------------------
-
-func (h *AcademicHandler) ListExamSchedules(c *gin.Context) {
-	examID := c.Query("exam_id")
-	courseID := c.Query("course_id")
-
-	query := `
-		SELECT es.id, es.exam_id, e.name, es.course_id, c.code, c.name,
-		       DATE_FORMAT(es.exam_date, '%Y-%m-%d'), es.start_time, es.end_time, es.venue, COALESCE(es.instructions, ''), es.status, es.created_at, es.updated_at
-		FROM academic_exam_schedules es
-		JOIN academic_exams e ON es.exam_id = e.id
-		JOIN academic_courses c ON es.course_id = c.id
-	`
-	var where []string
-	var args []interface{}
-
-	if examID != "" {
-		where = append(where, "es.exam_id = ?")
-		args = append(args, examID)
-	}
-	if courseID != "" {
-		where = append(where, "es.course_id = ?")
-		args = append(args, courseID)
-	}
-
-	if len(where) > 0 {
-		query += " WHERE " + strings.Join(where, " AND ")
-	}
-	query += " ORDER BY es.exam_date ASC, es.start_time ASC"
-
-	rows, err := h.DB.Query(query, args...)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	defer rows.Close()
-
-	var result []models.ExamSchedule
-	for rows.Next() {
-		var es models.ExamSchedule
-		if err := rows.Scan(&es.ID, &es.ExamID, &es.ExamName, &es.CourseID, &es.CourseCode, &es.CourseName,
-			&es.ExamDate, &es.StartTime, &es.EndTime, &es.Venue, &es.Instructions, &es.Status, &es.CreatedAt, &es.UpdatedAt); err == nil {
-			result = append(result, es)
-		}
-	}
-	if result == nil {
-		result = []models.ExamSchedule{}
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": result})
-}
-
-func (h *AcademicHandler) CreateExamSchedule(c *gin.Context) {
-	var payload models.ExamSchedule
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	payload.Venue = strings.TrimSpace(payload.Venue)
-	if payload.ExamID <= 0 || payload.CourseID <= 0 || payload.ExamDate == "" || payload.StartTime == "" || payload.EndTime == "" || payload.Venue == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Exam, course, date, start time, end time, and venue are required"})
-		return
-	}
-	if payload.Status == "" {
-		payload.Status = "scheduled"
-	}
-
-	res, err := h.DB.Exec(`
-		INSERT INTO academic_exam_schedules (exam_id, course_id, exam_date, start_time, end_time, venue, instructions, status)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-	`, payload.ExamID, payload.CourseID, payload.ExamDate, payload.StartTime, payload.EndTime, payload.Venue, payload.Instructions, payload.Status)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	id, _ := res.LastInsertId()
-	payload.ID = int(id)
-	c.JSON(http.StatusCreated, gin.H{"success": true, "message": "Exam schedule added successfully", "data": payload})
-}
-
-func (h *AcademicHandler) UpdateExamSchedule(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
-		return
-	}
-	var payload models.ExamSchedule
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-
-	_, err = h.DB.Exec(`
-		UPDATE academic_exam_schedules
-		SET exam_id = ?, course_id = ?, exam_date = ?, start_time = ?, end_time = ?, venue = ?, instructions = ?, status = ?
-		WHERE id = ?
-	`, payload.ExamID, payload.CourseID, payload.ExamDate, payload.StartTime, payload.EndTime, payload.Venue, payload.Instructions, payload.Status, id)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	payload.ID = id
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Exam schedule updated successfully", "data": payload})
-}
-
-func (h *AcademicHandler) DeleteExamSchedule(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
-		return
-	}
-	_, err = h.DB.Exec("DELETE FROM academic_exam_schedules WHERE id = ?", id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Exam schedule deleted successfully"})
-}
-
-// -----------------------------------------------------------------------------
-// 10. QUESTION PAPERS
-// -----------------------------------------------------------------------------
-
-func (h *AcademicHandler) ListQuestionPapers(c *gin.Context) {
-	courseID := c.Query("course_id")
-	examType := c.Query("exam_type")
-	academicYear := c.Query("academic_year")
-	regID := c.Query("regulation_id")
-	semID := c.Query("semester_id")
-	status := c.Query("status")
-
-	query := `
-		SELECT q.id, q.course_id, c.code, c.name, q.exam_type, q.academic_year, q.regulation_id, r.name,
-		       q.semester_id, s.semester_name, q.year_number, q.file_url, COALESCE(q.description, ''), q.status, q.created_at, q.updated_at
-		FROM academic_question_papers q
-		JOIN academic_courses c ON q.course_id = c.id
-		JOIN academic_regulations r ON q.regulation_id = r.id
-		JOIN academic_semesters s ON q.semester_id = s.id
-	`
-	var where []string
-	var args []interface{}
-
-	if courseID != "" {
-		where = append(where, "q.course_id = ?")
-		args = append(args, courseID)
-	}
-	if examType != "" {
-		where = append(where, "q.exam_type = ?")
-		args = append(args, examType)
-	}
-	if academicYear != "" {
-		where = append(where, "q.academic_year = ?")
-		args = append(args, academicYear)
-	}
-	if regID != "" {
-		where = append(where, "q.regulation_id = ?")
-		args = append(args, regID)
-	}
-	if semID != "" {
-		where = append(where, "q.semester_id = ?")
-		args = append(args, semID)
-	}
-	if status != "" {
-		where = append(where, "q.status = ?")
-		args = append(args, status)
-	}
-
-	if len(where) > 0 {
-		query += " WHERE " + strings.Join(where, " AND ")
-	}
-	query += " ORDER BY q.academic_year DESC, c.code ASC"
-
-	rows, err := h.DB.Query(query, args...)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	defer rows.Close()
-
-	var result []models.QuestionPaper
-	for rows.Next() {
-		var qp models.QuestionPaper
-		if err := rows.Scan(&qp.ID, &qp.CourseID, &qp.CourseCode, &qp.CourseName, &qp.ExamType, &qp.AcademicYear, &qp.RegulationID, &qp.RegulationName,
-			&qp.SemesterID, &qp.SemesterName, &qp.YearNumber, &qp.FileURL, &qp.Description, &qp.Status, &qp.CreatedAt, &qp.UpdatedAt); err == nil {
-			result = append(result, qp)
-		}
-	}
-	if result == nil {
-		result = []models.QuestionPaper{}
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "data": result})
-}
-
-func (h *AcademicHandler) CreateQuestionPaper(c *gin.Context) {
-	var payload models.QuestionPaper
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	payload.FileURL = strings.TrimSpace(payload.FileURL)
-	if payload.CourseID <= 0 || payload.RegulationID <= 0 || payload.SemesterID <= 0 || payload.AcademicYear == "" || payload.FileURL == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Course, regulation, semester, academic year, and question paper file URL are required"})
-		return
-	}
-	if payload.ExamType == "" {
-		payload.ExamType = "End Semester Examination"
-	}
-	if payload.YearNumber <= 0 {
-		payload.YearNumber = 1
-	}
-	if payload.Status == "" {
-		payload.Status = "active"
-	}
-
-	res, err := h.DB.Exec(`
-		INSERT INTO academic_question_papers (course_id, exam_type, academic_year, regulation_id, semester_id, year_number, file_url, description, status)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-	`, payload.CourseID, payload.ExamType, payload.AcademicYear, payload.RegulationID, payload.SemesterID, payload.YearNumber, payload.FileURL, payload.Description, payload.Status)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	id, _ := res.LastInsertId()
-	payload.ID = int(id)
-	c.JSON(http.StatusCreated, gin.H{"success": true, "message": "Question paper uploaded successfully", "data": payload})
-}
-
-func (h *AcademicHandler) UpdateQuestionPaper(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
-		return
-	}
-	var payload models.QuestionPaper
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-
-	_, err = h.DB.Exec(`
-		UPDATE academic_question_papers
-		SET course_id = ?, exam_type = ?, academic_year = ?, regulation_id = ?, semester_id = ?, year_number = ?, file_url = ?, description = ?, status = ?
-		WHERE id = ?
-	`, payload.CourseID, payload.ExamType, payload.AcademicYear, payload.RegulationID, payload.SemesterID, payload.YearNumber, payload.FileURL, payload.Description, payload.Status, id)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	payload.ID = id
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Question paper updated successfully", "data": payload})
-}
-
-func (h *AcademicHandler) DeleteQuestionPaper(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
-		return
-	}
-	_, err = h.DB.Exec("DELETE FROM academic_question_papers WHERE id = ?", id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Question paper deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": fmt.Sprintf("Bulk upload processed: %d succeeded, %d failed", successCount, failedCount),
+		"data": gin.H{
+			"total_rows":    len(rows) - 1,
+			"success_count": successCount,
+			"failed_count":  failedCount,
+			"errors":        errorMessages,
+		},
+	})
 }
