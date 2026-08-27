@@ -8,6 +8,10 @@ export function processLeaderboardData(sponsors = []) {
   const aggregatedMap = new Map();
 
   sponsors.forEach((s) => {
+    if (s.status && String(s.status).toLowerCase() !== "captured") {
+      return;
+    }
+
     const rawName = (s.name || "").trim();
     const rawPhone = (s.phone || s.contact || "").replace(/\D/g, "");
     const phoneKey = rawPhone.length >= 10 ? rawPhone.slice(-10) : rawPhone;

@@ -107,6 +107,10 @@ func (h *SponsorsHandler) GetSponsorsAdmin(c *gin.Context) {
 				var rzpRes RazorpayPaymentsResponse
 				if err := json.Unmarshal(body, &rzpRes); err == nil {
 					for _, item := range rzpRes.Items {
+						if strings.ToLower(item.Status) != "captured" {
+							continue
+						}
+
 						amtInRupees := float64(item.Amount) / 100.0
 						if item.AmountPaid > 0 {
 							amtInRupees = float64(item.AmountPaid) / 100.0
@@ -199,6 +203,10 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 					aggregatedMap := make(map[string]*AggregatedDonor)
 
 					for _, item := range rzpRes.Items {
+						if strings.ToLower(item.Status) != "captured" {
+							continue
+						}
+
 						amt := float64(item.Amount) / 100.0
 						if item.AmountPaid > 0 {
 							amt = float64(item.AmountPaid) / 100.0
