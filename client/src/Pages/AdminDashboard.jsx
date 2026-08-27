@@ -57,10 +57,12 @@ import {
   GraduationCap,
   ArrowLeft,
   ArrowRight,
+  MessageSquare,
 } from "lucide-react";
 import SuperAdminPanel from "./SuperAdminPanel.jsx";
 import AdminPSRewardsPage from "./AdminPSRewards.jsx";
 import AcademicManagement from "./AcademicManagement.jsx";
+import AdminFeedbackPage from "./AdminFeedbackPage.jsx";
 import { checkSuperAdmin } from "../api/admin.js";
 import { PING_ON } from "../config/runtimeFlags.js";
 
@@ -212,6 +214,15 @@ const ADMIN_TABS = [
     description: "Upload and schedule boys & girls mess menu CSV files for weekly meals.",
   },
   {
+    key: "feedback",
+    label: "Feedback & Support",
+    href: "/admin/feedback",
+    icon: MessageSquare,
+    gradient: "from-blue-600 to-indigo-600",
+    badge: "Student Chat",
+    description: "Chat directly with users to answer feedback, resolve issues, and send live status updates.",
+  },
+  {
     key: "super",
     label: "Super Admin",
     href: "/admin/super",
@@ -230,6 +241,7 @@ function getAdminTabFromPath(pathname) {
   if (pathname.startsWith("/admin/ps-rewards")) return "ps";
   if (pathname.startsWith("/admin/cards")) return "cards";
   if (pathname.startsWith("/admin/mess")) return "mess";
+  if (pathname.startsWith("/admin/feedback")) return "feedback";
   if (pathname.startsWith("/admin/super")) return "super";
   if (pathname.startsWith("/admin/users")) return "users";
   return "overview";
@@ -3480,6 +3492,8 @@ function AdminDashboard({ initialTab } = {}) {
         <CardsSection />
       ) : activeTab === "mess" ? (
         <MessSection />
+      ) : activeTab === "feedback" ? (
+        <AdminFeedbackPage />
       ) : activeTab === "super" ? (
         <SuperAdminPanel />
       ) : (
@@ -3517,6 +3531,10 @@ function AdminMessPage() {
   return <AdminDashboard initialTab="mess" />;
 }
 
+function AdminFeedbackPageRoute() {
+  return <AdminDashboard initialTab="feedback" />;
+}
+
 export {
   AdminAcademicPage,
   AdminUsersPage,
@@ -3525,5 +3543,6 @@ export {
   AdminPSRewardsPageRoute as AdminPSRewardsPage,
   AdminCardsPage,
   AdminMessPage,
+  AdminFeedbackPageRoute as AdminFeedbackPage,
 };
 export default AdminDashboard;

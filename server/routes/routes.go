@@ -26,6 +26,7 @@ func SetupRouter(
 	trackerUserHandler *handlers.TrackerUserHandler,
 	sponsorsHandler *handlers.SponsorsHandler,
 	academicHandler *handlers.AcademicHandler,
+	feedbackHandler *handlers.FeedbackHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -123,6 +124,10 @@ func SetupRouter(
 		api.GET("/academic/semesters", academicHandler.ListSemesters)
 		api.GET("/academic/courses", academicHandler.ListCourses)
 		api.GET("/academic/courses/:id/content", academicHandler.GetCourseContent)
+
+		// Feedback Chat User API
+		api.POST("/feedback/messages", feedbackHandler.SendMessage)
+		api.GET("/feedback/messages", feedbackHandler.GetUserMessages)
 	}
 
 	// Serve uploaded files
@@ -219,6 +224,11 @@ func SetupRouter(
 		admin.GET("/academic/question-papers", academicHandler.ListQuestionPapers)
 		admin.POST("/academic/question-papers", academicHandler.CreateQuestionPaper)
 		admin.DELETE("/academic/question-papers/:id", academicHandler.DeleteQuestionPaper)
+
+		// Feedback Chat Admin API
+		admin.GET("/feedback/conversations", feedbackHandler.GetAdminConversations)
+		admin.GET("/feedback/messages/:user_uid", feedbackHandler.GetAdminUserMessages)
+		admin.POST("/feedback/reply", feedbackHandler.AdminReply)
 	}
 
 	// Super-admin routes: manage admins and allowed external emails/domains

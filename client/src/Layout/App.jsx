@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import FullScreenLoader from "../Component/FullScreenLoader.jsx";
 import SEO from "../Component/SEO.jsx";
 import DailySupportModal from "../Component/DailySupportModal.jsx";
+import FloatingFeedbackButton from "../Component/FloatingFeedbackButton.jsx";
 import { ROUTE_SEO } from "../seo/routeSeo.js";
 
 const Login = lazy(() => import("../Pages/Login.jsx"));
@@ -67,6 +68,9 @@ const AdminCardsPage = lazy(() =>
 );
 const AdminMessPage = lazy(() =>
   import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.AdminMessPage }))
+);
+const AdminFeedbackPage = lazy(() =>
+  import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.AdminFeedbackPage }))
 );
 
 function App() {
@@ -246,6 +250,14 @@ function App() {
               }
             />
             <Route
+              path="/admin/feedback"
+              element={
+                <AdminRoute>
+                  <AdminFeedbackPage />
+                </AdminRoute>
+              }
+            />
+            <Route
               path="/admin/super"
               element={
                 <AdminRoute>
@@ -283,6 +295,7 @@ function App() {
       </Suspense>
       <Analytics />
       <DailySupportModal />
+      <FloatingFeedbackButton />
     </>
   );
 }

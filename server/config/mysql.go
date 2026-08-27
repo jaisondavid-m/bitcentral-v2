@@ -102,6 +102,7 @@ func InitMySQL() {
 	createAllowedEmailsTable()
 	createTrackerUsersTable()
 	createAcademicTables()
+	createFeedbackMessagesTable()
 }
 
 func createAdminsTable() {
@@ -116,6 +117,27 @@ func createAdminsTable() {
 		log.Fatalf("❌ Failed to create admins table: %v", err)
 	}
 	log.Println("✅ admins table ready")
+}
+
+func createFeedbackMessagesTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS feedback_messages (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		user_uid VARCHAR(128) NOT NULL,
+		sender_type ENUM('user', 'admin') NOT NULL,
+		sender_name VARCHAR(255) NOT NULL,
+		sender_email VARCHAR(255) NOT NULL,
+		message TEXT NOT NULL,
+		is_read_by_admin TINYINT(1) DEFAULT 0,
+		is_read_by_user TINYINT(1) DEFAULT 0,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		INDEX idx_user_uid_created (user_uid, created_at)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(query); err != nil {
+		log.Fatalf("❌ Failed to create feedback_messages table: %v", err)
+	}
+	log.Println("✅ feedback_messages table ready")
 }
 
 func createAllowedEmailsTable() {
