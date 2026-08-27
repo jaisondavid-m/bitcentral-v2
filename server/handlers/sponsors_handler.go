@@ -155,6 +155,20 @@ func (h *SponsorsHandler) GetSponsorsAdmin(c *gin.Context) {
 	})
 }
 
+func cleanPhone(phone string) string {
+	var digits []rune
+	for _, r := range phone {
+		if r >= '0' && r <= '9' {
+			digits = append(digits, r)
+		}
+	}
+	s := string(digits)
+	if len(s) >= 10 {
+		return s[len(s)-10:]
+	}
+	return s
+}
+
 type AggregatedDonor struct {
 	Name       string  `json:"name"`
 	Amount     float64 `json:"amount"`
@@ -191,14 +205,29 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 						}
 						total += amt
 
-						donorName := extractName(item.Notes, item.Email)
-						normKey := strings.ToLower(strings.TrimSpace(donorName))
-						if normKey == "" || normKey == "anonymous bitsian" {
-							if item.Email != "" {
-								normKey = strings.ToLower(strings.TrimSpace(item.Email))
-							} else {
-								normKey = fmt.Sprintf("anon_%s", item.ID)
+						email := item.Email
+						phone := item.Contact
+						if item.Notes != nil {
+							if e, ok := item.Notes["email"].(string); ok && e != "" {
+								email = e
 							}
+							if p, ok := item.Notes["phone"].(string); ok && p != "" {
+								phone = p
+							} else if p, ok := item.Notes["contact"].(string); ok && p != "" {
+								phone = p
+							}
+						}
+
+						donorName := extractName(item.Notes, email)
+						phoneDigits := cleanPhone(phone)
+
+						var normKey string
+						if phoneDigits != "" {
+							normKey = "phone_" + phoneDigits
+						} else if strings.TrimSpace(email) != "" {
+							normKey = "email_" + strings.ToLower(strings.TrimSpace(email))
+						} else {
+							normKey = "name_" + strings.ToLower(strings.TrimSpace(donorName))
 						}
 
 						itemDate := time.Unix(item.CreatedAt, 0).Format("2006-01-02")
@@ -207,6 +236,10 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 							existing.Amount += amt
 							if itemDate > existing.LatestDate {
 								existing.LatestDate = itemDate
+							}
+							// Keep longer or non-anonymous name if available
+							if len(donorName) > len(existing.Name) && donorName != "Anonymous BITSian" {
+								existing.Name = donorName
 							}
 						} else {
 							aggregatedMap[normKey] = &AggregatedDonor{

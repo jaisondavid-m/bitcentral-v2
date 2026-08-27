@@ -39,12 +39,23 @@ export default function SupportDev() {
           const aggregatedMap = new Map();
           data.sponsors.forEach((s) => {
             const rawName = (s.name || "").trim();
-            const normKey = rawName.toLowerCase() || (s.email || "").toLowerCase() || s.id;
+            const rawPhone = (s.phone || s.contact || "").replace(/\D/g, "");
+            const phoneKey = rawPhone.length >= 10 ? rawPhone.slice(-10) : rawPhone;
+
+            const normKey = phoneKey
+              ? `phone_${phoneKey}`
+              : (s.email || "").toLowerCase()
+              ? `email_${(s.email || "").toLowerCase()}`
+              : `name_${rawName.toLowerCase() || s.id}`;
+
             const amt = Number(s.amount) || 0;
 
             if (aggregatedMap.has(normKey)) {
               const existing = aggregatedMap.get(normKey);
               existing.amount = (Number(existing.amount) || 0) + amt;
+              if (rawName.length > (existing.name || "").length && rawName !== "Anonymous BITSian") {
+                existing.name = rawName;
+              }
             } else {
               aggregatedMap.set(normKey, {
                 ...s,
