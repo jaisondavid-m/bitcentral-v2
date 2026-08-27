@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"server/config"
 	"server/data"
@@ -29,7 +30,25 @@ func (h *SemesterHandler) GetSemesterByYear(c *gin.Context) {
 		return
 	}
 
-	rows, err := h.DB.Query(`SELECT idx, code, name, qb1, qb2, ak1, ak2, sem_qb_with_ans FROM semester_subjects WHERE year = ? ORDER BY idx`, year)
+	deptParam := strings.TrimSpace(c.Query("dept"))
+	if deptParam == "" {
+		deptParam = strings.TrimSpace(c.Query("department"))
+	}
+
+	query := `
+		SELECT idx, code, name, COALESCE(department, 'ALL'), qb1, qb2, ak1, ak2, sem_qb_with_ans
+		FROM semester_subjects
+		WHERE year = ?
+		  AND (
+		    ? = '' OR
+		    UPPER(department) = 'ALL' OR
+		    department = '' OR
+		    LOWER(department) = LOWER(?) OR
+		    (LOWER(?) = 'cs' AND LOWER(department) = 'cse')
+		  )
+		ORDER BY idx`
+
+	rows, err := h.DB.Query(query, year, deptParam, deptParam, deptParam)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
@@ -39,8 +58,8 @@ func (h *SemesterHandler) GetSemesterByYear(c *gin.Context) {
 	var result []models.SemesterSubject
 	for rows.Next() {
 		var idx int
-		var code, name, qb1, qb2, ak1, ak2, semqb sql.NullString
-		if err := rows.Scan(&idx, &code, &name, &qb1, &qb2, &ak1, &ak2, &semqb); err != nil {
+		var code, name, dept, qb1, qb2, ak1, ak2, semqb sql.NullString
+		if err := rows.Scan(&idx, &code, &name, &dept, &qb1, &qb2, &ak1, &ak2, &semqb); err != nil {
 			continue
 		}
 		var s models.SemesterSubject
@@ -49,6 +68,9 @@ func (h *SemesterHandler) GetSemesterByYear(c *gin.Context) {
 		}
 		if name.Valid {
 			s.Name = &name.String
+		}
+		if dept.Valid {
+			s.Department = &dept.String
 		}
 		if qb1.Valid {
 			s.QB1 = &qb1.String

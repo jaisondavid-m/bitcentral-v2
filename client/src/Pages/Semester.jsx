@@ -17,26 +17,30 @@ function normalizeSemesterYear(yearCode) {
 
 const semesterCache = new Map();
 
-async function fetchSubjects(yearCode) {
+async function fetchSubjects(yearCode, deptCode = "") {
   const semesterYear = normalizeSemesterYear(yearCode);
+  const cacheKey = `${semesterYear}_${(deptCode || "ALL").toLowerCase()}`;
 
-  if (semesterCache.has(semesterYear)) {
-    return semesterCache.get(semesterYear);
+  if (semesterCache.has(cacheKey)) {
+    return semesterCache.get(cacheKey);
   }
 
   const promise = (async () => {
-    const res = await api.get(`/semesters/${semesterYear}`);
+    const params = new URLSearchParams();
+    if (deptCode) params.set("dept", deptCode);
+    const url = params.toString() ? `/semesters/${semesterYear}?${params.toString()}` : `/semesters/${semesterYear}`;
+    const res = await api.get(url);
     return res.data.data || [];
   })();
 
-  semesterCache.set(semesterYear, promise);
+  semesterCache.set(cacheKey, promise);
 
   try {
     const data = await promise;
-    semesterCache.set(semesterYear, Promise.resolve(data));
+    semesterCache.set(cacheKey, Promise.resolve(data));
     return data;
   } catch (err) {
-    semesterCache.delete(semesterYear);
+    semesterCache.delete(cacheKey);
     throw err;
   }
 }
@@ -170,7 +174,8 @@ export default function Semester() {
       setError(null);
 
       try {
-        const subjectsData = await fetchSubjects(student.yearCode);
+        const deptCode = student.deptCode || student.department || "";
+        const subjectsData = await fetchSubjects(student.yearCode, deptCode);
         setSubjects(subjectsData);
       } catch (err) {
         console.error("Load error:", err);
@@ -181,7 +186,7 @@ export default function Semester() {
     };
 
     load();
-  }, [student?.yearCode, user]);
+  }, [student?.yearCode, student?.deptCode, student?.department, user]);
 
   if (loading) return <FullScreenLoader />;
 

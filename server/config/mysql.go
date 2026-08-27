@@ -238,6 +238,7 @@ func createSemesterSubjectsTable() {
 	CREATE TABLE IF NOT EXISTS semester_subjects (
 		id INT AUTO_INCREMENT PRIMARY KEY,
 		year INT NOT NULL,
+		department VARCHAR(50) NOT NULL DEFAULT 'ALL',
 		idx INT NOT NULL,
 		code VARCHAR(50),
 		name VARCHAR(255),
@@ -254,6 +255,14 @@ func createSemesterSubjectsTable() {
 	_, err := DB.Exec(query)
 	if err != nil {
 		log.Fatalf("❌ Failed to create semester_subjects table: %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE semester_subjects ADD COLUMN department VARCHAR(50) NOT NULL DEFAULT 'ALL'`); err != nil {
+		log.Printf("ℹ️ department column not created (may already exist): %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE semester_subjects ADD INDEX idx_sem_sub_year_dept (year, department)`); err != nil {
+		log.Printf("ℹ️ idx_sem_sub_year_dept index not created (may already exist): %v", err)
 	}
 
 	if _, err := DB.Exec(`ALTER TABLE semester_subjects ADD UNIQUE KEY unique_year_code (year, code)`); err != nil {

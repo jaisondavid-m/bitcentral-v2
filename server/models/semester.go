@@ -3,6 +3,7 @@ package models
 type SemesterSubject struct {
 	Code          *string `json:"code"`
 	Name          *string `json:"name"`
+	Department    *string `json:"department"`
 	QB1           *string `json:"qb1"`
 	QB2           *string `json:"qb2"`
 	AK1           *string `json:"ak1"`

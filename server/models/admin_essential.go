@@ -30,6 +30,7 @@ type PSToken struct {
 type QBAnswerKey struct {
 	ID           int     `json:"id"`
 	Year         int     `json:"year"`
+	Department   string  `json:"department"`
 	SubjectCode  string  `json:"subject_code"`
 	SubjectName  string  `json:"subject_name"`
 	QB1          *string `json:"qb1"`
@@ -43,6 +44,7 @@ type QBAnswerKey struct {
 
 type QBAnswerKeyInput struct {
 	Year         int     `json:"year" binding:"required"`
+	Department   string  `json:"department"`
 	SubjectCode  string  `json:"subject_code" binding:"required"`
 	SubjectName  string  `json:"subject_name" binding:"required"`
 	QB1          *string `json:"qb1"`
@@ -58,6 +60,7 @@ type QBAnswerKeyBatchInput struct {
 }
 
 type QBAnswerKeyReorderInput struct {
-	Year       int   `json:"year" binding:"required"`
-	SubjectIDs []int `json:"subject_ids" binding:"required"`
+	Year       int    `json:"year" binding:"required"`
+	Department string `json:"department"`
+	SubjectIDs []int  `json:"subject_ids" binding:"required"`
 }

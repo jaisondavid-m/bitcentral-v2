@@ -20,10 +20,10 @@ func NewQBHandler() *QBHandler {
 	return &QBHandler{DB: config.DB}
 }
 
-// GET /admin/qb?semester=3&year=2024
+// GET /admin/qb?semester=3&year=2024&dept=CSE
 func (h *QBHandler) List(c *gin.Context) {
 	query := `
-		SELECT id, year, code, name, qb1, qb2, ak1, ak2, sem_qb_with_ans, created_at, updated_at
+		SELECT id, year, COALESCE(department, 'ALL'), code, name, qb1, qb2, ak1, ak2, sem_qb_with_ans, created_at, updated_at
 		FROM semester_subjects
 		WHERE 1=1`
 	args := []any{}
@@ -31,6 +31,14 @@ func (h *QBHandler) List(c *gin.Context) {
 	if y := c.Query("year"); y != "" {
 		query += " AND year = ?"
 		args = append(args, y)
+	}
+	dept := strings.TrimSpace(c.Query("dept"))
+	if dept == "" {
+		dept = strings.TrimSpace(c.Query("department"))
+	}
+	if dept != "" && strings.ToUpper(dept) != "ALL" {
+		query += " AND (LOWER(department) = LOWER(?) OR UPPER(department) = 'ALL' OR department = '')"
+		args = append(args, dept)
 	}
 	if q := strings.TrimSpace(c.Query("q")); q != "" {
 		query += " AND (LOWER(code) LIKE ? OR LOWER(name) LIKE ?)"
@@ -52,6 +60,7 @@ func (h *QBHandler) List(c *gin.Context) {
 		if err := rows.Scan(
 			&q.ID,
 			&q.Year,
+			&q.Department,
 			&q.SubjectCode,
 			&q.SubjectName,
 			&q.QB1,
@@ -80,6 +89,11 @@ func (h *QBHandler) Create(c *gin.Context) {
 		return
 	}
 
+	dept := strings.ToUpper(strings.TrimSpace(body.Department))
+	if dept == "" {
+		dept = "ALL"
+	}
+
 	var nextIdx int
 	if err := h.DB.QueryRow(`SELECT COALESCE(MAX(idx), -1) + 1 FROM semester_subjects WHERE year = ?`, body.Year).Scan(&nextIdx); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
@@ -87,9 +101,10 @@ func (h *QBHandler) Create(c *gin.Context) {
 	}
 
 	_, err := h.DB.Exec(`
-		INSERT INTO semester_subjects (year, idx, code, name, qb1, qb2, ak1, ak2, sem_qb_with_ans)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		INSERT INTO semester_subjects (year, department, idx, code, name, qb1, qb2, ak1, ak2, sem_qb_with_ans)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		body.Year,
+		dept,
 		nextIdx,
 		strings.TrimSpace(body.SubjectCode),
 		strings.TrimSpace(body.SubjectName),
@@ -132,8 +147,8 @@ func (h *QBHandler) BatchCreate(c *gin.Context) {
 	}
 
 	stmt, err := tx.Prepare(`
-		INSERT INTO semester_subjects (year, idx, code, name, qb1, qb2, ak1, ak2, sem_qb_with_ans)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+		INSERT INTO semester_subjects (year, department, idx, code, name, qb1, qb2, ak1, ak2, sem_qb_with_ans)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
@@ -145,8 +160,13 @@ func (h *QBHandler) BatchCreate(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "subject_code and subject_name are required"})
 			return
 		}
+		dept := strings.ToUpper(strings.TrimSpace(subject.Department))
+		if dept == "" {
+			dept = "ALL"
+		}
 		if _, err := stmt.Exec(
 			body.Year,
+			dept,
 			startIdx+i,
 			strings.TrimSpace(subject.SubjectCode),
 			strings.TrimSpace(subject.SubjectName),
@@ -263,11 +283,17 @@ func (h *QBHandler) Update(c *gin.Context) {
 		return
 	}
 
+	dept := strings.ToUpper(strings.TrimSpace(body.Department))
+	if dept == "" {
+		dept = "ALL"
+	}
+
 	res, err := h.DB.Exec(`
 		UPDATE semester_subjects
-		SET year=?, code=?, name=?, qb1=?, qb2=?, ak1=?, ak2=?, sem_qb_with_ans=?
+		SET year=?, department=?, code=?, name=?, qb1=?, qb2=?, ak1=?, ak2=?, sem_qb_with_ans=?
 		WHERE id=?`,
 		body.Year,
+		dept,
 		strings.TrimSpace(body.SubjectCode),
 		strings.TrimSpace(body.SubjectName),
 		body.QB1,
