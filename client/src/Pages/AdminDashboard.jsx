@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import {
@@ -38,6 +38,7 @@ import {
   Trash2,
   Users,
   X,
+  Check,
   ChevronDown,
   ChevronUp,
   Eye,
@@ -1712,9 +1713,266 @@ function CardsSection() {
   );
 }
 
-/* -- QB Section -------------------------------------------------------------- */
-const QB_DEPARTMENTS = ["ALL", "CSE", "ECE", "IT", "MECH", "EEE", "CIVIL", "AI&DS", "CSD", "CSBS", "BT", "FT", "FD", "BME", "AGRI"];
+/* -- Student Email Parsing Helper ----------------------------------------- */
+const DEPARTMENT_MASTER = {
+  cs: { code: "CS", alt: "CSE", name: "Computer Science & Engineering (CS / CSE)" },
+  ad: { code: "AD", alt: "AI&DS", name: "Artificial Intelligence & Data Science (AD / AI&DS)" },
+  al: { code: "AL", alt: "AIML", name: "Artificial Intelligence & Machine Learning (AL / AIML)" },
+  it: { code: "IT", alt: "IT", name: "Information Technology (IT)" },
+  ec: { code: "EC", alt: "ECE", name: "Electronics & Communication Engineering (EC / ECE)" },
+  ee: { code: "EE", alt: "EEE", name: "Electrical & Electronics Engineering (EE / EEE)" },
+  ei: { code: "EI", alt: "EIE", name: "Electronics & Instrumentation Engineering (EI)" },
+  me: { code: "ME", alt: "MECH", name: "Mechanical Engineering (ME / MECH)" },
+  ce: { code: "CE", alt: "CIVIL", name: "Civil Engineering (CE / CIVIL)" },
+  ag: { code: "AG", alt: "AGRI", name: "Agricultural Engineering (AG / AGRI)" },
+  bt: { code: "BT", alt: "BT", name: "Biotechnology (BT)" },
+  ft: { code: "FT", alt: "FT", name: "Food Technology (FT)" },
+  fd: { code: "FD", alt: "FD", name: "Fashion Technology (FD)" },
+  bm: { code: "BM", alt: "BME", name: "Biomedical Engineering (BM / BME)" },
+  mb: { code: "MB", alt: "MBA", name: "Management Studies (MB / MBA)" },
+  cb: { code: "CB", alt: "CSBS", name: "Computer Science & Business Systems (CB / CSBS)" },
+  cd: { code: "CD", alt: "CSD", name: "Computer Science & Design (CD / CSD)" },
+  ct: { code: "CT", alt: "CT", name: "Computer Technology (CT)" },
+  mz: { code: "MZ", alt: "MCTR", name: "Mechatronics Engineering (MZ)" },
+};
 
+function parseStudentEmail(email) {
+  if (!email || typeof email !== "string") return null;
+  const cleanEmail = email.trim().toLowerCase();
+
+  // Must end with @bitsathy.ac.in (ignore gmail.com or plain domains)
+  if (!cleanEmail.endsWith("@bitsathy.ac.in")) return null;
+
+  const username = cleanEmail.split("@")[0];
+  const parts = username.split(".");
+  // Must have a dot before @, e.g., jaisondavidm.cs25
+  if (parts.length < 2) return null;
+
+  const deptYear = parts[parts.length - 1]; // e.g. "cs25", "ad25", "al25"
+  const match = deptYear.match(/^([a-z]{2})(\d{2})$/);
+  if (!match) return null;
+
+  const rawDept = match[1];
+  const yearTwoDigits = match[2];
+  const fullYear = 2000 + parseInt(yearTwoDigits, 10);
+
+  const deptInfo = DEPARTMENT_MASTER[rawDept] || {
+    code: rawDept.toUpperCase(),
+    alt: rawDept.toUpperCase(),
+    name: `${rawDept.toUpperCase()} Department`,
+  };
+
+  return {
+    email: cleanEmail,
+    deptCode: deptInfo.code,
+    deptAlt: deptInfo.alt,
+    deptName: deptInfo.name,
+    yearCode: yearTwoDigits,
+    fullYear: String(fullYear),
+  };
+}
+
+/* -- Department Multi-Select Component ----------------------------------- */
+const DEFAULT_DEPARTMENTS_LIST = [
+  { code: "ALL", name: "All Departments" },
+  { code: "CS", name: "Computer Science & Engineering (CS / CSE)" },
+  { code: "AD", name: "Artificial Intelligence & Data Science (AD / AI&DS)" },
+  { code: "AL", name: "Artificial Intelligence & Machine Learning (AL / AIML)" },
+  { code: "IT", name: "Information Technology (IT)" },
+  { code: "EC", name: "Electronics & Communication Engineering (EC / ECE)" },
+  { code: "EE", name: "Electrical & Electronics Engineering (EE / EEE)" },
+  { code: "EI", name: "Electronics & Instrumentation Engineering (EI)" },
+  { code: "ME", name: "Mechanical Engineering (ME / MECH)" },
+  { code: "CE", name: "Civil Engineering (CE / CIVIL)" },
+  { code: "AG", name: "Agricultural Engineering (AG / AGRI)" },
+  { code: "BT", name: "Biotechnology (BT)" },
+  { code: "FT", name: "Food Technology (FT)" },
+  { code: "FD", name: "Fashion Technology (FD)" },
+  { code: "BM", name: "Biomedical Engineering (BM / BME)" },
+  { code: "MB", name: "Management Studies (MB / MBA)" },
+  { code: "CB", name: "Computer Science & Business Systems (CB / CSBS)" },
+  { code: "CD", name: "Computer Science & Design (CD / CSD)" },
+  { code: "CT", name: "Computer Technology (CT)" },
+  { code: "MZ", name: "Mechatronics Engineering (MZ)" },
+];
+
+function DepartmentSelect({ value = "ALL", onChange, label = "Department", isMulti = true, customOptions = null }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const availableDepts = useMemo(() => {
+    const baseList = customOptions && customOptions.length > 0 ? customOptions : DEFAULT_DEPARTMENTS_LIST;
+    const hasAll = baseList.some((d) => d.code === "ALL");
+    return hasAll ? baseList : [{ code: "ALL", name: "All Departments" }, ...baseList];
+  }, [customOptions]);
+
+  const selectedCodes = useMemo(() => {
+    if (!value || value.toUpperCase() === "ALL") return ["ALL"];
+    return value.split(",").map((s) => s.trim()).filter(Boolean);
+  }, [value]);
+
+  const isAll = selectedCodes.includes("ALL");
+
+  const filteredDepts = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    if (!q) return availableDepts;
+    return availableDepts.filter(
+      (d) => d.code.toLowerCase().includes(q) || (d.name || "").toLowerCase().includes(q)
+    );
+  }, [search, availableDepts]);
+
+  const toggleDept = (code) => {
+    if (!isMulti) {
+      onChange(code);
+      setIsOpen(false);
+      return;
+    }
+
+    if (code === "ALL") {
+      onChange("ALL");
+      return;
+    }
+
+    let next = selectedCodes.filter((c) => c !== "ALL");
+    if (next.includes(code)) {
+      next = next.filter((c) => c !== code);
+    } else {
+      next.push(code);
+    }
+
+    if (next.length === 0) {
+      onChange("ALL");
+    } else {
+      onChange(next.join(", "));
+    }
+  };
+
+  const removeDept = (e, code) => {
+    e.stopPropagation();
+    if (code === "ALL" || selectedCodes.length <= 1) {
+      onChange("ALL");
+    } else {
+      const next = selectedCodes.filter((c) => c !== code && c !== "ALL");
+      onChange(next.length === 0 ? "ALL" : next.join(", "));
+    }
+  };
+
+  return (
+    <div ref={containerRef} className="relative w-full">
+      {label && <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">{label}</label>}
+
+      <div
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="flex min-h-[42px] cursor-pointer flex-wrap items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-sm transition hover:border-blue-400 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-blue-500"
+      >
+        <div className="flex flex-1 flex-wrap items-center gap-1.5">
+          {selectedCodes.map((code) => (
+            <span
+              key={code}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold ${
+                code === "ALL"
+                  ? "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                  : "border border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/70 dark:text-blue-300"
+              }`}
+            >
+              {code === "ALL" ? "All Departments" : code}
+              {selectedCodes.length > 1 && (
+                <button
+                  type="button"
+                  onClick={(e) => removeDept(e, code)}
+                  className="rounded hover:bg-blue-200/60 dark:hover:bg-blue-900"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </span>
+          ))}
+        </div>
+
+        <ChevronDown className={`h-4 w-4 shrink-0 text-slate-400 transition-transform ${isOpen ? "rotate-180 text-blue-600" : ""}`} />
+      </div>
+
+      {isOpen && (
+        <div className="absolute left-0 top-full z-50 mt-1.5 w-full min-w-[280px] max-w-md rounded-2xl border border-slate-200 bg-white p-2.5 shadow-2xl animate-in fade-in zoom-in-95 dark:border-slate-800 dark:bg-slate-950">
+          <div className="mb-2 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-900">
+            <Search className="h-4 w-4 shrink-0 text-slate-400" />
+            <input
+              type="text"
+              autoFocus
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search dept code (e.g. cs, ad, al) or name..."
+              className="w-full bg-transparent text-xs text-slate-800 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
+            />
+            {search && (
+              <button type="button" onClick={() => setSearch("")} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+
+          <div className="max-h-56 overflow-y-auto space-y-1 pr-1">
+            {filteredDepts.length === 0 ? (
+              <div className="py-6 text-center text-xs text-slate-400 dark:text-slate-500">No matching department found</div>
+            ) : (
+              filteredDepts.map((dept) => {
+                const isSelected = selectedCodes.includes(dept.code);
+                return (
+                  <button
+                    key={dept.code}
+                    type="button"
+                    onClick={() => toggleDept(dept.code)}
+                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs transition ${
+                      isSelected
+                        ? "bg-blue-50 font-bold text-blue-700 dark:bg-blue-950/80 dark:text-blue-200"
+                        : "text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-900"
+                    }`}
+                  >
+                    <div className="flex flex-col min-w-0 pr-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`font-mono text-xs ${dept.code === "ALL" ? "text-slate-500 dark:text-slate-400" : "text-blue-600 dark:text-blue-400 font-bold"}`}>
+                          {dept.code}
+                        </span>
+                        <span className="truncate text-slate-800 dark:text-slate-200">{dept.name}</span>
+                      </div>
+                    </div>
+                    {isSelected && <Check className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />}
+                  </button>
+                );
+              })
+            )}
+          </div>
+
+          {isMulti && (
+            <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-2 text-[11px] text-slate-500 dark:border-slate-800 dark:text-slate-400">
+              <span>{isAll ? "All Departments selected" : `${selectedCodes.length} department(s) selected`}</span>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="font-bold text-blue-600 hover:underline dark:text-blue-400"
+              >
+                Done
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* -- QB Section -------------------------------------------------------------- */
 function QBSection() {
   const [qbItems, setQbItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -1739,8 +1997,50 @@ function QBSection() {
   const [banner, setBanner] = useState({ type: "", message: "" });
   const [filterYear, setFilterYear] = useState(String(CURRENT_YEAR));
   const [searchQuery, setSearchQuery] = useState("");
-  const [draggedId, setDraggedId] = useState(null);
-  const [dropTargetId, setDropTargetId] = useState(null);
+  const [extractedDepts, setExtractedDepts] = useState([]);
+  const [extractedYears, setExtractedYears] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    async function loadUserDepartments() {
+      try {
+        const res = await listAdminUsers();
+        if (!active) return;
+        const users = res?.users || [];
+        const deptsMap = new Map();
+        const yearsSet = new Set();
+
+        users.forEach((u) => {
+          const parsed = parseStudentEmail(u.email);
+          if (parsed) {
+            deptsMap.set(parsed.deptCode, {
+              code: parsed.deptCode,
+              name: parsed.deptName,
+            });
+            yearsSet.add(parsed.fullYear);
+          }
+        });
+
+        const mergedMap = new Map();
+        DEFAULT_DEPARTMENTS_LIST.forEach((d) => mergedMap.set(d.code, d));
+        deptsMap.forEach((d) => mergedMap.set(d.code, d));
+
+        setExtractedDepts(Array.from(mergedMap.values()));
+        if (yearsSet.size > 0) {
+          setExtractedYears(Array.from(yearsSet).sort());
+        }
+      } catch (err) {
+        console.warn("User email department parsing error:", err);
+      }
+    }
+    loadUserDepartments();
+    return () => { active = false; };
+  }, []);
+
+  const allYearOptions = useMemo(() => {
+    const combined = new Set([...YEAR_OPTIONS, ...extractedYears]);
+    return Array.from(combined).sort((a, b) => Number(b) - Number(a));
+  }, [extractedYears]);
 
   function toNullable(value) {
     const trimmed = (value || "").trim();
@@ -1898,7 +2198,7 @@ function QBSection() {
   async function handleCreateBatch() {
     const validRows = batchRows
       .map((row) => ({
-        year: Number(batchYear),
+        year: Number(row.year || batchYear),
         department: row.department || filterDepartment || "ALL",
         subject_code: row.subject_code.trim(),
         subject_name: row.subject_name.trim(),
@@ -1922,7 +2222,7 @@ function QBSection() {
       setBanner({ type: "success", message: "Subjects added successfully" });
       setShowBatchForm(false);
       setBatchYear(String(CURRENT_YEAR));
-      setBatchRows([{ id: Math.random().toString(36).substring(2, 9), department: filterDepartment || "ALL", subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
+      setBatchRows([{ id: Math.random().toString(36).substring(2, 9), year: String(CURRENT_YEAR), department: filterDepartment || "ALL", subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
       await load();
     } catch (err) {
       setBanner({ type: "error", message: normalizeError(err, "Failed to add subjects") });
@@ -2021,37 +2321,33 @@ function QBSection() {
           </div>
         )}
 
-
         <div className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Filter Subjects</h3>
               <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Select batch year and department to view and configure subjects.</p>
             </div>
-            <div className="flex flex-wrap gap-3 sm:w-auto">
+            <div className="flex flex-wrap items-center gap-3 sm:w-auto">
               <div className="w-full sm:w-36">
                 <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Batch Year</label>
                 <select
                   value={batchYear}
                   onChange={(e) => { setBatchYear(e.target.value); setFilterYear(e.target.value); }}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                 >
-                  {YEAR_OPTIONS.map((year) => (
+                  {allYearOptions.map((year) => (
                     <option key={year} value={year}>{year}</option>
                   ))}
                 </select>
               </div>
-              <div className="w-full sm:w-44">
-                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Department</label>
-                <select
+              <div className="w-full sm:w-72">
+                <DepartmentSelect
+                  label="Department"
                   value={filterDepartment}
-                  onChange={(e) => setFilterDepartment(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                >
-                  {QB_DEPARTMENTS.map((dept) => (
-                    <option key={dept} value={dept}>{dept === "ALL" ? "All Departments" : dept}</option>
-                  ))}
-                </select>
+                  onChange={setFilterDepartment}
+                  isMulti={false}
+                  customOptions={extractedDepts}
+                />
               </div>
             </div>
           </div>
@@ -2078,74 +2374,110 @@ function QBSection() {
 
         {showBatchForm && !editItem && (
           <div className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
-            <div className="mb-3 flex items-center justify-between gap-2">
+            <div className="mb-4 flex flex-col gap-3 border-b border-slate-100 pb-3.5 dark:border-slate-800/80 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Add subjects (batch)</h3>
-                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Add one or more subjects for Year {batchYear}.</p>
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Add subjects (batch entry)</h3>
+                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Configure and insert multiple subjects into the database.</p>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowBatchForm(false);
-                  setBatchRows([{ id: Math.random().toString(36).substring(2, 9), department: filterDepartment || "ALL", subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
-                }}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-              >
-                Hide form
-              </button>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50/60 px-3 py-1.5 dark:border-blue-900/60 dark:bg-blue-950/60">
+                  <label className="text-xs font-bold text-blue-900 dark:text-blue-200">Default Batch Year:</label>
+                  <select
+                    value={batchYear}
+                    onChange={(e) => {
+                      const newYr = e.target.value;
+                      setBatchYear(newYr);
+                      setFilterYear(newYr);
+                      setBatchRows((current) => current.map((r) => ({ ...r, year: newYr })));
+                    }}
+                    className="rounded-lg border border-blue-300 bg-white px-2.5 py-1 font-mono text-xs font-extrabold text-blue-900 outline-none transition focus:ring-2 focus:ring-blue-500/30 dark:border-blue-700 dark:bg-slate-900 dark:text-blue-200"
+                  >
+                    {allYearOptions.map((y) => (
+                      <option key={y} value={y}>Batch {y}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowBatchForm(false);
+                    setBatchRows([{ id: Math.random().toString(36).substring(2, 9), year: String(CURRENT_YEAR), department: filterDepartment || "ALL", subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
+                  }}
+                  className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                  Hide form
+                </button>
+              </div>
             </div>
 
             <div className="space-y-3">
               {batchRows.map((row, index) => (
-                <div key={row.id || index} className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900">
-                  <div className="mb-3 flex items-center justify-between gap-2">
-                    <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Subject {index + 1}</p>
+                <div key={row.id || index} className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+                  <div className="mb-3 flex items-center justify-between gap-2 border-b border-slate-200/50 pb-2 dark:border-slate-800">
+                    <span className="inline-block rounded-md bg-blue-100 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                      Subject {index + 1}
+                    </span>
                     <button
                       type="button"
                       onClick={() => setBatchRows((current) => current.filter((_, currentIndex) => currentIndex !== index))}
                       disabled={batchRows.length === 1}
-                      className="text-xs font-medium text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+                      className="text-xs font-semibold text-red-600 hover:underline disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       Remove
                     </button>
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="grid gap-3 sm:grid-cols-4">
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-slate-500 dark:text-slate-400">Department</label>
+                      <label className="mb-1 block text-[11px] font-bold text-slate-700 dark:text-slate-300">Batch Year</label>
                       <select
-                        value={row.department || filterDepartment || "ALL"}
-                        onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, department: e.target.value } : item))}
-                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                        value={row.year || batchYear}
+                        onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, year: e.target.value } : item))}
+                        className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                       >
-                        {QB_DEPARTMENTS.map((d) => (
-                          <option key={d} value={d}>{d === "ALL" ? "All Departments" : d}</option>
+                        {allYearOptions.map((y) => (
+                          <option key={y} value={y}>Batch {y}</option>
                         ))}
                       </select>
                     </div>
+
+                    <div className="sm:col-span-3">
+                      <DepartmentSelect
+                        label="Department(s)"
+                        value={row.department || filterDepartment || "ALL"}
+                        onChange={(newVal) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, department: newVal } : item))}
+                        isMulti={true}
+                        customOptions={extractedDepts}
+                      />
+                    </div>
+
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-slate-500 dark:text-slate-400">Subject Code</label>
+                      <label className="mb-1 block text-[11px] font-semibold text-slate-600 dark:text-slate-400">Subject Code</label>
                       <input
                         value={row.subject_code}
                         onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, subject_code: e.target.value } : item))}
                         placeholder="e.g. 22CS301"
-                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                        className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                       />
                     </div>
-                    <div>
-                      <label className="mb-1 block text-[11px] font-medium text-slate-500 dark:text-slate-400">Subject Name</label>
+
+                    <div className="sm:col-span-3">
+                      <label className="mb-1 block text-[11px] font-semibold text-slate-600 dark:text-slate-400">Subject Name</label>
                       <input
                         value={row.subject_name}
                         onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, subject_name: e.target.value } : item))}
                         placeholder="Subject title"
-                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                        className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                       />
                     </div>
-                    <input value={row.qb1} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, qb1: e.target.value } : item))} placeholder="QB1 link" className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
-                    <input value={row.qb2} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, qb2: e.target.value } : item))} placeholder="QB2 link" className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
-                    <input value={row.ak1} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, ak1: e.target.value } : item))} placeholder="AK1 link" className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
-                    <input value={row.ak2} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, ak2: e.target.value } : item))} placeholder="AK2 link" className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
-                    <input value={row.semqbwithans} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, semqbwithans: e.target.value } : item))} placeholder="Sem QB with answer link" className="sm:col-span-2 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
+
+                    <input value={row.qb1} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, qb1: e.target.value } : item))} placeholder="QB1 link" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
+                    <input value={row.qb2} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, qb2: e.target.value } : item))} placeholder="QB2 link" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
+                    <input value={row.ak1} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, ak1: e.target.value } : item))} placeholder="AK1 link" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
+                    <input value={row.ak2} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, ak2: e.target.value } : item))} placeholder="AK2 link" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
+                    <input value={row.semqbwithans} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, semqbwithans: e.target.value } : item))} placeholder="Sem QB with answer link" className="sm:col-span-4 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
                   </div>
                 </div>
               ))}
@@ -2154,7 +2486,7 @@ function QBSection() {
                 <button
                   type="button"
                   onClick={() => setBatchRows((current) => ([...current, { id: Math.random().toString(36).substring(2, 9), department: filterDepartment || "ALL", subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]))}
-                  className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   <Plus className="h-4 w-4" />
                   Add row
@@ -2163,7 +2495,7 @@ function QBSection() {
                   type="button"
                   onClick={handleCreateBatch}
                   disabled={isSaving}
-                  className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                  className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
                 >
                   {isSaving ? <Loader className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
                   {isSaving ? "Saving..." : "Save batch"}
@@ -2175,7 +2507,7 @@ function QBSection() {
                     setBatchRows([{ id: Math.random().toString(36).substring(2, 9), department: filterDepartment || "ALL", subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
                     setBatchYear(String(CURRENT_YEAR));
                   }}
-                  className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   <X className="h-4 w-4" />
                   Cancel
@@ -2243,9 +2575,23 @@ function QBSection() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`rounded px-2 py-0.5 font-mono text-xs font-bold ${item.department === "ALL" || !item.department ? "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300" : "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"}`}>
-                        {item.department || "ALL"}
-                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {(item.department || "ALL").split(",").map((deptCode) => {
+                          const d = deptCode.trim();
+                          return (
+                            <span
+                              key={d}
+                              className={`rounded px-2 py-0.5 font-mono text-xs font-bold ${
+                                d === "ALL"
+                                  ? "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                                  : "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
+                              }`}
+                            >
+                              {d}
+                            </span>
+                          );
+                        })}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-gray-800 dark:text-slate-200">{item.subject_name}</td>
                     <td className="px-4 py-3"><LinkCell value={item.qb1} /></td>
@@ -2291,51 +2637,79 @@ function QBSection() {
         </div>
 
         {viewItem && (
-          <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-slate-950/60 px-4 py-6 backdrop-blur-sm sm:px-6">
+          <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-slate-950/65 px-4 py-6 backdrop-blur-md sm:px-6">
             <div className="absolute inset-0" onClick={closePreviewModals} />
-            <div className="relative z-50 w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
-              <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4 dark:border-slate-800 sm:px-6">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Subject details</p>
-                  <h3 className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">{viewItem.subject_code}</h3>
+            <div className="relative z-50 w-full max-w-2xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
+              <div className="flex items-center justify-between border-b border-slate-200/80 px-6 py-5 dark:border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+                    <BookOpen className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="inline-block rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                      Subject Overview
+                    </span>
+                    <h3 className="mt-0.5 text-base font-bold text-slate-900 dark:text-slate-100">{viewItem.subject_code}</h3>
+                  </div>
                 </div>
-                <button type="button" onClick={closePreviewModals} className="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900">
+                <button type="button" onClick={closePreviewModals} className="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800">
                   <X className="h-4 w-4" />
                 </button>
               </div>
 
-              <div className="grid gap-3 p-4 sm:grid-cols-2 sm:p-6">
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900">
-                  <p className="text-[10px] uppercase tracking-wide text-slate-400">Year</p>
+              <div className="grid gap-3 p-6 sm:grid-cols-2">
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3.5 dark:border-slate-800 dark:bg-slate-900/60">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Year</p>
                   <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{viewItem.year}</p>
                 </div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900">
-                  <p className="text-[10px] uppercase tracking-wide text-slate-400">Subject</p>
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3.5 dark:border-slate-800 dark:bg-slate-900/60">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Department(s)</p>
+                  <p className="mt-1 text-sm font-semibold text-blue-600 dark:text-blue-400">{viewItem.department || "ALL"}</p>
+                </div>
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3.5 dark:border-slate-800 dark:bg-slate-900/60 sm:col-span-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Subject Name</p>
                   <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{viewItem.subject_name}</p>
                 </div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">QB1</p><LinkCell value={viewItem.qb1} /></div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">QB2</p><LinkCell value={viewItem.qb2} /></div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">AK1</p><LinkCell value={viewItem.ak1} /></div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900"><p className="text-[10px] uppercase tracking-wide text-slate-400">AK2</p><LinkCell value={viewItem.ak2} /></div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900 sm:col-span-2"><p className="text-[10px] uppercase tracking-wide text-slate-400">Sem QB with answer</p><LinkCell value={viewItem.semqbwithans} /></div>
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3.5 dark:border-slate-800 dark:bg-slate-900/60"><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">QB1 Link</p><LinkCell value={viewItem.qb1} /></div>
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3.5 dark:border-slate-800 dark:bg-slate-900/60"><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">QB2 Link</p><LinkCell value={viewItem.qb2} /></div>
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3.5 dark:border-slate-800 dark:bg-slate-900/60"><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">AK1 Link</p><LinkCell value={viewItem.ak1} /></div>
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3.5 dark:border-slate-800 dark:bg-slate-900/60"><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">AK2 Link</p><LinkCell value={viewItem.ak2} /></div>
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3.5 dark:border-slate-800 dark:bg-slate-900/60 sm:col-span-2"><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Sem QB with Answer</p><LinkCell value={viewItem.semqbwithans} /></div>
               </div>
             </div>
           </div>
         )}
 
+        {/* Improved Modal UI for Edit Subject */}
         {editItem && (
-          <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-slate-950/60 px-4 py-6 backdrop-blur-sm sm:px-6">
+          <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/70 px-4 py-6 backdrop-blur-md sm:px-6">
             <div className="absolute inset-0" onClick={closePreviewModals} />
-            <div className="relative z-50 w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
-              <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4 dark:border-slate-800 sm:px-6">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Edit subject</p>
-                  <h3 className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">{editItem.subject_code || "Subject"}</h3>
+            <div className="relative z-50 my-auto w-full max-w-3xl overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5 dark:border-slate-800/80 dark:bg-slate-900/40">
+                <div className="flex items-center gap-3.5">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-md shadow-blue-500/20">
+                    <Edit2 className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="inline-block rounded-full bg-blue-100 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                      EDIT SUBJECT
+                    </span>
+                    <h3 className="mt-0.5 text-lg font-extrabold text-slate-900 dark:text-slate-100">
+                      {editItem.subject_code ? `${editItem.subject_code} - ${editItem.subject_name}` : "Configure Subject Links"}
+                    </h3>
+                  </div>
                 </div>
-                <button type="button" onClick={closePreviewModals} className="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900">
-                  <X className="h-4 w-4" />
+                <button
+                  type="button"
+                  onClick={closePreviewModals}
+                  className="rounded-2xl border border-slate-200 bg-white p-2.5 text-slate-500 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
+                >
+                  <X className="h-5 w-5" />
                 </button>
               </div>
+
+              {/* Modal Body Form */}
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -2351,115 +2725,140 @@ function QBSection() {
                     semqbwithans: toNullable(editItem.semqbwithans),
                   });
                 }}
-                className="space-y-4 p-4 sm:p-6"
+                className="max-h-[78vh] overflow-y-auto p-6 space-y-5"
               >
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Year</label>
-                    <select
-                      value={editItem.year}
-                      onChange={(e) => setEditItem((prev) => ({ ...prev, year: e.target.value }))}
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                    >
-                      {YEAR_OPTIONS.map((y) => (
-                        <option key={y} value={y}>{y}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Department</label>
-                    <select
-                      value={editItem.department || "ALL"}
-                      onChange={(e) => setEditItem((prev) => ({ ...prev, department: e.target.value }))}
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                    >
-                      {QB_DEPARTMENTS.map((d) => (
-                        <option key={d} value={d}>{d === "ALL" ? "All Departments" : d}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Subject Code</label>
-                    <input
-                      required
-                      value={editItem.subject_code}
-                      onChange={(e) => setEditItem((prev) => ({ ...prev, subject_code: e.target.value }))}
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                    />
+                {/* Section 1: Target Department & Academic Year */}
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 space-y-4 dark:border-slate-800 dark:bg-slate-900/30">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    1. Target Department & Year
+                  </h4>
+
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Batch Year</label>
+                      <select
+                        value={editItem.year}
+                        onChange={(e) => setEditItem((prev) => ({ ...prev, year: e.target.value }))}
+                        className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                      >
+                        {allYearOptions.map((y) => (
+                          <option key={y} value={y}>{y}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <DepartmentSelect
+                        label="Department(s) Allowed"
+                        value={editItem.department || "ALL"}
+                        onChange={(newVal) => setEditItem((prev) => ({ ...prev, department: newVal }))}
+                        isMulti={true}
+                        customOptions={extractedDepts}
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Subject Name</label>
-                  <input
-                    required
-                    value={editItem.subject_name}
-                    onChange={(e) => setEditItem((prev) => ({ ...prev, subject_name: e.target.value }))}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                  />
-                </div>
+                {/* Section 2: Subject Details */}
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 space-y-4 dark:border-slate-800 dark:bg-slate-900/30">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    2. Subject Identity
+                  </h4>
 
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">QB1 Link</label>
-                    <input
-                      value={editItem.qb1 || ""}
-                      onChange={(e) => setEditItem((prev) => ({ ...prev, qb1: e.target.value }))}
-                      placeholder="https://..."
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">QB2 Link</label>
-                    <input
-                      value={editItem.qb2 || ""}
-                      onChange={(e) => setEditItem((prev) => ({ ...prev, qb2: e.target.value }))}
-                      placeholder="https://..."
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">AK1 Link</label>
-                    <input
-                      value={editItem.ak1 || ""}
-                      onChange={(e) => setEditItem((prev) => ({ ...prev, ak1: e.target.value }))}
-                      placeholder="https://..."
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">AK2 Link</label>
-                    <input
-                      value={editItem.ak2 || ""}
-                      onChange={(e) => setEditItem((prev) => ({ ...prev, ak2: e.target.value }))}
-                      placeholder="https://..."
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                    />
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Subject Code</label>
+                      <input
+                        required
+                        value={editItem.subject_code}
+                        onChange={(e) => setEditItem((prev) => ({ ...prev, subject_code: e.target.value }))}
+                        className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 font-mono text-sm font-bold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Subject Name</label>
+                      <input
+                        required
+                        value={editItem.subject_name}
+                        onChange={(e) => setEditItem((prev) => ({ ...prev, subject_name: e.target.value }))}
+                        className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Sem QB with Answer Link</label>
+                {/* Section 3: Question Banks & Answer Keys */}
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 space-y-4 dark:border-slate-800 dark:bg-slate-900/30">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    3. QB & AK PDF Links
+                  </h4>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">PT-1 Question Bank (QB1)</label>
+                      <input
+                        value={editItem.qb1 || ""}
+                        onChange={(e) => setEditItem((prev) => ({ ...prev, qb1: e.target.value }))}
+                        placeholder="https://drive.google.com/..."
+                        className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">PT-2 Question Bank (QB2)</label>
+                      <input
+                        value={editItem.qb2 || ""}
+                        onChange={(e) => setEditItem((prev) => ({ ...prev, qb2: e.target.value }))}
+                        placeholder="https://drive.google.com/..."
+                        className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">PT-1 Answer Key (AK1)</label>
+                      <input
+                        value={editItem.ak1 || ""}
+                        onChange={(e) => setEditItem((prev) => ({ ...prev, ak1: e.target.value }))}
+                        placeholder="https://drive.google.com/..."
+                        className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">PT-2 Answer Key (AK2)</label>
+                      <input
+                        value={editItem.ak2 || ""}
+                        onChange={(e) => setEditItem((prev) => ({ ...prev, ak2: e.target.value }))}
+                        placeholder="https://drive.google.com/..."
+                        className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 4: Semester Bundle */}
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 space-y-2 dark:border-slate-800 dark:bg-slate-900/30">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    4. Semester-End QB + Answers Bundle
+                  </label>
                   <input
                     value={editItem.semqbwithans || ""}
                     onChange={(e) => setEditItem((prev) => ({ ...prev, semqbwithans: e.target.value }))}
-                    placeholder="https://..."
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                    placeholder="https://drive.google.com/..."
+                    className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                   />
                 </div>
 
-                <div className="flex justify-end gap-2 pt-2">
+                {/* Footer Buttons */}
+                <div className="flex items-center justify-end gap-3 pt-3">
                   <button
                     type="button"
                     onClick={closePreviewModals}
-                    className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                    className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+                    className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-blue-500/20 transition hover:bg-blue-700 disabled:opacity-60"
                   >
                     {isSaving ? <Loader className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
                     Save changes
