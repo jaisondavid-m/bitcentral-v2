@@ -61,11 +61,13 @@ export async function updateUsers() {
   return response.data;
 }
 
-export async function listQBAnswerKeys({ semester, year } = {}) {
+export async function listQBAnswerKeys({ semester, year, department, dept } = {}) {
   const headers = await getAdminHeaders();
   const params = new URLSearchParams();
   if (semester) params.set("semester", semester);
   if (year) params.set("year", year);
+  const d = department || dept;
+  if (d) params.set("dept", d);
   const response = await api.get(`/admin/qb?${params.toString()}`, { headers });
   return response.data;
 }

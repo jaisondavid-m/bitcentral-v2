@@ -1713,6 +1713,8 @@ function CardsSection() {
 }
 
 /* -- QB Section -------------------------------------------------------------- */
+const QB_DEPARTMENTS = ["ALL", "CSE", "ECE", "IT", "MECH", "EEE", "CIVIL", "AI&DS", "CSD", "CSBS", "BT", "FT", "FD", "BME", "AGRI"];
+
 function QBSection() {
   const [qbItems, setQbItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -1724,6 +1726,7 @@ function QBSection() {
   const [viewItem, setViewItem] = useState(null);
   const [showBatchForm, setShowBatchForm] = useState(false);
   const [batchYear, setBatchYear] = useState(String(CURRENT_YEAR));
+  const [filterDepartment, setFilterDepartment] = useState("ALL");
   const [batchPreviewItems, setBatchPreviewItems] = useState([]);
   const [batchPreviewLoading, setBatchPreviewLoading] = useState(false);
   const [batchPreviewError, setBatchPreviewError] = useState("");
@@ -1731,7 +1734,7 @@ function QBSection() {
   const [batchPreviewDropTargetId, setBatchPreviewDropTargetId] = useState(null);
   const [batchPreviewReordering, setBatchPreviewReordering] = useState(false);
   const [batchRows, setBatchRows] = useState([
-    { subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" },
+    { id: Math.random().toString(36).substring(2, 9), department: "ALL", subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" },
   ]);
   const [banner, setBanner] = useState({ type: "", message: "" });
   const [filterYear, setFilterYear] = useState(String(CURRENT_YEAR));
@@ -1749,7 +1752,7 @@ function QBSection() {
     setIsLoading(true);
     setBanner({ type: "", message: "" });
     try {
-      const result = await listQBAnswerKeys({ year: filterYear || undefined });
+      const result = await listQBAnswerKeys({ year: filterYear || undefined, dept: filterDepartment !== "ALL" ? filterDepartment : undefined });
       setQbItems(result.data || []);
     } catch (err) {
       setBanner({ type: "error", message: normalizeError(err, "Failed to load subjects") });
@@ -1757,7 +1760,7 @@ function QBSection() {
     } finally {
       setIsLoading(false);
     }
-  }, [filterYear]);
+  }, [filterYear, filterDepartment]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -1768,7 +1771,7 @@ function QBSection() {
     setBatchPreviewError("");
 
     try {
-      const result = await listQBAnswerKeys({ year: batchYear });
+      const result = await listQBAnswerKeys({ year: batchYear, dept: filterDepartment !== "ALL" ? filterDepartment : undefined });
       setBatchPreviewItems(result.data || []);
     } catch (err) {
       setBatchPreviewItems([]);
@@ -1776,7 +1779,7 @@ function QBSection() {
     } finally {
       setBatchPreviewLoading(false);
     }
-  }, [batchYear]);
+  }, [batchYear, filterDepartment]);
 
   useEffect(() => {
     loadBatchPreview();
@@ -1806,7 +1809,7 @@ function QBSection() {
     setBatchPreviewReordering(true);
 
     try {
-      await reorderQBAnswerKeys({ year: Number(batchYear), subject_ids });
+      await reorderQBAnswerKeys({ year: Number(batchYear), department: filterDepartment, subject_ids });
       setBanner({ type: "success", message: "Subject order updated" });
       if (String(filterYear) === String(batchYear)) {
         await load();
@@ -1846,7 +1849,8 @@ function QBSection() {
     return qbItems.filter(
       (item) =>
         (item.subject_code || "").toLowerCase().includes(q) ||
-        (item.subject_name || "").toLowerCase().includes(q)
+        (item.subject_name || "").toLowerCase().includes(q) ||
+        (item.department || "").toLowerCase().includes(q)
     );
   }, [qbItems, searchQuery]);
 
@@ -1861,7 +1865,7 @@ function QBSection() {
     setBanner({ type: "", message: "" });
 
     try {
-      await reorderQBAnswerKeys({ year: Number(filterYear), subject_ids });
+      await reorderQBAnswerKeys({ year: Number(filterYear), department: filterDepartment, subject_ids });
       setBanner({ type: "success", message: "Subject order updated" });
     } catch (err) {
       setQbItems(previousItems);
@@ -1895,6 +1899,7 @@ function QBSection() {
     const validRows = batchRows
       .map((row) => ({
         year: Number(batchYear),
+        department: row.department || filterDepartment || "ALL",
         subject_code: row.subject_code.trim(),
         subject_name: row.subject_name.trim(),
         qb1: toNullable(row.qb1),
@@ -1917,7 +1922,7 @@ function QBSection() {
       setBanner({ type: "success", message: "Subjects added successfully" });
       setShowBatchForm(false);
       setBatchYear(String(CURRENT_YEAR));
-      setBatchRows([{ subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
+      setBatchRows([{ id: Math.random().toString(36).substring(2, 9), department: filterDepartment || "ALL", subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
       await load();
     } catch (err) {
       setBanner({ type: "error", message: normalizeError(err, "Failed to add subjects") });
@@ -1963,6 +1968,7 @@ function QBSection() {
     setEditItem({
       id: item.id,
       year: String(item.year || batchYear || CURRENT_YEAR),
+      department: item.department || "ALL",
       subject_code: item.subject_code || "",
       subject_name: item.subject_name || "",
       qb1: item.qb1 || "",
@@ -1995,7 +2001,7 @@ function QBSection() {
             <BookOpen className="h-5 w-5 text-blue-600" />
             QB Handling
           </h2>
-          <p className="mt-0.5 text-sm text-gray-500 dark:text-slate-400">Add multiple subjects for a year, then drag the Move handle to change the order.</p>
+          <p className="mt-0.5 text-sm text-gray-500 dark:text-slate-400">Configure Question Bank & Answer Key links by Batch Year and Department.</p>
           {isReordering && <p className="mt-1 text-xs font-semibold text-blue-600 dark:text-blue-300">Saving new order...</p>}
         </div>
         <button
@@ -2019,34 +2025,44 @@ function QBSection() {
         <div className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Batch year</h3>
-              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Select a year to review and manage its subjects.</p>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Filter Subjects</h3>
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Select batch year and department to view and configure subjects.</p>
             </div>
-            <div className="w-full sm:w-48">
-              <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Year</label>
-              <select
-                value={batchYear}
-                onChange={(e) => setBatchYear(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-              >
-                {YEAR_OPTIONS.map((year) => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
+            <div className="flex flex-wrap gap-3 sm:w-auto">
+              <div className="w-full sm:w-36">
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Batch Year</label>
+                <select
+                  value={batchYear}
+                  onChange={(e) => { setBatchYear(e.target.value); setFilterYear(e.target.value); }}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                >
+                  {YEAR_OPTIONS.map((year) => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="w-full sm:w-44">
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Department</label>
+                <select
+                  value={filterDepartment}
+                  onChange={(e) => setFilterDepartment(e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                >
+                  {QB_DEPARTMENTS.map((dept) => (
+                    <option key={dept} value={dept}>{dept === "ALL" ? "All Departments" : dept}</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
           <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Selected batch</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Selected Filter</p>
                 <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                  {batchPreviewLoading ? "Loading subjects..." : `${batchPreviewStats.total} subject${batchPreviewStats.total === 1 ? "" : "s"} in ${batchYear}`}
+                  {batchPreviewLoading ? "Loading subjects..." : `${batchPreviewStats.total} subject${batchPreviewStats.total === 1 ? "" : "s"} in ${batchYear} (${filterDepartment === "ALL" ? "All Departments" : filterDepartment})`}
                 </p>
-                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Drag the Move handle to change the order.</p>
-                {batchPreviewReordering && (
-                  <p className="mt-1 text-xs font-semibold text-blue-600 dark:text-blue-300">Saving new order...</p>
-                )}
               </div>
               <button
                 type="button"
@@ -2057,127 +2073,21 @@ function QBSection() {
                 Refresh
               </button>
             </div>
-
-            {batchPreviewError ? (
-              <p className="mt-3 text-sm text-red-600 dark:text-red-300">{batchPreviewError}</p>
-            ) : batchPreviewLoading ? (
-              <div className="mt-3 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                <Loader className="h-4 w-4 animate-spin" />
-                Loading batch details...
-              </div>
-            ) : batchPreviewItems.length === 0 ? (
-              <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">This batch is empty. You can add the first subject below.</p>
-            ) : (
-              <div className="mt-3 overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
-                <div className="max-h-64 overflow-y-auto">
-                  <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
-                    <thead className="sticky top-0 bg-slate-50 dark:bg-slate-900">
-                      <tr>
-                        <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Move</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Code</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Subject</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                      {batchPreviewItems.map((item, index) => (
-                        <tr
-                          key={item.id}
-                          onDragOver={(event) => {
-                            if (!canReorderPreview) return;
-                            event.preventDefault();
-                            setBatchPreviewDropTargetId(item.id);
-                          }}
-                          onDrop={async (event) => {
-                            if (!canReorderPreview) return;
-                            event.preventDefault();
-                            await handleBatchPreviewDrop(item.id);
-                          }}
-                          onDragEnd={() => {
-                            setBatchPreviewDraggedId(null);
-                            setBatchPreviewDropTargetId(null);
-                          }}
-                          className={`transition hover:bg-slate-50 dark:hover:bg-slate-900 ${batchPreviewDraggedId === item.id ? "opacity-50" : ""} ${batchPreviewDropTargetId === item.id ? "ring-2 ring-inset ring-blue-400" : ""}`}
-                        >
-                          <td className="px-3 py-2">
-                            <button
-                              type="button"
-                              draggable={canReorderPreview}
-                              onDragStart={(event) => {
-                                if (!canReorderPreview) return;
-                                setBatchPreviewDraggedId(item.id);
-                                event.dataTransfer.effectAllowed = "move";
-                                event.dataTransfer.setData("text/plain", String(item.id));
-                              }}
-                              onDragEnd={() => {
-                                setBatchPreviewDraggedId(null);
-                                setBatchPreviewDropTargetId(null);
-                              }}
-                              disabled={!canReorderPreview}
-                              title={canReorderPreview ? "Drag to reorder" : "Reordering is temporarily unavailable"}
-                              className="inline-flex cursor-grab items-center rounded-md border border-slate-200 bg-white px-2 py-1 text-slate-400 transition hover:bg-slate-50 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-500"
-                              aria-label={`Drag to reorder ${item.subject_code}`}
-                            >
-                              <GripVertical className="h-4 w-4" />
-                            </button>
-                          </td>
-                          <td className="px-3 py-2 font-mono text-xs font-semibold text-slate-700 dark:text-slate-200">{item.subject_code}</td>
-                          <td className="px-3 py-2 text-slate-700 dark:text-slate-200">{item.subject_name}</td>
-                          <td className="px-3 py-2">
-                            <div className="flex flex-wrap gap-2">
-                              <button
-                                type="button"
-                                onClick={() => openView(item)}
-                                className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
-                              >
-                                <Eye className="h-3.5 w-3.5 text-blue-600" />
-                                View
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => openEdit(item)}
-                                className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
-                              >
-                                <Edit2 className="h-3.5 w-3.5 text-amber-600" />
-                                Edit
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setDeleteConfirmItem(item)}
-                                disabled={deletingId === item.id}
-                                className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50/50 px-2.5 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-900/60"
-                              >
-                                {deletingId === item.id ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-                                Delete
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="border-t border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
-                  Showing {batchPreviewItems.length} subject{batchPreviewItems.length === 1 ? "" : "s"}.
-                </div>
-              </div>
-            )}
           </div>
-
-          </div>
+        </div>
 
         {showBatchForm && !editItem && (
           <div className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
             <div className="mb-3 flex items-center justify-between gap-2">
               <div>
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Add subjects</h3>
-                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Add one or more subjects for the selected year.</p>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Add subjects (batch)</h3>
+                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Add one or more subjects for Year {batchYear}.</p>
               </div>
               <button
                 type="button"
                 onClick={() => {
                   setShowBatchForm(false);
-                  setBatchRows([{ subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
+                  setBatchRows([{ id: Math.random().toString(36).substring(2, 9), department: filterDepartment || "ALL", subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
                 }}
                 className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
               >
@@ -2187,7 +2097,7 @@ function QBSection() {
 
             <div className="space-y-3">
               {batchRows.map((row, index) => (
-                <div key={`${index}-${row.subject_code}`} className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900">
+                <div key={row.id || index} className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900">
                   <div className="mb-3 flex items-center justify-between gap-2">
                     <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Subject {index + 1}</p>
                     <button
@@ -2200,19 +2110,37 @@ function QBSection() {
                     </button>
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <input
-                      value={row.subject_code}
-                      onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, subject_code: e.target.value } : item))}
-                      placeholder="Subject code"
-                      className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
-                    />
-                    <input
-                      value={row.subject_name}
-                      onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, subject_name: e.target.value } : item))}
-                      placeholder="Subject name"
-                      className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
-                    />
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <div>
+                      <label className="mb-1 block text-[11px] font-medium text-slate-500 dark:text-slate-400">Department</label>
+                      <select
+                        value={row.department || filterDepartment || "ALL"}
+                        onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, department: e.target.value } : item))}
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                      >
+                        {QB_DEPARTMENTS.map((d) => (
+                          <option key={d} value={d}>{d === "ALL" ? "All Departments" : d}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[11px] font-medium text-slate-500 dark:text-slate-400">Subject Code</label>
+                      <input
+                        value={row.subject_code}
+                        onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, subject_code: e.target.value } : item))}
+                        placeholder="e.g. 22CS301"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[11px] font-medium text-slate-500 dark:text-slate-400">Subject Name</label>
+                      <input
+                        value={row.subject_name}
+                        onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, subject_name: e.target.value } : item))}
+                        placeholder="Subject title"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                      />
+                    </div>
                     <input value={row.qb1} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, qb1: e.target.value } : item))} placeholder="QB1 link" className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
                     <input value={row.qb2} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, qb2: e.target.value } : item))} placeholder="QB2 link" className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
                     <input value={row.ak1} onChange={(e) => setBatchRows((current) => current.map((item, currentIndex) => currentIndex === index ? { ...item, ak1: e.target.value } : item))} placeholder="AK1 link" className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
@@ -2225,7 +2153,7 @@ function QBSection() {
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
-                  onClick={() => setBatchRows((current) => ([...current, { subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]))}
+                  onClick={() => setBatchRows((current) => ([...current, { id: Math.random().toString(36).substring(2, 9), department: filterDepartment || "ALL", subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]))}
                   className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   <Plus className="h-4 w-4" />
@@ -2244,7 +2172,7 @@ function QBSection() {
                   type="button"
                   onClick={() => {
                     setShowBatchForm(false);
-                    setBatchRows([{ subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
+                    setBatchRows([{ id: Math.random().toString(36).substring(2, 9), department: filterDepartment || "ALL", subject_code: "", subject_name: "", qb1: "", qb2: "", ak1: "", ak2: "", semqbwithans: "" }]);
                     setBatchYear(String(CURRENT_YEAR));
                   }}
                   className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
@@ -2261,7 +2189,7 @@ function QBSection() {
           <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-blue-900">
             <thead className="bg-white/70 dark:bg-slate-900/70">
               <tr>
-                {["#", "Move", "Code", "Subject", "QB1", "QB2", "AK1", "AK2", "Sem + Ans", "Updated", "Actions"].map((h) => (
+                {["#", "Move", "Code", "Dept", "Subject", "QB1", "QB2", "AK1", "AK2", "Sem + Ans", "Updated", "Actions"].map((h) => (
                   <th key={h} className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-slate-200">{h}</th>
                 ))}
               </tr>
@@ -2314,6 +2242,11 @@ function QBSection() {
                         {item.subject_code}
                       </span>
                     </td>
+                    <td className="px-4 py-3">
+                      <span className={`rounded px-2 py-0.5 font-mono text-xs font-bold ${item.department === "ALL" || !item.department ? "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300" : "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"}`}>
+                        {item.department || "ALL"}
+                      </span>
+                    </td>
                     <td className="px-4 py-3 text-gray-800 dark:text-slate-200">{item.subject_name}</td>
                     <td className="px-4 py-3"><LinkCell value={item.qb1} /></td>
                     <td className="px-4 py-3"><LinkCell value={item.qb2} /></td>
@@ -2325,17 +2258,25 @@ function QBSection() {
                       <div className="flex gap-2">
                         <button
                           type="button"
-                          onClick={() => { setEditItem(item); setShowBatchForm(false); }}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-900 dark:text-slate-200"
+                          onClick={() => openView(item)}
+                          className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
                         >
-                          <Edit2 className="h-3.5 w-3.5" />
+                          <Eye className="h-3.5 w-3.5 text-blue-600" />
+                          View
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => openEdit(item)}
+                          className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+                        >
+                          <Edit2 className="h-3.5 w-3.5 text-amber-600" />
                           Edit
                         </button>
                         <button
                           type="button"
                           onClick={() => setDeleteConfirmItem(item)}
                           disabled={deletingId === item.id}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50/50 px-2.5 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-100 disabled:opacity-60 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400"
+                          className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50/50 px-2.5 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-900/60"
                         >
                           {deletingId === item.id ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                           Delete
@@ -2389,20 +2330,142 @@ function QBSection() {
               <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4 dark:border-slate-800 sm:px-6">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Edit subject</p>
-                  <h3 className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">{editItem.subject_code}</h3>
+                  <h3 className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">{editItem.subject_code || "Subject"}</h3>
                 </div>
                 <button type="button" onClick={closePreviewModals} className="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900">
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              <div className="p-4 sm:p-6">
-                <QBForm
-                  initial={editItem}
-                  onSubmit={handleUpdate}
-                  onCancel={closePreviewModals}
-                  isLoading={isSaving}
-                />
-              </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleUpdate({
+                    year: Number(editItem.year),
+                    department: editItem.department || "ALL",
+                    subject_code: editItem.subject_code,
+                    subject_name: editItem.subject_name,
+                    qb1: toNullable(editItem.qb1),
+                    qb2: toNullable(editItem.qb2),
+                    ak1: toNullable(editItem.ak1),
+                    ak2: toNullable(editItem.ak2),
+                    semqbwithans: toNullable(editItem.semqbwithans),
+                  });
+                }}
+                className="space-y-4 p-4 sm:p-6"
+              >
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Year</label>
+                    <select
+                      value={editItem.year}
+                      onChange={(e) => setEditItem((prev) => ({ ...prev, year: e.target.value }))}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                    >
+                      {YEAR_OPTIONS.map((y) => (
+                        <option key={y} value={y}>{y}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Department</label>
+                    <select
+                      value={editItem.department || "ALL"}
+                      onChange={(e) => setEditItem((prev) => ({ ...prev, department: e.target.value }))}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                    >
+                      {QB_DEPARTMENTS.map((d) => (
+                        <option key={d} value={d}>{d === "ALL" ? "All Departments" : d}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Subject Code</label>
+                    <input
+                      required
+                      value={editItem.subject_code}
+                      onChange={(e) => setEditItem((prev) => ({ ...prev, subject_code: e.target.value }))}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Subject Name</label>
+                  <input
+                    required
+                    value={editItem.subject_name}
+                    onChange={(e) => setEditItem((prev) => ({ ...prev, subject_name: e.target.value }))}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                  />
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">QB1 Link</label>
+                    <input
+                      value={editItem.qb1 || ""}
+                      onChange={(e) => setEditItem((prev) => ({ ...prev, qb1: e.target.value }))}
+                      placeholder="https://..."
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">QB2 Link</label>
+                    <input
+                      value={editItem.qb2 || ""}
+                      onChange={(e) => setEditItem((prev) => ({ ...prev, qb2: e.target.value }))}
+                      placeholder="https://..."
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">AK1 Link</label>
+                    <input
+                      value={editItem.ak1 || ""}
+                      onChange={(e) => setEditItem((prev) => ({ ...prev, ak1: e.target.value }))}
+                      placeholder="https://..."
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">AK2 Link</label>
+                    <input
+                      value={editItem.ak2 || ""}
+                      onChange={(e) => setEditItem((prev) => ({ ...prev, ak2: e.target.value }))}
+                      placeholder="https://..."
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Sem QB with Answer Link</label>
+                  <input
+                    value={editItem.semqbwithans || ""}
+                    onChange={(e) => setEditItem((prev) => ({ ...prev, semqbwithans: e.target.value }))}
+                    placeholder="https://..."
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={closePreviewModals}
+                    className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+                  >
+                    {isSaving ? <Loader className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+                    Save changes
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}
