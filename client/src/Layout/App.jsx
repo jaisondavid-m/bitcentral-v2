@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import FullScreenLoader from "../Component/FullScreenLoader.jsx";
 import SEO from "../Component/SEO.jsx";
+import DailySupportModal from "../Component/DailySupportModal.jsx";
 import { ROUTE_SEO } from "../seo/routeSeo.js";
 
 const Login = lazy(() => import("../Pages/Login.jsx"));
@@ -281,6 +282,7 @@ function App() {
         </Routes>
       </Suspense>
       <Analytics />
+      <DailySupportModal />
     </>
   );
 }
