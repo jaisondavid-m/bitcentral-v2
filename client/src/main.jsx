@@ -9,6 +9,16 @@ import "./index.css";
 
 const queryClient = new QueryClient();
 
+// Handle stale asset preload errors when a new build is deployed
+window.addEventListener("vite:preloadError", (event) => {
+  event.preventDefault();
+  const reloaded = sessionStorage.getItem("vite_preload_reloaded");
+  if (!reloaded) {
+    sessionStorage.setItem("vite_preload_reloaded", "true");
+    window.location.reload();
+  }
+});
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <HelmetProvider>
