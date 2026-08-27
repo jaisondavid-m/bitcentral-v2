@@ -10,10 +10,6 @@ export default function SubjectCard({ subject, onOpenDetails, dark = false }) {
   const ak1 = subject?.ak1 || "";
   const ak2 = subject?.ak2 || "";
 
-  const hasTest1 = Boolean(qb1 || ak1);
-  const hasTest2 = Boolean(qb2 || ak2);
-  const hasSemester = Boolean(semqbwithans);
-
   const totalLinks = [qb1, qb2, ak1, ak2, semqbwithans].filter(Boolean).length;
 
   return (
@@ -52,30 +48,6 @@ export default function SubjectCard({ subject, onOpenDetails, dark = false }) {
         <h3 className="mt-3 text-base font-bold tracking-tight text-slate-900 transition-colors group-hover:text-blue-600 dark:text-slate-100 dark:group-hover:text-blue-400">
           {name}
         </h3>
-
-        {/* Status badges */}
-        <div className="mt-4 flex flex-wrap items-center gap-1.5">
-          {hasTest1 && (
-            <span className="rounded-lg bg-emerald-50 px-2.5 py-1 text-[10px] font-extrabold text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300">
-              PT-1 Available
-            </span>
-          )}
-          {hasTest2 && (
-            <span className="rounded-lg bg-indigo-50 px-2.5 py-1 text-[10px] font-extrabold text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300">
-              PT-2 Available
-            </span>
-          )}
-          {hasSemester && (
-            <span className="rounded-lg bg-purple-50 px-2.5 py-1 text-[10px] font-extrabold text-purple-700 dark:bg-purple-950/70 dark:text-purple-300">
-              Semester Bundle
-            </span>
-          )}
-          {totalLinks === 0 && (
-            <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-[10px] font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-              Coming Soon
-            </span>
-          )}
-        </div>
       </div>
 
       {/* Bottom Footer: View details button */}
