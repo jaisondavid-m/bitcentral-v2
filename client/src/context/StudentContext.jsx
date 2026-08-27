@@ -76,6 +76,8 @@ const toProfileStudent = (studentProfile, fallbackStudent = null) => {
     creationTime: studentProfile.creation_time || fallbackStudent?.creationTime || null,
     lastSignInTime: studentProfile.last_sign_in_time || fallbackStudent?.lastSignInTime || null,
     lastSeenAt: studentProfile.last_seen_at || fallbackStudent?.lastSeenAt || null,
+    phone: profileData.phone || profileData.phone_no || fallbackStudent?.phone || "",
+    phone_no: profileData.phone_no || profileData.phone || fallbackStudent?.phone_no || "",
   };
 };
 

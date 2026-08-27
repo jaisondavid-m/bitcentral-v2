@@ -211,6 +211,10 @@ func createUsersTable() {
 		log.Printf("ℹ️ blocked_at column not created (may already exist): %v", err)
 	}
 
+	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN phone VARCHAR(64) NULL`); err != nil {
+		log.Printf("ℹ️ phone column not created (may already exist): %v", err)
+	}
+
 	log.Println("✅ users table ready")
 }
 
