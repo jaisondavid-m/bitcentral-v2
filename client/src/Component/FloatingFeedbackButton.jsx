@@ -17,12 +17,8 @@ export default function FloatingFeedbackButton() {
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
 
-  const TEN_MINUTES_MS = 10 * 60 * 1000;
-
   const fetchMessages = async (markRead = false) => {
     if (!user) return;
-    if (typeof navigator !== "undefined" && !navigator.onLine) return;
-
     try {
       const data = await getFeedbackMessages(markRead);
       if (Array.isArray(data)) {
@@ -37,32 +33,21 @@ export default function FloatingFeedbackButton() {
   };
 
   useEffect(() => {
-    if (!user) return;
-
-    if (isOpen) {
+    if (user && isOpen) {
       setLoading(true);
       fetchMessages(true).finally(() => setLoading(false));
-    } else {
-      fetchMessages(false);
+
+      const interval = setInterval(() => fetchMessages(true), 4000);
+      return () => clearInterval(interval);
     }
+  }, [user, isOpen]);
 
-    // Fetch once every 10 minutes only when online
-    const interval = setInterval(() => {
-      if (typeof navigator === "undefined" || navigator.onLine) {
-        fetchMessages(isOpen);
-      }
-    }, TEN_MINUTES_MS);
-
-    const handleOnline = () => {
-      fetchMessages(isOpen);
-    };
-
-    window.addEventListener("online", handleOnline);
-
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener("online", handleOnline);
-    };
+  useEffect(() => {
+    if (user && !isOpen) {
+      fetchMessages(false);
+      const interval = setInterval(() => fetchMessages(false), 8000);
+      return () => clearInterval(interval);
+    }
   }, [user, isOpen]);
 
   useEffect(() => {
@@ -133,11 +118,10 @@ export default function FloatingFeedbackButton() {
         animate={{ scale: 1 }}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
-        className={`fixed bottom-6 right-6 z-40 flex items-center justify-center h-14 w-14 rounded-full text-white shadow-xl transition-all cursor-pointer border ${
-          hasUnreadAdminMsg
+        className={`fixed bottom-6 right-6 z-40 flex items-center justify-center h-14 w-14 rounded-full text-white shadow-xl transition-all cursor-pointer border ${hasUnreadAdminMsg
             ? "bg-blue-600 shadow-red-500/40 border-red-500/60 ring-4 ring-red-500/30 animate-pulse"
             : "bg-blue-600 shadow-blue-600/30 hover:bg-blue-700 border-blue-400/40"
-        }`}
+          }`}
         aria-label="Open Feedback Chat"
       >
         <MessageSquare className="h-6 w-6" />
@@ -253,11 +237,10 @@ export default function FloatingFeedbackButton() {
                       </div>
 
                       <div
-                        className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed shadow-xs ${
-                          isAdmin
+                        className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed shadow-xs ${isAdmin
                             ? "bg-white text-slate-900 border border-slate-200/80 rounded-tl-xs dark:bg-slate-800 dark:text-white dark:border-slate-700"
                             : "bg-blue-600 text-white rounded-tr-xs"
-                        }`}
+                          }`}
                       >
                         {msg.message}
                       </div>
