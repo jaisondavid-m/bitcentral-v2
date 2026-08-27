@@ -53,9 +53,11 @@ import {
   Download,
   UserMinus,
   Heart,
+  GraduationCap,
 } from "lucide-react";
 import SuperAdminPanel from "./SuperAdminPanel.jsx";
 import AdminPSRewardsPage from "./AdminPSRewards.jsx";
+import AcademicManagement from "./AcademicManagement.jsx";
 import { checkSuperAdmin } from "../api/admin.js";
 import { PING_ON } from "../config/runtimeFlags.js";
 
@@ -144,6 +146,13 @@ const EMPTY_QB_FORM = {
 
 const ADMIN_TABS = [
   {
+    key: "academic",
+    label: "Academic Management",
+    href: "/admin/academic",
+    icon: GraduationCap,
+    description: "Manage departments, programs, regulations, courses, curriculum, materials, exams, and question papers.",
+  },
+  {
     key: "users",
     label: "Users",
     href: "/admin/users",
@@ -195,6 +204,7 @@ const ADMIN_TABS = [
 ];
 
 function getAdminTabFromPath(pathname) {
+  if (pathname.startsWith("/admin/academic")) return "academic";
   if (pathname.startsWith("/admin/sponsors")) return "sponsors";
   if (pathname.startsWith("/admin/qb")) return "qb";
   if (pathname.startsWith("/admin/ps-rewards")) return "ps";
@@ -2894,9 +2904,29 @@ function AdminDashboard({ initialTab } = {}) {
 
   return (
     <AdminDashboardShell activeTab={activeTab} isSuper={isSuper}>
-      {activeTab === "sponsors" ? <SponsorsSection /> : activeTab === "qb" ? <QBSection /> : activeTab === "ps" ? <AdminPSRewardsPage /> : activeTab === "cards" ? <CardsSection /> : activeTab === "mess" ? <MessSection /> : activeTab === "super" ? <SuperAdminPanel /> : <UsersSection isSuper={isSuper} />}
+      {activeTab === "academic" ? (
+        <AcademicManagement />
+      ) : activeTab === "sponsors" ? (
+        <SponsorsSection />
+      ) : activeTab === "qb" ? (
+        <QBSection />
+      ) : activeTab === "ps" ? (
+        <AdminPSRewardsPage />
+      ) : activeTab === "cards" ? (
+        <CardsSection />
+      ) : activeTab === "mess" ? (
+        <MessSection />
+      ) : activeTab === "super" ? (
+        <SuperAdminPanel />
+      ) : (
+        <UsersSection isSuper={isSuper} />
+      )}
     </AdminDashboardShell>
   );
+}
+
+function AdminAcademicPage() {
+  return <AdminDashboard initialTab="academic" />;
 }
 
 function AdminUsersPage() {
@@ -2923,5 +2953,13 @@ function AdminMessPage() {
   return <AdminDashboard initialTab="mess" />;
 }
 
-export { AdminUsersPage, AdminSponsorsPage, AdminQBPage, AdminPSRewardsPageRoute as AdminPSRewardsPage, AdminCardsPage, AdminMessPage };
+export {
+  AdminAcademicPage,
+  AdminUsersPage,
+  AdminSponsorsPage,
+  AdminQBPage,
+  AdminPSRewardsPageRoute as AdminPSRewardsPage,
+  AdminCardsPage,
+  AdminMessPage,
+};
 export default AdminDashboard;
