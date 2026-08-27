@@ -257,6 +257,14 @@ func createSemesterSubjectsTable() {
 		log.Fatalf("❌ Failed to create semester_subjects table: %v", err)
 	}
 
+	if _, err := DB.Exec(`ALTER TABLE semester_subjects DROP INDEX unique_year_idx`); err != nil {
+		log.Printf("ℹ️ unique_year_idx index drop status: %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE semester_subjects DROP INDEX unique_year_code`); err != nil {
+		log.Printf("ℹ️ unique_year_code index drop status: %v", err)
+	}
+
 	if _, err := DB.Exec(`ALTER TABLE semester_subjects ADD COLUMN department VARCHAR(50) NOT NULL DEFAULT 'ALL'`); err != nil {
 		log.Printf("ℹ️ department column not created (may already exist): %v", err)
 	}
@@ -265,8 +273,8 @@ func createSemesterSubjectsTable() {
 		log.Printf("ℹ️ idx_sem_sub_year_dept index not created (may already exist): %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE semester_subjects ADD UNIQUE KEY unique_year_code (year, code)`); err != nil {
-		log.Printf("ℹ️ unique_year_code index not created (may already exist): %v", err)
+	if _, err := DB.Exec(`ALTER TABLE semester_subjects ADD INDEX idx_sem_sub_year_idx (year, idx)`); err != nil {
+		log.Printf("ℹ️ idx_sem_sub_year_idx index not created (may already exist): %v", err)
 	}
 	log.Println("✅ semester_subjects table ready")
 }

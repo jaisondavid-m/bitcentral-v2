@@ -288,21 +288,56 @@ func (h *QBHandler) Update(c *gin.Context) {
 		dept = "ALL"
 	}
 
-	res, err := h.DB.Exec(`
-		UPDATE semester_subjects
-		SET year=?, department=?, code=?, name=?, qb1=?, qb2=?, ak1=?, ak2=?, sem_qb_with_ans=?
-		WHERE id=?`,
-		body.Year,
-		dept,
-		strings.TrimSpace(body.SubjectCode),
-		strings.TrimSpace(body.SubjectName),
-		body.QB1,
-		body.QB2,
-		body.AK1,
-		body.AK2,
-		body.SemQBWithAns,
-		id,
-	)
+	var currentYear int
+	err = h.DB.QueryRow(`SELECT year FROM semester_subjects WHERE id = ?`, id).Scan(&currentYear)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "Subject not found"})
+		return
+	}
+
+	var res sql.Result
+	if currentYear != body.Year {
+		var maxIdx sql.NullInt64
+		_ = h.DB.QueryRow(`SELECT MAX(idx) FROM semester_subjects WHERE year = ?`, body.Year).Scan(&maxIdx)
+		newIdx := 0
+		if maxIdx.Valid {
+			newIdx = int(maxIdx.Int64) + 1
+		}
+
+		res, err = h.DB.Exec(`
+			UPDATE semester_subjects
+			SET year=?, department=?, idx=?, code=?, name=?, qb1=?, qb2=?, ak1=?, ak2=?, sem_qb_with_ans=?
+			WHERE id=?`,
+			body.Year,
+			dept,
+			newIdx,
+			strings.TrimSpace(body.SubjectCode),
+			strings.TrimSpace(body.SubjectName),
+			body.QB1,
+			body.QB2,
+			body.AK1,
+			body.AK2,
+			body.SemQBWithAns,
+			id,
+		)
+	} else {
+		res, err = h.DB.Exec(`
+			UPDATE semester_subjects
+			SET year=?, department=?, code=?, name=?, qb1=?, qb2=?, ak1=?, ak2=?, sem_qb_with_ans=?
+			WHERE id=?`,
+			body.Year,
+			dept,
+			strings.TrimSpace(body.SubjectCode),
+			strings.TrimSpace(body.SubjectName),
+			body.QB1,
+			body.QB2,
+			body.AK1,
+			body.AK2,
+			body.SemQBWithAns,
+			id,
+		)
+	}
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
