@@ -19,11 +19,19 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../Authentication/firebase.js";
 import { getSponsorsLeaderboard } from "../api/axios.js";
 import { processLeaderboardData } from "../utils/sponsorUtils.js";
-
-
+import { useAuth } from "../context/StudentContext.jsx";
 
 export default function SupportDev() {
-  const [user] = useAuthState(auth);
+  const authContext = useAuth() || {};
+  const [firebaseUser] = useAuthState(auth);
+  const user = authContext.user || firebaseUser;
+  const profile = authContext.profile;
+  const student = authContext.student;
+
+  const userEmail = profile?.email || user?.email || student?.email || "";
+  const userName = profile?.display_name || user?.displayName || student?.displayName || student?.name || "";
+  const userPhone = profile?.phone || profile?.phone_no || student?.phone || student?.phone_no || "";
+
   const [loading, setLoading] = useState(true);
   const [leaderboard, setLeaderboard] = useState({
     total_raised: 0,
@@ -55,15 +63,147 @@ export default function SupportDev() {
 
   const paymentFormRef = useRef(null);
 
+  // Reload Razorpay Payment Button script whenever user profile details load or change
   useEffect(() => {
     if (!paymentFormRef.current) return;
     paymentFormRef.current.innerHTML = "";
+
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/payment-button.js";
     script.setAttribute("data-payment_button_id", "pl_TUlix4nQCJh453");
+
+    // Attach data-prefill attributes to parent form container
+    if (paymentFormRef.current) {
+      if (userName) {
+        paymentFormRef.current.setAttribute("data-prefill.name", userName);
+        paymentFormRef.current.setAttribute("data-prefill_name", userName);
+      }
+      if (userEmail) {
+        paymentFormRef.current.setAttribute("data-prefill.email", userEmail);
+        paymentFormRef.current.setAttribute("data-prefill_email", userEmail);
+      }
+      if (userPhone) {
+        paymentFormRef.current.setAttribute("data-prefill.contact", userPhone);
+        paymentFormRef.current.setAttribute("data-prefill.phone", userPhone);
+        paymentFormRef.current.setAttribute("data-prefill_contact", userPhone);
+      }
+    }
+
+    // Attach data-prefill attributes to script tag
+    if (userName) {
+      script.setAttribute("data-prefill.name", userName);
+      script.setAttribute("data-prefill_name", userName);
+      script.setAttribute("data-name", userName);
+    }
+    if (userEmail) {
+      script.setAttribute("data-prefill.email", userEmail);
+      script.setAttribute("data-prefill_email", userEmail);
+      script.setAttribute("data-email", userEmail);
+    }
+    if (userPhone) {
+      script.setAttribute("data-prefill.contact", userPhone);
+      script.setAttribute("data-prefill.phone", userPhone);
+      script.setAttribute("data-prefill_contact", userPhone);
+      script.setAttribute("data-prefill_phone", userPhone);
+      script.setAttribute("data-contact", userPhone);
+      script.setAttribute("data-phone", userPhone);
+    }
+
     script.async = true;
     paymentFormRef.current.appendChild(script);
-  }, []);
+  }, [userName, userEmail, userPhone]);
+
+  // Autofill helper function
+  const autoFillModalInputs = () => {
+    if (!userEmail && !userPhone && !userName) return;
+
+    const allDocs = [document];
+    document.querySelectorAll("iframe").forEach((iframe) => {
+      try {
+        if (iframe.contentDocument) {
+          allDocs.push(iframe.contentDocument);
+        }
+      } catch (e) {
+        // Cross-origin iframe
+      }
+    });
+
+    allDocs.forEach((doc) => {
+      const inputs = doc.querySelectorAll("input");
+      inputs.forEach((input) => {
+        if (input.type === "hidden" || input.type === "submit" || input.type === "button") return;
+
+        const placeholder = (input.placeholder || "").toLowerCase();
+        const nameAttr = (input.name || "").toLowerCase();
+        const typeAttr = (input.type || "").toLowerCase();
+        const idAttr = (input.id || "").toLowerCase();
+        const parentText = (input.parentElement?.textContent || "").toLowerCase();
+        const labelText = (input.labels ? Array.from(input.labels).map((l) => l.textContent).join(" ") : "").toLowerCase();
+
+        let valToSet = null;
+
+        if (
+          userEmail &&
+          (typeAttr === "email" ||
+            nameAttr.includes("email") ||
+            idAttr.includes("email") ||
+            placeholder.includes("email") ||
+            parentText.includes("email") ||
+            labelText.includes("email"))
+        ) {
+          if (!input.value) valToSet = userEmail;
+        } else if (
+          userPhone &&
+          (typeAttr === "tel" ||
+            nameAttr.includes("phone") ||
+            nameAttr.includes("contact") ||
+            idAttr.includes("phone") ||
+            idAttr.includes("contact") ||
+            placeholder.includes("phone") ||
+            parentText.includes("phone") ||
+            labelText.includes("phone"))
+        ) {
+          if (!input.value) valToSet = userPhone;
+        } else if (
+          userName &&
+          (nameAttr.includes("name") ||
+            idAttr.includes("name") ||
+            placeholder.includes("name") ||
+            parentText.includes("name") ||
+            labelText.includes("name"))
+        ) {
+          if (!input.value) valToSet = userName;
+        }
+
+        if (valToSet !== null) {
+          const nativeSetter = Object.getOwnPropertyDescriptor(
+            window.HTMLInputElement.prototype,
+            "value"
+          )?.set;
+          if (nativeSetter) {
+            nativeSetter.call(input, valToSet);
+          } else {
+            input.value = valToSet;
+          }
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+          input.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      });
+    });
+  };
+
+  useEffect(() => {
+    if (!userEmail && !userPhone && !userName) return;
+
+    const intervalId = setInterval(autoFillModalInputs, 300);
+    const observer = new MutationObserver(autoFillModalInputs);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      clearInterval(intervalId);
+      observer.disconnect();
+    };
+  }, [userEmail, userPhone, userName]);
 
   const formattedTotal = Number(leaderboard.total_raised || 0).toLocaleString("en-IN");
 

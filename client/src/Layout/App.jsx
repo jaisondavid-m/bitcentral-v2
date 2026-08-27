@@ -166,7 +166,14 @@ function App() {
           <Route path="/features" element={<Features />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/support-dev" element={<SupportDev />} />
+          <Route
+            path="/support-dev"
+            element={
+              <AuthScope>
+                <SupportDev />
+              </AuthScope>
+            }
+          />
           <Route path="/payment-successful" element={<PaymentSuccessful />} />
           <Route path="/payment-successfull" element={<PaymentSuccessful />} />
           {/* <Route path="/docs/about" element={<DocsPage />} /> */}
