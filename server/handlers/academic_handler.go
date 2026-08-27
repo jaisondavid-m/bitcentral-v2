@@ -1190,28 +1190,55 @@ func (h *AcademicHandler) CreateExam(c *gin.Context) {
 	}
 	payload.Name = strings.TrimSpace(payload.Name)
 	payload.ExamType = strings.TrimSpace(payload.ExamType)
-	payload.AcademicYear = strings.TrimSpace(payload.AcademicYear)
 
-	if payload.Name == "" || payload.ExamType == "" || payload.AcademicYear == "" || payload.DepartmentID <= 0 || payload.SemesterID <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Exam Name, Exam Type, Academic Year, Department, and Semester are required"})
+	if payload.Name == "" || payload.ExamType == "" || payload.SemesterID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Exam Name, Exam Type, and Semester are required"})
 		return
 	}
+
+	deptIDs := payload.DepartmentIDs
+	if len(deptIDs) == 0 && payload.DepartmentID > 0 {
+		deptIDs = []int{payload.DepartmentID}
+	}
+	if len(deptIDs) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "At least one Department must be selected"})
+		return
+	}
+
 	if payload.Status == "" {
 		payload.Status = "scheduled"
 	}
 
-	res, err := h.DB.Exec(`
-		INSERT INTO academic_exams (name, exam_type, academic_year, department_id, regulation_id, semester_id, start_date, end_date, description, status)
-		VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?, ?)
-	`, payload.Name, payload.ExamType, payload.AcademicYear, payload.DepartmentID, payload.SemesterID, payload.StartDate, payload.EndDate, payload.Description, payload.Status)
-
+	tx, err := h.DB.Begin()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
 	}
-	id, _ := res.LastInsertId()
-	payload.ID = int(id)
-	c.JSON(http.StatusCreated, gin.H{"success": true, "message": "Exam created successfully", "data": payload})
+	defer tx.Rollback()
+
+	var createdCount int
+	for _, deptID := range deptIDs {
+		_, err := tx.Exec(`
+			INSERT INTO academic_exams (name, exam_type, academic_year, department_id, regulation_id, semester_id, start_date, end_date, description, status)
+			VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?, ?)
+		`, payload.Name, payload.ExamType, payload.AcademicYear, deptID, payload.SemesterID, payload.StartDate, payload.EndDate, payload.Description, payload.Status)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+			return
+		}
+		createdCount++
+	}
+
+	if err := tx.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"message": fmt.Sprintf("Exam created for %d department(s) successfully", createdCount),
+	})
 }
 
 func (h *AcademicHandler) UpdateExam(c *gin.Context) {
@@ -1227,10 +1254,9 @@ func (h *AcademicHandler) UpdateExam(c *gin.Context) {
 	}
 	payload.Name = strings.TrimSpace(payload.Name)
 	payload.ExamType = strings.TrimSpace(payload.ExamType)
-	payload.AcademicYear = strings.TrimSpace(payload.AcademicYear)
 
-	if payload.Name == "" || payload.ExamType == "" || payload.AcademicYear == "" || payload.DepartmentID <= 0 || payload.SemesterID <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Exam Name, Exam Type, Academic Year, Department, and Semester are required"})
+	if payload.Name == "" || payload.ExamType == "" || payload.DepartmentID <= 0 || payload.SemesterID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Exam Name, Exam Type, Department, and Semester are required"})
 		return
 	}
 

@@ -1414,7 +1414,8 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
       } else if (type === "exams") {
         const payload = {
           ...formData,
-          department_id: Number(formData.department_id),
+          department_id: formData.department_id ? Number(formData.department_id) : 0,
+          department_ids: (formData.department_ids || []).map(Number),
           semester_id: Number(formData.semester_id),
         };
         if (initial?.id) await updateExam(initial.id, payload);
@@ -1764,9 +1765,54 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
 
       {type === "exams" && (
         <>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Department</label>
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Target Department(s)</label>
+              {!initial?.id && options.departments?.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const currentIds = formData.department_ids || [];
+                    const allIds = options.departments.map((d) => d.id);
+                    if (currentIds.length === allIds.length) {
+                      setFormData((p) => ({ ...p, department_ids: [] }));
+                    } else {
+                      setFormData((p) => ({ ...p, department_ids: allIds }));
+                    }
+                  }}
+                  className="text-xs font-bold text-blue-600 hover:underline"
+                >
+                  {(formData.department_ids || []).length === options.departments.length ? "Deselect All" : "Select All Departments"}
+                </button>
+              )}
+            </div>
+
+            {!initial?.id ? (
+              <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto rounded-xl border border-slate-200 p-3 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
+                {options.departments.map((d) => {
+                  const isChecked = (formData.department_ids || []).includes(d.id);
+                  return (
+                    <label key={d.id} className="flex items-center gap-2 text-xs font-medium text-slate-800 dark:text-slate-200 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => {
+                          const checked = e.target.checked;
+                          setFormData((prev) => {
+                            const ids = new Set(prev.department_ids || []);
+                            if (checked) ids.add(d.id);
+                            else ids.delete(d.id);
+                            return { ...prev, department_ids: Array.from(ids) };
+                          });
+                        }}
+                        className="h-4 w-4 rounded text-blue-600"
+                      />
+                      <span className="font-semibold">{d.code}</span> - <span className="truncate">{d.name}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            ) : (
               <select
                 required
                 value={formData.department_id || ""}
@@ -1780,7 +1826,10 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
                   </option>
                 ))}
               </select>
-            </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Semester</label>
               <select
@@ -1797,8 +1846,6 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
                 ))}
               </select>
             </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Exam Type</label>
               <select
@@ -1814,17 +1861,6 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
                 <option value="Practical Exam">Practical Exam</option>
                 <option value="Other">Other</option>
               </select>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Academic Year</label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. 2025-2026"
-                value={formData.academic_year || "2025-2026"}
-                onChange={set("academic_year")}
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
-              />
             </div>
           </div>
           <div>
