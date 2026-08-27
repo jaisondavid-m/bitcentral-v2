@@ -275,23 +275,7 @@ export default function Semester() {
     [subjects, search]
   );
 
-  const visibleSubjects = useMemo(
-    () =>
-      filteredSubjects.filter((sub) => {
-        const qb1 = sub.qb1 || "";
-        const qb2 = sub.qb2 || "";
-        const ak1 = sub.ak1 || "";
-        const ak2 = sub.ak2 || "";
-        const semqbwithans = sub.semqbwithans || sub.sem_qb_with_ans || "";
-
-        if (activeTab === "test1") return Boolean(qb1 || ak1);
-        if (activeTab === "test2") return Boolean(qb2 || ak2);
-        if (activeTab === "semester") return Boolean(semqbwithans);
-
-        return true;
-      }),
-    [activeTab, filteredSubjects]
-  );
+  const visibleSubjects = filteredSubjects;
 
   useEffect(() => {
     const load = async () => {
@@ -337,43 +321,9 @@ export default function Semester() {
   return (
     <div className={`min-h-screen ${containerBg} px-4 py-6 sm:px-6 lg:px-8`}>
       <div className="mx-auto flex max-w-5xl flex-col gap-4">
-        {/* Top Header Card */}
-        <div className={`rounded-2xl border ${cardBorder} ${cardBg} shadow-sm ${isDark ? "shadow-black/20" : "shadow-blue-100/30"}`}>
-          <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className={`flex items-center gap-2.5 text-lg font-extrabold ${isDark ? "text-slate-100" : "text-slate-900"} sm:text-xl`}>
-                  <BookOpen className={`h-5 w-5 ${isDark ? "text-blue-400" : "text-blue-600"}`} />
-                  Academic Resources & Question Banks
-                </h1>
-              </div>
-              <p className={`mt-1 text-xs ${mutedText}`}>
-                Select any subject card and click <span className="font-semibold text-blue-600 dark:text-blue-400">View details</span> to access question banks and answer keys.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Filter Controls & Search Bar */}
-        <div className={`flex flex-col gap-3 rounded-2xl border ${cardBorder} ${cardBg} p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between`}>
-          <div className="flex flex-wrap items-center gap-2">
-            <TabButton dark={isDark} active={activeTab === "all"} onClick={() => setActiveTab("all")}>
-              All Subjects ({subjects.length})
-            </TabButton>
-            <TabButton dark={isDark} active={activeTab === "test1"} onClick={() => setActiveTab("test1")}>
-              PT-1 Available
-            </TabButton>
-            <TabButton dark={isDark} active={activeTab === "test2"} onClick={() => setActiveTab("test2")}>
-              PT-2 Available
-            </TabButton>
-            <TabButton dark={isDark} active={activeTab === "semester"} onClick={() => setActiveTab("semester")}>
-              Semester Bundle
-            </TabButton>
-          </div>
-
-          <div className="w-full sm:w-64">
-            <SearchBar isDark={isDark} search={search} setSearch={setSearch} placeholder="Search code or subject name" />
-          </div>
+        {/* Single Search Bar */}
+        <div className={`rounded-2xl border ${cardBorder} ${cardBg} p-3.5 shadow-sm`}>
+          <SearchBar isDark={isDark} search={search} setSearch={setSearch} placeholder="Search code or subject name..." />
         </div>
 
         {/* Subjects Grid */}
