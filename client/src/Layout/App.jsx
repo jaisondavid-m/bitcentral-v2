@@ -46,6 +46,9 @@ const ProtectedLayout = lazy(() => import("../routes/ProtectedLayout.jsx"));
 const AdminDashboard = lazy(() =>
   import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.default }))
 );
+const AdminAcademicPage = lazy(() =>
+  import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.AdminAcademicPage }))
+);
 const AdminUsersPage = lazy(() =>
   import("../Pages/AdminDashboard.jsx").then((module) => ({ default: module.AdminUsersPage }))
 );
@@ -174,6 +177,22 @@ function App() {
               element={
                 <AdminRoute>
                   <AdminDashboard />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/academic"
+              element={
+                <AdminRoute>
+                  <AdminAcademicPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/academic/:subtab"
+              element={
+                <AdminRoute>
+                  <AdminAcademicPage />
                 </AdminRoute>
               }
             />

@@ -49,6 +49,7 @@ func main() {
 	uploadHandler := handlers.NewUploadHandler()
 	trackerUserHandler := handlers.NewTrackerUserHandler()
 	sponsorsHandler := handlers.NewSponsorsHandler()
+	academicHandler := handlers.NewAcademicHandler()
 
 	r := routes.SetupRouter(
 		sheetHandler,
@@ -65,6 +66,7 @@ func main() {
 		uploadHandler,
 		trackerUserHandler,
 		sponsorsHandler,
+		academicHandler,
 	)
 	r.Static("/pdfs", "./pdfs")
 

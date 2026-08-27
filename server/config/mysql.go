@@ -101,6 +101,7 @@ func InitMySQL() {
 	createAdminsTable()
 	createAllowedEmailsTable()
 	createTrackerUsersTable()
+	createAcademicTables()
 }
 
 func createAdminsTable() {
@@ -377,4 +378,207 @@ func createTrackerUsersTable() {
 	DB.Exec(`ALTER TABLE tracker_users ADD COLUMN phone VARCHAR(64) NULL`)
 	DB.Exec(`ALTER TABLE tracker_users ADD COLUMN department VARCHAR(255) NULL`)
 }
+
+func createAcademicTables() {
+	queries := []string{
+		`CREATE TABLE IF NOT EXISTS academic_departments (
+			id INT AUTO_INCREMENT PRIMARY KEY,
+			name VARCHAR(255) NOT NULL,
+			code VARCHAR(50) NOT NULL UNIQUE,
+			description TEXT,
+			status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+		) ENGINE=InnoDB;`,
+
+		`CREATE TABLE IF NOT EXISTS academic_programs (
+			id INT AUTO_INCREMENT PRIMARY KEY,
+			department_id INT NOT NULL,
+			name VARCHAR(255) NOT NULL,
+			code VARCHAR(50) NOT NULL UNIQUE,
+			degree_type VARCHAR(50) NOT NULL DEFAULT 'B.E.',
+			duration_years INT NOT NULL DEFAULT 4,
+			status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			INDEX idx_prog_dept (department_id),
+			CONSTRAINT fk_prog_dept FOREIGN KEY (department_id) REFERENCES academic_departments(id) ON DELETE CASCADE
+		) ENGINE=InnoDB;`,
+
+		`CREATE TABLE IF NOT EXISTS academic_regulations (
+			id INT AUTO_INCREMENT PRIMARY KEY,
+			name VARCHAR(255) NOT NULL,
+			year INT NOT NULL,
+			description TEXT,
+			status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+		) ENGINE=InnoDB;`,
+
+		`CREATE TABLE IF NOT EXISTS academic_batches (
+			id INT AUTO_INCREMENT PRIMARY KEY,
+			program_id INT NOT NULL,
+			regulation_id INT NOT NULL,
+			start_year INT NOT NULL,
+			end_year INT NOT NULL,
+			batch_name VARCHAR(100) NOT NULL,
+			status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			INDEX idx_batch_prog (program_id),
+			INDEX idx_batch_reg (regulation_id),
+			CONSTRAINT fk_batch_prog FOREIGN KEY (program_id) REFERENCES academic_programs(id) ON DELETE CASCADE,
+			CONSTRAINT fk_batch_reg FOREIGN KEY (regulation_id) REFERENCES academic_regulations(id) ON DELETE CASCADE
+		) ENGINE=InnoDB;`,
+
+		`CREATE TABLE IF NOT EXISTS academic_semesters (
+			id INT AUTO_INCREMENT PRIMARY KEY,
+			semester_number INT NOT NULL UNIQUE,
+			semester_name VARCHAR(100) NOT NULL,
+			year_number INT NOT NULL,
+			status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+		) ENGINE=InnoDB;`,
+
+		`CREATE TABLE IF NOT EXISTS academic_courses (
+			id INT AUTO_INCREMENT PRIMARY KEY,
+			code VARCHAR(50) NOT NULL UNIQUE,
+			name VARCHAR(255) NOT NULL,
+			short_name VARCHAR(100),
+			credits INT NOT NULL DEFAULT 3,
+			course_type VARCHAR(50) NOT NULL DEFAULT 'Theory',
+			description TEXT,
+			status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+		) ENGINE=InnoDB;`,
+
+		`CREATE TABLE IF NOT EXISTS academic_curriculum (
+			id INT AUTO_INCREMENT PRIMARY KEY,
+			department_id INT NOT NULL,
+			program_id INT NOT NULL,
+			regulation_id INT NOT NULL,
+			semester_id INT NOT NULL,
+			course_id INT NOT NULL,
+			is_elective TINYINT(1) NOT NULL DEFAULT 0,
+			course_order INT NOT NULL DEFAULT 0,
+			status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			UNIQUE KEY unique_curr (program_id, regulation_id, semester_id, course_id),
+			INDEX idx_curr_dept (department_id),
+			INDEX idx_curr_prog (program_id),
+			INDEX idx_curr_reg (regulation_id),
+			INDEX idx_curr_sem (semester_id),
+			INDEX idx_curr_course (course_id),
+			CONSTRAINT fk_curr_dept FOREIGN KEY (department_id) REFERENCES academic_departments(id) ON DELETE CASCADE,
+			CONSTRAINT fk_curr_prog FOREIGN KEY (program_id) REFERENCES academic_programs(id) ON DELETE CASCADE,
+			CONSTRAINT fk_curr_reg FOREIGN KEY (regulation_id) REFERENCES academic_regulations(id) ON DELETE CASCADE,
+			CONSTRAINT fk_curr_sem FOREIGN KEY (semester_id) REFERENCES academic_semesters(id) ON DELETE CASCADE,
+			CONSTRAINT fk_curr_course FOREIGN KEY (course_id) REFERENCES academic_courses(id) ON DELETE CASCADE
+		) ENGINE=InnoDB;`,
+
+		`CREATE TABLE IF NOT EXISTS academic_materials (
+			id INT AUTO_INCREMENT PRIMARY KEY,
+			course_id INT NOT NULL,
+			title VARCHAR(255) NOT NULL,
+			description TEXT,
+			material_type VARCHAR(50) NOT NULL,
+			file_url VARCHAR(1024) NOT NULL,
+			unit VARCHAR(50),
+			item_order INT NOT NULL DEFAULT 0,
+			status ENUM('published', 'unpublished') NOT NULL DEFAULT 'published',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			INDEX idx_mat_course (course_id),
+			CONSTRAINT fk_mat_course FOREIGN KEY (course_id) REFERENCES academic_courses(id) ON DELETE CASCADE
+		) ENGINE=InnoDB;`,
+
+		`CREATE TABLE IF NOT EXISTS academic_exams (
+			id INT AUTO_INCREMENT PRIMARY KEY,
+			name VARCHAR(255) NOT NULL,
+			exam_type VARCHAR(50) NOT NULL,
+			academic_year VARCHAR(50) NOT NULL,
+			program_id INT NOT NULL,
+			regulation_id INT NOT NULL,
+			semester_id INT NOT NULL,
+			start_date DATE,
+			end_date DATE,
+			description TEXT,
+			status ENUM('scheduled', 'ongoing', 'completed', 'cancelled') NOT NULL DEFAULT 'scheduled',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			INDEX idx_exam_prog (program_id),
+			INDEX idx_exam_reg (regulation_id),
+			INDEX idx_exam_sem (semester_id),
+			CONSTRAINT fk_exam_prog FOREIGN KEY (program_id) REFERENCES academic_programs(id) ON DELETE CASCADE,
+			CONSTRAINT fk_exam_reg FOREIGN KEY (regulation_id) REFERENCES academic_regulations(id) ON DELETE CASCADE,
+			CONSTRAINT fk_exam_sem FOREIGN KEY (semester_id) REFERENCES academic_semesters(id) ON DELETE CASCADE
+		) ENGINE=InnoDB;`,
+
+		`CREATE TABLE IF NOT EXISTS academic_exam_schedules (
+			id INT AUTO_INCREMENT PRIMARY KEY,
+			exam_id INT NOT NULL,
+			course_id INT NOT NULL,
+			exam_date DATE NOT NULL,
+			start_time VARCHAR(20) NOT NULL,
+			end_time VARCHAR(20) NOT NULL,
+			venue VARCHAR(255) NOT NULL,
+			instructions TEXT,
+			status ENUM('scheduled', 'rescheduled', 'completed', 'cancelled') NOT NULL DEFAULT 'scheduled',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			INDEX idx_sched_exam (exam_id),
+			INDEX idx_sched_course (course_id),
+			CONSTRAINT fk_sched_exam FOREIGN KEY (exam_id) REFERENCES academic_exams(id) ON DELETE CASCADE,
+			CONSTRAINT fk_sched_course FOREIGN KEY (course_id) REFERENCES academic_courses(id) ON DELETE CASCADE
+		) ENGINE=InnoDB;`,
+
+		`CREATE TABLE IF NOT EXISTS academic_question_papers (
+			id INT AUTO_INCREMENT PRIMARY KEY,
+			course_id INT NOT NULL,
+			exam_type VARCHAR(50) NOT NULL,
+			academic_year VARCHAR(50) NOT NULL,
+			regulation_id INT NOT NULL,
+			semester_id INT NOT NULL,
+			year_number INT NOT NULL,
+			file_url VARCHAR(1024) NOT NULL,
+			description TEXT,
+			status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			INDEX idx_qp_course (course_id),
+			INDEX idx_qp_reg (regulation_id),
+			INDEX idx_qp_sem (semester_id),
+			CONSTRAINT fk_qp_course FOREIGN KEY (course_id) REFERENCES academic_courses(id) ON DELETE CASCADE,
+			CONSTRAINT fk_qp_reg FOREIGN KEY (regulation_id) REFERENCES academic_regulations(id) ON DELETE CASCADE,
+			CONSTRAINT fk_qp_sem FOREIGN KEY (semester_id) REFERENCES academic_semesters(id) ON DELETE CASCADE
+		) ENGINE=InnoDB;`,
+	}
+
+	for _, q := range queries {
+		if _, err := DB.Exec(q); err != nil {
+			log.Printf("⚠️ Academic table init notice: %v", err)
+		}
+	}
+
+	// Auto seed default 8 engineering semesters if empty
+	var semCount int
+	if err := DB.QueryRow("SELECT COUNT(*) FROM academic_semesters").Scan(&semCount); err == nil && semCount == 0 {
+		semStmt, err := DB.Prepare("INSERT INTO academic_semesters (semester_number, semester_name, year_number, status) VALUES (?, ?, ?, 'active')")
+		if err == nil {
+			defer semStmt.Close()
+			for i := 1; i <= 8; i++ {
+				yr := (i + 1) / 2
+				semName := fmt.Sprintf("Semester %d", i)
+				semStmt.Exec(i, semName, yr)
+			}
+			log.Println("✅ Auto-seeded 8 default semesters")
+		}
+	}
+
+	log.Println("✅ Academic tables ready")
+}
+
 
