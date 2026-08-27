@@ -17,8 +17,12 @@ export default function FloatingFeedbackButton() {
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
 
+  const TEN_MINUTES_MS = 10 * 60 * 1000;
+
   const fetchMessages = async (markRead = false) => {
     if (!user) return;
+    if (typeof navigator !== "undefined" && !navigator.onLine) return;
+
     try {
       const data = await getFeedbackMessages(markRead);
       if (Array.isArray(data)) {
@@ -33,21 +37,32 @@ export default function FloatingFeedbackButton() {
   };
 
   useEffect(() => {
-    if (user && isOpen) {
+    if (!user) return;
+
+    if (isOpen) {
       setLoading(true);
       fetchMessages(true).finally(() => setLoading(false));
-
-      const interval = setInterval(() => fetchMessages(true), 4000);
-      return () => clearInterval(interval);
-    }
-  }, [user, isOpen]);
-
-  useEffect(() => {
-    if (user && !isOpen) {
+    } else {
       fetchMessages(false);
-      const interval = setInterval(() => fetchMessages(false), 8000);
-      return () => clearInterval(interval);
     }
+
+    // Fetch once every 10 minutes only when online
+    const interval = setInterval(() => {
+      if (typeof navigator === "undefined" || navigator.onLine) {
+        fetchMessages(isOpen);
+      }
+    }, TEN_MINUTES_MS);
+
+    const handleOnline = () => {
+      fetchMessages(isOpen);
+    };
+
+    window.addEventListener("online", handleOnline);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("online", handleOnline);
+    };
   }, [user, isOpen]);
 
   useEffect(() => {

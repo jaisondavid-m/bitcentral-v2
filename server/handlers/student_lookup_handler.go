@@ -205,12 +205,12 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		return
 	}
 
-	var trackerID, trackerUserID string
+	var trackerID, trackerUserID, phoneNo string
 	if h.DB != nil {
 		_ = h.DB.QueryRow(
-			`SELECT COALESCE(id, ''), COALESCE(user_id, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
+			`SELECT COALESCE(id, ''), COALESCE(user_id, ''), COALESCE(phone, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
 			emailID,
-		).Scan(&trackerID, &trackerUserID)
+		).Scan(&trackerID, &trackerUserID, &phoneNo)
 	}
 
 	userID := trackerID
@@ -235,6 +235,8 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 			"is_blocked":        user.IsBlocked,
 			"blocked_at":        user.BlockedAt,
 			"roll_no":           rollNo,
+			"phone":             phoneNo,
+			"phone_no":          phoneNo,
 		},
 	})
 }
