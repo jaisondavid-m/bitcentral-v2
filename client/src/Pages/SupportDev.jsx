@@ -18,6 +18,7 @@ import Navbar from "../Component/NavBar.jsx";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../Authentication/firebase.js";
 import { getSponsorsLeaderboard } from "../api/axios.js";
+import { processLeaderboardData } from "../utils/sponsorUtils.js";
 
 
 
@@ -36,38 +37,7 @@ export default function SupportDev() {
         setLoading(true);
         const data = await getSponsorsLeaderboard();
         if (data?.success && Array.isArray(data.sponsors)) {
-          const aggregatedMap = new Map();
-          data.sponsors.forEach((s) => {
-            const rawName = (s.name || "").trim();
-            const rawPhone = (s.phone || s.contact || "").replace(/\D/g, "");
-            const phoneKey = rawPhone.length >= 10 ? rawPhone.slice(-10) : rawPhone;
-
-            const normKey = phoneKey
-              ? `phone_${phoneKey}`
-              : (s.email || "").toLowerCase()
-              ? `email_${(s.email || "").toLowerCase()}`
-              : `name_${rawName.toLowerCase() || s.id}`;
-
-            const amt = Number(s.amount) || 0;
-
-            if (aggregatedMap.has(normKey)) {
-              const existing = aggregatedMap.get(normKey);
-              existing.amount = (Number(existing.amount) || 0) + amt;
-              if (rawName.length > (existing.name || "").length && rawName !== "Anonymous BITSian") {
-                existing.name = rawName;
-              }
-            } else {
-              aggregatedMap.set(normKey, {
-                ...s,
-                name: rawName || "Anonymous BITSian",
-                amount: amt,
-              });
-            }
-          });
-
-          const sorted = Array.from(aggregatedMap.values()).sort(
-            (a, b) => (Number(b.amount) || 0) - (Number(a.amount) || 0)
-          );
+          const sorted = processLeaderboardData(data.sponsors);
 
           setLeaderboard({
             ...data,
