@@ -18,6 +18,12 @@ import {
   Upload,
   Download,
   FileSpreadsheet,
+  FileText,
+  FileCheck,
+  Calendar,
+  Eye,
+  UploadCloud,
+  ExternalLink,
 } from "lucide-react";
 
 import {
@@ -44,6 +50,21 @@ import {
   updateCourse,
   deleteCourse,
   bulkUploadCourses,
+  listMaterials,
+  createMaterial,
+  updateMaterial,
+  deleteMaterial,
+  listExams,
+  createExam,
+  updateExam,
+  deleteExam,
+  addExamSchedule,
+  deleteExamSchedule,
+  listQuestionPapers,
+  createQuestionPaper,
+  deleteQuestionPaper,
+  fetchCourseContent,
+  uploadFile,
 } from "../api/academic.js";
 
 function Banner({ banner, onDismiss }) {
@@ -123,7 +144,7 @@ function Modal({ open, title, onClose, children }) {
       <div
         role="dialog"
         aria-modal="true"
-        className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-950"
+        className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-950"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-slate-100 pb-4 dark:border-slate-800">
@@ -189,7 +210,6 @@ function BulkUploadModal({ open, onClose, onSuccess, onError }) {
   return (
     <Modal open={open} title="Bulk Upload Courses via CSV" onClose={onClose}>
       <div className="space-y-5">
-        {/* Step 1: Download Template */}
         <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-4 dark:border-blue-900/40 dark:bg-blue-950/30">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -208,7 +228,6 @@ function BulkUploadModal({ open, onClose, onSuccess, onError }) {
           </div>
         </div>
 
-        {/* Step 2: Choose File & Upload */}
         <form onSubmit={handleUpload} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Step 2: Select CSV File</label>
@@ -239,7 +258,6 @@ function BulkUploadModal({ open, onClose, onSuccess, onError }) {
           </div>
         </form>
 
-        {/* Upload Summary / Results */}
         {result && (
           <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs dark:border-slate-800 dark:bg-slate-900/60">
             <div className="flex items-center justify-between font-bold text-slate-900 dark:text-slate-100">
@@ -267,6 +285,143 @@ function BulkUploadModal({ open, onClose, onSuccess, onError }) {
   );
 }
 
+// Student View Course Content Modal
+function CourseContentViewModal({ open, course, onClose }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (open && course?.id) {
+      setLoading(true);
+      fetchCourseContent(course.id)
+        .then((res) => {
+          if (res.success) setData(res.data);
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false));
+    }
+  }, [open, course?.id]);
+
+  if (!open) return null;
+
+  return (
+    <Modal open={open} title={`Student View - ${course?.code || ""} ${course?.name || ""}`} onClose={onClose}>
+      {loading ? (
+        <div className="flex h-48 items-center justify-center text-slate-400">
+          <Loader className="h-8 w-8 animate-spin" />
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/60">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{data?.course?.name}</h2>
+            <div className="mt-1 flex flex-wrap gap-2 text-xs font-semibold text-slate-500">
+              <span className="rounded-md bg-blue-100 px-2 py-0.5 text-blue-700 dark:bg-blue-950 dark:text-blue-300">{data?.course?.code}</span>
+              <span>{data?.course?.department_name}</span>
+              <span>•</span>
+              <span>{data?.course?.semester_name}</span>
+            </div>
+          </div>
+
+          {/* Materials Section */}
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 border-b border-slate-200 pb-2 dark:border-slate-800 flex items-center gap-2">
+              <FileText className="h-4 w-4 text-blue-600" /> Materials
+            </h3>
+            {data?.materials?.length ? (
+              <div className="mt-3 space-y-2">
+                {data.materials.map((m) => (
+                  <div key={m.id} className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300">{m.unit}</span>
+                        <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">{m.title}</span>
+                      </div>
+                      {m.description && <p className="mt-1 text-xs text-slate-400">{m.description}</p>}
+                    </div>
+                    <a
+                      href={m.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300"
+                    >
+                      <FileText className="h-3.5 w-3.5" /> View PDF
+                    </a>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 text-xs italic text-slate-400">No published materials uploaded for this course yet.</p>
+            )}
+          </div>
+
+          {/* Exams & Question Banks Section */}
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 border-b border-slate-200 pb-2 dark:border-slate-800 flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-purple-600" /> Exams & Question Banks
+            </h3>
+            {data?.exams?.length || data?.question_banks?.length ? (
+              <div className="mt-3 space-y-3">
+                {data?.exams?.map((ex) => {
+                  const sch = ex.schedules?.[0];
+                  const qb = data?.question_banks?.find((q) => q.exam_id === ex.id);
+                  return (
+                    <div key={ex.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                          <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-bold text-purple-700 dark:bg-purple-950 dark:text-purple-300">{ex.exam_type}</span>
+                          <h4 className="mt-1 text-sm font-bold text-slate-900 dark:text-slate-100">{ex.name}</h4>
+                          {sch && (
+                            <p className="mt-1 text-xs text-slate-500">
+                              📅 {sch.exam_date} | 🕒 {sch.start_time} - {sch.end_time} | 📍 Venue: {sch.venue}
+                            </p>
+                          )}
+                        </div>
+
+                        {qb ? (
+                          <a
+                            href={qb.file_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-purple-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-purple-700"
+                          >
+                            <Download className="h-3.5 w-3.5" /> Question Bank PDF
+                          </a>
+                        ) : (
+                          <span className="text-xs italic text-slate-400">No Question Bank uploaded</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Additional unassigned Question Banks */}
+                {data?.question_banks?.filter((q) => !q.exam_id)?.map((qb) => (
+                  <div key={qb.id} className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <div>
+                      <span className="text-xs font-semibold text-slate-500">{qb.exam_type || "Question Bank"}</span>
+                      <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{qb.description || "Question Bank PDF"}</p>
+                    </div>
+                    <a
+                      href={qb.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-purple-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-purple-700"
+                    >
+                      <Download className="h-3.5 w-3.5" /> Question Bank PDF
+                    </a>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 text-xs italic text-slate-400">No exams or question banks configured for this course yet.</p>
+            )}
+          </div>
+        </div>
+      )}
+    </Modal>
+  );
+}
+
 // -----------------------------------------------------------------------------
 // MAIN COMPONENT
 // -----------------------------------------------------------------------------
@@ -278,6 +433,7 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
   const [confirmModal, setConfirmModal] = useState({ open: false, title: "", description: "", onConfirm: null, busy: false });
   const [modalState, setModalState] = useState({ open: false, title: "", type: "", data: null });
   const [bulkModalOpen, setBulkModalOpen] = useState(false);
+  const [previewCourse, setPreviewCourse] = useState(null);
 
   // Lookup options for dropdowns
   const [options, setOptions] = useState({
@@ -291,6 +447,7 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
   const [deptFilter, setDeptFilter] = useState("");
   const [regFilter, setRegFilter] = useState("");
   const [semFilter, setSemFilter] = useState("");
+  const [courseFilter, setCourseFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Data lists
@@ -299,6 +456,9 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
   const [batches, setBatches] = useState([]);
   const [semesters, setSemesters] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [materials, setMaterials] = useState([]);
+  const [exams, setExams] = useState([]);
+  const [questionPapers, setQuestionPapers] = useState([]);
 
   const showBanner = (type, message) => {
     setBanner({ type, message });
@@ -354,13 +514,33 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
           search: searchQuery,
         });
         if (res.success) setCourses(res.data || []);
+      } else if (activeTab === "materials") {
+        const res = await listMaterials({
+          department_id: deptFilter,
+          semester_id: semFilter,
+          course_id: courseFilter,
+        });
+        if (res.success) setMaterials(res.data || []);
+      } else if (activeTab === "exams") {
+        const res = await listExams({
+          department_id: deptFilter,
+          semester_id: semFilter,
+        });
+        if (res.success) setExams(res.data || []);
+      } else if (activeTab === "question-papers") {
+        const res = await listQuestionPapers({
+          department_id: deptFilter,
+          semester_id: semFilter,
+          course_id: courseFilter,
+        });
+        if (res.success) setQuestionPapers(res.data || []);
       }
     } catch (err) {
       showBanner("error", err.response?.data?.message || err.message || "Failed to load academic data");
     } finally {
       setLoading(false);
     }
-  }, [activeTab, deptFilter, regFilter, semFilter, searchQuery]);
+  }, [activeTab, deptFilter, regFilter, semFilter, courseFilter, searchQuery]);
 
   useEffect(() => {
     fetchData();
@@ -372,6 +552,9 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
     { key: "batches", label: "Batches", icon: CalendarDays },
     { key: "semesters", label: "Semesters", icon: Layers },
     { key: "courses", label: "Course Mapping", icon: BookOpen },
+    { key: "materials", label: "Course Materials (PDF)", icon: FileText },
+    { key: "exams", label: "Exams & Schedules", icon: Calendar },
+    { key: "question-papers", label: "Question Banks (PDF)", icon: FileCheck },
   ];
 
   return (
@@ -422,20 +605,6 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
             ))}
           </select>
 
-          {/* Regulation Filter */}
-          <select
-            value={regFilter}
-            onChange={(e) => setRegFilter(e.target.value)}
-            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-800 outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-          >
-            <option value="">All Regulations</option>
-            {options.regulations.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.name}
-              </option>
-            ))}
-          </select>
-
           {/* Semester Filter */}
           <select
             value={semFilter}
@@ -450,8 +619,24 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
             ))}
           </select>
 
+          {/* Course Filter (for Materials, Question Papers) */}
+          {(activeTab === "materials" || activeTab === "question-papers") && (
+            <select
+              value={courseFilter}
+              onChange={(e) => setCourseFilter(e.target.value)}
+              className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-800 outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 max-w-xs truncate"
+            >
+              <option value="">All Mapped Courses</option>
+              {options.courses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.code} - {c.name}
+                </option>
+              ))}
+            </select>
+          )}
+
           {/* Search Box */}
-          <div className="relative min-w-[200px] flex-1">
+          <div className="relative min-w-[180px] flex-1">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
             <input
               type="text"
@@ -476,7 +661,7 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
           {/* Add New Button */}
           <button
             type="button"
-            onClick={() => setModalState({ open: true, title: `Add New ${activeTab.slice(0, -1)}`, type: activeTab, data: null })}
+            onClick={() => setModalState({ open: true, title: `Add New ${activeTab.replace("-", " ")}`, type: activeTab, data: null })}
             className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700"
           >
             <Plus className="h-4 w-4" /> Add Record
@@ -619,6 +804,7 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
             {activeTab === "courses" && (
               <CoursesTable
                 data={courses}
+                onPreview={(item) => setPreviewCourse(item)}
                 onEdit={(item) => setModalState({ open: true, title: "Edit Mapped Course", type: "courses", data: item })}
                 onDelete={(item) =>
                   setConfirmModal({
@@ -632,6 +818,93 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
                         showBanner("success", "Course deleted");
                         fetchData();
                         loadLookupOptions();
+                      } catch (err) {
+                        showBanner("error", err.message);
+                      } finally {
+                        setConfirmModal({ open: false });
+                      }
+                    },
+                  })
+                }
+              />
+            )}
+
+            {activeTab === "materials" && (
+              <MaterialsTable
+                data={materials}
+                onEdit={(item) => setModalState({ open: true, title: "Edit Course Material", type: "materials", data: item })}
+                onDelete={(item) =>
+                  setConfirmModal({
+                    open: true,
+                    title: "Delete Course Material?",
+                    description: `Delete material "${item.title}"?`,
+                    onConfirm: async () => {
+                      try {
+                        setConfirmModal((p) => ({ ...p, busy: true }));
+                        await deleteMaterial(item.id);
+                        showBanner("success", "Material deleted");
+                        fetchData();
+                      } catch (err) {
+                        showBanner("error", err.message);
+                      } finally {
+                        setConfirmModal({ open: false });
+                      }
+                    },
+                  })
+                }
+              />
+            )}
+
+            {activeTab === "exams" && (
+              <ExamsTable
+                data={exams}
+                onAddSchedule={(exam) => setModalState({ open: true, title: `Add Course to ${exam.name}`, type: "add-exam-schedule", data: { exam_id: exam.id, department_id: exam.department_id, semester_id: exam.semester_id } })}
+                onEdit={(item) => setModalState({ open: true, title: "Edit Exam", type: "exams", data: item })}
+                onDelete={(item) =>
+                  setConfirmModal({
+                    open: true,
+                    title: "Delete Exam?",
+                    description: `Delete exam "${item.name}" and all schedules?`,
+                    onConfirm: async () => {
+                      try {
+                        setConfirmModal((p) => ({ ...p, busy: true }));
+                        await deleteExam(item.id);
+                        showBanner("success", "Exam deleted");
+                        fetchData();
+                      } catch (err) {
+                        showBanner("error", err.message);
+                      } finally {
+                        setConfirmModal({ open: false });
+                      }
+                    },
+                  })
+                }
+                onDeleteSchedule={async (schId) => {
+                  try {
+                    await deleteExamSchedule(schId);
+                    showBanner("success", "Course schedule removed from exam");
+                    fetchData();
+                  } catch (err) {
+                    showBanner("error", err.message);
+                  }
+                }}
+              />
+            )}
+
+            {activeTab === "question-papers" && (
+              <QuestionPapersTable
+                data={questionPapers}
+                onDelete={(item) =>
+                  setConfirmModal({
+                    open: true,
+                    title: "Delete Question Bank?",
+                    description: `Delete Question Bank for "${item.course_code} - ${item.course_name}"?`,
+                    onConfirm: async () => {
+                      try {
+                        setConfirmModal((p) => ({ ...p, busy: true }));
+                        await deleteQuestionPaper(item.id);
+                        showBanner("success", "Question Bank deleted");
+                        fetchData();
                       } catch (err) {
                         showBanner("error", err.message);
                       } finally {
@@ -676,6 +949,9 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
         }}
         onError={(msg) => showBanner("error", msg)}
       />
+
+      {/* Student View Course Content Modal */}
+      <CourseContentViewModal open={Boolean(previewCourse)} course={previewCourse} onClose={() => setPreviewCourse(null)} />
     </div>
   );
 }
@@ -685,7 +961,7 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
 // -----------------------------------------------------------------------------
 
 function StatusBadge({ status }) {
-  const isOk = status === "active";
+  const isOk = status === "active" || status === "published" || status === "scheduled";
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
@@ -852,7 +1128,7 @@ function SemestersTable({ data, onEdit, onDelete }) {
   );
 }
 
-function CoursesTable({ data, onEdit, onDelete }) {
+function CoursesTable({ data, onPreview, onEdit, onDelete }) {
   if (!data?.length) return <EmptyState label="department-wise courses mapped" />;
   return (
     <div className="overflow-x-auto">
@@ -885,7 +1161,148 @@ function CoursesTable({ data, onEdit, onDelete }) {
                 )}
               </td>
               <td className="px-4 py-3 text-right space-x-2">
+                <button onClick={() => onPreview(item)} className="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300">
+                  <Eye className="h-3.5 w-3.5" /> Student View
+                </button>
                 <button onClick={() => onEdit(item)} className="p-1.5 text-slate-500 hover:text-blue-600"><Edit2 className="h-4 w-4" /></button>
+                <button onClick={() => onDelete(item)} className="p-1.5 text-slate-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function MaterialsTable({ data, onEdit, onDelete }) {
+  if (!data?.length) return <EmptyState label="course materials (PDF only)" />;
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+        <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase text-slate-500 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-400">
+          <tr>
+            <th className="px-4 py-3">Course</th>
+            <th className="px-4 py-3">Unit</th>
+            <th className="px-4 py-3">Material Title</th>
+            <th className="px-4 py-3">PDF File</th>
+            <th className="px-4 py-3">Status</th>
+            <th className="px-4 py-3 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+          {data.map((item) => (
+            <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/40">
+              <td className="px-4 py-3">
+                <span className="font-mono font-bold text-blue-600">{item.course_code}</span>
+                <div className="text-xs text-slate-500">{item.course_name}</div>
+              </td>
+              <td className="px-4 py-3 font-semibold text-slate-800 dark:text-slate-200">{item.unit}</td>
+              <td className="px-4 py-3 font-semibold text-slate-900 dark:text-slate-100">{item.title}</td>
+              <td className="px-4 py-3">
+                <a href={item.file_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:underline">
+                  <FileText className="h-3.5 w-3.5" /> View PDF
+                </a>
+              </td>
+              <td className="px-4 py-3"><StatusBadge status={item.status} /></td>
+              <td className="px-4 py-3 text-right space-x-2">
+                <button onClick={() => onEdit(item)} className="p-1.5 text-slate-500 hover:text-blue-600"><Edit2 className="h-4 w-4" /></button>
+                <button onClick={() => onDelete(item)} className="p-1.5 text-slate-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function ExamsTable({ data, onAddSchedule, onEdit, onDelete, onDeleteSchedule }) {
+  if (!data?.length) return <EmptyState label="exams and schedules" />;
+  return (
+    <div className="space-y-4">
+      {data.map((exam) => (
+        <div key={exam.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3 dark:border-slate-800">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-bold text-purple-700 dark:bg-purple-950 dark:text-purple-300">{exam.exam_type}</span>
+                <span className="text-xs font-semibold text-slate-400">{exam.academic_year}</span>
+              </div>
+              <h3 className="mt-1 text-base font-bold text-slate-900 dark:text-slate-100">{exam.name}</h3>
+              <p className="text-xs text-slate-500">{exam.department_name} • {exam.semester_name}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => onAddSchedule(exam)}
+                className="inline-flex items-center gap-1 rounded-xl bg-purple-50 px-3 py-1.5 text-xs font-semibold text-purple-700 hover:bg-purple-100 dark:bg-purple-950 dark:text-purple-300"
+              >
+                <Plus className="h-3.5 w-3.5" /> Add Course Schedule
+              </button>
+              <button onClick={() => onEdit(exam)} className="p-1.5 text-slate-500 hover:text-blue-600"><Edit2 className="h-4 w-4" /></button>
+              <button onClick={() => onDelete(exam)} className="p-1.5 text-slate-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
+            </div>
+          </div>
+
+          {/* Exam Schedules for Courses */}
+          <div className="mt-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Scheduled Courses:</h4>
+            {exam.schedules?.length ? (
+              <div className="grid gap-2 sm:grid-cols-2">
+                {exam.schedules.map((sch) => (
+                  <div key={sch.id} className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 p-3 text-xs dark:border-slate-800 dark:bg-slate-900">
+                    <div>
+                      <span className="font-mono font-bold text-blue-600">{sch.course_code}</span> - <span className="font-semibold text-slate-800 dark:text-slate-200">{sch.course_name}</span>
+                      <div className="mt-1 text-slate-500">
+                        📅 {sch.exam_date} | 🕒 {sch.start_time} - {sch.end_time} | 📍 {sch.venue}
+                      </div>
+                    </div>
+                    <button onClick={() => onDeleteSchedule(sch.id)} className="p-1 text-slate-400 hover:text-red-600"><Trash2 className="h-3.5 w-3.5" /></button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs italic text-slate-400">No courses scheduled for this exam yet. Click "Add Course Schedule" above.</p>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function QuestionPapersTable({ data, onDelete }) {
+  if (!data?.length) return <EmptyState label="question banks (PDF only)" />;
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+        <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase text-slate-500 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-400">
+          <tr>
+            <th className="px-4 py-3">Course</th>
+            <th className="px-4 py-3">Exam / Type</th>
+            <th className="px-4 py-3">Department & Semester</th>
+            <th className="px-4 py-3">Question Bank PDF</th>
+            <th className="px-4 py-3 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+          {data.map((item) => (
+            <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/40">
+              <td className="px-4 py-3">
+                <span className="font-mono font-bold text-blue-600">{item.course_code}</span>
+                <div className="text-xs text-slate-500">{item.course_name}</div>
+              </td>
+              <td className="px-4 py-3">
+                <div className="font-semibold text-slate-800 dark:text-slate-200">{item.exam_name || item.exam_type || "Question Bank"}</div>
+                <div className="text-xs text-slate-400">{item.academic_year}</div>
+              </td>
+              <td className="px-4 py-3 text-slate-500">{item.department_name} • {item.semester_name}</td>
+              <td className="px-4 py-3">
+                <a href={item.file_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-700 hover:bg-purple-100 dark:bg-purple-950 dark:text-purple-300">
+                  <Download className="h-3.5 w-3.5" /> Download PDF
+                </a>
+              </td>
+              <td className="px-4 py-3 text-right">
                 <button onClick={() => onDelete(item)} className="p-1.5 text-slate-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
               </td>
             </tr>
@@ -913,10 +1330,34 @@ function EmptyState({ label }) {
 function AcademicForm({ type, initial, options, onSuccess, onError }) {
   const [formData, setFormData] = useState(initial || {});
   const [submitting, setSubmitting] = useState(false);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
 
   const set = (key) => (e) => {
     const val = e.target.type === "checkbox" ? e.target.checked : e.target.value;
     setFormData((prev) => ({ ...prev, [key]: val }));
+  };
+
+  const handlePDFUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith(".pdf")) {
+      onError("Only PDF files (.pdf) are allowed.");
+      e.target.value = "";
+      return;
+    }
+
+    setUploadingPdf(true);
+    try {
+      const res = await uploadFile(file);
+      if (res.success && res.url) {
+        setFormData((prev) => ({ ...prev, file_url: res.url }));
+      }
+    } catch (err) {
+      onError("Failed to upload PDF file");
+    } finally {
+      setUploadingPdf(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -962,6 +1403,36 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
         };
         if (initial?.id) await updateCourse(initial.id, payload);
         else await createCourse(payload);
+      } else if (type === "materials") {
+        const payload = {
+          ...formData,
+          course_id: Number(formData.course_id),
+          item_order: Number(formData.item_order || 0),
+        };
+        if (initial?.id) await updateMaterial(initial.id, payload);
+        else await createMaterial(payload);
+      } else if (type === "exams") {
+        const payload = {
+          ...formData,
+          department_id: Number(formData.department_id),
+          semester_id: Number(formData.semester_id),
+        };
+        if (initial?.id) await updateExam(initial.id, payload);
+        else await createExam(payload);
+      } else if (type === "add-exam-schedule") {
+        const payload = {
+          ...formData,
+          exam_id: Number(formData.exam_id),
+          course_id: Number(formData.course_id),
+        };
+        await addExamSchedule(payload);
+      } else if (type === "question-papers") {
+        const payload = {
+          ...formData,
+          course_id: Number(formData.course_id),
+          exam_id: formData.exam_id ? Number(formData.exam_id) : null,
+        };
+        await createQuestionPaper(payload);
       }
       onSuccess();
     } catch (err) {
@@ -1044,14 +1515,6 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
               placeholder="e.g. 2025"
               value={formData.year || ""}
               onChange={set("year")}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Description</label>
-            <textarea
-              value={formData.description || ""}
-              onChange={set("description")}
               className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
             />
           </div>
@@ -1143,18 +1606,6 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
               className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
             />
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Year Number (1-4)</label>
-            <input
-              type="number"
-              min="1"
-              max="5"
-              required
-              value={formData.year_number || ""}
-              onChange={set("year_number")}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
-            />
-          </div>
         </>
       )}
 
@@ -1241,10 +1692,291 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
         </>
       )}
 
+      {type === "materials" && (
+        <>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Target Course</label>
+            <select
+              required
+              value={formData.course_id || ""}
+              onChange={set("course_id")}
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+            >
+              <option value="">Select Course</option>
+              {options.courses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.code} - {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Material Title</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. Unit 1 Notes"
+                value={formData.title || ""}
+                onChange={set("title")}
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Unit (e.g. Unit 1, Unit 2)</label>
+              <input
+                type="text"
+                placeholder="e.g. Unit 1"
+                value={formData.unit || ""}
+                onChange={set("unit")}
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Upload PDF File (PDF Only)</label>
+            <input
+              type="file"
+              accept=".pdf,application/pdf"
+              onChange={handlePDFUpload}
+              className="mt-1 w-full text-xs text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+            />
+            {uploadingPdf && <p className="mt-1 text-xs text-blue-600 animate-pulse">Uploading PDF...</p>}
+            {formData.file_url && (
+              <p className="mt-1 text-xs font-mono text-emerald-600 truncate">
+                Attached PDF: {formData.file_url}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Publish Status</label>
+            <select
+              value={formData.status || "published"}
+              onChange={set("status")}
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+            >
+              <option value="published">Published</option>
+              <option value="unpublished">Unpublished</option>
+            </select>
+          </div>
+        </>
+      )}
+
+      {type === "exams" && (
+        <>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Department</label>
+              <select
+                required
+                value={formData.department_id || ""}
+                onChange={set("department_id")}
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+              >
+                <option value="">Select Department</option>
+                {options.departments.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.code} - {d.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Semester</label>
+              <select
+                required
+                value={formData.semester_id || ""}
+                onChange={set("semester_id")}
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+              >
+                <option value="">Select Semester</option>
+                {options.semesters.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.semester_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Exam Type</label>
+              <select
+                required
+                value={formData.exam_type || "PT-1"}
+                onChange={set("exam_type")}
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+              >
+                <option value="PT-1">PT-1</option>
+                <option value="PT-2">PT-2</option>
+                <option value="Model Exam">Model Exam</option>
+                <option value="Semester-End Exam">Semester-End Exam</option>
+                <option value="Practical Exam">Practical Exam</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Academic Year</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. 2025-2026"
+                value={formData.academic_year || "2025-2026"}
+                onChange={set("academic_year")}
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Exam Name</label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. PT-1 Midterm Examinations"
+              value={formData.name || ""}
+              onChange={set("name")}
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Start Date</label>
+              <input
+                type="date"
+                value={formData.start_date || ""}
+                onChange={set("start_date")}
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">End Date</label>
+              <input
+                type="date"
+                value={formData.end_date || ""}
+                onChange={set("end_date")}
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+              />
+            </div>
+          </div>
+        </>
+      )}
+
+      {type === "add-exam-schedule" && (
+        <>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Course</label>
+            <select
+              required
+              value={formData.course_id || ""}
+              onChange={set("course_id")}
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+            >
+              <option value="">Select Course</option>
+              {options.courses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.code} - {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Exam Date</label>
+            <input
+              type="date"
+              required
+              value={formData.exam_date || ""}
+              onChange={set("exam_date")}
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Start Time</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. 09:30 AM"
+                value={formData.start_time || ""}
+                onChange={set("start_time")}
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">End Time</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. 12:30 PM"
+                value={formData.end_time || ""}
+                onChange={set("end_time")}
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Venue</label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. Main Examination Hall 101"
+              value={formData.venue || ""}
+              onChange={set("venue")}
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+            />
+          </div>
+        </>
+      )}
+
+      {type === "question-papers" && (
+        <>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Course</label>
+            <select
+              required
+              value={formData.course_id || ""}
+              onChange={set("course_id")}
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+            >
+              <option value="">Select Course</option>
+              {options.courses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.code} - {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Upload Question Bank PDF (PDF Only)</label>
+            <input
+              type="file"
+              accept=".pdf,application/pdf"
+              onChange={handlePDFUpload}
+              className="mt-1 w-full text-xs text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-purple-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-purple-700 hover:file:bg-purple-100"
+            />
+            {uploadingPdf && <p className="mt-1 text-xs text-purple-600 animate-pulse">Uploading PDF...</p>}
+            {formData.file_url && (
+              <p className="mt-1 text-xs font-mono text-emerald-600 truncate">
+                Attached PDF: {formData.file_url}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Description (Optional)</label>
+            <input
+              type="text"
+              placeholder="e.g. PT-1 Question Bank with Answer Key"
+              value={formData.description || ""}
+              onChange={set("description")}
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+            />
+          </div>
+        </>
+      )}
+
       <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
         <button
           type="submit"
-          disabled={submitting}
+          disabled={submitting || uploadingPdf}
           className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
         >
           {submitting && <Loader className="h-4 w-4 animate-spin" />}

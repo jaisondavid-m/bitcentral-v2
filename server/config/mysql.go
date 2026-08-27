@@ -583,6 +583,10 @@ func createAcademicTables() {
 	DB.Exec(`ALTER TABLE academic_courses ADD COLUMN is_elective TINYINT(1) NOT NULL DEFAULT 0 AFTER course_type`)
 	DB.Exec(`ALTER TABLE academic_curriculum ADD COLUMN department_id INT NOT NULL DEFAULT 0 AFTER id`)
 	DB.Exec(`ALTER TABLE academic_exams ADD COLUMN department_id INT NOT NULL DEFAULT 0 AFTER academic_year`)
+	DB.Exec(`ALTER TABLE academic_materials ADD COLUMN department_id INT NOT NULL DEFAULT 0 AFTER course_id`)
+	DB.Exec(`ALTER TABLE academic_materials ADD COLUMN semester_id INT NOT NULL DEFAULT 0 AFTER department_id`)
+	DB.Exec(`ALTER TABLE academic_question_papers ADD COLUMN exam_id INT NULL AFTER id`)
+	DB.Exec(`ALTER TABLE academic_question_papers ADD COLUMN department_id INT NOT NULL DEFAULT 0 AFTER course_id`)
 
 	// Drop single-column UNIQUE index on code if present, so courses can be mapped per dept/reg/sem
 	DB.Exec(`ALTER TABLE academic_courses DROP INDEX code`)
