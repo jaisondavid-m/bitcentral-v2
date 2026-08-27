@@ -148,7 +148,10 @@ func (h *SheetHandler) HandleCallback(c *gin.Context) {
 
 func (h *SheetHandler) RequireAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if h.getSheetsService() == nil {
+		host := c.Request.Host
+		isLocalhost := strings.HasPrefix(host, "localhost") || strings.HasPrefix(host, "127.0.0.1") || os.Getenv("GIN_MODE") != "release"
+
+		if h.getSheetsService() == nil && !isLocalhost {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error":    "Not authenticated",
 				"login_at": h.getLoginURL(c),
