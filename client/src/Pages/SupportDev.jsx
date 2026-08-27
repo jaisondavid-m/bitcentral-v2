@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   Heart,
@@ -19,7 +19,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../Authentication/firebase.js";
 import { getSponsorsLeaderboard } from "../api/axios.js";
 
-const RAZORPAY_PAGE_URL = "https://pages.razorpay.com/X8K4y93";
+
 
 export default function SupportDev() {
   const [user] = useAuthState(auth);
@@ -83,9 +83,17 @@ export default function SupportDev() {
     })();
   }, []);
 
-  const handleProceedToPayment = () => {
-    window.open(RAZORPAY_PAGE_URL, "_blank", "noopener,noreferrer");
-  };
+  const paymentFormRef = useRef(null);
+
+  useEffect(() => {
+    if (!paymentFormRef.current) return;
+    paymentFormRef.current.innerHTML = "";
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/payment-button.js";
+    script.setAttribute("data-payment_button_id", "pl_TUlix4nQCJh453");
+    script.async = true;
+    paymentFormRef.current.appendChild(script);
+  }, []);
 
   const formattedTotal = Number(leaderboard.total_raised || 0).toLocaleString("en-IN");
 
@@ -178,14 +186,7 @@ export default function SupportDev() {
 
             {/* Main Action Button */}
             <div className="space-y-3 pt-2">
-              <button
-                onClick={handleProceedToPayment}
-                className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 py-4 text-base font-bold text-white shadow-xl shadow-blue-600/25 transition-all duration-300 hover:bg-blue-700 active:scale-[0.99] cursor-pointer"
-              >
-                <Heart className="h-5 w-5 fill-current text-white group-hover:scale-110 transition-transform" />
-                <span>Donate & Keep Us Running</span>
-                <ArrowRight className="h-4 w-4 text-white group-hover:translate-x-1 transition-transform" />
-              </button>
+              <form ref={paymentFormRef} className="flex justify-center" />
 
               <p className="text-center text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">
                 <Lock className="h-3.5 w-3.5 text-slate-400" />
