@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
   Building2,
-  GraduationCap,
   Award,
   Calendar,
   Layers,
@@ -34,10 +33,6 @@ import {
   createDepartment,
   updateDepartment,
   deleteDepartment,
-  listPrograms,
-  createProgram,
-  updateProgram,
-  deleteProgram,
   listRegulations,
   createRegulation,
   updateRegulation,
@@ -183,7 +178,6 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
   // Lookup options for dependent dropdowns
   const [options, setOptions] = useState({
     departments: [],
-    programs: [],
     regulations: [],
     semesters: [],
     courses: [],
@@ -191,14 +185,12 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
 
   // Dependent Filter Selection State
   const [deptFilter, setDeptFilter] = useState("");
-  const [progFilter, setProgFilter] = useState("");
   const [regFilter, setRegFilter] = useState("");
   const [semFilter, setSemFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Data lists
   const [departments, setDepartments] = useState([]);
-  const [programs, setPrograms] = useState([]);
   const [regulations, setRegulations] = useState([]);
   const [batches, setBatches] = useState([]);
   const [semesters, setSemesters] = useState([]);
@@ -212,28 +204,22 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
   // Selected Exam for Exam Details view
   const [selectedExam, setSelectedExam] = useState(null);
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-
   const showBanner = (type, message) => {
     setBanner({ type, message });
     setTimeout(() => setBanner({ type: "", message: "" }), 5000);
   };
 
   // Load lookup options
-  const loadLookupOptions = useCallback(async (deptId = "", progId = "", regId = "", semId = "") => {
+  const loadLookupOptions = useCallback(async (deptId = "", regId = "", semId = "") => {
     try {
       const res = await fetchAcademicOptions({
         department_id: deptId,
-        program_id: progId,
         regulation_id: regId,
         semester_id: semId,
       });
       if (res.success) {
         setOptions({
           departments: res.departments || [],
-          programs: res.programs || [],
           regulations: res.regulations || [],
           semesters: res.semesters || [],
           courses: res.courses || [],
@@ -245,25 +231,21 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
   }, []);
 
   useEffect(() => {
-    loadLookupOptions(deptFilter, progFilter, regFilter, semFilter);
-  }, [deptFilter, progFilter, regFilter, semFilter, loadLookupOptions]);
+    loadLookupOptions(deptFilter, regFilter, semFilter);
+  }, [deptFilter, regFilter, semFilter, loadLookupOptions]);
 
   // Load main tab data
   const fetchData = useCallback(async () => {
     setLoading(true);
-    setCurrentPage(1);
     try {
       if (activeTab === "departments") {
         const res = await listDepartments();
         if (res.success) setDepartments(res.data || []);
-      } else if (activeTab === "programs") {
-        const res = await listPrograms({ department_id: deptFilter });
-        if (res.success) setPrograms(res.data || []);
       } else if (activeTab === "regulations") {
         const res = await listRegulations();
         if (res.success) setRegulations(res.data || []);
       } else if (activeTab === "batches") {
-        const res = await listBatches({ program_id: progFilter, regulation_id: regFilter });
+        const res = await listBatches({ department_id: deptFilter, regulation_id: regFilter });
         if (res.success) setBatches(res.data || []);
       } else if (activeTab === "semesters") {
         const res = await listSemesters();
@@ -274,7 +256,6 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
       } else if (activeTab === "curriculum") {
         const res = await listCurriculum({
           department_id: deptFilter,
-          program_id: progFilter,
           regulation_id: regFilter,
           semester_id: semFilter,
         });
@@ -284,7 +265,7 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
         if (res.success) setMaterials(res.data || []);
       } else if (activeTab === "exams") {
         const res = await listExams({
-          program_id: progFilter,
+          department_id: deptFilter,
           regulation_id: regFilter,
           semester_id: semFilter,
         });
@@ -306,7 +287,7 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
     } finally {
       setLoading(false);
     }
-  }, [activeTab, deptFilter, progFilter, regFilter, semFilter, searchQuery, selectedExam]);
+  }, [activeTab, deptFilter, regFilter, semFilter, searchQuery, selectedExam]);
 
   useEffect(() => {
     fetchData();
@@ -331,7 +312,6 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
 
   const tabs = [
     { key: "departments", label: "Departments", icon: Building2 },
-    { key: "programs", label: "Programs", icon: GraduationCap },
     { key: "regulations", label: "Regulations", icon: Award },
     { key: "batches", label: "Batches", icon: CalendarDays },
     { key: "semesters", label: "Semesters", icon: Layers },
@@ -382,30 +362,13 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
           {/* Department Filter */}
           <select
             value={deptFilter}
-            onChange={(e) => {
-              setDeptFilter(e.target.value);
-              setProgFilter("");
-            }}
+            onChange={(e) => setDeptFilter(e.target.value)}
             className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-800 outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
           >
             <option value="">All Departments</option>
             {options.departments.map((d) => (
               <option key={d.id} value={d.id}>
                 {d.code} - {d.name}
-              </option>
-            ))}
-          </select>
-
-          {/* Program Filter */}
-          <select
-            value={progFilter}
-            onChange={(e) => setProgFilter(e.target.value)}
-            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-800 outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-          >
-            <option value="">All Programs</option>
-            {options.programs.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.code} ({p.degree_type})
               </option>
             ))}
           </select>
@@ -483,33 +446,6 @@ export default function AcademicManagement({ defaultSubTab = "departments" }) {
                         setConfirmModal((p) => ({ ...p, busy: true }));
                         await deleteDepartment(item.id);
                         showBanner("success", "Department deleted");
-                        fetchData();
-                        loadLookupOptions();
-                      } catch (err) {
-                        showBanner("error", err.message);
-                      } finally {
-                        setConfirmModal({ open: false });
-                      }
-                    },
-                  })
-                }
-              />
-            )}
-
-            {activeTab === "programs" && (
-              <ProgramsTable
-                data={programs}
-                onEdit={(item) => setModalState({ open: true, title: "Edit Program", type: "programs", data: item })}
-                onDelete={(item) =>
-                  setConfirmModal({
-                    open: true,
-                    title: "Delete Program?",
-                    description: `Delete program "${item.name}"?`,
-                    onConfirm: async () => {
-                      try {
-                        setConfirmModal((p) => ({ ...p, busy: true }));
-                        await deleteProgram(item.id);
-                        showBanner("success", "Program deleted");
                         fetchData();
                         loadLookupOptions();
                       } catch (err) {
@@ -841,43 +777,6 @@ function DepartmentsTable({ data, onEdit, onDelete }) {
   );
 }
 
-function ProgramsTable({ data, onEdit, onDelete }) {
-  if (!data?.length) return <EmptyState label="programs" />;
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
-        <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase text-slate-500 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-400">
-          <tr>
-            <th className="px-4 py-3">Code</th>
-            <th className="px-4 py-3">Program Name</th>
-            <th className="px-4 py-3">Department</th>
-            <th className="px-4 py-3">Degree</th>
-            <th className="px-4 py-3">Duration</th>
-            <th className="px-4 py-3">Status</th>
-            <th className="px-4 py-3 text-right">Actions</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-          {data.map((item) => (
-            <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/40">
-              <td className="px-4 py-3 font-mono font-bold text-slate-900 dark:text-slate-100">{item.code}</td>
-              <td className="px-4 py-3 font-semibold text-slate-800 dark:text-slate-200">{item.name}</td>
-              <td className="px-4 py-3 text-slate-500">{item.department_name} ({item.department_code})</td>
-              <td className="px-4 py-3">{item.degree_type}</td>
-              <td className="px-4 py-3">{item.duration_years} Years</td>
-              <td className="px-4 py-3"><StatusBadge status={item.status} /></td>
-              <td className="px-4 py-3 text-right space-x-2">
-                <button onClick={() => onEdit(item)} className="p-1.5 text-slate-500 hover:text-blue-600"><Edit2 className="h-4 w-4" /></button>
-                <button onClick={() => onDelete(item)} className="p-1.5 text-slate-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
 function RegulationsTable({ data, onEdit, onDelete }) {
   if (!data?.length) return <EmptyState label="regulations" />;
   return (
@@ -919,7 +818,7 @@ function BatchesTable({ data, onEdit, onDelete }) {
         <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase text-slate-500 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-400">
           <tr>
             <th className="px-4 py-3">Batch Name</th>
-            <th className="px-4 py-3">Program</th>
+            <th className="px-4 py-3">Department</th>
             <th className="px-4 py-3">Regulation</th>
             <th className="px-4 py-3">Duration</th>
             <th className="px-4 py-3">Status</th>
@@ -930,7 +829,7 @@ function BatchesTable({ data, onEdit, onDelete }) {
           {data.map((item) => (
             <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/40">
               <td className="px-4 py-3 font-mono font-bold text-slate-900 dark:text-slate-100">{item.batch_name}</td>
-              <td className="px-4 py-3 text-slate-800 dark:text-slate-200">{item.program_name}</td>
+              <td className="px-4 py-3 text-slate-800 dark:text-slate-200">{item.department_name}</td>
               <td className="px-4 py-3 text-slate-500">{item.regulation_name}</td>
               <td className="px-4 py-3 text-slate-500">{item.start_year} - {item.end_year}</td>
               <td className="px-4 py-3"><StatusBadge status={item.status} /></td>
@@ -1021,7 +920,7 @@ function CurriculumTable({ data, onEdit, onDelete }) {
       <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
         <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase text-slate-500 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-400">
           <tr>
-            <th className="px-4 py-3">Hierarchy (Dept / Prog / Reg)</th>
+            <th className="px-4 py-3">Department / Regulation</th>
             <th className="px-4 py-3">Semester</th>
             <th className="px-4 py-3">Course</th>
             <th className="px-4 py-3">Credits</th>
@@ -1033,8 +932,8 @@ function CurriculumTable({ data, onEdit, onDelete }) {
           {data.map((item) => (
             <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/40">
               <td className="px-4 py-3">
-                <div className="font-semibold text-slate-900 dark:text-slate-100">{item.program_name}</div>
-                <div className="text-xs text-slate-400">{item.department_name} • {item.regulation_name}</div>
+                <div className="font-semibold text-slate-900 dark:text-slate-100">{item.department_name}</div>
+                <div className="text-xs text-slate-400">{item.regulation_name}</div>
               </td>
               <td className="px-4 py-3 font-semibold text-slate-800 dark:text-slate-200">{item.semester_name}</td>
               <td className="px-4 py-3">
@@ -1101,7 +1000,6 @@ function MaterialsTable({ data, onEdit, onDelete }) {
   );
 }
 
-// Specialized Exams & Schedules Details View (Prompt Requirement #13)
 function ExamsView({ exams, selectedExam, onSelectExam, schedules, onAddExam, onEditExam, onDeleteExam, onAddSchedule, onEditSchedule, onDeleteSchedule }) {
   return (
     <div className="space-y-6">
@@ -1144,7 +1042,7 @@ function ExamsView({ exams, selectedExam, onSelectExam, schedules, onAddExam, on
                 <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">{selectedExam.name}</h3>
                 <div className="mt-1 flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
                   <span>Academic Year: <strong>{selectedExam.academic_year}</strong></span>
-                  <span>Program: <strong>{selectedExam.program_name}</strong></span>
+                  <span>Department: <strong>{selectedExam.department_name}</strong></span>
                   <span>Semester: <strong>{selectedExam.semester_name}</strong></span>
                   <span>Type: <strong>{selectedExam.exam_type}</strong></span>
                 </div>
@@ -1313,10 +1211,6 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
       if (type === "departments") {
         if (initial?.id) await updateDepartment(initial.id, formData);
         else await createDepartment(formData);
-      } else if (type === "programs") {
-        const payload = { ...formData, department_id: Number(formData.department_id), duration_years: Number(formData.duration_years || 4) };
-        if (initial?.id) await updateProgram(initial.id, payload);
-        else await createProgram(payload);
       } else if (type === "regulations") {
         const payload = { ...formData, year: Number(formData.year) };
         if (initial?.id) await updateRegulation(initial.id, payload);
@@ -1324,7 +1218,7 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
       } else if (type === "batches") {
         const payload = {
           ...formData,
-          program_id: Number(formData.program_id),
+          department_id: Number(formData.department_id),
           regulation_id: Number(formData.regulation_id),
           start_year: Number(formData.start_year),
           end_year: Number(formData.end_year),
@@ -1347,7 +1241,6 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
         const payload = {
           ...formData,
           department_id: Number(formData.department_id),
-          program_id: Number(formData.program_id),
           regulation_id: Number(formData.regulation_id),
           semester_id: Number(formData.semester_id),
           course_id: Number(formData.course_id),
@@ -1363,7 +1256,7 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
       } else if (type === "exams") {
         const payload = {
           ...formData,
-          program_id: Number(formData.program_id),
+          department_id: Number(formData.department_id),
           regulation_id: Number(formData.regulation_id),
           semester_id: Number(formData.semester_id),
         };
@@ -1433,70 +1326,6 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
         </>
       )}
 
-      {type === "programs" && (
-        <>
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Department</label>
-            <select
-              required
-              value={formData.department_id || ""}
-              onChange={set("department_id")}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
-            >
-              <option value="">Select Department</option>
-              {options.departments.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.code} - {d.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Program Name</label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. B.E. Computer Science and Engineering"
-              value={formData.name || ""}
-              onChange={set("name")}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Program Code</label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. BE-CSE"
-              value={formData.code || ""}
-              onChange={set("code")}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Degree Type</label>
-              <input
-                type="text"
-                placeholder="B.E. / B.Tech / M.E."
-                value={formData.degree_type || "B.E."}
-                onChange={set("degree_type")}
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Duration (Years)</label>
-              <input
-                type="number"
-                value={formData.duration_years || 4}
-                onChange={set("duration_years")}
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
-              />
-            </div>
-          </div>
-        </>
-      )}
-
       {type === "regulations" && (
         <>
           <div>
@@ -1535,17 +1364,17 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
       {type === "batches" && (
         <>
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Program</label>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Department</label>
             <select
               required
-              value={formData.program_id || ""}
-              onChange={set("program_id")}
+              value={formData.department_id || ""}
+              onChange={set("department_id")}
               className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
             >
-              <option value="">Select Program</option>
-              {options.programs.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} ({p.code})
+              <option value="">Select Department</option>
+              {options.departments.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.code} - {d.name}
                 </option>
               ))}
             </select>
@@ -1699,22 +1528,6 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
               {options.departments.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.code} - {d.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Program</label>
-            <select
-              required
-              value={formData.program_id || ""}
-              onChange={set("program_id")}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
-            >
-              <option value="">Select Program</option>
-              {options.programs.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} ({p.code})
                 </option>
               ))}
             </select>
@@ -1894,17 +1707,17 @@ function AcademicForm({ type, initial, options, onSuccess, onError }) {
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Program</label>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Department</label>
             <select
               required
-              value={formData.program_id || ""}
-              onChange={set("program_id")}
+              value={formData.department_id || ""}
+              onChange={set("department_id")}
               className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
             >
-              <option value="">Select Program</option>
-              {options.programs.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
+              <option value="">Select Department</option>
+              {options.departments.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.code} - {d.name}
                 </option>
               ))}
             </select>
