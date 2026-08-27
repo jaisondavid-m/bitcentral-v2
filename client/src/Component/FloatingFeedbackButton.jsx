@@ -17,10 +17,10 @@ export default function FloatingFeedbackButton() {
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
 
-  const fetchMessages = async () => {
+  const fetchMessages = async (markRead = false) => {
     if (!user) return;
     try {
-      const data = await getFeedbackMessages();
+      const data = await getFeedbackMessages(markRead);
       if (Array.isArray(data)) {
         setMessages(data);
         // Check if there are any unread admin messages
@@ -28,24 +28,24 @@ export default function FloatingFeedbackButton() {
         setHasUnreadAdminMsg(unread);
       }
     } catch (err) {
-      // Ignore errors silently or keep existing
+      // Ignore errors silently
     }
   };
 
   useEffect(() => {
     if (user && isOpen) {
       setLoading(true);
-      fetchMessages().finally(() => setLoading(false));
+      fetchMessages(true).finally(() => setLoading(false));
 
-      const interval = setInterval(fetchMessages, 4000);
+      const interval = setInterval(() => fetchMessages(true), 4000);
       return () => clearInterval(interval);
     }
   }, [user, isOpen]);
 
   useEffect(() => {
     if (user && !isOpen) {
-      fetchMessages();
-      const interval = setInterval(fetchMessages, 10000);
+      fetchMessages(false);
+      const interval = setInterval(() => fetchMessages(false), 8000);
       return () => clearInterval(interval);
     }
   }, [user, isOpen]);
@@ -70,7 +70,7 @@ export default function FloatingFeedbackButton() {
       if (sent) {
         setMessages((prev) => [...prev, sent]);
       } else {
-        await fetchMessages();
+        await fetchMessages(isOpen);
       }
     } catch (err) {
       // Revert if failed
@@ -80,28 +80,58 @@ export default function FloatingFeedbackButton() {
     }
   };
 
+  const handleButtonClick = () => {
+    const nextOpen = !isOpen;
+    setIsOpen(nextOpen);
+    if (nextOpen) {
+      setHasUnreadAdminMsg(false);
+      fetchMessages(true);
+    }
+  };
+
   return (
     <>
+      {/* Motivational Toast Pill when Admin replies */}
+      <AnimatePresence>
+        {hasUnreadAdminMsg && !isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.9 }}
+            onClick={handleButtonClick}
+            className="fixed bottom-22 right-6 z-40 flex items-center gap-2 rounded-full bg-gradient-to-r from-red-600 to-rose-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-lg shadow-red-500/40 hover:from-red-700 hover:to-rose-700 transition-all cursor-pointer border border-red-400/50 group"
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+            </span>
+            <span>Admin replied to you! Tap to read</span>
+            <Sparkles className="h-3.5 w-3.5 text-amber-300 fill-amber-300 animate-pulse" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Floating Action Button */}
       <motion.button
-        onClick={() => {
-          setIsOpen(!isOpen);
-          if (hasUnreadAdminMsg) setHasUnreadAdminMsg(false);
-        }}
+        onClick={handleButtonClick}
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-6 z-40 flex items-center justify-center h-14 w-14 rounded-full bg-blue-600 text-white shadow-xl shadow-blue-600/30 hover:bg-blue-700 active:scale-95 transition-all cursor-pointer border border-blue-400/40"
+        className={`fixed bottom-6 right-6 z-40 flex items-center justify-center h-14 w-14 rounded-full text-white shadow-xl transition-all cursor-pointer border ${
+          hasUnreadAdminMsg
+            ? "bg-blue-600 shadow-red-500/40 border-red-500/60 ring-4 ring-red-500/30 animate-pulse"
+            : "bg-blue-600 shadow-blue-600/30 hover:bg-blue-700 border-blue-400/40"
+        }`}
         aria-label="Open Feedback Chat"
       >
         <MessageSquare className="h-6 w-6" />
 
-        {/* Unread badge indicator */}
+        {/* Small Red Circle Indicator Badge */}
         {hasUnreadAdminMsg && (
-          <span className="absolute -top-1 -right-1 flex h-4 w-4">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-4 w-4 bg-rose-500 text-[9px] font-bold text-white items-center justify-center">
+          <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-5 w-5 bg-red-600 border-2 border-white dark:border-slate-900 text-[10px] font-black text-white items-center justify-center shadow-md">
               !
             </span>
           </span>
