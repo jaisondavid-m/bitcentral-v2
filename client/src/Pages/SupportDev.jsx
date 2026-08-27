@@ -36,11 +36,31 @@ export default function SupportDev() {
         setLoading(true);
         const data = await getSponsorsLeaderboard();
         if (data?.success && Array.isArray(data.sponsors)) {
-          const sorted = [...data.sponsors].sort(
+          const aggregatedMap = new Map();
+          data.sponsors.forEach((s) => {
+            const rawName = (s.name || "").trim();
+            const normKey = rawName.toLowerCase() || (s.email || "").toLowerCase() || s.id;
+            const amt = Number(s.amount) || 0;
+
+            if (aggregatedMap.has(normKey)) {
+              const existing = aggregatedMap.get(normKey);
+              existing.amount = (Number(existing.amount) || 0) + amt;
+            } else {
+              aggregatedMap.set(normKey, {
+                ...s,
+                name: rawName || "Anonymous BITSian",
+                amount: amt,
+              });
+            }
+          });
+
+          const sorted = Array.from(aggregatedMap.values()).sort(
             (a, b) => (Number(b.amount) || 0) - (Number(a.amount) || 0)
           );
+
           setLeaderboard({
             ...data,
+            total_supporters: sorted.length,
             sponsors: sorted,
           });
         }

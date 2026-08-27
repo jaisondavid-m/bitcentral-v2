@@ -155,6 +155,12 @@ func (h *SponsorsHandler) GetSponsorsAdmin(c *gin.Context) {
 	})
 }
 
+type AggregatedDonor struct {
+	Name       string  `json:"name"`
+	Amount     float64 `json:"amount"`
+	LatestDate string  `json:"date"`
+}
+
 // GetSponsorsLeaderboard returns real public leaderboard for Support Dev page
 func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 	keyID := os.Getenv("RAZORPAY_KEY_ID")
@@ -164,7 +170,7 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 	var total float64
 
 	if keyID != "" && keySecret != "" {
-		url := "https://api.razorpay.com/v1/payments?count=50"
+		url := "https://api.razorpay.com/v1/payments?count=100"
 		req, err := http.NewRequest("GET", url, nil)
 		if err == nil {
 			req.SetBasicAuth(keyID, keySecret)
@@ -176,6 +182,8 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 
 				var rzpRes RazorpayPaymentsResponse
 				if err := json.Unmarshal(body, &rzpRes); err == nil {
+					aggregatedMap := make(map[string]*AggregatedDonor)
+
 					for _, item := range rzpRes.Items {
 						amt := float64(item.Amount) / 100.0
 						if item.AmountPaid > 0 {
@@ -184,11 +192,36 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 						total += amt
 
 						donorName := extractName(item.Notes, item.Email)
+						normKey := strings.ToLower(strings.TrimSpace(donorName))
+						if normKey == "" || normKey == "anonymous bitsian" {
+							if item.Email != "" {
+								normKey = strings.ToLower(strings.TrimSpace(item.Email))
+							} else {
+								normKey = fmt.Sprintf("anon_%s", item.ID)
+							}
+						}
 
+						itemDate := time.Unix(item.CreatedAt, 0).Format("2006-01-02")
+
+						if existing, found := aggregatedMap[normKey]; found {
+							existing.Amount += amt
+							if itemDate > existing.LatestDate {
+								existing.LatestDate = itemDate
+							}
+						} else {
+							aggregatedMap[normKey] = &AggregatedDonor{
+								Name:       donorName,
+								Amount:     amt,
+								LatestDate: itemDate,
+							}
+						}
+					}
+
+					for _, donor := range aggregatedMap {
 						sponsors = append(sponsors, gin.H{
-							"name":   donorName,
-							"amount": amt,
-							"date":   time.Unix(item.CreatedAt, 0).Format("2006-01-02"),
+							"name":   donor.Name,
+							"amount": donor.Amount,
+							"date":   donor.LatestDate,
 						})
 					}
 
