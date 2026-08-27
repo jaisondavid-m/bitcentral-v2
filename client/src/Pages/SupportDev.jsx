@@ -285,7 +285,7 @@ export default function SupportDev() {
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-2xl bg-gradient-to-br from-blue-100/90 to-blue-50/80 p-5 border border-blue-200/60 dark:from-blue-950/60 dark:to-slate-900 dark:border-blue-900/60">
                 <div className="text-2xl sm:text-3xl font-black text-blue-700 dark:text-blue-300">
-                  3,000+
+                  3,600+
                 </div>
                 <div className="mt-1 text-xs font-semibold text-blue-600/80 dark:text-blue-400/80">
                   Students Served
