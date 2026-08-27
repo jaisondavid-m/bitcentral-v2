@@ -122,7 +122,7 @@ function S2() {
       <div className="max-w-3xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-blue-800 tracking-tight dark:text-blue-300">Semester 2</h1>
-          <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">Module test question banks and resources</p>
+          <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">Periodical test question banks and resources</p>
         </div>
 
         <div className="mb-6 flex gap-3">
@@ -134,7 +134,7 @@ function S2() {
                 : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
             }`}
           >
-            Module Test 1
+            Periodical Test 1
           </button>
           <button
             onClick={() => setSelectedTest('mt2')}
@@ -144,7 +144,7 @@ function S2() {
                 : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
             }`}
           >
-            Module Test 2
+            Periodical Test 2
           </button>
         </div>
 

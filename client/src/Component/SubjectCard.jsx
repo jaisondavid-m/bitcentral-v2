@@ -65,8 +65,8 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf, dark = f
   };
 
   const titleByView = {
-    test1: "Module Test 1",
-    test2: "Module Test 2",
+    test1: "Periodical Test 1",
+    test2: "Periodical Test 2",
     semester: "Semester",
     all: "All Materials",
   };
@@ -136,7 +136,7 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf, dark = f
       {view === "test1" && hasTest1 && (
         <>
           <Divider />
-          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-500">Module Test 1</p>
+          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-500">Periodical Test 1</p>
           <div className="flex flex-wrap gap-1.5">
             {qb1 && <LinkButton dark={dark} href={qb1} label="Question Bank" onNavigate={navigate} />}
             {ak1 && <LinkButton dark={dark} href={ak1} label="Answer Key" onNavigate={navigate} onClick={() => openPdf(ak1, `${code} - Answer Key`, true, false)} />}
@@ -147,7 +147,7 @@ export default function SubjectCard({ subject, view = "all", onOpenPdf, dark = f
       {view === "test2" && hasTest2 && (
         <>
           <Divider />
-          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-500">Module Test 2</p>
+          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-500">Periodical Test 2</p>
           <div className="flex flex-wrap gap-1.5">
             {qb2 && <LinkButton dark={dark} href={qb2} label="Question Bank" onNavigate={navigate} />}
             {ak2 && <LinkButton dark={dark} href={ak2} label="Answer Key" onNavigate={navigate} onClick={() => openPdf(ak2, `${code} - Answer Key`, true, false)} />}
