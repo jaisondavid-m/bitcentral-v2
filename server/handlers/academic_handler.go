@@ -925,3 +925,639 @@ func (h *AcademicHandler) BulkUploadCourses(c *gin.Context) {
 		},
 	})
 }
+
+// Helper to validate PDF extension
+func isPDFFile(filename string) bool {
+	lower := strings.ToLower(strings.TrimSpace(filename))
+	return strings.HasSuffix(lower, ".pdf")
+}
+
+// -----------------------------------------------------------------------------
+// 6. COURSE MATERIALS (PDF ONLY)
+// -----------------------------------------------------------------------------
+
+func (h *AcademicHandler) ListMaterials(c *gin.Context) {
+	deptID := c.Query("department_id")
+	semID := c.Query("semester_id")
+	courseID := c.Query("course_id")
+	status := c.Query("status")
+
+	query := `
+		SELECT m.id, m.course_id, COALESCE(c.code, ''), COALESCE(c.name, ''),
+		       COALESCE(c.department_id, 0), COALESCE(d.name, ''),
+		       COALESCE(c.semester_id, 0), COALESCE(s.semester_name, ''),
+		       m.title, COALESCE(m.description, ''), COALESCE(m.material_type, 'PDF'),
+		       m.file_url, COALESCE(m.unit, 'General'), m.item_order, m.status,
+		       m.created_at, m.updated_at
+		FROM academic_materials m
+		JOIN academic_courses c ON m.course_id = c.id
+		LEFT JOIN academic_departments d ON c.department_id = d.id
+		LEFT JOIN academic_semesters s ON c.semester_id = s.id
+	`
+	var where []string
+	var args []interface{}
+
+	if courseID != "" {
+		where = append(where, "m.course_id = ?")
+		args = append(args, courseID)
+	}
+	if deptID != "" {
+		where = append(where, "c.department_id = ?")
+		args = append(args, deptID)
+	}
+	if semID != "" {
+		where = append(where, "c.semester_id = ?")
+		args = append(args, semID)
+	}
+	if status != "" {
+		where = append(where, "m.status = ?")
+		args = append(args, status)
+	}
+
+	if len(where) > 0 {
+		query += " WHERE " + strings.Join(where, " AND ")
+	}
+	query += " ORDER BY m.unit ASC, m.item_order ASC, m.title ASC"
+
+	rows, err := h.DB.Query(query, args...)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	var result []models.Material
+	for rows.Next() {
+		var m models.Material
+		if err := rows.Scan(&m.ID, &m.CourseID, &m.CourseCode, &m.CourseName,
+			&m.DepartmentID, &m.DepartmentName, &m.SemesterID, &m.SemesterName,
+			&m.Title, &m.Description, &m.MaterialType, &m.FileURL, &m.Unit,
+			&m.ItemOrder, &m.Status, &m.CreatedAt, &m.UpdatedAt); err == nil {
+			result = append(result, m)
+		}
+	}
+	if result == nil {
+		result = []models.Material{}
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": result})
+}
+
+func (h *AcademicHandler) CreateMaterial(c *gin.Context) {
+	var payload models.Material
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	payload.Title = strings.TrimSpace(payload.Title)
+	payload.FileURL = strings.TrimSpace(payload.FileURL)
+	payload.Unit = strings.TrimSpace(payload.Unit)
+
+	if payload.CourseID <= 0 || payload.Title == "" || payload.FileURL == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Course, Material Title, and PDF File are required"})
+		return
+	}
+
+	if !isPDFFile(payload.FileURL) {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Only PDF files (.pdf) are allowed for course materials"})
+		return
+	}
+
+	if payload.MaterialType == "" {
+		payload.MaterialType = "PDF"
+	}
+	if payload.Unit == "" {
+		payload.Unit = "General"
+	}
+	if payload.Status == "" {
+		payload.Status = "published"
+	}
+
+	res, err := h.DB.Exec(`
+		INSERT INTO academic_materials (course_id, title, description, material_type, file_url, unit, item_order, status)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+	`, payload.CourseID, payload.Title, payload.Description, payload.MaterialType, payload.FileURL, payload.Unit, payload.ItemOrder, payload.Status)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	id, _ := res.LastInsertId()
+	payload.ID = int(id)
+	c.JSON(http.StatusCreated, gin.H{"success": true, "message": "Course material created successfully", "data": payload})
+}
+
+func (h *AcademicHandler) UpdateMaterial(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
+		return
+	}
+	var payload models.Material
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	payload.Title = strings.TrimSpace(payload.Title)
+	payload.FileURL = strings.TrimSpace(payload.FileURL)
+
+	if payload.CourseID <= 0 || payload.Title == "" || payload.FileURL == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Course, Material Title, and PDF File are required"})
+		return
+	}
+
+	if !isPDFFile(payload.FileURL) {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Only PDF files (.pdf) are allowed for course materials"})
+		return
+	}
+
+	_, err = h.DB.Exec(`
+		UPDATE academic_materials
+		SET course_id = ?, title = ?, description = ?, material_type = ?, file_url = ?, unit = ?, item_order = ?, status = ?
+		WHERE id = ?
+	`, payload.CourseID, payload.Title, payload.Description, payload.MaterialType, payload.FileURL, payload.Unit, payload.ItemOrder, payload.Status, id)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	payload.ID = id
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Material updated successfully", "data": payload})
+}
+
+func (h *AcademicHandler) DeleteMaterial(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
+		return
+	}
+	_, err = h.DB.Exec("DELETE FROM academic_materials WHERE id = ?", id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Material deleted successfully"})
+}
+
+// -----------------------------------------------------------------------------
+// 7. EXAMS & EXAM SCHEDULES
+// -----------------------------------------------------------------------------
+
+func (h *AcademicHandler) ListExams(c *gin.Context) {
+	deptID := c.Query("department_id")
+	semID := c.Query("semester_id")
+	status := c.Query("status")
+
+	query := `
+		SELECT e.id, e.name, e.exam_type, e.academic_year, e.department_id, COALESCE(d.name, ''),
+		       e.semester_id, COALESCE(s.semester_name, ''), COALESCE(e.start_date, ''),
+		       COALESCE(e.end_date, ''), COALESCE(e.description, ''), e.status, e.created_at, e.updated_at
+		FROM academic_exams e
+		LEFT JOIN academic_departments d ON e.department_id = d.id
+		LEFT JOIN academic_semesters s ON e.semester_id = s.id
+	`
+	var where []string
+	var args []interface{}
+
+	if deptID != "" {
+		where = append(where, "e.department_id = ?")
+		args = append(args, deptID)
+	}
+	if semID != "" {
+		where = append(where, "e.semester_id = ?")
+		args = append(args, semID)
+	}
+	if status != "" {
+		where = append(where, "e.status = ?")
+		args = append(args, status)
+	}
+
+	if len(where) > 0 {
+		query += " WHERE " + strings.Join(where, " AND ")
+	}
+	query += " ORDER BY e.created_at DESC"
+
+	rows, err := h.DB.Query(query, args...)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	var result []models.Exam
+	for rows.Next() {
+		var e models.Exam
+		if err := rows.Scan(&e.ID, &e.Name, &e.ExamType, &e.AcademicYear, &e.DepartmentID, &e.DepartmentName,
+			&e.SemesterID, &e.SemesterName, &e.StartDate, &e.EndDate, &e.Description, &e.Status,
+			&e.CreatedAt, &e.UpdatedAt); err == nil {
+
+			// Fetch schedules for this exam
+			sRows, sErr := h.DB.Query(`
+				SELECT es.id, es.exam_id, es.course_id, COALESCE(c.code, ''), COALESCE(c.name, ''),
+				       es.exam_date, es.start_time, es.end_time, es.venue, COALESCE(es.instructions, ''), es.status
+				FROM academic_exam_schedules es
+				JOIN academic_courses c ON es.course_id = c.id
+				WHERE es.exam_id = ?
+				ORDER BY es.exam_date ASC, es.start_time ASC
+			`, e.ID)
+			if sErr == nil {
+				for sRows.Next() {
+					var sch models.ExamSchedule
+					if err := sRows.Scan(&sch.ID, &sch.ExamID, &sch.CourseID, &sch.CourseCode, &sch.CourseName,
+						&sch.ExamDate, &sch.StartTime, &sch.EndTime, &sch.Venue, &sch.Instructions, &sch.Status); err == nil {
+						e.Schedules = append(e.Schedules, sch)
+					}
+				}
+				sRows.Close()
+			}
+			if e.Schedules == nil {
+				e.Schedules = []models.ExamSchedule{}
+			}
+
+			result = append(result, e)
+		}
+	}
+	if result == nil {
+		result = []models.Exam{}
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": result})
+}
+
+func (h *AcademicHandler) CreateExam(c *gin.Context) {
+	var payload models.Exam
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	payload.Name = strings.TrimSpace(payload.Name)
+	payload.ExamType = strings.TrimSpace(payload.ExamType)
+	payload.AcademicYear = strings.TrimSpace(payload.AcademicYear)
+
+	if payload.Name == "" || payload.ExamType == "" || payload.AcademicYear == "" || payload.DepartmentID <= 0 || payload.SemesterID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Exam Name, Exam Type, Academic Year, Department, and Semester are required"})
+		return
+	}
+	if payload.Status == "" {
+		payload.Status = "scheduled"
+	}
+
+	res, err := h.DB.Exec(`
+		INSERT INTO academic_exams (name, exam_type, academic_year, department_id, regulation_id, semester_id, start_date, end_date, description, status)
+		VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?, ?)
+	`, payload.Name, payload.ExamType, payload.AcademicYear, payload.DepartmentID, payload.SemesterID, payload.StartDate, payload.EndDate, payload.Description, payload.Status)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	id, _ := res.LastInsertId()
+	payload.ID = int(id)
+	c.JSON(http.StatusCreated, gin.H{"success": true, "message": "Exam created successfully", "data": payload})
+}
+
+func (h *AcademicHandler) UpdateExam(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
+		return
+	}
+	var payload models.Exam
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	payload.Name = strings.TrimSpace(payload.Name)
+	payload.ExamType = strings.TrimSpace(payload.ExamType)
+	payload.AcademicYear = strings.TrimSpace(payload.AcademicYear)
+
+	if payload.Name == "" || payload.ExamType == "" || payload.AcademicYear == "" || payload.DepartmentID <= 0 || payload.SemesterID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Exam Name, Exam Type, Academic Year, Department, and Semester are required"})
+		return
+	}
+
+	_, err = h.DB.Exec(`
+		UPDATE academic_exams
+		SET name = ?, exam_type = ?, academic_year = ?, department_id = ?, semester_id = ?, start_date = ?, end_date = ?, description = ?, status = ?
+		WHERE id = ?
+	`, payload.Name, payload.ExamType, payload.AcademicYear, payload.DepartmentID, payload.SemesterID, payload.StartDate, payload.EndDate, payload.Description, payload.Status, id)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	payload.ID = id
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Exam updated successfully", "data": payload})
+}
+
+func (h *AcademicHandler) DeleteExam(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
+		return
+	}
+	_, err = h.DB.Exec("DELETE FROM academic_exams WHERE id = ?", id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Exam deleted successfully"})
+}
+
+func (h *AcademicHandler) AddExamSchedule(c *gin.Context) {
+	var payload models.ExamSchedule
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	if payload.ExamID <= 0 || payload.CourseID <= 0 || payload.ExamDate == "" || payload.StartTime == "" || payload.EndTime == "" || payload.Venue == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Exam, Course, Exam Date, Start Time, End Time, and Venue are required"})
+		return
+	}
+	if payload.Status == "" {
+		payload.Status = "scheduled"
+	}
+
+	res, err := h.DB.Exec(`
+		INSERT INTO academic_exam_schedules (exam_id, course_id, exam_date, start_time, end_time, venue, instructions, status)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+	`, payload.ExamID, payload.CourseID, payload.ExamDate, payload.StartTime, payload.EndTime, payload.Venue, payload.Instructions, payload.Status)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	id, _ := res.LastInsertId()
+	payload.ID = int(id)
+	c.JSON(http.StatusCreated, gin.H{"success": true, "message": "Course schedule added to exam", "data": payload})
+}
+
+func (h *AcademicHandler) DeleteExamSchedule(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
+		return
+	}
+	_, err = h.DB.Exec("DELETE FROM academic_exam_schedules WHERE id = ?", id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Exam course schedule deleted"})
+}
+
+// -----------------------------------------------------------------------------
+// 8. QUESTION BANKS (PDF ONLY)
+// -----------------------------------------------------------------------------
+
+func (h *AcademicHandler) ListQuestionPapers(c *gin.Context) {
+	deptID := c.Query("department_id")
+	semID := c.Query("semester_id")
+	courseID := c.Query("course_id")
+	examID := c.Query("exam_id")
+
+	query := `
+		SELECT qp.id, qp.exam_id, COALESCE(e.name, ''), qp.course_id, COALESCE(c.code, ''), COALESCE(c.name, ''),
+		       COALESCE(c.department_id, 0), COALESCE(d.name, ''), COALESCE(c.semester_id, 0), COALESCE(s.semester_name, ''),
+		       COALESCE(qp.exam_type, ''), COALESCE(qp.academic_year, ''), qp.file_url, COALESCE(qp.description, ''), qp.status,
+		       qp.created_at, qp.updated_at
+		FROM academic_question_papers qp
+		JOIN academic_courses c ON qp.course_id = c.id
+		LEFT JOIN academic_exams e ON qp.exam_id = e.id
+		LEFT JOIN academic_departments d ON c.department_id = d.id
+		LEFT JOIN academic_semesters s ON c.semester_id = s.id
+	`
+	var where []string
+	var args []interface{}
+
+	if courseID != "" {
+		where = append(where, "qp.course_id = ?")
+		args = append(args, courseID)
+	}
+	if examID != "" {
+		where = append(where, "qp.exam_id = ?")
+		args = append(args, examID)
+	}
+	if deptID != "" {
+		where = append(where, "c.department_id = ?")
+		args = append(args, deptID)
+	}
+	if semID != "" {
+		where = append(where, "c.semester_id = ?")
+		args = append(args, semID)
+	}
+
+	if len(where) > 0 {
+		query += " WHERE " + strings.Join(where, " AND ")
+	}
+	query += " ORDER BY qp.created_at DESC"
+
+	rows, err := h.DB.Query(query, args...)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	var result []models.QuestionPaper
+	for rows.Next() {
+		var qp models.QuestionPaper
+		if err := rows.Scan(&qp.ID, &qp.ExamID, &qp.ExamName, &qp.CourseID, &qp.CourseCode, &qp.CourseName,
+			&qp.DepartmentID, &qp.DepartmentName, &qp.SemesterID, &qp.SemesterName,
+			&qp.ExamType, &qp.AcademicYear, &qp.FileURL, &qp.Description, &qp.Status,
+			&qp.CreatedAt, &qp.UpdatedAt); err == nil {
+			result = append(result, qp)
+		}
+	}
+	if result == nil {
+		result = []models.QuestionPaper{}
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": result})
+}
+
+func (h *AcademicHandler) CreateQuestionPaper(c *gin.Context) {
+	var payload models.QuestionPaper
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	payload.FileURL = strings.TrimSpace(payload.FileURL)
+
+	if payload.CourseID <= 0 || payload.FileURL == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Course and PDF File URL are required"})
+		return
+	}
+
+	if !isPDFFile(payload.FileURL) {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Only PDF files (.pdf) are allowed for question banks"})
+		return
+	}
+
+	// Auto populate exam details if exam_id is provided
+	if payload.ExamID != nil && *payload.ExamID > 0 {
+		var exType, acYear string
+		var semID int
+		err := h.DB.QueryRow("SELECT exam_type, academic_year, semester_id FROM academic_exams WHERE id = ?", *payload.ExamID).Scan(&exType, &acYear, &semID)
+		if err == nil {
+			payload.ExamType = exType
+			payload.AcademicYear = acYear
+			payload.SemesterID = semID
+		}
+	}
+
+	if payload.Status == "" {
+		payload.Status = "active"
+	}
+
+	res, err := h.DB.Exec(`
+		INSERT INTO academic_question_papers (exam_id, course_id, exam_type, academic_year, regulation_id, semester_id, year_number, file_url, description, status)
+		VALUES (?, ?, ?, ?, 1, ?, 1, ?, ?, ?)
+	`, payload.ExamID, payload.CourseID, payload.ExamType, payload.AcademicYear, payload.SemesterID, payload.FileURL, payload.Description, payload.Status)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	id, _ := res.LastInsertId()
+	payload.ID = int(id)
+	c.JSON(http.StatusCreated, gin.H{"success": true, "message": "Question Bank uploaded successfully", "data": payload})
+}
+
+func (h *AcademicHandler) DeleteQuestionPaper(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid ID"})
+		return
+	}
+	_, err = h.DB.Exec("DELETE FROM academic_question_papers WHERE id = ?", id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Question Bank deleted successfully"})
+}
+
+// -----------------------------------------------------------------------------
+// 9. STUDENT COURSE CONTENT VIEW
+// -----------------------------------------------------------------------------
+
+func (h *AcademicHandler) GetCourseContent(c *gin.Context) {
+	courseIDStr := c.Param("id")
+	courseID, err := strconv.Atoi(courseIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid Course ID"})
+		return
+	}
+
+	// 1. Fetch Course Metadata
+	var cr models.Course
+	err = h.DB.QueryRow(`
+		SELECT c.id, c.department_id, COALESCE(d.name, ''), c.regulation_id, COALESCE(r.name, ''),
+		       c.semester_id, COALESCE(s.semester_name, ''), c.code, c.name, COALESCE(c.short_name, ''),
+		       c.is_elective, COALESCE(c.description, '')
+		FROM academic_courses c
+		LEFT JOIN academic_departments d ON c.department_id = d.id
+		LEFT JOIN academic_regulations r ON c.regulation_id = r.id
+		LEFT JOIN academic_semesters s ON c.semester_id = s.id
+		WHERE c.id = ?
+	`, courseID).Scan(&cr.ID, &cr.DepartmentID, &cr.DepartmentName, &cr.RegulationID, &cr.RegulationName,
+		&cr.SemesterID, &cr.SemesterName, &cr.Code, &cr.Name, &cr.ShortName, &cr.IsElective, &cr.Description)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "Course not found"})
+		return
+	}
+
+	// 2. Fetch Course Materials (PDFs only)
+	mRows, mErr := h.DB.Query(`
+		SELECT id, course_id, title, COALESCE(description, ''), material_type, file_url, COALESCE(unit, 'General'), item_order, status, created_at, updated_at
+		FROM academic_materials
+		WHERE course_id = ? AND status = 'published'
+		ORDER BY unit ASC, item_order ASC, title ASC
+	`, courseID)
+	var materials []models.Material
+	if mErr == nil {
+		defer mRows.Close()
+		for mRows.Next() {
+			var m models.Material
+			mRows.Scan(&m.ID, &m.CourseID, &m.Title, &m.Description, &m.MaterialType, &m.FileURL, &m.Unit, &m.ItemOrder, &m.Status, &m.CreatedAt, &m.UpdatedAt)
+			materials = append(materials, m)
+		}
+	}
+	if materials == nil {
+		materials = []models.Material{}
+	}
+
+	// 3. Fetch Exams & Question Banks for this course
+	eRows, eErr := h.DB.Query(`
+		SELECT DISTINCT e.id, e.name, e.exam_type, e.academic_year, e.department_id, COALESCE(d.name, ''),
+		                e.semester_id, COALESCE(s.semester_name, ''), COALESCE(e.start_date, ''), COALESCE(e.end_date, ''),
+		                COALESCE(e.description, ''), e.status
+		FROM academic_exams e
+		JOIN academic_exam_schedules es ON es.exam_id = e.id
+		LEFT JOIN academic_departments d ON e.department_id = d.id
+		LEFT JOIN academic_semesters s ON e.semester_id = s.id
+		WHERE es.course_id = ?
+		ORDER BY e.created_at DESC
+	`, courseID)
+
+	var exams []models.Exam
+	if eErr == nil {
+		defer eRows.Close()
+		for eRows.Next() {
+			var ex models.Exam
+			if err := eRows.Scan(&ex.ID, &ex.Name, &ex.ExamType, &ex.AcademicYear, &ex.DepartmentID, &ex.DepartmentName,
+				&ex.SemesterID, &ex.SemesterName, &ex.StartDate, &ex.EndDate, &ex.Description, &ex.Status); err == nil {
+
+				// Fetch schedule for this course
+				var sch models.ExamSchedule
+				sErr := h.DB.QueryRow(`
+					SELECT id, exam_id, course_id, exam_date, start_time, end_time, venue, COALESCE(instructions, ''), status
+					FROM academic_exam_schedules
+					WHERE exam_id = ? AND course_id = ?
+					LIMIT 1
+				`, ex.ID, courseID).Scan(&sch.ID, &sch.ExamID, &sch.CourseID, &sch.ExamDate, &sch.StartTime, &sch.EndTime, &sch.Venue, &sch.Instructions, &sch.Status)
+
+				if sErr == nil {
+					ex.Schedules = []models.ExamSchedule{sch}
+				}
+
+				exams = append(exams, ex)
+			}
+		}
+	}
+	if exams == nil {
+		exams = []models.Exam{}
+	}
+
+	// 4. Fetch Question Bank PDFs for this course
+	qpRows, qpErr := h.DB.Query(`
+		SELECT qp.id, qp.exam_id, COALESCE(e.name, ''), qp.course_id, qp.exam_type, qp.academic_year, qp.file_url, COALESCE(qp.description, ''), qp.status, qp.created_at
+		FROM academic_question_papers qp
+		LEFT JOIN academic_exams e ON qp.exam_id = e.id
+		WHERE qp.course_id = ? AND qp.status = 'active'
+		ORDER BY qp.created_at DESC
+	`, courseID)
+
+	var questionBanks []models.QuestionPaper
+	if qpErr == nil {
+		defer qpRows.Close()
+		for qpRows.Next() {
+			var qp models.QuestionPaper
+			qpRows.Scan(&qp.ID, &qp.ExamID, &qp.ExamName, &qp.CourseID, &qp.ExamType, &qp.AcademicYear, &qp.FileURL, &qp.Description, &qp.Status, &qp.CreatedAt)
+			questionBanks = append(questionBanks, qp)
+		}
+	}
+	if questionBanks == nil {
+		questionBanks = []models.QuestionPaper{}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data": gin.H{
+			"course":         cr,
+			"materials":      materials,
+			"exams":          exams,
+			"question_banks": questionBanks,
+		},
+	})
+}
+

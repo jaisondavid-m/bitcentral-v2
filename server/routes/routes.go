@@ -199,7 +199,29 @@ func SetupRouter(
 		admin.POST("/academic/courses/bulk-upload", academicHandler.BulkUploadCourses)
 		admin.PUT("/academic/courses/:id", academicHandler.UpdateCourse)
 		admin.DELETE("/academic/courses/:id", academicHandler.DeleteCourse)
+
+		// Materials (PDF Only)
+		admin.GET("/academic/materials", academicHandler.ListMaterials)
+		admin.POST("/academic/materials", academicHandler.CreateMaterial)
+		admin.PUT("/academic/materials/:id", academicHandler.UpdateMaterial)
+		admin.DELETE("/academic/materials/:id", academicHandler.DeleteMaterial)
+
+		// Exams & Schedules
+		admin.GET("/academic/exams", academicHandler.ListExams)
+		admin.POST("/academic/exams", academicHandler.CreateExam)
+		admin.PUT("/academic/exams/:id", academicHandler.UpdateExam)
+		admin.DELETE("/academic/exams/:id", academicHandler.DeleteExam)
+		admin.POST("/academic/exam-schedules", academicHandler.AddExamSchedule)
+		admin.DELETE("/academic/exam-schedules/:id", academicHandler.DeleteExamSchedule)
+
+		// Question Banks (PDF Only)
+		admin.GET("/academic/question-papers", academicHandler.ListQuestionPapers)
+		admin.POST("/academic/question-papers", academicHandler.CreateQuestionPaper)
+		admin.DELETE("/academic/question-papers/:id", academicHandler.DeleteQuestionPaper)
 	}
+
+	// Public Student Course Content API
+	r.GET("/academic/courses/:id/content", academicHandler.GetCourseContent)
 
 	// Super-admin routes: manage admins and allowed external emails/domains
 	super := r.Group("/admin/super")

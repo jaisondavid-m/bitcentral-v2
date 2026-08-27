@@ -184,3 +184,117 @@ export async function bulkUploadCourses(formData) {
   });
   return res.data;
 }
+
+// -----------------------------------------------------------------------------
+// 6. COURSE MATERIALS (PDF ONLY)
+// -----------------------------------------------------------------------------
+
+export async function listMaterials(params = {}) {
+  const headers = await getAdminHeaders();
+  const query = new URLSearchParams(params).toString();
+  const res = await api.get(`/admin/academic/materials${query ? `?${query}` : ""}`, { headers });
+  return res.data;
+}
+
+export async function createMaterial(payload) {
+  const headers = await getAdminHeaders();
+  const res = await api.post("/admin/academic/materials", payload, { headers });
+  return res.data;
+}
+
+export async function updateMaterial(id, payload) {
+  const headers = await getAdminHeaders();
+  const res = await api.put(`/admin/academic/materials/${id}`, payload, { headers });
+  return res.data;
+}
+
+export async function deleteMaterial(id) {
+  const headers = await getAdminHeaders();
+  const res = await api.delete(`/admin/academic/materials/${id}`, { headers });
+  return res.data;
+}
+
+// -----------------------------------------------------------------------------
+// 7. EXAMS & EXAM SCHEDULES
+// -----------------------------------------------------------------------------
+
+export async function listExams(params = {}) {
+  const headers = await getAdminHeaders();
+  const query = new URLSearchParams(params).toString();
+  const res = await api.get(`/admin/academic/exams${query ? `?${query}` : ""}`, { headers });
+  return res.data;
+}
+
+export async function createExam(payload) {
+  const headers = await getAdminHeaders();
+  const res = await api.post("/admin/academic/exams", payload, { headers });
+  return res.data;
+}
+
+export async function updateExam(id, payload) {
+  const headers = await getAdminHeaders();
+  const res = await api.put(`/admin/academic/exams/${id}`, payload, { headers });
+  return res.data;
+}
+
+export async function deleteExam(id) {
+  const headers = await getAdminHeaders();
+  const res = await api.delete(`/admin/academic/exams/${id}`, { headers });
+  return res.data;
+}
+
+export async function addExamSchedule(payload) {
+  const headers = await getAdminHeaders();
+  const res = await api.post("/admin/academic/exam-schedules", payload, { headers });
+  return res.data;
+}
+
+export async function deleteExamSchedule(id) {
+  const headers = await getAdminHeaders();
+  const res = await api.delete(`/admin/academic/exam-schedules/${id}`, { headers });
+  return res.data;
+}
+
+// -----------------------------------------------------------------------------
+// 8. QUESTION BANKS (PDF ONLY)
+// -----------------------------------------------------------------------------
+
+export async function listQuestionPapers(params = {}) {
+  const headers = await getAdminHeaders();
+  const query = new URLSearchParams(params).toString();
+  const res = await api.get(`/admin/academic/question-papers${query ? `?${query}` : ""}`, { headers });
+  return res.data;
+}
+
+export async function createQuestionPaper(payload) {
+  const headers = await getAdminHeaders();
+  const res = await api.post("/admin/academic/question-papers", payload, { headers });
+  return res.data;
+}
+
+export async function deleteQuestionPaper(id) {
+  const headers = await getAdminHeaders();
+  const res = await api.delete(`/admin/academic/question-papers/${id}`, { headers });
+  return res.data;
+}
+
+// -----------------------------------------------------------------------------
+// 9. STUDENT COURSE CONTENT VIEW
+// -----------------------------------------------------------------------------
+
+export async function fetchCourseContent(courseId) {
+  const res = await api.get(`/academic/courses/${courseId}/content`);
+  return res.data;
+}
+export async function uploadFile(file) {
+  const headers = await getAdminHeaders();
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await api.post("/admin/upload", formData, {
+    headers: {
+      ...headers,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return res.data;
+}
