@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+
 import {
   Heart,
   ShieldCheck,
@@ -41,7 +43,9 @@ const loadRazorpayScript = () => {
 };
 
 export default function SupportDev() {
+  const navigate = useNavigate();
   const [user] = useAuthState(auth);
+
   const [loading, setLoading] = useState(true);
   const [leaderboard, setLeaderboard] = useState({
     total_raised: 0,
@@ -219,10 +223,13 @@ export default function SupportDev() {
       },
       handler: function (response) {
         setIsProcessing(false);
+        setIsModalOpen(false);
         setPaymentSuccess(true);
         fetchLeaderboard();
         fetchContributionStatus();
+        navigate("/payment-successful");
       },
+
       modal: {
         ondismiss: function () {
           setIsProcessing(false);
