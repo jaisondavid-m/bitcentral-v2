@@ -358,6 +358,7 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 	}
 
 	type InternalDonor struct {
+		Key        string
 		Name       string
 		Amount     float64
 		LatestDate string
@@ -420,12 +421,14 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 			}
 		} else {
 			donor := &InternalDonor{
+				Key:        normKey,
 				Name:       donorName,
 				Amount:     amt,
 				LatestDate: itemDate,
 				Phones:     make(map[string]bool),
 				Emails:     make(map[string]bool),
 			}
+
 			if phone != "" {
 				donor.Phones[phone] = true
 			}
@@ -459,6 +462,12 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 	}
 
 	if matchedDonor != nil {
+		hVal := uint32(0)
+		for _, ch := range []byte(matchedDonor.Key) {
+			hVal = hVal*31 + uint32(ch)
+		}
+		certID := fmt.Sprintf("BIT-PATRON-%d", hVal)
+
 		c.JSON(http.StatusOK, gin.H{
 			"success":          true,
 			"found":            true,
@@ -467,6 +476,7 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 			"total_supporters": len(donorList),
 			"name":             matchedDonor.Name,
 			"is_top_10":        matchedRank <= 10,
+			"certificate_id":   certID,
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
@@ -605,5 +615,205 @@ func (h *SponsorsHandler) CapturePayment(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "captured": true})
 }
+
+// GetCertificate fetches and verifies total cumulative patron contribution details directly from Razorpay
+func (h *SponsorsHandler) GetCertificate(c *gin.Context) {
+	idParam := c.Param("id")
+	idParam = strings.TrimSpace(idParam)
+
+	cleanID := idParam
+	if strings.HasPrefix(cleanID, "BIT-PATRON-") {
+		cleanID = strings.TrimPrefix(cleanID, "BIT-PATRON-")
+	}
+	cleanID = strings.ToLower(cleanID)
+
+	if cleanID == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"success":  true,
+			"verified": false,
+			"error":    "Missing certificate ID",
+		})
+		return
+	}
+
+	keyID := os.Getenv("RAZORPAY_KEY_ID")
+	keySecret := os.Getenv("RAZORPAY_KEY_SECRET")
+
+	if keyID == "" || keySecret == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"success":  true,
+			"verified": false,
+			"error":    "Server credentials missing",
+		})
+		return
+	}
+
+	url := "https://api.razorpay.com/v1/payments?count=100"
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "verified": false, "error": "Failed to create request"})
+		return
+	}
+
+	req.SetBasicAuth(keyID, keySecret)
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		c.JSON(http.StatusOK, gin.H{"success": true, "verified": false, "error": "Failed to query Razorpay records"})
+		return
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	var rzpRes RazorpayPaymentsResponse
+	if err := json.Unmarshal(body, &rzpRes); err != nil {
+		c.JSON(http.StatusOK, gin.H{"success": true, "verified": false, "error": "Failed to parse payment records"})
+		return
+	}
+
+	type InternalDonor struct {
+		Key        string
+		CertID     string
+		Name       string
+		Amount     float64
+		LatestDate string
+		PaymentIDs []string
+		Phones     map[string]bool
+		Emails     map[string]bool
+	}
+
+	aggregatedMap := make(map[string]*InternalDonor)
+
+	for _, item := range rzpRes.Items {
+		st := strings.ToLower(item.Status)
+		if st != "captured" && st != "authorized" {
+			continue
+		}
+
+		amt := float64(item.Amount) / 100.0
+		if item.AmountPaid > 0 {
+			amt = float64(item.AmountPaid) / 100.0
+		}
+
+		email := strings.ToLower(strings.TrimSpace(item.Email))
+		phone := cleanPhone(item.Contact)
+		if item.Notes != nil {
+			if e, ok := item.Notes["email"].(string); ok && e != "" {
+				email = strings.ToLower(strings.TrimSpace(e))
+			}
+			if p, ok := item.Notes["phone"].(string); ok && p != "" {
+				phone = cleanPhone(p)
+			} else if p, ok := item.Notes["contact"].(string); ok && p != "" {
+				phone = cleanPhone(p)
+			}
+		}
+
+		donorName := extractName(item.Notes, email)
+
+		var normKey string
+		if phone != "" {
+			normKey = "phone_" + phone
+		} else if email != "" {
+			normKey = "email_" + email
+		} else {
+			normKey = "name_" + strings.ToLower(strings.TrimSpace(donorName))
+		}
+
+		itemDate := time.Unix(item.CreatedAt, 0).Format("2006-01-02")
+
+		if existing, found := aggregatedMap[normKey]; found {
+			existing.Amount += amt
+			if itemDate > existing.LatestDate {
+				existing.LatestDate = itemDate
+			}
+			if len(donorName) > len(existing.Name) && donorName != "Anonymous BITSian" {
+				existing.Name = donorName
+			}
+			if phone != "" {
+				existing.Phones[phone] = true
+			}
+			if email != "" {
+				existing.Emails[email] = true
+			}
+			existing.PaymentIDs = append(existing.PaymentIDs, item.ID)
+		} else {
+			donor := &InternalDonor{
+				Key:        normKey,
+				Name:       donorName,
+				Amount:     amt,
+				LatestDate: itemDate,
+				PaymentIDs: []string{item.ID},
+				Phones:     make(map[string]bool),
+				Emails:     make(map[string]bool),
+			}
+			if phone != "" {
+				donor.Phones[phone] = true
+			}
+			if email != "" {
+				donor.Emails[email] = true
+			}
+			aggregatedMap[normKey] = donor
+		}
+	}
+
+	var donorList []*InternalDonor
+	for _, d := range aggregatedMap {
+		// Generate deterministic numeric patron cert ID snippet
+		hVal := uint32(0)
+		for _, ch := range []byte(d.Key) {
+			hVal = hVal*31 + uint32(ch)
+		}
+		d.CertID = fmt.Sprintf("%d", hVal)
+		donorList = append(donorList, d)
+	}
+
+	sort.Slice(donorList, func(i, j int) bool {
+		return donorList[i].Amount > donorList[j].Amount
+	})
+
+	var matchedDonor *InternalDonor
+	matchedRank := 0
+
+	for i, d := range donorList {
+		// Match cleanID against certID or Razorpay Payment IDs (do NOT match raw phone/email)
+		matchesCertID := strings.EqualFold(d.CertID, cleanID)
+
+		matchesPaymentID := false
+		for _, pid := range d.PaymentIDs {
+			if strings.EqualFold(pid, cleanID) || strings.EqualFold(strings.TrimPrefix(pid, "pay_"), cleanID) {
+				matchesPaymentID = true
+				break
+			}
+		}
+
+		if matchesCertID || matchesPaymentID {
+			matchedDonor = d
+			matchedRank = i + 1
+			break
+		}
+	}
+
+	if matchedDonor != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success":          true,
+			"verified":         true,
+			"certificate_id":   "BIT-PATRON-" + matchedDonor.CertID,
+			"name":             matchedDonor.Name,
+			"amount":           matchedDonor.Amount,
+			"rank":             matchedRank,
+			"total_supporters": len(donorList),
+			"date":             matchedDonor.LatestDate,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"success":  true,
+			"verified": false,
+			"error":    "No verified patron contribution record found for this certificate ID.",
+		})
+	}
+}
+
+
+
 
 

@@ -138,6 +138,8 @@ func SetupRouter(
 	r.POST("/sponsors/check-contribution", sponsorsHandler.CheckContribution)
 	r.POST("/sponsors/create-order", sponsorsHandler.CreateOrder)
 	r.POST("/sponsors/capture-payment", sponsorsHandler.CapturePayment)
+	r.GET("/sponsors/certificate/:id", sponsorsHandler.GetCertificate)
+
 
 
 	// Proxy PDF by Google Drive ID (keeps original links hidden)
