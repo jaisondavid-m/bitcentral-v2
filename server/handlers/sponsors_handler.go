@@ -479,3 +479,131 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 	}
 }
 
+type CreateOrderRequest struct {
+	Amount float64 `json:"amount"` // in Rupees
+	Name   string  `json:"name"`
+	Email  string  `json:"email"`
+	Phone  string  `json:"phone"`
+}
+
+// CreateOrder creates a Razorpay order with payment_capture: 1 for automatic capture
+func (h *SponsorsHandler) CreateOrder(c *gin.Context) {
+	var req CreateOrderRequest
+	if err := c.ShouldBindJSON(&req); err != nil || req.Amount <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid amount"})
+		return
+	}
+
+	keyID := os.Getenv("RAZORPAY_KEY_ID")
+	keySecret := os.Getenv("RAZORPAY_KEY_SECRET")
+
+	if keyID == "" || keySecret == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Razorpay API keys missing"})
+		return
+	}
+
+	amountInPaise := int64(req.Amount * 100)
+
+	payload := map[string]interface{}{
+		"amount":          amountInPaise,
+		"currency":        "INR",
+		"payment_capture": 1, // Auto capture
+		"notes": map[string]string{
+			"name":    req.Name,
+			"email":   req.Email,
+			"phone":   req.Phone,
+			"contact": req.Phone,
+		},
+	}
+
+	jsonBytes, _ := json.Marshal(payload)
+	url := "https://api.razorpay.com/v1/orders"
+
+	httpReq, err := http.NewRequest("POST", url, strings.NewReader(string(jsonBytes)))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to build order request"})
+		return
+	}
+
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.SetBasicAuth(keyID, keySecret)
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(httpReq)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Razorpay Order creation failed"})
+		return
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	var orderRes struct {
+		ID       string `json:"id"`
+		Amount   int64  `json:"amount"`
+		Currency string `json:"currency"`
+	}
+
+	if err := json.Unmarshal(body, &orderRes); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to parse order response"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success":  true,
+		"order_id": orderRes.ID,
+		"amount":   orderRes.Amount,
+		"currency": orderRes.Currency,
+	})
+}
+
+type CapturePaymentRequest struct {
+	PaymentID string  `json:"payment_id"`
+	Amount    float64 `json:"amount"`
+}
+
+// CapturePayment captures an authorized payment immediately via Razorpay API
+func (h *SponsorsHandler) CapturePayment(c *gin.Context) {
+	var req CapturePaymentRequest
+	if err := c.ShouldBindJSON(&req); err != nil || req.PaymentID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid payment ID"})
+		return
+	}
+
+	keyID := os.Getenv("RAZORPAY_KEY_ID")
+	keySecret := os.Getenv("RAZORPAY_KEY_SECRET")
+
+	if keyID == "" || keySecret == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Razorpay credentials missing"})
+		return
+	}
+
+	amountInPaise := int64(req.Amount * 100)
+	payload := map[string]interface{}{
+		"amount":   amountInPaise,
+		"currency": "INR",
+	}
+
+	jsonBytes, _ := json.Marshal(payload)
+	url := fmt.Sprintf("https://api.razorpay.com/v1/payments/%s/capture", req.PaymentID)
+
+	httpReq, err := http.NewRequest("POST", url, strings.NewReader(string(jsonBytes)))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to build capture request"})
+		return
+	}
+
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.SetBasicAuth(keyID, keySecret)
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(httpReq)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Razorpay capture call failed"})
+		return
+	}
+	defer resp.Body.Close()
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "captured": true})
+}
+
+

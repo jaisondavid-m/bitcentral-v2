@@ -70,4 +70,23 @@ export async function checkUserContribution({ phone, email } = {}) {
       rank: 0,
     };
   }
-}
+}
+
+export async function createSponsorOrder({ amount, name, email, phone }) {
+  try {
+    const response = await api.post("/sponsors/create-order", { amount, name, email, phone });
+    return response.data;
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function captureSponsorPayment({ payment_id, amount }) {
+  try {
+    const response = await api.post("/sponsors/capture-payment", { payment_id, amount });
+    return response.data;
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
