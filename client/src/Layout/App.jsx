@@ -5,6 +5,7 @@ import FullScreenLoader from "../Component/FullScreenLoader.jsx";
 import SEO from "../Component/SEO.jsx";
 import DailySupportModal from "../Component/DailySupportModal.jsx";
 import FloatingFeedbackButton from "../Component/FloatingFeedbackButton.jsx";
+import FloatingSupportButton from "../Component/FloatingSupportButton.jsx";
 import ErrorBoundary from "../Component/ErrorBoundary.jsx";
 import { lazyWithRetry } from "../utils/lazyWithRetry.js";
 import { ROUTE_SEO } from "../seo/routeSeo.js";
@@ -306,6 +307,7 @@ function App() {
       </ErrorBoundary>
       <Analytics />
       <DailySupportModal />
+      <FloatingSupportButton />
       <FloatingFeedbackButton />
     </>
   );

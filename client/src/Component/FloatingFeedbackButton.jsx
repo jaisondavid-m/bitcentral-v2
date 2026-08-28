@@ -99,7 +99,7 @@ export default function FloatingFeedbackButton() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.9 }}
             onClick={handleButtonClick}
-            className="fixed bottom-22 right-6 z-40 flex items-center gap-2 rounded-full bg-gradient-to-r from-red-600 to-rose-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-lg shadow-red-500/40 hover:from-red-700 hover:to-rose-700 transition-all cursor-pointer border border-red-400/50 group"
+            className="fixed bottom-[9rem] right-6 z-40 flex items-center gap-2 rounded-full bg-gradient-to-r from-red-600 to-rose-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-lg shadow-red-500/40 hover:from-red-700 hover:to-rose-700 transition-all cursor-pointer border border-red-400/50 group"
           >
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
