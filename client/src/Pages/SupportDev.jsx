@@ -588,8 +588,8 @@ export default function SupportDev() {
                       <Heart className="h-4 w-4 fill-white text-white" />
                       <span>
                         {effectiveAmount > 0
-                          ? `Donate ₹${effectiveAmount} via Razorpay`
-                          : "Donate via Razorpay"}
+                          ? `Donate ₹${effectiveAmount} now`
+                          : "Donate now"}
                       </span>
                     </>
                   )}
