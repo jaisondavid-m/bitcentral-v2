@@ -25,7 +25,7 @@ import PublicFooter from "../Component/PublicFooter.jsx";
 import Navbar from "../Component/NavBar.jsx";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../Authentication/firebase.js";
-import { getSponsorsLeaderboard, getMeProfile, checkUserContribution } from "../api/axios.js";
+import { getSponsorsLeaderboard, getMeProfile, checkUserContribution, createSponsorOrder, captureSponsorPayment } from "../api/axios.js";
 import { processLeaderboardData } from "../utils/sponsorUtils.js";
 
 const loadRazorpayScript = () => {
@@ -182,8 +182,24 @@ export default function SupportDev() {
       return;
     }
 
+    let orderId = "";
+    try {
+      const orderRes = await createSponsorOrder({
+        amount: effectiveAmount,
+        name: donorName,
+        email: donorEmail,
+        phone: donorPhone,
+      });
+      if (orderRes?.success && orderRes?.order_id) {
+        orderId = orderRes.order_id;
+      }
+    } catch (err) {
+      // order API fallback
+    }
+
     const options = {
       key: key,
+      ...(orderId ? { order_id: orderId } : {}),
       amount: Math.round(effectiveAmount * 100), // amount in paise
       currency: "INR",
       name: "BIT CENTRAL",
@@ -221,7 +237,17 @@ export default function SupportDev() {
       theme: {
         color: "#2563eb",
       },
-      handler: function (response) {
+      handler: async function (response) {
+        if (response?.razorpay_payment_id) {
+          try {
+            await captureSponsorPayment({
+              payment_id: response.razorpay_payment_id,
+              amount: effectiveAmount,
+            });
+          } catch (err) {
+            // ignore
+          }
+        }
         setIsProcessing(false);
         setIsModalOpen(false);
         setPaymentSuccess(true);
