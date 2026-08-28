@@ -251,9 +251,21 @@ export default function SupportDev() {
         setIsProcessing(false);
         setIsModalOpen(false);
         setPaymentSuccess(true);
-        const certParam = response?.razorpay_payment_id || userContribution?.certificate_id || "BIT-PATRON-VERIFIED";
-        navigate(`/payment-successful/${encodeURIComponent(certParam)}`);
+        fetchLeaderboard();
+
+        let certId = response?.razorpay_payment_id || "BIT-PATRON-VERIFIED";
+        try {
+          const res = await checkUserContribution({ phone: donorPhone, email: donorEmail });
+          if (res?.success && res?.certificate_id) {
+            certId = res.certificate_id;
+          }
+        } catch (err) {
+          // ignore
+        }
+
+        navigate(`/payment-successful/${encodeURIComponent(certId)}`);
       },
+
 
       modal: {
         ondismiss: function () {

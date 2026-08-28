@@ -771,16 +771,25 @@ func (h *SponsorsHandler) GetCertificate(c *gin.Context) {
 		return donorList[i].Amount > donorList[j].Amount
 	})
 
+	rawClean := strings.TrimSpace(idParam)
+	rawClean = strings.TrimPrefix(rawClean, "BIT-PATRON-")
+	rawClean = strings.TrimPrefix(rawClean, "bit-patron-")
+	rawCleanNoPay := strings.TrimPrefix(rawClean, "pay_")
+	rawCleanNoPay = strings.TrimPrefix(rawCleanNoPay, "PAY_")
+
 	var matchedDonor *InternalDonor
 	matchedRank := 0
 
 	for i, d := range donorList {
-		// Match cleanID against certID or Razorpay Payment IDs (do NOT match raw phone/email)
-		matchesCertID := strings.EqualFold(d.CertID, cleanID)
+		matchesCertID := strings.EqualFold(d.CertID, rawClean) || strings.EqualFold(d.CertID, rawCleanNoPay)
 
 		matchesPaymentID := false
 		for _, pid := range d.PaymentIDs {
-			if strings.EqualFold(pid, cleanID) || strings.EqualFold(strings.TrimPrefix(pid, "pay_"), cleanID) {
+			pidNoPay := strings.TrimPrefix(pid, "pay_")
+			if strings.EqualFold(pid, rawClean) ||
+				strings.EqualFold(pid, "pay_"+rawCleanNoPay) ||
+				strings.EqualFold(pidNoPay, rawClean) ||
+				strings.EqualFold(pidNoPay, rawCleanNoPay) {
 				matchesPaymentID = true
 				break
 			}
@@ -792,6 +801,7 @@ func (h *SponsorsHandler) GetCertificate(c *gin.Context) {
 			break
 		}
 	}
+
 
 	if matchedDonor != nil {
 		c.JSON(http.StatusOK, gin.H{
