@@ -135,6 +135,7 @@ func SetupRouter(
 
 	// Public/Protected Leaderboard & Sponsors API
 	r.GET("/sponsors/leaderboard", sponsorsHandler.GetSponsorsLeaderboard)
+	r.POST("/sponsors/check-contribution", sponsorsHandler.CheckContribution)
 
 	// Proxy PDF by Google Drive ID (keeps original links hidden)
 	r.GET("/pdf/:id", uploadHandler.ProxyPDF)

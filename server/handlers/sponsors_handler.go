@@ -283,3 +283,196 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 		"sponsors":         sponsors,
 	})
 }
+
+type ContributionCheckRequest struct {
+	Phone string `json:"phone"`
+	Email string `json:"email"`
+}
+
+// CheckContribution searches Razorpay payments for a specific user's phone or email
+// and returns their total contribution amount, rank, and supporter details securely.
+func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
+	var reqBody ContributionCheckRequest
+	if err := c.ShouldBindJSON(&reqBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "Invalid request body",
+		})
+		return
+	}
+
+	searchPhoneDigits := cleanPhone(reqBody.Phone)
+	searchEmail := strings.ToLower(strings.TrimSpace(reqBody.Email))
+
+	if searchPhoneDigits == "" && searchEmail == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"found":   false,
+			"amount":  0,
+			"rank":    0,
+		})
+		return
+	}
+
+	keyID := os.Getenv("RAZORPAY_KEY_ID")
+	keySecret := os.Getenv("RAZORPAY_KEY_SECRET")
+
+	if keyID == "" || keySecret == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"found":   false,
+			"amount":  0,
+			"rank":    0,
+		})
+		return
+	}
+
+	url := "https://api.razorpay.com/v1/payments?count=100"
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to create request"})
+		return
+	}
+
+	req.SetBasicAuth(keyID, keySecret)
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"found":   false,
+			"amount":  0,
+			"rank":    0,
+		})
+		return
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+
+	var rzpRes RazorpayPaymentsResponse
+	if err := json.Unmarshal(body, &rzpRes); err != nil {
+		c.JSON(http.StatusOK, gin.H{"success": true, "found": false})
+		return
+	}
+
+	type InternalDonor struct {
+		Name       string
+		Amount     float64
+		LatestDate string
+		Phones     map[string]bool
+		Emails     map[string]bool
+	}
+
+	aggregatedMap := make(map[string]*InternalDonor)
+
+	for _, item := range rzpRes.Items {
+		if strings.ToLower(item.Status) != "captured" {
+			continue
+		}
+
+		amt := float64(item.Amount) / 100.0
+		if item.AmountPaid > 0 {
+			amt = float64(item.AmountPaid) / 100.0
+		}
+
+		email := strings.ToLower(strings.TrimSpace(item.Email))
+		phone := cleanPhone(item.Contact)
+		if item.Notes != nil {
+			if e, ok := item.Notes["email"].(string); ok && e != "" {
+				email = strings.ToLower(strings.TrimSpace(e))
+			}
+			if p, ok := item.Notes["phone"].(string); ok && p != "" {
+				phone = cleanPhone(p)
+			} else if p, ok := item.Notes["contact"].(string); ok && p != "" {
+				phone = cleanPhone(p)
+			}
+		}
+
+		donorName := extractName(item.Notes, email)
+
+		var normKey string
+		if phone != "" {
+			normKey = "phone_" + phone
+		} else if email != "" {
+			normKey = "email_" + email
+		} else {
+			normKey = "name_" + strings.ToLower(strings.TrimSpace(donorName))
+		}
+
+		itemDate := time.Unix(item.CreatedAt, 0).Format("2006-01-02")
+
+		if existing, found := aggregatedMap[normKey]; found {
+			existing.Amount += amt
+			if itemDate > existing.LatestDate {
+				existing.LatestDate = itemDate
+			}
+			if len(donorName) > len(existing.Name) && donorName != "Anonymous BITSian" {
+				existing.Name = donorName
+			}
+			if phone != "" {
+				existing.Phones[phone] = true
+			}
+			if email != "" {
+				existing.Emails[email] = true
+			}
+		} else {
+			donor := &InternalDonor{
+				Name:       donorName,
+				Amount:     amt,
+				LatestDate: itemDate,
+				Phones:     make(map[string]bool),
+				Emails:     make(map[string]bool),
+			}
+			if phone != "" {
+				donor.Phones[phone] = true
+			}
+			if email != "" {
+				donor.Emails[email] = true
+			}
+			aggregatedMap[normKey] = donor
+		}
+	}
+
+	var donorList []*InternalDonor
+	for _, d := range aggregatedMap {
+		donorList = append(donorList, d)
+	}
+
+	sort.Slice(donorList, func(i, j int) bool {
+		return donorList[i].Amount > donorList[j].Amount
+	})
+
+	var matchedDonor *InternalDonor
+	matchedRank := 0
+
+	for i, d := range donorList {
+		matchesPhone := searchPhoneDigits != "" && d.Phones[searchPhoneDigits]
+		matchesEmail := searchEmail != "" && d.Emails[searchEmail]
+		if matchesPhone || matchesEmail {
+			matchedDonor = d
+			matchedRank = i + 1
+			break
+		}
+	}
+
+	if matchedDonor != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success":          true,
+			"found":            true,
+			"amount":           matchedDonor.Amount,
+			"rank":             matchedRank,
+			"total_supporters": len(donorList),
+			"name":             matchedDonor.Name,
+			"is_top_10":        matchedRank <= 10,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"success":          true,
+			"found":            false,
+			"amount":           0,
+			"rank":             0,
+			"total_supporters": len(donorList),
+		})
+	}
+}
+

@@ -37,19 +37,9 @@ export default function FloatingFeedbackButton() {
     if (user && isOpen) {
       setLoading(true);
       fetchMessages(true).finally(() => setLoading(false));
-
-      const interval = setInterval(() => fetchMessages(true), 4000);
-      return () => clearInterval(interval);
     }
   }, [user, isOpen]);
 
-  useEffect(() => {
-    if (user && !isOpen) {
-      fetchMessages(false);
-      const interval = setInterval(() => fetchMessages(false), 8000);
-      return () => clearInterval(interval);
-    }
-  }, [user, isOpen]);
 
   useEffect(() => {
     if (isOpen) {
