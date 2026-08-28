@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../Authentication/firebase.js";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, X, Send, ShieldCheck, User, Sparkles, Loader2, LogIn } from "lucide-react";
+import { MessageSquare, X, Send, ShieldCheck, User, Sparkles, Loader2, LogIn, Headphones } from "lucide-react";
+import { BiSupport } from "react-icons/bi";
 import { sendFeedbackMessage, getFeedbackMessages } from "../api/feedback.js";
 import { useNavigate } from "react-router-dom";
 
@@ -124,7 +125,7 @@ export default function FloatingFeedbackButton() {
           }`}
         aria-label="Open Feedback Chat"
       >
-        <MessageSquare className="h-6 w-6" />
+        <BiSupport className="h-6 w-6" />
 
         {/* Small Red Circle Indicator Badge */}
         {hasUnreadAdminMsg && (
@@ -152,7 +153,7 @@ export default function FloatingFeedbackButton() {
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className="rounded-full bg-white/20 p-2 text-white backdrop-blur-md">
-                    <MessageSquare className="h-5 w-5" />
+                    <BiSupport className="h-5 w-5" />
                   </div>
                   <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-400 border-2 border-blue-600" />
                 </div>
