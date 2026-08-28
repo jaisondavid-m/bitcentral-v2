@@ -21,7 +21,7 @@ export default function DailySupportModal() {
       return;
     }
 
-    // Safely check localStorage for last shown date
+    // Safely check localStorage for last shown timestamp
     let lastShown = null;
     try {
       lastShown = localStorage.getItem(STORAGE_KEY);
@@ -29,9 +29,20 @@ export default function DailySupportModal() {
       // Storage access blocked or restricted
     }
 
-    const todayStr = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD format in local time
-    if (lastShown === todayStr) {
-      return;
+    const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
+    if (lastShown) {
+      const lastShownTime = Number(lastShown);
+      if (!isNaN(lastShownTime)) {
+        if (Date.now() - lastShownTime < THREE_DAYS_MS) {
+          return;
+        }
+      } else {
+        // Backward compatibility for existing YYYY-MM-DD date strings
+        const parsedDate = new Date(lastShown).getTime();
+        if (!isNaN(parsedDate) && Date.now() - parsedDate < THREE_DAYS_MS) {
+          return;
+        }
+      }
     }
 
     // Timer delay (7 seconds) before displaying modal
@@ -52,9 +63,9 @@ export default function DailySupportModal() {
         setLoading(false);
       }
 
-      // Mark modal as shown today
+      // Mark modal as shown with current timestamp
       try {
-        localStorage.setItem(STORAGE_KEY, todayStr);
+        localStorage.setItem(STORAGE_KEY, Date.now().toString());
       } catch (e) {
         // Storage write failed
       }
