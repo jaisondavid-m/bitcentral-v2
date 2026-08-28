@@ -107,7 +107,8 @@ func (h *SponsorsHandler) GetSponsorsAdmin(c *gin.Context) {
 				var rzpRes RazorpayPaymentsResponse
 				if err := json.Unmarshal(body, &rzpRes); err == nil {
 					for _, item := range rzpRes.Items {
-						if strings.ToLower(item.Status) != "captured" {
+						st := strings.ToLower(item.Status)
+						if st != "captured" && st != "authorized" {
 							continue
 						}
 
@@ -203,7 +204,8 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 					aggregatedMap := make(map[string]*AggregatedDonor)
 
 					for _, item := range rzpRes.Items {
-						if strings.ToLower(item.Status) != "captured" {
+						st := strings.ToLower(item.Status)
+						if st != "captured" && st != "authorized" {
 							continue
 						}
 
@@ -366,7 +368,8 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 	aggregatedMap := make(map[string]*InternalDonor)
 
 	for _, item := range rzpRes.Items {
-		if strings.ToLower(item.Status) != "captured" {
+		st := strings.ToLower(item.Status)
+		if st != "captured" && st != "authorized" {
 			continue
 		}
 
