@@ -172,7 +172,9 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/support-dev" element={<SupportDev />} />
             <Route path="/payment-successful" element={<PaymentSuccessful />} />
+            <Route path="/payment-successful/:id" element={<PaymentSuccessful />} />
             <Route path="/payment-successfull" element={<PaymentSuccessful />} />
+            <Route path="/payment-successfull/:id" element={<PaymentSuccessful />} />
             {/* <Route path="/docs/about" element={<DocsPage />} /> */}
 
             {/* Protected Layout */}

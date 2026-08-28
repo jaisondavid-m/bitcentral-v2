@@ -89,4 +89,14 @@ export async function captureSponsorPayment({ payment_id, amount }) {
     return { success: false, error: error.message };
   }
 }
+
+export async function getVerifiedCertificate(id) {
+  try {
+    const response = await api.get(`/sponsors/certificate/${encodeURIComponent(id)}`);
+    return response.data;
+  } catch (error) {
+    return { success: false, verified: false, error: "Failed to fetch certificate" };
+  }
+}
+
 
