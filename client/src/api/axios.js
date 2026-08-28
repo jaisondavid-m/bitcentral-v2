@@ -57,3 +57,17 @@ export async function getSponsorsLeaderboard() {
     };
   }
 }
+
+export async function checkUserContribution({ phone, email } = {}) {
+  try {
+    const response = await api.post("/sponsors/check-contribution", { phone, email });
+    return response.data;
+  } catch (error) {
+    return {
+      success: false,
+      found: false,
+      amount: 0,
+      rank: 0,
+    };
+  }
+}

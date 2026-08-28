@@ -23,7 +23,7 @@ import PublicFooter from "../Component/PublicFooter.jsx";
 import Navbar from "../Component/NavBar.jsx";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../Authentication/firebase.js";
-import { getSponsorsLeaderboard, getMeProfile } from "../api/axios.js";
+import { getSponsorsLeaderboard, getMeProfile, checkUserContribution } from "../api/axios.js";
 import { processLeaderboardData } from "../utils/sponsorUtils.js";
 
 const loadRazorpayScript = () => {
@@ -49,6 +49,9 @@ export default function SupportDev() {
     sponsors: [],
   });
 
+  // User Contribution State
+  const [userContribution, setUserContribution] = useState(null);
+
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -64,6 +67,20 @@ export default function SupportDev() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const fetchContributionStatus = async (pVal, eVal) => {
+    const p = pVal || donorPhone;
+    const e = eVal || donorEmail || user?.email;
+    if (!p && !e) return;
+    try {
+      const res = await checkUserContribution({ phone: p, email: e });
+      if (res?.success) {
+        setUserContribution(res);
+      }
+    } catch (err) {
+      // ignore
+    }
+  };
 
   const fetchLeaderboard = async () => {
     try {
@@ -104,20 +121,27 @@ export default function SupportDev() {
             if (displayNameFromMe) {
               setDonorName(displayNameFromMe);
             }
-            if (meData.email) {
-              setDonorEmail(meData.email);
+            let emailToUse = meData.email;
+            let phoneToUse = meData.phone || meData.phone_no;
+            if (emailToUse) {
+              setDonorEmail(emailToUse);
             }
-            if (meData.phone || meData.phone_no) {
-              setDonorPhone(meData.phone || meData.phone_no);
+            if (phoneToUse) {
+              setDonorPhone(phoneToUse);
             }
+            fetchContributionStatus(phoneToUse, emailToUse);
           } else if (isMounted && auth.currentUser.displayName) {
             setDonorName(auth.currentUser.displayName);
+            fetchContributionStatus(donorPhone, auth.currentUser.email);
           }
+        } else {
+          fetchContributionStatus(donorPhone, donorEmail);
         }
       } catch (err) {
         if (isMounted && auth.currentUser?.displayName) {
           setDonorName(auth.currentUser.displayName);
         }
+        fetchContributionStatus(donorPhone, donorEmail);
       }
     })();
 
@@ -125,6 +149,7 @@ export default function SupportDev() {
       isMounted = false;
     };
   }, [user]);
+
 
   const effectiveAmount = Number(amount);
 
@@ -196,6 +221,7 @@ export default function SupportDev() {
         setIsProcessing(false);
         setPaymentSuccess(true);
         fetchLeaderboard();
+        fetchContributionStatus();
       },
       modal: {
         ondismiss: function () {
@@ -346,23 +372,52 @@ export default function SupportDev() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="lg:col-span-5"
+            className="lg:col-span-5 space-y-4"
           >
-            <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900">
+            {/* User Contribution Card (Visible even if not in Top 10) */}
+            {userContribution?.found && (
+              <div className="rounded-2xl border border-emerald-200/90 bg-[#dcfce7]/80 p-3.5 sm:p-4 shadow-xs dark:border-emerald-800/80 dark:bg-emerald-950/50 transition-all">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-[#047857] dark:bg-emerald-600 flex items-center justify-center text-white shrink-0 shadow-xs">
+                      <Heart className="h-5 w-5 fill-white text-white" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#047857] dark:text-emerald-400 block leading-tight">
+                        YOUR CONTRIBUTION
+                      </span>
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                        {userContribution.name}
+                      </h4>
+                    </div>
+                  </div>
 
+                  <div className="text-right shrink-0">
+                    <div className="text-base sm:text-lg font-black text-[#047857] dark:text-emerald-300 leading-tight">
+                      ₹{Number(userContribution.amount || 0).toLocaleString("en-IN")}
+                    </div>
+                    <span className="inline-block mt-0.5 rounded-md bg-[#86efac] px-2 py-0.5 text-[11px] font-bold text-[#064e3b] dark:bg-emerald-800 dark:text-emerald-100">
+                      Rank #{userContribution.rank} {userContribution.total_supporters ? `of ${userContribution.total_supporters}` : ""}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
               {/* Leaderboard Header */}
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
+              <div className="flex items-center justify-between pb-3.5">
                 <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
                   <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                   <span>Top Donors</span>
                 </div>
-                <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-bold text-blue-700 dark:bg-blue-950 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60">
+                <span className="rounded-full bg-[#e0e7ff]/80 px-3 py-0.5 text-[11px] font-bold text-[#4318ff] dark:bg-blue-950 dark:text-blue-300 border border-blue-100/60 dark:border-blue-800/60">
                   Top 10 Supporters
                 </span>
               </div>
 
               {/* List / Skeleton Loading / Empty State */}
-              <div className="mt-3.5 space-y-2 max-h-[540px] min-h-[220px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex flex-col justify-start">
+              <div className="mt-2 space-y-2 max-h-[540px] min-h-[200px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex flex-col justify-start">
                 {loading ? (
                   /* Skeleton Loading State */
                   Array.from({ length: 5 }).map((_, idx) => (
@@ -397,22 +452,31 @@ export default function SupportDev() {
                   /* Real Donors List */
                   leaderboard.sponsors.slice(0, 10).map((sponsor, idx) => {
                     const rank = idx + 1;
-                    let rowStyle = "bg-slate-50/80 hover:bg-slate-100 dark:bg-slate-950/60 dark:hover:bg-slate-950 border border-transparent";
-                    let badgeStyle = "text-slate-400 font-bold px-2 text-[11px]";
+                    const isCurrentUser = Boolean(
+                      userContribution?.found &&
+                        userContribution?.rank === rank
+                    );
+
+                    let rowStyle = "border border-slate-100 bg-slate-50/50 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950/60 dark:hover:bg-slate-950";
+                    let badgeStyle = "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-bold px-2 py-0.5 rounded-lg text-xs";
                     let badgeContent = `#${rank}`;
 
                     if (rank === 1) {
-                      rowStyle = "border border-amber-300/80 bg-gradient-to-r from-amber-500/10 via-amber-100/40 to-yellow-50/30 dark:border-amber-700/60 dark:from-amber-950/40 dark:to-slate-900 shadow-sm";
-                      badgeStyle = "bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black px-2.5 py-0.5 rounded-lg shadow-xs text-xs";
+                      rowStyle = "border border-amber-200/90 bg-amber-50/40 dark:border-amber-800/60 dark:from-amber-950/30 dark:to-slate-900";
+                      badgeStyle = "bg-[#ff6b00] text-white font-black px-2 py-0.5 rounded-lg text-xs shadow-xs";
                       badgeContent = "#1";
                     } else if (rank === 2) {
-                      rowStyle = "border border-slate-300/80 bg-gradient-to-r from-slate-200/40 via-slate-100/50 to-slate-50/30 dark:border-slate-700/60 dark:from-slate-800/40 dark:to-slate-900 shadow-xs";
-                      badgeStyle = "bg-slate-300 text-slate-900 dark:bg-slate-700 dark:text-slate-100 font-bold px-2.5 py-0.5 rounded-lg shadow-xs text-xs";
+                      rowStyle = "border border-slate-200/80 bg-slate-100/50 dark:border-slate-700/60 dark:bg-slate-800/40";
+                      badgeStyle = "bg-[#64748b] text-white font-bold px-2 py-0.5 rounded-lg text-xs";
                       badgeContent = "#2";
                     } else if (rank === 3) {
-                      rowStyle = "border border-orange-300/70 bg-gradient-to-r from-orange-100/30 via-orange-50/40 to-amber-50/20 dark:border-amber-900/50 dark:from-orange-950/30 dark:to-slate-900 shadow-xs";
-                      badgeStyle = "bg-amber-700 text-white font-bold px-2 py-0.5 rounded-lg shadow-xs text-xs";
+                      rowStyle = "border border-orange-200/80 bg-orange-50/30 dark:border-amber-900/50 dark:bg-orange-950/20";
+                      badgeStyle = "bg-[#ea580c] text-white font-bold px-2 py-0.5 rounded-lg text-xs";
                       badgeContent = "#3";
+                    }
+
+                    if (isCurrentUser) {
+                      rowStyle = "border-2 border-[#10b981] bg-[#ecfdf5]/80 dark:bg-emerald-950/40 shadow-xs";
                     }
 
                     return (
@@ -420,17 +484,22 @@ export default function SupportDev() {
                         key={idx}
                         className={`flex items-center justify-between rounded-xl p-2.5 text-xs transition-all duration-200 ${rowStyle}`}
                       >
-                        <div className="flex items-center gap-2.5">
-                          <span className={`inline-flex items-center justify-center ${badgeStyle}`}>
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className={`inline-flex items-center justify-center shrink-0 ${badgeStyle}`}>
                             {badgeContent}
                           </span>
                           <span className="font-bold text-slate-900 dark:text-slate-100 truncate max-w-[150px]">
                             {sponsor.name}
                           </span>
+                          {isCurrentUser && (
+                            <span className="rounded bg-[#047857] px-1.5 py-0.5 text-[9px] font-black text-white uppercase tracking-wider shrink-0">
+                              YOU
+                            </span>
+                          )}
                         </div>
 
-                        <div className="flex items-center gap-3">
-                          <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span className="font-extrabold text-[#047857] dark:text-emerald-400 text-sm">
                             ₹{Number(sponsor.amount || 0).toLocaleString("en-IN")}
                           </span>
                         </div>
@@ -439,9 +508,9 @@ export default function SupportDev() {
                   })
                 )}
               </div>
-
             </div>
           </motion.div>
+
 
         </div>
       </main>
@@ -511,7 +580,7 @@ export default function SupportDev() {
               {/* Donor Information Section */}
               <div className="space-y-2 pt-1">
                 <label className="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase block">
-                  DONOR INFORMATION (PREFILLED FOR LEADERBOARD)
+                  DONOR NAME (PREFILLED FOR LEADERBOARD)
                 </label>
 
                 <div className="space-y-2">
@@ -526,32 +595,9 @@ export default function SupportDev() {
                       className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
                     />
                   </div>
-
-                  {/* Phone Input */}
-                  <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
-                    <Phone className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
-                    <input
-                      type="text"
-                      placeholder="Phone"
-                      value={donorPhone}
-                      onChange={(e) => setDonorPhone(e.target.value)}
-                      className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
-                    />
-                  </div>
-
-                  {/* Email Input */}
-                  <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
-                    <Mail className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      value={donorEmail}
-                      onChange={(e) => setDonorEmail(e.target.value)}
-                      className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
-                    />
-                  </div>
                 </div>
               </div>
+
 
               {/* Error Alert */}
               {errorMessage && (
