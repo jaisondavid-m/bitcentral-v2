@@ -17,8 +17,8 @@ import {
   CreditCard,
   Loader2,
   X,
+  ArrowLeft,
 } from "lucide-react";
-import { BiDonateHeart } from "react-icons/bi";
 import { FaHandHoldingHeart } from "react-icons/fa6";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../Authentication/firebase.js";
@@ -340,11 +340,15 @@ export default function SupportDev() {
             transition={{ duration: 0.5 }}
             className="lg:col-span-7 space-y-6"
           >
-            {/* Pill Badge */}
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100/80 px-3.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60">
-              <BiDonateHeart className="h-4 w-4 text-rose-500" />
-              Student-built · Free forever
-            </span>
+            {/* Back to Home Button */}
+            <button
+              type="button"
+              onClick={() => navigate("/")}
+              className="inline-flex items-center gap-2 rounded-full bg-white/80 dark:bg-slate-900/80 px-4 py-1.5 text-xs font-semibold text-slate-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400 border border-slate-200/80 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-800 transition-all duration-200 shadow-xs cursor-pointer w-fit"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back to Home</span>
+            </button>
 
             {/* Main Headline */}
             <div>
