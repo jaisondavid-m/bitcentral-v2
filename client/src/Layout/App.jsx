@@ -170,11 +170,6 @@ function App() {
             <Route path="/features" element={<Features />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/support-dev" element={<SupportDev />} />
-            <Route path="/payment-successful" element={<PaymentSuccessful />} />
-            <Route path="/payment-successful/:id" element={<PaymentSuccessful />} />
-            <Route path="/payment-successfull" element={<PaymentSuccessful />} />
-            <Route path="/payment-successfull/:id" element={<PaymentSuccessful />} />
             {/* <Route path="/docs/about" element={<DocsPage />} /> */}
 
             {/* Protected Layout */}
@@ -299,6 +294,11 @@ function App() {
               <Route path="/ps-point-details" element={<PSPointDetails />} />
               <Route path="/ps-biometrics" element={<PSBiometricDetails />} />
               <Route path="/ps-biometric-details" element={<PSBiometricDetails />} />
+              <Route path="/support-dev" element={<SupportDev />} />
+              <Route path="/payment-successful" element={<PaymentSuccessful />} />
+              <Route path="/payment-successful/:id" element={<PaymentSuccessful />} />
+              <Route path="/payment-successfull" element={<PaymentSuccessful />} />
+              <Route path="/payment-successfull/:id" element={<PaymentSuccessful />} />
               <Route path="*" element={<NotFound />} />
               <Route path="/ak_22ph202" element={<AK22PH202 />} />
               <Route path="/tamil_ak" element={<AnswerKey22HS006 />} />

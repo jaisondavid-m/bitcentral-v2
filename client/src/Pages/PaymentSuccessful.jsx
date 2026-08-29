@@ -17,8 +17,6 @@ import {
   ShieldAlert,
   Loader2,
 } from "lucide-react";
-import PublicNav from "../Component/PublicNav.jsx";
-import Navbar from "../Component/NavBar.jsx";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../Authentication/firebase.js";
 import { getVerifiedCertificate } from "../api/axios.js";
@@ -118,10 +116,6 @@ export default function PaymentSuccessful() {
 
   return (
     <div className="min-h-screen w-full flex flex-col justify-between bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-black dark:text-white">
-      {/* Top Navigation */}
-      <div className="shrink-0">
-        {user ? <Navbar /> : <PublicNav />}
-      </div>
 
       {/* Main Centered Content */}
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative my-4">

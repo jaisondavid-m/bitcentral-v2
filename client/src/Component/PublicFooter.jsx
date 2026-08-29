@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { GraduationCap, Mail, Heart } from "lucide-react";
+import { GraduationCap, Mail } from "lucide-react";
 import { developerProfile } from "../content/publicContent.js";
 
 export default function PublicFooter() {
@@ -37,11 +37,6 @@ export default function PublicFooter() {
               </li>
               <li>
                 <Link to="/faq" className="hover:text-blue-600 dark:hover:text-blue-400">Frequently Asked Questions</Link>
-              </li>
-              <li>
-                <Link to="/support-dev" className="inline-flex items-center gap-1.5 hover:text-rose-600 dark:hover:text-rose-400">
-                  Support Dev <Heart className="h-3.5 w-3.5 fill-rose-500 text-rose-500" aria-hidden="true" />
-                </Link>
               </li>
             </ul>
           </div>
