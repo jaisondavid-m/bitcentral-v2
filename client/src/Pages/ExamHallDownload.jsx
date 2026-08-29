@@ -548,7 +548,7 @@ export default function ExamHallDownload() {
             <div className="flex items-center gap-3 bg-blue-600 dark:bg-[#0F2850] px-5 py-4">
               <div
                 className="flex h-11 w-11 shrink-0 flex-col items-center
-      justify-center rounded-xl bg-blue-600"
+      justify-center rounded-xl bg-blue-600 border border-blue-400/30 shadow-inner"
               >
                 <span className="text-[12px] font-black leading-none text-white">BIT</span>
                 <span className="text-[7px] font-bold leading-none text-blue-200">SATHY</span>
@@ -565,8 +565,7 @@ export default function ExamHallDownload() {
 
               <button
                 onClick={() => navigate("/exam-hall-manual")}
-                className="rounded-lg bg-white/15 px-3 py-1.5 text-xs font-semibold text-white
-      backdrop-blur transition hover:bg-white/20"
+                className="rounded-xl bg-white border border-blue-500 px-3.5 py-1.5 text-xs font-bold text-blue-600 shadow-sm transition-all hover:bg-blue-50 hover:border-blue-600 hover:scale-[1.02] active:scale-[0.98] cursor-pointer dark:bg-slate-900 dark:text-blue-400 dark:border-blue-500 dark:hover:bg-slate-800"
               >
                 Manual Search
               </button>
@@ -588,13 +587,6 @@ export default function ExamHallDownload() {
                     </p>
                   )}
                 </div>
-
-                <button
-                  onClick={() => navigate("/exam-hall-manual")}
-                  className="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400"
-                >
-                  Can't find hall?
-                </button>
               </div>
             </div>
           </div>
