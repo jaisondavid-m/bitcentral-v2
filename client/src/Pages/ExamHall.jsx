@@ -255,21 +255,18 @@ const ExamHall = () => {
       <div className="mx-auto max-w-sm">
 
         {/* Header */}
-        <div className="mb-8 flex items-center gap-3">
-          {/* Icon badge */}
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 dark:bg-blue-500">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none"
-              viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round"
-                d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
-            </svg>
+        <div className="mb-6 flex items-center gap-3 rounded-2xl bg-white p-4 border border-blue-100 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+          {/* BIT Sathy Logo Badge */}
+          <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl bg-blue-600 shadow-sm">
+            <span className="text-[12px] font-black leading-none text-white">BIT</span>
+            <span className="text-[7px] font-bold leading-none text-blue-200">SATHY</span>
           </div>
           <div>
-            <h1 className="text-lg font-semibold leading-tight text-slate-800 dark:text-slate-100">
-              Exam hall finder
+            <h1 className="text-sm font-bold leading-tight text-slate-900 dark:text-slate-100">
+              Bannari Amman Institute of Technology
             </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              BIT Sathy · Semester exams
+            <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-0.5">
+              Semester Examinations · Manual Search
             </p>
           </div>
         </div>
