@@ -6936,7 +6936,7 @@ func LookupAllByRegister(registerNo string) []models.ExamSession {
 							Date:       meta.Date,
 							Session:    meta.Session,
 							Time:       meta.Time,
-							IsArrear:   meta.Session == "AN",
+							IsArrear:   false,
 						})
 					}
 					break
