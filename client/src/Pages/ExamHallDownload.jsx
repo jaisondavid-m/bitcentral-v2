@@ -543,51 +543,33 @@ export default function ExamHallDownload() {
       <div className="min-h-screen bg-[#EEF4FF] px-4 py-8 dark:bg-[#080F1E]">
         <div className="mx-auto max-w-2xl space-y-6">
 
-          {/* ── BIT Header card ── */}
-          <div className="overflow-hidden rounded-2xl shadow-sm ring-1 ring-blue-100 dark:ring-blue-900/30">
-            <div className="flex items-center gap-3 bg-blue-600 dark:bg-[#0F2850] px-5 py-4">
-              <div
-                className="flex h-11 w-11 shrink-0 flex-col items-center
-      justify-center rounded-xl bg-blue-600 border border-blue-400/30 shadow-inner"
-              >
-                <span className="text-[12px] font-black leading-none text-white">BIT</span>
-                <span className="text-[7px] font-bold leading-none text-blue-200">SATHY</span>
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-white">
-                  Bannari Amman Institute of Technology
-                </p>
-                <p className="text-[11px] text-blue-300">
-                  Semester Examinations
-                </p>
+          {/* ── Header card ── */}
+          <div className="overflow-hidden rounded-2xl bg-white p-4 border border-blue-100 shadow-sm dark:bg-[#0F1C33] dark:border-blue-900/30">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl bg-blue-600 shadow-sm">
+                  <span className="text-[12px] font-black leading-none text-white">BIT</span>
+                  <span className="text-[7px] font-bold leading-none text-blue-200">SATHY</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <GraduationCap className="h-4.5 w-4.5 text-blue-600 dark:text-blue-400" />
+                    <h1 className="text-base font-bold text-slate-900 dark:text-slate-100">
+                      Exam Hall Schedule
+                    </h1>
+                  </div>
+                  <p className="mt-0.5 font-mono text-sm font-bold text-blue-600 dark:text-blue-400">
+                    {registerNo || "7376251CS221"}
+                  </p>
+                </div>
               </div>
 
               <button
                 onClick={() => navigate("/exam-hall-manual")}
-                className="rounded-xl bg-white border border-blue-500 px-3.5 py-1.5 text-xs font-bold text-blue-600 shadow-sm transition-all hover:bg-blue-50 hover:border-blue-600 hover:scale-[1.02] active:scale-[0.98] cursor-pointer dark:bg-slate-900 dark:text-blue-400 dark:border-blue-500 dark:hover:bg-slate-800"
+                className="rounded-xl bg-white border border-blue-500 px-3.5 py-1.5 text-xs font-bold text-blue-600 shadow-sm transition-all hover:bg-blue-50 hover:border-blue-600 hover:scale-[1.02] active:scale-[0.98] cursor-pointer dark:bg-slate-900 dark:text-blue-400 dark:border-blue-500 dark:hover:bg-slate-800 shrink-0"
               >
                 Manual Search
               </button>
-            </div>
-
-            <div className="bg-white px-5 py-3.5 dark:bg-[#0F1C33]">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <GraduationCap className="h-4 w-4 text-blue-400" />
-                    <h1 className="text-base font-bold text-blue-900 dark:text-blue-100">
-                      Exam Hall Schedule
-                    </h1>
-                  </div>
-
-                  {registerNo && (
-                    <p className="mt-0.5 font-mono text-sm font-semibold text-blue-600 dark:text-blue-400">
-                      {registerNo}
-                    </p>
-                  )}
-                </div>
-              </div>
             </div>
           </div>
 
