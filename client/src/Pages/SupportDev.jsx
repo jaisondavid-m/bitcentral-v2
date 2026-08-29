@@ -64,6 +64,10 @@ export default function SupportDev() {
   const [donorEmail, setDonorEmail] = useState("");
   const [donorPhone, setDonorPhone] = useState("");
 
+  const [hasUserName, setHasUserName] = useState(false);
+  const [hasUserEmail, setHasUserEmail] = useState(false);
+  const [hasUserPhone, setHasUserPhone] = useState(false);
+
   // Editable Amount State (User types custom amount)
   const [amount, setAmount] = useState("");
 
@@ -127,17 +131,53 @@ export default function SupportDev() {
             const emailToUse = meData?.email || auth.currentUser.email || "";
             const phoneToUse = meData?.phone || meData?.phone_no || meData?.phoneNumber || "";
 
-            if (displayNameFromMe) setDonorName(displayNameFromMe);
-            if (emailToUse) setDonorEmail(emailToUse);
-            if (phoneToUse) setDonorPhone(phoneToUse);
+            if (displayNameFromMe) {
+              setDonorName(displayNameFromMe);
+              setHasUserName(true);
+            } else {
+              setHasUserName(false);
+            }
+
+            if (emailToUse) {
+              setDonorEmail(emailToUse);
+              setHasUserEmail(true);
+            } else {
+              setHasUserEmail(false);
+            }
+
+            if (phoneToUse) {
+              setDonorPhone(phoneToUse);
+              setHasUserPhone(true);
+            } else {
+              setHasUserPhone(false);
+            }
 
             fetchContributionStatus(phoneToUse, emailToUse);
+          }
+        } else {
+          if (isMounted) {
+            setHasUserName(false);
+            setHasUserEmail(false);
+            setHasUserPhone(false);
           }
         }
       } catch (err) {
         if (isMounted && auth.currentUser) {
-          if (auth.currentUser.displayName) setDonorName(auth.currentUser.displayName);
-          if (auth.currentUser.email) setDonorEmail(auth.currentUser.email);
+          if (auth.currentUser.displayName) {
+            setDonorName(auth.currentUser.displayName);
+            setHasUserName(true);
+          } else {
+            setHasUserName(false);
+          }
+
+          if (auth.currentUser.email) {
+            setDonorEmail(auth.currentUser.email);
+            setHasUserEmail(true);
+          } else {
+            setHasUserEmail(false);
+          }
+
+          setHasUserPhone(false);
         }
       }
     })();
@@ -643,7 +683,7 @@ export default function SupportDev() {
                 </label>
 
                 <div className="space-y-2">
-                  {/* Name Input */}
+                  {/* Name Input - Always editable */}
                   <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
                     <User className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
                     <input
@@ -655,29 +695,33 @@ export default function SupportDev() {
                     />
                   </div>
 
-                  {/* Email Input */}
-                  <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
-                    <Mail className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
-                    <input
-                      type="email"
-                      placeholder="Email Address"
-                      value={donorEmail}
-                      onChange={(e) => setDonorEmail(e.target.value)}
-                      className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
-                    />
-                  </div>
+                  {/* Email Input - Only if not from user */}
+                  {!hasUserEmail && (
+                    <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
+                      <Mail className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
+                      <input
+                        type="email"
+                        placeholder="Email Address"
+                        value={donorEmail}
+                        onChange={(e) => setDonorEmail(e.target.value)}
+                        className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
+                      />
+                    </div>
+                  )}
 
-                  {/* Phone Input */}
-                  <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
-                    <Phone className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
-                    <input
-                      type="tel"
-                      placeholder="Phone Number *"
-                      value={donorPhone}
-                      onChange={(e) => setDonorPhone(e.target.value)}
-                      className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
-                    />
-                  </div>
+                  {/* Phone Input - Only if not from user */}
+                  {!hasUserPhone && (
+                    <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
+                      <Phone className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
+                      <input
+                        type="tel"
+                        placeholder="Phone Number *"
+                        value={donorPhone}
+                        onChange={(e) => setDonorPhone(e.target.value)}
+                        className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
