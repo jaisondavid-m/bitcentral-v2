@@ -6,8 +6,8 @@ import {
   Clock, CalendarDays, FileDown, GraduationCap, Building2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios.js";
 
-const API_BASE = "https://api.bitcentral.bitsathy.in";
 const CREATOR_LINKEDIN = "https://www.linkedin.com/in/jaison-david-m-a14072360/";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -509,11 +509,11 @@ export default function ExamHallDownload() {
     hasFetched.current = true;
     setRegisterNo(roll);
     setLoading(true);
-    fetch(`${API_BASE}/exam-hall/all?registerNo=${roll}`)
-      .then(r => r.json())
-      .then(data => {
+    api.get("/exam-hall/all", { params: { registerNo: roll } })
+      .then(res => {
+        const data = res.data;
         if (!data.success || !data.sessions?.length) { setError("No exam schedule found."); return; }
-        const up = data.sessions
+        const up = data.sessions;
         up.length === 0 ? setError("All exams done — nothing upcoming.") : setSessions(up);
       })
       .catch(() => setError("Could not reach the server. Try again."))
