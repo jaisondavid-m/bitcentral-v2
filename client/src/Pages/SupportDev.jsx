@@ -20,9 +20,6 @@ import {
 } from "lucide-react";
 import { BiDonateHeart } from "react-icons/bi";
 import { FaHandHoldingHeart } from "react-icons/fa6";
-import PublicNav from "../Component/PublicNav.jsx";
-import PublicFooter from "../Component/PublicFooter.jsx";
-import Navbar from "../Component/NavBar.jsx";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../Authentication/firebase.js";
 import { getSponsorsLeaderboard, getMeProfile, checkUserContribution, createSponsorOrder, captureSponsorPayment } from "../api/axios.js";
@@ -332,11 +329,6 @@ export default function SupportDev() {
 
   return (
     <div className="min-h-screen w-full flex flex-col justify-between bg-[#f2f6ff] text-slate-900 transition-colors duration-300 dark:bg-black dark:text-white">
-      {/* Top Navigation */}
-      <div className="shrink-0">
-        {user ? <Navbar /> : <PublicNav />}
-      </div>
-
       {/* Main Container */}
       <main className="flex-1 flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
         <div className="w-full max-w-6xl grid gap-8 lg:grid-cols-12 lg:items-start">
@@ -777,9 +769,6 @@ export default function SupportDev() {
           </div>
         )}
       </AnimatePresence>
-
-      {/* Footer */}
-      <PublicFooter />
     </div>
   );
 }

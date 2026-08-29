@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, X, Sparkles, Trophy, Users } from "lucide-react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../Authentication/firebase.js";
 import { getSponsorsLeaderboard } from "../api/axios.js";
 import { processLeaderboardData } from "../utils/sponsorUtils.js";
 
@@ -9,6 +11,7 @@ const STORAGE_KEY = "bitcentral_support_modal_last_shown";
 const SHOW_DELAY_MS = 7000; // 7 seconds delay
 
 export default function DailySupportModal() {
+  const [user] = useAuthState(auth);
   const [isOpen, setIsOpen] = useState(false);
   const [topDonors, setTopDonors] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -16,8 +19,8 @@ export default function DailySupportModal() {
   const location = useLocation();
 
   useEffect(() => {
-    // Do not display if user is already on support-dev page
-    if (location.pathname === "/support-dev") {
+    // Do not display if user is not logged in or is already on support-dev page
+    if (!user || location.pathname === "/support-dev") {
       return;
     }
 
@@ -76,7 +79,7 @@ export default function DailySupportModal() {
     return () => {
       clearTimeout(timer);
     };
-  }, [location.pathname]);
+  }, [user, location.pathname]);
 
   // Lock/restore body scroll when modal toggles
   useEffect(() => {

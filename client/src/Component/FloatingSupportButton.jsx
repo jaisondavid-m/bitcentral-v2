@@ -3,14 +3,17 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { BiDonateHeart } from "react-icons/bi";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../Authentication/firebase.js";
 
 export default function FloatingSupportButton() {
+  const [user] = useAuthState(auth);
   const location = useLocation();
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
 
-  // Do not display if user is already on support-dev page
-  if (location.pathname === "/support-dev") {
+  // Do not display if user is not logged in or is already on support-dev page
+  if (!user || location.pathname === "/support-dev") {
     return null;
   }
 

@@ -14,7 +14,6 @@ import {
 export const publicLinks = [
   { label: "About", href: "/about" },
   { label: "Developer", href: "/developer" },
-  { label: "Support Dev ❤️", href: "/support-dev" },
   { label: "Features", href: "/features" },
   { label: "Wi-Fi Details", href: "/wifi-details" },
   { label: "FAQ", href: "/faq" },

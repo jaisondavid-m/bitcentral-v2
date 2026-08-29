@@ -234,7 +234,7 @@ export const ROUTE_SEO = {
     description:
       "Support Jaison David M in maintaining server hosting, database costs, and developing free student tools for the BIT Sathy community.",
     keywords: ["support developer", "BIT Central donation", "Razorpay support", "BIT Sathy student portal"],
-    pageType: "WebPage",
+    noIndex: true,
   },
 
   "/wifi-details": {
@@ -285,7 +285,6 @@ export const SITEMAP_ROUTES = [
   "/wifi-details",
   "/faq",
   "/contact",
-  "/support-dev",
   "/privacy-policy",
   "/terms",
   "/apsite",
