@@ -31,7 +31,7 @@ export default function FloatingSupportButton() {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 10, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="hidden sm:flex fixed bottom-[6rem] right-[5.5rem] z-40 items-center gap-1.5 rounded-full bg-slate-900/90 text-white px-3.5 py-1.5 text-xs font-bold shadow-xl border border-slate-700/60 backdrop-blur-md whitespace-nowrap pointer-events-none"
+            className="hidden sm:flex fixed bottom-[9.75rem] right-[5.5rem] z-40 items-center gap-1.5 rounded-full bg-slate-900/90 text-white px-3.5 py-1.5 text-xs font-bold shadow-xl border border-slate-700/60 backdrop-blur-md whitespace-nowrap pointer-events-none"
           >
             <Sparkles className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
             <span>Support BIT-CENTRAL</span>
@@ -49,7 +49,7 @@ export default function FloatingSupportButton() {
         animate={{ scale: 1 }}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-[5.75rem] right-6 z-40 flex items-center justify-center h-14 w-14 rounded-full text-white bg-gradient-to-r from-rose-500 via-rose-600 to-red-600 shadow-xl shadow-rose-500/30 border border-rose-300/40 hover:shadow-rose-500/50 transition-all cursor-pointer group"
+        className="fixed bottom-[9.5rem] right-6 z-40 flex items-center justify-center h-14 w-14 rounded-full text-white bg-gradient-to-r from-rose-500 via-rose-600 to-red-600 shadow-xl shadow-rose-500/30 border border-rose-300/40 hover:shadow-rose-500/50 transition-all cursor-pointer group"
         aria-label="Support BIT-CENTRAL / Donate"
       >
         {/* Subtle Ambient Pulse Ring */}
