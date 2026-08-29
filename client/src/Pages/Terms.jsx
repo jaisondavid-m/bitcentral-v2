@@ -47,7 +47,7 @@ const sections = [
   {
     title: "9. Governing Contact",
     content:
-      "For questions about these Terms, contact the BIT CENTRAL team through the site or the official institutional support channel.",
+      "For questions about these Terms, contact the BIT CENTRAL team through the site support options.",
   },
 ];
 

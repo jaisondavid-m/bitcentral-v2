@@ -160,12 +160,12 @@ export default function PaymentSuccessful() {
                   className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white transition-colors"
                 >
                   <Heart className="h-4 w-4 text-rose-500 fill-rose-500" />
-                  <span>Support BIT-CENTRAL or View Official Leaderboard</span>
+                  <span>Support BIT-CENTRAL or View Leaderboard</span>
                 </Link>
               </div>
             </div>
           ) : (
-            /* VERIFIED OFFICIAL DIGITAL CERTIFICATE */
+            /* VERIFIED DIGITAL CERTIFICATE */
             <>
               {/* Success Header Badge */}
               <div className="flex flex-col items-center">
@@ -180,7 +180,7 @@ export default function PaymentSuccessful() {
 
                 <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/60 dark:text-emerald-300">
                   <Sparkles className="h-3.5 w-3.5 fill-current text-amber-400" />
-                  Official Verified Patron Certificate
+                  Verified Patron Certificate
                 </span>
 
                 <h1 className="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white">
@@ -332,7 +332,7 @@ export default function PaymentSuccessful() {
 
       {/* Footer */}
       <footer className="shrink-0 py-3 text-center text-[11px] text-slate-400 dark:text-slate-500">
-        Official BIT-CENTRAL Digital Verified Patron Certificate • 2026
+        BIT-CENTRAL Digital Verified Patron Certificate • 2026
       </footer>
     </div>
   );
