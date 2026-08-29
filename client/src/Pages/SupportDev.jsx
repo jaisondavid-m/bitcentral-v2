@@ -449,6 +449,10 @@ export default function SupportDev() {
                   Secure 256-bit SSL
                 </p>
               </div>
+
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 pt-3 border-t border-slate-100 dark:border-slate-800/80 leading-relaxed">
+                <span className="font-semibold text-slate-500 dark:text-slate-400">Disclaimer:</span> BIT-CENTRAL is an independent student-developed platform and is not officially affiliated with or endorsed by Bannari Amman Institute of Technology.
+              </p>
             </div>
           </motion.div>
 

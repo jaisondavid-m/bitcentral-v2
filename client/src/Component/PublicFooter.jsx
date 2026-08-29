@@ -70,7 +70,7 @@ export default function PublicFooter() {
               className="inline-flex items-center gap-2 text-sm text-slate-700 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400"
             >
               <GraduationCap className="h-4 w-4 text-blue-600" aria-hidden="true" />
-              BIT Sathy Official Site
+              BIT Sathy College Website
             </a>
             <a
               href="mailto:developer@bitsathy.in"

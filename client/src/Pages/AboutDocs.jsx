@@ -10,7 +10,7 @@ export default function DocsPage() {
         <title>BIT Central Documentation</title>
         <meta
           name="description"
-          content="Official documentation for BIT Central."
+          content="Documentation for BIT Central."
         />
       </Helmet>
       <article className="prose max-w-none dark:prose-invert">
