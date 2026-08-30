@@ -253,13 +253,10 @@ func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int
 			authenticatedUID = uid
 			authenticatedEmail = strings.ToLower(strings.TrimSpace(email))
 			if h.DB != nil && authenticatedEmail != "" {
-				var rollNo string
-				_ = h.DB.QueryRow(`SELECT rollno FROM student_email WHERE LOWER(TRIM(emailid)) = ? LIMIT 1`, authenticatedEmail).Scan(&rollNo)
-				if rollNo != "" {
-					authenticatedRollNo = strings.TrimSpace(rollNo)
-				}
-
 				_ = h.DB.QueryRow(`SELECT COALESCE(user_id, ''), COALESCE(id, '') FROM tracker_users WHERE LOWER(TRIM(email)) = ? LIMIT 1`, authenticatedEmail).Scan(&authenticatedTrackerUserID, &authenticatedTrackerID)
+				if authenticatedTrackerUserID != "" {
+					authenticatedRollNo = strings.TrimSpace(authenticatedTrackerUserID)
+				}
 			}
 		}
 	}
@@ -330,17 +327,6 @@ func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int
 				requestedID, requestedID,
 			).Scan(&tEmail)
 			if tEmail != "" && strings.EqualFold(tEmail, authenticatedEmail) {
-				isOwnID = true
-			}
-		}
-
-		if !isOwnID && h.DB != nil {
-			var sEmail string
-			_ = h.DB.QueryRow(
-				`SELECT COALESCE(emailid, '') FROM student_email WHERE LOWER(TRIM(rollno)) = LOWER(TRIM(?)) LIMIT 1`,
-				requestedID,
-			).Scan(&sEmail)
-			if sEmail != "" && strings.EqualFold(sEmail, authenticatedEmail) {
 				isOwnID = true
 			}
 		}
