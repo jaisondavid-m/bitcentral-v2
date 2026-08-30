@@ -60,9 +60,11 @@ export default function FloatingMenu() {
     }
   }, [user, isChatOpen]);
 
+  const messagesContainerRef = useRef(null);
+
   useEffect(() => {
-    if (isChatOpen) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (isChatOpen && messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [messages, isChatOpen]);
 
@@ -303,7 +305,7 @@ export default function FloatingMenu() {
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/60 dark:bg-slate-950/40">
+            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/60 dark:bg-slate-950/40">
               {loading ? (
                 <div className="flex justify-center items-center h-full">
                   <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
@@ -355,7 +357,6 @@ export default function FloatingMenu() {
                   );
                 })
               )}
-              <div ref={messagesEndRef} />
             </div>
 
             {/* Input Footer */}

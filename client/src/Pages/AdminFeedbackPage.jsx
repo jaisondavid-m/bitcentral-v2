@@ -12,6 +12,7 @@ import {
   User,
   Loader2,
   Inbox,
+  ArrowLeft,
   Sparkles,
 } from "lucide-react";
 
@@ -24,7 +25,7 @@ export default function AdminFeedbackPage() {
   const [loadingMsgs, setLoadingMsgs] = useState(false);
   const [sending, setSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
 
   const fetchConversations = async () => {
     try {
@@ -53,6 +54,16 @@ export default function AdminFeedbackPage() {
     }
   };
 
+  const scrollToBottom = (smooth = true) => {
+    if (messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: smooth ? "smooth" : "auto",
+      });
+    }
+  };
+
   useEffect(() => {
     fetchConversations();
     const interval = setInterval(fetchConversations, 6000);
@@ -68,9 +79,17 @@ export default function AdminFeedbackPage() {
     }
   }, [selectedUser]);
 
+  // Scroll message container to bottom when messages load or update (if near bottom)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      const isNearBottom =
+        container.scrollHeight - container.scrollTop - container.clientHeight < 160;
+      if (isNearBottom || loadingMsgs) {
+        scrollToBottom(false);
+      }
+    }
+  }, [messages, loadingMsgs]);
 
   const handleSelectUser = (conv) => {
     setSelectedUser(conv);
@@ -91,7 +110,6 @@ export default function AdminFeedbackPage() {
       const sent = await sendAdminFeedbackReply(selectedUser.user_uid, text);
       if (sent) {
         setMessages((prev) => [...prev, sent]);
-        // Update conversation last message in list
         setConversations((prev) =>
           prev.map((c) =>
             c.user_uid === selectedUser.user_uid
@@ -99,8 +117,10 @@ export default function AdminFeedbackPage() {
               : c
           )
         );
+        setTimeout(() => scrollToBottom(true), 50);
       } else {
         await fetchMessagesForUser(selectedUser.user_uid);
+        setTimeout(() => scrollToBottom(true), 50);
       }
     } catch (err) {
       setReplyText(text);
@@ -126,22 +146,22 @@ export default function AdminFeedbackPage() {
   const totalUnread = conversations.reduce((acc, c) => acc + (c.unread_count || 0), 0);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 dark:bg-black dark:text-white flex flex-col">
+    <div className="h-[calc(100vh-7rem)] min-h-[520px] max-h-[850px] w-full rounded-2xl border border-slate-200/80 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900 flex flex-col overflow-hidden">
       {/* Header Bar */}
-      <div className="border-b border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 flex items-center justify-between shrink-0">
+      <div className="border-b border-slate-200/80 bg-slate-50/80 px-4 py-3 sm:px-5 dark:border-slate-800 dark:bg-slate-900/90 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-blue-50 p-2.5 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60">
-            <MessageSquare className="h-6 w-6" />
+          <div className="rounded-xl bg-blue-500/10 p-2 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 border border-blue-500/20">
+            <MessageSquare className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-lg sm:text-xl font-black text-slate-950 dark:text-white flex items-center gap-2">
+            <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
               <span>User Feedback & Support Chats</span>
               {totalUnread > 0 && (
-                <span className="rounded-full bg-rose-500 px-2 py-0.5 text-xs font-bold text-white animate-pulse">
+                <span className="rounded-full bg-rose-500 px-2 py-0.5 text-[11px] font-bold text-white animate-pulse">
                   {totalUnread} New
                 </span>
               )}
-            </h1>
+            </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               Direct communication line with BIT-CENTRAL students & users
             </p>
@@ -153,19 +173,23 @@ export default function AdminFeedbackPage() {
             setLoadingConvs(true);
             fetchConversations();
           }}
-          className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
         >
-          <RefreshCw className={`h-4 w-4 ${loadingConvs ? "animate-spin" : ""}`} />
+          <RefreshCw className={`h-3.5 w-3.5 ${loadingConvs ? "animate-spin" : ""}`} />
           <span>Refresh</span>
         </button>
       </div>
 
       {/* Main Split Body */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-12 min-h-0 overflow-hidden">
         {/* Left Column: Conversations List */}
-        <div className="md:col-span-4 lg:col-span-4 border-r border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900/60 flex flex-col h-full">
+        <div
+          className={`md:col-span-4 lg:col-span-4 border-r border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900/60 flex flex-col h-full overflow-hidden ${
+            selectedUser ? "hidden md:flex" : "flex"
+          }`}
+        >
           {/* Search Box */}
-          <div className="p-3.5 border-b border-slate-100 dark:border-slate-800">
+          <div className="p-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
             <div className="relative">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <input
@@ -179,7 +203,7 @@ export default function AdminFeedbackPage() {
           </div>
 
           {/* List */}
-          <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
+          <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60 [scrollbar-width:thin]">
             {loadingConvs ? (
               <div className="flex justify-center items-center py-12">
                 <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
@@ -247,7 +271,11 @@ export default function AdminFeedbackPage() {
         </div>
 
         {/* Right Column: Chat Transcript */}
-        <div className="md:col-span-8 lg:col-span-8 flex flex-col bg-slate-50/50 dark:bg-black h-full">
+        <div
+          className={`md:col-span-8 lg:col-span-8 flex flex-col bg-slate-50/50 dark:bg-black h-full overflow-hidden ${
+            !selectedUser ? "hidden md:flex" : "flex"
+          }`}
+        >
           {!selectedUser ? (
             <div className="flex flex-col items-center justify-center h-full text-center p-8 text-slate-400 dark:text-slate-500 space-y-3">
               <MessageSquare className="h-12 w-12 stroke-1 opacity-40 text-blue-500" />
@@ -263,16 +291,23 @@ export default function AdminFeedbackPage() {
           ) : (
             <>
               {/* Selected User Header */}
-              <div className="p-4 border-b border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900 flex items-center justify-between shrink-0">
+              <div className="p-3.5 border-b border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setSelectedUser(null)}
+                    className="md:hidden rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                    aria-label="Back to conversations"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </button>
                   <div className="rounded-full bg-blue-50 dark:bg-blue-950/60 p-2 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60">
-                    <User className="h-5 w-5" />
+                    <User className="h-4 w-4" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                    <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
                       {selectedUser.user_name || "Student"}
                     </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
                       {selectedUser.user_email} • UID:{" "}
                       <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500">
                         {selectedUser.user_uid}
@@ -282,8 +317,11 @@ export default function AdminFeedbackPage() {
                 </div>
               </div>
 
-              {/* Message Transcript */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/70 dark:bg-slate-950/40">
+              {/* Message Transcript Container */}
+              <div
+                ref={messagesContainerRef}
+                className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/70 dark:bg-slate-950/40 [scrollbar-width:thin]"
+              >
                 {loadingMsgs ? (
                   <div className="flex justify-center items-center py-12">
                     <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
@@ -313,7 +351,7 @@ export default function AdminFeedbackPage() {
                         </div>
 
                         <div
-                          className={`max-w-[75%] rounded-2xl px-4 py-3 text-xs leading-relaxed shadow-xs ${
+                          className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed shadow-xs ${
                             isAdmin
                               ? "bg-blue-600 text-white rounded-tr-xs"
                               : "bg-white text-slate-900 border border-slate-200/80 rounded-tl-xs dark:bg-slate-800 dark:text-white dark:border-slate-700"
@@ -325,11 +363,10 @@ export default function AdminFeedbackPage() {
                     );
                   })
                 )}
-                <div ref={messagesEndRef} />
               </div>
 
               {/* Quick Reply Pills */}
-              <div className="p-2.5 border-t border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900 flex items-center gap-2 overflow-x-auto [scrollbar-width:none] shrink-0">
+              <div className="p-2 border-t border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900 flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] shrink-0">
                 <span className="text-[10px] font-extrabold uppercase text-slate-400 dark:text-slate-500 whitespace-nowrap pl-1">
                   Quick Reply:
                 </span>
@@ -351,7 +388,7 @@ export default function AdminFeedbackPage() {
                   e.preventDefault();
                   handleSendReply();
                 }}
-                className="p-3.5 border-t border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900 flex items-center gap-2 shrink-0"
+                className="p-3 border-t border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900 flex items-center gap-2 shrink-0"
               >
                 <input
                   type="text"
