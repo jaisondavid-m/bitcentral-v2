@@ -559,7 +559,7 @@ export default function ExamHallDownload() {
                     </h1>
                   </div>
                   <p className="mt-0.5 font-mono text-sm font-bold text-blue-600 dark:text-blue-400">
-                    {registerNo || "7376251CS221"}
+                    {registerNo || "Register No not found"}
                   </p>
                 </div>
               </div>
