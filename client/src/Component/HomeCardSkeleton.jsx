@@ -2,18 +2,15 @@ import React from "react";
 
 export function HomeCardSkeleton() {
   return (
-    <div className="group flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm sm:rounded-xl animate-pulse dark:border-blue-900 dark:bg-slate-950">
-      <div className="hidden sm:block aspect-video w-full overflow-hidden bg-slate-200 dark:bg-slate-900">
-        <div className="h-full w-full bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 bg-[length:200%_100%] animate-shimmer"></div>
-      </div>
-      
-      <div className="flex flex-1 flex-col p-3 sm:p-4">
-        <div className="mb-2 space-y-2">
-          <div className="h-4 bg-slate-200 rounded w-3/4 dark:bg-slate-800"></div>
-          <div className="h-4 bg-slate-200 rounded w-1/2 dark:bg-slate-800"></div>
+    <div className="flex flex-col justify-between h-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-sm animate-pulse dark:border-slate-800 dark:bg-slate-950">
+      <div className="w-full max-w-[200px] sm:max-w-[210px] aspect-square mx-auto overflow-hidden rounded-xl bg-slate-200 dark:bg-slate-800 mb-2.5 shrink-0"></div>
+
+      <div className="flex flex-1 flex-col justify-between">
+        <div>
+          <div className="h-4.5 bg-slate-200 rounded-md w-3/4 dark:bg-slate-800"></div>
+          <div className="mt-1 h-3 bg-slate-100 rounded w-full dark:bg-slate-900"></div>
         </div>
-        <div className="flex-1" />
-        <div className="mt-2 sm:mt-3 h-8 sm:h-10 bg-slate-200 rounded-lg sm:rounded-xl w-full dark:bg-slate-800"></div>
+        <div className="mt-3 h-9 bg-slate-200 rounded-xl w-full dark:bg-slate-800"></div>
       </div>
     </div>
   );

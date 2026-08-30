@@ -1,8 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios.js";
+import DynamicIcon from "./DynamicIcon.jsx";
 
-export function Card({ id, name, link, img, btntext }) {
+export function Card({ id, name, description, link, img, icon, btntext }) {
   const navigate = useNavigate();
 
   const trackClick = () => {
@@ -36,25 +37,62 @@ export function Card({ id, name, link, img, btntext }) {
       window.open(link, "_blank");
     }
   };
+
   return (
-    <article onClick={handleNavigate} className="group flex flex-col overflow-hidden rounded-lg border border-blue-200 bg-white shadow-sm transition-all hover:shadow-md cursor-pointer sm:rounded-xl dark:border-blue-900 dark:bg-slate-950 dark:shadow-blue-950/30" aria-label={`Open ${name}`}>
-      <div className="hidden sm:flex aspect-video w-full overflow-hidden bg-slate-100 items-center justify-center dark:bg-slate-900">
+    <article
+      onClick={handleNavigate}
+      className="group flex flex-col justify-between h-full overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-3.5 sm:p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md cursor-pointer dark:border-slate-800 dark:bg-slate-950 dark:shadow-slate-950/40"
+      aria-label={`Open ${name}`}
+    >
+      {/* Centered 1:1 Square Image Container (Max 200-210px) */}
+      <div className="relative w-full max-w-[200px] sm:max-w-[210px] aspect-square mx-auto overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-900 mb-2.5 shrink-0">
         {img ? (
-          <img src={img} alt={name} className="h-full w-full object-cover transition-transform group-hover:scale-105" loading="lazy" decoding="async" />
+          <img
+            src={img}
+            alt={name}
+            className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
+            decoding="async"
+          />
         ) : (
-          <p className="text-center text-lg font-semibold text-slate-500 dark:text-slate-300">{name}</p>
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-b from-blue-100/70 via-blue-50/50 to-blue-50/20 dark:from-blue-950/50 dark:via-blue-950/20 dark:to-slate-900/40">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full border border-blue-200/80 bg-white shadow-sm transition-transform group-hover:scale-110 dark:border-blue-800 dark:bg-slate-900">
+              <DynamicIcon
+                name={icon || "Award"}
+                className="h-5.5 w-5.5 text-blue-600 dark:text-blue-400"
+              />
+            </div>
+          </div>
         )}
       </div>
 
-      <div className="flex flex-1 flex-col p-3 sm:p-4">
-        <h3 className="mb-2 line-clamp-2 text-sm font-semibold text-slate-900 sm:text-base sm:min-h-[3rem] dark:text-slate-100">{name}</h3>
-        <div className="flex-1" />
+      {/* Feature Title & Action Button */}
+      <div className="flex flex-1 flex-col justify-between">
+        <div>
+          <h3 className="line-clamp-1 text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100">
+            {name}
+          </h3>
 
-        <button onClick={(e) => { e.stopPropagation(); handleNavigate(); }} className="mt-2 inline-flex items-center cursor-pointer justify-center rounded-lg border border-slate-300 bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-3 sm:rounded-xl sm:px-4 sm:py-2 sm:text-sm dark:border-blue-900 dark:focus:ring-offset-slate-950" aria-label={`${btntext || "View"} ${name}`}>
+          {description && (
+            <p className="mt-0.5 line-clamp-1 text-xs text-slate-500 dark:text-slate-400 leading-snug">
+              {description}
+            </p>
+          )}
+        </div>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleNavigate();
+          }}
+          className="mt-3 inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-3.5 py-2 text-xs sm:text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer dark:focus:ring-offset-slate-950"
+          aria-label={`${btntext || "View"} ${name}`}
+        >
           {btntext || "View"}
         </button>
-
       </div>
     </article>
   );
 }
+
+export default Card;
