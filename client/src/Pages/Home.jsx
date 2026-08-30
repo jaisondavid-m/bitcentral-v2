@@ -80,13 +80,13 @@ function HomeContent() {
         </section>
 
         {isPending ? (
-          <section className="grid auto-rows-fr grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 sm:gap-6" aria-label="Available resources">
+          <section className="grid auto-rows-fr grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 sm:gap-6" aria-label="Available resources">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((_, index) => (
               <HomeCardSkeleton key={index} />
             ))}
           </section>
         ) : filteredCards.length > 0 ? (
-          <section className="grid auto-rows-fr grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 sm:gap-6" aria-label="Available resources">
+          <section className="grid auto-rows-fr grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 sm:gap-6" aria-label="Available resources">
             {filteredCards.map((card, index) => (
               <Card
                 key={card.id || index}
