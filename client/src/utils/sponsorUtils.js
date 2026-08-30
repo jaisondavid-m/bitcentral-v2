@@ -39,7 +39,12 @@ export function processLeaderboardData(sponsors = []) {
     }
   });
 
-  return Array.from(aggregatedMap.values()).sort(
-    (a, b) => (Number(b.amount) || 0) - (Number(a.amount) || 0)
-  );
+  return Array.from(aggregatedMap.values()).sort((a, b) => {
+    const diff = (Number(b.amount) || 0) - (Number(a.amount) || 0);
+    if (diff !== 0) return diff;
+    const dateA = a.date || a.created_at || "";
+    const dateB = b.date || b.created_at || "";
+    if (dateA !== dateB) return dateB.localeCompare(dateA);
+    return (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" });
+  });
 }

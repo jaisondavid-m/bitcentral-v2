@@ -18,10 +18,11 @@ import {
   Loader2,
   X,
   ArrowLeft,
+  LogIn,
 } from "lucide-react";
 import { FaHandHoldingHeart } from "react-icons/fa6";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../Authentication/firebase.js";
+import { auth, logout } from "../Authentication/firebase.js";
+import { useAuth } from "../context/StudentContext.jsx";
 import { getSponsorsLeaderboard, getMeProfile, checkUserContribution, createSponsorOrder, captureSponsorPayment } from "../api/axios.js";
 import { processLeaderboardData } from "../utils/sponsorUtils.js";
 
@@ -41,7 +42,19 @@ const loadRazorpayScript = () => {
 
 export default function SupportDev() {
   const navigate = useNavigate();
-  const [user] = useAuthState(auth);
+  const { user } = useAuth();
+  const isRealUser = Boolean(user && !user?.isGuest);
+
+  const handleLoginToDonate = async () => {
+    if (user?.isGuest) {
+      try {
+        await logout();
+      } catch (e) {
+        // ignore
+      }
+    }
+    navigate("/login", { state: { from: "/support-dev" } });
+  };
 
   const [loading, setLoading] = useState(true);
   const [leaderboard, setLeaderboard] = useState({
@@ -431,18 +444,34 @@ export default function SupportDev() {
               </div>
 
               <div className="flex items-center justify-between pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPaymentSuccess(false);
-                    setErrorMessage("");
-                    setIsModalOpen(true);
-                  }}
-                  className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-md shadow-blue-600/25 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-1.5 cursor-pointer w-fit"
-                >
-                  <Heart className="h-3.5 w-3.5 fill-white text-white" />
-                  <span>Donate Now</span>
-                </button>
+                {isRealUser ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPaymentSuccess(false);
+                      setErrorMessage("");
+                      setIsModalOpen(true);
+                    }}
+                    className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-md shadow-blue-600/25 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-1.5 cursor-pointer w-fit"
+                  >
+                    <Heart className="h-3.5 w-3.5 fill-white text-white" />
+                    <span>Donate Now</span>
+                  </button>
+                ) : (
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleLoginToDonate}
+                      className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-md shadow-blue-600/25 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-1.5 cursor-pointer w-fit"
+                    >
+                      <LogIn className="h-3.5 w-3.5 text-white" />
+                      <span>Log In to Donate</span>
+                    </button>
+                    <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400">
+                      Log in with your @bitsathy.ac.in mail to donate & get featured.
+                    </span>
+                  </div>
+                )}
 
                 <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
                   <Lock className="h-3 w-3 text-slate-400 shrink-0" />
@@ -553,7 +582,10 @@ export default function SupportDev() {
                     const rank = idx + 1;
                     const isCurrentUser = Boolean(
                       userContribution?.found &&
-                        userContribution?.rank === rank
+                      userContribution?.name &&
+                      sponsor?.name &&
+                      userContribution.name.trim().toLowerCase() === sponsor.name.trim().toLowerCase() &&
+                      Number(userContribution.amount) === Number(sponsor.amount)
                     );
 
                     let rowStyle = "border border-slate-100 bg-slate-50/50 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950/60 dark:hover:bg-slate-950";

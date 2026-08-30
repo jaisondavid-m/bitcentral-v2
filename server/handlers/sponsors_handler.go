@@ -271,7 +271,17 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 					sort.Slice(sponsors, func(i, j int) bool {
 						amtI, _ := sponsors[i]["amount"].(float64)
 						amtJ, _ := sponsors[j]["amount"].(float64)
-						return amtI > amtJ
+						if amtI != amtJ {
+							return amtI > amtJ
+						}
+						dateI, _ := sponsors[i]["date"].(string)
+						dateJ, _ := sponsors[j]["date"].(string)
+						if dateI != dateJ {
+							return dateI > dateJ
+						}
+						nameI, _ := sponsors[i]["name"].(string)
+						nameJ, _ := sponsors[j]["name"].(string)
+						return strings.ToLower(nameI) < strings.ToLower(nameJ)
 					})
 				}
 			}
@@ -445,7 +455,13 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 	}
 
 	sort.Slice(donorList, func(i, j int) bool {
-		return donorList[i].Amount > donorList[j].Amount
+		if donorList[i].Amount != donorList[j].Amount {
+			return donorList[i].Amount > donorList[j].Amount
+		}
+		if donorList[i].LatestDate != donorList[j].LatestDate {
+			return donorList[i].LatestDate > donorList[j].LatestDate
+		}
+		return strings.ToLower(donorList[i].Name) < strings.ToLower(donorList[j].Name)
 	})
 
 	var matchedDonor *InternalDonor
@@ -768,7 +784,13 @@ func (h *SponsorsHandler) GetCertificate(c *gin.Context) {
 	}
 
 	sort.Slice(donorList, func(i, j int) bool {
-		return donorList[i].Amount > donorList[j].Amount
+		if donorList[i].Amount != donorList[j].Amount {
+			return donorList[i].Amount > donorList[j].Amount
+		}
+		if donorList[i].LatestDate != donorList[j].LatestDate {
+			return donorList[i].LatestDate > donorList[j].LatestDate
+		}
+		return strings.ToLower(donorList[i].Name) < strings.ToLower(donorList[j].Name)
 	})
 
 	rawClean := strings.TrimSpace(idParam)
