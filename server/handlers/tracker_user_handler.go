@@ -249,14 +249,18 @@ func (h *TrackerUserHandler) GetProfileV2(c *gin.Context) {
 		&userUID, &uEmail, &displayName, &photoURL, &creationTime, &lastSignInTime,
 	)
 
-	// 3. Fetch rollno from student_email table
+	// 3. Fetch rollno (user_id) from tracker_users table
 	var rollNo string
-	_ = h.DB.QueryRow(
-		`SELECT COALESCE(rollno, '') FROM student_email WHERE LOWER(TRIM(emailid)) = LOWER(TRIM(?)) LIMIT 1`,
-		searchEmail,
-	).Scan(&rollNo)
+	if tUserID != "" {
+		rollNo = tUserID
+	} else {
+		_ = h.DB.QueryRow(
+			`SELECT COALESCE(user_id, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
+			searchEmail,
+		).Scan(&rollNo)
+	}
 
-	// If not found in tracker_users, users, or student_email
+	// If not found in tracker_users or users
 	if trackerErr != nil && userUID == "" && displayName == "" && rollNo == "" {
 		c.JSON(http.StatusNotFound, gin.H{
 			"success": false,

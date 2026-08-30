@@ -63,7 +63,7 @@ func (h *StudentLookupHandler) GetRollNoByEmail(c *gin.Context) {
 
 	var rollNo string
 	err := h.DB.QueryRow(
-		`SELECT rollno FROM student_email WHERE LOWER(TRIM(emailid)) = LOWER(TRIM(?)) LIMIT 1`,
+		`SELECT COALESCE(user_id, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) AND COALESCE(user_id, '') != '' LIMIT 1`,
 		mailID,
 	).Scan(&rollNo)
 	if err == sql.ErrNoRows {
@@ -194,7 +194,7 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 
 	var rollNo string
 	rollErr := h.DB.QueryRow(
-		`SELECT rollno FROM student_email WHERE LOWER(TRIM(emailid)) = LOWER(TRIM(?)) LIMIT 1`,
+		`SELECT COALESCE(user_id, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
 		emailID,
 	).Scan(&rollNo)
 	if rollErr != nil && !errors.Is(rollErr, sql.ErrNoRows) {
