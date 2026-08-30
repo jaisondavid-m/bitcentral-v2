@@ -41,9 +41,11 @@ export default function FloatingFeedbackButton() {
   }, [user, isOpen]);
 
 
+  const messagesContainerRef = useRef(null);
+
   useEffect(() => {
-    if (isOpen) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (isOpen && messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [messages, isOpen]);
 
@@ -168,7 +170,7 @@ export default function FloatingFeedbackButton() {
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/60 dark:bg-slate-950/40">
+            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/60 dark:bg-slate-950/40">
               {!user ? (
                 /* Unauthenticated view */
                 <div className="flex flex-col items-center justify-center h-full text-center p-6 space-y-3">
@@ -239,7 +241,6 @@ export default function FloatingFeedbackButton() {
                   );
                 })
               )}
-              <div ref={messagesEndRef} />
             </div>
 
             {/* Input Footer */}
