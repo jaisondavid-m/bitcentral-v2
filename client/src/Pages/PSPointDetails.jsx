@@ -34,7 +34,7 @@ export default function PSPointDetails() {
     student?.register_no ||
     student?.roll_no ||
     student?.rollNo ||
-    "7376251CS221";
+    "";
 
   const [searchTerm, setSearchTerm] = useState("");
 
