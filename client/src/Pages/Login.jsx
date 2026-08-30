@@ -13,7 +13,7 @@ function Login() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, loading, accessDeniedMessage } = useAuth();
-  
+
   useEffect(() => {
     if (location.state?.error === "unauthorized") {
       setError("Only @bitsathy.ac.in email accounts are allowed to sign in.");
@@ -26,7 +26,7 @@ function Login() {
       setError(accessDeniedMessage);
     }
   }, [accessDeniedMessage]);
-  
+
   useEffect(() => {
     if (user && isAllowedEmail(user.email)) {
       navigate("/home", { replace: true });
@@ -76,14 +76,14 @@ function Login() {
           <h1 className="text-2xl font-semibold text-white">BIT Central</h1>
           <p className="mt-1 text-sm text-blue-100">By student · For students</p>
         </div>
-        
+
         <div className="px-6 py-7">
           <p className="mb-6 text-center text-sm text-gray-600 dark:text-slate-300">
             Only{" "}
             <span className="font-medium text-blue-600">@bitsathy.ac.in</span>{" "}
             email accounts are allowed
           </p>
-          
+
           {error && (
             <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
               <div className="flex items-start gap-3">
@@ -93,8 +93,8 @@ function Login() {
             </div>
           )}
 
-          <button disabled={loading} onClick={handleSignIn} className={`flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${ loading ? "cursor-not-allowed bg-blue-300 text-white" : "bg-blue-600 text-white hover:bg-blue-700"}`}>
-            <img src="https://img.icons8.com/color/48/google-logo.png" alt="Google" className="h-5 w-5 rounded-full"/>
+          <button disabled={loading} onClick={handleSignIn} className={`flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${loading ? "cursor-not-allowed bg-blue-300 text-white" : "bg-blue-600 text-white hover:bg-blue-700"}`}>
+            <img src="https://img.icons8.com/color/48/google-logo.png" alt="Google" className="h-5 w-5 rounded-full" />
             {loading ? "Initializing..." : "Sign in with Google"}
           </button>
 
@@ -108,7 +108,7 @@ function Login() {
               Continue as Guest
             </button>
           )}
-          
+
           <p className="mt-6 text-center text-xs text-gray-400 dark:text-slate-400">Secure authentication powered by Google</p>
 
           {accessDeniedMessage && (
