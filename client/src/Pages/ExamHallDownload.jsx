@@ -3,7 +3,7 @@ import { useAuth } from "../context/StudentContext.jsx";
 import { useTheme } from "../context/ThemeContext.jsx";
 import {
   Loader2, AlertCircle, MapPin, BookOpen,
-  Clock, CalendarDays, FileDown, GraduationCap, Building2,
+  Clock, CalendarDays, FileDown, GraduationCap, Building2, Search,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios.js";
@@ -358,9 +358,66 @@ function UrgentPill({ label }) {
   );
 }
 
+function getExamCountdown(dateStr, timeStr) {
+  if (!dateStr || !timeStr) return null;
+  const [dd, mm, yy] = dateStr.split("-");
+  const startPart = (timeStr.split("–")[0] ?? timeStr.split("-")[0] ?? "").trim();
+  const endPart = (timeStr.split("–")[1] ?? timeStr.split("-")[1] ?? "").trim();
+
+  const parseTime = (tp) => {
+    if (!tp) return null;
+    const parts = tp.split(" ");
+    if (parts.length < 2) return null;
+    const [timeVal, meridiem] = parts;
+    const [hh, min] = timeVal.split(":").map(Number);
+    if (isNaN(hh) || isNaN(min)) return null;
+    let h = hh;
+    if (meridiem.toUpperCase() === "PM" && hh !== 12) h += 12;
+    if (meridiem.toUpperCase() === "AM" && hh === 12) h = 0;
+    return new Date(`${yy}-${mm}-${dd}T${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}:00`);
+  };
+
+  const startTime = parseTime(startPart);
+  const endTime = parseTime(endPart);
+  const now = new Date();
+
+  if (!startTime) return null;
+
+  if (endTime && now > endTime) {
+    return { label: "Completed", isOver: true, isOngoing: false };
+  }
+
+  if (startTime && endTime && now >= startTime && now <= endTime) {
+    return { label: "Ongoing", isOver: false, isOngoing: true };
+  }
+
+  const diffMs = startTime - now;
+  if (diffMs <= 0) return { label: "Starting...", isOver: false, isOngoing: true };
+
+  const totalMins = Math.floor(diffMs / (1000 * 60));
+  const days = Math.floor(totalMins / (60 * 24));
+  const hours = Math.floor((totalMins % (60 * 24)) / 60);
+  const mins = totalMins % 60;
+
+  const parts = [];
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0 || days > 0) parts.push(`${hours}h`);
+  parts.push(`${mins}m`);
+
+  return {
+    label: `In ${parts.join(" ")}`,
+    days,
+    hours,
+    mins,
+    isOver: false,
+    isOngoing: false,
+    isUrgent: days === 0,
+  };
+}
+
 function ExamCard({ session: s }) {
   const dt = fmt(s.date);
-  const cd = daysUntil(s.date);
+  const countdown = getExamCountdown(s.date, s.time);
   const arr = s.is_arrear;
 
   return (
@@ -401,7 +458,6 @@ function ExamCard({ session: s }) {
           <div className="flex flex-wrap items-center gap-1 min-w-0">
             <SessionPill session={s.session} />
             {arr && <ArrearPill />}
-            {/* {cd.urgent && <UrgentPill label={cd.label} />} */}
           </div>
 
           {/* Right: hall badge — compact */}
@@ -447,9 +503,16 @@ function ExamCard({ session: s }) {
             <Clock className="h-3 w-3 shrink-0 text-blue-200 dark:text-blue-800" />
             <span className="text-[11px] text-blue-500 dark:text-blue-400">{s.time}</span>
           </div>
-          {!cd.urgent && (
-            <span className="text-[10px] font-medium text-blue-200 dark:text-blue-800 shrink-0">
-              {cd.label}
+          {countdown && (
+            <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold shrink-0
+              ${countdown.isOngoing
+                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 animate-pulse"
+                : countdown.isUrgent
+                ? "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
+                : countdown.isOver
+                ? "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+                : "bg-blue-100/70 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"}`}>
+              {countdown.label}
             </span>
           )}
         </div>
@@ -581,24 +644,50 @@ export default function ExamHallDownload() {
             </div>
           )}
 
-          {/* ── Not signed in ── */}
+          {/* ── Register No Not Found / Not signed in ── */}
           {!loading && !sessions && !error && (
-            <div className="flex flex-col items-center gap-3 rounded-2xl border
-              border-dashed border-blue-200 bg-white py-20
+            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border
+              border-dashed border-blue-200 bg-white px-4 py-14 text-center
               dark:border-blue-900/40 dark:bg-[#0F1C33]">
-              <CalendarDays className="h-8 w-8 text-blue-200 dark:text-blue-700" />
-              <p className="text-sm text-blue-400 dark:text-blue-500">
-                Sign in to view your exam schedule
-              </p>
+              <CalendarDays className="h-10 w-10 text-blue-300 dark:text-blue-600" />
+              <div className="max-w-xs space-y-1">
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                  Register Number Not Found
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  No registered profile detected. You can search your exam hall manually using your register number and course code.
+                </p>
+              </div>
+              <button
+                onClick={() => navigate("/exam-hall-manual")}
+                className="mt-2 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.98] dark:bg-blue-500 dark:hover:bg-blue-600 cursor-pointer"
+              >
+                <Search className="h-3.5 w-3.5" />
+                Go to Manual Search
+              </button>
             </div>
           )}
 
           {/* ── Error ── */}
           {error && (
-            <div className="flex items-start gap-3 rounded-2xl border border-red-100
-              bg-red-50 px-4 py-3.5 dark:border-red-900/30 dark:bg-red-900/10">
-              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
-              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <div className="flex flex-col gap-3 rounded-2xl border border-red-100
+              bg-red-50 p-4 dark:border-red-900/30 dark:bg-red-900/10">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              </div>
+              <div className="flex items-center justify-between border-t border-red-200/60 pt-3 dark:border-red-800/40">
+                <span className="text-xs font-medium text-red-600 dark:text-red-400">
+                  Want to search manually?
+                </span>
+                <button
+                  onClick={() => navigate("/exam-hall-manual")}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-red-100 px-3 py-1.5 text-xs font-bold text-red-700 transition-colors hover:bg-red-200 dark:bg-red-950 dark:text-red-300 dark:hover:bg-red-900 cursor-pointer"
+                >
+                  <Search className="h-3 w-3" />
+                  Manual Search
+                </button>
+              </div>
             </div>
           )}
 
