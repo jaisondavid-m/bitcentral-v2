@@ -1,5 +1,5 @@
 import api, { getAuthenticatedHeaders } from "./axios";
-import { PING_ON } from "../config/runtimeFlags.js";
+import { PING_ON } from "@/config/runtimeFlags.js";
 
 export async function pingPresence(user = null, routeLabel = "Other") {
   if (!PING_ON) {

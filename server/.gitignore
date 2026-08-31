@@ -1,9 +1,7 @@
 .env
-# *.json
 firebase_credentials.json
 oauth_credentials.json
-token.json"sa-key.json" 
-tmp/main.exe
+token.json
+sa-key.json
 *.exe
 tmp/
-*.exe
