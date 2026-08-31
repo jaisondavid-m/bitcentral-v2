@@ -1,5 +1,5 @@
 import api, { getAuthenticatedHeaders } from "./axios.js";
-import { auth } from "../Authentication/firebase.js";
+import { auth } from "@/config/firebase.js";
 
 async function getAdminHeaders() {
   const currentUser = auth.currentUser;

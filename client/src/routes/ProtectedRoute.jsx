@@ -1,8 +1,8 @@
 import { Navigate } from "react-router-dom";
-import { logout } from "../Authentication/firebase.js";
-import { isAllowedEmail } from "../Authentication/authRules.js";
-import { useAuth } from "../context/StudentContext.jsx";
-import FullScreenLoader from "../Component/FullScreenLoader.jsx";
+import { logout } from "@/config/firebase.js";
+import { isAllowedEmail } from "@/services/authRules.js";
+import { useAuth } from "@/context/StudentContext.jsx";
+import FullScreenLoader from "@/components/common/FullScreenLoader.jsx";
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();

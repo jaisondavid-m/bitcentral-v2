@@ -1,5 +1,5 @@
 import api from "./axios";
-import { auth } from "../Authentication/firebase.js";
+import { auth } from "@/config/firebase.js";
 import { getAuthenticatedHeaders } from "./axios.js";
 
 async function getAdminHeaders() {

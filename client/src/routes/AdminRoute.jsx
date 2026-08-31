@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/StudentContext.jsx";
-import FullScreenLoader from "../Component/FullScreenLoader.jsx";
+import { useAuth } from "@/context/StudentContext.jsx";
+import FullScreenLoader from "@/components/common/FullScreenLoader.jsx";
 
 const ADMIN_UID = import.meta.env.VITE_ADMIN_FIREBASE_UID?.trim();
 
