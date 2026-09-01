@@ -31,7 +31,6 @@ const NotFound = lazyWithRetry(() => import("@/pages/NotFound.jsx"));
 const LeaveDetails = lazyWithRetry(() => import("@/pages/student/LeaveDetails.jsx"));
 const ExamHall = lazyWithRetry(() => import("@/pages/student/ExamHall.jsx"));
 const ExamHallDownload = lazyWithRetry(() => import("@/pages/student/ExamHallDownload.jsx"));
-const UserDirectory = lazyWithRetry(() => import("@/pages/student/UserDirectory.jsx"));
 const StudentReportDetails = lazyWithRetry(() => import("@/pages/student/StudentReportDetails.jsx"));
 const PSAssessmentHistory = lazyWithRetry(() => import("@/pages/student/PSAssessmentHistory.jsx"));
 const PSPointDetails = lazyWithRetry(() => import("@/pages/student/PSPointDetails.jsx"));
@@ -49,9 +48,6 @@ const ProtectedLayout = lazyWithRetry(() => import("../routes/ProtectedLayout.js
 
 const AdminDashboard = lazyWithRetry(() =>
   import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.default }))
-);
-const AdminAcademicPage = lazyWithRetry(() =>
-  import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminAcademicPage }))
 );
 const AdminUsersPage = lazyWithRetry(() =>
   import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminUsersPage }))
@@ -193,22 +189,6 @@ function App() {
                 }
               />
               <Route
-                path="/admin/academic"
-                element={
-                  <AdminRoute>
-                    <AdminAcademicPage />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/academic/:subtab"
-                element={
-                  <AdminRoute>
-                    <AdminAcademicPage />
-                  </AdminRoute>
-                }
-              />
-              <Route
                 path="/admin/users"
                 element={
                   <AdminRoute>
@@ -284,7 +264,6 @@ function App() {
               <Route path="/leavedetails" element={<LeaveDetails />} />
               <Route path="/semester" element={<Semester />} />
               <Route path="/mess" element={<MessMenu />} />
-              <Route path="/user-directory" element={<UserDirectory />} />
               <Route path="/student-report/:id" element={<StudentReportDetails />} />
               <Route path="/student-report" element={<StudentReportDetails />} />
               <Route path="/ps-assessment-history" element={<PSAssessmentHistory />} />

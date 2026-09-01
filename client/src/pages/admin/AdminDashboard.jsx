@@ -41,6 +41,8 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   Eye,
   ExternalLink,
   Clock,
@@ -61,10 +63,8 @@ import {
 } from "lucide-react";
 import SuperAdminPanel from "./SuperAdminPanel.jsx";
 import AdminPSRewardsPage from "./AdminPSRewards.jsx";
-import AcademicManagement from "./AcademicManagement.jsx";
 import AdminFeedbackPage from "./AdminFeedbackPage.jsx";
 import { checkSuperAdmin } from "@/api/admin.js";
-import { PING_ON } from "@/config/runtimeFlags.js";
 
 function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
@@ -151,15 +151,6 @@ const EMPTY_QB_FORM = {
 
 const ADMIN_TABS = [
   {
-    key: "academic",
-    label: "Academic Management",
-    href: "/admin/academic",
-    icon: GraduationCap,
-    gradient: "from-blue-600 to-indigo-600",
-    badge: "Academic Core",
-    description: "Manage departments, regulations, batches, semesters, courses, materials (PDF), exams & question banks.",
-  },
-  {
     key: "users",
     label: "Users",
     href: "/admin/users",
@@ -235,7 +226,6 @@ const ADMIN_TABS = [
 
 function getAdminTabFromPath(pathname) {
   if (pathname === "/admin" || pathname === "/admin/") return "overview";
-  if (pathname.startsWith("/admin/academic")) return "academic";
   if (pathname.startsWith("/admin/sponsors")) return "sponsors";
   if (pathname.startsWith("/admin/qb")) return "qb";
   if (pathname.startsWith("/admin/ps-rewards")) return "ps";
@@ -523,7 +513,7 @@ function reorderList(items, fromId, toId) {
   return next;
 }
 
-/* -- Admin Overview Grid (8 Big Cards) --------------------------------------- */
+/* -- Admin Overview Grid ----------------------------------------------------- */
 function AdminOverviewGrid({ isSuper }) {
   const visibleTabs = ADMIN_TABS.filter((t) => {
     if (t.key === "users" || t.key === "super") return Boolean(isSuper);
@@ -531,71 +521,56 @@ function AdminOverviewGrid({ isSuper }) {
   });
 
   return (
-    <div className="space-y-8 py-2">
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-sm backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/80 sm:p-8">
-        <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-blue-500/10 blur-3xl" />
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between relative z-10">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-blue-600 dark:bg-blue-950 dark:text-blue-400">
-              <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" /> Admin Control Center
-            </div>
-            <h1 className="mt-3 text-2xl font-black text-slate-900 dark:text-white sm:text-3xl">
-              System Management Overview
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-              Select an administrative section below to manage college academic structures, user directory, sponsored contributions, question banks, mess schedules, and system security.
-            </p>
-          </div>
-
-          <div className="hidden sm:block">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/80 px-6 py-4 text-center dark:border-slate-800 dark:bg-slate-900/80 shadow-sm">
-              <span className="text-3xl font-black text-blue-600 dark:text-blue-400">{visibleTabs.length}</span>
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">Active Modules</p>
-            </div>
-          </div>
+    <div className="space-y-6">
+      {/* Simple, Professional Header */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-5 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Admin Management
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Select an administrative module below to manage your system settings, user directory, and content.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 dark:bg-slate-800/80 px-3.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            {visibleTabs.length} Active Modules
+          </span>
         </div>
       </div>
 
-      {/* 8 Big Cards Grid */}
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Module Cards Grid */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {visibleTabs.map((tab) => {
           const Icon = tab.icon;
           return (
             <Link
               key={tab.key}
               to={tab.href}
-              className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-blue-500/50"
+              className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition-all duration-200 hover:border-blue-500/40 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/90 dark:hover:border-blue-500/40"
             >
-              {/* Background Accent Glow */}
-              <div className={`absolute -right-8 -top-8 h-28 w-28 rounded-full bg-gradient-to-br ${tab.gradient} opacity-10 blur-2xl transition group-hover:opacity-25`} />
-
               <div>
-                {/* Header Row inside card */}
-                <div className="flex items-start justify-between gap-3">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${tab.gradient} text-white shadow-md shadow-blue-500/10 transition transform group-hover:scale-110`}>
-                    <Icon className="h-6 w-6" />
+                <div className="flex items-center justify-between gap-2">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${tab.gradient} text-white shadow-xs`}>
+                    <Icon className="h-5 w-5" />
                   </div>
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                     {tab.badge}
                   </span>
                 </div>
 
-                {/* Card Title & Description */}
-                <h3 className="mt-5 text-lg font-bold text-slate-900 transition group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
+                <h3 className="mt-4 text-base font-semibold text-slate-900 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
                   {tab.label}
                 </h3>
-                <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400 line-clamp-3">
+                <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400 line-clamp-2">
                   {tab.description}
                 </p>
               </div>
 
-              {/* Bottom Action Arrow */}
-              <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 text-xs font-bold text-blue-600 dark:border-slate-800/80 dark:text-blue-400">
-                <span>Open Module</span>
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-50 transition transform group-hover:translate-x-1 group-hover:bg-blue-600 group-hover:text-white dark:bg-blue-950 dark:group-hover:bg-blue-500">
-                  <ArrowRight className="h-4 w-4" />
-                </span>
+              <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-3 text-xs font-medium text-slate-500 transition-colors group-hover:text-blue-600 dark:border-slate-800 dark:text-slate-400 dark:group-hover:text-blue-400">
+                <span>Manage module</span>
+                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
               </div>
             </Link>
           );
@@ -690,18 +665,6 @@ function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showS
               Blocked
             </span>
           )}
-          {showStatus && (
-            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-              isBlocked
-                ? "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300"
-                : userItem.isOnline
-                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
-                  : "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-400"
-            }`}>
-              {isBlocked ? <AlertTriangle className="h-2.5 w-2.5" /> : userItem.isOnline ? <Wifi className="h-2.5 w-2.5" /> : <WifiOff className="h-2.5 w-2.5" />}
-              {isBlocked ? "Blocked" : userItem.isOnline ? "Online" : "Offline"}
-            </span>
-          )}
           {expanded ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
         </div>
       </button>
@@ -711,17 +674,19 @@ function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showS
         <div className="border-t border-gray-100 px-4 pb-4 pt-3 dark:border-blue-900">
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div>
-              <p className="font-semibold text-gray-500 dark:text-slate-400">Last seen</p>
-              <p className="mt-0.5 text-gray-800 dark:text-slate-200">{userItem.lastSeenAt ? formatDateTime(userItem.lastSeenAt) : "Never"}</p>
+              <p className="font-semibold text-gray-500 dark:text-slate-400">Created at</p>
+              <p className="mt-0.5 text-gray-800 dark:text-slate-200">{formatDateTime(userItem.creationTime)}</p>
             </div>
             <div>
-              <p className="font-semibold text-gray-500 dark:text-slate-400">Last route</p>
-              <p className="mt-0.5 truncate text-gray-800 dark:text-slate-200">{formatRouteLabel(userItem.lastUsedRoute)}</p>
+              <p className="font-semibold text-gray-500 dark:text-slate-400">Last sign in</p>
+              <p className="mt-0.5 text-gray-800 dark:text-slate-200">{formatDateTime(userItem.lastSignInTime)}</p>
             </div>
-            <div>
-              <p className="font-semibold text-gray-500 dark:text-slate-400">Blocked at</p>
-              <p className="mt-0.5 text-gray-800 dark:text-slate-200">{isBlocked ? formatBlockedAt(userItem.blockedAt) : "-"}</p>
-            </div>
+            {isBlocked && (
+              <div className="col-span-2">
+                <p className="font-semibold text-gray-500 dark:text-slate-400">Blocked at</p>
+                <p className="mt-0.5 text-gray-800 dark:text-slate-200">{formatBlockedAt(userItem.blockedAt)}</p>
+              </div>
+            )}
           </div>
           <button
             type="button"
@@ -763,91 +728,112 @@ function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showS
 }
 
 /* -- Users table (desktop) --------------------------------------------------- */
-function UserTable({ users, onDelete, onToggleBlock, deletingUid, showStatus, isSuper, onToggleAdmin, adminActionUid }) {
-  const cols = showStatus
-    ? ["#", "Photo", "Email", "Display name", "Status", "Last seen", "Last used", "Blocked at", "Action"]
-    : ["#", "Photo", "Email", "Display name", "Last seen", "Last used", "Blocked at", "Action"];
+function UserTable({ users, onDelete, onToggleBlock, deletingUid, isSuper, onToggleAdmin, adminActionUid, page, pageSize }) {
+  const cols = ["#", "User", "Created at", "Last sign in", "Status", "Action"];
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-blue-900">
-        <thead className="bg-white/70 dark:bg-slate-900/70">
+    <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-blue-900/60">
+      <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-blue-900/60">
+        <thead className="bg-gray-50/80 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:bg-slate-900/80 dark:text-slate-400">
           <tr>
             {cols.map((h) => (
-              <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-200">{h}</th>
+              <th key={h} className="px-4 py-3.5 text-left">{h}</th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100 bg-white dark:divide-blue-900 dark:bg-slate-950">
-          {users.map((userItem, index) => (
-            <tr key={userItem.uid} className="transition hover:bg-gray-50 dark:hover:bg-slate-900">
-              <td className="px-4 py-3 font-medium text-gray-500 dark:text-slate-400">{index + 1}</td>
-              <td className="px-4 py-3">
-                {userItem.photoURL ? (
-                  <img src={userItem.photoURL} alt={userItem.displayName || userItem.email || "User profile photo"} className="h-9 w-9 rounded-full border border-gray-200 object-cover dark:border-blue-900" loading="lazy" decoding="async" />
-                ) : (
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-500 dark:bg-slate-800 dark:text-slate-300">
-                    {(userItem.displayName || userItem.email || "U").charAt(0).toUpperCase()}
+        <tbody className="divide-y divide-gray-100 bg-white dark:divide-blue-900/40 dark:bg-slate-950">
+          {users.map((userItem, index) => {
+            const rowNumber = (page - 1) * pageSize + index + 1;
+            const isBlocked = userItem.isBlocked;
+            return (
+              <tr key={userItem.uid} className="transition hover:bg-gray-50/80 dark:hover:bg-slate-900/50">
+                <td className="px-4 py-3.5 text-xs font-medium text-gray-400 dark:text-slate-500">{rowNumber}</td>
+                <td className="px-4 py-3.5">
+                  <div className="flex items-center gap-3">
+                    {userItem.photoURL ? (
+                      <img
+                        src={userItem.photoURL}
+                        alt={userItem.displayName || userItem.email || "User photo"}
+                        className="h-9 w-9 shrink-0 rounded-full border border-gray-200 object-cover dark:border-slate-700"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-blue-600 dark:bg-blue-950 dark:text-blue-300 border border-blue-100 dark:border-blue-900">
+                        {(userItem.displayName || userItem.email || "U").charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-gray-900 dark:text-slate-100">
+                        {userItem.displayName || "No Name"}
+                      </p>
+                      <p className="truncate text-xs text-gray-500 dark:text-slate-400">{userItem.email || userItem.uid}</p>
+                    </div>
                   </div>
-                )}
-              </td>
-              <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.email || "-"}</td>
-              <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.displayName || "-"}</td>
-              {showStatus && (
-                <td className="px-4 py-3">
-                  <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                    userItem.isBlocked
-                      ? "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300"
-                      : userItem.isOnline
-                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
-                        : "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-300"
-                  }`}>
-                    {userItem.isBlocked ? "Blocked" : userItem.isOnline ? "Online" : "Offline"}
-                  </span>
                 </td>
-              )}
-              <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{userItem.lastSeenAt ? formatDateTime(userItem.lastSeenAt) : "Never"}</td>
-              <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatRouteLabel(userItem.lastUsedRoute)}</td>
-              <td className="px-4 py-3 text-gray-700 dark:text-slate-300">{formatBlockedAt(userItem.blockedAt)}</td>
-              <td className="px-4 py-3">
-                <div className="flex flex-wrap gap-2">
-                  {isSuper && (
+                <td className="whitespace-nowrap px-4 py-3.5 text-xs text-gray-600 dark:text-slate-300">{formatDateTime(userItem.creationTime)}</td>
+                <td className="whitespace-nowrap px-4 py-3.5 text-xs text-gray-600 dark:text-slate-300">{formatDateTime(userItem.lastSignInTime)}</td>
+                <td className="whitespace-nowrap px-4 py-3.5">
+                  {isBlocked ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700 dark:bg-red-950/60 dark:text-red-300 border border-red-200 dark:border-red-900">
+                      Blocked
+                    </span>
+                  ) : userItem.isAdmin ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-900">
+                      Admin
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900">
+                      Active
+                    </span>
+                  )}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3.5">
+                  <div className="flex items-center gap-2">
+                    {isSuper && (
+                      <button
+                        type="button"
+                        onClick={() => onToggleAdmin(userItem)}
+                        disabled={adminActionUid === userItem.uid}
+                        className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition disabled:opacity-50 ${
+                          userItem.isAdmin
+                            ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200"
+                            : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                        }`}
+                      >
+                        {adminActionUid === userItem.uid ? (
+                          <Loader className="h-3.5 w-3.5 animate-spin" />
+                        ) : userItem.isAdmin ? (
+                          <UserMinus className="h-3.5 w-3.5" />
+                        ) : (
+                          <Plus className="h-3.5 w-3.5" />
+                        )}
+                        <span>{userItem.isAdmin ? "Depromote" : "Promote"}</span>
+                      </button>
+                    )}
                     <button
                       type="button"
-                      onClick={() => onToggleAdmin(userItem)}
-                      disabled={adminActionUid === userItem.uid}
-                      className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition disabled:opacity-60 ${
-                        userItem.isAdmin
-                          ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200 dark:hover:bg-amber-950/60"
-                          : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-blue-900 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+                      onClick={() => onToggleBlock(userItem.uid, !userItem.isBlocked)}
+                      className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-white transition ${
+                        userItem.isBlocked ? "bg-emerald-600 hover:bg-emerald-700" : "bg-amber-600 hover:bg-amber-700"
                       }`}
                     >
-                      {adminActionUid === userItem.uid ? <Loader className="h-3.5 w-3.5 animate-spin" /> : userItem.isAdmin ? <UserMinus className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
-                      {userItem.isAdmin ? "Depromote" : "Promote"}
+                      <span>{userItem.isBlocked ? "Unblock" : "Block"}</span>
                     </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => onToggleBlock(userItem.uid, !userItem.isBlocked)}
-                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-white transition ${
-                      userItem.isBlocked ? "bg-emerald-600 hover:bg-emerald-700" : "bg-red-600 hover:bg-red-700"
-                    }`}
-                  >
-                    {userItem.isBlocked ? "Unblock" : "Block"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onDelete(userItem.uid)}
-                    disabled={deletingUid === userItem.uid}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-60 dark:border-red-900 dark:bg-slate-950 dark:text-red-300 dark:hover:bg-slate-900"
-                  >
-                    {deletingUid === userItem.uid ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-                    Delete
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
+                    <button
+                      type="button"
+                      onClick={() => onDelete(userItem.uid)}
+                      disabled={deletingUid === userItem.uid}
+                      className="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-50 dark:border-red-900/60 dark:bg-slate-950 dark:text-red-400 dark:hover:bg-red-950/40"
+                    >
+                      {deletingUid === userItem.uid ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                      <span>Delete</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -857,9 +843,14 @@ function UserTable({ users, onDelete, onToggleBlock, deletingUid, showStatus, is
 /* -- Users Section ----------------------------------------------------------- */
 function UsersSection({ isSuper }) {
   const [users, setUsers] = useState([]);
-  const [usersLoaded, setUsersLoaded] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [filteredTotal, setFilteredTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [totalPages, setTotalPages] = useState(1);
+  const [batchCounts, setBatchCounts] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedVisitDate, setSelectedVisitDate] = useState(todayIST());
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [batchFilter, setBatchFilter] = useState("");
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [deletingUid, setDeletingUid] = useState("");
@@ -869,90 +860,39 @@ function UsersSection({ isSuper }) {
   const [banner, setBanner] = useState({ type: "", message: "" });
   const [adminActionUid, setAdminActionUid] = useState("");
 
-  function getBatchLabelFromEmail(email) {
-    if (!email) return "others";
-    // find first occurrence of exactly two digits not part of a longer digit sequence
-    const m = email.match(/(^|[^0-9])(\d{2})(?!\d)/);
-    if (!m) return "others";
-    const two = m[2];
-    if (!/^[0-9]{2}$/.test(two)) return "others";
-    // only allow these two-digit batches
-    const allowed = ["22", "23", "24", "25", "26"];
-    if (!allowed.includes(two)) return "others";
-    const start = 2000 + Number(two);
-    const end = start + 4;
-    return `${start}-${end}`;
-  }
-
-  const batchCounts = useMemo(() => {
-    const counts = {};
-    for (const u of users) {
-      const label = getBatchLabelFromEmail((u.email || "").toLowerCase());
-      counts[label] = (counts[label] || 0) + 1;
-    }
-    return counts;
-  }, [users]);
-
-  const filteredUsers = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    return users.filter((user) => {
-      if (batchFilter) {
-        const label = getBatchLabelFromEmail((user.email || "").toLowerCase());
-        if (label !== batchFilter) return false;
-      }
-      if (!q) return true;
-      const email = (user.email || "").toLowerCase();
-      const name = (user.displayName || "").toLowerCase();
-      const uid = (user.uid || "").toLowerCase();
-      return email.includes(q) || name.includes(q) || uid.includes(q);
-    });
-  }, [users, searchQuery, batchFilter]);
-
-  const sortedUsers = useMemo(() => {
-    return [...filteredUsers].sort((left, right) => {
-      const leftOnline = Boolean(left.isOnline);
-      const rightOnline = Boolean(right.isOnline);
-      if (leftOnline !== rightOnline) return leftOnline ? -1 : 1;
-      const lastSeenDiff = parseDateValue(right.lastSeenAt) - parseDateValue(left.lastSeenAt);
-      if (lastSeenDiff !== 0) return lastSeenDiff;
-      return parseDateValue(right.creationTime) - parseDateValue(left.creationTime);
-    });
-  }, [filteredUsers]);
-
-  const onlineUsers = useMemo(() => sortedUsers.filter((u) => u.isOnline), [sortedUsers]);
-  const recentActivityUsers = useMemo(() => sortedUsers.filter((u) => !u.isOnline && u.lastSeenAt), [sortedUsers]);
-  const neverActiveUsers = useMemo(() => sortedUsers.filter((u) => !u.isOnline && !u.lastSeenAt), [sortedUsers]);
-  const latestActiveUser = sortedUsers[0] || null;
-
-  const usersVisitedOnSelectedDate = useMemo(() => {
-    if (!selectedVisitDate) return [];
-    return users.filter((user) => dateKeyFromValue(user.lastSeenAt) === selectedVisitDate);
-  }, [users, selectedVisitDate]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const loadUsers = useCallback(async () => {
     setIsLoadingUsers(true);
     setBanner({ type: "", message: "" });
     try {
-      const result = await listAdminUsers();
+      const result = await listAdminUsers({
+        page,
+        limit: pageSize,
+        search: debouncedSearch,
+        batch: batchFilter,
+      });
       setUsers(result.users || []);
-      setUsersLoaded(true);
+      setTotal(result.total || 0);
+      setFilteredTotal(result.filteredTotal || 0);
+      setTotalPages(result.totalPages || 1);
+      setBatchCounts(result.batchCounts || {});
     } catch (error) {
       setUsers([]);
-      setUsersLoaded(false);
       setBanner({ type: "error", message: normalizeError(error, "Failed to load users") });
     } finally {
       setIsLoadingUsers(false);
     }
-  }, []);
+  }, [page, pageSize, debouncedSearch, batchFilter]);
 
-  useEffect(() => { loadUsers(); }, [loadUsers]);
   useEffect(() => {
-    if (!PING_ON) {
-      return undefined;
-    }
-
-    const id = window.setInterval(loadUsers, 30000);
-    return () => window.clearInterval(id);
+    loadUsers();
   }, [loadUsers]);
 
   const onUpdateUsers = async () => {
@@ -960,10 +900,10 @@ function UsersSection({ isSuper }) {
     setBanner({ type: "", message: "" });
     try {
       const result = await updateUsers();
-      setBanner({ type: "success", message: result?.message || "Users updated successfully" });
+      setBanner({ type: "success", message: result?.message || "Users synced successfully" });
       await loadUsers();
     } catch (error) {
-      setBanner({ type: "error", message: normalizeError(error, "Failed to update users") });
+      setBanner({ type: "error", message: normalizeError(error, "Failed to sync users") });
     } finally {
       setIsUpdatingUsers(false);
     }
@@ -979,8 +919,8 @@ function UsersSection({ isSuper }) {
     setBanner({ type: "", message: "" });
     try {
       await deleteAdminUser({ uid });
-      setUsers((prev) => prev.filter((u) => u.uid !== uid));
       setBanner({ type: "success", message: "User deleted successfully" });
+      await loadUsers();
     } catch (error) {
       setBanner({ type: "error", message: normalizeError(error, "Failed to delete user") });
     } finally {
@@ -1007,18 +947,8 @@ function UsersSection({ isSuper }) {
     setBanner({ type: "", message: "" });
     try {
       const result = await setAdminUserBlocked({ uid, blocked });
-      setUsers((prev) =>
-        prev.map((user) =>
-          user.uid === uid
-            ? {
-                ...user,
-                isBlocked: blocked,
-                blockedAt: blocked ? result?.user?.blocked_at || new Date().toISOString() : "",
-              }
-            : user
-        )
-      );
       setBanner({ type: "success", message: result?.message || (blocked ? "User blocked successfully" : "User unblocked successfully") });
+      await loadUsers();
     } catch (error) {
       setBanner({ type: "error", message: normalizeError(error, blocked ? "Failed to block user" : "Failed to unblock user") });
     }
@@ -1072,29 +1002,38 @@ function UsersSection({ isSuper }) {
     }
   };
 
+  const allowedBatches = ["2026-2030", "2025-2029", "2024-2028", "2023-2027", "2022-2026", "others"];
+
   return (
     <section className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-blue-900 dark:bg-slate-950">
       {/* Section header */}
       <div className="flex flex-col gap-3 border-b border-gray-100 p-4 dark:border-blue-900 sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div>
-          <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100">Users</h2>
-          <p className="mt-0.5 text-sm text-gray-500 dark:text-slate-400">Search and remove user accounts.</p>
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100">Users</h2>
+            <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+              {total.toLocaleString()} total
+            </span>
+          </div>
+          <p className="mt-0.5 text-sm text-gray-500 dark:text-slate-400">
+            Search across all user accounts and manage permissions.
+          </p>
         </div>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={onUpdateUsers}
             disabled={isUpdatingUsers}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60 sm:flex-none"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60 sm:flex-none"
           >
             {isUpdatingUsers ? <Loader className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-            <span>{isUpdatingUsers ? "Updating..." : "Update users"}</span>
+            <span>{isUpdatingUsers ? "Syncing..." : "Sync users"}</span>
           </button>
           <button
             type="button"
             onClick={loadUsers}
             disabled={isLoadingUsers}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60 sm:flex-none"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60 sm:flex-none"
           >
             {isLoadingUsers ? <Loader className="h-4 w-4 animate-spin" /> : <Users className="h-4 w-4" />}
             <span>{isLoadingUsers ? "Loading..." : "Refresh"}</span>
@@ -1103,40 +1042,6 @@ function UsersSection({ isSuper }) {
       </div>
 
       <div className="p-4 sm:p-6">
-        {/* Stats */}
-        <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950/30">
-            <p className="text-xs font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">Online now</p>
-            <p className="mt-2 text-3xl font-black text-emerald-800 dark:text-emerald-200">{onlineUsers.length}</p>
-          </div>
-          <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/30">
-            <p className="text-xs font-bold uppercase tracking-wide text-blue-700 dark:text-blue-300">Latest activity</p>
-            <p className="mt-2 truncate text-sm font-bold text-blue-800 dark:text-blue-200">
-              {latestActiveUser ? latestActiveUser.displayName || latestActiveUser.email || latestActiveUser.uid : "No activity"}
-            </p>
-            <p className="mt-0.5 flex items-center gap-1 text-xs text-blue-700 dark:text-blue-300">
-              <Clock className="h-3 w-3" />
-              {latestActiveUser?.lastSeenAt ? formatDateTime(latestActiveUser.lastSeenAt) : "Never"}
-            </p>
-            <p className="mt-0.5 truncate text-xs text-blue-600 dark:text-blue-400">
-              {latestActiveUser?.lastUsedRoute ? formatRouteLabel(latestActiveUser.lastUsedRoute) : "No route"}
-            </p>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/60">
-            <p className="text-xs font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">Visits on date</p>
-            <div className="mt-2 flex items-center gap-2">
-              <input
-                type="date"
-                value={selectedVisitDate}
-                onChange={(e) => setSelectedVisitDate(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
-              />
-            </div>
-            <p className="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{usersVisitedOnSelectedDate.length}</p>
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Users whose last visit was on {selectedVisitDate || "the selected date"}.</p>
-          </div>
-        </div>
-
         {banner.message && (
           <div className="mb-4">
             <Banner banner={banner} onDismiss={() => setBanner({ type: "", message: "" })} />
@@ -1163,110 +1068,172 @@ function UsersSection({ isSuper }) {
           onCancel={closeConfirmation}
         />
 
-        {isLoadingUsers && !usersLoaded ? (
-          <div className="flex h-36 items-center justify-center">
+        {/* Batch badges */}
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => { setBatchFilter(""); setPage(1); }}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+              batchFilter === "" ? "bg-blue-600 text-white shadow-sm" : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+            }`}
+          >
+            <span>All</span>
+            <span className={`rounded-full px-1.5 py-0.5 text-[11px] font-bold ${batchFilter === "" ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700 dark:bg-slate-800 dark:text-slate-300"}`}>
+              {total.toLocaleString()}
+            </span>
+          </button>
+          {allowedBatches.map((label) => {
+            const count = batchCounts[label] || 0;
+            return (
+              <button
+                key={label}
+                type="button"
+                onClick={() => { setBatchFilter(label); setPage(1); }}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                  batchFilter === label ? "bg-blue-600 text-white shadow-sm" : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                }`}
+              >
+                <span>{label}</span>
+                <span className={`rounded-full px-1.5 py-0.5 text-[11px] font-bold ${batchFilter === label ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700 dark:bg-slate-800 dark:text-slate-300"}`}>
+                  {count.toLocaleString()}
+                </span>
+              </button>
+            );
+          })}
+          {batchFilter && (
+            <button type="button" onClick={() => { setBatchFilter(""); setPage(1); }} className="ml-auto text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400">
+              Clear filter
+            </button>
+          )}
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-4 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50/70 px-3.5 py-2.5 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 dark:border-blue-900 dark:bg-slate-900 dark:focus-within:bg-slate-950">
+          <Search className="h-4 w-4 shrink-0 text-gray-400 dark:text-slate-500" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search all users by email, name, or UID..."
+            className="w-full bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400 dark:text-slate-100 dark:placeholder:text-slate-500"
+          />
+          {searchQuery && (
+            <button type="button" onClick={() => setSearchQuery("")} className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300">
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Table Content */}
+        {isLoadingUsers ? (
+          <div className="flex h-48 items-center justify-center">
             <Loader className="h-6 w-6 animate-spin text-blue-600" />
+          </div>
+        ) : users.length === 0 ? (
+          <div className="flex h-36 flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 p-6 dark:border-slate-800">
+            <p className="text-sm font-semibold text-gray-600 dark:text-slate-300">No users found</p>
+            <p className="mt-1 text-xs text-gray-400 dark:text-slate-500">Try adjusting your search query or batch filter.</p>
           </div>
         ) : (
           <>
-            {/* Batch badges */}
-            <div className="mb-3 flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setBatchFilter("")}
-                className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${batchFilter === "" ? "bg-blue-600 text-white" : "bg-white border border-gray-200 text-gray-700"}`}
-              >
-                All
-                <span className="ml-1 rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-bold text-blue-700">{users.length}</span>
-              </button>
-              {Object.entries(batchCounts)
-                .sort((a, b) => b[1] - a[1])
-                .map(([label, count]) => (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={() => setBatchFilter(label)}
-                    className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${batchFilter === label ? "bg-blue-600 text-white" : "bg-white border border-gray-200 text-gray-700"}`}
-                  >
-                    {label}
-                    <span className="ml-1 rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-bold text-blue-700">{count}</span>
-                  </button>
-                ))}
-              {batchFilter && (
-                <button type="button" onClick={() => setBatchFilter("")} className="ml-auto text-xs text-gray-500 underline">
-                  Clear
-                </button>
-              )}
+            {/* Mobile: cards */}
+            <div className="space-y-2.5 sm:hidden">
+              {users.map((u, i) => (
+                <UserCard
+                  key={u.uid}
+                  userItem={u}
+                  index={i}
+                  onDelete={onDeleteUser}
+                  onToggleBlock={onToggleBlock}
+                  deletingUid={deletingUid}
+                  isSuper={isSuper}
+                  onToggleAdmin={onToggleAdmin}
+                  adminActionUid={adminActionUid}
+                />
+              ))}
             </div>
 
-            {/* Search */}
-            <div className="mb-4 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 dark:border-blue-900 dark:bg-slate-900">
-              <Search className="h-4 w-4 shrink-0 text-gray-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by email, name, or UID"
-                className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400 dark:text-slate-100 dark:placeholder:text-slate-500"
+            {/* Desktop: table */}
+            <div className="hidden sm:block">
+              <UserTable
+                users={users}
+                onDelete={onDeleteUser}
+                onToggleBlock={onToggleBlock}
+                deletingUid={deletingUid}
+                isSuper={isSuper}
+                onToggleAdmin={onToggleAdmin}
+                adminActionUid={adminActionUid}
+                page={page}
+                pageSize={pageSize}
               />
-              {searchQuery && (
-                <button type="button" onClick={() => setSearchQuery("")} className="text-gray-400 hover:text-gray-600">
-                  <X className="h-4 w-4" />
+            </div>
+
+            {/* Pagination Controls Footer */}
+            <div className="mt-4 flex flex-col gap-3 border-t border-gray-100 pt-4 dark:border-blue-900/50 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-slate-400">
+                <span>
+                  Showing{" "}
+                  <span className="font-semibold text-gray-800 dark:text-slate-200">
+                    {filteredTotal === 0 ? 0 : (page - 1) * pageSize + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-semibold text-gray-800 dark:text-slate-200">
+                    {Math.min(page * pageSize, filteredTotal)}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-semibold text-gray-800 dark:text-slate-200">
+                    {filteredTotal.toLocaleString()}
+                  </span>{" "}
+                  users {batchFilter || debouncedSearch ? `(filtered from ${total.toLocaleString()})` : ""}
+                </span>
+
+                <div className="flex items-center gap-1.5">
+                  <span className="text-gray-400">|</span>
+                  <span>Per page:</span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) => {
+                      setPageSize(Number(e.target.value));
+                      setPage(1);
+                    }}
+                    className="rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-semibold text-gray-700 outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                  >
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Page buttons */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1 || isLoadingUsers}
+                  className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                  <span>Previous</span>
                 </button>
-              )}
-            </div>
 
-            {/* Online users group */}
-            <div className="mb-4 overflow-hidden rounded-xl border border-emerald-200 bg-emerald-50/40 dark:border-emerald-900 dark:bg-emerald-950/20">
-              <div className="flex items-center gap-2 border-b border-emerald-200 px-4 py-3 dark:border-emerald-900">
-                <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
-                <h3 className="text-sm font-bold text-emerald-800 dark:text-emerald-200">Online now</h3>
-                <span className="ml-auto rounded-full bg-emerald-200 px-2 py-0.5 text-xs font-bold text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
-                  {onlineUsers.length}
-                </span>
-              </div>
-              {onlineUsers.length === 0 ? (
-                <p className="px-4 py-6 text-center text-sm text-gray-500 dark:text-slate-400">No users online right now.</p>
-              ) : (
-                <>
-                  {/* Mobile: cards */}
-                  <div className="space-y-2 p-3 sm:hidden">
-                    {onlineUsers.map((u, i) => (
-                      <UserCard key={u.uid} userItem={u} index={i} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus={false} isSuper={isSuper} onToggleAdmin={onToggleAdmin} adminActionUid={adminActionUid} />
-                    ))}
-                  </div>
-                  {/* Desktop: table */}
-                  <div className="hidden sm:block">
-                    <UserTable users={onlineUsers} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus={false} isSuper={isSuper} onToggleAdmin={onToggleAdmin} adminActionUid={adminActionUid} />
-                  </div>
-                </>
-              )}
-            </div>
+                <div className="flex items-center gap-1 px-2 text-xs font-bold text-gray-700 dark:text-slate-300">
+                  <span>Page {page}</span>
+                  <span className="font-normal text-gray-400">of</span>
+                  <span>{totalPages}</span>
+                </div>
 
-            {/* All other users group */}
-            <div className="overflow-hidden rounded-xl border border-blue-200 bg-blue-50/40 dark:border-blue-900 dark:bg-blue-950/20">
-              <div className="flex items-center gap-2 border-b border-blue-200 px-4 py-3 dark:border-blue-900">
-                <h3 className="text-sm font-bold text-blue-800 dark:text-blue-200">All other users</h3>
-                <span className="ml-auto rounded-full bg-blue-200 px-2 py-0.5 text-xs font-bold text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                  {recentActivityUsers.length + neverActiveUsers.length}
-                </span>
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages || isLoadingUsers}
+                  className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
               </div>
-              {recentActivityUsers.length === 0 && neverActiveUsers.length === 0 ? (
-                <p className="px-4 py-6 text-center text-sm text-gray-500 dark:text-slate-400">No activity history available.</p>
-              ) : (
-                <>
-                  {/* Mobile: cards */}
-                  <div className="space-y-2 p-3 sm:hidden">
-                    {[...recentActivityUsers, ...neverActiveUsers].map((u, i) => (
-                      <UserCard key={u.uid} userItem={u} index={i} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus isSuper={isSuper} onToggleAdmin={onToggleAdmin} adminActionUid={adminActionUid} />
-                    ))}
-                  </div>
-                  {/* Desktop: table */}
-                  <div className="hidden sm:block">
-                    <UserTable users={[...recentActivityUsers, ...neverActiveUsers]} onDelete={onDeleteUser} onToggleBlock={onToggleBlock} deletingUid={deletingUid} showStatus isSuper={isSuper} onToggleAdmin={onToggleAdmin} adminActionUid={adminActionUid} />
-                  </div>
-                </>
-              )}
             </div>
           </>
         )}
@@ -3480,8 +3447,6 @@ function AdminDashboard({ initialTab } = {}) {
     <AdminDashboardShell activeTab={activeTab} isSuper={isSuper}>
       {activeTab === "overview" ? (
         <AdminOverviewGrid isSuper={isSuper} />
-      ) : activeTab === "academic" ? (
-        <AcademicManagement />
       ) : activeTab === "sponsors" ? (
         <SponsorsSection />
       ) : activeTab === "qb" ? (
@@ -3501,10 +3466,6 @@ function AdminDashboard({ initialTab } = {}) {
       )}
     </AdminDashboardShell>
   );
-}
-
-function AdminAcademicPage() {
-  return <AdminDashboard initialTab="academic" />;
 }
 
 function AdminUsersPage() {
@@ -3536,7 +3497,6 @@ function AdminFeedbackPageRoute() {
 }
 
 export {
-  AdminAcademicPage,
   AdminUsersPage,
   AdminSponsorsPage,
   AdminQBPage,

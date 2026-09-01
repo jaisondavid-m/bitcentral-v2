@@ -3,7 +3,12 @@ package handlers
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"log"
+	"math"
 	"net/http"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -12,6 +17,8 @@ import (
 	"server/utils"
 
 	"github.com/gin-gonic/gin"
+	"google.golang.org/api/iterator"
+	"firebase.google.com/go/auth"
 )
 
 type AdminHandler struct {
@@ -23,130 +30,245 @@ func NewAdminHandler() *AdminHandler {
 		DB: config.DB,
 	}
 }
-func (h *AdminHandler) GetUsers(c *gin.Context) {
+func getBatchLabelFromEmail(email string) string {
+	email = strings.ToLower(strings.TrimSpace(email))
+	if email == "" {
+		return "others"
+	}
+	re := regexp.MustCompile(`(?:^|[^0-9])([0-9]{2})(?:[^0-9]|$)`)
+	matches := re.FindStringSubmatch(email)
+	if len(matches) < 2 {
+		return "others"
+	}
+	two := matches[1]
+	allowed := map[string]bool{"22": true, "23": true, "24": true, "25": true, "26": true}
+	if !allowed[two] {
+		return "others"
+	}
+	year, _ := strconv.Atoi(two)
+	start := 2000 + year
+	end := start + 4
+	return fmt.Sprintf("%d-%d", start, end)
+}
+
+func (h *AdminHandler) syncFirebaseUsersToDB() error {
 	client, err := config.FirebaseAuthClient()
 	if err != nil || client == nil {
-		msg := "Failed to initialize Firebase auth"
-		if err != nil {
-			msg = "Failed to initialize Firebase auth: " + err.Error()
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": msg})
-		return
-	}
-
-	adminRows, err := h.DB.Query(`SELECT uid FROM admins`)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-	defer adminRows.Close()
-
-	adminByUID := make(map[string]bool)
-	for adminRows.Next() {
-		var uid string
-		if err := adminRows.Scan(&uid); err != nil {
-			continue
-		}
-		adminByUID[uid] = true
-	}
-
-	presenceByUID, err := h.loadUserPresenceMap()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	statusByUID, err := h.loadUserStatusMap()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
+		return err
 	}
 
 	iter := client.Users(context.Background(), "")
-
-	var users []models.User
+	var batchUsers []models.User
+	batchSize := 100
+	totalSynced := 0
 
 	for {
 		u, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
 		if err != nil {
+			log.Printf("⚠️ Error iterating Firebase users: %v", err)
 			break
 		}
 
-		users = append(users, models.User{
+		batchUsers = append(batchUsers, models.User{
 			UID:            u.UID,
 			Email:          u.Email,
 			DisplayName:    u.DisplayName,
 			PhotoURL:       u.PhotoURL,
 			CreationTime:   utils.TsToString(u.UserMetadata.CreationTimestamp),
 			LastSignInTime: utils.TsToString(u.UserMetadata.LastLogInTimestamp),
-			LastSeenAt:     presenceByUID[u.UID].LastSeenAt,
-			LastUsedRoute:  presenceByUID[u.UID].LastUsedRoute,
-			IsOnline:       presenceByUID[u.UID].IsOnline,
-			IsAdmin:        adminByUID[u.UID],
-			IsBlocked:      statusByUID[u.UID].IsBlocked,
-			BlockedAt:      statusByUID[u.UID].BlockedAt,
 		})
+		totalSynced++
+
+		if len(batchUsers) >= batchSize {
+			if err := h.syncUsersToMySQL(batchUsers); err != nil {
+				log.Printf("❌ Failed to sync batch of %d users to MySQL: %v", len(batchUsers), err)
+				return err
+			}
+			batchUsers = batchUsers[:0]
+		}
+	}
+
+	if len(batchUsers) > 0 {
+		if err := h.syncUsersToMySQL(batchUsers); err != nil {
+			log.Printf("❌ Failed to sync final batch of %d users to MySQL: %v", len(batchUsers), err)
+			return err
+		}
+	}
+
+	log.Printf("✅ Synced %d total users from Firebase to MySQL", totalSynced)
+	return nil
+}
+
+func (h *AdminHandler) GetUsers(c *gin.Context) {
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if page < 1 {
+		page = 1
+	}
+
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "25"))
+	if limit < 1 {
+		limit = 25
+	}
+	if limit > 200 {
+		limit = 200
+	}
+
+	search := strings.ToLower(strings.TrimSpace(c.Query("search")))
+	batch := strings.TrimSpace(c.Query("batch"))
+
+	var totalInDB int
+	_ = h.DB.QueryRow(`SELECT COUNT(*) FROM users`).Scan(&totalInDB)
+	if totalInDB == 0 {
+		_ = h.syncFirebaseUsersToDB()
+	}
+
+	rows, err := h.DB.Query(`SELECT uid, COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(creation_time, ''), COALESCE(last_sign_in_time, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%Y-%m-%dT%H:%i:%sZ'), '') FROM users ORDER BY creation_time DESC, uid DESC`)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	var allUsers []models.User
+	batchCounts := make(map[string]int)
+
+	for rows.Next() {
+		var u models.User
+		var blocked int
+		var blockedAt string
+		if err := rows.Scan(&u.UID, &u.Email, &u.DisplayName, &u.PhotoURL, &u.CreationTime, &u.LastSignInTime, &blocked, &blockedAt); err != nil {
+			continue
+		}
+		u.IsBlocked = blocked == 1
+		u.BlockedAt = blockedAt
+
+		batchLabel := getBatchLabelFromEmail(u.Email)
+		batchCounts[batchLabel]++
+
+		allUsers = append(allUsers, u)
+	}
+
+	var filtered []models.User
+	for _, u := range allUsers {
+		if batch != "" {
+			label := getBatchLabelFromEmail(u.Email)
+			if label != batch {
+				continue
+			}
+		}
+
+		if search != "" {
+			emailLower := strings.ToLower(u.Email)
+			nameLower := strings.ToLower(u.DisplayName)
+			uidLower := strings.ToLower(u.UID)
+			if !strings.Contains(emailLower, search) && !strings.Contains(nameLower, search) && !strings.Contains(uidLower, search) {
+				continue
+			}
+		}
+
+		filtered = append(filtered, u)
+	}
+
+	// If search query returned 0 matches in local DB, attempt direct Firebase lookup (by email or UID)
+	if len(filtered) == 0 && search != "" {
+		client, err := config.FirebaseAuthClient()
+		if err == nil && client != nil {
+			var fbUser *auth.UserRecord
+			if strings.Contains(search, "@") {
+				fbUser, _ = client.GetUserByEmail(context.Background(), search)
+			} else {
+				fbUser, _ = client.GetUser(context.Background(), search)
+			}
+
+			if fbUser != nil {
+				u := models.User{
+					UID:            fbUser.UID,
+					Email:          fbUser.Email,
+					DisplayName:    fbUser.DisplayName,
+					PhotoURL:       fbUser.PhotoURL,
+					CreationTime:   utils.TsToString(fbUser.UserMetadata.CreationTimestamp),
+					LastSignInTime: utils.TsToString(fbUser.UserMetadata.LastLogInTimestamp),
+				}
+
+				label := getBatchLabelFromEmail(u.Email)
+				if batch == "" || batch == label {
+					_ = h.syncUsersToMySQL([]models.User{u})
+
+					statusMap, _ := h.loadUserStatusMap()
+					if st, ok := statusMap[u.UID]; ok {
+						u.IsBlocked = st.IsBlocked
+						u.BlockedAt = st.BlockedAt
+					}
+
+					filtered = append(filtered, u)
+					allUsers = append(allUsers, u)
+					batchCounts[label]++
+				}
+			}
+		}
+	}
+
+	totalFiltered := len(filtered)
+	totalPages := int(math.Ceil(float64(totalFiltered) / float64(limit)))
+	if totalPages < 1 {
+		totalPages = 1
+	}
+
+	startIndex := (page - 1) * limit
+	if startIndex > totalFiltered {
+		startIndex = totalFiltered
+	}
+
+	endIndex := startIndex + limit
+	if endIndex > totalFiltered {
+		endIndex = totalFiltered
+	}
+
+	paginatedSlice := filtered[startIndex:endIndex]
+
+	adminRows, err := h.DB.Query(`SELECT uid FROM admins`)
+	adminByUID := make(map[string]bool)
+	if err == nil {
+		defer adminRows.Close()
+		for adminRows.Next() {
+			var uid string
+			if err := adminRows.Scan(&uid); err == nil {
+				adminByUID[uid] = true
+			}
+		}
+	}
+
+	for i := range paginatedSlice {
+		paginatedSlice[i].IsAdmin = adminByUID[paginatedSlice[i].UID]
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"users":   users,
+		"success":       true,
+		"users":         paginatedSlice,
+		"total":         len(allUsers),
+		"filteredTotal": totalFiltered,
+		"page":          page,
+		"pageSize":      limit,
+		"totalPages":    totalPages,
+		"batchCounts":   batchCounts,
 	})
 }
 func (h *AdminHandler) UpdateUsers(c *gin.Context) {
-	client, err := config.FirebaseAuthClient()
-	if err != nil || client == nil {
-		msg := "Failed to initialize Firebase auth"
-		if err != nil {
-			msg = "Failed to initialize Firebase auth: " + err.Error()
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": msg})
+	if err := h.syncFirebaseUsersToDB(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
-	iter := client.Users(context.Background(), "")
 
-	var users []models.User
-	var syncErr error
-	batchSize := 100
-
-	for {
-		u, err := iter.Next()
-		if err != nil {
-			break
-		}
-
-		users = append(users, models.User{
-			UID:            u.UID,
-			Email:          u.Email,
-			DisplayName:    u.DisplayName,
-			PhotoURL:       u.PhotoURL,
-			CreationTime:   utils.TsToString(u.UserMetadata.CreationTimestamp),
-			LastSignInTime: utils.TsToString(u.UserMetadata.LastLogInTimestamp),
-		})
-
-		// Upsert every 100 users
-		if len(users) >= batchSize {
-			if err := h.syncUsersToMySQL(users); err != nil {
-				syncErr = err
-				break
-			}
-			users = users[:0]
-		}
-	}
-
-	// Upsert any remaining users
-	if syncErr == nil && len(users) > 0 {
-		syncErr = h.syncUsersToMySQL(users)
-	}
-
-	if syncErr != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": syncErr.Error()})
-		return
-	}
+	var totalInDB int
+	_ = h.DB.QueryRow(`SELECT COUNT(*) FROM users`).Scan(&totalInDB)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": "Users synced successfully",
+		"message": fmt.Sprintf("Successfully synced all %d users from Firebase", totalInDB),
+		"total":   totalInDB,
 	})
 }
 
@@ -184,45 +306,9 @@ func (h *AdminHandler) syncUsersToMySQL(users []models.User) error {
 	return tx.Commit()
 }
 
-type userPresence struct {
-	LastSeenAt    string
-	LastUsedRoute string
-	IsOnline      bool
-}
-
 type userStatus struct {
 	IsBlocked bool
 	BlockedAt string
-}
-
-func (h *AdminHandler) loadUserPresenceMap() (map[string]userPresence, error) {
-	rows, err := h.DB.Query(`SELECT uid, last_seen_at, last_used_route FROM user_presence`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	result := make(map[string]userPresence)
-	for rows.Next() {
-		var uid string
-		var lastSeen sql.NullString
-		var lastUsedRoute sql.NullString
-		if err := rows.Scan(&uid, &lastSeen, &lastUsedRoute); err != nil {
-			return nil, err
-		}
-
-		presence := userPresence{}
-		if lastSeen.Valid {
-			presence.LastSeenAt = lastSeen.String
-			presence.IsOnline = isOnlineFromTimestamp(lastSeen.String)
-		}
-		if lastUsedRoute.Valid {
-			presence.LastUsedRoute = lastUsedRoute.String
-		}
-		result[uid] = presence
-	}
-
-	return result, nil
 }
 
 func (h *AdminHandler) loadUserStatusMap() (map[string]userStatus, error) {
@@ -250,30 +336,7 @@ func (h *AdminHandler) loadUserStatusMap() (map[string]userStatus, error) {
 	return result, nil
 }
 
-func isOnlineFromTimestamp(value string) bool {
-	if value == "" {
-		return false
-	}
 
-	parsed, err := time.Parse(time.RFC3339, value)
-	if err != nil {
-		return false
-	}
-
-	return time.Since(parsed) <= 2*time.Minute
-}
-
-func (h *AdminHandler) TouchUserPresence(uid, routeLabel string) error {
-	_, err := h.DB.Exec(`
-		INSERT INTO user_presence (uid, last_seen_at, last_used_route)
-		VALUES (?, ?, ?)
-		ON DUPLICATE KEY UPDATE last_seen_at = VALUES(last_seen_at), last_used_route = VALUES(last_used_route)`,
-		uid,
-		utils.TimeToString(time.Now()),
-		routeLabel,
-	)
-	return err
-}
 
 func (h *AdminHandler) UpdateUserBlockStatus(c *gin.Context) {
 	uid := strings.TrimSpace(c.Param("uid"))
@@ -374,6 +437,9 @@ func (h *AdminHandler) DeleteUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
+
+	_, _ = h.DB.Exec("DELETE FROM users WHERE uid = ?", uid)
+	_, _ = h.DB.Exec("DELETE FROM admins WHERE uid = ?", uid)
 
 	c.JSON(http.StatusOK, gin.H{"success": true})
 }

@@ -66,7 +66,6 @@ Powered by a modern **React 19** frontend and a robust **Go (Gin Framework)** ba
 - **PS Rewards & Leaderboards (`/admin/ps-rewards`)**: Syncs with Google Sheets API via OAuth 2.0 to showcase student performance rewards and rankings.
 
 ### 👤 Student Directory & Profile Reports
-- **User Directory (`/user-directory`)**: Searchable student and campus user database.
 - **Student Analytics Reports (`/student-report/:id`)**: Comprehensive individual student profile pages showing course enrollment, leave history, and academic engagement.
 
 ### ❤️ Developer Support & Patron Portal
@@ -319,7 +318,7 @@ In the `client/` directory, you can run:
 BIT-CENTRAL enforces strict multi-tier permissions:
 
 - 🔓 **Public Routes**: `/login`, `/landing`, `/privacy-policy`, `/terms`, `/about`, `/features`, `/faq`, `/contact`. Accessible without signing in.
-- 🔒 **Student Protected Routes**: `/home`, `/dashboard`, `/semester`, `/exam-hall`, `/mess`, `/leavedetails`, `/rpsite`, `/apsite`, `/pcdp`, `/findmyway`, `/user-directory`, `/student-report`. Requires active Firebase user authentication (`ProtectedRoute.jsx`).
+- 🔒 **Student Protected Routes**: `/home`, `/dashboard`, `/semester`, `/exam-hall`, `/mess`, `/leavedetails`, `/rpsite`, `/apsite`, `/pcdp`, `/findmyway`, `/student-report`. Requires active Firebase user authentication (`ProtectedRoute.jsx`).
 - 🛡️ **Admin Protected Routes**: `/admin`, `/admin/users`, `/admin/qb`, `/admin/cards`, `/admin/mess`, `/admin/ps-rewards`, `/admin/super`. Restricted to users matching administrative UID roles (`AdminRoute.jsx`).
 
 ---
