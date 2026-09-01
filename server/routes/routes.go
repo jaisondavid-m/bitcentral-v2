@@ -142,6 +142,7 @@ func SetupRouter(
 	{
 		admin.GET("/sponsors", sponsorsHandler.GetSponsorsAdmin)
 		admin.GET("/users", adminHandler.GetUsers)
+		admin.GET("/tracker-users", trackerUserHandler.GetTrackerUsersAdmin)
 		admin.GET("/users/update", adminHandler.UpdateUsers)
 		admin.PUT("/users/:uid/block", adminHandler.UpdateUserBlockStatus)
 		admin.DELETE("/users/:uid", adminHandler.DeleteUser)

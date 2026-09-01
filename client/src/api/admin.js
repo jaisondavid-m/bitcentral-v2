@@ -280,3 +280,28 @@ export async function getAdminSponsors({ count = 10, skip = 0 } = {}) {
   const response = await api.get(`/admin/sponsors?count=${count}&skip=${skip}`, { headers });
   return response.data;
 }
+
+export async function listTrackerUsers({ page = 1, limit = 25, search = "", batch = "", department = "" } = {}) {
+  const headers = await getAdminHeaders();
+  const params = new URLSearchParams();
+  if (page) params.set("page", page);
+  if (limit) params.set("limit", limit);
+  if (search) params.set("search", search);
+  if (batch) params.set("batch", batch);
+  if (department) params.set("department", department);
+
+  const response = await api.get(`/admin/tracker-users?${params.toString()}`, {
+    headers,
+  });
+
+  return {
+    success: response.data.success,
+    users: response.data.users || [],
+    total: response.data.total || 0,
+    filteredTotal: response.data.filteredTotal || 0,
+    page: response.data.page || 1,
+    pageSize: response.data.pageSize || 25,
+    totalPages: response.data.totalPages || 1,
+    batchCounts: response.data.batchCounts || {},
+  };
+}

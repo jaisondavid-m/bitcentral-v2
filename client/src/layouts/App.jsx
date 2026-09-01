@@ -52,6 +52,9 @@ const AdminDashboard = lazyWithRetry(() =>
 const AdminUsersPage = lazyWithRetry(() =>
   import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminUsersPage }))
 );
+const AdminUserDirectoryPage = lazyWithRetry(() =>
+  import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminUserDirectoryPage }))
+);
 const AdminSponsorsPage = lazyWithRetry(() =>
   import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminSponsorsPage }))
 );
@@ -193,6 +196,14 @@ function App() {
                 element={
                   <AdminRoute>
                     <AdminUsersPage />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/user-directory"
+                element={
+                  <AdminRoute>
+                    <AdminUserDirectoryPage />
                   </AdminRoute>
                 }
               />

@@ -25,6 +25,7 @@ import {
   addAdmin,
   removeAdmin,
   getAdminSponsors,
+  listTrackerUsers,
 } from "@/api/admin.js";
 import { MealCard } from "@/components/cards/MealCard.jsx";
 import {
@@ -61,6 +62,7 @@ import {
   ArrowLeft,
   ArrowRight,
   MessageSquare,
+  Contact,
 } from "lucide-react";
 import SuperAdminPanel from "./SuperAdminPanel.jsx";
 import AdminPSRewardsPage from "./AdminPSRewards.jsx";
@@ -215,6 +217,15 @@ const ADMIN_TABS = [
     description: "Chat directly with users to answer feedback, resolve issues, and send live status updates.",
   },
   {
+    key: "user-directory",
+    label: "User Directory",
+    href: "/admin/user-directory",
+    icon: Contact,
+    gradient: "from-indigo-600 to-cyan-600",
+    badge: "Tracker Users",
+    description: "Flexible search and view directory of tracker_users data (user_id, id, name, email, batch, phone, department).",
+  },
+  {
     key: "super",
     label: "Super Admin",
     href: "/admin/super",
@@ -227,6 +238,7 @@ const ADMIN_TABS = [
 
 function getAdminTabFromPath(pathname) {
   if (pathname === "/admin" || pathname === "/admin/") return "overview";
+  if (pathname.startsWith("/admin/user-directory")) return "user-directory";
   if (pathname.startsWith("/admin/sponsors")) return "sponsors";
   if (pathname.startsWith("/admin/qb")) return "qb";
   if (pathname.startsWith("/admin/ps-rewards")) return "ps";
@@ -1424,6 +1436,328 @@ function UsersSection({ isSuper }) {
           </>
         )}
       </div>
+    </section>
+  );
+}
+
+/* -- User Directory Section -------------------------------------------------- */
+function UserDirectorySection() {
+  const [users, setUsers] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [filteredTotal, setFilteredTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [totalPages, setTotalPages] = useState(1);
+  const [batchCounts, setBatchCounts] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [batchFilter, setBatchFilter] = useState("");
+  const [deptFilter, setDeptFilter] = useState("");
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [banner, setBanner] = useState({ type: "", message: "" });
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const loadUsers = useCallback(async () => {
+    setIsLoadingUsers(true);
+    setBanner({ type: "", message: "" });
+    try {
+      const result = await listTrackerUsers({
+        page,
+        limit: pageSize,
+        search: debouncedSearch,
+        batch: batchFilter,
+        department: deptFilter,
+      });
+      setUsers(result.users || []);
+      setTotal(result.total || 0);
+      setFilteredTotal(result.filteredTotal || 0);
+      setTotalPages(result.totalPages || 1);
+      setBatchCounts(result.batchCounts || {});
+    } catch (error) {
+      setUsers([]);
+      setBanner({ type: "error", message: normalizeError(error, "Failed to load user directory data") });
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  }, [page, pageSize, debouncedSearch, batchFilter, deptFilter]);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
+
+  const allowedBatches = ["2026-2030", "2025-2029", "2024-2028", "2023-2027", "2022-2026", "others"];
+
+  return (
+    <section className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-blue-900 dark:bg-slate-950">
+      {/* Section header */}
+      <div className="flex flex-col gap-3 border-b border-gray-100 p-4 dark:border-blue-900 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100">User Directory</h2>
+            <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+              {total.toLocaleString()} records
+            </span>
+          </div>
+          <p className="mt-0.5 text-sm text-gray-500 dark:text-slate-400">
+            Flexible search across tracker users data (user_id, id, name, email, batch, phone, department).
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={loadUsers}
+            disabled={isLoadingUsers}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60 sm:flex-none"
+          >
+            {isLoadingUsers ? <Loader className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            <span>{isLoadingUsers ? "Loading..." : "Refresh"}</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="p-4 sm:p-6">
+        {banner.message && (
+          <div className="mb-4">
+            <Banner banner={banner} onDismiss={() => setBanner({ type: "", message: "" })} />
+          </div>
+        )}
+
+        {/* Search Bar */}
+        <div className="mb-4 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50/70 px-3.5 py-2.5 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 dark:border-blue-900 dark:bg-slate-900 dark:focus-within:bg-slate-950">
+          <Search className="h-4 w-4 shrink-0 text-gray-400 dark:text-slate-500" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search flexible: user_id, tracker id, name, email, batch, phone, department..."
+            className="w-full bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400 dark:text-slate-100 dark:placeholder:text-slate-500"
+          />
+          {searchQuery && (
+            <button type="button" onClick={() => setSearchQuery("")} className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300">
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Table Content */}
+        {isLoadingUsers ? (
+          <div className="flex h-48 items-center justify-center">
+            <Loader className="h-6 w-6 animate-spin text-blue-600" />
+          </div>
+        ) : users.length === 0 ? (
+          <div className="flex h-36 flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 p-6 dark:border-slate-800">
+            <p className="text-sm font-semibold text-gray-600 dark:text-slate-300">No tracker users found</p>
+            <p className="mt-1 text-xs text-gray-400 dark:text-slate-500">Try adjusting your search terms or filter criteria.</p>
+          </div>
+        ) : (
+          <>
+            {/* Table */}
+            <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-blue-900/60">
+              <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-blue-900/60">
+                <thead className="bg-gray-50/80 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:bg-slate-900/80 dark:text-slate-400">
+                  <tr>
+                    <th className="px-4 py-3.5 text-left">#</th>
+                    <th className="px-4 py-3.5 text-left">User ID</th>
+                    <th className="px-4 py-3.5 text-left">ID</th>
+                    <th className="px-4 py-3.5 text-left">Name</th>
+                    <th className="px-4 py-3.5 text-left">Email</th>
+                    <th className="px-4 py-3.5 text-left">Batch</th>
+                    <th className="px-4 py-3.5 text-left">Phone</th>
+                    <th className="px-4 py-3.5 text-left">Department</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 bg-white dark:divide-blue-900/40 dark:bg-slate-950">
+                  {users.map((u, index) => {
+                    const rowNum = (page - 1) * pageSize + index + 1;
+                    return (
+                      <tr
+                        key={u.id || u.user_id || index}
+                        onClick={() => setSelectedUser(u)}
+                        className="cursor-pointer transition hover:bg-blue-50/50 dark:hover:bg-slate-900/60"
+                      >
+                        <td className="px-4 py-3.5 text-xs font-medium text-gray-400 dark:text-slate-500">{rowNum}</td>
+                        <td className="whitespace-nowrap px-4 py-3.5 text-xs font-mono font-bold text-blue-600 dark:text-blue-400">
+                          {u.user_id || "-"}
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-3.5 text-xs font-mono text-gray-600 dark:text-slate-300">
+                          {u.id || "-"}
+                        </td>
+                        <td className="px-4 py-3.5 font-semibold text-gray-900 dark:text-slate-100">
+                          {u.name || "-"}
+                        </td>
+                        <td className="px-4 py-3.5 text-xs text-gray-600 dark:text-slate-300">
+                          {u.email || "-"}
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-3.5 text-xs font-medium text-gray-700 dark:text-slate-300">
+                          {u.batch ? (
+                            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                              {u.batch}
+                            </span>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-3.5 text-xs font-mono text-gray-600 dark:text-slate-300">
+                          {u.phone || "-"}
+                        </td>
+                        <td className="px-4 py-3.5 text-xs text-gray-700 dark:text-slate-300">
+                          {u.department || "-"}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination Controls Footer */}
+            <div className="mt-4 flex flex-col gap-3 border-t border-gray-100 pt-4 dark:border-blue-900/50 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-slate-400">
+                <span>
+                  Showing{" "}
+                  <span className="font-semibold text-gray-800 dark:text-slate-200">
+                    {filteredTotal === 0 ? 0 : (page - 1) * pageSize + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-semibold text-gray-800 dark:text-slate-200">
+                    {Math.min(page * pageSize, filteredTotal)}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-semibold text-gray-800 dark:text-slate-200">
+                    {filteredTotal.toLocaleString()}
+                  </span>{" "}
+                  records {batchFilter || debouncedSearch || deptFilter ? `(filtered from ${total.toLocaleString()})` : ""}
+                </span>
+
+                <div className="flex items-center gap-1.5">
+                  <span className="text-gray-400">|</span>
+                  <span>Per page:</span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) => {
+                      setPageSize(Number(e.target.value));
+                      setPage(1);
+                    }}
+                    className="rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-semibold text-gray-700 outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                  >
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                    <option value={250}>250</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Page buttons */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1 || isLoadingUsers}
+                  className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                  <span>Previous</span>
+                </button>
+
+                <div className="flex items-center gap-1 px-2 text-xs font-bold text-gray-700 dark:text-slate-300">
+                  <span>Page {page}</span>
+                  <span className="font-normal text-gray-400">of</span>
+                  <span>{totalPages}</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages || isLoadingUsers}
+                  className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* User Details Modal */}
+      {selectedUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm" onClick={() => setSelectedUser(null)}>
+          <div
+            className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-950"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between border-b border-slate-100 pb-4 dark:border-slate-800">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  {selectedUser.name || "Tracker User Details"}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+                  User ID: {selectedUser.user_id || "-"}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedUser(null)}
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-900 dark:hover:text-slate-200"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="mt-4 space-y-3.5 text-sm">
+              <div className="grid grid-cols-3 gap-2 border-b border-slate-100 pb-2.5 dark:border-slate-900">
+                <span className="font-semibold text-slate-500 dark:text-slate-400">User ID</span>
+                <span className="col-span-2 font-mono font-bold text-blue-600 dark:text-blue-400">{selectedUser.user_id || "-"}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 border-b border-slate-100 pb-2.5 dark:border-slate-900">
+                <span className="font-semibold text-slate-500 dark:text-slate-400">Tracker ID</span>
+                <span className="col-span-2 font-mono text-slate-800 dark:text-slate-200">{selectedUser.id || "-"}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 border-b border-slate-100 pb-2.5 dark:border-slate-900">
+                <span className="font-semibold text-slate-500 dark:text-slate-400">Name</span>
+                <span className="col-span-2 font-semibold text-slate-900 dark:text-white">{selectedUser.name || "-"}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 border-b border-slate-100 pb-2.5 dark:border-slate-900">
+                <span className="font-semibold text-slate-500 dark:text-slate-400">Email</span>
+                <span className="col-span-2 text-slate-800 dark:text-slate-200">{selectedUser.email || "-"}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 border-b border-slate-100 pb-2.5 dark:border-slate-900">
+                <span className="font-semibold text-slate-500 dark:text-slate-400">Batch</span>
+                <span className="col-span-2 text-slate-800 dark:text-slate-200">{selectedUser.batch || "-"}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 border-b border-slate-100 pb-2.5 dark:border-slate-900">
+                <span className="font-semibold text-slate-500 dark:text-slate-400">Phone</span>
+                <span className="col-span-2 font-mono text-slate-800 dark:text-slate-200">{selectedUser.phone || "-"}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <span className="font-semibold text-slate-500 dark:text-slate-400">Department</span>
+                <span className="col-span-2 text-slate-800 dark:text-slate-200">{selectedUser.department || "-"}</span>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setSelectedUser(null)}
+                className="rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
@@ -3645,6 +3979,8 @@ function AdminDashboard({ initialTab } = {}) {
         <MessSection />
       ) : activeTab === "feedback" ? (
         <AdminFeedbackPage />
+      ) : activeTab === "user-directory" ? (
+        <UserDirectorySection />
       ) : activeTab === "super" ? (
         <SuperAdminPanel />
       ) : (
@@ -3656,6 +3992,10 @@ function AdminDashboard({ initialTab } = {}) {
 
 function AdminUsersPage() {
   return <AdminDashboard initialTab="users" />;
+}
+
+function AdminUserDirectoryPage() {
+  return <AdminDashboard initialTab="user-directory" />;
 }
 
 function AdminSponsorsPage() {
@@ -3684,6 +4024,7 @@ function AdminFeedbackPageRoute() {
 
 export {
   AdminUsersPage,
+  AdminUserDirectoryPage,
   AdminSponsorsPage,
   AdminQBPage,
   AdminPSRewardsPageRoute as AdminPSRewardsPage,
@@ -3691,4 +4032,4 @@ export {
   AdminMessPage,
   AdminFeedbackPageRoute as AdminFeedbackPage,
 };
-export default AdminDashboard;
+export default AdminDashboard;
