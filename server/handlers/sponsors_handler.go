@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"bitcentral-v2/server/config"
+	"server/config"
 
 	"github.com/gin-gonic/gin"
 )
