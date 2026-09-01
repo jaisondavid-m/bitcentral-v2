@@ -3,7 +3,9 @@ package handlers
 import (
 	"database/sql"
 	"fmt"
+	"math"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"server/config"
@@ -235,3 +237,157 @@ func (h *TrackerUserHandler) GetProfileV2(c *gin.Context) {
 		"data":    profile,
 	})
 }
+
+// GetTrackerUsersAdmin fetches tracker_users data with flexible search and pagination for admin view.
+// Excludes created_at and updated_at fields as requested.
+func (h *TrackerUserHandler) GetTrackerUsersAdmin(c *gin.Context) {
+	if h.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   "Database connection is not initialized",
+		})
+		return
+	}
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if page < 1 {
+		page = 1
+	}
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "25"))
+	if limit < 1 {
+		limit = 25
+	} else if limit > 500 {
+		limit = 500
+	}
+	offset := (page - 1) * limit
+
+	search := strings.TrimSpace(c.Query("search"))
+	batchFilter := strings.TrimSpace(c.Query("batch"))
+	deptFilter := strings.TrimSpace(c.Query("department"))
+
+	whereClauses := []string{"1=1"}
+	args := []interface{}{}
+
+	if search != "" {
+		sPattern := "%" + strings.ToLower(search) + "%"
+		whereClauses = append(whereClauses, `(
+			LOWER(COALESCE(user_id, '')) LIKE ? OR
+			LOWER(COALESCE(id, '')) LIKE ? OR
+			LOWER(COALESCE(name, '')) LIKE ? OR
+			LOWER(COALESCE(email, '')) LIKE ? OR
+			LOWER(COALESCE(batch, '')) LIKE ? OR
+			LOWER(COALESCE(phone, '')) LIKE ? OR
+			LOWER(COALESCE(department, '')) LIKE ?
+		)`)
+		args = append(args, sPattern, sPattern, sPattern, sPattern, sPattern, sPattern, sPattern)
+	}
+
+	if batchFilter != "" {
+		if strings.EqualFold(batchFilter, "others") {
+			whereClauses = append(whereClauses, "(batch IS NULL OR batch = '' OR batch = '-')")
+		} else {
+			whereClauses = append(whereClauses, "LOWER(COALESCE(batch, '')) = LOWER(?)")
+			args = append(args, batchFilter)
+		}
+	}
+
+	if deptFilter != "" {
+		whereClauses = append(whereClauses, "LOWER(COALESCE(department, '')) LIKE LOWER(?)")
+		args = append(args, "%"+deptFilter+"%")
+	}
+
+	whereSQL := strings.Join(whereClauses, " AND ")
+
+	var total int
+	_ = h.DB.QueryRow("SELECT COUNT(*) FROM tracker_users").Scan(&total)
+
+	var filteredTotal int
+	countQuery := "SELECT COUNT(*) FROM tracker_users WHERE " + whereSQL
+	if err := h.DB.QueryRow(countQuery, args...).Scan(&filteredTotal); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   "Failed to count tracker users: " + err.Error(),
+		})
+		return
+	}
+
+	selectQuery := fmt.Sprintf(`
+		SELECT 
+			COALESCE(user_id, ''),
+			COALESCE(id, ''),
+			COALESCE(name, ''),
+			COALESCE(email, ''),
+			COALESCE(batch, ''),
+			COALESCE(phone, ''),
+			COALESCE(department, '')
+		FROM tracker_users
+		WHERE %s
+		ORDER BY name ASC, user_id ASC
+		LIMIT ? OFFSET ?
+	`, whereSQL)
+
+	selectArgs := append(args, limit, offset)
+
+	rows, err := h.DB.Query(selectQuery, selectArgs...)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   "Failed to query tracker users: " + err.Error(),
+		})
+		return
+	}
+	defer rows.Close()
+
+	type TrackerUserItem struct {
+		UserID     string `json:"user_id"`
+		ID         string `json:"id"`
+		Name       string `json:"name"`
+		Email      string `json:"email"`
+		Batch      string `json:"batch"`
+		Phone      string `json:"phone"`
+		Department string `json:"department"`
+	}
+
+	users := make([]TrackerUserItem, 0)
+	for rows.Next() {
+		var u TrackerUserItem
+		if err := rows.Scan(&u.UserID, &u.ID, &u.Name, &u.Email, &u.Batch, &u.Phone, &u.Department); err == nil {
+			users = append(users, u)
+		}
+	}
+
+	batchCounts := make(map[string]int)
+	bRows, bErr := h.DB.Query("SELECT COALESCE(batch, ''), COUNT(*) FROM tracker_users GROUP BY batch")
+	if bErr == nil {
+		defer bRows.Close()
+		for bRows.Next() {
+			var bName string
+			var cnt int
+			if err := bRows.Scan(&bName, &cnt); err == nil {
+				bName = strings.TrimSpace(bName)
+				if bName == "" || bName == "-" {
+					batchCounts["others"] += cnt
+				} else {
+					batchCounts[bName] += cnt
+				}
+			}
+		}
+	}
+
+	totalPages := int(math.Ceil(float64(filteredTotal) / float64(limit)))
+	if totalPages < 1 {
+		totalPages = 1
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success":       true,
+		"users":         users,
+		"total":         total,
+		"filteredTotal": filteredTotal,
+		"page":          page,
+		"pageSize":      limit,
+		"totalPages":    totalPages,
+		"batchCounts":   batchCounts,
+	})
+}
+
