@@ -24,7 +24,7 @@ import { FaHandHoldingHeart } from "react-icons/fa6";
 import { auth, logout } from "@/config/firebase.js";
 import { useAuth } from "@/context/StudentContext.jsx";
 import { getSponsorsLeaderboard, getMeProfile, checkUserContribution, createSponsorOrder, captureSponsorPayment } from "@/api/axios.js";
-import { processLeaderboardData } from "@/utils/sponsorUtils.js";
+import { processLeaderboardData, isCurrentUserSponsor } from "@/utils/sponsorUtils.js";
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -580,12 +580,11 @@ export default function SupportDev() {
                   /* Real Donors List */
                   leaderboard.sponsors.slice(0, 10).map((sponsor, idx) => {
                     const rank = idx + 1;
-                    const isCurrentUser = Boolean(
-                      userContribution?.found &&
-                      userContribution?.name &&
-                      sponsor?.name &&
-                      userContribution.name.trim().toLowerCase() === sponsor.name.trim().toLowerCase() &&
-                      Number(userContribution.amount) === Number(sponsor.amount)
+                    const isCurrentUser = isCurrentUserSponsor(
+                      userContribution,
+                      sponsor,
+                      donorEmail || user?.email,
+                      donorPhone
                     );
 
                     let rowStyle = "border border-slate-100 bg-slate-50/50 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950/60 dark:hover:bg-slate-950";

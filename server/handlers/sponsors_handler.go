@@ -330,6 +330,7 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 							"name":   displayName,
 							"amount": donor.Amount,
 							"date":   donor.LatestDate,
+							"email":  donor.Email,
 						})
 					}
 
@@ -781,13 +782,49 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 		}
 		certID := fmt.Sprintf("BIT-PATRON-%d", hVal)
 
+		overridesMap := getOverridesMap()
+		displayName := matchedDonor.Name
+		if custom, ok := overridesMap[matchedDonor.Key]; ok && custom != "" {
+			displayName = custom
+		} else {
+			if searchPhoneDigits != "" {
+				if custom, ok := overridesMap["phone_"+searchPhoneDigits]; ok && custom != "" {
+					displayName = custom
+				}
+			}
+			if searchEmail != "" {
+				if custom, ok := overridesMap["email_"+searchEmail]; ok && custom != "" {
+					displayName = custom
+				}
+			}
+		}
+
+		matchedEmail := searchEmail
+		if matchedEmail == "" {
+			for e := range matchedDonor.Emails {
+				matchedEmail = e
+				break
+			}
+		}
+
+		matchedPhone := searchPhoneDigits
+		if matchedPhone == "" {
+			for p := range matchedDonor.Phones {
+				matchedPhone = p
+				break
+			}
+		}
+
 		c.JSON(http.StatusOK, gin.H{
 			"success":          true,
 			"found":            true,
 			"amount":           matchedDonor.Amount,
 			"rank":             matchedRank,
 			"total_supporters": len(donorList),
-			"name":             matchedDonor.Name,
+			"name":             displayName,
+			"email":            matchedEmail,
+			"phone":            matchedPhone,
+			"donor_key":        matchedDonor.Key,
 			"is_top_10":        matchedRank <= 10,
 			"certificate_id":   certID,
 		})
