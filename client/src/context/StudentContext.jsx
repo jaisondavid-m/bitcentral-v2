@@ -2,10 +2,8 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import { useLocation } from "react-router-dom";
 import { auth } from "@/config/firebase.js";
 import { onAuthStateChanged } from "firebase/auth";
-import { pingPresence } from "@/api/presence.js";
 import { getMeProfile } from "@/api/axios.js";
 import { logout } from "@/config/firebase.js";
-import { PING_ON } from "@/config/runtimeFlags.js";
 import {
   clearGuestSession,
   createGuestStudent,
@@ -232,41 +230,7 @@ export const StudentContext = ({ children }) => {
     };
   }, []);
 
-  useEffect(() => {
-    if (!PING_ON || !user || typeof user.getIdToken !== "function") {
-      return undefined;
-    }
 
-    let cancelled = false;
-
-    const sendPresencePing = async () => {
-      try {
-        if (cancelled) return;
-        await pingPresence(user, currentRouteLabel);
-      } catch (error) {
-        if (!cancelled) {
-          console.error("Failed to update presence", error);
-        }
-      }
-    };
-
-    sendPresencePing();
-    const intervalId = window.setInterval(sendPresencePing, 30000);
-
-    const handleFocus = () => {
-      sendPresencePing();
-    };
-
-    window.addEventListener("focus", handleFocus);
-    document.addEventListener("visibilitychange", handleFocus);
-
-    return () => {
-      cancelled = true;
-      window.clearInterval(intervalId);
-      window.removeEventListener("focus", handleFocus);
-      document.removeEventListener("visibilitychange", handleFocus);
-    };
-  }, [user?.uid, currentRouteLabel]);
 
   return (
     <AuthContext.Provider value={{ user, student, profile, loading, accessDeniedMessage, setAccessDeniedMessage }}>

@@ -16,15 +16,27 @@ async function getAdminHeaders() {
   };
 }
 
-export async function listAdminUsers() {
+export async function listAdminUsers({ page = 1, limit = 25, search = "", batch = "" } = {}) {
   const headers = await getAdminHeaders();
-  const response = await api.get("/admin/users", {
+  const params = new URLSearchParams();
+  if (page) params.set("page", page);
+  if (limit) params.set("limit", limit);
+  if (search) params.set("search", search);
+  if (batch) params.set("batch", batch);
+
+  const response = await api.get(`/admin/users?${params.toString()}`, {
     headers,
   });
 
   return {
     success: response.data.success,
     users: response.data.users || [],
+    total: response.data.total || 0,
+    filteredTotal: response.data.filteredTotal || 0,
+    page: response.data.page || 1,
+    pageSize: response.data.pageSize || 25,
+    totalPages: response.data.totalPages || 1,
+    batchCounts: response.data.batchCounts || {},
   };
 }
 

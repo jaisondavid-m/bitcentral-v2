@@ -15,7 +15,6 @@ func SetupRouter(
 	cardHandler *handlers.CardHandler,
 	semesterHandler *handlers.SemesterHandler,
 	adminHandler *handlers.AdminHandler,
-	presenceHandler *handlers.PresenceHandler,
 	messHandler *handlers.MessHandler,
 	leaderboardHandler *handlers.LeaderboardHandler,
 	leaveHandler *handlers.LeaveHandler,
@@ -25,7 +24,6 @@ func SetupRouter(
 	uploadHandler *handlers.UploadHandler,
 	trackerUserHandler *handlers.TrackerUserHandler,
 	sponsorsHandler *handlers.SponsorsHandler,
-	academicHandler *handlers.AcademicHandler,
 	feedbackHandler *handlers.FeedbackHandler,
 ) *gin.Engine {
 
@@ -110,20 +108,10 @@ func SetupRouter(
 		api.GET("/ps/assessments", adminHandler.FetchAssessmentDetails)
 		api.GET("/ps/points", adminHandler.FetchPointsDetails)
 		api.GET("/ps/biometrics", adminHandler.FetchBiometricDetails)
-		api.GET("/tracker-users", trackerUserHandler.GetTrackerUsers)
 		api.GET("/v2/profile", trackerUserHandler.GetProfileV2)
 		api.GET("/profile/v2", trackerUserHandler.GetProfileV2)
 
 		api.GET("/top10", leaderboardHandler.GetTop10Students)
-
-		// Student Read-only Academic API
-		api.GET("/academic/options", academicHandler.GetAcademicOptions)
-		api.GET("/academic/departments", academicHandler.ListDepartments)
-		api.GET("/academic/regulations", academicHandler.ListRegulations)
-		api.GET("/academic/batches", academicHandler.ListBatches)
-		api.GET("/academic/semesters", academicHandler.ListSemesters)
-		api.GET("/academic/courses", academicHandler.ListCourses)
-		api.GET("/academic/courses/:id/content", academicHandler.GetCourseContent)
 
 		// Feedback Chat User API
 		api.POST("/feedback/messages", feedbackHandler.SendMessage)
@@ -182,55 +170,6 @@ func SetupRouter(
 		admin.PUT("/cards/reorder", handlers.ReorderCards)
 		admin.DELETE("/cards/:id", handlers.DeleteCard)
 
-		// Academic Management Admin CRUD
-		admin.GET("/academic/options", academicHandler.GetAcademicOptions)
-
-		admin.GET("/academic/departments", academicHandler.ListDepartments)
-		admin.POST("/academic/departments", academicHandler.CreateDepartment)
-		admin.PUT("/academic/departments/:id", academicHandler.UpdateDepartment)
-		admin.PUT("/academic/departments/:id/current-semester", academicHandler.SetDepartmentCurrentSemester)
-		admin.DELETE("/academic/departments/:id", academicHandler.DeleteDepartment)
-
-		admin.GET("/academic/regulations", academicHandler.ListRegulations)
-		admin.POST("/academic/regulations", academicHandler.CreateRegulation)
-		admin.PUT("/academic/regulations/:id", academicHandler.UpdateRegulation)
-		admin.DELETE("/academic/regulations/:id", academicHandler.DeleteRegulation)
-
-		admin.GET("/academic/batches", academicHandler.ListBatches)
-		admin.POST("/academic/batches", academicHandler.CreateBatch)
-		admin.PUT("/academic/batches/:id", academicHandler.UpdateBatch)
-		admin.DELETE("/academic/batches/:id", academicHandler.DeleteBatch)
-
-		admin.GET("/academic/semesters", academicHandler.ListSemesters)
-		admin.POST("/academic/semesters", academicHandler.CreateSemester)
-		admin.PUT("/academic/semesters/:id", academicHandler.UpdateSemester)
-		admin.DELETE("/academic/semesters/:id", academicHandler.DeleteSemester)
-
-		admin.GET("/academic/courses", academicHandler.ListCourses)
-		admin.POST("/academic/courses", academicHandler.CreateCourse)
-		admin.POST("/academic/courses/bulk-upload", academicHandler.BulkUploadCourses)
-		admin.PUT("/academic/courses/:id", academicHandler.UpdateCourse)
-		admin.DELETE("/academic/courses/:id", academicHandler.DeleteCourse)
-
-		// Materials (PDF Only)
-		admin.GET("/academic/materials", academicHandler.ListMaterials)
-		admin.POST("/academic/materials", academicHandler.CreateMaterial)
-		admin.PUT("/academic/materials/:id", academicHandler.UpdateMaterial)
-		admin.DELETE("/academic/materials/:id", academicHandler.DeleteMaterial)
-
-		// Exams & Schedules
-		admin.GET("/academic/exams", academicHandler.ListExams)
-		admin.POST("/academic/exams", academicHandler.CreateExam)
-		admin.PUT("/academic/exams/:id", academicHandler.UpdateExam)
-		admin.DELETE("/academic/exams/:id", academicHandler.DeleteExam)
-		admin.POST("/academic/exam-schedules", academicHandler.AddExamSchedule)
-		admin.DELETE("/academic/exam-schedules/:id", academicHandler.DeleteExamSchedule)
-
-		// Question Banks (PDF Only)
-		admin.GET("/academic/question-papers", academicHandler.ListQuestionPapers)
-		admin.POST("/academic/question-papers", academicHandler.CreateQuestionPaper)
-		admin.DELETE("/academic/question-papers/:id", academicHandler.DeleteQuestionPaper)
-
 		// Feedback Chat Admin API
 		admin.GET("/feedback/conversations", feedbackHandler.GetAdminConversations)
 		admin.GET("/feedback/messages/:user_uid", feedbackHandler.GetAdminUserMessages)
@@ -249,8 +188,6 @@ func SetupRouter(
 		super.POST("/allowed", adminHandler.AddAllowed)
 		super.DELETE("/allowed/:id", adminHandler.RemoveAllowed)
 	}
-
-	r.POST("/presence/ping", presenceHandler.Ping)
 
 	return r
 }

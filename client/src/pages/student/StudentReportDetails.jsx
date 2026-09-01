@@ -183,13 +183,13 @@ export default function StudentReportDetails() {
         <ShieldAlert className="w-12 h-12 text-amber-500" />
         <h2 className="text-xl font-bold text-slate-800">No Student ID Provided</h2>
         <p className="text-xs sm:text-sm text-slate-500 max-w-md">
-          Please select a valid student card from the User Directory page or provide a valid student ID in the URL.
+          Please provide a valid student ID in the URL.
         </p>
         <button
-          onClick={() => navigate("/user-directory")}
+          onClick={() => navigate(-1)}
           className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-xs transition-all shadow-md"
         >
-          Back to User Directory
+          Go Back
         </button>
       </div>
     );
@@ -211,17 +211,17 @@ export default function StudentReportDetails() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate("/user-directory")}
+              onClick={() => navigate(-1)}
               className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all border border-slate-200/60"
-              title="Back to User Directory"
+              title="Go Back"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
 
             <div>
               <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-                <span className="hover:underline cursor-pointer" onClick={() => navigate("/user-directory")}>
-                  User Directory
+                <span className="hover:underline cursor-pointer" onClick={() => navigate(-1)}>
+                  Back
                 </span>
                 <ChevronRight className="w-3 h-3 text-slate-400" />
                 <span className="text-blue-600 font-semibold">Student Detailed Report</span>
@@ -278,10 +278,10 @@ export default function StudentReportDetails() {
                 Retry Request
               </button>
               <button
-                onClick={() => navigate("/user-directory")}
+                onClick={() => navigate(-1)}
                 className="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition-all"
               >
-                Back to User Directory
+                Go Back
               </button>
             </div>
           </div>

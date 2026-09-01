@@ -39,7 +39,6 @@ func main() {
 	cardHandler := handlers.NewCardHandler()
 	semesterHandler := handlers.NewSemesterHandler()
 	adminHandler := handlers.NewAdminHandler()
-	presenceHandler := handlers.NewPresenceHandler(adminHandler)
 	examHallHandler := handlers.NewExamHallHandler()
 	messHandler := handlers.NewMessHandler()
 	leaderboardHandler := handlers.NewLeaderboardHandler(sheetHandler)
@@ -49,7 +48,6 @@ func main() {
 	uploadHandler := handlers.NewUploadHandler()
 	trackerUserHandler := handlers.NewTrackerUserHandler()
 	sponsorsHandler := handlers.NewSponsorsHandler()
-	academicHandler := handlers.NewAcademicHandler()
 	feedbackHandler := handlers.NewFeedbackHandler()
 
 	r := routes.SetupRouter(
@@ -57,7 +55,6 @@ func main() {
 		cardHandler,
 		semesterHandler,
 		adminHandler,
-		presenceHandler,
 		messHandler,
 		leaderboardHandler,
 		leaveHandler,
@@ -67,7 +64,6 @@ func main() {
 		uploadHandler,
 		trackerUserHandler,
 		sponsorsHandler,
-		academicHandler,
 		feedbackHandler,
 	)
 	r.Static("/pdfs", "./pdfs")
