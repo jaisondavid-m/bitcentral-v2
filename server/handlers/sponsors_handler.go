@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"bitcentral-v2/server/config"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -174,10 +176,49 @@ func cleanPhone(phone string) string {
 	return s
 }
 
+func getOverridesMap() map[string]string {
+	overrides := make(map[string]string)
+	if config.DB == nil {
+		return overrides
+	}
+	rows, err := config.DB.Query("SELECT donor_key, custom_name, COALESCE(email, ''), COALESCE(phone, '') FROM sponsor_name_overrides")
+	if err != nil {
+		return overrides
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var key, customName, email, phone string
+		if err := rows.Scan(&key, &customName, &email, &phone); err == nil {
+			customName = strings.TrimSpace(customName)
+			if customName != "" {
+				if key != "" {
+					overrides[key] = customName
+				}
+				if phone != "" {
+					pDigits := cleanPhone(phone)
+					if pDigits != "" {
+						overrides["phone_"+pDigits] = customName
+					}
+				}
+				if email != "" {
+					overrides["email_"+strings.ToLower(strings.TrimSpace(email))] = customName
+				}
+			}
+		}
+	}
+	return overrides
+}
+
 type AggregatedDonor struct {
-	Name       string  `json:"name"`
-	Amount     float64 `json:"amount"`
-	LatestDate string  `json:"date"`
+	DonorKey     string  `json:"donor_key"`
+	Name         string  `json:"name"`
+	OriginalName string  `json:"original_name"`
+	Email        string  `json:"email"`
+	Phone        string  `json:"phone"`
+	PhoneDigits  string  `json:"phone_digits"`
+	Amount       float64 `json:"amount"`
+	LatestDate   string  `json:"date"`
 }
 
 // GetSponsorsLeaderboard returns real public leaderboard for Support Dev page
@@ -187,6 +228,7 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 
 	var sponsors []gin.H
 	var total float64
+	overridesMap := getOverridesMap()
 
 	if keyID != "" && keySecret != "" {
 		url := "https://api.razorpay.com/v1/payments?count=100"
@@ -247,22 +289,45 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 							if itemDate > existing.LatestDate {
 								existing.LatestDate = itemDate
 							}
-							// Keep longer or non-anonymous name if available
-							if len(donorName) > len(existing.Name) && donorName != "Anonymous BITSian" {
-								existing.Name = donorName
+							if len(donorName) > len(existing.OriginalName) && donorName != "Anonymous BITSian" {
+								existing.OriginalName = donorName
+							}
+							if existing.Email == "" && email != "" {
+								existing.Email = email
+							}
+							if existing.Phone == "" && phone != "" {
+								existing.Phone = phone
 							}
 						} else {
 							aggregatedMap[normKey] = &AggregatedDonor{
-								Name:       donorName,
-								Amount:     amt,
-								LatestDate: itemDate,
+								DonorKey:     normKey,
+								Name:         donorName,
+								OriginalName: donorName,
+								Email:        email,
+								Phone:        phone,
+								PhoneDigits:  phoneDigits,
+								Amount:       amt,
+								LatestDate:   itemDate,
 							}
 						}
 					}
 
-					for _, donor := range aggregatedMap {
+					for key, donor := range aggregatedMap {
+						displayName := donor.OriginalName
+						if custom, ok := overridesMap[key]; ok && custom != "" {
+							displayName = custom
+						} else if donor.PhoneDigits != "" {
+							if custom, ok := overridesMap["phone_"+donor.PhoneDigits]; ok && custom != "" {
+								displayName = custom
+							}
+						} else if donor.Email != "" {
+							if custom, ok := overridesMap["email_"+strings.ToLower(strings.TrimSpace(donor.Email))]; ok && custom != "" {
+								displayName = custom
+							}
+						}
+
 						sponsors = append(sponsors, gin.H{
-							"name":   donor.Name,
+							"name":   displayName,
 							"amount": donor.Amount,
 							"date":   donor.LatestDate,
 						})
@@ -293,6 +358,238 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 		"total_raised":     total,
 		"total_supporters": len(sponsors),
 		"sponsors":         sponsors,
+	})
+}
+
+// GetSponsorsLeaderboardAdmin returns detailed leaderboard data for admin review with override state
+func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
+	keyID := os.Getenv("RAZORPAY_KEY_ID")
+	keySecret := os.Getenv("RAZORPAY_KEY_SECRET")
+
+	var leaderboard []gin.H
+	overridesMap := getOverridesMap()
+
+	if keyID != "" && keySecret != "" {
+		url := "https://api.razorpay.com/v1/payments?count=100"
+		req, err := http.NewRequest("GET", url, nil)
+		if err == nil {
+			req.SetBasicAuth(keyID, keySecret)
+			client := &http.Client{Timeout: 10 * time.Second}
+			resp, err := client.Do(req)
+			if err == nil && resp.StatusCode == http.StatusOK {
+				defer resp.Body.Close()
+				body, _ := io.ReadAll(resp.Body)
+
+				var rzpRes RazorpayPaymentsResponse
+				if err := json.Unmarshal(body, &rzpRes); err == nil {
+					aggregatedMap := make(map[string]*AggregatedDonor)
+
+					for _, item := range rzpRes.Items {
+						st := strings.ToLower(item.Status)
+						if st != "captured" && st != "authorized" {
+							continue
+						}
+
+						amt := float64(item.Amount) / 100.0
+						if item.AmountPaid > 0 {
+							amt = float64(item.AmountPaid) / 100.0
+						}
+
+						email := item.Email
+						phone := item.Contact
+						if item.Notes != nil {
+							if e, ok := item.Notes["email"].(string); ok && e != "" {
+								email = e
+							}
+							if p, ok := item.Notes["phone"].(string); ok && p != "" {
+								phone = p
+							} else if p, ok := item.Notes["contact"].(string); ok && p != "" {
+								phone = p
+							}
+						}
+
+						donorName := extractName(item.Notes, email)
+						phoneDigits := cleanPhone(phone)
+
+						var normKey string
+						if phoneDigits != "" {
+							normKey = "phone_" + phoneDigits
+						} else if strings.TrimSpace(email) != "" {
+							normKey = "email_" + strings.ToLower(strings.TrimSpace(email))
+						} else {
+							normKey = "name_" + strings.ToLower(strings.TrimSpace(donorName))
+						}
+
+						itemDate := time.Unix(item.CreatedAt, 0).Format("2006-01-02")
+
+						if existing, found := aggregatedMap[normKey]; found {
+							existing.Amount += amt
+							if itemDate > existing.LatestDate {
+								existing.LatestDate = itemDate
+							}
+							if len(donorName) > len(existing.OriginalName) && donorName != "Anonymous BITSian" {
+								existing.OriginalName = donorName
+							}
+							if existing.Email == "" && email != "" {
+								existing.Email = email
+							}
+							if existing.Phone == "" && phone != "" {
+								existing.Phone = phone
+							}
+						} else {
+							aggregatedMap[normKey] = &AggregatedDonor{
+								DonorKey:     normKey,
+								Name:         donorName,
+								OriginalName: donorName,
+								Email:        email,
+								Phone:        phone,
+								PhoneDigits:  phoneDigits,
+								Amount:       amt,
+								LatestDate:   itemDate,
+							}
+						}
+					}
+
+					for key, donor := range aggregatedMap {
+						customName := ""
+						isOverridden := false
+						if custom, ok := overridesMap[key]; ok && custom != "" {
+							customName = custom
+							isOverridden = true
+						} else if donor.PhoneDigits != "" {
+							if custom, ok := overridesMap["phone_"+donor.PhoneDigits]; ok && custom != "" {
+								customName = custom
+								isOverridden = true
+							}
+						} else if donor.Email != "" {
+							if custom, ok := overridesMap["email_"+strings.ToLower(strings.TrimSpace(donor.Email))]; ok && custom != "" {
+								customName = custom
+								isOverridden = true
+							}
+						}
+
+						displayName := donor.OriginalName
+						if isOverridden && customName != "" {
+							displayName = customName
+						}
+
+						leaderboard = append(leaderboard, gin.H{
+							"donor_key":     key,
+							"display_name":  displayName,
+							"original_name": donor.OriginalName,
+							"custom_name":   customName,
+							"is_overridden": isOverridden,
+							"email":         donor.Email,
+							"phone":         donor.Phone,
+							"amount":        donor.Amount,
+							"date":          donor.LatestDate,
+						})
+					}
+
+					sort.Slice(leaderboard, func(i, j int) bool {
+						amtI, _ := leaderboard[i]["amount"].(float64)
+						amtJ, _ := leaderboard[j]["amount"].(float64)
+						if amtI != amtJ {
+							return amtI > amtJ
+						}
+						dateI, _ := leaderboard[i]["date"].(string)
+						dateJ, _ := leaderboard[j]["date"].(string)
+						if dateI != dateJ {
+							return dateI > dateJ
+						}
+						nameI, _ := leaderboard[i]["display_name"].(string)
+						nameJ, _ := leaderboard[j]["display_name"].(string)
+						return strings.ToLower(nameI) < strings.ToLower(nameJ)
+					})
+				}
+			}
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success":     true,
+		"leaderboard": leaderboard,
+	})
+}
+
+type UpdateSponsorNameOverrideRequest struct {
+	DonorKey   string `json:"donor_key"`
+	CustomName string `json:"custom_name"`
+	Email      string `json:"email"`
+	Phone      string `json:"phone"`
+}
+
+// UpdateSponsorNameOverride allows admin to change how a donor's name appears on the leaderboard
+func (h *SponsorsHandler) UpdateSponsorNameOverride(c *gin.Context) {
+	var req UpdateSponsorNameOverrideRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid request payload"})
+		return
+	}
+
+	donorKey := strings.TrimSpace(req.DonorKey)
+	customName := strings.TrimSpace(req.CustomName)
+	if donorKey == "" || customName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "donor_key and custom_name are required"})
+		return
+	}
+
+	if config.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Database connection not available"})
+		return
+	}
+
+	query := `
+		INSERT INTO sponsor_name_overrides (donor_key, custom_name, email, phone)
+		VALUES (?, ?, ?, ?)
+		ON DUPLICATE KEY UPDATE
+			custom_name = VALUES(custom_name),
+			email = VALUES(email),
+			phone = VALUES(phone);
+	`
+
+	_, err := config.DB.Exec(query, donorKey, customName, strings.TrimSpace(req.Email), strings.TrimSpace(req.Phone))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to update name override: %v", err)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Donor leaderboard display name updated successfully",
+	})
+}
+
+// DeleteSponsorNameOverride resets a donor's leaderboard display name back to original
+func (h *SponsorsHandler) DeleteSponsorNameOverride(c *gin.Context) {
+	donorKey := strings.TrimSpace(c.Query("donor_key"))
+	if donorKey == "" {
+		var req struct {
+			DonorKey string `json:"donor_key"`
+		}
+		c.ShouldBindJSON(&req)
+		donorKey = strings.TrimSpace(req.DonorKey)
+	}
+
+	if donorKey == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "donor_key is required"})
+		return
+	}
+
+	if config.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Database connection not available"})
+		return
+	}
+
+	_, err := config.DB.Exec("DELETE FROM sponsor_name_overrides WHERE donor_key = ?", donorKey)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to reset name override: %v", err)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Donor leaderboard display name reset to original",
 	})
 }
 

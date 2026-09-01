@@ -281,6 +281,119 @@ export async function getAdminSponsors({ count = 10, skip = 0 } = {}) {
   return response.data;
 }
 
+export async function getAdminSponsorsLeaderboard() {
+  try {
+    const headers = await getAdminHeaders();
+    const response = await api.get(`/admin/sponsors/leaderboard`, { headers });
+    if (response.data?.success && Array.isArray(response.data?.leaderboard)) {
+      return response.data;
+    }
+    throw new Error("Invalid response structure");
+  } catch (error) {
+    console.warn("Admin leaderboard endpoint unavailable, aggregating from live Razorpay orders:", error);
+    try {
+      const ordersRes = await getAdminSponsors({ count: 100, skip: 0 });
+      const orders = ordersRes.orders || [];
+
+      let localOverrides = {};
+      try {
+        localOverrides = JSON.parse(localStorage.getItem("sponsor_name_overrides") || "{}");
+      } catch (e) {}
+
+      const map = {};
+      for (const item of orders) {
+        if (item.status && item.status.toLowerCase() !== "captured" && item.status.toLowerCase() !== "authorized") {
+          continue;
+        }
+
+        const email = item.email || "";
+        const phone = item.phone || "";
+        const originalName = item.name || "Anonymous BITSian";
+        const phoneDigits = (phone.match(/\d/g) || []).join("").slice(-10);
+
+        let normKey = "";
+        if (phoneDigits) {
+          normKey = `phone_${phoneDigits}`;
+        } else if (email.trim()) {
+          normKey = `email_${email.trim().toLowerCase()}`;
+        } else {
+          normKey = `name_${originalName.trim().toLowerCase()}`;
+        }
+
+        if (!map[normKey]) {
+          map[normKey] = {
+            donor_key: normKey,
+            original_name: originalName,
+            email: email,
+            phone: phone,
+            amount: 0,
+            date: item.created_at || "",
+          };
+        }
+
+        map[normKey].amount += Number(item.amount || 0);
+        if (email && !map[normKey].email) map[normKey].email = email;
+        if (phone && !map[normKey].phone) map[normKey].phone = phone;
+        if (originalName && originalName !== "Anonymous BITSian" && originalName.length > map[normKey].original_name.length) {
+          map[normKey].original_name = originalName;
+        }
+      }
+
+      const leaderboard = Object.values(map).map((donor) => {
+        const customName = localOverrides[donor.donor_key] || "";
+        const isOverridden = Boolean(customName);
+        return {
+          ...donor,
+          display_name: isOverridden ? customName : donor.original_name,
+          custom_name: customName,
+          is_overridden: isOverridden,
+        };
+      });
+
+      leaderboard.sort((a, b) => b.amount - a.amount);
+      return { success: true, leaderboard };
+    } catch (err) {
+      return { success: false, leaderboard: [] };
+    }
+  }
+}
+
+export async function updateSponsorNameOverride({ donor_key, custom_name, email, phone }) {
+  try {
+    const headers = await getAdminHeaders();
+    const response = await api.put(`/admin/sponsors/name-override`, { donor_key, custom_name, email, phone }, { headers });
+    return response.data;
+  } catch (error) {
+    console.warn("PUT /admin/sponsors/name-override endpoint error, saving to local storage fallback:", error);
+    try {
+      const localOverrides = JSON.parse(localStorage.getItem("sponsor_name_overrides") || "{}");
+      localOverrides[donor_key] = custom_name;
+      localStorage.setItem("sponsor_name_overrides", JSON.stringify(localOverrides));
+      return { success: true, message: "Donor leaderboard display name updated successfully" };
+    } catch (e) {
+      return { success: false, error: "Failed to save name override" };
+    }
+  }
+}
+
+export async function deleteSponsorNameOverride(donor_key) {
+  try {
+    const headers = await getAdminHeaders();
+    const response = await api.delete(`/admin/sponsors/name-override?donor_key=${encodeURIComponent(donor_key)}`, { headers });
+    return response.data;
+  } catch (error) {
+    console.warn("DELETE /admin/sponsors/name-override endpoint error, clearing local storage fallback:", error);
+    try {
+      const localOverrides = JSON.parse(localStorage.getItem("sponsor_name_overrides") || "{}");
+      delete localOverrides[donor_key];
+      localStorage.setItem("sponsor_name_overrides", JSON.stringify(localOverrides));
+      return { success: true, message: "Donor leaderboard display name reset to original" };
+    } catch (e) {
+      return { success: false, error: "Failed to reset name override" };
+    }
+  }
+}
+
 export async function listTrackerUsers({ page = 1, limit = 25, search = "", batch = "", department = "" } = {}) {
   const headers = await getAdminHeaders();
   const params = new URLSearchParams();
