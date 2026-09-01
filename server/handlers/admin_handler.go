@@ -72,6 +72,11 @@ func (h *AdminHandler) syncFirebaseUsersToDB() error {
 			break
 		}
 
+		email := strings.ToLower(strings.TrimSpace(u.Email))
+		if !strings.HasSuffix(email, "@bitsathy.ac.in") {
+			continue
+		}
+
 		batchUsers = append(batchUsers, models.User{
 			UID:            u.UID,
 			Email:          u.Email,
@@ -98,7 +103,9 @@ func (h *AdminHandler) syncFirebaseUsersToDB() error {
 		}
 	}
 
-	log.Printf("✅ Synced %d total users from Firebase to MySQL", totalSynced)
+	_, _ = h.DB.Exec(`DELETE FROM users WHERE email NOT LIKE '%@bitsathy.ac.in'`)
+
+	log.Printf("✅ Synced %d total @bitsathy.ac.in users from Firebase to MySQL", totalSynced)
 	return nil
 }
 
@@ -125,7 +132,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		_ = h.syncFirebaseUsersToDB()
 	}
 
-	rows, err := h.DB.Query(`SELECT uid, COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(creation_time, ''), COALESCE(last_sign_in_time, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%Y-%m-%dT%H:%i:%sZ'), '') FROM users ORDER BY creation_time DESC, uid DESC`)
+	rows, err := h.DB.Query(`SELECT uid, COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(creation_time, ''), COALESCE(last_sign_in_time, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%Y-%m-%dT%H:%i:%sZ'), '') FROM users WHERE email LIKE '%@bitsathy.ac.in' ORDER BY creation_time DESC, uid DESC`)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -183,7 +190,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 				fbUser, _ = client.GetUser(context.Background(), search)
 			}
 
-			if fbUser != nil {
+			if fbUser != nil && strings.HasSuffix(strings.ToLower(strings.TrimSpace(fbUser.Email)), "@bitsathy.ac.in") {
 				u := models.User{
 					UID:            fbUser.UID,
 					Email:          fbUser.Email,
@@ -297,6 +304,10 @@ func (h *AdminHandler) syncUsersToMySQL(users []models.User) error {
 	defer stmt.Close()
 
 	for _, u := range users {
+		email := strings.ToLower(strings.TrimSpace(u.Email))
+		if !strings.HasSuffix(email, "@bitsathy.ac.in") {
+			continue
+		}
 		_, err := stmt.Exec(u.UID, u.Email, u.DisplayName, u.PhotoURL, u.CreationTime, u.LastSignInTime)
 		if err != nil {
 			return err
@@ -442,4 +453,40 @@ func (h *AdminHandler) DeleteUser(c *gin.Context) {
 	_, _ = h.DB.Exec("DELETE FROM admins WHERE uid = ?", uid)
 
 	c.JSON(http.StatusOK, gin.H{"success": true})
+}
+
+type BatchDeleteRequest struct {
+	UIDs []string `json:"uids"`
+}
+
+// BATCH DELETE USERS
+func (h *AdminHandler) DeleteUsersBatch(c *gin.Context) {
+	var req BatchDeleteRequest
+	if err := c.ShouldBindJSON(&req); err != nil || len(req.UIDs) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "No users selected for deletion"})
+		return
+	}
+
+	client, err := config.FirebaseAuthClient()
+	if err != nil || client == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to initialize Firebase auth"})
+		return
+	}
+
+	deletedCount := 0
+	for _, uid := range req.UIDs {
+		if uid == "" {
+			continue
+		}
+		_ = client.DeleteUser(context.Background(), uid)
+		_, _ = h.DB.Exec("DELETE FROM users WHERE uid = ?", uid)
+		_, _ = h.DB.Exec("DELETE FROM admins WHERE uid = ?", uid)
+		deletedCount++
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": fmt.Sprintf("Successfully deleted %d user(s)", deletedCount),
+		"count":   deletedCount,
+	})
 }

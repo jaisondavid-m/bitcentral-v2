@@ -361,12 +361,10 @@ function UrgentPill({ label }) {
 function getExamCountdown(dateStr, timeStr) {
   if (!dateStr || !timeStr) return null;
   const [dd, mm, yy] = dateStr.split("-");
-  const startPart = (timeStr.split("–")[0] ?? timeStr.split("-")[0] ?? "").trim();
-  const endPart = (timeStr.split("–")[1] ?? timeStr.split("-")[1] ?? "").trim();
 
-  const parseTime = (tp) => {
+  const parseSingleTime = (tp) => {
     if (!tp) return null;
-    const parts = tp.split(" ");
+    const parts = tp.trim().split(" ");
     if (parts.length < 2) return null;
     const [timeVal, meridiem] = parts;
     const [hh, min] = timeVal.split(":").map(Number);
@@ -374,11 +372,16 @@ function getExamCountdown(dateStr, timeStr) {
     let h = hh;
     if (meridiem.toUpperCase() === "PM" && hh !== 12) h += 12;
     if (meridiem.toUpperCase() === "AM" && hh === 12) h = 0;
-    return new Date(`${yy}-${mm}-${dd}T${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}:00`);
+    return new Date(`${yy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}T${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}:00`);
   };
 
-  const startTime = parseTime(startPart);
-  const endTime = parseTime(endPart);
+  const times = timeStr.match(/\b\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)\b/gi);
+  const startTime = times && times[0] ? parseSingleTime(times[0]) : null;
+  let endTime = times && times[1] ? parseSingleTime(times[1]) : null;
+  if (startTime && !endTime) {
+    endTime = new Date(startTime.getTime() + 3 * 60 * 60 * 1000);
+  }
+
   const now = new Date();
 
   if (!startTime) return null;
@@ -591,10 +594,15 @@ export default function ExamHallDownload() {
     })
     : [];
 
-  const nC = sessions?.filter(s => !s.is_arrear).length ?? 0;
-  const nA = sessions?.filter(s => s.is_arrear).length ?? 0;
+  const activeSessions = sorted.filter(s => {
+    const cd = getExamCountdown(s.date, s.time);
+    return !cd?.isOver;
+  });
 
-  const grouped = sorted.reduce((acc, s) => {
+  const nC = activeSessions.filter(s => !s.is_arrear).length;
+  const nA = activeSessions.filter(s => s.is_arrear).length;
+
+  const grouped = activeSessions.reduce((acc, s) => {
     if (!acc[s.date]) acc[s.date] = [];
     acc[s.date].push(s);
     return acc;
@@ -692,32 +700,42 @@ export default function ExamHallDownload() {
           )}
 
           {/* ── Schedule ── */}
-          {sessions && sorted.length > 0 && (
+          {sessions && (
             <div className="space-y-5">
-
-              {/* Stats + Download */}
-
-
-              {/* Exam cards grouped by date */}
-              {Object.entries(grouped).map(([date, exams]) => {
-                const dt = fmt(date);
-                return (
-                  <div key={date}>
-                    <div className="mb-2.5 flex items-center gap-3">
-                      <span className="whitespace-nowrap text-[11px] font-bold uppercase
-                        tracking-widest text-blue-400 dark:text-blue-600">
-                        {dt.weekday}, {dt.day} {dt.month} {dt.year}
-                      </span>
-                      <div className="h-px flex-1 bg-blue-100 dark:bg-blue-900/30" />
+              {activeSessions.length > 0 ? (
+                /* Exam cards grouped by date */
+                Object.entries(grouped).map(([date, exams]) => {
+                  const dt = fmt(date);
+                  return (
+                    <div key={date}>
+                      <div className="mb-2.5 flex items-center gap-3">
+                        <span className="whitespace-nowrap text-[11px] font-bold uppercase
+                          tracking-widest text-blue-400 dark:text-blue-600">
+                          {dt.weekday}, {dt.day} {dt.month} {dt.year}
+                        </span>
+                        <div className="h-px flex-1 bg-blue-100 dark:bg-blue-900/30" />
+                      </div>
+                      <div className="space-y-2.5">
+                        {exams.map((s, i) => (
+                          <ExamCard key={`${s.course_code}-${s.session}-${i}`} session={s} />
+                        ))}
+                      </div>
                     </div>
-                    <div className="space-y-2.5">
-                      {exams.map((s, i) => (
-                        <ExamCard key={`${s.course_code}-${s.session}-${i}`} session={s} />
-                      ))}
-                    </div>
+                  );
+                })
+              ) : (
+                <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-blue-200 bg-white px-4 py-14 text-center dark:border-blue-900/40 dark:bg-[#0F1C33]">
+                  <CalendarDays className="h-10 w-10 text-blue-300 dark:text-blue-600" />
+                  <div className="max-w-xs space-y-1">
+                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                      All Exams Completed
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      You have completed all scheduled examinations.
+                    </p>
                   </div>
-                );
-              })}
+                </div>
+              )}
 
               {/* Creator credit */}
               <div className="flex justify-center pt-2 pb-4">

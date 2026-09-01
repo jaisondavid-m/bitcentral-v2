@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import api from "@/api/axios";
 import {
   deleteAdminUser,
+  deleteAdminUsersBatch,
   listAdminUsers,
   updateUsers,
   setAdminUserBlocked,
@@ -630,17 +631,26 @@ function AdminDashboardShell({ activeTab, children }) {
 }
 
 /* -- User card (mobile) ------------------------------------------------------ */
-function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showStatus, isSuper, onToggleAdmin, adminActionUid }) {
+function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showStatus, isSuper, onToggleAdmin, adminActionUid, isSelected, onToggleSelect }) {
   const [expanded, setExpanded] = useState(false);
   const isBlocked = Boolean(userItem.isBlocked);
   return (
-    <div className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-blue-900 dark:bg-slate-950">
+    <div className={`rounded-xl border bg-white shadow-sm transition dark:bg-slate-950 ${
+      isSelected ? "border-blue-500 ring-2 ring-blue-500/20 dark:border-blue-500" : "border-gray-200 dark:border-blue-900"
+    }`}>
       {/* Card header -- always visible */}
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left"
-      >
+      <div className="flex items-center gap-3 px-4 py-3">
+        <input
+          type="checkbox"
+          checked={Boolean(isSelected)}
+          onChange={() => onToggleSelect(userItem.uid)}
+          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="flex min-w-0 flex-1 items-center gap-3 text-left"
+        >
         {userItem.photoURL ? (
           <img
             src={userItem.photoURL}
@@ -668,6 +678,7 @@ function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showS
           {expanded ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
         </div>
       </button>
+    </div>
 
       {/* Expanded details */}
       {expanded && (
@@ -728,25 +739,68 @@ function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showS
 }
 
 /* -- Users table (desktop) --------------------------------------------------- */
-function UserTable({ users, onDelete, onToggleBlock, deletingUid, isSuper, onToggleAdmin, adminActionUid, page, pageSize }) {
-  const cols = ["#", "User", "Created at", "Last sign in", "Status", "Action"];
+function UserTable({
+  users,
+  onDelete,
+  onToggleBlock,
+  deletingUid,
+  isSuper,
+  onToggleAdmin,
+  adminActionUid,
+  page,
+  pageSize,
+  selectedUids,
+  onToggleSelectUser,
+  onToggleSelectAll,
+}) {
+  const allPageSelected = users.length > 0 && users.every((u) => selectedUids.has(u.uid));
+  const somePageSelected = users.some((u) => selectedUids.has(u.uid)) && !allPageSelected;
 
   return (
     <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-blue-900/60">
       <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-blue-900/60">
         <thead className="bg-gray-50/80 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:bg-slate-900/80 dark:text-slate-400">
           <tr>
-            {cols.map((h) => (
-              <th key={h} className="px-4 py-3.5 text-left">{h}</th>
-            ))}
+            <th className="w-10 px-4 py-3.5 text-center">
+              <input
+                type="checkbox"
+                checked={allPageSelected}
+                ref={(el) => {
+                  if (el) el.indeterminate = somePageSelected;
+                }}
+                onChange={onToggleSelectAll}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                title="Select / Deselect all on current page"
+              />
+            </th>
+            <th className="px-4 py-3.5 text-left">#</th>
+            <th className="px-4 py-3.5 text-left">User</th>
+            <th className="px-4 py-3.5 text-left">Created at</th>
+            <th className="px-4 py-3.5 text-left">Last sign in</th>
+            <th className="px-4 py-3.5 text-left">Status</th>
+            <th className="px-4 py-3.5 text-left">Action</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100 bg-white dark:divide-blue-900/40 dark:bg-slate-950">
           {users.map((userItem, index) => {
             const rowNumber = (page - 1) * pageSize + index + 1;
             const isBlocked = userItem.isBlocked;
+            const isSelected = selectedUids.has(userItem.uid);
             return (
-              <tr key={userItem.uid} className="transition hover:bg-gray-50/80 dark:hover:bg-slate-900/50">
+              <tr
+                key={userItem.uid}
+                className={`transition hover:bg-gray-50/80 dark:hover:bg-slate-900/50 ${
+                  isSelected ? "bg-blue-50/50 dark:bg-blue-950/30" : ""
+                }`}
+              >
+                <td className="px-4 py-3.5 text-center">
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => onToggleSelectUser(userItem.uid)}
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                </td>
                 <td className="px-4 py-3.5 text-xs font-medium text-gray-400 dark:text-slate-500">{rowNumber}</td>
                 <td className="px-4 py-3.5">
                   <div className="flex items-center gap-3">
@@ -859,6 +913,45 @@ function UsersSection({ isSuper }) {
   const [isConfirming, setIsConfirming] = useState(false);
   const [banner, setBanner] = useState({ type: "", message: "" });
   const [adminActionUid, setAdminActionUid] = useState("");
+  const [selectedUids, setSelectedUids] = useState(new Set());
+
+  const onToggleSelectUser = (uid) => {
+    setSelectedUids((prev) => {
+      const next = new Set(prev);
+      if (next.has(uid)) next.delete(uid);
+      else next.add(uid);
+      return next;
+    });
+  };
+
+  const onToggleSelectAllOnPage = () => {
+    const currentPageUids = users.map((u) => u.uid);
+    const allSelected = currentPageUids.length > 0 && currentPageUids.every((uid) => selectedUids.has(uid));
+    setSelectedUids((prev) => {
+      const next = new Set(prev);
+      if (allSelected) {
+        currentPageUids.forEach((uid) => next.delete(uid));
+      } else {
+        currentPageUids.forEach((uid) => next.add(uid));
+      }
+      return next;
+    });
+  };
+
+  const selectNonBitsathyUsers = () => {
+    const nonBitsathyUids = users
+      .filter((u) => u.email && !u.email.toLowerCase().endsWith("@bitsathy.ac.in"))
+      .map((u) => u.uid);
+    setSelectedUids((prev) => {
+      const next = new Set(prev);
+      nonBitsathyUids.forEach((uid) => next.add(uid));
+      return next;
+    });
+  };
+
+  const clearSelection = () => {
+    setSelectedUids(new Set());
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -920,6 +1013,11 @@ function UsersSection({ isSuper }) {
     try {
       await deleteAdminUser({ uid });
       setBanner({ type: "success", message: "User deleted successfully" });
+      setSelectedUids((prev) => {
+        const next = new Set(prev);
+        next.delete(uid);
+        return next;
+      });
       await loadUsers();
     } catch (error) {
       setBanner({ type: "error", message: normalizeError(error, "Failed to delete user") });
@@ -933,14 +1031,32 @@ function UsersSection({ isSuper }) {
   };
 
   const onConfirmDelete = async () => {
-    if (!confirmation || confirmation.type !== "delete") return;
+    if (!confirmation) return;
     setIsConfirming(true);
     try {
-      await deleteUser(confirmation.uid);
+      if (confirmation.type === "delete") {
+        await deleteUser(confirmation.uid);
+      } else if (confirmation.type === "batchDelete") {
+        const res = await deleteAdminUsersBatch({ uids: confirmation.uids });
+        setBanner({ type: "success", message: res?.message || `Deleted ${confirmation.uids.length} users successfully` });
+        clearSelection();
+        await loadUsers();
+      }
       setConfirmation(null);
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to delete users") });
     } finally {
       setIsConfirming(false);
     }
+  };
+
+  const onBatchDeleteClick = () => {
+    if (selectedUids.size === 0) return;
+    setConfirmation({
+      type: "batchDelete",
+      count: selectedUids.size,
+      uids: Array.from(selectedUids),
+    });
   };
 
   const blockUser = async (uid, blocked) => {
@@ -1050,21 +1166,43 @@ function UsersSection({ isSuper }) {
 
         <ConfirmModal
           open={Boolean(confirmation)}
-          title={confirmation?.type === "delete" ? "Delete this user?" : confirmation?.type === "block" ? "Block this user?" : confirmation?.isAdmin ? "Depromote this user?" : "Promote this user?"}
+          title={
+            confirmation?.type === "delete"
+              ? "Delete this user?"
+              : confirmation?.type === "batchDelete"
+                ? `Delete ${confirmation?.count} selected user${confirmation?.count === 1 ? "" : "s"}?`
+                : confirmation?.type === "block"
+                  ? "Block this user?"
+                  : confirmation?.isAdmin
+                    ? "Depromote this user?"
+                    : "Promote this user?"
+          }
           description={
             confirmation?.type === "delete"
               ? "This permanently removes the user from the database and cannot be undone."
-              : confirmation?.type === "block"
-                ? "The user will be blocked from signing in and will see the support contact message."
-                : confirmation?.isAdmin
-                  ? `This will remove admin access from ${confirmation?.label || "this user"}.`
-                  : `This will add ${confirmation?.label || "this user"} to the admins table and grant admin access.`
+              : confirmation?.type === "batchDelete"
+                ? `This will permanently delete all ${confirmation?.count} selected user accounts from Firebase Auth and MySQL. This action cannot be undone.`
+                : confirmation?.type === "block"
+                  ? "The user will be blocked from signing in and will see the support contact message."
+                  : confirmation?.isAdmin
+                    ? `This will remove admin access from ${confirmation?.label || "this user"}.`
+                    : `This will add ${confirmation?.label || "this user"} to the admins table and grant admin access.`
           }
-          confirmLabel={confirmation?.type === "delete" ? "Delete user" : confirmation?.type === "block" ? "Block user" : confirmation?.isAdmin ? "Depromote user" : "Promote user"}
+          confirmLabel={
+            confirmation?.type === "delete"
+              ? "Delete user"
+              : confirmation?.type === "batchDelete"
+                ? `Delete ${confirmation?.count} users`
+                : confirmation?.type === "block"
+                  ? "Block user"
+                  : confirmation?.isAdmin
+                    ? "Depromote user"
+                    : "Promote user"
+          }
           cancelLabel="Cancel"
           tone={confirmation?.type === "admin" && !confirmation?.isAdmin ? "success" : "danger"}
           busy={isConfirming || Boolean(deletingUid) || Boolean(adminActionUid)}
-          onConfirm={confirmation?.type === "delete" ? onConfirmDelete : confirmation?.type === "block" ? onConfirmBlock : onConfirmAdminToggle}
+          onConfirm={confirmation?.type === "delete" || confirmation?.type === "batchDelete" ? onConfirmDelete : confirmation?.type === "block" ? onConfirmBlock : onConfirmAdminToggle}
           onCancel={closeConfirmation}
         />
 
@@ -1106,6 +1244,49 @@ function UsersSection({ isSuper }) {
             </button>
           )}
         </div>
+
+        {/* Bulk Selection Banner */}
+        {selectedUids.size > 0 && (
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900/80 dark:bg-blue-950/50">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-sm font-bold text-blue-900 dark:text-blue-100">
+                {selectedUids.size} user{selectedUids.size === 1 ? "" : "s"} selected
+              </span>
+              <button
+                type="button"
+                onClick={onToggleSelectAllOnPage}
+                className="text-xs font-semibold text-blue-700 hover:underline dark:text-blue-300"
+              >
+                {users.length > 0 && users.every((u) => selectedUids.has(u.uid)) ? "Deselect all on page" : "Select all on page"}
+              </button>
+              {users.some((u) => u.email && !u.email.toLowerCase().endsWith("@bitsathy.ac.in")) && (
+                <button
+                  type="button"
+                  onClick={selectNonBitsathyUsers}
+                  className="rounded-lg bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800 hover:bg-amber-200 dark:bg-amber-950/60 dark:text-amber-300"
+                >
+                  Select non-@bitsathy users
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={clearSelection}
+                className="text-xs font-medium text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200"
+              >
+                Clear selection
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={onBatchDeleteClick}
+              className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-red-700"
+            >
+              <Trash2 className="h-4 w-4" />
+              <span>Delete selected ({selectedUids.size})</span>
+            </button>
+          </div>
+        )}
 
         {/* Search Bar */}
         <div className="mb-4 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50/70 px-3.5 py-2.5 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 dark:border-blue-900 dark:bg-slate-900 dark:focus-within:bg-slate-950">
@@ -1149,6 +1330,8 @@ function UsersSection({ isSuper }) {
                   isSuper={isSuper}
                   onToggleAdmin={onToggleAdmin}
                   adminActionUid={adminActionUid}
+                  isSelected={selectedUids.has(u.uid)}
+                  onToggleSelect={onToggleSelectUser}
                 />
               ))}
             </div>
@@ -1165,6 +1348,9 @@ function UsersSection({ isSuper }) {
                 adminActionUid={adminActionUid}
                 page={page}
                 pageSize={pageSize}
+                selectedUids={selectedUids}
+                onToggleSelectUser={onToggleSelectUser}
+                onToggleSelectAll={onToggleSelectAllOnPage}
               />
             </div>
 
