@@ -141,6 +141,9 @@ func SetupRouter(
 	admin.Use(middleware.RequireAdmin())
 	{
 		admin.GET("/sponsors", sponsorsHandler.GetSponsorsAdmin)
+		admin.GET("/sponsors/leaderboard", sponsorsHandler.GetSponsorsLeaderboardAdmin)
+		admin.PUT("/sponsors/name-override", sponsorsHandler.UpdateSponsorNameOverride)
+		admin.DELETE("/sponsors/name-override", sponsorsHandler.DeleteSponsorNameOverride)
 		admin.GET("/users", adminHandler.GetUsers)
 		admin.GET("/tracker-users", trackerUserHandler.GetTrackerUsersAdmin)
 		admin.GET("/users/update", adminHandler.UpdateUsers)

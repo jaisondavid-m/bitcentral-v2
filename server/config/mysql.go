@@ -101,6 +101,7 @@ func InitMySQL() {
 	createAdminsTable()
 	createAllowedEmailsTable()
 	createTrackerUsersTable()
+	createSponsorNameOverridesTable()
 	dropAcademicTables()
 	createFeedbackMessagesTable()
 }
@@ -423,5 +424,25 @@ func dropAcademicTables() {
 		DB.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", t))
 	}
 }
+
+func createSponsorNameOverridesTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS sponsor_name_overrides (
+		donor_key VARCHAR(255) PRIMARY KEY,
+		custom_name VARCHAR(255) NOT NULL,
+		email VARCHAR(255) NULL,
+		phone VARCHAR(64) NULL,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		INDEX idx_sponsor_overrides_email (email),
+		INDEX idx_sponsor_overrides_phone (phone)
+	) ENGINE=InnoDB;`
+
+	if _, err := DB.Exec(query); err != nil {
+		log.Printf("ℹ️ sponsor_name_overrides table notice: %v", err)
+	} else {
+		log.Println("✅ sponsor_name_overrides table ready")
+	}
+}
+
 
 

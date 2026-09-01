@@ -22,9 +22,10 @@ import {
   updateCard,
   reorderAdminCards,
   deleteCard,
-  addAdmin,
-  removeAdmin,
   getAdminSponsors,
+  getAdminSponsorsLeaderboard,
+  updateSponsorNameOverride,
+  deleteSponsorNameOverride,
   listTrackerUsers,
 } from "@/api/admin.js";
 import { MealCard } from "@/components/cards/MealCard.jsx";
@@ -3865,51 +3866,125 @@ function MessSection() {
     </section>
   );
 }
-
 /* -- Sponsors Section -------------------------------------------------------- */
 function SponsorsSection() {
-  const [loading, setLoading] = useState(true);
+  const [activeSubTab, setActiveSubTab] = useState("leaderboard"); // "leaderboard" | "transactions"
+  const [data, setData] = useState({ orders: [], total_amount_raised: 0 });
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [data, setData] = useState({ total_amount_raised: 0, count: 0, orders: [] });
+  const [banner, setBanner] = useState({ type: "", message: "" });
 
-  const fetchSponsors = useCallback(async () => {
+  // Modal State for Editing Leaderboard Name
+  const [editingDonor, setEditingDonor] = useState(null);
+  const [customNameInput, setCustomNameInput] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const fetchSponsorsData = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      // Always load all records (count=100, skip=0)
-      const res = await getAdminSponsors({ count: 100, skip: 0 });
-      if (res?.success) {
-        setData(res);
-      } else {
-        setError(res?.message || "Failed to load sponsor data");
+      const [sponsorsRes, leaderboardRes] = await Promise.allSettled([
+        getAdminSponsors({ count: 100, skip: 0 }),
+        getAdminSponsorsLeaderboard(),
+      ]);
+
+      if (sponsorsRes.status === "fulfilled" && sponsorsRes.value?.success) {
+        setData(sponsorsRes.value);
+      } else if (sponsorsRes.status === "rejected") {
+        setError(normalizeError(sponsorsRes.reason, "Failed to load sponsor transactions"));
+      }
+
+      if (leaderboardRes.status === "fulfilled" && leaderboardRes.value?.success) {
+        setLeaderboard(leaderboardRes.value.leaderboard || []);
       }
     } catch (err) {
-      setError(normalizeError(err, "Failed to fetch Razorpay sponsor orders"));
+      setError(normalizeError(err, "Failed to fetch sponsor data"));
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchSponsors();
-  }, [fetchSponsors]);
+    fetchSponsorsData();
+  }, [fetchSponsorsData]);
+
+  const handleOpenEditModal = (donor) => {
+    setEditingDonor(donor);
+    setCustomNameInput(donor.display_name || donor.original_name || "");
+    setBanner({ type: "", message: "" });
+  };
+
+  const handleSaveCustomName = async (e) => {
+    e.preventDefault();
+    if (!editingDonor || !customNameInput.trim()) return;
+
+    setIsSaving(true);
+    try {
+      const res = await updateSponsorNameOverride({
+        donor_key: editingDonor.donor_key,
+        custom_name: customNameInput.trim(),
+        email: editingDonor.email,
+        phone: editingDonor.phone,
+      });
+
+      if (res?.success) {
+        setBanner({ type: "success", message: res.message || "Leaderboard name updated successfully!" });
+        setEditingDonor(null);
+        await fetchSponsorsData();
+      } else {
+        setBanner({ type: "error", message: res?.error || "Failed to update leaderboard name" });
+      }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to save leaderboard name") });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleResetToOriginal = async () => {
+    if (!editingDonor) return;
+    setIsSaving(true);
+    try {
+      const res = await deleteSponsorNameOverride(editingDonor.donor_key);
+      if (res?.success) {
+        setBanner({ type: "success", message: "Leaderboard name reset to original!" });
+        setEditingDonor(null);
+        await fetchSponsorsData();
+      } else {
+        setBanner({ type: "error", message: res?.error || "Failed to reset name" });
+      }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to reset leaderboard name") });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <section className="space-y-6">
+      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div>
           <h2 className="text-xl font-bold text-slate-950 dark:text-white flex items-center gap-2">
-            <Heart className="h-5 w-5 text-rose-500 fill-rose-500" /> Sponsored Users & Razorpay Payments
+            <Heart className="h-5 w-5 text-rose-500 fill-rose-500" /> Sponsored Users & Leaderboard Control
           </h2>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Live contribution history fetched directly from Razorpay
+            Review donor phone numbers/emails and manage official names displayed on the public leaderboard.
           </p>
         </div>
 
-        <div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 rounded-xl bg-emerald-50 px-3.5 py-2 border border-emerald-200 dark:bg-emerald-950/80 dark:border-emerald-900/80">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Total Raised:</span>
+            <span className="text-base font-black text-emerald-700 dark:text-emerald-300">
+              ₹{Number(data.total_amount_raised || 0).toLocaleString("en-IN")}
+            </span>
+          </div>
+
           <button
             type="button"
-            onClick={fetchSponsors}
+            onClick={fetchSponsorsData}
             disabled={loading}
             className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-700 disabled:opacity-50 cursor-pointer shadow-sm"
           >
@@ -3918,79 +3993,326 @@ function SponsorsSection() {
         </div>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 shadow-sm">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Funds Raised</span>
-          <div className="mt-2 text-3xl font-black text-emerald-600 dark:text-emerald-400">
-            ₹{Number(data.total_amount_raised || 0).toLocaleString("en-IN")}
-          </div>
-        </div>
+      {banner.message && (
+        <Banner banner={banner} onDismiss={() => setBanner({ type: "", message: "" })} />
+      )}
 
-        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 shadow-sm">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Payments Recorded</span>
-          <div className="mt-2 text-3xl font-black text-slate-900 dark:text-white">
-            {data.orders?.length || 0} sponsors
-          </div>
-        </div>
+      {/* Sub Tabs */}
+      <div className="flex border-b border-slate-200 dark:border-slate-800 gap-4">
+        <button
+          type="button"
+          onClick={() => setActiveSubTab("leaderboard")}
+          className={`pb-3 text-sm font-bold transition border-b-2 cursor-pointer ${
+            activeSubTab === "leaderboard"
+              ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+              : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+          }`}
+        >
+          🏆 Leaderboard & Name Control ({leaderboard.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveSubTab("transactions")}
+          className={`pb-3 text-sm font-bold transition border-b-2 cursor-pointer ${
+            activeSubTab === "transactions"
+              ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+              : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+          }`}
+        >
+          💳 Razorpay Transactions Log ({data.orders?.length || 0})
+        </button>
       </div>
 
-      {/* Table */}
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
-          <h3 className="font-bold text-slate-900 dark:text-white">Sponsored Users & Razorpay Payments</h3>
-        </div>
+      {/* Main Content Area */}
+      {activeSubTab === "leaderboard" ? (
+        <div className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-800 flex items-center justify-between">
+            <div>
+              <h3 className="font-bold text-slate-900 dark:text-white">Top Donors Leaderboard Management</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Review donor email/phone and override leaderboard display names to prevent unwanted name changes.
+              </p>
+            </div>
+          </div>
 
-        {error && (
-          <div className="p-4 text-xs font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/50 border-b border-red-200 dark:border-red-900">
-            {error}
-          </div>
-        )}
+          {loading ? (
+            <div className="flex items-center justify-center p-12">
+              <Loader className="h-6 w-6 animate-spin text-blue-600" />
+            </div>
+          ) : leaderboard.length === 0 ? (
+            <div className="p-12 text-center text-xs text-slate-500 dark:text-slate-400">
+              No donors found in the leaderboard.
+            </div>
+          ) : (
+            <>
+              {/* Mobile View - Vertical Stacked Cards */}
+              <div className="space-y-3 p-4 sm:hidden">
+                {leaderboard.map((donor, idx) => (
+                  <div
+                    key={donor.donor_key || idx}
+                    className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-950 space-y-3"
+                  >
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-2 dark:border-slate-800">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-blue-600 dark:text-blue-400 font-mono">
+                          #{idx + 1}
+                        </span>
+                        <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                          {donor.display_name}
+                        </span>
+                      </div>
+                      {donor.is_overridden ? (
+                        <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold uppercase text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                          Customized
+                        </span>
+                      ) : (
+                        <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                          Original
+                        </span>
+                      )}
+                    </div>
 
-        {loading ? (
-          <div className="flex items-center justify-center p-12">
-            <Loader className="h-6 w-6 animate-spin text-blue-600" />
-          </div>
-        ) : (data.orders || []).length === 0 ? (
-          <div className="p-12 text-center text-xs text-slate-500 dark:text-slate-400">
-            No sponsored payment records found.
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-400 font-bold uppercase tracking-wider">
-                <tr>
-                  <th className="px-4 py-3">Order ID</th>
-                  <th className="px-4 py-3">Donator Name</th>
-                  <th className="px-4 py-3">Email & Contact</th>
-                  <th className="px-4 py-3">Amount Paid</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {data.orders.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-950/50">
-                    <td className="px-4 py-3 font-mono font-bold text-blue-600 dark:text-blue-400">{item.id}</td>
-                    <td className="px-4 py-3 font-semibold text-slate-900 dark:text-white">{item.name || "Anonymous"}</td>
-                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
-                      <div>{item.email || "-"}</div>
-                      <div className="text-[10px] text-slate-400">{item.phone || ""}</div>
-                    </td>
-                    <td className="px-4 py-3 font-bold text-emerald-600 dark:text-emerald-400 text-sm">₹{item.amount}</td>
-                    <td className="px-4 py-3">
-                      <span className="rounded-full bg-emerald-50 px-2 py-0.5 font-bold uppercase tracking-wider text-[10px] text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                        {item.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{item.created_at}</td>
-                  </tr>
+                    {donor.is_overridden && (
+                      <div className="text-xs text-slate-500 dark:text-slate-400">
+                        <span className="text-[10px] text-slate-400 uppercase block font-semibold">Original Name</span>
+                        <span className="font-medium text-slate-700 dark:text-slate-300">{donor.original_name}</span>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="text-[10px] font-semibold uppercase text-slate-400 block">Total Contributed</span>
+                        <p className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">₹{donor.amount}</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-semibold uppercase text-slate-400 block">Phone</span>
+                        <p className="font-mono text-slate-700 dark:text-slate-300 truncate">{donor.phone || "No phone"}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-[10px] font-semibold uppercase text-slate-400 block">Email</span>
+                        <p className="font-medium text-slate-700 dark:text-slate-300 truncate">{donor.email || "No email"}</p>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditModal(donor)}
+                        className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700 cursor-pointer"
+                      >
+                        <Edit2 className="h-3 w-3" /> Edit Name
+                      </button>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-400 font-bold uppercase tracking-wider">
+                    <tr>
+                      <th className="px-4 py-3">Rank</th>
+                      <th className="px-4 py-3">Leaderboard Display Name</th>
+                      <th className="px-4 py-3">Original Donor Name</th>
+                      <th className="px-4 py-3">Phone & Email (Review)</th>
+                      <th className="px-4 py-3">Total Contributed</th>
+                      <th className="px-4 py-3">Override Status</th>
+                      <th className="px-4 py-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {leaderboard.map((donor, idx) => (
+                      <tr key={donor.donor_key || idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-950/50">
+                        <td className="px-4 py-3 font-bold text-slate-700 dark:text-slate-300">
+                          #{idx + 1}
+                        </td>
+                        <td className="px-4 py-3 font-bold text-slate-900 dark:text-white">
+                          {donor.display_name}
+                        </td>
+                        <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
+                          {donor.original_name}
+                        </td>
+                        <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                          <div className="font-mono text-xs">{donor.phone || "No phone"}</div>
+                          <div className="text-[11px] text-slate-400">{donor.email || "No email"}</div>
+                        </td>
+                        <td className="px-4 py-3 font-bold text-emerald-600 dark:text-emerald-400 text-sm">
+                          ₹{donor.amount}
+                        </td>
+                        <td className="px-4 py-3">
+                          {donor.is_overridden ? (
+                            <span className="rounded-full bg-blue-50 px-2 py-0.5 font-bold uppercase text-[10px] text-blue-700 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                              Customized
+                            </span>
+                          ) : (
+                            <span className="rounded-full bg-slate-100 px-2 py-0.5 font-bold uppercase text-[10px] text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                              Original
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditModal(donor)}
+                            className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-blue-600 hover:text-white dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-blue-600 dark:hover:text-white cursor-pointer"
+                          >
+                            <Edit2 className="h-3 w-3" /> Edit Name
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </div>
+      ) : (
+        /* Razorpay Transactions View */
+        <div className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+            <h3 className="font-bold text-slate-900 dark:text-white">Razorpay Payments History</h3>
           </div>
-        )}
-      </div>
+
+          {loading ? (
+            <div className="flex items-center justify-center p-12">
+              <Loader className="h-6 w-6 animate-spin text-blue-600" />
+            </div>
+          ) : (data.orders || []).length === 0 ? (
+            <div className="p-12 text-center text-xs text-slate-500 dark:text-slate-400">
+              No payment records found.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-400 font-bold uppercase tracking-wider">
+                  <tr>
+                    <th className="px-4 py-3">Order ID</th>
+                    <th className="px-4 py-3">Donator Name</th>
+                    <th className="px-4 py-3">Email & Contact</th>
+                    <th className="px-4 py-3">Amount Paid</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {data.orders.map((item) => (
+                    <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-950/50">
+                      <td className="px-4 py-3 font-mono font-bold text-blue-600 dark:text-blue-400">{item.id}</td>
+                      <td className="px-4 py-3 font-semibold text-slate-900 dark:text-white">{item.name || "Anonymous"}</td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                        <div>{item.email || "-"}</div>
+                        <div className="text-[10px] text-slate-400">{item.phone || ""}</div>
+                      </td>
+                      <td className="px-4 py-3 font-bold text-emerald-600 dark:text-emerald-400 text-sm">₹{item.amount}</td>
+                      <td className="px-4 py-3">
+                        <span className="rounded-full bg-emerald-50 px-2 py-0.5 font-bold uppercase tracking-wider text-[10px] text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                          {item.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{item.created_at}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Edit Donor Name Modal */}
+      {editingDonor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Edit2 className="h-4 w-4 text-blue-600" /> Change Leaderboard Display Name
+              </h3>
+              <button
+                type="button"
+                onClick={() => setEditingDonor(null)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCustomName} className="mt-4 space-y-4 text-xs">
+              {/* Donor Contact Review Card */}
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950 space-y-1.5">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Review Donor Details</p>
+                <div className="grid grid-cols-2 gap-2 text-slate-700 dark:text-slate-300">
+                  <div>
+                    <span className="text-[10px] text-slate-400 block">Phone</span>
+                    <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{editingDonor.phone || "-"}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block">Total Amount</span>
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">₹{editingDonor.amount}</span>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 block">Email</span>
+                  <span className="font-medium text-slate-900 dark:text-slate-100">{editingDonor.email || "-"}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 block">Original Razorpay Name</span>
+                  <span className="font-medium text-slate-900 dark:text-slate-100">{editingDonor.original_name}</span>
+                </div>
+              </div>
+
+              {/* Name Input */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Name to Appear on Leaderboard
+                </label>
+                <input
+                  type="text"
+                  value={customNameInput}
+                  onChange={(e) => setCustomNameInput(e.target.value)}
+                  placeholder="Enter official name for leaderboard..."
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                  required
+                />
+              </div>
+
+              <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                {editingDonor.is_overridden ? (
+                  <button
+                    type="button"
+                    onClick={handleResetToOriginal}
+                    disabled={isSaving}
+                    className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-300 disabled:opacity-50 cursor-pointer"
+                  >
+                    Reset to Original
+                  </button>
+                ) : (
+                  <div />
+                )}
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingDonor(null)}
+                    className="rounded-lg border border-slate-200 px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSaving || !customNameInput.trim()}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
+                  >
+                    {isSaving && <Loader className="h-3.5 w-3.5 animate-spin" />}
+                    Save Name
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
