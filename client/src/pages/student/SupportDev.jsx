@@ -575,46 +575,49 @@ export default function SupportDev() {
             className="lg:col-span-5 space-y-3"
           >
             {/* User Contribution Cards */}
-            {userContribution?.found && (
-              <div className="space-y-2">
-                {/* 1. Public Named Contribution Card */}
-                {userContribution.named_amount > 0 && userContribution.name !== "Anonymous BITSian" && (
-                  <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/70 p-3 shadow-2xs dark:border-emerald-900/60 dark:bg-emerald-950/40 transition-all">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
-                          <Heart className="h-4 w-4 fill-white text-white" />
-                        </div>
-                        <div className="min-w-0">
-                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block leading-none">
-                            YOUR PUBLIC CONTRIBUTION
-                          </span>
-                          <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate mt-0.5">
-                            {userContribution.name}
-                          </h4>
-                        </div>
-                      </div>
+            {userContribution?.found && (() => {
+              const publicSponsorIndex = (leaderboard.sponsors || []).findIndex((s) =>
+                isCurrentUserSponsor(userContribution, s, donorEmail, donorPhone)
+              );
+              const userPublicRank = publicSponsorIndex !== -1 ? publicSponsorIndex + 1 : (userContribution.rank || 0);
 
-                      <div className="text-right shrink-0 flex flex-col items-end">
-                        <div className="text-sm font-black text-emerald-700 dark:text-emerald-300 leading-none">
-                          ₹{Number(userContribution.named_amount || userContribution.amount || 0).toLocaleString("en-IN")}
+              return (
+                <div className="space-y-2">
+                  {/* 1. Public Named Contribution Card */}
+                  {userContribution.named_amount > 0 && userContribution.name !== "Anonymous BITSian" && (
+                    <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/70 p-3 shadow-2xs dark:border-emerald-900/60 dark:bg-emerald-950/40 transition-all">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                            <Heart className="h-4 w-4 fill-white text-white" />
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block leading-none">
+                              YOUR PUBLIC CONTRIBUTION
+                            </span>
+                            <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate mt-0.5">
+                              {userContribution.name}
+                            </h4>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <span className="rounded bg-emerald-200/80 dark:bg-emerald-900 px-1.5 py-0.5 text-[10px] font-bold text-emerald-900 dark:text-emerald-200">
-                            Rank #{userContribution.rank}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => navigate(`/payment-successful/${encodeURIComponent(userContribution.certificate_id || 'BIT-PATRON-VERIFIED')}`)}
-                            className="inline-flex items-center gap-0.5 rounded bg-emerald-700 px-1.5 py-0.5 text-[10px] font-bold text-white hover:bg-emerald-800 transition-colors cursor-pointer"
-                          >
-                            <span>Certificate</span>
-                          </button>
+
+                        <div className="text-right shrink-0 flex flex-col items-end">
+                          <div className="text-sm font-black text-emerald-700 dark:text-emerald-300 leading-none">
+                            ₹{Number(userContribution.named_amount || userContribution.amount || 0).toLocaleString("en-IN")}
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/payment-successful/${encodeURIComponent(userContribution.certificate_id || 'BIT-PATRON-VERIFIED')}`)}
+                              className="inline-flex items-center gap-0.5 rounded bg-emerald-700 px-1.5 py-0.5 text-[10px] font-bold text-white hover:bg-emerald-800 transition-colors cursor-pointer"
+                            >
+                              <span>Certificate</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {/* 2. Anonymous Contribution Card */}
                 {(userContribution.anonymous_amount > 0 || userContribution.name === "Anonymous BITSian") && (
@@ -649,7 +652,8 @@ export default function SupportDev() {
                   </div>
                 )}
               </div>
-            )}
+            );
+          })()}
 
 
             <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-2xs dark:border-slate-800 dark:bg-slate-900">

@@ -104,6 +104,7 @@ func InitMySQL() {
 	createSponsorNameOverridesTable()
 	createSponsorDepartmentTables()
 	createSponsorTransactionOverridesTable()
+	createSponsorTransactionsTable()
 	dropAcademicTables()
 	createFeedbackMessagesTable()
 }
@@ -481,6 +482,8 @@ func createSponsorDepartmentTables() {
 	if _, err := DB.Exec(queryMapping); err != nil {
 		log.Printf("ℹ️ sponsor_department_mappings table notice: %v", err)
 	}
+	createSponsorTransactionOverridesTable()
+	createSponsorTransactionsTable()
 }
 
 func createSponsorTransactionOverridesTable() {
@@ -498,7 +501,29 @@ func createSponsorTransactionOverridesTable() {
 	}
 }
 
+func createSponsorTransactionsTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS sponsor_transactions (
+		payment_id VARCHAR(255) PRIMARY KEY,
+		donor_name VARCHAR(255) NOT NULL DEFAULT '',
+		email VARCHAR(255) NOT NULL DEFAULT '',
+		phone VARCHAR(50) NOT NULL DEFAULT '',
+		phone_digits VARCHAR(20) NOT NULL DEFAULT '',
+		amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+		is_anonymous TINYINT(1) NOT NULL DEFAULT 0,
+		target_department_id INT NOT NULL DEFAULT 0,
+		target_department_code VARCHAR(50) NOT NULL DEFAULT '',
+		payment_status VARCHAR(50) NOT NULL DEFAULT 'captured',
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		INDEX idx_tx_phone (phone_digits),
+		INDEX idx_tx_email (email),
+		INDEX idx_tx_is_anon (is_anonymous)
+	) ENGINE=InnoDB;`
 
-
-
-
+	if _, err := DB.Exec(query); err != nil {
+		log.Printf("ℹ️ sponsor_transactions table notice: %v", err)
+	} else {
+		log.Println("✅ sponsor_transactions table ready")
+	}
+}
