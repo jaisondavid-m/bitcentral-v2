@@ -505,205 +505,256 @@ func buildDepartmentLeaderboard(aggregatedMap map[string]*AggregatedDonor) []gin
 	return leaderboard
 }
 
-// GetSponsorsLeaderboard returns real public leaderboard for Support Dev page
-func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
+func syncRazorpayTransactionsToDatabase() {
 	keyID := os.Getenv("RAZORPAY_KEY_ID")
 	keySecret := os.Getenv("RAZORPAY_KEY_SECRET")
+	if keyID == "" || keySecret == "" || config.DB == nil {
+		return
+	}
+
+	url := "https://api.razorpay.com/v1/payments?count=100"
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return
+	}
+	req.SetBasicAuth(keyID, keySecret)
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		if resp != nil {
+			resp.Body.Close()
+		}
+		return
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+
+	var rzpRes RazorpayPaymentsResponse
+	if err := json.Unmarshal(body, &rzpRes); err != nil {
+		return
+	}
+
+	txOverrides := getTransactionOverridesMap()
+
+	for _, item := range rzpRes.Items {
+		st := strings.ToLower(item.Status)
+		if st != "captured" && st != "authorized" {
+			continue
+		}
+
+		amt := float64(item.Amount) / 100.0
+		if item.AmountPaid > 0 {
+			amt = float64(item.AmountPaid) / 100.0
+		}
+
+		email := strings.ToLower(strings.TrimSpace(item.Email))
+		phone := cleanPhone(item.Contact)
+		isAnon := false
+		var targetDeptID int
+		var targetDeptCode string
+
+		if item.Notes != nil {
+			if e, ok := item.Notes["email"].(string); ok && e != "" {
+				email = strings.ToLower(strings.TrimSpace(e))
+			}
+			if p, ok := item.Notes["phone"].(string); ok && p != "" {
+				phone = cleanPhone(p)
+			} else if p, ok := item.Notes["contact"].(string); ok && p != "" {
+				phone = cleanPhone(p)
+			}
+			if anonStr, ok := item.Notes["is_anonymous"].(string); ok {
+				isAnon = (anonStr == "true" || anonStr == "1" || anonStr == "yes")
+			} else if anonBool, ok := item.Notes["is_anonymous"].(bool); ok {
+				isAnon = anonBool
+			}
+			if deptIDStr, ok := item.Notes["target_department_id"].(string); ok && deptIDStr != "" {
+				targetDeptID, _ = strconv.Atoi(deptIDStr)
+			} else if deptIDNum, ok := item.Notes["target_department_id"].(float64); ok {
+				targetDeptID = int(deptIDNum)
+			}
+			if codeStr, ok := item.Notes["target_department_code"].(string); ok && codeStr != "" {
+				targetDeptCode = codeStr
+			}
+		}
+
+		// Apply override if present
+		if txIsAnon, ok := txOverrides[item.ID]; ok {
+			isAnon = txIsAnon
+		}
+
+		donorName := extractName(item.Notes, email)
+		phoneDigits := cleanPhone(phone)
+		createdAt := time.Unix(item.CreatedAt, 0).Format("2006-01-02 15:04:05")
+
+		var count int
+		err := config.DB.QueryRow("SELECT COUNT(*) FROM sponsor_transactions WHERE payment_id = ?", item.ID).Scan(&count)
+		if err == nil && count == 0 {
+			anonVal := 0
+			if isAnon {
+				anonVal = 1
+			}
+			query := `INSERT INTO sponsor_transactions (payment_id, donor_name, email, phone, phone_digits, amount, is_anonymous, target_department_id, target_department_code, payment_status, created_at)
+					  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+			_, _ = config.DB.Exec(query, item.ID, donorName, email, phone, phoneDigits, amt, anonVal, targetDeptID, targetDeptCode, st, createdAt)
+		} else if err == nil {
+			query := `UPDATE sponsor_transactions SET donor_name = IF(donor_name = '' OR donor_name = 'Anonymous BITSian', ?, donor_name), email = IF(email = '', ?, email), phone = ?, phone_digits = ?, amount = ?, target_department_id = IF(target_department_id = 0, ?, target_department_id), target_department_code = IF(target_department_code = '', ?, target_department_code), payment_status = ? WHERE payment_id = ?`
+			_, _ = config.DB.Exec(query, donorName, email, phone, phoneDigits, amt, targetDeptID, targetDeptCode, st, item.ID)
+		}
+	}
+}
+
+// GetSponsorsLeaderboard returns real public leaderboard for Support Dev page
+func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
+	syncRazorpayTransactionsToDatabase()
 
 	var sponsors []gin.H
 	var total float64
 	overridesMap := getOverridesMap()
-	txOverrides := getTransactionOverridesMap()
 	deptMap, _ := getDepartmentsMap()
 	deptMappings := getDepartmentMappingsMap()
 	aggregatedMap := make(map[string]*AggregatedDonor)
 
-	if keyID != "" && keySecret != "" {
-		url := "https://api.razorpay.com/v1/payments?count=100"
-		req, err := http.NewRequest("GET", url, nil)
+	if config.DB != nil {
+		rows, err := config.DB.Query(`SELECT payment_id, donor_name, email, phone, phone_digits, amount, is_anonymous, target_department_id, target_department_code, DATE_FORMAT(created_at, '%Y-%m-%d') as date_str FROM sponsor_transactions WHERE payment_status IN ('captured', 'authorized')`)
 		if err == nil {
-			req.SetBasicAuth(keyID, keySecret)
-			client := &http.Client{Timeout: 10 * time.Second}
-			resp, err := client.Do(req)
-			if err == nil && resp.StatusCode == http.StatusOK {
-				defer resp.Body.Close()
-				body, _ := io.ReadAll(resp.Body)
+			defer rows.Close()
+			for rows.Next() {
+				var pid, dName, email, phone, phoneDigits, targetDeptCode, dateStr string
+				var amt float64
+				var isAnonInt, targetDeptID int
+				if err := rows.Scan(&pid, &dName, &email, &phone, &phoneDigits, &amt, &isAnonInt, &targetDeptID, &targetDeptCode, &dateStr); err == nil {
+					total += amt
+					isAnon := (isAnonInt == 1)
 
-				var rzpRes RazorpayPaymentsResponse
-				if err := json.Unmarshal(body, &rzpRes); err == nil {
-					for _, item := range rzpRes.Items {
-						st := strings.ToLower(item.Status)
-						if st != "captured" && st != "authorized" {
-							continue
-						}
-
-						amt := float64(item.Amount) / 100.0
-						if item.AmountPaid > 0 {
-							amt = float64(item.AmountPaid) / 100.0
-						}
-						total += amt
-
-						email := item.Email
-						phone := item.Contact
-						isAnon := false
-						var targetDeptID int
-						var targetDeptCode string
-
-						if txIsAnon, ok := txOverrides[item.ID]; ok {
-							isAnon = txIsAnon
-						} else if item.Notes != nil {
-							if e, ok := item.Notes["email"].(string); ok && e != "" {
-								email = e
-							}
-							if p, ok := item.Notes["phone"].(string); ok && p != "" {
-								phone = p
-							} else if p, ok := item.Notes["contact"].(string); ok && p != "" {
-								phone = p
-							}
-							if anonStr, ok := item.Notes["is_anonymous"].(string); ok {
-								isAnon = (anonStr == "true" || anonStr == "1" || anonStr == "yes")
-							} else if anonBool, ok := item.Notes["is_anonymous"].(bool); ok {
-								isAnon = anonBool
-							}
-							if deptIDStr, ok := item.Notes["target_department_id"].(string); ok && deptIDStr != "" {
-								targetDeptID, _ = strconv.Atoi(deptIDStr)
-							} else if deptIDNum, ok := item.Notes["target_department_id"].(float64); ok {
-								targetDeptID = int(deptIDNum)
-							}
-							if codeStr, ok := item.Notes["target_department_code"].(string); ok && codeStr != "" {
-								targetDeptCode = codeStr
-							}
-						}
-
-						donorName := extractName(item.Notes, email)
-						if isAnon {
-							donorName = "Anonymous BITSian"
-						}
-						phoneDigits := cleanPhone(phone)
-
-						var normKey string
-						if phoneDigits != "" {
-							normKey = "phone_" + phoneDigits
-						} else if strings.TrimSpace(email) != "" {
-							normKey = "email_" + strings.ToLower(strings.TrimSpace(email))
-						} else {
-							normKey = "name_" + strings.ToLower(strings.TrimSpace(donorName))
-						}
-
-						itemDate := time.Unix(item.CreatedAt, 0).Format("2006-01-02")
-
-						if existing, found := aggregatedMap[normKey]; found {
-							existing.Amount += amt
-							if !isAnon {
-								existing.PublicAmount += amt
-							}
-							if itemDate > existing.LatestDate {
-								existing.LatestDate = itemDate
-							}
-							if len(donorName) > len(existing.OriginalName) && donorName != "Anonymous BITSian" {
-								existing.OriginalName = donorName
-							}
-							if existing.Email == "" && email != "" {
-								existing.Email = email
-							}
-							if existing.Phone == "" && phone != "" {
-								existing.Phone = phone
-							}
-							if targetDeptID > 0 {
-								existing.TargetDeptID = targetDeptID
-							}
-							if targetDeptCode != "" {
-								existing.TargetDeptCode = targetDeptCode
-							}
-						} else {
-							pubAmt := 0.0
-							if !isAnon {
-								pubAmt = amt
-							}
-							aggregatedMap[normKey] = &AggregatedDonor{
-								DonorKey:       normKey,
-								Name:           donorName,
-								OriginalName:   donorName,
-								Email:          email,
-								Phone:          phone,
-								PhoneDigits:    phoneDigits,
-								Amount:         amt,
-								PublicAmount:   pubAmt,
-								LatestDate:     itemDate,
-								TargetDeptID:   targetDeptID,
-								TargetDeptCode: targetDeptCode,
-								IsAnonymous:    isAnon,
-							}
-						}
+					var normKey string
+					if phoneDigits != "" {
+						normKey = "phone_" + phoneDigits
+					} else if strings.TrimSpace(email) != "" {
+						normKey = "email_" + strings.ToLower(strings.TrimSpace(email))
+					} else {
+						normKey = "name_" + strings.ToLower(strings.TrimSpace(dName))
 					}
 
-					for key, donor := range aggregatedMap {
-						// Only show donors with public contributions on the individual leaderboard.
-						// Exclude anonymous entries and anonymous amounts from individual donors leaderboard!
-						if donor.PublicAmount <= 0 {
-							continue
+					if existing, found := aggregatedMap[normKey]; found {
+						existing.Amount += amt
+						if !isAnon {
+							existing.PublicAmount += amt
 						}
-
-						displayName := donor.OriginalName
-						if custom, ok := overridesMap[key]; ok && custom != "" {
-							displayName = custom
-						} else if donor.PhoneDigits != "" {
-							if custom, ok := overridesMap["phone_"+donor.PhoneDigits]; ok && custom != "" {
-								displayName = custom
-							}
-						} else if donor.Email != "" {
-							if custom, ok := overridesMap["email_"+strings.ToLower(strings.TrimSpace(donor.Email))]; ok && custom != "" {
-								displayName = custom
-							}
+						if dateStr > existing.LatestDate {
+							existing.LatestDate = dateStr
 						}
-
-						if displayName == "Anonymous BITSian" || strings.TrimSpace(displayName) == "" {
-							continue
+						if (existing.OriginalName == "Anonymous BITSian" || strings.TrimSpace(existing.OriginalName) == "") && dName != "Anonymous BITSian" {
+							existing.OriginalName = dName
+						} else if len(dName) > len(existing.OriginalName) && dName != "Anonymous BITSian" {
+							existing.OriginalName = dName
 						}
-
-						deptID := resolveDonorDepartmentID(key, donor, deptMappings)
-						var deptDisplay string
-						var deptCode string
-						var deptYear string
-						if deptID > 0 {
-							if d, ok := deptMap[deptID]; ok {
-								deptDisplay = fmt.Sprintf("%s - %s", d.Code, d.Year)
-								deptCode = d.Code
-								deptYear = d.Year
-							}
+						if existing.Email == "" && email != "" {
+							existing.Email = email
 						}
-
-						sponsors = append(sponsors, gin.H{
-							"name":               displayName,
-							"amount":             donor.PublicAmount, // Display ONLY public named contribution!
-							"date":               donor.LatestDate,
-							"email":              donor.Email,
-							"department_id":      deptID,
-							"department_code":    deptCode,
-							"department_year":    deptYear,
-							"department_display": deptDisplay,
-						})
+						if existing.Phone == "" && phone != "" {
+							existing.Phone = phone
+						}
+						if targetDeptID > 0 {
+							existing.TargetDeptID = targetDeptID
+						}
+						if targetDeptCode != "" {
+							existing.TargetDeptCode = targetDeptCode
+						}
+					} else {
+						pubAmt := 0.0
+						if !isAnon {
+							pubAmt = amt
+						}
+						aggregatedMap[normKey] = &AggregatedDonor{
+							DonorKey:       normKey,
+							Name:           dName,
+							OriginalName:   dName,
+							Email:          email,
+							Phone:          phone,
+							PhoneDigits:    phoneDigits,
+							Amount:         amt,
+							PublicAmount:   pubAmt,
+							LatestDate:     dateStr,
+							TargetDeptID:   targetDeptID,
+							TargetDeptCode: targetDeptCode,
+							IsAnonymous:    isAnon,
+						}
 					}
-
-					sort.Slice(sponsors, func(i, j int) bool {
-						amtI, _ := sponsors[i]["amount"].(float64)
-						amtJ, _ := sponsors[j]["amount"].(float64)
-						if amtI != amtJ {
-							return amtI > amtJ
-						}
-						dateI, _ := sponsors[i]["date"].(string)
-						dateJ, _ := sponsors[j]["date"].(string)
-						if dateI != dateJ {
-							return dateI > dateJ
-						}
-						nameI, _ := sponsors[i]["name"].(string)
-						nameJ, _ := sponsors[j]["name"].(string)
-						return strings.ToLower(nameI) < strings.ToLower(nameJ)
-					})
 				}
 			}
 		}
 	}
+
+	for key, donor := range aggregatedMap {
+		if donor.PublicAmount <= 0 {
+			continue
+		}
+
+		displayName := donor.OriginalName
+		if custom, ok := overridesMap[key]; ok && custom != "" && custom != "Anonymous BITSian" {
+			displayName = custom
+		} else if donor.PhoneDigits != "" {
+			if custom, ok := overridesMap["phone_"+donor.PhoneDigits]; ok && custom != "" && custom != "Anonymous BITSian" {
+				displayName = custom
+			}
+		} else if donor.Email != "" {
+			if custom, ok := overridesMap["email_"+strings.ToLower(strings.TrimSpace(donor.Email))]; ok && custom != "" && custom != "Anonymous BITSian" {
+				displayName = custom
+			}
+		}
+
+		if displayName == "Anonymous BITSian" || strings.TrimSpace(displayName) == "" {
+			if donor.Email != "" {
+				displayName = extractName(nil, donor.Email)
+			}
+		}
+
+		if displayName == "Anonymous BITSian" || strings.TrimSpace(displayName) == "" {
+			continue
+		}
+
+		deptID := resolveDonorDepartmentID(key, donor, deptMappings)
+		var deptDisplay string
+		var deptCode string
+		var deptYear string
+		if deptID > 0 {
+			if d, ok := deptMap[deptID]; ok {
+				deptDisplay = fmt.Sprintf("%s - %s", d.Code, d.Year)
+				deptCode = d.Code
+				deptYear = d.Year
+			}
+		}
+
+		sponsors = append(sponsors, gin.H{
+			"name":               displayName,
+			"amount":             donor.PublicAmount,
+			"date":               donor.LatestDate,
+			"email":              donor.Email,
+			"department_id":      deptID,
+			"department_code":    deptCode,
+			"department_year":    deptYear,
+			"department_display": deptDisplay,
+		})
+	}
+
+	sort.Slice(sponsors, func(i, j int) bool {
+		amtI, _ := sponsors[i]["amount"].(float64)
+		amtJ, _ := sponsors[j]["amount"].(float64)
+		if amtI != amtJ {
+			return amtI > amtJ
+		}
+		dateI, _ := sponsors[i]["date"].(string)
+		dateJ, _ := sponsors[j]["date"].(string)
+		if dateI != dateJ {
+			return dateI > dateJ
+		}
+		nameI, _ := sponsors[i]["name"].(string)
+		nameJ, _ := sponsors[j]["name"].(string)
+		return strings.ToLower(nameI) < strings.ToLower(nameJ)
+	})
 
 	deptLeaderboard := buildDepartmentLeaderboard(aggregatedMap)
 
@@ -758,9 +809,7 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 						var targetDeptID int
 						var targetDeptCode string
 
-						if txIsAnon, ok := txOverrides[item.ID]; ok {
-							isAnon = txIsAnon
-						} else if item.Notes != nil {
+						if item.Notes != nil {
 							if e, ok := item.Notes["email"].(string); ok && e != "" {
 								email = e
 							}
@@ -782,6 +831,10 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 							if codeStr, ok := item.Notes["target_department_code"].(string); ok && codeStr != "" {
 								targetDeptCode = codeStr
 							}
+						}
+
+						if txIsAnon, ok := txOverrides[item.ID]; ok {
+							isAnon = txIsAnon
 						}
 
 						donorName := extractName(item.Notes, email)
@@ -806,7 +859,7 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 							if itemDate > existing.LatestDate {
 								existing.LatestDate = itemDate
 							}
-							if len(donorName) > len(existing.OriginalName) && donorName != "Anonymous BITSian" {
+							if (existing.OriginalName == "Anonymous BITSian" || len(donorName) > len(existing.OriginalName)) && donorName != "Anonymous BITSian" {
 								existing.OriginalName = donorName
 							}
 							if existing.Email == "" && email != "" {
@@ -1052,6 +1105,13 @@ func (h *SponsorsHandler) UpdateSponsorTransactionOverride(c *gin.Context) {
 		return
 	}
 
+	anonVal := 0
+	if req.IsAnonymous {
+		anonVal = 1
+	}
+
+	_, _ = config.DB.Exec("UPDATE sponsor_transactions SET is_anonymous = ? WHERE payment_id = ?", anonVal, paymentID)
+
 	query := `
 		INSERT INTO sponsor_transaction_overrides (payment_id, is_anonymous)
 		VALUES (?, ?)
@@ -1066,8 +1126,10 @@ func (h *SponsorsHandler) UpdateSponsorTransactionOverride(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "Transaction anonymous status updated successfully",
+		"success":      true,
+		"message":      "Transaction anonymous status updated successfully",
+		"payment_id":   paymentID,
+		"is_anonymous": req.IsAnonymous,
 	})
 }
 
@@ -1079,6 +1141,8 @@ type ContributionCheckRequest struct {
 // CheckContribution searches Razorpay payments for a specific user's phone or email
 // and returns their total contribution amount, rank, and supporter details securely.
 func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
+	syncRazorpayTransactionsToDatabase()
+
 	var reqBody ContributionCheckRequest
 	if err := c.ShouldBindJSON(&reqBody); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -1101,47 +1165,6 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 		return
 	}
 
-	keyID := os.Getenv("RAZORPAY_KEY_ID")
-	keySecret := os.Getenv("RAZORPAY_KEY_SECRET")
-
-	if keyID == "" || keySecret == "" {
-		c.JSON(http.StatusOK, gin.H{
-			"success": true,
-			"found":   false,
-			"amount":  0,
-			"rank":    0,
-		})
-		return
-	}
-
-	url := "https://api.razorpay.com/v1/payments?count=100"
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to create request"})
-		return
-	}
-
-	req.SetBasicAuth(keyID, keySecret)
-	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil || resp.StatusCode != http.StatusOK {
-		c.JSON(http.StatusOK, gin.H{
-			"success": true,
-			"found":   false,
-			"amount":  0,
-			"rank":    0,
-		})
-		return
-	}
-	defer resp.Body.Close()
-	body, _ := io.ReadAll(resp.Body)
-
-	var rzpRes RazorpayPaymentsResponse
-	if err := json.Unmarshal(body, &rzpRes); err != nil {
-		c.JSON(http.StatusOK, gin.H{"success": true, "found": false})
-		return
-	}
-
 	type InternalDonor struct {
 		Key             string
 		Name            string
@@ -1154,140 +1177,133 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 	}
 
 	aggregatedMap := make(map[string]*InternalDonor)
-
 	overridesMap := getOverridesMap()
-	txOverrides := getTransactionOverridesMap()
 
-	for _, item := range rzpRes.Items {
-		st := strings.ToLower(item.Status)
-		if st != "captured" && st != "authorized" {
+	if config.DB != nil {
+		rows, err := config.DB.Query(`SELECT payment_id, donor_name, email, phone, phone_digits, amount, is_anonymous, DATE_FORMAT(created_at, '%Y-%m-%d') as date_str FROM sponsor_transactions WHERE payment_status IN ('captured', 'authorized')`)
+		if err == nil {
+			defer rows.Close()
+			for rows.Next() {
+				var pid, dName, email, phone, phoneDigits, dateStr string
+				var amt float64
+				var isAnonInt int
+				if err := rows.Scan(&pid, &dName, &email, &phone, &phoneDigits, &amt, &isAnonInt, &dateStr); err == nil {
+					isAnon := (isAnonInt == 1)
+
+					var normKey string
+					if phoneDigits != "" {
+						normKey = "phone_" + phoneDigits
+					} else if strings.TrimSpace(email) != "" {
+						normKey = "email_" + strings.ToLower(strings.TrimSpace(email))
+					} else {
+						normKey = "name_" + strings.ToLower(strings.TrimSpace(dName))
+					}
+
+					if existing, found := aggregatedMap[normKey]; found {
+						existing.Amount += amt
+						if isAnon {
+							existing.AnonymousAmount += amt
+						} else {
+							existing.NamedAmount += amt
+						}
+						if dateStr > existing.LatestDate {
+							existing.LatestDate = dateStr
+						}
+						if (existing.Name == "Anonymous BITSian" || strings.TrimSpace(existing.Name) == "") && dName != "Anonymous BITSian" {
+							existing.Name = dName
+						} else if len(dName) > len(existing.Name) && dName != "Anonymous BITSian" {
+							existing.Name = dName
+						}
+						if phoneDigits != "" {
+							existing.Phones[phoneDigits] = true
+						}
+						if email != "" {
+							existing.Emails[email] = true
+						}
+					} else {
+						donor := &InternalDonor{
+							Key:        normKey,
+							Name:       dName,
+							Amount:     amt,
+							LatestDate: dateStr,
+							Phones:     make(map[string]bool),
+							Emails:     make(map[string]bool),
+						}
+						donor.Phones[phoneDigits] = true
+						donor.Emails[email] = true
+						if isAnon {
+							donor.AnonymousAmount = amt
+						} else {
+							donor.NamedAmount = amt
+						}
+						aggregatedMap[normKey] = donor
+					}
+				}
+			}
+		}
+	}
+
+	var publicDonorList []*InternalDonor
+	for _, d := range aggregatedMap {
+		if d.NamedAmount <= 0 {
 			continue
 		}
-
-		amt := float64(item.Amount) / 100.0
-		if item.AmountPaid > 0 {
-			amt = float64(item.AmountPaid) / 100.0
-		}
-
-		email := strings.ToLower(strings.TrimSpace(item.Email))
-		phone := cleanPhone(item.Contact)
-		isAnon := false
-
-		if txIsAnon, ok := txOverrides[item.ID]; ok {
-			isAnon = txIsAnon
-		} else if item.Notes != nil {
-			if e, ok := item.Notes["email"].(string); ok && e != "" {
-				email = strings.ToLower(strings.TrimSpace(e))
-			}
-			if p, ok := item.Notes["phone"].(string); ok && p != "" {
-				phone = cleanPhone(p)
-			} else if p, ok := item.Notes["contact"].(string); ok && p != "" {
-				phone = cleanPhone(p)
-			}
-			if anonStr, ok := item.Notes["is_anonymous"].(string); ok {
-				isAnon = (anonStr == "true" || anonStr == "1" || anonStr == "yes")
-			} else if anonBool, ok := item.Notes["is_anonymous"].(bool); ok {
-				isAnon = anonBool
-			}
-		}
-
-		donorName := extractName(item.Notes, email)
-
-		var normKey string
-		if phone != "" {
-			normKey = "phone_" + phone
-		} else if email != "" {
-			normKey = "email_" + email
+		displayName := d.Name
+		if custom, ok := overridesMap[d.Key]; ok && custom != "" && custom != "Anonymous BITSian" {
+			displayName = custom
 		} else {
-			normKey = "name_" + strings.ToLower(strings.TrimSpace(donorName))
+			for p := range d.Phones {
+				if custom, ok := overridesMap["phone_"+p]; ok && custom != "" && custom != "Anonymous BITSian" {
+					displayName = custom
+					break
+				}
+			}
+			if displayName == d.Name {
+				for e := range d.Emails {
+					if custom, ok := overridesMap["email_"+e]; ok && custom != "" && custom != "Anonymous BITSian" {
+						displayName = custom
+						break
+					}
+				}
+			}
 		}
-
-		if custom, ok := overridesMap[normKey]; ok && custom != "" {
-			donorName = custom
-		} else if phone != "" {
-			if custom, ok := overridesMap["phone_"+phone]; ok && custom != "" {
-				donorName = custom
-			}
-		} else if email != "" {
-			if custom, ok := overridesMap["email_"+email]; ok && custom != "" {
-				donorName = custom
-			}
-		}
-
-		if donorName == "Anonymous BITSian" {
-			isAnon = true
-		}
-
-		itemDate := time.Unix(item.CreatedAt, 0).Format("2006-01-02")
-
-		if existing, found := aggregatedMap[normKey]; found {
-			existing.Amount += amt
-			if isAnon {
-				existing.AnonymousAmount += amt
-			} else {
-				existing.NamedAmount += amt
-			}
-			if itemDate > existing.LatestDate {
-				existing.LatestDate = itemDate
-			}
-			if len(donorName) > len(existing.Name) && donorName != "Anonymous BITSian" {
-				existing.Name = donorName
-			}
-			if phone != "" {
-				existing.Phones[phone] = true
-			}
-			if email != "" {
-				existing.Emails[email] = true
-			}
-		} else {
-			donor := &InternalDonor{
-				Key:        normKey,
-				Name:       donorName,
-				Amount:     amt,
-				LatestDate: itemDate,
-				Phones:     make(map[string]bool),
-				Emails:     make(map[string]bool),
-			}
-			if isAnon {
-				donor.AnonymousAmount = amt
-			} else {
-				donor.NamedAmount = amt
-			}
-			if phone != "" {
-				donor.Phones[phone] = true
-			}
-			if email != "" {
-				donor.Emails[email] = true
-			}
-			aggregatedMap[normKey] = donor
+		if strings.TrimSpace(displayName) != "" {
+			publicDonorList = append(publicDonorList, d)
 		}
 	}
 
-	var donorList []*InternalDonor
-	for _, d := range aggregatedMap {
-		donorList = append(donorList, d)
-	}
-
-	sort.Slice(donorList, func(i, j int) bool {
-		if donorList[i].Amount != donorList[j].Amount {
-			return donorList[i].Amount > donorList[j].Amount
+	sort.Slice(publicDonorList, func(i, j int) bool {
+		if publicDonorList[i].NamedAmount != publicDonorList[j].NamedAmount {
+			return publicDonorList[i].NamedAmount > publicDonorList[j].NamedAmount
 		}
-		if donorList[i].LatestDate != donorList[j].LatestDate {
-			return donorList[i].LatestDate > donorList[j].LatestDate
+		if publicDonorList[i].LatestDate != publicDonorList[j].LatestDate {
+			return publicDonorList[i].LatestDate > publicDonorList[j].LatestDate
 		}
-		return strings.ToLower(donorList[i].Name) < strings.ToLower(donorList[j].Name)
+		return strings.ToLower(publicDonorList[i].Name) < strings.ToLower(publicDonorList[j].Name)
 	})
 
 	var matchedDonor *InternalDonor
 	matchedRank := 0
 
-	for i, d := range donorList {
+	for i, d := range publicDonorList {
 		matchesPhone := searchPhoneDigits != "" && d.Phones[searchPhoneDigits]
 		matchesEmail := searchEmail != "" && d.Emails[searchEmail]
 		if matchesPhone || matchesEmail {
 			matchedDonor = d
 			matchedRank = i + 1
 			break
+		}
+	}
+
+	if matchedDonor == nil {
+		for _, d := range aggregatedMap {
+			matchesPhone := searchPhoneDigits != "" && d.Phones[searchPhoneDigits]
+			matchesEmail := searchEmail != "" && d.Emails[searchEmail]
+			if matchesPhone || matchesEmail {
+				matchedDonor = d
+				matchedRank = 0
+				break
+			}
 		}
 	}
 
@@ -1337,7 +1353,7 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 			"named_amount":     matchedDonor.NamedAmount,
 			"anonymous_amount": matchedDonor.AnonymousAmount,
 			"rank":             matchedRank,
-			"total_supporters": len(donorList),
+			"total_supporters": len(publicDonorList),
 			"name":             displayName,
 			"email":            matchedEmail,
 			"phone":            matchedPhone,
@@ -1351,7 +1367,7 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 			"found":            false,
 			"amount":           0,
 			"rank":             0,
-			"total_supporters": len(donorList),
+			"total_supporters": len(publicDonorList),
 		})
 	}
 }

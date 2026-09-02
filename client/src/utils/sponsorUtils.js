@@ -34,7 +34,7 @@ export function processLeaderboardData(sponsors = []) {
     if (aggregatedMap.has(normKey)) {
       const existing = aggregatedMap.get(normKey);
       existing.amount = (Number(existing.amount) || 0) + amt;
-      if (rawName.length > (existing.name || "").length && rawName !== "Anonymous BITSian") {
+      if ((existing.name === "Anonymous BITSian" || rawName.length > (existing.name || "").length) && rawName !== "Anonymous BITSian") {
         existing.name = rawName;
       }
       if (!existing.email && rawEmail) {
