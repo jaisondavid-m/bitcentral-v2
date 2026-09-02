@@ -26,6 +26,13 @@ import {
   getAdminSponsorsLeaderboard,
   updateSponsorNameOverride,
   deleteSponsorNameOverride,
+  getSponsorDepartments,
+  createSponsorDepartment,
+  createSponsorDepartmentsBatch,
+  updateSponsorDepartment,
+  deleteSponsorDepartment,
+  updateSponsorDepartmentMapping,
+  updateSponsorDepartmentMappingsBatch,
   listTrackerUsers,
   getAdminAnalytics,
 } from "@/api/admin.js";
@@ -3886,25 +3893,63 @@ function MessSection() {
 }
 /* -- Sponsors Section -------------------------------------------------------- */
 function SponsorsSection() {
-  const [activeSubTab, setActiveSubTab] = useState("leaderboard"); // "leaderboard" | "transactions"
+  const [activeSubTab, setActiveSubTab] = useState("leaderboard"); // "leaderboard" | "departments" | "transactions"
   const [data, setData] = useState({ orders: [], total_amount_raised: 0 });
   const [leaderboard, setLeaderboard] = useState([]);
+  const [deptLeaderboard, setDeptLeaderboard] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [deptSearchQuery, setDeptSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const filteredDepartments = useMemo(() => {
+    if (!deptSearchQuery.trim()) return departments;
+    const q = deptSearchQuery.toLowerCase().trim();
+    return departments.filter(
+      (dept) =>
+        dept.name?.toLowerCase().includes(q) ||
+        dept.code?.toLowerCase().includes(q) ||
+        dept.email_code?.toLowerCase().includes(q) ||
+        dept.year?.toLowerCase().includes(q) ||
+        dept.year_code?.toLowerCase().includes(q) ||
+        String(dept.id).includes(q)
+    );
+  }, [departments, deptSearchQuery]);
   const [error, setError] = useState("");
   const [banner, setBanner] = useState({ type: "", message: "" });
 
-  // Modal State for Editing Leaderboard Name
+  // Modal State for Editing Leaderboard Name & Department Mapping
   const [editingDonor, setEditingDonor] = useState(null);
   const [customNameInput, setCustomNameInput] = useState("");
+  const [selectedDeptId, setSelectedDeptId] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  // State for Creating & Editing Department
+  const [newDeptName, setNewDeptName] = useState("");
+  const [newDeptCode, setNewDeptCode] = useState("");
+  const [newDeptEmailCode, setNewDeptEmailCode] = useState("");
+  const [newDeptYear, setNewDeptYear] = useState("1st Year");
+  const [newDeptYearCode, setNewDeptYearCode] = useState("");
+  const [isAddingDept, setIsAddingDept] = useState(false);
+  const [editingDept, setEditingDept] = useState(null);
+  const [isSavingDept, setIsSavingDept] = useState(false);
+
+  // Bulk Upload State
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [bulkMode, setBulkMode] = useState("departments"); // "departments" | "mappings"
+  const [bulkDeptFile, setBulkDeptFile] = useState(null);
+  const [bulkDeptPreview, setBulkDeptPreview] = useState([]);
+  const [bulkMappingFile, setBulkMappingFile] = useState(null);
+  const [bulkMappingPreview, setBulkMappingPreview] = useState([]);
+  const [isUploadingBulk, setIsUploadingBulk] = useState(false);
 
   const fetchSponsorsData = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const [sponsorsRes, leaderboardRes] = await Promise.allSettled([
+      const [sponsorsRes, leaderboardRes, deptsRes] = await Promise.allSettled([
         getAdminSponsors({ count: 100, skip: 0 }),
         getAdminSponsorsLeaderboard(),
+        getSponsorDepartments(),
       ]);
 
       if (sponsorsRes.status === "fulfilled" && sponsorsRes.value?.success) {
@@ -3915,6 +3960,11 @@ function SponsorsSection() {
 
       if (leaderboardRes.status === "fulfilled" && leaderboardRes.value?.success) {
         setLeaderboard(leaderboardRes.value.leaderboard || []);
+        setDeptLeaderboard(leaderboardRes.value.department_leaderboard || []);
+      }
+
+      if (deptsRes.status === "fulfilled" && deptsRes.value?.success) {
+        setDepartments(deptsRes.value.departments || []);
       }
     } catch (err) {
       setError(normalizeError(err, "Failed to fetch sponsor data"));
@@ -3930,7 +3980,131 @@ function SponsorsSection() {
   const handleOpenEditModal = (donor) => {
     setEditingDonor(donor);
     setCustomNameInput(donor.display_name || donor.original_name || "");
+    setSelectedDeptId(donor.department_id ? String(donor.department_id) : "");
     setBanner({ type: "", message: "" });
+  };
+
+  const parseCSV = (text) => {
+    const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+    if (lines.length < 2) return [];
+    const headers = lines[0].split(",").map((h) => h.trim().toLowerCase().replace(/^["']|["']$/g, ""));
+    const records = [];
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(",").map((v) => v.trim().replace(/^["']|["']$/g, ""));
+      if (values.length === 0 || (values.length === 1 && !values[0])) continue;
+      const row = {};
+      headers.forEach((h, idx) => {
+        row[h] = values[idx] || "";
+      });
+      records.push(row);
+    }
+    return records;
+  };
+
+  const handleDeptCsvChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setBulkDeptFile(file);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const rows = parseCSV(text);
+      const parsedDepts = rows
+        .map((r) => ({
+          name: r.name || r["department name"] || r.department || "",
+          code: (r.code || r["short code"] || r.shortcode || "").toUpperCase(),
+          email_code: (r.email_code || r["email code"] || r.email_short_code || "").toLowerCase(),
+          year: r.year || r["year / batch"] || r.batch || "1st Year",
+          year_code: (r.year_code || r["year code"] || r.batch_code || "").toLowerCase(),
+        }))
+        .filter((d) => d.name && d.code);
+      setBulkDeptPreview(parsedDepts);
+    };
+    reader.readAsText(file);
+  };
+
+  const handleMappingCsvChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setBulkMappingFile(file);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const rows = parseCSV(text);
+      const parsedMappings = rows
+        .map((r) => ({
+          email: r.email || r["donor email"] || "",
+          phone: r.phone || r["donor phone"] || r.contact || "",
+          donor_key: r.donor_key || r.key || "",
+          department_code: (r.department_code || r.code || r.department || "").toUpperCase(),
+          year: r.year || r.batch || "1st Year",
+        }))
+        .filter((m) => m.department_code && (m.email || m.phone || m.donor_key));
+      setBulkMappingPreview(parsedMappings);
+    };
+    reader.readAsText(file);
+  };
+
+  const handleUploadBulkDepts = async () => {
+    if (bulkDeptPreview.length === 0) return;
+    setIsUploadingBulk(true);
+    try {
+      const res = await createSponsorDepartmentsBatch(bulkDeptPreview);
+      if (res?.success) {
+        setBanner({ type: "success", message: res.message || "Bulk departments uploaded successfully!" });
+        setBulkDeptFile(null);
+        setBulkDeptPreview([]);
+        setIsBulkModalOpen(false);
+        await fetchSponsorsData();
+      } else {
+        setBanner({ type: "error", message: res?.error || "Failed to bulk upload departments" });
+      }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to upload departments batch") });
+    } finally {
+      setIsUploadingBulk(false);
+    }
+  };
+
+  const handleUploadBulkMappings = async () => {
+    if (bulkMappingPreview.length === 0) return;
+    setIsUploadingBulk(true);
+    try {
+      const res = await updateSponsorDepartmentMappingsBatch(bulkMappingPreview);
+      if (res?.success) {
+        setBanner({ type: "success", message: res.message || "Bulk donor mappings updated successfully!" });
+        setBulkMappingFile(null);
+        setBulkMappingPreview([]);
+        setIsBulkModalOpen(false);
+        await fetchSponsorsData();
+      } else {
+        setBanner({ type: "error", message: res?.error || "Failed to bulk map donors" });
+      }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to upload donor mappings batch") });
+    } finally {
+      setIsUploadingBulk(false);
+    }
+  };
+
+  const downloadDeptTemplate = () => {
+    const content = "name,code,email_code,year,year_code\nComputer Science and Engineering,CSE,cs,1st Year,25\nComputer Science and Engineering,CSE,cs,2nd Year,24\nElectrical and Electronics Engineering,EEE,ee,3rd Year,24\nInformation Technology,IT,it,1st Year,25";
+    const blob = new Blob([content], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "departments_template.csv";
+    a.click();
+  };
+
+  const downloadMappingTemplate = () => {
+    const content = "email,phone,code,year\nstudent1@example.com,9876543210,CSE,1st Year\nstudent2@example.com,,IT,2nd Year";
+    const blob = new Blob([content], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "donor_mappings_template.csv";
+    a.click();
   };
 
   const handleSaveCustomName = async (e) => {
@@ -3939,22 +4113,30 @@ function SponsorsSection() {
 
     setIsSaving(true);
     try {
-      const res = await updateSponsorNameOverride({
-        donor_key: editingDonor.donor_key,
-        custom_name: customNameInput.trim(),
-        email: editingDonor.email,
-        phone: editingDonor.phone,
-      });
+      const [nameRes, deptRes] = await Promise.all([
+        updateSponsorNameOverride({
+          donor_key: editingDonor.donor_key,
+          custom_name: customNameInput.trim(),
+          email: editingDonor.email,
+          phone: editingDonor.phone,
+        }),
+        updateSponsorDepartmentMapping({
+          donor_key: editingDonor.donor_key,
+          department_id: Number(selectedDeptId) || 0,
+          email: editingDonor.email,
+          phone: editingDonor.phone,
+        }),
+      ]);
 
-      if (res?.success) {
-        setBanner({ type: "success", message: res.message || "Leaderboard name updated successfully!" });
+      if (nameRes?.success && deptRes?.success) {
+        setBanner({ type: "success", message: "Donor display name and department updated successfully!" });
         setEditingDonor(null);
         await fetchSponsorsData();
       } else {
-        setBanner({ type: "error", message: res?.error || "Failed to update leaderboard name" });
+        setBanner({ type: "error", message: nameRes?.error || deptRes?.error || "Failed to update donor settings" });
       }
     } catch (err) {
-      setBanner({ type: "error", message: normalizeError(err, "Failed to save leaderboard name") });
+      setBanner({ type: "error", message: normalizeError(err, "Failed to save donor settings") });
     } finally {
       setIsSaving(false);
     }
@@ -3979,6 +4161,81 @@ function SponsorsSection() {
     }
   };
 
+  const handleAddDepartment = async (e) => {
+    e.preventDefault();
+    if (!newDeptName.trim() || !newDeptCode.trim()) return;
+
+    setIsAddingDept(true);
+    try {
+      const res = await createSponsorDepartment({
+        name: newDeptName.trim(),
+        code: newDeptCode.trim().toUpperCase(),
+        email_code: newDeptEmailCode.trim().toLowerCase(),
+        year: newDeptYear || "1st Year",
+        year_code: newDeptYearCode.trim().toLowerCase(),
+      });
+
+      if (res?.success) {
+        setBanner({ type: "success", message: res.message || "Department created successfully!" });
+        setNewDeptName("");
+        setNewDeptCode("");
+        setNewDeptEmailCode("");
+        setNewDeptYear("1st Year");
+        setNewDeptYearCode("");
+        await fetchSponsorsData();
+      } else {
+        setBanner({ type: "error", message: res?.error || "Failed to create department" });
+      }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to create department") });
+    } finally {
+      setIsAddingDept(false);
+    }
+  };
+
+  const handleUpdateDepartment = async (e) => {
+    e.preventDefault();
+    if (!editingDept || !editingDept.name.trim() || !editingDept.code.trim()) return;
+
+    setIsSavingDept(true);
+    try {
+      const res = await updateSponsorDepartment(editingDept.id, {
+        name: editingDept.name.trim(),
+        code: editingDept.code.trim().toUpperCase(),
+        email_code: (editingDept.email_code || "").trim().toLowerCase(),
+        year: editingDept.year || "1st Year",
+        year_code: (editingDept.year_code || "").trim().toLowerCase(),
+      });
+
+      if (res?.success) {
+        setBanner({ type: "success", message: "Department updated successfully!" });
+        setEditingDept(null);
+        await fetchSponsorsData();
+      } else {
+        setBanner({ type: "error", message: res?.error || "Failed to update department" });
+      }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to update department") });
+    } finally {
+      setIsSavingDept(false);
+    }
+  };
+
+  const handleDeleteDept = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this department?")) return;
+    try {
+      const res = await deleteSponsorDepartment(id);
+      if (res?.success) {
+        setBanner({ type: "success", message: "Department deleted successfully!" });
+        await fetchSponsorsData();
+      } else {
+        setBanner({ type: "error", message: res?.error || "Failed to delete department" });
+      }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to delete department") });
+    }
+  };
+
   return (
     <section className="space-y-6">
       {/* Header */}
@@ -3988,7 +4245,7 @@ function SponsorsSection() {
             <Heart className="h-5 w-5 text-rose-500 fill-rose-500" /> Sponsored Users & Leaderboard Control
           </h2>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Review donor phone numbers/emails and manage official names displayed on the public leaderboard.
+            Review donor phone numbers/emails, map users to departments, and manage official names displayed on the public leaderboard.
           </p>
         </div>
 
@@ -4016,22 +4273,33 @@ function SponsorsSection() {
       )}
 
       {/* Sub Tabs */}
-      <div className="flex border-b border-slate-200 dark:border-slate-800 gap-4">
+      <div className="flex border-b border-slate-200 dark:border-slate-800 gap-4 overflow-x-auto">
         <button
           type="button"
           onClick={() => setActiveSubTab("leaderboard")}
-          className={`pb-3 text-sm font-bold transition border-b-2 cursor-pointer ${
+          className={`pb-3 text-sm font-bold transition border-b-2 whitespace-nowrap cursor-pointer ${
             activeSubTab === "leaderboard"
               ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
               : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
           }`}
         >
-          🏆 Leaderboard & Name Control ({leaderboard.length})
+          🏆 Individual Leaderboard ({leaderboard.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveSubTab("departments")}
+          className={`pb-3 text-sm font-bold transition border-b-2 whitespace-nowrap cursor-pointer ${
+            activeSubTab === "departments"
+              ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+              : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+          }`}
+        >
+          🏢 Department Leaderboard & Setup ({departments.length})
         </button>
         <button
           type="button"
           onClick={() => setActiveSubTab("transactions")}
-          className={`pb-3 text-sm font-bold transition border-b-2 cursor-pointer ${
+          className={`pb-3 text-sm font-bold transition border-b-2 whitespace-nowrap cursor-pointer ${
             activeSubTab === "transactions"
               ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
               : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
@@ -4048,7 +4316,7 @@ function SponsorsSection() {
             <div>
               <h3 className="font-bold text-slate-900 dark:text-white">Top Donors Leaderboard Management</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Review donor email/phone and override leaderboard display names to prevent unwanted name changes.
+                Review donor email/phone, override display names, and map users to created departments.
               </p>
             </div>
           </div>
@@ -4079,23 +4347,16 @@ function SponsorsSection() {
                           {donor.display_name}
                         </span>
                       </div>
-                      {donor.is_overridden ? (
-                        <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold uppercase text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                          Customized
+                      {donor.department_display ? (
+                        <span className="rounded-md bg-purple-50 px-2 py-0.5 text-[10px] font-bold text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                          {donor.department_display}
                         </span>
                       ) : (
-                        <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-600 dark:bg-slate-800 dark:text-slate-400">
-                          Original
+                        <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                          Unmapped
                         </span>
                       )}
                     </div>
-
-                    {donor.is_overridden && (
-                      <div className="text-xs text-slate-500 dark:text-slate-400">
-                        <span className="text-[10px] text-slate-400 uppercase block font-semibold">Original Name</span>
-                        <span className="font-medium text-slate-700 dark:text-slate-300">{donor.original_name}</span>
-                      </div>
-                    )}
 
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div>
@@ -4118,7 +4379,7 @@ function SponsorsSection() {
                         onClick={() => handleOpenEditModal(donor)}
                         className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700 cursor-pointer"
                       >
-                        <Edit2 className="h-3 w-3" /> Edit Name
+                        <Edit2 className="h-3 w-3" /> Edit Name & Dept
                       </button>
                     </div>
                   </div>
@@ -4132,8 +4393,8 @@ function SponsorsSection() {
                     <tr>
                       <th className="px-4 py-3">Rank</th>
                       <th className="px-4 py-3">Leaderboard Display Name</th>
-                      <th className="px-4 py-3">Original Donor Name</th>
-                      <th className="px-4 py-3">Phone & Email (Review)</th>
+                      <th className="px-4 py-3">Mapped Department</th>
+                      <th className="px-4 py-3">Phone & Email</th>
                       <th className="px-4 py-3">Total Contributed</th>
                       <th className="px-4 py-3">Override Status</th>
                       <th className="px-4 py-3 text-right">Action</th>
@@ -4147,9 +4408,21 @@ function SponsorsSection() {
                         </td>
                         <td className="px-4 py-3 font-bold text-slate-900 dark:text-white">
                           {donor.display_name}
+                          {donor.is_overridden && (
+                            <span className="block text-[10px] text-slate-400 font-normal">Orig: {donor.original_name}</span>
+                          )}
                         </td>
-                        <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
-                          {donor.original_name}
+                        <td className="px-4 py-3">
+                          {donor.department_display ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 px-2.5 py-0.5 text-[11px] font-bold text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                              <GraduationCap className="h-3 w-3 text-purple-600 dark:text-purple-400" />
+                              {donor.department_display}
+                            </span>
+                          ) : (
+                            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 font-bold uppercase text-[10px] text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                              Unmapped
+                            </span>
+                          )}
                         </td>
                         <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                           <div className="font-mono text-xs">{donor.phone || "No phone"}</div>
@@ -4175,7 +4448,7 @@ function SponsorsSection() {
                             onClick={() => handleOpenEditModal(donor)}
                             className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-blue-600 hover:text-white dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-blue-600 dark:hover:text-white cursor-pointer"
                           >
-                            <Edit2 className="h-3 w-3" /> Edit Name
+                            <Edit2 className="h-3 w-3" /> Edit Name & Dept
                           </button>
                         </td>
                       </tr>
@@ -4184,6 +4457,395 @@ function SponsorsSection() {
                 </table>
               </div>
             </>
+          )}
+        </div>
+      ) : activeSubTab === "departments" ? (
+        /* Department Setup & Leaderboard View */
+        <div className="space-y-6">
+          {/* Form to Add New Department */}
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-100 dark:border-slate-800">
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-base">
+                  <Plus className="h-4 w-4 text-blue-600" /> Create / Add New Department
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Add a department name, short code (e.g. CSE), and academic year (e.g. 1st Year).
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsBulkModalOpen(true)}
+                className="inline-flex items-center gap-2 rounded-xl bg-purple-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-purple-700 cursor-pointer shadow-sm"
+              >
+                <Upload className="h-4 w-4" /> Bulk Upload via CSV
+              </button>
+            </div>
+
+            <form onSubmit={handleAddDepartment} className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-6 items-end">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Department Name *
+                </label>
+                <input
+                  type="text"
+                  value={newDeptName}
+                  onChange={(e) => setNewDeptName(e.target.value)}
+                  placeholder="e.g. Computer Science and Engineering"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Short Code *
+                </label>
+                <input
+                  type="text"
+                  value={newDeptCode}
+                  onChange={(e) => setNewDeptCode(e.target.value.toUpperCase())}
+                  placeholder="e.g. EEE"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white uppercase"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Email Short Code
+                </label>
+                <input
+                  type="text"
+                  value={newDeptEmailCode}
+                  onChange={(e) => setNewDeptEmailCode(e.target.value.toLowerCase())}
+                  placeholder="e.g. ee (or cs, ad, it)"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white lowercase"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Year / Batch *
+                </label>
+                <select
+                  value={newDeptYear}
+                  onChange={(e) => setNewDeptYear(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white cursor-pointer"
+                >
+                  <option value="1st Year">1st Year</option>
+                  <option value="2nd Year">2nd Year</option>
+                  <option value="3rd Year">3rd Year</option>
+                  <option value="4th Year">4th Year</option>
+                  <option value="All Years">All Years</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Year Code (e.g. 22, 24)
+                </label>
+                <input
+                  type="text"
+                  value={newDeptYearCode}
+                  onChange={(e) => setNewDeptYearCode(e.target.value.toLowerCase())}
+                  placeholder="e.g. 24 or 22"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <button
+                  type="submit"
+                  disabled={isAddingDept || !newDeptName.trim() || !newDeptCode.trim()}
+                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-blue-700 disabled:opacity-50 cursor-pointer shadow-sm"
+                >
+                  {isAddingDept ? <Loader className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Add Department
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Department Leaderboard Preview Card */}
+          <div className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-800 flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-white text-base">Top 10 Sponsoring Departments Leaderboard</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Aggregated funds contributed by donors mapped under each department & year (e.g. CSE - 1st Year ₹50).
+                </p>
+              </div>
+            </div>
+
+            {loading ? (
+              <div className="flex items-center justify-center p-8">
+                <Loader className="h-6 w-6 animate-spin text-blue-600" />
+              </div>
+            ) : deptLeaderboard.length === 0 ? (
+              <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">
+                No department leaderboard data yet. Map donors to departments to see totals here.
+              </div>
+            ) : (
+              <div className="p-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {deptLeaderboard.map((dept, idx) => (
+                  <div
+                    key={dept.id || idx}
+                    className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 p-4 transition-all hover:border-blue-200 dark:border-slate-800 dark:bg-slate-950/60"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className={`inline-flex h-8 w-8 items-center justify-center rounded-lg font-black text-xs shrink-0 ${
+                        idx === 0
+                          ? "bg-amber-500 text-white shadow-xs"
+                          : idx === 1
+                          ? "bg-slate-400 text-white"
+                          : idx === 2
+                          ? "bg-orange-500 text-white"
+                          : "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                      }`}>
+                        #{idx + 1}
+                      </span>
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-xs text-slate-900 dark:text-white truncate">
+                          {dept.display_name}
+                        </h4>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                          {dept.name}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <span className="font-black text-emerald-600 dark:text-emerald-400 text-sm block">
+                        ₹{Number(dept.total_amount || 0).toLocaleString("en-IN")}
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-medium">
+                        {dept.total_supporters || 0} Patrons
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Created Departments List */}
+          <div className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <h3 className="font-bold text-slate-900 dark:text-white">
+                All Configured Departments ({filteredDepartments.length}
+                {deptSearchQuery.trim() ? ` / ${departments.length}` : ""})
+              </h3>
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search code, name, year, id..."
+                  value={deptSearchQuery}
+                  onChange={(e) => setDeptSearchQuery(e.target.value)}
+                  className="w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-8 py-1.5 text-xs text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-blue-500"
+                />
+                {deptSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setDeptSearchQuery("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {departments.length === 0 ? (
+              <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">
+                No departments added yet. Use the form above to add your first department.
+              </div>
+            ) : filteredDepartments.length === 0 ? (
+              <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">
+                No departments found matching "{deptSearchQuery}".
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-400 font-bold uppercase tracking-wider">
+                    <tr>
+                      <th className="px-4 py-3">ID</th>
+                      <th className="px-4 py-3">Short Code</th>
+                      <th className="px-4 py-3">Email Short Code</th>
+                      <th className="px-4 py-3">Year Code</th>
+                      <th className="px-4 py-3">Year / Batch</th>
+                      <th className="px-4 py-3">Department Name</th>
+                      <th className="px-4 py-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {filteredDepartments.map((dept) => (
+                      <tr key={dept.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-950/50">
+                        <td className="px-4 py-3 font-mono font-semibold text-slate-500">#{dept.id}</td>
+                        <td className="px-4 py-3">
+                          <span className="font-black text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800">
+                            {dept.code}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          {dept.email_code ? (
+                            <span className="font-mono text-purple-600 dark:text-purple-400 font-bold bg-purple-50 dark:bg-purple-950 px-2 py-0.5 rounded-md border border-purple-200 dark:border-purple-800">
+                              {dept.email_code}
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 text-[11px]">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          {dept.year_code ? (
+                            <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
+                              {dept.year_code}
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 text-[11px]">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">
+                          {dept.year}
+                        </td>
+                        <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">
+                          {dept.name}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setEditingDept({ ...dept })}
+                              className="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600 transition hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-400 cursor-pointer"
+                            >
+                              <Edit2 className="h-3 w-3" /> Edit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteDept(dept.id)}
+                              className="inline-flex items-center gap-1 rounded-lg bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600 transition hover:bg-rose-100 dark:bg-rose-950 dark:text-rose-400 cursor-pointer"
+                            >
+                              <Trash2 className="h-3 w-3" /> Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Edit Department Modal */}
+          {editingDept && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
+              <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <h3 className="font-bold text-slate-900 dark:text-white text-base">Edit Department #{editingDept.id}</h3>
+                  <button
+                    type="button"
+                    onClick={() => setEditingDept(null)}
+                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleUpdateDepartment} className="mt-4 space-y-3">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Department Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={editingDept.name}
+                      onChange={(e) => setEditingDept({ ...editingDept, name: e.target.value })}
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        Short Code *
+                      </label>
+                      <input
+                        type="text"
+                        value={editingDept.code}
+                        onChange={(e) => setEditingDept({ ...editingDept, code: e.target.value.toUpperCase() })}
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white uppercase"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        Email Short Code
+                      </label>
+                      <input
+                        type="text"
+                        value={editingDept.email_code || ""}
+                        onChange={(e) => setEditingDept({ ...editingDept, email_code: e.target.value.toLowerCase() })}
+                        placeholder="e.g. ee, cs, it"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white lowercase"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        Year / Batch *
+                      </label>
+                      <select
+                        value={editingDept.year}
+                        onChange={(e) => setEditingDept({ ...editingDept, year: e.target.value })}
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white cursor-pointer"
+                      >
+                        <option value="1st Year">1st Year</option>
+                        <option value="2nd Year">2nd Year</option>
+                        <option value="3rd Year">3rd Year</option>
+                        <option value="4th Year">4th Year</option>
+                        <option value="All Years">All Years</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        Year Code (e.g. 22, 24)
+                      </label>
+                      <input
+                        type="text"
+                        value={editingDept.year_code || ""}
+                        onChange={(e) => setEditingDept({ ...editingDept, year_code: e.target.value.toLowerCase() })}
+                        placeholder="e.g. 22 or 24"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => setEditingDept(null)}
+                      className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSavingDept || !editingDept.name.trim() || !editingDept.code.trim()}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
+                    >
+                      {isSavingDept && <Loader className="h-3.5 w-3.5 animate-spin" />} Save Changes
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
           )}
         </div>
       ) : (
@@ -4239,13 +4901,13 @@ function SponsorsSection() {
         </div>
       )}
 
-      {/* Edit Donor Name Modal */}
+      {/* Edit Donor Name & Department Mapping Modal */}
       {editingDonor && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
               <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Edit2 className="h-4 w-4 text-blue-600" /> Change Leaderboard Display Name
+                <Edit2 className="h-4 w-4 text-blue-600" /> Edit Donor Display Name & Department
               </h3>
               <button
                 type="button"
@@ -4295,6 +4957,25 @@ function SponsorsSection() {
                 />
               </div>
 
+              {/* Department Selector */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Assign Department & Year
+                </label>
+                <select
+                  value={selectedDeptId}
+                  onChange={(e) => setSelectedDeptId(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white cursor-pointer"
+                >
+                  <option value="">-- No Department Assigned (Unmapped) --</option>
+                  {departments.map((dept) => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.code} - {dept.year} ({dept.name})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                 {editingDonor.is_overridden ? (
                   <button
@@ -4313,21 +4994,212 @@ function SponsorsSection() {
                   <button
                     type="button"
                     onClick={() => setEditingDonor(null)}
-                    className="rounded-lg border border-slate-200 px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 cursor-pointer"
+                    className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSaving || !customNameInput.trim()}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-700 disabled:opacity-50 cursor-pointer shadow-sm"
                   >
-                    {isSaving && <Loader className="h-3.5 w-3.5 animate-spin" />}
-                    Save Name
+                    {isSaving ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />} Save Settings
                   </button>
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Upload CSV Modal */}
+      {isBulkModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 overflow-y-auto">
+          <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Upload className="h-5 w-5 text-purple-600" /> Bulk Upload via CSV
+              </h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsBulkModalOpen(false);
+                  setBulkDeptFile(null);
+                  setBulkDeptPreview([]);
+                  setBulkMappingFile(null);
+                  setBulkMappingPreview([]);
+                }}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Sub tabs inside Bulk Upload Modal */}
+            <div className="flex border-b border-slate-200 dark:border-slate-800 gap-4">
+              <button
+                type="button"
+                onClick={() => setBulkMode("departments")}
+                className={`pb-2 text-xs font-bold transition border-b-2 cursor-pointer ${
+                  bulkMode === "departments"
+                    ? "border-purple-600 text-purple-600 dark:border-purple-400 dark:text-purple-400"
+                    : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400"
+                }`}
+              >
+                🏢 Bulk Add Departments
+              </button>
+              <button
+                type="button"
+                onClick={() => setBulkMode("mappings")}
+                className={`pb-2 text-xs font-bold transition border-b-2 cursor-pointer ${
+                  bulkMode === "mappings"
+                    ? "border-purple-600 text-purple-600 dark:border-purple-400 dark:text-purple-400"
+                    : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400"
+                }`}
+              >
+                👥 Bulk Map Donors to Departments
+              </button>
+            </div>
+
+            {bulkMode === "departments" ? (
+              <div className="space-y-4 text-xs">
+                <div className="flex items-center justify-between rounded-xl bg-purple-50 p-3.5 border border-purple-200 dark:bg-purple-950/50 dark:border-purple-900/60">
+                  <div>
+                    <p className="font-bold text-purple-900 dark:text-purple-200">Upload Departments CSV</p>
+                    <p className="text-[11px] text-purple-700 dark:text-purple-300 mt-0.5">
+                      Required columns: <code className="font-mono bg-purple-100 dark:bg-purple-900 px-1 py-0.5 rounded text-purple-800 dark:text-purple-200">name, code, year</code>
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={downloadDeptTemplate}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-purple-700 hover:text-purple-900 dark:text-purple-300 underline cursor-pointer shrink-0"
+                  >
+                    <Download className="h-3.5 w-3.5" /> Download Template
+                  </button>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Select CSV File
+                  </label>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleDeptCsvChange}
+                    className="w-full rounded-xl border border-slate-200 bg-white p-2 text-xs font-medium text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white cursor-pointer"
+                  />
+                </div>
+
+                {bulkDeptPreview.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="font-bold text-slate-800 dark:text-slate-200 text-xs">
+                      Parsed Preview ({bulkDeptPreview.length} departments found)
+                    </p>
+                    <div className="max-h-48 overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                      <table className="w-full text-left text-[11px]">
+                        <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 font-bold sticky top-0">
+                          <tr>
+                            <th className="px-3 py-2">Code</th>
+                            <th className="px-3 py-2">Year</th>
+                            <th className="px-3 py-2">Department Name</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                          {bulkDeptPreview.map((d, i) => (
+                            <tr key={i}>
+                              <td className="px-3 py-1.5 font-bold text-blue-600 dark:text-blue-400">{d.code}</td>
+                              <td className="px-3 py-1.5 font-medium">{d.year}</td>
+                              <td className="px-3 py-1.5">{d.name}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="pt-2 flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={handleUploadBulkDepts}
+                        disabled={isUploadingBulk}
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-purple-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-purple-700 disabled:opacity-50 cursor-pointer shadow-sm"
+                      >
+                        {isUploadingBulk ? <Loader className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />} Upload {bulkDeptPreview.length} Departments
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4 text-xs">
+                <div className="flex items-center justify-between rounded-xl bg-purple-50 p-3.5 border border-purple-200 dark:bg-purple-950/50 dark:border-purple-900/60">
+                  <div>
+                    <p className="font-bold text-purple-900 dark:text-purple-200">Upload Donor Mappings CSV</p>
+                    <p className="text-[11px] text-purple-700 dark:text-purple-300 mt-0.5">
+                      Required columns: <code className="font-mono bg-purple-100 dark:bg-purple-900 px-1 py-0.5 rounded text-purple-800 dark:text-purple-200">email (or phone), code, year</code>
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={downloadMappingTemplate}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-purple-700 hover:text-purple-900 dark:text-purple-300 underline cursor-pointer shrink-0"
+                  >
+                    <Download className="h-3.5 w-3.5" /> Download Template
+                  </button>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Select CSV File
+                  </label>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleMappingCsvChange}
+                    className="w-full rounded-xl border border-slate-200 bg-white p-2 text-xs font-medium text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-white cursor-pointer"
+                  />
+                </div>
+
+                {bulkMappingPreview.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="font-bold text-slate-800 dark:text-slate-200 text-xs">
+                      Parsed Preview ({bulkMappingPreview.length} mappings found)
+                    </p>
+                    <div className="max-h-48 overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                      <table className="w-full text-left text-[11px]">
+                        <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 font-bold sticky top-0">
+                          <tr>
+                            <th className="px-3 py-2">Identifier (Email/Phone)</th>
+                            <th className="px-3 py-2">Target Department Code</th>
+                            <th className="px-3 py-2">Year</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                          {bulkMappingPreview.map((m, i) => (
+                            <tr key={i}>
+                              <td className="px-3 py-1.5 font-medium">{m.email || m.phone || m.donor_key}</td>
+                              <td className="px-3 py-1.5 font-bold text-purple-600 dark:text-purple-400">{m.department_code}</td>
+                              <td className="px-3 py-1.5 font-medium">{m.year}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="pt-2 flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={handleUploadBulkMappings}
+                        disabled={isUploadingBulk}
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-purple-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-purple-700 disabled:opacity-50 cursor-pointer shadow-sm"
+                      >
+                        {isUploadingBulk ? <Loader className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />} Apply {bulkMappingPreview.length} Mappings
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

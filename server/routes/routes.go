@@ -124,12 +124,11 @@ func SetupRouter(
 
 	// Public/Protected Leaderboard & Sponsors API
 	r.GET("/sponsors/leaderboard", sponsorsHandler.GetSponsorsLeaderboard)
+	r.GET("/sponsors/department-leaderboard", sponsorsHandler.GetDepartmentLeaderboard)
 	r.POST("/sponsors/check-contribution", sponsorsHandler.CheckContribution)
 	r.POST("/sponsors/create-order", sponsorsHandler.CreateOrder)
 	r.POST("/sponsors/capture-payment", sponsorsHandler.CapturePayment)
 	r.GET("/sponsors/certificate/:id", sponsorsHandler.GetCertificate)
-
-
 
 	// Proxy PDF by Google Drive ID (keeps original links hidden)
 	r.GET("/pdf/:id", uploadHandler.ProxyPDF)
@@ -146,6 +145,13 @@ func SetupRouter(
 		admin.GET("/sponsors/leaderboard", sponsorsHandler.GetSponsorsLeaderboardAdmin)
 		admin.PUT("/sponsors/name-override", sponsorsHandler.UpdateSponsorNameOverride)
 		admin.DELETE("/sponsors/name-override", sponsorsHandler.DeleteSponsorNameOverride)
+		admin.GET("/sponsors/departments", sponsorsHandler.GetSponsorDepartments)
+		admin.POST("/sponsors/departments", sponsorsHandler.CreateSponsorDepartment)
+		admin.POST("/sponsors/departments/batch", sponsorsHandler.CreateSponsorDepartmentsBatch)
+		admin.PUT("/sponsors/departments/:id", sponsorsHandler.UpdateSponsorDepartment)
+		admin.DELETE("/sponsors/departments/:id", sponsorsHandler.DeleteSponsorDepartment)
+		admin.POST("/sponsors/department-mapping", sponsorsHandler.UpdateSponsorDepartmentMapping)
+		admin.POST("/sponsors/department-mapping/batch", sponsorsHandler.UpdateSponsorDepartmentMappingsBatch)
 		admin.GET("/users", adminHandler.GetUsers)
 		admin.GET("/tracker-users", trackerUserHandler.GetTrackerUsersAdmin)
 		admin.GET("/users/update", adminHandler.UpdateUsers)

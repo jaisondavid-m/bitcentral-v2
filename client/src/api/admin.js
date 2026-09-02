@@ -394,6 +394,76 @@ export async function deleteSponsorNameOverride(donor_key) {
   }
 }
 
+export async function getSponsorDepartments() {
+  try {
+    const headers = await getAdminHeaders();
+    const response = await api.get(`/admin/sponsors/departments`, { headers });
+    return response.data;
+  } catch (error) {
+    return { success: false, error: normalizeAdminError(error, "Failed to load departments"), departments: [] };
+  }
+}
+
+export async function createSponsorDepartment({ name, code, email_code, year, year_code }) {
+  try {
+    const headers = await getAdminHeaders();
+    const response = await api.post(`/admin/sponsors/departments`, { name, code, email_code, year, year_code }, { headers });
+    return response.data;
+  } catch (error) {
+    return { success: false, error: normalizeAdminError(error, "Failed to create department") };
+  }
+}
+
+export async function updateSponsorDepartment(id, { name, code, email_code, year, year_code }) {
+  try {
+    const headers = await getAdminHeaders();
+    const response = await api.put(`/admin/sponsors/departments/${id}`, { name, code, email_code, year, year_code }, { headers });
+    return response.data;
+  } catch (error) {
+    return { success: false, error: normalizeAdminError(error, "Failed to update department") };
+  }
+}
+
+export async function deleteSponsorDepartment(id) {
+  try {
+    const headers = await getAdminHeaders();
+    const response = await api.delete(`/admin/sponsors/departments/${id}`, { headers });
+    return response.data;
+  } catch (error) {
+    return { success: false, error: normalizeAdminError(error, "Failed to delete department") };
+  }
+}
+
+export async function updateSponsorDepartmentMapping({ donor_key, department_id, email, phone }) {
+  try {
+    const headers = await getAdminHeaders();
+    const response = await api.post(`/admin/sponsors/department-mapping`, { donor_key, department_id, email, phone }, { headers });
+    return response.data;
+  } catch (error) {
+    return { success: false, error: normalizeAdminError(error, "Failed to update department mapping") };
+  }
+}
+
+export async function createSponsorDepartmentsBatch(departments) {
+  try {
+    const headers = await getAdminHeaders();
+    const response = await api.post(`/admin/sponsors/departments/batch`, { departments }, { headers });
+    return response.data;
+  } catch (error) {
+    return { success: false, error: normalizeAdminError(error, "Failed to bulk upload departments") };
+  }
+}
+
+export async function updateSponsorDepartmentMappingsBatch(mappings) {
+  try {
+    const headers = await getAdminHeaders();
+    const response = await api.post(`/admin/sponsors/department-mapping/batch`, { mappings }, { headers });
+    return response.data;
+  } catch (error) {
+    return { success: false, error: normalizeAdminError(error, "Failed to bulk map donors") };
+  }
+}
+
 export async function listTrackerUsers({ page = 1, limit = 25, search = "", batch = "", department = "" } = {}) {
   const headers = await getAdminHeaders();
   const params = new URLSearchParams();

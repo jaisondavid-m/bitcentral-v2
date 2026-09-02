@@ -19,6 +19,7 @@ import {
   X,
   ArrowLeft,
   LogIn,
+  GraduationCap,
 } from "lucide-react";
 import { FaHandHoldingHeart } from "react-icons/fa6";
 import { auth, logout } from "@/config/firebase.js";
@@ -57,10 +58,12 @@ export default function SupportDev() {
   };
 
   const [loading, setLoading] = useState(true);
+  const [leaderboardTab, setLeaderboardTab] = useState("individual"); // "individual" | "departments"
   const [leaderboard, setLeaderboard] = useState({
     total_raised: 0,
     total_supporters: 0,
     sponsors: [],
+    department_leaderboard: [],
   });
 
   // User Contribution State
@@ -110,6 +113,7 @@ export default function SupportDev() {
           ...data,
           total_supporters: sorted.length,
           sponsors: sorted,
+          department_leaderboard: data.department_leaderboard || [],
         });
       }
     } catch (err) {
@@ -533,19 +537,43 @@ export default function SupportDev() {
 
 
             <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              {/* Leaderboard Header */}
-              <div className="flex items-center justify-between pb-3.5">
-                <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
-                  <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  <span>Top Donors</span>
+              {/* Leaderboard Header & Tabs */}
+              <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl dark:bg-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setLeaderboardTab("individual")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      leaderboardTab === "individual"
+                        ? "bg-white text-blue-600 shadow-xs dark:bg-slate-900 dark:text-blue-400"
+                        : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+                    }`}
+                  >
+                    <Users className="h-3.5 w-3.5" />
+                    <span>Top Donors</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setLeaderboardTab("departments")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      leaderboardTab === "departments"
+                        ? "bg-white text-purple-600 shadow-xs dark:bg-slate-900 dark:text-purple-400"
+                        : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+                    }`}
+                  >
+                    <GraduationCap className="h-3.5 w-3.5" />
+                    <span>Departments</span>
+                  </button>
                 </div>
-                <span className="rounded-full bg-[#e0e7ff]/80 px-3 py-0.5 text-[11px] font-bold text-[#4318ff] dark:bg-blue-950 dark:text-blue-300 border border-blue-100/60 dark:border-blue-800/60">
-                  Top 10 Supporters
+
+                <span className="rounded-full bg-[#e0e7ff]/80 px-2.5 py-0.5 text-[10px] font-bold text-[#4318ff] dark:bg-blue-950 dark:text-blue-300 border border-blue-100/60 dark:border-blue-800/60">
+                  Top 10 Rankings
                 </span>
               </div>
 
               {/* List / Skeleton Loading / Empty State */}
-              <div className="mt-2 space-y-2 max-h-[540px] min-h-[200px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex flex-col justify-start">
+              <div className="mt-3 space-y-2 max-h-[540px] min-h-[200px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex flex-col justify-start">
                 {loading ? (
                   /* Skeleton Loading State */
                   Array.from({ length: 5 }).map((_, idx) => (
@@ -560,82 +588,148 @@ export default function SupportDev() {
                       <div className="h-4 w-12 rounded bg-slate-200 dark:bg-slate-700"></div>
                     </div>
                   ))
-                ) : leaderboard.sponsors.length === 0 ? (
-                  /* Empty State (No Donors Yet) */
-                  <div className="flex flex-col items-center justify-center py-10 text-center space-y-3">
-                    <div className="rounded-full bg-rose-50 p-3 text-rose-500 dark:bg-rose-950/60 dark:text-rose-400">
-                      <Heart className="h-6 w-6 fill-current animate-bounce" />
+                ) : leaderboardTab === "individual" ? (
+                  leaderboard.sponsors.length === 0 ? (
+                    /* Empty State (No Donors Yet) */
+                    <div className="flex flex-col items-center justify-center py-10 text-center space-y-3">
+                      <div className="rounded-full bg-rose-50 p-3 text-rose-500 dark:bg-rose-950/60 dark:text-rose-400">
+                        <Heart className="h-6 w-6 fill-current animate-bounce" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center justify-center gap-1">
+                          <span>Be the first patron!</span>
+                          <Sparkles className="h-4 w-4 text-amber-500" />
+                        </h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-[220px] mx-auto">
+                          Your support keeps open student infrastructure running.
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center justify-center gap-1">
-                        <span>Be the first patron!</span>
-                        <Sparkles className="h-4 w-4 text-amber-500" />
+                  ) : (
+                    /* Real Donors List */
+                    leaderboard.sponsors.slice(0, 10).map((sponsor, idx) => {
+                      const rank = idx + 1;
+                      const isCurrentUser = isCurrentUserSponsor(
+                        userContribution,
+                        sponsor,
+                        donorEmail || user?.email,
+                        donorPhone
+                      );
+
+                      let rowStyle = "border border-slate-100 bg-slate-50/50 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950/60 dark:hover:bg-slate-950";
+                      let badgeStyle = "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-bold px-2 py-0.5 rounded-lg text-xs";
+                      let badgeContent = `#${rank}`;
+
+                      if (rank === 1) {
+                        rowStyle = "border border-amber-200/90 bg-amber-50/40 dark:border-amber-800/60 dark:from-amber-950/30 dark:to-slate-900";
+                        badgeStyle = "bg-[#ff6b00] text-white font-black px-2 py-0.5 rounded-lg text-xs shadow-xs";
+                        badgeContent = "#1";
+                      } else if (rank === 2) {
+                        rowStyle = "border border-slate-200/80 bg-slate-100/50 dark:border-slate-700/60 dark:bg-slate-800/40";
+                        badgeStyle = "bg-[#64748b] text-white font-bold px-2 py-0.5 rounded-lg text-xs";
+                        badgeContent = "#2";
+                      } else if (rank === 3) {
+                        rowStyle = "border border-orange-200/80 bg-orange-50/30 dark:border-amber-900/50 dark:bg-orange-950/20";
+                        badgeStyle = "bg-[#ea580c] text-white font-bold px-2 py-0.5 rounded-lg text-xs";
+                        badgeContent = "#3";
+                      }
+
+                      if (isCurrentUser) {
+                        rowStyle = "border-2 border-[#10b981] bg-[#ecfdf5]/80 dark:bg-emerald-950/40 shadow-xs";
+                      }
+
+                      return (
+                        <div
+                          key={idx}
+                          className={`flex items-center justify-between rounded-xl p-2.5 text-xs transition-all duration-200 ${rowStyle}`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className={`inline-flex items-center justify-center shrink-0 ${badgeStyle}`}>
+                              {badgeContent}
+                            </span>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-bold text-slate-900 dark:text-slate-100 truncate max-w-[140px]">
+                                  {sponsor.name}
+                                </span>
+                                {isCurrentUser && (
+                                  <span className="rounded bg-[#047857] px-1.5 py-0.5 text-[9px] font-black text-white uppercase tracking-wider shrink-0">
+                                    YOU
+                                  </span>
+                                )}
+                              </div>
+                              {sponsor.department_display && (
+                                <span className="text-[10px] text-purple-600 dark:text-purple-400 font-semibold block truncate">
+                                  {sponsor.department_display}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 shrink-0">
+                            <span className="font-extrabold text-[#047857] dark:text-emerald-400 text-sm">
+                              ₹{Number(sponsor.amount || 0).toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )
+                ) : (
+                  /* Department Leaderboard List */
+                  (leaderboard.department_leaderboard || []).length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-10 text-center space-y-2">
+                      <GraduationCap className="h-6 w-6 text-purple-500 animate-bounce" />
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                        No Department Contributions Yet
                       </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-[220px] mx-auto">
-                        Your support keeps open student infrastructure running.
+                      <p className="text-xs text-slate-500 dark:text-slate-400 max-w-[220px]">
+                        Support Dev to place your department on top of the leaderboard!
                       </p>
                     </div>
-                  </div>
-                ) : (
-                  /* Real Donors List */
-                  leaderboard.sponsors.slice(0, 10).map((sponsor, idx) => {
-                    const rank = idx + 1;
-                    const isCurrentUser = isCurrentUserSponsor(
-                      userContribution,
-                      sponsor,
-                      donorEmail || user?.email,
-                      donorPhone
-                    );
+                  ) : (
+                    (leaderboard.department_leaderboard || []).slice(0, 10).map((dept, idx) => {
+                      const rank = idx + 1;
+                      let badgeStyle = "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-bold px-2 py-0.5 rounded-lg text-xs";
+                      let rowStyle = "border border-slate-100 bg-slate-50/50 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950/60 dark:hover:bg-slate-950";
 
-                    let rowStyle = "border border-slate-100 bg-slate-50/50 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950/60 dark:hover:bg-slate-950";
-                    let badgeStyle = "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-bold px-2 py-0.5 rounded-lg text-xs";
-                    let badgeContent = `#${rank}`;
+                      if (rank === 1) {
+                        rowStyle = "border border-purple-200/90 bg-purple-50/40 dark:border-purple-800/60 dark:from-purple-950/30 dark:to-slate-900";
+                        badgeStyle = "bg-purple-600 text-white font-black px-2 py-0.5 rounded-lg text-xs shadow-xs";
+                      } else if (rank === 2) {
+                        badgeStyle = "bg-[#64748b] text-white font-bold px-2 py-0.5 rounded-lg text-xs";
+                      } else if (rank === 3) {
+                        badgeStyle = "bg-[#ea580c] text-white font-bold px-2 py-0.5 rounded-lg text-xs";
+                      }
 
-                    if (rank === 1) {
-                      rowStyle = "border border-amber-200/90 bg-amber-50/40 dark:border-amber-800/60 dark:from-amber-950/30 dark:to-slate-900";
-                      badgeStyle = "bg-[#ff6b00] text-white font-black px-2 py-0.5 rounded-lg text-xs shadow-xs";
-                      badgeContent = "#1";
-                    } else if (rank === 2) {
-                      rowStyle = "border border-slate-200/80 bg-slate-100/50 dark:border-slate-700/60 dark:bg-slate-800/40";
-                      badgeStyle = "bg-[#64748b] text-white font-bold px-2 py-0.5 rounded-lg text-xs";
-                      badgeContent = "#2";
-                    } else if (rank === 3) {
-                      rowStyle = "border border-orange-200/80 bg-orange-50/30 dark:border-amber-900/50 dark:bg-orange-950/20";
-                      badgeStyle = "bg-[#ea580c] text-white font-bold px-2 py-0.5 rounded-lg text-xs";
-                      badgeContent = "#3";
-                    }
-
-                    if (isCurrentUser) {
-                      rowStyle = "border-2 border-[#10b981] bg-[#ecfdf5]/80 dark:bg-emerald-950/40 shadow-xs";
-                    }
-
-                    return (
-                      <div
-                        key={idx}
-                        className={`flex items-center justify-between rounded-xl p-2.5 text-xs transition-all duration-200 ${rowStyle}`}
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <span className={`inline-flex items-center justify-center shrink-0 ${badgeStyle}`}>
-                            {badgeContent}
-                          </span>
-                          <span className="font-bold text-slate-900 dark:text-slate-100 truncate max-w-[150px]">
-                            {sponsor.name}
-                          </span>
-                          {isCurrentUser && (
-                            <span className="rounded bg-[#047857] px-1.5 py-0.5 text-[9px] font-black text-white uppercase tracking-wider shrink-0">
-                              YOU
+                      return (
+                        <div
+                          key={dept.id || idx}
+                          className={`flex items-center justify-between rounded-xl p-2.5 text-xs transition-all duration-200 ${rowStyle}`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className={`inline-flex items-center justify-center shrink-0 ${badgeStyle}`}>
+                              #{rank}
                             </span>
-                          )}
-                        </div>
+                            <div className="min-w-0">
+                              <span className="font-extrabold text-slate-900 dark:text-white truncate block text-xs">
+                                {dept.display_name}
+                              </span>
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate block">
+                                {dept.name}
+                              </span>
+                            </div>
+                          </div>
 
-                        <div className="flex items-center gap-3 shrink-0">
-                          <span className="font-extrabold text-[#047857] dark:text-emerald-400 text-sm">
-                            ₹{Number(sponsor.amount || 0).toLocaleString("en-IN")}
-                          </span>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="font-extrabold text-[#047857] dark:text-emerald-400 text-sm">
+                              ₹{Number(dept.total_amount || 0).toLocaleString("en-IN")}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })
+                      );
+                    })
+                  )
                 )}
               </div>
             </div>
