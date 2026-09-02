@@ -52,6 +52,9 @@ const ProtectedLayout = lazyWithRetry(() => import("../routes/ProtectedLayout.js
 const AdminDashboard = lazyWithRetry(() =>
   import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.default }))
 );
+const AdminAnalyticsPage = lazyWithRetry(() =>
+  import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminAnalyticsPage }))
+);
 const AdminUsersPage = lazyWithRetry(() =>
   import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminUsersPage }))
 );
@@ -194,6 +197,14 @@ function App() {
                 element={
                   <AdminRoute>
                     <AdminDashboard />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/analytics"
+                element={
+                  <AdminRoute>
+                    <AdminAnalyticsPage />
                   </AdminRoute>
                 }
               />
