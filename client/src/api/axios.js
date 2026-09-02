@@ -54,6 +54,19 @@ export async function getSponsorsLeaderboard() {
       total_raised: 0,
       total_supporters: 0,
       sponsors: [],
+      department_leaderboard: [],
+    };
+  }
+}
+
+export async function getDepartmentLeaderboard() {
+  try {
+    const response = await api.get("/sponsors/department-leaderboard");
+    return response.data;
+  } catch (error) {
+    return {
+      success: true,
+      department_leaderboard: [],
     };
   }
 }

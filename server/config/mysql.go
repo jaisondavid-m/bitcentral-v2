@@ -102,6 +102,7 @@ func InitMySQL() {
 	createAllowedEmailsTable()
 	createTrackerUsersTable()
 	createSponsorNameOverridesTable()
+	createSponsorDepartmentTables()
 	dropAcademicTables()
 	createFeedbackMessagesTable()
 }
@@ -443,6 +444,45 @@ func createSponsorNameOverridesTable() {
 		log.Println("✅ sponsor_name_overrides table ready")
 	}
 }
+
+func createSponsorDepartmentTables() {
+	queryDept := `
+	CREATE TABLE IF NOT EXISTS sponsor_departments (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		name VARCHAR(255) NOT NULL,
+		code VARCHAR(50) NOT NULL,
+		email_code VARCHAR(50) NOT NULL DEFAULT '',
+		year VARCHAR(50) NOT NULL,
+		year_code VARCHAR(50) NOT NULL DEFAULT '',
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		UNIQUE KEY uk_dept_code_year (code, year)
+	) ENGINE=InnoDB;`
+
+	if _, err := DB.Exec(queryDept); err != nil {
+		log.Printf("ℹ️ sponsor_departments table notice: %v", err)
+	} else {
+		log.Println("✅ sponsor_departments table ready")
+	}
+
+	// Add email_code and year_code columns if missing (for existing databases)
+	_, _ = DB.Exec("ALTER TABLE sponsor_departments ADD COLUMN email_code VARCHAR(50) NOT NULL DEFAULT '' AFTER code")
+	_, _ = DB.Exec("ALTER TABLE sponsor_departments ADD COLUMN year_code VARCHAR(50) NOT NULL DEFAULT '' AFTER year")
+
+	queryMapping := `
+	CREATE TABLE IF NOT EXISTS sponsor_department_mappings (
+		donor_key VARCHAR(255) PRIMARY KEY,
+		department_id INT NOT NULL,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		INDEX idx_sponsor_dept_id (department_id)
+	) ENGINE=InnoDB;`
+
+	if _, err := DB.Exec(queryMapping); err != nil {
+		log.Printf("ℹ️ sponsor_department_mappings table notice: %v", err)
+	}
+}
+
+
 
 
 

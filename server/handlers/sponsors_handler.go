@@ -221,6 +221,256 @@ type AggregatedDonor struct {
 	LatestDate   string  `json:"date"`
 }
 
+type SponsorDepartment struct {
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	Code      string `json:"code"`
+	EmailCode string `json:"email_code"`
+	Year      string `json:"year"`
+	YearCode  string `json:"year_code"`
+	CreatedAt string `json:"created_at,omitempty"`
+}
+
+func getDepartmentsMap() (map[int]SponsorDepartment, []SponsorDepartment) {
+	deptMap := make(map[int]SponsorDepartment)
+	var deptList []SponsorDepartment
+	if config.DB == nil {
+		return deptMap, deptList
+	}
+	rows, err := config.DB.Query("SELECT id, name, code, COALESCE(email_code, ''), year, COALESCE(year_code, '') FROM sponsor_departments ORDER BY name ASC, year ASC")
+	if err != nil {
+		return deptMap, deptList
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var d SponsorDepartment
+		if err := rows.Scan(&d.ID, &d.Name, &d.Code, &d.EmailCode, &d.Year, &d.YearCode); err == nil {
+			deptMap[d.ID] = d
+			deptList = append(deptList, d)
+		}
+	}
+	return deptMap, deptList
+}
+
+func getDepartmentMappingsMap() map[string]int {
+	mappings := make(map[string]int)
+	if config.DB == nil {
+		return mappings
+	}
+	rows, err := config.DB.Query("SELECT donor_key, department_id FROM sponsor_department_mappings")
+	if err != nil {
+		return mappings
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var key string
+		var deptID int
+		if err := rows.Scan(&key, &deptID); err == nil {
+			mappings[key] = deptID
+		}
+	}
+	return mappings
+}
+
+func extractEmailDepartmentAndYear(email string) (string, string) {
+	emailLower := strings.ToLower(strings.TrimSpace(email))
+	if emailLower == "" {
+		return "", ""
+	}
+
+	atIdx := strings.Index(emailLower, "@")
+	username := emailLower
+	if atIdx != -1 {
+		username = emailLower[:atIdx]
+	}
+
+	dotIdx := strings.LastIndex(username, ".")
+	codeSegment := username
+	if dotIdx != -1 && dotIdx < len(username)-1 {
+		codeSegment = username[dotIdx+1:]
+	}
+
+	var alphaParts []string
+	var digitParts []string
+
+	var curAlpha strings.Builder
+	var curDigit strings.Builder
+
+	for _, ch := range codeSegment {
+		if (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') {
+			if curDigit.Len() > 0 {
+				digitParts = append(digitParts, curDigit.String())
+				curDigit.Reset()
+			}
+			curAlpha.WriteRune(ch)
+		} else if ch >= '0' && ch <= '9' {
+			if curAlpha.Len() > 0 {
+				alphaParts = append(alphaParts, curAlpha.String())
+				curAlpha.Reset()
+			}
+			curDigit.WriteRune(ch)
+		}
+	}
+	if curAlpha.Len() > 0 {
+		alphaParts = append(alphaParts, curAlpha.String())
+	}
+	if curDigit.Len() > 0 {
+		digitParts = append(digitParts, curDigit.String())
+	}
+
+	parsedEmailCode := ""
+	parsedYearCode := ""
+
+	if len(alphaParts) > 0 {
+		parsedEmailCode = alphaParts[0]
+	}
+	if len(digitParts) > 0 {
+		for _, d := range digitParts {
+			if len(d) == 2 {
+				parsedYearCode = d
+				break
+			}
+		}
+		if parsedYearCode == "" && len(digitParts) > 0 {
+			parsedYearCode = digitParts[0]
+		}
+	}
+
+	return parsedEmailCode, parsedYearCode
+}
+
+func resolveDonorDepartmentID(key string, donor *AggregatedDonor, mappings map[string]int) int {
+	if deptID, ok := mappings[key]; ok && deptID > 0 {
+		return deptID
+	}
+	if donor.PhoneDigits != "" {
+		if deptID, ok := mappings["phone_"+donor.PhoneDigits]; ok && deptID > 0 {
+			return deptID
+		}
+	}
+	if donor.Email != "" {
+		emailLower := strings.ToLower(strings.TrimSpace(donor.Email))
+		if deptID, ok := mappings["email_"+emailLower]; ok && deptID > 0 {
+			return deptID
+		}
+		// Automatic email short code and year code matching fallback (e.g. 'it' and '23' in cheran.it23@bitsathy.ac.in)
+		parsedEmailCode, parsedYearCode := extractEmailDepartmentAndYear(emailLower)
+		_, deptList := getDepartmentsMap()
+
+		// Pass 1: Try matching BOTH email_code AND year_code with exact equality
+		if parsedEmailCode != "" && parsedYearCode != "" {
+			for _, dept := range deptList {
+				emailCode := strings.ToLower(strings.TrimSpace(dept.EmailCode))
+				yearCode := strings.ToLower(strings.TrimSpace(dept.YearCode))
+				if emailCode != "" && yearCode != "" {
+					if strings.EqualFold(emailCode, parsedEmailCode) && strings.EqualFold(yearCode, parsedYearCode) {
+						return dept.ID
+					}
+				}
+			}
+		}
+
+		// Pass 2: Fallback matching email_code + year number pattern (e.g. '26'->1st Year, '25'->2nd Year, '24'->3rd Year, '23'->3rd Year, '22'->4th Year)
+		if parsedEmailCode != "" {
+			for _, dept := range deptList {
+				emailCode := strings.ToLower(strings.TrimSpace(dept.EmailCode))
+				if emailCode != "" && strings.EqualFold(emailCode, parsedEmailCode) {
+					if parsedYearCode != "" {
+						yearStr := strings.ToLower(dept.Year)
+						if parsedYearCode == "26" && strings.Contains(yearStr, "1") {
+							return dept.ID
+						} else if parsedYearCode == "25" && strings.Contains(yearStr, "2") {
+							return dept.ID
+						} else if parsedYearCode == "24" && strings.Contains(yearStr, "3") {
+							return dept.ID
+						} else if parsedYearCode == "23" && strings.Contains(yearStr, "3") {
+							return dept.ID
+						} else if parsedYearCode == "22" && strings.Contains(yearStr, "4") {
+							return dept.ID
+						}
+					}
+				}
+			}
+
+			// Pass 3: Fallback matching email_code alone with exact equality (so 'ch' or 'ag' won't match student names)
+			for _, dept := range deptList {
+				emailCode := strings.ToLower(strings.TrimSpace(dept.EmailCode))
+				if emailCode != "" && strings.EqualFold(emailCode, parsedEmailCode) {
+					return dept.ID
+				}
+			}
+		}
+
+		// Pass 4: Fallback if email didn't have a dot separator, check for '.{email_code}' in email
+		for _, dept := range deptList {
+			emailCode := strings.ToLower(strings.TrimSpace(dept.EmailCode))
+			if emailCode != "" && len(emailCode) >= 2 {
+				if strings.Contains(emailLower, "."+emailCode) {
+					return dept.ID
+				}
+			}
+		}
+	}
+	return 0
+}
+
+func buildDepartmentLeaderboard(aggregatedMap map[string]*AggregatedDonor) []gin.H {
+	_, deptList := getDepartmentsMap()
+	mappings := getDepartmentMappingsMap()
+
+	deptTotals := make(map[int]float64)
+	deptCounts := make(map[int]int)
+
+	for key, donor := range aggregatedMap {
+		deptID := resolveDonorDepartmentID(key, donor, mappings)
+		if deptID > 0 {
+			deptTotals[deptID] += donor.Amount
+			deptCounts[deptID] += 1
+		}
+	}
+
+	var leaderboard []gin.H
+	for _, dept := range deptList {
+		totalAmt := deptTotals[dept.ID]
+		supporters := deptCounts[dept.ID]
+
+		leaderboard = append(leaderboard, gin.H{
+			"id":               dept.ID,
+			"name":             dept.Name,
+			"code":             dept.Code,
+			"year":             dept.Year,
+			"display_name":     fmt.Sprintf("%s - %s", dept.Code, dept.Year),
+			"full_name":        fmt.Sprintf("%s (%s - %s)", dept.Name, dept.Code, dept.Year),
+			"total_amount":     totalAmt,
+			"total_supporters": supporters,
+		})
+	}
+
+	sort.Slice(leaderboard, func(i, j int) bool {
+		amtI, _ := leaderboard[i]["total_amount"].(float64)
+		amtJ, _ := leaderboard[j]["total_amount"].(float64)
+		if amtI != amtJ {
+			return amtI > amtJ
+		}
+		cntI, _ := leaderboard[i]["total_supporters"].(int)
+		cntJ, _ := leaderboard[j]["total_supporters"].(int)
+		if cntI != cntJ {
+			return cntI > cntJ
+		}
+		nameI, _ := leaderboard[i]["display_name"].(string)
+		nameJ, _ := leaderboard[j]["display_name"].(string)
+		return nameI < nameJ
+	})
+
+	for i := range leaderboard {
+		leaderboard[i]["rank"] = i + 1
+	}
+
+	return leaderboard
+}
+
 // GetSponsorsLeaderboard returns real public leaderboard for Support Dev page
 func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 	keyID := os.Getenv("RAZORPAY_KEY_ID")
@@ -229,6 +479,9 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 	var sponsors []gin.H
 	var total float64
 	overridesMap := getOverridesMap()
+	deptMap, _ := getDepartmentsMap()
+	deptMappings := getDepartmentMappingsMap()
+	aggregatedMap := make(map[string]*AggregatedDonor)
 
 	if keyID != "" && keySecret != "" {
 		url := "https://api.razorpay.com/v1/payments?count=100"
@@ -243,8 +496,6 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 
 				var rzpRes RazorpayPaymentsResponse
 				if err := json.Unmarshal(body, &rzpRes); err == nil {
-					aggregatedMap := make(map[string]*AggregatedDonor)
-
 					for _, item := range rzpRes.Items {
 						st := strings.ToLower(item.Status)
 						if st != "captured" && st != "authorized" {
@@ -326,11 +577,27 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 							}
 						}
 
+						deptID := resolveDonorDepartmentID(key, donor, deptMappings)
+						var deptDisplay string
+						var deptCode string
+						var deptYear string
+						if deptID > 0 {
+							if d, ok := deptMap[deptID]; ok {
+								deptDisplay = fmt.Sprintf("%s - %s", d.Code, d.Year)
+								deptCode = d.Code
+								deptYear = d.Year
+							}
+						}
+
 						sponsors = append(sponsors, gin.H{
-							"name":   displayName,
-							"amount": donor.Amount,
-							"date":   donor.LatestDate,
-							"email":  donor.Email,
+							"name":               displayName,
+							"amount":             donor.Amount,
+							"date":               donor.LatestDate,
+							"email":              donor.Email,
+							"department_id":      deptID,
+							"department_code":    deptCode,
+							"department_year":    deptYear,
+							"department_display": deptDisplay,
 						})
 					}
 
@@ -354,11 +621,14 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 		}
 	}
 
+	deptLeaderboard := buildDepartmentLeaderboard(aggregatedMap)
+
 	c.JSON(http.StatusOK, gin.H{
-		"success":          true,
-		"total_raised":     total,
-		"total_supporters": len(sponsors),
-		"sponsors":         sponsors,
+		"success":                true,
+		"total_raised":           total,
+		"total_supporters":       len(sponsors),
+		"sponsors":               sponsors,
+		"department_leaderboard": deptLeaderboard,
 	})
 }
 
@@ -369,6 +639,9 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 
 	var leaderboard []gin.H
 	overridesMap := getOverridesMap()
+	deptMap, _ := getDepartmentsMap()
+	deptMappings := getDepartmentMappingsMap()
+	aggregatedMap := make(map[string]*AggregatedDonor)
 
 	if keyID != "" && keySecret != "" {
 		url := "https://api.razorpay.com/v1/payments?count=100"
@@ -383,8 +656,6 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 
 				var rzpRes RazorpayPaymentsResponse
 				if err := json.Unmarshal(body, &rzpRes); err == nil {
-					aggregatedMap := make(map[string]*AggregatedDonor)
-
 					for _, item := range rzpRes.Items {
 						st := strings.ToLower(item.Status)
 						if st != "captured" && st != "authorized" {
@@ -474,16 +745,35 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 							displayName = customName
 						}
 
+						deptID := resolveDonorDepartmentID(key, donor, deptMappings)
+						var deptDisplay string
+						var deptCode string
+						var deptYear string
+						var deptName string
+						if deptID > 0 {
+							if d, ok := deptMap[deptID]; ok {
+								deptDisplay = fmt.Sprintf("%s - %s", d.Code, d.Year)
+								deptCode = d.Code
+								deptYear = d.Year
+								deptName = d.Name
+							}
+						}
+
 						leaderboard = append(leaderboard, gin.H{
-							"donor_key":     key,
-							"display_name":  displayName,
-							"original_name": donor.OriginalName,
-							"custom_name":   customName,
-							"is_overridden": isOverridden,
-							"email":         donor.Email,
-							"phone":         donor.Phone,
-							"amount":        donor.Amount,
-							"date":          donor.LatestDate,
+							"donor_key":          key,
+							"display_name":       displayName,
+							"original_name":      donor.OriginalName,
+							"custom_name":        customName,
+							"is_overridden":      isOverridden,
+							"email":              donor.Email,
+							"phone":              donor.Phone,
+							"amount":             donor.Amount,
+							"date":               donor.LatestDate,
+							"department_id":      deptID,
+							"department_name":    deptName,
+							"department_code":    deptCode,
+							"department_year":    deptYear,
+							"department_display": deptDisplay,
 						})
 					}
 
@@ -507,9 +797,12 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 		}
 	}
 
+	deptLeaderboard := buildDepartmentLeaderboard(aggregatedMap)
+
 	c.JSON(http.StatusOK, gin.H{
-		"success":     true,
-		"leaderboard": leaderboard,
+		"success":                true,
+		"leaderboard":            leaderboard,
+		"department_leaderboard": deptLeaderboard,
 	})
 }
 
@@ -1177,6 +1470,430 @@ func (h *SponsorsHandler) GetCertificate(c *gin.Context) {
 			"error":    "No verified patron contribution record found for this certificate ID.",
 		})
 	}
+}
+
+func (h *SponsorsHandler) GetDepartmentLeaderboard(c *gin.Context) {
+	keyID := os.Getenv("RAZORPAY_KEY_ID")
+	keySecret := os.Getenv("RAZORPAY_KEY_SECRET")
+
+	aggregatedMap := make(map[string]*AggregatedDonor)
+
+	if keyID != "" && keySecret != "" {
+		url := "https://api.razorpay.com/v1/payments?count=100"
+		req, err := http.NewRequest("GET", url, nil)
+		if err == nil {
+			req.SetBasicAuth(keyID, keySecret)
+			client := &http.Client{Timeout: 10 * time.Second}
+			resp, err := client.Do(req)
+			if err == nil && resp.StatusCode == http.StatusOK {
+				defer resp.Body.Close()
+				body, _ := io.ReadAll(resp.Body)
+
+				var rzpRes RazorpayPaymentsResponse
+				if err := json.Unmarshal(body, &rzpRes); err == nil {
+					for _, item := range rzpRes.Items {
+						st := strings.ToLower(item.Status)
+						if st != "captured" && st != "authorized" {
+							continue
+						}
+
+						amt := float64(item.Amount) / 100.0
+						if item.AmountPaid > 0 {
+							amt = float64(item.AmountPaid) / 100.0
+						}
+
+						email := item.Email
+						phone := item.Contact
+						if item.Notes != nil {
+							if e, ok := item.Notes["email"].(string); ok && e != "" {
+								email = e
+							}
+							if p, ok := item.Notes["phone"].(string); ok && p != "" {
+								phone = p
+							} else if p, ok := item.Notes["contact"].(string); ok && p != "" {
+								phone = p
+							}
+						}
+
+						donorName := extractName(item.Notes, email)
+						phoneDigits := cleanPhone(phone)
+
+						var normKey string
+						if phoneDigits != "" {
+							normKey = "phone_" + phoneDigits
+						} else if strings.TrimSpace(email) != "" {
+							normKey = "email_" + strings.ToLower(strings.TrimSpace(email))
+						} else {
+							normKey = "name_" + strings.ToLower(strings.TrimSpace(donorName))
+						}
+
+						itemDate := time.Unix(item.CreatedAt, 0).Format("2006-01-02")
+
+						if existing, found := aggregatedMap[normKey]; found {
+							existing.Amount += amt
+							if itemDate > existing.LatestDate {
+								existing.LatestDate = itemDate
+							}
+						} else {
+							aggregatedMap[normKey] = &AggregatedDonor{
+								DonorKey:     normKey,
+								Name:         donorName,
+								OriginalName: donorName,
+								Email:        email,
+								Phone:        phone,
+								PhoneDigits:  phoneDigits,
+								Amount:       amt,
+								LatestDate:   itemDate,
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	deptLeaderboard := buildDepartmentLeaderboard(aggregatedMap)
+	c.JSON(http.StatusOK, gin.H{
+		"success":                true,
+		"department_leaderboard": deptLeaderboard,
+	})
+}
+
+func (h *SponsorsHandler) GetSponsorDepartments(c *gin.Context) {
+	_, list := getDepartmentsMap()
+	c.JSON(http.StatusOK, gin.H{
+		"success":     true,
+		"departments": list,
+	})
+}
+
+func (h *SponsorsHandler) CreateSponsorDepartment(c *gin.Context) {
+	var req struct {
+		Name      string `json:"name"`
+		Code      string `json:"code"`
+		EmailCode string `json:"email_code"`
+		Year      string `json:"year"`
+		YearCode  string `json:"year_code"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid request payload"})
+		return
+	}
+
+	name := strings.TrimSpace(req.Name)
+	code := strings.ToUpper(strings.TrimSpace(req.Code))
+	emailCode := strings.ToLower(strings.TrimSpace(req.EmailCode))
+	year := strings.TrimSpace(req.Year)
+	yearCode := strings.ToLower(strings.TrimSpace(req.YearCode))
+
+	if name == "" || code == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Department name and short code are required"})
+		return
+	}
+	if year == "" {
+		year = "1st Year"
+	}
+
+	if config.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Database not available"})
+		return
+	}
+
+	res, err := config.DB.Exec("INSERT INTO sponsor_departments (name, code, email_code, year, year_code) VALUES (?, ?, ?, ?, ?)", name, code, emailCode, year, yearCode)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": fmt.Sprintf("Failed to create department: %v", err)})
+		return
+	}
+
+	id, _ := res.LastInsertId()
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Department created successfully",
+		"department": gin.H{
+			"id":         id,
+			"name":       name,
+			"code":       code,
+			"email_code": emailCode,
+			"year":       year,
+			"year_code":  yearCode,
+		},
+	})
+}
+
+func (h *SponsorsHandler) UpdateSponsorDepartment(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid department ID"})
+		return
+	}
+
+	var req struct {
+		Name      string `json:"name"`
+		Code      string `json:"code"`
+		EmailCode string `json:"email_code"`
+		Year      string `json:"year"`
+		YearCode  string `json:"year_code"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid request payload"})
+		return
+	}
+
+	name := strings.TrimSpace(req.Name)
+	code := strings.ToUpper(strings.TrimSpace(req.Code))
+	emailCode := strings.ToLower(strings.TrimSpace(req.EmailCode))
+	year := strings.TrimSpace(req.Year)
+	yearCode := strings.ToLower(strings.TrimSpace(req.YearCode))
+
+	if name == "" || code == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Department name and short code are required"})
+		return
+	}
+
+	_, err = config.DB.Exec("UPDATE sponsor_departments SET name = ?, code = ?, email_code = ?, year = ?, year_code = ? WHERE id = ?", name, code, emailCode, year, yearCode, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to update department: %v", err)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Department updated successfully",
+	})
+}
+
+func (h *SponsorsHandler) DeleteSponsorDepartment(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid department ID"})
+		return
+	}
+
+	_, _ = config.DB.Exec("DELETE FROM sponsor_department_mappings WHERE department_id = ?", id)
+	_, err = config.DB.Exec("DELETE FROM sponsor_departments WHERE id = ?", id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to delete department: %v", err)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Department deleted successfully",
+	})
+}
+
+func (h *SponsorsHandler) UpdateSponsorDepartmentMapping(c *gin.Context) {
+	var req struct {
+		DonorKey     string `json:"donor_key"`
+		DepartmentID int    `json:"department_id"`
+		Email        string `json:"email"`
+		Phone        string `json:"phone"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid request payload"})
+		return
+	}
+
+	donorKey := strings.TrimSpace(req.DonorKey)
+	if donorKey == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "donor_key is required"})
+		return
+	}
+
+	if config.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Database not available"})
+		return
+	}
+
+	if req.DepartmentID <= 0 {
+		_, err := config.DB.Exec("DELETE FROM sponsor_department_mappings WHERE donor_key = ?", donorKey)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to remove mapping: %v", err)})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"success": true, "message": "Donor department mapping removed"})
+		return
+	}
+
+	query := `
+		INSERT INTO sponsor_department_mappings (donor_key, department_id)
+		VALUES (?, ?)
+		ON DUPLICATE KEY UPDATE department_id = VALUES(department_id);
+	`
+	_, err := config.DB.Exec(query, donorKey, req.DepartmentID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to update mapping: %v", err)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Donor department mapping updated successfully",
+	})
+}
+
+func (h *SponsorsHandler) CreateSponsorDepartmentsBatch(c *gin.Context) {
+	var req struct {
+		Departments []struct {
+			Name      string `json:"name"`
+			Code      string `json:"code"`
+			EmailCode string `json:"email_code"`
+			Year      string `json:"year"`
+			YearCode  string `json:"year_code"`
+		} `json:"departments"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid request payload"})
+		return
+	}
+
+	if len(req.Departments) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "No departments provided"})
+		return
+	}
+
+	if config.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Database not available"})
+		return
+	}
+
+	stmt, err := config.DB.Prepare(`
+		INSERT INTO sponsor_departments (name, code, email_code, year, year_code)
+		VALUES (?, ?, ?, ?, ?)
+		ON DUPLICATE KEY UPDATE name = VALUES(name), email_code = VALUES(email_code), year_code = VALUES(year_code)
+	`)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to prepare statement: %v", err)})
+		return
+	}
+	defer stmt.Close()
+
+	added := 0
+	for _, d := range req.Departments {
+		name := strings.TrimSpace(d.Name)
+		code := strings.ToUpper(strings.TrimSpace(d.Code))
+		emailCode := strings.ToLower(strings.TrimSpace(d.EmailCode))
+		year := strings.TrimSpace(d.Year)
+		yearCode := strings.ToLower(strings.TrimSpace(d.YearCode))
+
+		if name != "" && code != "" {
+			if year == "" {
+				year = "1st Year"
+			}
+			if _, err := stmt.Exec(name, code, emailCode, year, yearCode); err == nil {
+				added++
+			}
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success":     true,
+		"message":     fmt.Sprintf("Successfully uploaded %d departments", added),
+		"count_added": added,
+	})
+}
+
+func (h *SponsorsHandler) UpdateSponsorDepartmentMappingsBatch(c *gin.Context) {
+	var req struct {
+		Mappings []struct {
+			DonorKey       string `json:"donor_key"`
+			Email          string `json:"email"`
+			Phone          string `json:"phone"`
+			DepartmentCode string `json:"department_code"`
+			Year           string `json:"year"`
+			DepartmentID   int    `json:"department_id"`
+		} `json:"mappings"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid request payload"})
+		return
+	}
+
+	if len(req.Mappings) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "No mappings provided"})
+		return
+	}
+
+	if config.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Database not available"})
+		return
+	}
+
+	deptMap, _ := getDepartmentsMap()
+	lookupByCodeYear := make(map[string]int)
+	lookupByCode := make(map[string]int)
+	for _, d := range deptMap {
+		key := strings.ToLower(d.Code) + "_" + strings.ToLower(d.Year)
+		lookupByCodeYear[key] = d.ID
+		lookupByCode[strings.ToLower(d.Code)] = d.ID
+	}
+
+	stmt, err := config.DB.Prepare(`
+		INSERT INTO sponsor_department_mappings (donor_key, department_id)
+		VALUES (?, ?)
+		ON DUPLICATE KEY UPDATE department_id = VALUES(department_id)
+	`)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to prepare statement: %v", err)})
+		return
+	}
+	defer stmt.Close()
+
+	updatedCount := 0
+	for _, m := range req.Mappings {
+		deptID := m.DepartmentID
+
+		if deptID <= 0 && m.DepartmentCode != "" {
+			codeLower := strings.ToLower(strings.TrimSpace(m.DepartmentCode))
+			yearLower := strings.ToLower(strings.TrimSpace(m.Year))
+			if yearLower != "" {
+				if id, found := lookupByCodeYear[codeLower+"_"+yearLower]; found {
+					deptID = id
+				}
+			}
+			if deptID <= 0 {
+				if id, found := lookupByCode[codeLower]; found {
+					deptID = id
+				}
+			}
+		}
+
+		if deptID <= 0 {
+			continue
+		}
+
+		var keysToMap []string
+		donorKey := strings.TrimSpace(m.DonorKey)
+		if donorKey != "" {
+			keysToMap = append(keysToMap, donorKey)
+		}
+
+		phoneDigits := cleanPhone(m.Phone)
+		if phoneDigits != "" {
+			keysToMap = append(keysToMap, "phone_"+phoneDigits)
+		}
+
+		email := strings.ToLower(strings.TrimSpace(m.Email))
+		if email != "" {
+			keysToMap = append(keysToMap, "email_"+email)
+		}
+
+		for _, k := range keysToMap {
+			if _, err := stmt.Exec(k, deptID); err == nil {
+				updatedCount++
+			}
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": fmt.Sprintf("Successfully mapped %d donor records to departments", updatedCount),
+		"updated": updatedCount,
+	})
 }
 
 
