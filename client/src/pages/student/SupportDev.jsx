@@ -577,7 +577,7 @@ export default function SupportDev() {
             {userContribution?.found && (
               <div className="space-y-2">
                 {/* 1. Public Named Contribution Card */}
-                {(userContribution.named_amount > 0 || !userContribution.anonymous_amount) && (
+                {userContribution.named_amount > 0 && userContribution.name !== "Anonymous BITSian" && (
                   <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/70 p-3 shadow-2xs dark:border-emerald-900/60 dark:bg-emerald-950/40 transition-all">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2.5">
@@ -616,7 +616,7 @@ export default function SupportDev() {
                 )}
 
                 {/* 2. Anonymous Contribution Card */}
-                {userContribution.anonymous_amount > 0 && (
+                {(userContribution.anonymous_amount > 0 || userContribution.name === "Anonymous BITSian") && (
                   <div className="rounded-xl border border-slate-700/60 bg-slate-900 text-white p-3 shadow-2xs dark:border-slate-700 dark:bg-slate-900 transition-all">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2.5">
@@ -638,7 +638,7 @@ export default function SupportDev() {
 
                       <div className="text-right shrink-0 flex flex-col items-end">
                         <div className="text-sm font-black text-white leading-none">
-                          ₹{Number(userContribution.anonymous_amount || 0).toLocaleString("en-IN")}
+                          ₹{Number(userContribution.anonymous_amount || userContribution.amount || 0).toLocaleString("en-IN")}
                         </div>
                         <span className="mt-1 rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold text-slate-300">
                           Verified Anonymous

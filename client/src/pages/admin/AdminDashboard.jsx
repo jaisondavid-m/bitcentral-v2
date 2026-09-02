@@ -33,6 +33,7 @@ import {
   deleteSponsorDepartment,
   updateSponsorDepartmentMapping,
   updateSponsorDepartmentMappingsBatch,
+  updateSponsorTransactionOverride,
   listTrackerUsers,
   getAdminAnalytics,
 } from "@/api/admin.js";
@@ -4195,6 +4196,30 @@ function SponsorsSection() {
     }
   };
 
+  const handleToggleTransactionAnonymous = async (item) => {
+    const nextIsAnon = !item.is_anonymous;
+    setIsSaving(true);
+    try {
+      const res = await updateSponsorTransactionOverride({
+        payment_id: item.id,
+        is_anonymous: nextIsAnon,
+      });
+      if (res?.success) {
+        setBanner({
+          type: "success",
+          message: `Transaction ${item.id} set to ${nextIsAnon ? "Anonymous (Hidden on public leaderboard)" : "Public (Visible on public leaderboard)"}.`,
+        });
+        await fetchSponsorsData();
+      } else {
+        setBanner({ type: "error", message: res?.error || "Failed to update transaction anonymous status" });
+      }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to toggle transaction anonymous status") });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleAddDepartment = async (e) => {
     e.preventDefault();
     if (!newDeptName.trim() || !newDeptCode.trim()) return;
@@ -4924,7 +4949,10 @@ function SponsorsSection() {
         /* Razorpay Transactions View */
         <div className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
-            <h3 className="font-bold text-slate-900 dark:text-white">Razorpay Payments History</h3>
+            <h3 className="font-bold text-slate-900 dark:text-white">Razorpay Payments History & Transaction Control</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Toggle visibility per specific transaction so individual donations can be made anonymous independently.
+            </p>
           </div>
 
           {loading ? (
@@ -4940,12 +4968,14 @@ function SponsorsSection() {
               <table className="w-full text-left text-xs">
                 <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-400 font-bold uppercase tracking-wider">
                   <tr>
-                    <th className="px-4 py-3">Order ID</th>
+                    <th className="px-4 py-3">Payment / Order ID</th>
                     <th className="px-4 py-3">Donator Name</th>
                     <th className="px-4 py-3">Email & Contact</th>
                     <th className="px-4 py-3">Amount Paid</th>
-                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Razorpay Status</th>
+                    <th className="px-4 py-3">Visibility</th>
                     <th className="px-4 py-3">Date</th>
+                    <th className="px-4 py-3 text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -4963,7 +4993,43 @@ function SponsorsSection() {
                           {item.status}
                         </span>
                       </td>
+                      <td className="px-4 py-3">
+                        {item.is_anonymous ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                            <EyeOff className="h-3 w-3 text-slate-400" />
+                            Anonymous
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                            <Eye className="h-3 w-3 text-emerald-500" />
+                            Public
+                          </span>
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{item.created_at}</td>
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleTransactionAnonymous(item)}
+                          disabled={isSaving}
+                          className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                            item.is_anonymous
+                              ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                              : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200"
+                          }`}
+                          title={item.is_anonymous ? "Make Transaction Public" : "Make Transaction Anonymous"}
+                        >
+                          {item.is_anonymous ? (
+                            <>
+                              <Eye className="h-3 w-3 text-emerald-600" /> Make Public
+                            </>
+                          ) : (
+                            <>
+                              <EyeOff className="h-3 w-3 text-slate-500" /> Make Anonymous
+                            </>
+                          )}
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

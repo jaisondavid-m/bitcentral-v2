@@ -103,6 +103,7 @@ func InitMySQL() {
 	createTrackerUsersTable()
 	createSponsorNameOverridesTable()
 	createSponsorDepartmentTables()
+	createSponsorTransactionOverridesTable()
 	dropAcademicTables()
 	createFeedbackMessagesTable()
 }
@@ -479,6 +480,21 @@ func createSponsorDepartmentTables() {
 
 	if _, err := DB.Exec(queryMapping); err != nil {
 		log.Printf("ℹ️ sponsor_department_mappings table notice: %v", err)
+	}
+}
+
+func createSponsorTransactionOverridesTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS sponsor_transaction_overrides (
+		payment_id VARCHAR(255) PRIMARY KEY,
+		is_anonymous TINYINT(1) NOT NULL DEFAULT 0,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+	) ENGINE=InnoDB;`
+
+	if _, err := DB.Exec(query); err != nil {
+		log.Printf("ℹ️ sponsor_transaction_overrides table notice: %v", err)
+	} else {
+		log.Println("✅ sponsor_transaction_overrides table ready")
 	}
 }
 

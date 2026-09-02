@@ -145,6 +145,7 @@ func SetupRouter(
 		admin.GET("/sponsors/leaderboard", sponsorsHandler.GetSponsorsLeaderboardAdmin)
 		admin.PUT("/sponsors/name-override", sponsorsHandler.UpdateSponsorNameOverride)
 		admin.DELETE("/sponsors/name-override", sponsorsHandler.DeleteSponsorNameOverride)
+		admin.PUT("/sponsors/transaction-override", sponsorsHandler.UpdateSponsorTransactionOverride)
 		admin.GET("/sponsors/departments", sponsorsHandler.GetSponsorDepartments)
 		admin.POST("/sponsors/departments", sponsorsHandler.CreateSponsorDepartment)
 		admin.POST("/sponsors/departments/batch", sponsorsHandler.CreateSponsorDepartmentsBatch)
