@@ -27,6 +27,7 @@ import { auth, logout } from "@/config/firebase.js";
 import { useAuth } from "@/context/StudentContext.jsx";
 import { getSponsorsLeaderboard, getMeProfile, checkUserContribution, createSponsorOrder, captureSponsorPayment } from "@/api/axios.js";
 import { processLeaderboardData, isCurrentUserSponsor } from "@/utils/sponsorUtils.js";
+import SearchableDepartmentSelect from "@/components/common/SearchableDepartmentSelect.jsx";
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -956,20 +957,12 @@ export default function SupportDev() {
                 <label className="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase block">
                   CONTRIBUTE AS THIS DEPARTMENT
                 </label>
-                <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
-                  <GraduationCap className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
-                  <select
-                    value={targetDeptId}
-                    onChange={(e) => setTargetDeptId(e.target.value)}
-                    className="w-full text-xs font-semibold text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none cursor-pointer"
-                  >
-                    {(leaderboard.department_leaderboard || []).map((dept) => (
-                      <option key={dept.id} value={dept.id} className="dark:bg-slate-900">
-                        {dept.display_name} ({dept.name})
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <SearchableDepartmentSelect
+                  departments={leaderboard.department_leaderboard || []}
+                  value={targetDeptId}
+                  onChange={(val) => setTargetDeptId(val)}
+                  placeholder="Type code, branch, or year (e.g. CSE, 3rd Year)..."
+                />
               </div>
 
               {/* Anonymous Checkbox Option */}
