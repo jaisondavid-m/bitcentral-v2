@@ -25,6 +25,7 @@ func SetupRouter(
 	trackerUserHandler *handlers.TrackerUserHandler,
 	sponsorsHandler *handlers.SponsorsHandler,
 	feedbackHandler *handlers.FeedbackHandler,
+	analyticsHandler *handlers.AnalyticsHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -140,6 +141,7 @@ func SetupRouter(
 	admin := r.Group("/admin")
 	admin.Use(middleware.RequireAdmin())
 	{
+		admin.GET("/analytics", analyticsHandler.GetAnalytics)
 		admin.GET("/sponsors", sponsorsHandler.GetSponsorsAdmin)
 		admin.GET("/sponsors/leaderboard", sponsorsHandler.GetSponsorsLeaderboardAdmin)
 		admin.PUT("/sponsors/name-override", sponsorsHandler.UpdateSponsorNameOverride)
