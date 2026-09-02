@@ -20,6 +20,7 @@ import {
   ArrowLeft,
   LogIn,
   GraduationCap,
+  EyeOff,
 } from "lucide-react";
 import { FaHandHoldingHeart } from "react-icons/fa6";
 import { auth, logout } from "@/config/firebase.js";
@@ -562,42 +563,79 @@ export default function SupportDev() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="lg:col-span-5 space-y-4"
           >
-            {/* User Contribution Card (Visible even if not in Top 10) */}
+            {/* User Contribution Cards */}
             {userContribution?.found && (
-              <div className="rounded-2xl border border-emerald-200/90 bg-[#dcfce7]/80 p-3.5 sm:p-4 shadow-xs dark:border-emerald-800/80 dark:bg-emerald-950/50 transition-all">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#047857] dark:bg-emerald-600 flex items-center justify-center text-white shrink-0 shadow-xs">
-                      <Heart className="h-5 w-5 fill-white text-white" />
-                    </div>
-                    <div className="min-w-0">
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#047857] dark:text-emerald-400 block leading-tight">
-                        YOUR CONTRIBUTION
-                      </span>
-                      <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
-                        {userContribution.name}
-                      </h4>
+              <div className="space-y-3">
+                {/* 1. Public Named Contribution Card */}
+                {(userContribution.named_amount > 0 || !userContribution.anonymous_amount) && (
+                  <div className="rounded-2xl border border-emerald-200/90 bg-[#dcfce7]/80 p-3.5 sm:p-4 shadow-xs dark:border-emerald-800/80 dark:bg-emerald-950/50 transition-all">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-[#047857] dark:bg-emerald-600 flex items-center justify-center text-white shrink-0 shadow-xs">
+                          <Heart className="h-5 w-5 fill-white text-white" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#047857] dark:text-emerald-400 block leading-tight">
+                            YOUR PUBLIC CONTRIBUTION
+                          </span>
+                          <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                            {userContribution.name}
+                          </h4>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0 flex flex-col items-end">
+                        <div className="text-base sm:text-lg font-black text-[#047857] dark:text-emerald-300 leading-tight">
+                          ₹{Number(userContribution.named_amount || userContribution.amount || 0).toLocaleString("en-IN")}
+                        </div>
+                        <span className="inline-block mt-0.5 rounded-md bg-[#86efac] px-2 py-0.5 text-[11px] font-bold text-[#064e3b] dark:bg-emerald-800 dark:text-emerald-100">
+                          Rank #{userContribution.rank} {userContribution.total_supporters ? `of ${userContribution.total_supporters}` : ""}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/payment-successful/${encodeURIComponent(userContribution.certificate_id || 'BIT-PATRON-VERIFIED')}`)}
+                          className="mt-2 inline-flex items-center gap-1 rounded-lg bg-[#047857] px-2.5 py-1 text-[11px] font-bold text-white shadow-xs hover:bg-[#065f46] dark:bg-emerald-600 dark:hover:bg-emerald-500 transition-colors cursor-pointer"
+                        >
+                          <Sparkles className="h-3 w-3 text-amber-300 fill-amber-300" />
+                          <span>View Certificate</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
+                )}
 
-                  <div className="text-right shrink-0 flex flex-col items-end">
-                    <div className="text-base sm:text-lg font-black text-[#047857] dark:text-emerald-300 leading-tight">
-                      ₹{Number(userContribution.amount || 0).toLocaleString("en-IN")}
+                {/* 2. Anonymous Contribution Card */}
+                {userContribution.anonymous_amount > 0 && (
+                  <div className="rounded-2xl border border-purple-200/90 bg-purple-50/80 p-3.5 sm:p-4 shadow-xs dark:border-purple-800/80 dark:bg-purple-950/50 transition-all">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-purple-600 dark:bg-purple-500 flex items-center justify-center text-white shrink-0 shadow-xs">
+                          <EyeOff className="h-5 w-5 text-white" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-700 dark:text-purple-300 block leading-tight">
+                            YOUR ANONYMOUS CONTRIBUTION
+                          </span>
+                          <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                            Anonymous BITSian
+                          </h4>
+                          <span className="text-[10px] text-purple-600 dark:text-purple-400 font-medium block mt-0.5">
+                            🔒 Hidden on Leaderboard • Counted for Department
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0 flex flex-col items-end">
+                        <div className="text-base sm:text-lg font-black text-purple-700 dark:text-purple-300 leading-tight">
+                          ₹{Number(userContribution.anonymous_amount || 0).toLocaleString("en-IN")}
+                        </div>
+                        <span className="inline-block mt-0.5 rounded-md bg-purple-200 px-2 py-0.5 text-[11px] font-bold text-purple-900 dark:bg-purple-800 dark:text-purple-100">
+                          Verified Anonymous
+                        </span>
+                      </div>
                     </div>
-                    <span className="inline-block mt-0.5 rounded-md bg-[#86efac] px-2 py-0.5 text-[11px] font-bold text-[#064e3b] dark:bg-emerald-800 dark:text-emerald-100">
-                      Rank #{userContribution.rank} {userContribution.total_supporters ? `of ${userContribution.total_supporters}` : ""}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/payment-successful/${encodeURIComponent(userContribution.certificate_id || 'BIT-PATRON-VERIFIED')}`)}
-                      className="mt-2 inline-flex items-center gap-1 rounded-lg bg-[#047857] px-2.5 py-1 text-[11px] font-bold text-white shadow-xs hover:bg-[#065f46] dark:bg-emerald-600 dark:hover:bg-emerald-500 transition-colors cursor-pointer"
-                    >
-                      <Sparkles className="h-3 w-3 text-amber-300 fill-amber-300" />
-                      <span>View Certificate</span>
-                    </button>
-
                   </div>
-                </div>
+                )}
               </div>
             )}
 
@@ -867,15 +905,14 @@ export default function SupportDev() {
                 </div>
               </div>
 
-              {/* Donor Information Section */}
-              <div className="space-y-2 pt-1">
-                <label className="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase block">
-                  DONOR DETAILS (FOR LEADERBOARD & RECEIPT)
-                </label>
+              {/* Donor Information Section - Only visible when NOT anonymous */}
+              {!isAnonymous && (
+                <div className="space-y-2 pt-1">
+                  <label className="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase block">
+                    DONOR DETAILS (FOR LEADERBOARD & RECEIPT)
+                  </label>
 
-                <div className="space-y-2">
-                  {/* Name Input - Only visible when not anonymous */}
-                  {!isAnonymous && (
+                  <div className="space-y-2">
                     <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
                       <User className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
                       <input
@@ -886,42 +923,42 @@ export default function SupportDev() {
                         className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
                       />
                     </div>
-                  )}
 
-                  {/* Email Input - Only if not from user */}
-                  {!hasUserEmail && (
-                    <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
-                      <Mail className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
-                      <input
-                        type="email"
-                        placeholder="Email Address"
-                        value={donorEmail}
-                        onChange={(e) => setDonorEmail(e.target.value)}
-                        className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
-                      />
-                    </div>
-                  )}
+                    {/* Email Input - Only if not from user */}
+                    {!hasUserEmail && (
+                      <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
+                        <Mail className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
+                        <input
+                          type="email"
+                          placeholder="Email Address"
+                          value={donorEmail}
+                          onChange={(e) => setDonorEmail(e.target.value)}
+                          className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
+                        />
+                      </div>
+                    )}
 
-                  {/* Phone Input - Only if not from user */}
-                  {!hasUserPhone && (
-                    <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
-                      <Phone className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
-                      <input
-                        type="tel"
-                        placeholder="Phone Number *"
-                        value={donorPhone}
-                        onChange={(e) => setDonorPhone(e.target.value)}
-                        className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
-                      />
-                    </div>
-                  )}
+                    {/* Phone Input - Only if not from user */}
+                    {!hasUserPhone && (
+                      <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
+                        <Phone className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
+                        <input
+                          type="tel"
+                          placeholder="Phone Number *"
+                          value={donorPhone}
+                          onChange={(e) => setDonorPhone(e.target.value)}
+                          className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Department Target Section */}
               <div className="space-y-1.5 pt-1">
                 <label className="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase block">
-                  CONTRIBUTE TO DEPARTMENT
+                  CONTRIBUTE AS THIS DEPARTMENT
                 </label>
                 <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
                   <GraduationCap className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
