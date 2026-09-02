@@ -81,6 +81,10 @@ export default function SupportDev() {
   const [hasUserEmail, setHasUserEmail] = useState(false);
   const [hasUserPhone, setHasUserPhone] = useState(false);
 
+  // Preference Options (Anonymous & Target Department)
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [targetDeptId, setTargetDeptId] = useState("");
+
   // Editable Amount State (User types custom amount)
   const [amount, setAmount] = useState("");
 
@@ -239,13 +243,19 @@ export default function SupportDev() {
       return;
     }
 
+    const targetDept = (leaderboard.department_leaderboard || []).find((d) => String(d.id) === String(targetDeptId));
+    const targetDeptCode = targetDept?.code || "";
+
     let orderId = "";
     try {
       const orderRes = await createSponsorOrder({
         amount: effectiveAmount,
-        name: donorName,
+        name: isAnonymous ? "Anonymous BITSian" : donorName,
         email: donorEmail,
         phone: donorPhone,
+        is_anonymous: isAnonymous,
+        target_department_id: targetDeptId ? Number(targetDeptId) : 0,
+        target_department_code: targetDeptCode,
       });
       if (orderRes?.success && orderRes?.order_id) {
         orderId = orderRes.order_id;
@@ -262,15 +272,18 @@ export default function SupportDev() {
       name: "BIT CENTRAL",
       description: "Support BIT-CENTRAL Community Platform",
       prefill: {
-        name: donorName,
+        name: isAnonymous ? "Anonymous BITSian" : donorName,
         email: donorEmail,
         contact: donorPhone,
       },
       notes: {
-        name: donorName,
+        name: isAnonymous ? "Anonymous BITSian" : donorName,
         email: donorEmail,
         phone: donorPhone,
         contact: donorPhone,
+        is_anonymous: isAnonymous ? "true" : "false",
+        target_department_id: targetDeptId ? String(targetDeptId) : "",
+        target_department_code: targetDeptCode,
       },
       config: {
         display: {
@@ -848,6 +861,50 @@ export default function SupportDev() {
                     </div>
                   )}
                 </div>
+              </div>
+
+              {/* Department Target Section */}
+              <div className="space-y-1.5 pt-1">
+                <label className="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase block">
+                  CONTRIBUTE TO DEPARTMENT
+                </label>
+                <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
+                  <GraduationCap className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
+                  <select
+                    value={targetDeptId}
+                    onChange={(e) => setTargetDeptId(e.target.value)}
+                    className="w-full text-xs font-semibold text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none cursor-pointer"
+                  >
+                    <option value="" className="dark:bg-slate-900">
+                      ✨ Auto-detect my department from email
+                    </option>
+                    {(leaderboard.department_leaderboard || []).map((dept) => (
+                      <option key={dept.id} value={dept.id} className="dark:bg-slate-900">
+                        {dept.display_name} ({dept.name})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Anonymous Checkbox Option */}
+              <div className="pt-1">
+                <label className="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-200/60 bg-slate-50/30 dark:border-slate-800 dark:bg-slate-800/20 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={isAnonymous}
+                    onChange={(e) => setIsAnonymous(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                  />
+                  <div>
+                    <span className="text-xs font-bold text-slate-900 dark:text-white block">
+                      Donate Anonymously
+                    </span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">
+                      Hide your name on individual leaderboard. Your contribution still counts towards your selected department!
+                    </span>
+                  </div>
+                </label>
               </div>
 
 
