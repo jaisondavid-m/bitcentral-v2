@@ -218,6 +218,7 @@ type AggregatedDonor struct {
 	Phone          string  `json:"phone"`
 	PhoneDigits    string  `json:"phone_digits"`
 	Amount         float64 `json:"amount"`
+	PublicAmount   float64 `json:"public_amount"`
 	LatestDate     string  `json:"date"`
 	TargetDeptID   int     `json:"target_department_id"`
 	TargetDeptCode string  `json:"target_department_code"`
@@ -573,6 +574,9 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 
 						if existing, found := aggregatedMap[normKey]; found {
 							existing.Amount += amt
+							if !isAnon {
+								existing.PublicAmount += amt
+							}
 							if itemDate > existing.LatestDate {
 								existing.LatestDate = itemDate
 							}
@@ -592,6 +596,10 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 								existing.TargetDeptCode = targetDeptCode
 							}
 						} else {
+							pubAmt := 0.0
+							if !isAnon {
+								pubAmt = amt
+							}
 							aggregatedMap[normKey] = &AggregatedDonor{
 								DonorKey:       normKey,
 								Name:           donorName,
@@ -600,6 +608,7 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 								Phone:          phone,
 								PhoneDigits:    phoneDigits,
 								Amount:         amt,
+								PublicAmount:   pubAmt,
 								LatestDate:     itemDate,
 								TargetDeptID:   targetDeptID,
 								TargetDeptCode: targetDeptCode,
@@ -609,7 +618,17 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 					}
 
 					for key, donor := range aggregatedMap {
+						// Only show donors with public contributions on the individual leaderboard.
+						// Exclude anonymous entries and anonymous amounts from individual donors leaderboard!
+						if donor.PublicAmount <= 0 {
+							continue
+						}
+
 						displayName := donor.OriginalName
+						if displayName == "Anonymous BITSian" || strings.TrimSpace(displayName) == "" {
+							continue
+						}
+
 						if custom, ok := overridesMap[key]; ok && custom != "" {
 							displayName = custom
 						} else if donor.PhoneDigits != "" {
@@ -636,7 +655,7 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 
 						sponsors = append(sponsors, gin.H{
 							"name":               displayName,
-							"amount":             donor.Amount,
+							"amount":             donor.PublicAmount, // Display ONLY public named contribution!
 							"date":               donor.LatestDate,
 							"email":              donor.Email,
 							"department_id":      deptID,
