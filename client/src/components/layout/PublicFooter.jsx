@@ -24,8 +24,11 @@ export default function PublicFooter() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-950 dark:text-white">Navigation</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-950 dark:text-white">Student Knowledge</h3>
             <ul className="mt-4 space-y-2 text-sm">
+              <li>
+                <Link to="/guides" className="font-semibold text-blue-600 hover:underline dark:text-blue-400">Campus Guides & Hub</Link>
+              </li>
               <li>
                 <Link to="/about" className="hover:text-blue-600 dark:hover:text-blue-400">About Portal</Link>
               </li>
@@ -45,6 +48,9 @@ export default function PublicFooter() {
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-950 dark:text-white">Trust & Policies</h3>
             <ul className="mt-4 space-y-2 text-sm">
+              <li>
+                <Link to="/disclaimer" className="hover:text-blue-600 dark:hover:text-blue-400">Disclaimer & Notice</Link>
+              </li>
               <li>
                 <Link to="/privacy-policy" className="hover:text-blue-600 dark:hover:text-blue-400">Privacy Policy</Link>
               </li>
