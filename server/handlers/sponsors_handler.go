@@ -625,10 +625,6 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 						}
 
 						displayName := donor.OriginalName
-						if displayName == "Anonymous BITSian" || strings.TrimSpace(displayName) == "" {
-							continue
-						}
-
 						if custom, ok := overridesMap[key]; ok && custom != "" {
 							displayName = custom
 						} else if donor.PhoneDigits != "" {
@@ -639,6 +635,10 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 							if custom, ok := overridesMap["email_"+strings.ToLower(strings.TrimSpace(donor.Email))]; ok && custom != "" {
 								displayName = custom
 							}
+						}
+
+						if displayName == "Anonymous BITSian" || strings.TrimSpace(displayName) == "" {
+							continue
 						}
 
 						deptID := resolveDonorDepartmentID(key, donor, deptMappings)
@@ -838,6 +838,8 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 							displayName = customName
 						}
 
+						isAnon := donor.IsAnonymous || displayName == "Anonymous BITSian" || customName == "Anonymous BITSian"
+
 						deptID := resolveDonorDepartmentID(key, donor, deptMappings)
 						var deptDisplay string
 						var deptCode string
@@ -858,6 +860,7 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 							"original_name":      donor.OriginalName,
 							"custom_name":        customName,
 							"is_overridden":      isOverridden,
+							"is_anonymous":       isAnon,
 							"email":              donor.Email,
 							"phone":              donor.Phone,
 							"amount":             donor.Amount,
