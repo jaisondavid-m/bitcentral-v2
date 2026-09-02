@@ -205,6 +205,58 @@ export default function SupportDev() {
     };
   }, [user]);
 
+  // Helper to auto-detect department ID from user email
+  const detectDepartmentFromEmail = (email, depts) => {
+    if (!email || !Array.isArray(depts) || depts.length === 0) return "";
+    const emailLower = email.toLowerCase().trim();
+    const atIdx = emailLower.indexOf("@");
+    const username = atIdx !== -1 ? emailLower.slice(0, atIdx) : emailLower;
+    const lastDot = username.lastIndexOf(".");
+    const codeSegment = lastDot !== -1 ? username.slice(lastDot + 1) : username;
+
+    const alphaMatch = codeSegment.match(/[a-z]+/i);
+    const digitMatch = codeSegment.match(/\d+/);
+
+    const emailCode = alphaMatch ? alphaMatch[0].toLowerCase() : "";
+    const yearCode = digitMatch ? digitMatch[0] : "";
+
+    if (!emailCode) return "";
+
+    for (const dept of depts) {
+      const dCode = (dept.code || "").toLowerCase();
+      const dYear = (dept.year || "").toLowerCase();
+      if (dCode === emailCode) {
+        if (yearCode === "26" && dYear.includes("1")) return String(dept.id);
+        if (yearCode === "25" && dYear.includes("2")) return String(dept.id);
+        if ((yearCode === "24" || yearCode === "23") && dYear.includes("3")) return String(dept.id);
+        if (yearCode === "22" && dYear.includes("4")) return String(dept.id);
+      }
+    }
+
+    for (const dept of depts) {
+      const dCode = (dept.code || "").toLowerCase();
+      if (dCode === emailCode) {
+        return String(dept.id);
+      }
+    }
+
+    return "";
+  };
+
+  // Auto-detect and pre-select department when email or department leaderboard loads
+  useEffect(() => {
+    const depts = leaderboard.department_leaderboard || [];
+    if (depts.length > 0 && !targetDeptId) {
+      const emailToTest = donorEmail || user?.email || auth.currentUser?.email || "";
+      const detectedId = detectDepartmentFromEmail(emailToTest, depts);
+      if (detectedId) {
+        setTargetDeptId(detectedId);
+      } else if (depts[0]?.id) {
+        setTargetDeptId(String(depts[0].id));
+      }
+    }
+  }, [donorEmail, user, leaderboard.department_leaderboard, targetDeptId]);
+
 
   const effectiveAmount = Number(amount);
 
@@ -217,7 +269,7 @@ export default function SupportDev() {
       return;
     }
 
-    if (!donorName.trim()) {
+    if (!isAnonymous && !donorName.trim()) {
       setErrorMessage("Please enter your name.");
       return;
     }
@@ -245,12 +297,13 @@ export default function SupportDev() {
 
     const targetDept = (leaderboard.department_leaderboard || []).find((d) => String(d.id) === String(targetDeptId));
     const targetDeptCode = targetDept?.code || "";
+    const actualName = donorName.trim() || user?.displayName || "Anonymous BITSian";
 
     let orderId = "";
     try {
       const orderRes = await createSponsorOrder({
         amount: effectiveAmount,
-        name: isAnonymous ? "Anonymous BITSian" : donorName,
+        name: actualName,
         email: donorEmail,
         phone: donorPhone,
         is_anonymous: isAnonymous,
@@ -272,12 +325,12 @@ export default function SupportDev() {
       name: "BIT CENTRAL",
       description: "Support BIT-CENTRAL Community Platform",
       prefill: {
-        name: isAnonymous ? "Anonymous BITSian" : donorName,
+        name: actualName,
         email: donorEmail,
         contact: donorPhone,
       },
       notes: {
-        name: isAnonymous ? "Anonymous BITSian" : donorName,
+        name: actualName,
         email: donorEmail,
         phone: donorPhone,
         contact: donorPhone,
@@ -821,17 +874,19 @@ export default function SupportDev() {
                 </label>
 
                 <div className="space-y-2">
-                  {/* Name Input - Always editable */}
-                  <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
-                    <User className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
-                    <input
-                      type="text"
-                      placeholder="Full Name *"
-                      value={donorName}
-                      onChange={(e) => setDonorName(e.target.value)}
-                      className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
-                    />
-                  </div>
+                  {/* Name Input - Only visible when not anonymous */}
+                  {!isAnonymous && (
+                    <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
+                      <User className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
+                      <input
+                        type="text"
+                        placeholder="Full Name *"
+                        value={donorName}
+                        onChange={(e) => setDonorName(e.target.value)}
+                        className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
+                      />
+                    </div>
+                  )}
 
                   {/* Email Input - Only if not from user */}
                   {!hasUserEmail && (
@@ -875,9 +930,6 @@ export default function SupportDev() {
                     onChange={(e) => setTargetDeptId(e.target.value)}
                     className="w-full text-xs font-semibold text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none cursor-pointer"
                   >
-                    <option value="" className="dark:bg-slate-900">
-                      ✨ Auto-detect my department from email
-                    </option>
                     {(leaderboard.department_leaderboard || []).map((dept) => (
                       <option key={dept.id} value={dept.id} className="dark:bg-slate-900">
                         {dept.display_name} ({dept.name})
