@@ -1156,6 +1156,7 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 	aggregatedMap := make(map[string]*InternalDonor)
 
 	overridesMap := getOverridesMap()
+	txOverrides := getTransactionOverridesMap()
 
 	for _, item := range rzpRes.Items {
 		st := strings.ToLower(item.Status)
@@ -1171,7 +1172,10 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 		email := strings.ToLower(strings.TrimSpace(item.Email))
 		phone := cleanPhone(item.Contact)
 		isAnon := false
-		if item.Notes != nil {
+
+		if txIsAnon, ok := txOverrides[item.ID]; ok {
+			isAnon = txIsAnon
+		} else if item.Notes != nil {
 			if e, ok := item.Notes["email"].(string); ok && e != "" {
 				email = strings.ToLower(strings.TrimSpace(e))
 			}
