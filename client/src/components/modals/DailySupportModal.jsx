@@ -190,7 +190,7 @@ export default function DailySupportModal() {
           {/* Top Donors & Department Showcase */}
           <div className="mt-4 mb-3">
             <div className="text-center mb-2">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-center gap-1">
+              <span className="text-[10px] my-5 font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-center gap-1">
                 <Trophy className="h-3 w-3 text-amber-500" /> Top Patrons & Department
               </span>
             </div>
