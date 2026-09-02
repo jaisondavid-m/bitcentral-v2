@@ -268,6 +268,101 @@ export const ROUTE_SEO = {
     keywords: ["PS Biometric", "Biometric Scans", "Daily Attendance", "Punch In Log"],
     pageType: "CollectionPage",
   },
+  "/disclaimer": {
+    title: "Disclaimer & Legal Notice - BIT Central",
+    description:
+      "BIT Central legal disclaimer clarifying independent student platform status, non-official nature, and fair-use guidelines for Bannari Amman Institute of Technology.",
+    keywords: ["BIT Central disclaimer", "BIT Sathy legal notice", "student portal disclaimer"],
+    pageType: "WebPage",
+  },
+
+  "/guides": {
+    title: "BIT Sathy Student Guides & Knowledge Base - BIT Central",
+    description:
+      "Comprehensive public guides for Bannari Amman Institute of Technology students, covering campus blocks, academic regulations, exam hall finder, question banks, attendance, mess menu schedules, and first-year onboarding.",
+    keywords: ["BIT Sathy guides", "BIT campus guide", "BIT question bank guide", "BIT exam hall finder guide", "BIT mess schedule"],
+    pageType: "CollectionPage",
+  },
+
+  "/guides/campus": {
+    title: "Complete BIT Campus Guide: Infrastructure & Academic Blocks",
+    description:
+      "In-depth guide to Bannari Amman Institute of Technology (BIT Sathy) campus layout, academic blocks, central library, and student facilities.",
+    keywords: ["BIT Sathy campus guide", "BIT academic blocks", "BIT central library"],
+    pageType: "Article",
+  },
+
+  "/guides/academic-resources": {
+    title: "BIT Academic Resources Guide: Question Banks & Curriculum",
+    description:
+      "Practical breakdown of academic structures, autonomous CBCS regulations, internal assessment rules, and question bank resources at BIT Sathy.",
+    keywords: ["BIT academic resources", "BIT CBCS regulations", "BIT internal assessments"],
+    pageType: "Article",
+  },
+
+  "/guides/semester-exams": {
+    title: "BIT Semester Examination Guide: Rules, Valuation & CGPA",
+    description:
+      "Everything about end-semester examination procedures, hall ticket verification, valuation rules, and grade calculations at BIT Sathy.",
+    keywords: ["BIT semester exams", "BIT COE rules", "BIT hall ticket", "BIT CGPA calculation"],
+    pageType: "Article",
+  },
+
+  "/guides/exam-hall-finder": {
+    title: "BIT Exam Hall Finder Guide: How to Locate Your Exam Room",
+    description:
+      "Step-by-step walkthrough on finding assigned examination block, floor, and desk allocation using BIT Central tools.",
+    keywords: ["BIT exam hall finder", "BIT exam seat lookup", "BIT hall allocation"],
+    pageType: "TechArticle",
+  },
+
+  "/guides/question-bank": {
+    title: "BIT Question Bank Guide: Subject Code Index & Model Answers",
+    description:
+      "Learn how to access semester question banks, model answer keys (22PH202, 22HS006), and syllabus resources efficiently on BIT Central.",
+    keywords: ["BIT question bank", "22PH202 answer key", "22HS006 answer key", "BIT model papers"],
+    pageType: "Article",
+  },
+
+  "/guides/attendance": {
+    title: "BIT Attendance & Leave Guide: Biometrics, Rules & OD Workflow",
+    description:
+      "Practical guide to the biometric attendance system, tracking attendance percentages, leave requests, and On-Duty (OD) approvals at BIT Sathy.",
+    keywords: ["BIT biometric attendance", "BIT attendance percentage", "BIT OD approval"],
+    pageType: "Article",
+  },
+
+  "/guides/mess-schedule": {
+    title: "BIT Mess Schedule Guide: Hostel Dining Timings & Menus",
+    description:
+      "Complete guide to hostel mess timings, daily meal routines, menu cycles, and dining rules for Sapphire, Ruby, and Emerald hostels.",
+    keywords: ["BIT mess schedule", "BIT hostel menu", "Sapphire hostel mess", "Ruby hostel mess"],
+    pageType: "Article",
+  },
+
+  "/guides/first-year": {
+    title: "BIT First-Year Student Guide: Onboarding, Wi-Fi Setup & Tips",
+    description:
+      "Essential orientation guide for newly admitted first-year engineering students at Bannari Amman Institute of Technology.",
+    keywords: ["BIT first year guide", "BIT freshers guide", "BIT campus onboarding"],
+    pageType: "Article",
+  },
+
+  "/guides/campus-facilities": {
+    title: "BIT Campus Facilities Guide: Sports, Labs & Healthcare",
+    description:
+      "Overview of world-class facilities available at BIT Sathy, including sports complexes, special research labs, health centers, and amenities.",
+    keywords: ["BIT sports complex", "BIT special labs", "BIT health center"],
+    pageType: "Article",
+  },
+
+  "/guides/platform-guide": {
+    title: "BIT-CENTRAL Platform Guide: Public Guides vs Student Tools",
+    description:
+      "Discover how to navigate BIT-CENTRAL, access public guides, and log in to protected student utilities securely.",
+    keywords: ["BIT-CENTRAL platform guide", "BIT Central login", "BIT student tools"],
+    pageType: "TechArticle",
+  },
 };
 
 export const SITEMAP_ROUTES = [
@@ -280,5 +375,16 @@ export const SITEMAP_ROUTES = [
   "/contact",
   "/privacy-policy",
   "/terms",
-  "/apsite",
+  "/disclaimer",
+  "/guides",
+  "/guides/campus",
+  "/guides/academic-resources",
+  "/guides/semester-exams",
+  "/guides/exam-hall-finder",
+  "/guides/question-bank",
+  "/guides/attendance",
+  "/guides/mess-schedule",
+  "/guides/first-year",
+  "/guides/campus-facilities",
+  "/guides/platform-guide",
 ];

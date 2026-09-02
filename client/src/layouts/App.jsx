@@ -21,6 +21,9 @@ const FAQ = lazyWithRetry(() => import("@/pages/public/FAQ.jsx"));
 const Contact = lazyWithRetry(() => import("@/pages/public/Contact.jsx"));
 const PrivacyPolicy = lazyWithRetry(() => import("@/pages/public/PrivacyPolicy.jsx"));
 const Terms = lazyWithRetry(() => import("@/pages/public/Terms.jsx"));
+const Disclaimer = lazyWithRetry(() => import("@/pages/public/Disclaimer.jsx"));
+const GuidesIndex = lazyWithRetry(() => import("@/pages/public/GuidesIndex.jsx"));
+const GuideDetail = lazyWithRetry(() => import("@/pages/public/GuideDetail.jsx"));
 const Rpsite = lazyWithRetry(() => import("@/pages/student/Rpsite.jsx"));
 const Semester = lazyWithRetry(() => import("@/pages/student/Semester.jsx"));
 const MessMenu = lazyWithRetry(() => import("@/pages/student/MessMenu.jsx"));
@@ -155,6 +158,9 @@ function App() {
             />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/disclaimer" element={<Disclaimer />} />
+            <Route path="/guides" element={<GuidesIndex />} />
+            <Route path="/guides/:slug" element={<GuideDetail />} />
             <Route
               path="/"
               element={

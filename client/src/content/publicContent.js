@@ -12,12 +12,14 @@ import {
 } from "lucide-react";
 
 export const publicLinks = [
+  { label: "Guides", href: "/guides" },
   { label: "About", href: "/about" },
   { label: "Developer", href: "/developer" },
   { label: "Features", href: "/features" },
   { label: "Wi-Fi Details", href: "/wifi-details" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
+  { label: "Disclaimer", href: "/disclaimer" },
 ];
 
 export const developerProfile = {
@@ -142,3 +144,34 @@ export const contactMethods = [
     external: true,
   },
 ];
+
+export const impactStats = {
+  title: "BIT-CENTRAL in Numbers",
+  subtitle: "Demonstrating genuine platform adoption across the BIT Sathy student community",
+  primaryStat: "4,500+",
+  exactCount: "4,546",
+  statLabel: "Registered Students",
+  dailyActive: "1,400+",
+  analyticsImage: "/statics/image.png",
+  description:
+    "BIT-CENTRAL brings academic resources, examination utilities, campus information, and student-focused tools together in one platform for the BIT student community.",
+  disclaimer:
+    "Registration statistics are based on BIT-CENTRAL's Firebase Authentication records and verified analytics metrics.",
+  metrics: [
+    {
+      value: "4,500+",
+      label: "Registered Students",
+      detail: "Verified BIT Sathy institutional accounts registered on the platform.",
+    },
+    {
+      value: "1,400+",
+      label: "Daily Active Users",
+      detail: "Daily student traffic accessing exam hall lookups, mess updates, and tools.",
+    },
+    {
+      value: "10",
+      label: "Public Knowledge Guides",
+      detail: "Comprehensive open-access documentation for campus, exams, and academics.",
+    },
+  ],
+};
