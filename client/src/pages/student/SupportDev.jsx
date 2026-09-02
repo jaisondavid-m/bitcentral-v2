@@ -423,10 +423,10 @@ export default function SupportDev() {
 
   const formattedTotal = Number(leaderboard.total_raised || 0).toLocaleString("en-IN");
   return (
-    <div className="w-full min-h-[calc(100vh-80px)] lg:h-[calc(100vh-80px)] flex flex-col justify-center bg-slate-50/60 text-slate-900 transition-colors duration-300 dark:bg-black dark:text-white overflow-hidden">
+    <div className="w-full min-h-screen py-6 lg:py-10 bg-slate-50/60 text-slate-900 transition-colors duration-300 dark:bg-black dark:text-white">
       {/* Main Container */}
-      <main className="flex-1 flex items-center justify-center px-4 py-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full">
-        <div className="w-full grid gap-6 lg:grid-cols-12 lg:items-center">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="w-full grid gap-6 lg:grid-cols-12 lg:items-start">
 
           {/* Left Column: Hero & Clean CTA */}
           <motion.div
@@ -509,19 +509,19 @@ export default function SupportDev() {
             </div>
 
             {/* Main Action Button Card */}
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4.5 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-3.5">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                    <Heart className="h-4 w-4 text-blue-600 dark:text-blue-400 fill-blue-600/20" />
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <Heart className="h-4.5 w-4.5 text-blue-600 dark:text-blue-400 fill-blue-600/20" />
                     Support Our Platform
                   </h2>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     Your contributions fund server infrastructure and free tools for all students.
                   </p>
                 </div>
-                <span className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-1 shrink-0 bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-full border border-blue-100 dark:border-blue-900">
-                  <Sparkles className="h-3 w-3" /> Razorpay Secured
+                <span className="text-xs text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-1 shrink-0 bg-blue-50 dark:bg-blue-950 px-2.5 py-1 rounded-full border border-blue-100 dark:border-blue-900">
+                  <Sparkles className="h-3.5 w-3.5" /> Razorpay Secured
                 </span>
               </div>
 
@@ -534,9 +534,9 @@ export default function SupportDev() {
                       setErrorMessage("");
                       setIsModalOpen(true);
                     }}
-                    className="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-xs hover:scale-102 active:scale-98 transition-all duration-150 flex items-center gap-1.5 cursor-pointer w-fit"
+                    className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-md hover:scale-102 active:scale-98 transition-all duration-150 flex items-center gap-2 cursor-pointer w-fit"
                   >
-                    <Heart className="h-3.5 w-3.5 fill-white text-white" />
+                    <Heart className="h-4 w-4 fill-white text-white" />
                     <span>Donate Now</span>
                   </button>
                 ) : (
@@ -544,24 +544,24 @@ export default function SupportDev() {
                     <button
                       type="button"
                       onClick={handleLoginToDonate}
-                      className="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-xs hover:scale-102 active:scale-98 transition-all duration-150 flex items-center gap-1.5 cursor-pointer w-fit"
+                      className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-md hover:scale-102 active:scale-98 transition-all duration-150 flex items-center gap-2 cursor-pointer w-fit"
                     >
-                      <LogIn className="h-3.5 w-3.5 text-white" />
+                      <LogIn className="h-4 w-4 text-white" />
                       <span>Log In to Donate</span>
                     </button>
-                    <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
                       Log in with @bitsathy.ac.in email
                     </span>
                   </div>
                 )}
 
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 flex items-center gap-1">
-                  <Lock className="h-3 w-3 text-slate-400 shrink-0" />
+                <p className="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                  <Lock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                   Secure 256-bit SSL
                 </p>
               </div>
 
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-100 dark:border-slate-800/80 leading-tight">
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 leading-relaxed">
                 <span className="font-semibold text-slate-500 dark:text-slate-400">Disclaimer:</span> BIT-CENTRAL is an independent student-developed platform not officially affiliated with Bannari Amman Institute of Technology.
               </p>
             </div>
@@ -618,30 +618,30 @@ export default function SupportDev() {
 
                 {/* 2. Anonymous Contribution Card */}
                 {(userContribution.anonymous_amount > 0 || userContribution.name === "Anonymous BITSian") && (
-                  <div className="rounded-xl border border-slate-700/60 bg-slate-900 text-white p-3 shadow-2xs dark:border-slate-700 dark:bg-slate-900 transition-all">
+                  <div className="rounded-xl border border-indigo-200/80 bg-indigo-50/70 p-3 shadow-2xs dark:border-indigo-900/60 dark:bg-indigo-950/40 transition-all">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 shrink-0">
-                          <EyeOff className="h-4 w-4" />
+                        <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                          <EyeOff className="h-4 w-4 fill-white text-white" />
                         </div>
                         <div className="min-w-0">
-                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block leading-none">
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-400 block leading-none">
                             YOUR ANONYMOUS CONTRIBUTION
                           </span>
-                          <h4 className="text-xs font-bold text-white truncate mt-0.5">
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate mt-0.5">
                             Anonymous BITSian
                           </h4>
-                          <span className="text-[9px] text-slate-400 font-medium block">
+                          <span className="text-[9px] text-indigo-600/90 dark:text-indigo-300/90 font-medium block">
                             🔒 Hidden on Leaderboard • Counted for Dept
                           </span>
                         </div>
                       </div>
 
                       <div className="text-right shrink-0 flex flex-col items-end">
-                        <div className="text-sm font-black text-white leading-none">
+                        <div className="text-sm font-black text-indigo-700 dark:text-indigo-300 leading-none">
                           ₹{Number(userContribution.anonymous_amount || userContribution.amount || 0).toLocaleString("en-IN")}
                         </div>
-                        <span className="mt-1 rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold text-slate-300">
+                        <span className="mt-1 rounded bg-indigo-200/80 dark:bg-indigo-900 px-1.5 py-0.5 text-[10px] font-bold text-indigo-900 dark:text-indigo-200">
                           Verified Anonymous
                         </span>
                       </div>
