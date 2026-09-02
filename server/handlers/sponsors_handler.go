@@ -1031,12 +1031,14 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 	}
 
 	type InternalDonor struct {
-		Key        string
-		Name       string
-		Amount     float64
-		LatestDate string
-		Phones     map[string]bool
-		Emails     map[string]bool
+		Key             string
+		Name            string
+		Amount          float64
+		NamedAmount     float64
+		AnonymousAmount float64
+		LatestDate      string
+		Phones          map[string]bool
+		Emails          map[string]bool
 	}
 
 	aggregatedMap := make(map[string]*InternalDonor)
@@ -1054,6 +1056,7 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 
 		email := strings.ToLower(strings.TrimSpace(item.Email))
 		phone := cleanPhone(item.Contact)
+		isAnon := false
 		if item.Notes != nil {
 			if e, ok := item.Notes["email"].(string); ok && e != "" {
 				email = strings.ToLower(strings.TrimSpace(e))
@@ -1063,9 +1066,17 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 			} else if p, ok := item.Notes["contact"].(string); ok && p != "" {
 				phone = cleanPhone(p)
 			}
+			if anonStr, ok := item.Notes["is_anonymous"].(string); ok {
+				isAnon = (anonStr == "true" || anonStr == "1" || anonStr == "yes")
+			} else if anonBool, ok := item.Notes["is_anonymous"].(bool); ok {
+				isAnon = anonBool
+			}
 		}
 
 		donorName := extractName(item.Notes, email)
+		if donorName == "Anonymous BITSian" {
+			isAnon = true
+		}
 
 		var normKey string
 		if phone != "" {
@@ -1080,6 +1091,11 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 
 		if existing, found := aggregatedMap[normKey]; found {
 			existing.Amount += amt
+			if isAnon {
+				existing.AnonymousAmount += amt
+			} else {
+				existing.NamedAmount += amt
+			}
 			if itemDate > existing.LatestDate {
 				existing.LatestDate = itemDate
 			}
@@ -1101,7 +1117,11 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 				Phones:     make(map[string]bool),
 				Emails:     make(map[string]bool),
 			}
-
+			if isAnon {
+				donor.AnonymousAmount = amt
+			} else {
+				donor.NamedAmount = amt
+			}
 			if phone != "" {
 				donor.Phones[phone] = true
 			}
@@ -1184,6 +1204,8 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 			"success":          true,
 			"found":            true,
 			"amount":           matchedDonor.Amount,
+			"named_amount":     matchedDonor.NamedAmount,
+			"anonymous_amount": matchedDonor.AnonymousAmount,
 			"rank":             matchedRank,
 			"total_supporters": len(donorList),
 			"name":             displayName,
