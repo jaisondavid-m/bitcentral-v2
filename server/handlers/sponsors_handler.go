@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"server/config"
@@ -362,12 +363,11 @@ func extractEmailDepartmentAndYear(email string) (string, string) {
 	return parsedEmailCode, parsedYearCode
 }
 
-func resolveDonorDepartmentID(key string, donor *AggregatedDonor, mappings map[string]int) int {
+func resolveDonorDepartmentID(key string, donor *AggregatedDonor, mappings map[string]int, deptList []SponsorDepartment) int {
 	if donor != nil && donor.TargetDeptID > 0 {
 		return donor.TargetDeptID
 	}
 	if donor != nil && donor.TargetDeptCode != "" {
-		_, deptList := getDepartmentsMap()
 		for _, d := range deptList {
 			if strings.EqualFold(d.Code, donor.TargetDeptCode) || strings.EqualFold(d.EmailCode, donor.TargetDeptCode) {
 				return d.ID
@@ -389,7 +389,6 @@ func resolveDonorDepartmentID(key string, donor *AggregatedDonor, mappings map[s
 		}
 		// Automatic email short code and year code matching fallback (e.g. 'it' and '23' in cheran.it23@bitsathy.ac.in)
 		parsedEmailCode, parsedYearCode := extractEmailDepartmentAndYear(emailLower)
-		_, deptList := getDepartmentsMap()
 
 		// Pass 1: Try matching BOTH email_code AND year_code with exact equality
 		if parsedEmailCode != "" && parsedYearCode != "" {
@@ -426,7 +425,7 @@ func resolveDonorDepartmentID(key string, donor *AggregatedDonor, mappings map[s
 				}
 			}
 
-			// Pass 3: Fallback matching email_code alone with exact equality (so 'ch' or 'ag' won't match student names)
+			// Pass 3: Fallback matching email_code alone with exact equality
 			for _, dept := range deptList {
 				emailCode := strings.ToLower(strings.TrimSpace(dept.EmailCode))
 				if emailCode != "" && strings.EqualFold(emailCode, parsedEmailCode) {
@@ -448,15 +447,12 @@ func resolveDonorDepartmentID(key string, donor *AggregatedDonor, mappings map[s
 	return 0
 }
 
-func buildDepartmentLeaderboard(aggregatedMap map[string]*AggregatedDonor) []gin.H {
-	_, deptList := getDepartmentsMap()
-	mappings := getDepartmentMappingsMap()
-
+func buildDepartmentLeaderboard(aggregatedMap map[string]*AggregatedDonor, deptList []SponsorDepartment, mappings map[string]int) []gin.H {
 	deptTotals := make(map[int]float64)
 	deptCounts := make(map[int]int)
 
 	for key, donor := range aggregatedMap {
-		deptID := resolveDonorDepartmentID(key, donor, mappings)
+		deptID := resolveDonorDepartmentID(key, donor, mappings, deptList)
 		if deptID > 0 {
 			deptTotals[deptID] += donor.Amount
 			deptCounts[deptID] += 1
@@ -505,6 +501,23 @@ func buildDepartmentLeaderboard(aggregatedMap map[string]*AggregatedDonor) []gin
 	return leaderboard
 }
 
+var (
+	syncMutex    sync.Mutex
+	lastSyncTime time.Time
+)
+
+func syncRazorpayTransactionsToDatabaseAsync() {
+	syncMutex.Lock()
+	if time.Since(lastSyncTime) < 15*time.Second {
+		syncMutex.Unlock()
+		return
+	}
+	lastSyncTime = time.Now()
+	syncMutex.Unlock()
+
+	go syncRazorpayTransactionsToDatabase()
+}
+
 func syncRazorpayTransactionsToDatabase() {
 	keyID := os.Getenv("RAZORPAY_KEY_ID")
 	keySecret := os.Getenv("RAZORPAY_KEY_SECRET")
@@ -538,6 +551,39 @@ func syncRazorpayTransactionsToDatabase() {
 	}
 
 	txOverrides := getTransactionOverridesMap()
+
+	// 1. Single query to fetch all existing payment IDs
+	existingMap := make(map[string]bool)
+	rows, err := config.DB.Query("SELECT payment_id FROM sponsor_transactions")
+	if err == nil {
+		for rows.Next() {
+			var pid string
+			if err := rows.Scan(&pid); err == nil {
+				existingMap[pid] = true
+			}
+		}
+		rows.Close()
+	}
+
+	// 2. Perform batched execution inside a single database transaction
+	tx, err := config.DB.Begin()
+	if err != nil {
+		return
+	}
+
+	insertStmt, err := tx.Prepare(`INSERT INTO sponsor_transactions (payment_id, donor_name, email, phone, phone_digits, amount, is_anonymous, target_department_id, target_department_code, payment_status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+	if err != nil {
+		tx.Rollback()
+		return
+	}
+	defer insertStmt.Close()
+
+	updateStmt, err := tx.Prepare(`UPDATE sponsor_transactions SET donor_name = IF(donor_name = '' OR donor_name = 'Anonymous BITSian', ?, donor_name), email = IF(email = '', ?, email), phone = ?, phone_digits = ?, amount = ?, target_department_id = IF(target_department_id = 0, ?, target_department_id), target_department_code = IF(target_department_code = '', ?, target_department_code), payment_status = ? WHERE payment_id = ?`)
+	if err != nil {
+		tx.Rollback()
+		return
+	}
+	defer updateStmt.Close()
 
 	for _, item := range rzpRes.Items {
 		st := strings.ToLower(item.Status)
@@ -580,7 +626,6 @@ func syncRazorpayTransactionsToDatabase() {
 			}
 		}
 
-		// Apply override if present
 		if txIsAnon, ok := txOverrides[item.ID]; ok {
 			isAnon = txIsAnon
 		}
@@ -589,31 +634,28 @@ func syncRazorpayTransactionsToDatabase() {
 		phoneDigits := cleanPhone(phone)
 		createdAt := time.Unix(item.CreatedAt, 0).Format("2006-01-02 15:04:05")
 
-		var count int
-		err := config.DB.QueryRow("SELECT COUNT(*) FROM sponsor_transactions WHERE payment_id = ?", item.ID).Scan(&count)
-		if err == nil && count == 0 {
+		if !existingMap[item.ID] {
 			anonVal := 0
 			if isAnon {
 				anonVal = 1
 			}
-			query := `INSERT INTO sponsor_transactions (payment_id, donor_name, email, phone, phone_digits, amount, is_anonymous, target_department_id, target_department_code, payment_status, created_at)
-					  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-			_, _ = config.DB.Exec(query, item.ID, donorName, email, phone, phoneDigits, amt, anonVal, targetDeptID, targetDeptCode, st, createdAt)
-		} else if err == nil {
-			query := `UPDATE sponsor_transactions SET donor_name = IF(donor_name = '' OR donor_name = 'Anonymous BITSian', ?, donor_name), email = IF(email = '', ?, email), phone = ?, phone_digits = ?, amount = ?, target_department_id = IF(target_department_id = 0, ?, target_department_id), target_department_code = IF(target_department_code = '', ?, target_department_code), payment_status = ? WHERE payment_id = ?`
-			_, _ = config.DB.Exec(query, donorName, email, phone, phoneDigits, amt, targetDeptID, targetDeptCode, st, item.ID)
+			_, _ = insertStmt.Exec(item.ID, donorName, email, phone, phoneDigits, amt, anonVal, targetDeptID, targetDeptCode, st, createdAt)
+		} else {
+			_, _ = updateStmt.Exec(donorName, email, phone, phoneDigits, amt, targetDeptID, targetDeptCode, st, item.ID)
 		}
 	}
+
+	_ = tx.Commit()
 }
 
 // GetSponsorsLeaderboard returns real public leaderboard for Support Dev page
 func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
-	syncRazorpayTransactionsToDatabase()
+	syncRazorpayTransactionsToDatabaseAsync()
 
 	var sponsors []gin.H
 	var total float64
 	overridesMap := getOverridesMap()
-	deptMap, _ := getDepartmentsMap()
+	deptMap, deptList := getDepartmentsMap()
 	deptMappings := getDepartmentMappingsMap()
 	aggregatedMap := make(map[string]*AggregatedDonor)
 
@@ -716,7 +758,7 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 			continue
 		}
 
-		deptID := resolveDonorDepartmentID(key, donor, deptMappings)
+		deptID := resolveDonorDepartmentID(key, donor, deptMappings, deptList)
 		var deptDisplay string
 		var deptCode string
 		var deptYear string
@@ -756,7 +798,7 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 		return strings.ToLower(nameI) < strings.ToLower(nameJ)
 	})
 
-	deptLeaderboard := buildDepartmentLeaderboard(aggregatedMap)
+	deptLeaderboard := buildDepartmentLeaderboard(aggregatedMap, deptList, deptMappings)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success":                true,
@@ -775,7 +817,7 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 	var leaderboard []gin.H
 	overridesMap := getOverridesMap()
 	txOverrides := getTransactionOverridesMap()
-	deptMap, _ := getDepartmentsMap()
+	deptMap, deptList := getDepartmentsMap()
 	deptMappings := getDepartmentMappingsMap()
 	aggregatedMap := make(map[string]*AggregatedDonor)
 
@@ -916,7 +958,7 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 
 						isAnon := donor.IsAnonymous || displayName == "Anonymous BITSian" || customName == "Anonymous BITSian"
 
-						deptID := resolveDonorDepartmentID(key, donor, deptMappings)
+						deptID := resolveDonorDepartmentID(key, donor, deptMappings, deptList)
 						var deptDisplay string
 						var deptCode string
 						var deptYear string
@@ -969,7 +1011,7 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 		}
 	}
 
-	deptLeaderboard := buildDepartmentLeaderboard(aggregatedMap)
+	deptLeaderboard := buildDepartmentLeaderboard(aggregatedMap, deptList, deptMappings)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success":                true,
@@ -1141,7 +1183,7 @@ type ContributionCheckRequest struct {
 // CheckContribution searches Razorpay payments for a specific user's phone or email
 // and returns their total contribution amount, rank, and supporter details securely.
 func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
-	syncRazorpayTransactionsToDatabase()
+	syncRazorpayTransactionsToDatabaseAsync()
 
 	var reqBody ContributionCheckRequest
 	if err := c.ShouldBindJSON(&reqBody); err != nil {
@@ -1502,6 +1544,8 @@ func (h *SponsorsHandler) CapturePayment(c *gin.Context) {
 	}
 	defer resp.Body.Close()
 
+	go syncRazorpayTransactionsToDatabase()
+
 	c.JSON(http.StatusOK, gin.H{"success": true, "captured": true})
 }
 
@@ -1719,78 +1763,67 @@ func (h *SponsorsHandler) GetCertificate(c *gin.Context) {
 }
 
 func (h *SponsorsHandler) GetDepartmentLeaderboard(c *gin.Context) {
-	keyID := os.Getenv("RAZORPAY_KEY_ID")
-	keySecret := os.Getenv("RAZORPAY_KEY_SECRET")
+	syncRazorpayTransactionsToDatabaseAsync()
 
 	aggregatedMap := make(map[string]*AggregatedDonor)
+	_, deptList := getDepartmentsMap()
+	deptMappings := getDepartmentMappingsMap()
 
-	if keyID != "" && keySecret != "" {
-		url := "https://api.razorpay.com/v1/payments?count=100"
-		req, err := http.NewRequest("GET", url, nil)
+	if config.DB != nil {
+		rows, err := config.DB.Query(`SELECT payment_id, donor_name, email, phone, phone_digits, amount, is_anonymous, target_department_id, target_department_code, DATE_FORMAT(created_at, '%Y-%m-%d') as date_str FROM sponsor_transactions WHERE payment_status IN ('captured', 'authorized')`)
 		if err == nil {
-			req.SetBasicAuth(keyID, keySecret)
-			client := &http.Client{Timeout: 10 * time.Second}
-			resp, err := client.Do(req)
-			if err == nil && resp.StatusCode == http.StatusOK {
-				defer resp.Body.Close()
-				body, _ := io.ReadAll(resp.Body)
+			defer rows.Close()
+			for rows.Next() {
+				var pid, dName, email, phone, phoneDigits, targetDeptCode, dateStr string
+				var amt float64
+				var isAnonInt, targetDeptID int
+				if err := rows.Scan(&pid, &dName, &email, &phone, &phoneDigits, &amt, &isAnonInt, &targetDeptID, &targetDeptCode, &dateStr); err == nil {
+					isAnon := (isAnonInt == 1)
 
-				var rzpRes RazorpayPaymentsResponse
-				if err := json.Unmarshal(body, &rzpRes); err == nil {
-					for _, item := range rzpRes.Items {
-						st := strings.ToLower(item.Status)
-						if st != "captured" && st != "authorized" {
-							continue
+					var normKey string
+					if phoneDigits != "" {
+						normKey = "phone_" + phoneDigits
+					} else if strings.TrimSpace(email) != "" {
+						normKey = "email_" + strings.ToLower(strings.TrimSpace(email))
+					} else {
+						normKey = "name_" + strings.ToLower(strings.TrimSpace(dName))
+					}
+
+					if existing, found := aggregatedMap[normKey]; found {
+						existing.Amount += amt
+						if !isAnon {
+							existing.PublicAmount += amt
 						}
-
-						amt := float64(item.Amount) / 100.0
-						if item.AmountPaid > 0 {
-							amt = float64(item.AmountPaid) / 100.0
+						if dateStr > existing.LatestDate {
+							existing.LatestDate = dateStr
 						}
-
-						email := item.Email
-						phone := item.Contact
-						if item.Notes != nil {
-							if e, ok := item.Notes["email"].(string); ok && e != "" {
-								email = e
-							}
-							if p, ok := item.Notes["phone"].(string); ok && p != "" {
-								phone = p
-							} else if p, ok := item.Notes["contact"].(string); ok && p != "" {
-								phone = p
-							}
+						if (existing.OriginalName == "Anonymous BITSian" || strings.TrimSpace(existing.OriginalName) == "") && dName != "Anonymous BITSian" {
+							existing.OriginalName = dName
 						}
-
-						donorName := extractName(item.Notes, email)
-						phoneDigits := cleanPhone(phone)
-
-						var normKey string
-						if phoneDigits != "" {
-							normKey = "phone_" + phoneDigits
-						} else if strings.TrimSpace(email) != "" {
-							normKey = "email_" + strings.ToLower(strings.TrimSpace(email))
-						} else {
-							normKey = "name_" + strings.ToLower(strings.TrimSpace(donorName))
+						if targetDeptID > 0 {
+							existing.TargetDeptID = targetDeptID
 						}
-
-						itemDate := time.Unix(item.CreatedAt, 0).Format("2006-01-02")
-
-						if existing, found := aggregatedMap[normKey]; found {
-							existing.Amount += amt
-							if itemDate > existing.LatestDate {
-								existing.LatestDate = itemDate
-							}
-						} else {
-							aggregatedMap[normKey] = &AggregatedDonor{
-								DonorKey:     normKey,
-								Name:         donorName,
-								OriginalName: donorName,
-								Email:        email,
-								Phone:        phone,
-								PhoneDigits:  phoneDigits,
-								Amount:       amt,
-								LatestDate:   itemDate,
-							}
+						if targetDeptCode != "" {
+							existing.TargetDeptCode = targetDeptCode
+						}
+					} else {
+						pubAmt := 0.0
+						if !isAnon {
+							pubAmt = amt
+						}
+						aggregatedMap[normKey] = &AggregatedDonor{
+							DonorKey:       normKey,
+							Name:           dName,
+							OriginalName:   dName,
+							Email:          email,
+							Phone:          phone,
+							PhoneDigits:    phoneDigits,
+							Amount:         amt,
+							PublicAmount:   pubAmt,
+							LatestDate:     dateStr,
+							TargetDeptID:   targetDeptID,
+							TargetDeptCode: targetDeptCode,
+							IsAnonymous:    isAnon,
 						}
 					}
 				}
@@ -1798,7 +1831,7 @@ func (h *SponsorsHandler) GetDepartmentLeaderboard(c *gin.Context) {
 		}
 	}
 
-	deptLeaderboard := buildDepartmentLeaderboard(aggregatedMap)
+	deptLeaderboard := buildDepartmentLeaderboard(aggregatedMap, deptList, deptMappings)
 	c.JSON(http.StatusOK, gin.H{
 		"success":                true,
 		"department_leaderboard": deptLeaderboard,
