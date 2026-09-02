@@ -223,20 +223,31 @@ export default function SupportDev() {
 
     if (!emailCode) return "";
 
+    // Pass 1: Try matching email_code (or code) AND year_code (or year number)
     for (const dept of depts) {
+      const dEmailCode = (dept.email_code || dept.code || "").toLowerCase();
       const dCode = (dept.code || "").toLowerCase();
+      const dYearCode = (dept.year_code || "").toLowerCase();
       const dYear = (dept.year || "").toLowerCase();
-      if (dCode === emailCode) {
-        if (yearCode === "26" && dYear.includes("1")) return String(dept.id);
-        if (yearCode === "25" && dYear.includes("2")) return String(dept.id);
-        if ((yearCode === "24" || yearCode === "23") && dYear.includes("3")) return String(dept.id);
-        if (yearCode === "22" && dYear.includes("4")) return String(dept.id);
+
+      const codeMatches = (dEmailCode === emailCode || dCode === emailCode);
+
+      if (codeMatches) {
+        if (yearCode && dYearCode && yearCode === dYearCode) {
+          return String(dept.id);
+        }
+        if (yearCode === "26" && (dYear.includes("1") || dYearCode === "26")) return String(dept.id);
+        if (yearCode === "25" && (dYear.includes("2") || dYearCode === "25")) return String(dept.id);
+        if ((yearCode === "24" || yearCode === "23") && (dYear.includes("3") || dYearCode === "24" || dYearCode === "23")) return String(dept.id);
+        if (yearCode === "22" && (dYear.includes("4") || dYearCode === "22")) return String(dept.id);
       }
     }
 
+    // Pass 2: Match email_code or code alone
     for (const dept of depts) {
+      const dEmailCode = (dept.email_code || dept.code || "").toLowerCase();
       const dCode = (dept.code || "").toLowerCase();
-      if (dCode === emailCode) {
+      if (dEmailCode === emailCode || dCode === emailCode) {
         return String(dept.id);
       }
     }
@@ -247,16 +258,16 @@ export default function SupportDev() {
   // Auto-detect and pre-select department when email or department leaderboard loads
   useEffect(() => {
     const depts = leaderboard.department_leaderboard || [];
-    if (depts.length > 0 && !targetDeptId) {
+    if (depts.length > 0) {
       const emailToTest = donorEmail || user?.email || auth.currentUser?.email || "";
       const detectedId = detectDepartmentFromEmail(emailToTest, depts);
       if (detectedId) {
         setTargetDeptId(detectedId);
-      } else if (depts[0]?.id) {
+      } else if (!targetDeptId && depts[0]?.id) {
         setTargetDeptId(String(depts[0].id));
       }
     }
-  }, [donorEmail, user, leaderboard.department_leaderboard, targetDeptId]);
+  }, [donorEmail, user, leaderboard.department_leaderboard]);
 
 
   const effectiveAmount = Number(amount);
