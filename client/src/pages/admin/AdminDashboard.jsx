@@ -58,6 +58,7 @@ import {
   Edit2,
   ExternalLink,
   Eye,
+  EyeOff,
   GraduationCap,
   GripVertical,
   Heart,
@@ -4161,6 +4162,39 @@ function SponsorsSection() {
     }
   };
 
+  const handleToggleAnonymous = async (donor) => {
+    const nextIsAnonymous = !donor.is_anonymous;
+    setIsSaving(true);
+    try {
+      if (nextIsAnonymous) {
+        const res = await updateSponsorNameOverride({
+          donor_key: donor.donor_key,
+          custom_name: "Anonymous BITSian",
+          email: donor.email,
+          phone: donor.phone,
+        });
+        if (res?.success) {
+          setBanner({ type: "success", message: `Donor set to Anonymous & hidden from public leaderboard.` });
+          await fetchSponsorsData();
+        } else {
+          setBanner({ type: "error", message: res?.error || "Failed to set donor as anonymous" });
+        }
+      } else {
+        const res = await deleteSponsorNameOverride(donor.donor_key);
+        if (res?.success) {
+          setBanner({ type: "success", message: `Donor set to Public & visible on public leaderboard.` });
+          await fetchSponsorsData();
+        } else {
+          setBanner({ type: "error", message: res?.error || "Failed to make donor public" });
+        }
+      }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to toggle anonymous status") });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleAddDepartment = async (e) => {
     e.preventDefault();
     if (!newDeptName.trim() || !newDeptCode.trim()) return;
@@ -4393,11 +4427,12 @@ function SponsorsSection() {
                     <tr>
                       <th className="px-4 py-3">Rank</th>
                       <th className="px-4 py-3">Leaderboard Display Name</th>
+                      <th className="px-4 py-3">Visibility</th>
                       <th className="px-4 py-3">Mapped Department</th>
                       <th className="px-4 py-3">Phone & Email</th>
                       <th className="px-4 py-3">Total Contributed</th>
                       <th className="px-4 py-3">Override Status</th>
-                      <th className="px-4 py-3 text-right">Action</th>
+                      <th className="px-4 py-3 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -4410,6 +4445,19 @@ function SponsorsSection() {
                           {donor.display_name}
                           {donor.is_overridden && (
                             <span className="block text-[10px] text-slate-400 font-normal">Orig: {donor.original_name}</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          {donor.is_anonymous ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                              <EyeOff className="h-3 w-3 text-slate-400" />
+                              Anonymous (Hidden)
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                              <Eye className="h-3 w-3 text-emerald-500" />
+                              Public (Visible)
+                            </span>
                           )}
                         </td>
                         <td className="px-4 py-3">
@@ -4443,13 +4491,37 @@ function SponsorsSection() {
                           )}
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenEditModal(donor)}
-                            className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-blue-600 hover:text-white dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-blue-600 dark:hover:text-white cursor-pointer"
-                          >
-                            <Edit2 className="h-3 w-3" /> Edit Name & Dept
-                          </button>
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleAnonymous(donor)}
+                              disabled={isSaving}
+                              className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold transition cursor-pointer ${
+                                donor.is_anonymous
+                                  ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                                  : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200"
+                              }`}
+                              title={donor.is_anonymous ? "Make Public" : "Make Anonymous"}
+                            >
+                              {donor.is_anonymous ? (
+                                <>
+                                  <Eye className="h-3 w-3 text-emerald-600" /> Make Public
+                                </>
+                              ) : (
+                                <>
+                                  <EyeOff className="h-3 w-3 text-slate-500" /> Make Anonymous
+                                </>
+                              )}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEditModal(donor)}
+                              className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:bg-blue-600 hover:text-white dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-blue-600 dark:hover:text-white cursor-pointer"
+                            >
+                              <Edit2 className="h-3 w-3" /> Edit
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -4940,6 +5012,31 @@ function SponsorsSection() {
                   <span className="text-[10px] text-slate-400 block">Original Razorpay Name</span>
                   <span className="font-medium text-slate-900 dark:text-slate-100">{editingDonor.original_name}</span>
                 </div>
+              </div>
+
+              {/* Anonymous Toggle Option */}
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950 flex items-center justify-between">
+                <div>
+                  <label htmlFor="modal-anonymous-toggle" className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 cursor-pointer">
+                    <EyeOff className="h-3.5 w-3.5 text-slate-500" /> Hide from Public Leaderboard (Make Anonymous)
+                  </label>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    Hides donor name from public rankings while keeping contribution in department total.
+                  </p>
+                </div>
+                <input
+                  id="modal-anonymous-toggle"
+                  type="checkbox"
+                  checked={customNameInput === "Anonymous BITSian"}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setCustomNameInput("Anonymous BITSian");
+                    } else {
+                      setCustomNameInput(editingDonor.original_name !== "Anonymous BITSian" ? editingDonor.original_name : "");
+                    }
+                  }}
+                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
+                />
               </div>
 
               {/* Name Input */}
