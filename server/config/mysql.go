@@ -518,7 +518,8 @@ func createSponsorTransactionsTable() {
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		INDEX idx_tx_phone (phone_digits),
 		INDEX idx_tx_email (email),
-		INDEX idx_tx_is_anon (is_anonymous)
+		INDEX idx_tx_is_anon (is_anonymous),
+		INDEX idx_tx_status (payment_status)
 	) ENGINE=InnoDB;`
 
 	if _, err := DB.Exec(query); err != nil {
@@ -526,4 +527,5 @@ func createSponsorTransactionsTable() {
 	} else {
 		log.Println("✅ sponsor_transactions table ready")
 	}
+	_, _ = DB.Exec("CREATE INDEX idx_tx_status ON sponsor_transactions (payment_status)")
 }
