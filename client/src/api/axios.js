@@ -85,9 +85,17 @@ export async function checkUserContribution({ phone, email } = {}) {
   }
 }
 
-export async function createSponsorOrder({ amount, name, email, phone }) {
+export async function createSponsorOrder({ amount, name, email, phone, is_anonymous, target_department_id, target_department_code }) {
   try {
-    const response = await api.post("/sponsors/create-order", { amount, name, email, phone });
+    const response = await api.post("/sponsors/create-order", {
+      amount,
+      name,
+      email,
+      phone,
+      is_anonymous,
+      target_department_id,
+      target_department_code,
+    });
     return response.data;
   } catch (error) {
     return { success: false, error: error.message };

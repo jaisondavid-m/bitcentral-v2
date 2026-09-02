@@ -211,14 +211,17 @@ func getOverridesMap() map[string]string {
 }
 
 type AggregatedDonor struct {
-	DonorKey     string  `json:"donor_key"`
-	Name         string  `json:"name"`
-	OriginalName string  `json:"original_name"`
-	Email        string  `json:"email"`
-	Phone        string  `json:"phone"`
-	PhoneDigits  string  `json:"phone_digits"`
-	Amount       float64 `json:"amount"`
-	LatestDate   string  `json:"date"`
+	DonorKey       string  `json:"donor_key"`
+	Name           string  `json:"name"`
+	OriginalName   string  `json:"original_name"`
+	Email          string  `json:"email"`
+	Phone          string  `json:"phone"`
+	PhoneDigits    string  `json:"phone_digits"`
+	Amount         float64 `json:"amount"`
+	LatestDate     string  `json:"date"`
+	TargetDeptID   int     `json:"target_department_id"`
+	TargetDeptCode string  `json:"target_department_code"`
+	IsAnonymous    bool    `json:"is_anonymous"`
 }
 
 type SponsorDepartment struct {
@@ -342,15 +345,26 @@ func extractEmailDepartmentAndYear(email string) (string, string) {
 }
 
 func resolveDonorDepartmentID(key string, donor *AggregatedDonor, mappings map[string]int) int {
+	if donor != nil && donor.TargetDeptID > 0 {
+		return donor.TargetDeptID
+	}
+	if donor != nil && donor.TargetDeptCode != "" {
+		_, deptList := getDepartmentsMap()
+		for _, d := range deptList {
+			if strings.EqualFold(d.Code, donor.TargetDeptCode) || strings.EqualFold(d.EmailCode, donor.TargetDeptCode) {
+				return d.ID
+			}
+		}
+	}
 	if deptID, ok := mappings[key]; ok && deptID > 0 {
 		return deptID
 	}
-	if donor.PhoneDigits != "" {
+	if donor != nil && donor.PhoneDigits != "" {
 		if deptID, ok := mappings["phone_"+donor.PhoneDigits]; ok && deptID > 0 {
 			return deptID
 		}
 	}
-	if donor.Email != "" {
+	if donor != nil && donor.Email != "" {
 		emailLower := strings.ToLower(strings.TrimSpace(donor.Email))
 		if deptID, ok := mappings["email_"+emailLower]; ok && deptID > 0 {
 			return deptID
@@ -510,6 +524,10 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 
 						email := item.Email
 						phone := item.Contact
+						isAnon := false
+						var targetDeptID int
+						var targetDeptCode string
+
 						if item.Notes != nil {
 							if e, ok := item.Notes["email"].(string); ok && e != "" {
 								email = e
@@ -519,9 +537,25 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 							} else if p, ok := item.Notes["contact"].(string); ok && p != "" {
 								phone = p
 							}
+							if anonStr, ok := item.Notes["is_anonymous"].(string); ok {
+								isAnon = (anonStr == "true" || anonStr == "1" || anonStr == "yes")
+							} else if anonBool, ok := item.Notes["is_anonymous"].(bool); ok {
+								isAnon = anonBool
+							}
+							if deptIDStr, ok := item.Notes["target_department_id"].(string); ok && deptIDStr != "" {
+								targetDeptID, _ = strconv.Atoi(deptIDStr)
+							} else if deptIDNum, ok := item.Notes["target_department_id"].(float64); ok {
+								targetDeptID = int(deptIDNum)
+							}
+							if codeStr, ok := item.Notes["target_department_code"].(string); ok && codeStr != "" {
+								targetDeptCode = codeStr
+							}
 						}
 
 						donorName := extractName(item.Notes, email)
+						if isAnon {
+							donorName = "Anonymous BITSian"
+						}
 						phoneDigits := cleanPhone(phone)
 
 						var normKey string
@@ -549,16 +583,25 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 							if existing.Phone == "" && phone != "" {
 								existing.Phone = phone
 							}
+							if targetDeptID > 0 {
+								existing.TargetDeptID = targetDeptID
+							}
+							if targetDeptCode != "" {
+								existing.TargetDeptCode = targetDeptCode
+							}
 						} else {
 							aggregatedMap[normKey] = &AggregatedDonor{
-								DonorKey:     normKey,
-								Name:         donorName,
-								OriginalName: donorName,
-								Email:        email,
-								Phone:        phone,
-								PhoneDigits:  phoneDigits,
-								Amount:       amt,
-								LatestDate:   itemDate,
+								DonorKey:       normKey,
+								Name:           donorName,
+								OriginalName:   donorName,
+								Email:          email,
+								Phone:          phone,
+								PhoneDigits:    phoneDigits,
+								Amount:         amt,
+								LatestDate:     itemDate,
+								TargetDeptID:   targetDeptID,
+								TargetDeptCode: targetDeptCode,
+								IsAnonymous:    isAnon,
 							}
 						}
 					}
@@ -669,6 +712,10 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 
 						email := item.Email
 						phone := item.Contact
+						isAnon := false
+						var targetDeptID int
+						var targetDeptCode string
+
 						if item.Notes != nil {
 							if e, ok := item.Notes["email"].(string); ok && e != "" {
 								email = e
@@ -678,9 +725,25 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 							} else if p, ok := item.Notes["contact"].(string); ok && p != "" {
 								phone = p
 							}
+							if anonStr, ok := item.Notes["is_anonymous"].(string); ok {
+								isAnon = (anonStr == "true" || anonStr == "1" || anonStr == "yes")
+							} else if anonBool, ok := item.Notes["is_anonymous"].(bool); ok {
+								isAnon = anonBool
+							}
+							if deptIDStr, ok := item.Notes["target_department_id"].(string); ok && deptIDStr != "" {
+								targetDeptID, _ = strconv.Atoi(deptIDStr)
+							} else if deptIDNum, ok := item.Notes["target_department_id"].(float64); ok {
+								targetDeptID = int(deptIDNum)
+							}
+							if codeStr, ok := item.Notes["target_department_code"].(string); ok && codeStr != "" {
+								targetDeptCode = codeStr
+							}
 						}
 
 						donorName := extractName(item.Notes, email)
+						if isAnon {
+							donorName = "Anonymous BITSian"
+						}
 						phoneDigits := cleanPhone(phone)
 
 						var normKey string
@@ -708,16 +771,25 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 							if existing.Phone == "" && phone != "" {
 								existing.Phone = phone
 							}
+							if targetDeptID > 0 {
+								existing.TargetDeptID = targetDeptID
+							}
+							if targetDeptCode != "" {
+								existing.TargetDeptCode = targetDeptCode
+							}
 						} else {
 							aggregatedMap[normKey] = &AggregatedDonor{
-								DonorKey:     normKey,
-								Name:         donorName,
-								OriginalName: donorName,
-								Email:        email,
-								Phone:        phone,
-								PhoneDigits:  phoneDigits,
-								Amount:       amt,
-								LatestDate:   itemDate,
+								DonorKey:       normKey,
+								Name:           donorName,
+								OriginalName:   donorName,
+								Email:          email,
+								Phone:          phone,
+								PhoneDigits:    phoneDigits,
+								Amount:         amt,
+								LatestDate:     itemDate,
+								TargetDeptID:   targetDeptID,
+								TargetDeptCode: targetDeptCode,
+								IsAnonymous:    isAnon,
 							}
 						}
 					}
@@ -1133,10 +1205,13 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 }
 
 type CreateOrderRequest struct {
-	Amount float64 `json:"amount"` // in Rupees
-	Name   string  `json:"name"`
-	Email  string  `json:"email"`
-	Phone  string  `json:"phone"`
+	Amount             float64 `json:"amount"` // in Rupees
+	Name               string  `json:"name"`
+	Email              string  `json:"email"`
+	Phone              string  `json:"phone"`
+	IsAnonymous        bool    `json:"is_anonymous"`
+	TargetDepartmentID int     `json:"target_department_id"`
+	TargetDeptCode     string  `json:"target_department_code"`
 }
 
 // CreateOrder creates a Razorpay order with payment_capture: 1 for automatic capture
@@ -1162,10 +1237,13 @@ func (h *SponsorsHandler) CreateOrder(c *gin.Context) {
 		"currency":        "INR",
 		"payment_capture": 1, // Auto capture
 		"notes": map[string]string{
-			"name":    req.Name,
-			"email":   req.Email,
-			"phone":   req.Phone,
-			"contact": req.Phone,
+			"name":                   req.Name,
+			"email":                  req.Email,
+			"phone":                  req.Phone,
+			"contact":                req.Phone,
+			"is_anonymous":           fmt.Sprintf("%t", req.IsAnonymous),
+			"target_department_id":   fmt.Sprintf("%d", req.TargetDepartmentID),
+			"target_department_code": req.TargetDeptCode,
 		},
 	}
 
