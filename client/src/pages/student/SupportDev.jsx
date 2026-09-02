@@ -421,107 +421,106 @@ export default function SupportDev() {
   };
 
   const formattedTotal = Number(leaderboard.total_raised || 0).toLocaleString("en-IN");
-
   return (
-    <div className="min-h-screen w-full flex flex-col justify-between bg-[#f2f6ff] text-slate-900 transition-colors duration-300 dark:bg-black dark:text-white">
+    <div className="w-full min-h-[calc(100vh-80px)] lg:h-[calc(100vh-80px)] flex flex-col justify-center bg-slate-50/60 text-slate-900 transition-colors duration-300 dark:bg-black dark:text-white overflow-hidden">
       {/* Main Container */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
-        <div className="w-full max-w-6xl grid gap-8 lg:grid-cols-12 lg:items-start">
+      <main className="flex-1 flex items-center justify-center px-4 py-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full">
+        <div className="w-full grid gap-6 lg:grid-cols-12 lg:items-center">
 
           {/* Left Column: Hero & Clean CTA */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="lg:col-span-7 space-y-6"
+            transition={{ duration: 0.4 }}
+            className="lg:col-span-7 space-y-4"
           >
             {/* Back to Home Button */}
             <button
               type="button"
               onClick={() => navigate("/")}
-              className="inline-flex items-center gap-2 rounded-full bg-white/80 dark:bg-slate-900/80 px-4 py-1.5 text-xs font-semibold text-slate-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400 border border-slate-200/80 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-800 transition-all duration-200 shadow-xs cursor-pointer w-fit"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white dark:bg-slate-900 px-3.5 py-1 text-xs font-semibold text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 border border-slate-200/80 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-800 transition-all duration-200 shadow-2xs cursor-pointer w-fit"
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-3.5 w-3.5" />
               <span>Back to Home</span>
             </button>
 
             {/* Main Headline */}
             <div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 dark:text-white flex items-center flex-wrap gap-2">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center flex-wrap gap-2">
                 <span>Keep BIT-CENTRAL</span>{" "}
                 <span className="text-blue-600 dark:text-blue-400">
                   Running
                 </span>
-                <FaHandHoldingHeart className="h-8 w-8 text-rose-500 inline-block shrink-0 ml-1" />
+                <FaHandHoldingHeart className="h-7 w-7 text-blue-600 dark:text-blue-400 inline-block shrink-0 ml-1" />
               </h1>
 
-              <p className="mt-3 text-sm sm:text-base text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl">
+              <p className="mt-1.5 text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-lg">
                 BIT-CENTRAL provides free question banks, answer keys, exam hall finders, and mess schedules for the BIT Sathy community. Help us keep it running.
               </p>
             </div>
 
             {/* 3 Feature Cards */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                <div className="rounded-lg bg-blue-50 p-2 text-blue-600 dark:bg-blue-950 dark:text-blue-400 w-fit">
-                  <Server className="h-5 w-5" />
+            <div className="grid grid-cols-3 gap-2.5">
+              <div className="rounded-xl border border-slate-200/70 bg-white p-3 shadow-2xs dark:border-slate-800 dark:bg-slate-900/90">
+                <div className="rounded-md bg-blue-50 p-1.5 text-blue-600 dark:bg-blue-950/80 dark:text-blue-400 w-fit">
+                  <Server className="h-4 w-4" />
                 </div>
-                <h3 className="mt-3 text-sm font-bold text-slate-900 dark:text-white">Cloud Server</h3>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">High speed delivery</p>
+                <h3 className="mt-2 text-xs font-bold text-slate-900 dark:text-white">Cloud Server</h3>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">High speed delivery</p>
               </div>
 
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                <div className="rounded-lg bg-blue-50 p-2 text-blue-600 dark:bg-blue-400 dark:bg-blue-950 w-fit">
-                  <ShieldCheck className="h-5 w-5" />
+              <div className="rounded-xl border border-slate-200/70 bg-white p-3 shadow-2xs dark:border-slate-800 dark:bg-slate-900/90">
+                <div className="rounded-md bg-blue-50 p-1.5 text-blue-600 dark:bg-blue-950/80 dark:text-blue-400 w-fit">
+                  <ShieldCheck className="h-4 w-4" />
                 </div>
-                <h3 className="mt-3 text-sm font-bold text-slate-900 dark:text-white">100% Ad-Free</h3>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Clean student UX</p>
+                <h3 className="mt-2 text-xs font-bold text-slate-900 dark:text-white">100% Ad-Free</h3>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Clean student UX</p>
               </div>
 
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                <div className="rounded-lg bg-blue-50 p-2 text-blue-600 dark:bg-blue-400 dark:bg-blue-950 w-fit">
-                  <Code2 className="h-5 w-5" />
+              <div className="rounded-xl border border-slate-200/70 bg-white p-3 shadow-2xs dark:border-slate-800 dark:bg-slate-900/90">
+                <div className="rounded-md bg-blue-50 p-1.5 text-blue-600 dark:bg-blue-950/80 dark:text-blue-400 w-fit">
+                  <Code2 className="h-4 w-4" />
                 </div>
-                <h3 className="mt-3 text-sm font-bold text-slate-900 dark:text-white">Active R&D</h3>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">New campus tools</p>
+                <h3 className="mt-2 text-xs font-bold text-slate-900 dark:text-white">Active R&D</h3>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">New campus tools</p>
               </div>
             </div>
 
             {/* 2 Stat Cards */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-2xl bg-gradient-to-br from-blue-100/90 to-blue-50/80 p-5 border border-blue-200/60 dark:from-blue-950/60 dark:to-slate-900 dark:border-blue-900/60">
-                <div className="text-2xl sm:text-3xl font-black text-blue-700 dark:text-blue-300">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl bg-blue-50/70 p-3.5 border border-blue-100 dark:bg-blue-950/30 dark:border-blue-900/40">
+                <div className="text-xl sm:text-2xl font-black text-blue-700 dark:text-blue-300">
                   3,600+
                 </div>
-                <div className="mt-1 text-xs font-semibold text-blue-600/80 dark:text-blue-400/80">
+                <div className="mt-0.5 text-[11px] font-semibold text-blue-600/90 dark:text-blue-400/90">
                   Students Served
                 </div>
               </div>
 
-              <div className="rounded-2xl bg-gradient-to-br from-blue-100/90 to-blue-50/80 p-5 border border-blue-200/60 dark:from-blue-950/60 dark:to-slate-900 dark:border-blue-900/60">
-                <div className="text-2xl sm:text-3xl font-black text-blue-700 dark:text-blue-300">
+              <div className="rounded-xl bg-blue-50/70 p-3.5 border border-blue-100 dark:bg-blue-950/30 dark:border-blue-900/40">
+                <div className="text-xl sm:text-2xl font-black text-blue-700 dark:text-blue-300">
                   ₹{formattedTotal}
                 </div>
-                <div className="mt-1 text-xs font-semibold text-blue-600/80 dark:text-blue-400/80">
+                <div className="mt-0.5 text-[11px] font-semibold text-blue-600/90 dark:text-blue-400/90">
                   Raised by Community
                 </div>
               </div>
             </div>
 
             {/* Main Action Button Card */}
-            <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900 space-y-4">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Heart className="h-4 w-4 text-rose-500 fill-rose-500" />
+                  <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <Heart className="h-4 w-4 text-blue-600 dark:text-blue-400 fill-blue-600/20" />
                     Support Our Platform
                   </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                     Your contributions fund server infrastructure and free tools for all students.
                   </p>
                 </div>
-                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1 shrink-0">
-                  <Sparkles className="h-3.5 w-3.5" /> Razorpay Secured
+                <span className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-1 shrink-0 bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-full border border-blue-100 dark:border-blue-900">
+                  <Sparkles className="h-3 w-3" /> Razorpay Secured
                 </span>
               </div>
 
@@ -534,7 +533,7 @@ export default function SupportDev() {
                       setErrorMessage("");
                       setIsModalOpen(true);
                     }}
-                    className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-md shadow-blue-600/25 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-1.5 cursor-pointer w-fit"
+                    className="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-xs hover:scale-102 active:scale-98 transition-all duration-150 flex items-center gap-1.5 cursor-pointer w-fit"
                   >
                     <Heart className="h-3.5 w-3.5 fill-white text-white" />
                     <span>Donate Now</span>
@@ -544,25 +543,25 @@ export default function SupportDev() {
                     <button
                       type="button"
                       onClick={handleLoginToDonate}
-                      className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-md shadow-blue-600/25 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-1.5 cursor-pointer w-fit"
+                      className="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-xs hover:scale-102 active:scale-98 transition-all duration-150 flex items-center gap-1.5 cursor-pointer w-fit"
                     >
                       <LogIn className="h-3.5 w-3.5 text-white" />
                       <span>Log In to Donate</span>
                     </button>
-                    <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400">
-                      Log in with your @bitsathy.ac.in mail to donate & get featured.
+                    <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                      Log in with @bitsathy.ac.in email
                     </span>
                   </div>
                 )}
 
-                <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <p className="text-[11px] text-slate-400 dark:text-slate-500 flex items-center gap-1">
                   <Lock className="h-3 w-3 text-slate-400 shrink-0" />
                   Secure 256-bit SSL
                 </p>
               </div>
 
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 pt-3 border-t border-slate-100 dark:border-slate-800/80 leading-relaxed">
-                <span className="font-semibold text-slate-500 dark:text-slate-400">Disclaimer:</span> BIT-CENTRAL is an independent student-developed platform and is not officially affiliated with or endorsed by Bannari Amman Institute of Technology.
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-100 dark:border-slate-800/80 leading-tight">
+                <span className="font-semibold text-slate-500 dark:text-slate-400">Disclaimer:</span> BIT-CENTRAL is an independent student-developed platform not officially affiliated with Bannari Amman Institute of Technology.
               </p>
             </div>
           </motion.div>
@@ -571,45 +570,46 @@ export default function SupportDev() {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="lg:col-span-5 space-y-4"
+            transition={{ duration: 0.4, delay: 0.15 }}
+            className="lg:col-span-5 space-y-3"
           >
             {/* User Contribution Cards */}
             {userContribution?.found && (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {/* 1. Public Named Contribution Card */}
                 {(userContribution.named_amount > 0 || !userContribution.anonymous_amount) && (
-                  <div className="rounded-2xl border border-emerald-200/90 bg-[#dcfce7]/80 p-3.5 sm:p-4 shadow-xs dark:border-emerald-800/80 dark:bg-emerald-950/50 transition-all">
+                  <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/70 p-3 shadow-2xs dark:border-emerald-900/60 dark:bg-emerald-950/40 transition-all">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#047857] dark:bg-emerald-600 flex items-center justify-center text-white shrink-0 shadow-xs">
-                          <Heart className="h-5 w-5 fill-white text-white" />
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                          <Heart className="h-4 w-4 fill-white text-white" />
                         </div>
                         <div className="min-w-0">
-                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#047857] dark:text-emerald-400 block leading-tight">
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block leading-none">
                             YOUR PUBLIC CONTRIBUTION
                           </span>
-                          <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate mt-0.5">
                             {userContribution.name}
                           </h4>
                         </div>
                       </div>
 
                       <div className="text-right shrink-0 flex flex-col items-end">
-                        <div className="text-base sm:text-lg font-black text-[#047857] dark:text-emerald-300 leading-tight">
+                        <div className="text-sm font-black text-emerald-700 dark:text-emerald-300 leading-none">
                           ₹{Number(userContribution.named_amount || userContribution.amount || 0).toLocaleString("en-IN")}
                         </div>
-                        <span className="inline-block mt-0.5 rounded-md bg-[#86efac] px-2 py-0.5 text-[11px] font-bold text-[#064e3b] dark:bg-emerald-800 dark:text-emerald-100">
-                          Rank #{userContribution.rank} {userContribution.total_supporters ? `of ${userContribution.total_supporters}` : ""}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => navigate(`/payment-successful/${encodeURIComponent(userContribution.certificate_id || 'BIT-PATRON-VERIFIED')}`)}
-                          className="mt-2 inline-flex items-center gap-1 rounded-lg bg-[#047857] px-2.5 py-1 text-[11px] font-bold text-white shadow-xs hover:bg-[#065f46] dark:bg-emerald-600 dark:hover:bg-emerald-500 transition-colors cursor-pointer"
-                        >
-                          <Sparkles className="h-3 w-3 text-amber-300 fill-amber-300" />
-                          <span>View Certificate</span>
-                        </button>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <span className="rounded bg-emerald-200/80 dark:bg-emerald-900 px-1.5 py-0.5 text-[10px] font-bold text-emerald-900 dark:text-emerald-200">
+                            Rank #{userContribution.rank}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => navigate(`/payment-successful/${encodeURIComponent(userContribution.certificate_id || 'BIT-PATRON-VERIFIED')}`)}
+                            className="inline-flex items-center gap-0.5 rounded bg-emerald-700 px-1.5 py-0.5 text-[10px] font-bold text-white hover:bg-emerald-800 transition-colors cursor-pointer"
+                          >
+                            <span>Certificate</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -617,30 +617,30 @@ export default function SupportDev() {
 
                 {/* 2. Anonymous Contribution Card */}
                 {userContribution.anonymous_amount > 0 && (
-                  <div className="rounded-2xl border border-purple-200/90 bg-purple-50/80 p-3.5 sm:p-4 shadow-xs dark:border-purple-800/80 dark:bg-purple-950/50 transition-all">
+                  <div className="rounded-xl border border-slate-700/60 bg-slate-900 text-white p-3 shadow-2xs dark:border-slate-700 dark:bg-slate-900 transition-all">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-purple-600 dark:bg-purple-500 flex items-center justify-center text-white shrink-0 shadow-xs">
-                          <EyeOff className="h-5 w-5 text-white" />
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 shrink-0">
+                          <EyeOff className="h-4 w-4" />
                         </div>
                         <div className="min-w-0">
-                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-700 dark:text-purple-300 block leading-tight">
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block leading-none">
                             YOUR ANONYMOUS CONTRIBUTION
                           </span>
-                          <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                          <h4 className="text-xs font-bold text-white truncate mt-0.5">
                             Anonymous BITSian
                           </h4>
-                          <span className="text-[10px] text-purple-600 dark:text-purple-400 font-medium block mt-0.5">
-                            🔒 Hidden on Leaderboard • Counted for Department
+                          <span className="text-[9px] text-slate-400 font-medium block">
+                            🔒 Hidden on Leaderboard • Counted for Dept
                           </span>
                         </div>
                       </div>
 
                       <div className="text-right shrink-0 flex flex-col items-end">
-                        <div className="text-base sm:text-lg font-black text-purple-700 dark:text-purple-300 leading-tight">
+                        <div className="text-sm font-black text-white leading-none">
                           ₹{Number(userContribution.anonymous_amount || 0).toLocaleString("en-IN")}
                         </div>
-                        <span className="inline-block mt-0.5 rounded-md bg-purple-200 px-2 py-0.5 text-[11px] font-bold text-purple-900 dark:bg-purple-800 dark:text-purple-100">
+                        <span className="mt-1 rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold text-slate-300">
                           Verified Anonymous
                         </span>
                       </div>
@@ -651,16 +651,16 @@ export default function SupportDev() {
             )}
 
 
-            <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-2xs dark:border-slate-800 dark:bg-slate-900">
               {/* Leaderboard Header & Tabs */}
-              <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl dark:bg-slate-800">
+              <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl dark:bg-slate-800">
                   <button
                     type="button"
                     onClick={() => setLeaderboardTab("individual")}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                       leaderboardTab === "individual"
-                        ? "bg-white text-blue-600 shadow-xs dark:bg-slate-900 dark:text-blue-400"
+                        ? "bg-white text-blue-600 shadow-2xs dark:bg-slate-900 dark:text-blue-400"
                         : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                     }`}
                   >
@@ -671,9 +671,9 @@ export default function SupportDev() {
                   <button
                     type="button"
                     onClick={() => setLeaderboardTab("departments")}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                       leaderboardTab === "departments"
-                        ? "bg-white text-purple-600 shadow-xs dark:bg-slate-900 dark:text-purple-400"
+                        ? "bg-white text-blue-600 shadow-2xs dark:bg-slate-900 dark:text-blue-400"
                         : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                     }`}
                   >
@@ -682,41 +682,40 @@ export default function SupportDev() {
                   </button>
                 </div>
 
-                <span className="rounded-full bg-[#e0e7ff]/80 px-2.5 py-0.5 text-[10px] font-bold text-[#4318ff] dark:bg-blue-950 dark:text-blue-300 border border-blue-100/60 dark:border-blue-800/60">
-                  Top 10 Rankings
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  Top Rankings
                 </span>
               </div>
 
               {/* List / Skeleton Loading / Empty State */}
-              <div className="mt-3 space-y-2 max-h-[540px] min-h-[200px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex flex-col justify-start">
+              <div className="mt-2.5 space-y-1.5 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin flex flex-col justify-start">
                 {loading ? (
                   /* Skeleton Loading State */
-                  Array.from({ length: 5 }).map((_, idx) => (
+                  Array.from({ length: 4 }).map((_, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between rounded-xl bg-slate-100/70 p-3 dark:bg-slate-800/50 animate-pulse"
+                      className="flex items-center justify-between rounded-lg bg-slate-50 p-2.5 dark:bg-slate-800/40 animate-pulse"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="h-5 w-8 rounded bg-slate-200 dark:bg-slate-700"></div>
-                        <div className="h-4 w-28 rounded bg-slate-200 dark:bg-slate-700"></div>
+                      <div className="flex items-center gap-2.5">
+                        <div className="h-4 w-6 rounded bg-slate-200 dark:bg-slate-700"></div>
+                        <div className="h-3.5 w-24 rounded bg-slate-200 dark:bg-slate-700"></div>
                       </div>
-                      <div className="h-4 w-12 rounded bg-slate-200 dark:bg-slate-700"></div>
+                      <div className="h-3.5 w-10 rounded bg-slate-200 dark:bg-slate-700"></div>
                     </div>
                   ))
                 ) : leaderboardTab === "individual" ? (
                   leaderboard.sponsors.length === 0 ? (
                     /* Empty State (No Donors Yet) */
-                    <div className="flex flex-col items-center justify-center py-10 text-center space-y-3">
-                      <div className="rounded-full bg-rose-50 p-3 text-rose-500 dark:bg-rose-950/60 dark:text-rose-400">
-                        <Heart className="h-6 w-6 fill-current animate-bounce" />
+                    <div className="flex flex-col items-center justify-center py-8 text-center space-y-2">
+                      <div className="rounded-full bg-blue-50 p-2.5 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+                        <Heart className="h-5 w-5 fill-current" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center justify-center gap-1">
-                          <span>Be the first patron!</span>
-                          <Sparkles className="h-4 w-4 text-amber-500" />
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                          Be the first patron!
                         </h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-[220px] mx-auto">
-                          Your support keeps open student infrastructure running.
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 max-w-[200px] mx-auto">
+                          Your support keeps student tools online.
                         </p>
                       </div>
                     </div>
@@ -732,57 +731,51 @@ export default function SupportDev() {
                       );
 
                       let rowStyle = "border border-slate-100 bg-slate-50/50 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950/60 dark:hover:bg-slate-950";
-                      let badgeStyle = "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-bold px-2 py-0.5 rounded-lg text-xs";
-                      let badgeContent = `#${rank}`;
+                      let badgeStyle = "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-bold px-1.5 py-0.5 rounded text-[10px]";
 
                       if (rank === 1) {
-                        rowStyle = "border border-amber-200/90 bg-amber-50/40 dark:border-amber-800/60 dark:from-amber-950/30 dark:to-slate-900";
-                        badgeStyle = "bg-[#ff6b00] text-white font-black px-2 py-0.5 rounded-lg text-xs shadow-xs";
-                        badgeContent = "#1";
+                        rowStyle = "border border-slate-300 bg-slate-100/80 dark:border-slate-700 dark:bg-slate-800/60 font-semibold";
+                        badgeStyle = "bg-slate-900 text-white dark:bg-blue-600 dark:text-white font-extrabold px-1.5 py-0.5 rounded text-[10px]";
                       } else if (rank === 2) {
-                        rowStyle = "border border-slate-200/80 bg-slate-100/50 dark:border-slate-700/60 dark:bg-slate-800/40";
-                        badgeStyle = "bg-[#64748b] text-white font-bold px-2 py-0.5 rounded-lg text-xs";
-                        badgeContent = "#2";
+                        badgeStyle = "bg-slate-700 text-white font-bold px-1.5 py-0.5 rounded text-[10px]";
                       } else if (rank === 3) {
-                        rowStyle = "border border-orange-200/80 bg-orange-50/30 dark:border-amber-900/50 dark:bg-orange-950/20";
-                        badgeStyle = "bg-[#ea580c] text-white font-bold px-2 py-0.5 rounded-lg text-xs";
-                        badgeContent = "#3";
+                        badgeStyle = "bg-slate-600 text-white font-bold px-1.5 py-0.5 rounded text-[10px]";
                       }
 
                       if (isCurrentUser) {
-                        rowStyle = "border-2 border-[#10b981] bg-[#ecfdf5]/80 dark:bg-emerald-950/40 shadow-xs";
+                        rowStyle = "border-2 border-emerald-500 bg-emerald-50/80 dark:bg-emerald-950/40";
                       }
 
                       return (
                         <div
                           key={idx}
-                          className={`flex items-center justify-between rounded-xl p-2.5 text-xs transition-all duration-200 ${rowStyle}`}
+                          className={`flex items-center justify-between rounded-lg p-2 text-xs transition-all duration-150 ${rowStyle}`}
                         >
-                          <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="flex items-center gap-2 min-w-0">
                             <span className={`inline-flex items-center justify-center shrink-0 ${badgeStyle}`}>
-                              {badgeContent}
+                              #{rank}
                             </span>
                             <div className="min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <span className="font-bold text-slate-900 dark:text-slate-100 truncate max-w-[140px]">
+                                <span className="font-bold text-slate-900 dark:text-slate-100 truncate max-w-[130px]">
                                   {sponsor.name}
                                 </span>
                                 {isCurrentUser && (
-                                  <span className="rounded bg-[#047857] px-1.5 py-0.5 text-[9px] font-black text-white uppercase tracking-wider shrink-0">
+                                  <span className="rounded bg-emerald-700 px-1 py-0.2 text-[8px] font-black text-white uppercase tracking-wider shrink-0">
                                     YOU
                                   </span>
                                 )}
                               </div>
                               {sponsor.department_display && (
-                                <span className="text-[10px] text-purple-600 dark:text-purple-400 font-semibold block truncate">
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block truncate">
                                   {sponsor.department_display}
                                 </span>
                               )}
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-3 shrink-0">
-                            <span className="font-extrabold text-[#047857] dark:text-emerald-400 text-sm">
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="font-bold text-slate-900 dark:text-white text-xs">
                               ₹{Number(sponsor.amount || 0).toLocaleString("en-IN")}
                             </span>
                           </div>
@@ -793,41 +786,34 @@ export default function SupportDev() {
                 ) : (
                   /* Department Leaderboard List */
                   (leaderboard.department_leaderboard || []).length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-10 text-center space-y-2">
-                      <GraduationCap className="h-6 w-6 text-purple-500 animate-bounce" />
-                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                    <div className="flex flex-col items-center justify-center py-8 text-center space-y-1">
+                      <GraduationCap className="h-5 w-5 text-slate-400" />
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">
                         No Department Contributions Yet
                       </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 max-w-[220px]">
-                        Support Dev to place your department on top of the leaderboard!
-                      </p>
                     </div>
                   ) : (
                     (leaderboard.department_leaderboard || []).slice(0, 10).map((dept, idx) => {
                       const rank = idx + 1;
-                      let badgeStyle = "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-bold px-2 py-0.5 rounded-lg text-xs";
+                      let badgeStyle = "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-bold px-1.5 py-0.5 rounded text-[10px]";
                       let rowStyle = "border border-slate-100 bg-slate-50/50 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950/60 dark:hover:bg-slate-950";
 
                       if (rank === 1) {
-                        rowStyle = "border border-purple-200/90 bg-purple-50/40 dark:border-purple-800/60 dark:from-purple-950/30 dark:to-slate-900";
-                        badgeStyle = "bg-purple-600 text-white font-black px-2 py-0.5 rounded-lg text-xs shadow-xs";
-                      } else if (rank === 2) {
-                        badgeStyle = "bg-[#64748b] text-white font-bold px-2 py-0.5 rounded-lg text-xs";
-                      } else if (rank === 3) {
-                        badgeStyle = "bg-[#ea580c] text-white font-bold px-2 py-0.5 rounded-lg text-xs";
+                        rowStyle = "border border-slate-300 bg-slate-100/80 dark:border-slate-700 dark:bg-slate-800/60 font-semibold";
+                        badgeStyle = "bg-blue-600 text-white font-black px-1.5 py-0.5 rounded text-[10px]";
                       }
 
                       return (
                         <div
                           key={dept.id || idx}
-                          className={`flex items-center justify-between rounded-xl p-2.5 text-xs transition-all duration-200 ${rowStyle}`}
+                          className={`flex items-center justify-between rounded-lg p-2 text-xs transition-all duration-150 ${rowStyle}`}
                         >
-                          <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="flex items-center gap-2 min-w-0">
                             <span className={`inline-flex items-center justify-center shrink-0 ${badgeStyle}`}>
                               #{rank}
                             </span>
                             <div className="min-w-0">
-                              <span className="font-extrabold text-slate-900 dark:text-white truncate block text-xs">
+                              <span className="font-bold text-slate-900 dark:text-white truncate block text-xs">
                                 {dept.display_name}
                               </span>
                               <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate block">
@@ -837,7 +823,7 @@ export default function SupportDev() {
                           </div>
 
                           <div className="flex items-center gap-2 shrink-0">
-                            <span className="font-extrabold text-[#047857] dark:text-emerald-400 text-sm">
+                            <span className="font-bold text-slate-900 dark:text-white text-xs">
                               ₹{Number(dept.total_amount || 0).toLocaleString("en-IN")}
                             </span>
                           </div>
@@ -849,7 +835,6 @@ export default function SupportDev() {
               </div>
             </div>
           </motion.div>
-
 
         </div>
       </main>
