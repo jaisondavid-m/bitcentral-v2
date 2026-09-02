@@ -394,6 +394,17 @@ export async function deleteSponsorNameOverride(donor_key) {
   }
 }
 
+export async function updateSponsorTransactionOverride({ payment_id, is_anonymous }) {
+  try {
+    const headers = await getAdminHeaders();
+    const response = await api.put(`/admin/sponsors/transaction-override`, { payment_id, is_anonymous }, { headers });
+    return response.data;
+  } catch (error) {
+    console.warn("PUT /admin/sponsors/transaction-override error:", error);
+    return { success: false, error: "Failed to update transaction anonymous status" };
+  }
+}
+
 export async function getSponsorDepartments() {
   try {
     const headers = await getAdminHeaders();

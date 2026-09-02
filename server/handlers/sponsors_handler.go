@@ -42,14 +42,15 @@ type RazorpayPaymentsResponse struct {
 }
 
 type SponsorItem struct {
-	ID        string  `json:"id"`
-	Amount    float64 `json:"amount"` // in Rupees
-	Status    string  `json:"status"`
-	Currency  string  `json:"currency"`
-	Email     string  `json:"email"`
-	Phone     string  `json:"phone"`
-	Name      string  `json:"name"`
-	CreatedAt string  `json:"created_at"`
+	ID          string  `json:"id"`
+	Amount      float64 `json:"amount"` // in Rupees
+	Status      string  `json:"status"`
+	Currency    string  `json:"currency"`
+	Email       string  `json:"email"`
+	Phone       string  `json:"phone"`
+	Name        string  `json:"name"`
+	CreatedAt   string  `json:"created_at"`
+	IsAnonymous bool    `json:"is_anonymous"`
 }
 
 func extractName(notes map[string]interface{}, topEmail string) string {
@@ -133,15 +134,31 @@ func (h *SponsorsHandler) GetSponsorsAdmin(c *gin.Context) {
 
 						donorName := extractName(item.Notes, email)
 
+						isAnon := false
+						txOverrides := getTransactionOverridesMap()
+						if txIsAnon, ok := txOverrides[item.ID]; ok {
+							isAnon = txIsAnon
+						} else if item.Notes != nil {
+							if anonStr, ok := item.Notes["is_anonymous"].(string); ok {
+								isAnon = (anonStr == "true" || anonStr == "1" || anonStr == "yes")
+							} else if anonBool, ok := item.Notes["is_anonymous"].(bool); ok {
+								isAnon = anonBool
+							}
+						}
+						if donorName == "Anonymous BITSian" {
+							isAnon = true
+						}
+
 						sponsors = append(sponsors, SponsorItem{
-							ID:        item.ID,
-							Amount:    amtInRupees,
-							Status:    item.Status,
-							Currency:  item.Currency,
-							Email:     email,
-							Phone:     phone,
-							Name:      donorName,
-							CreatedAt: time.Unix(item.CreatedAt, 0).Format("2006-01-02 15:04:05"),
+							ID:          item.ID,
+							Amount:      amtInRupees,
+							Status:      item.Status,
+							Currency:    item.Currency,
+							Email:       email,
+							Phone:       phone,
+							Name:        donorName,
+							CreatedAt:   time.Unix(item.CreatedAt, 0).Format("2006-01-02 15:04:05"),
+							IsAnonymous: isAnon,
 						})
 					}
 
@@ -496,6 +513,7 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 	var sponsors []gin.H
 	var total float64
 	overridesMap := getOverridesMap()
+	txOverrides := getTransactionOverridesMap()
 	deptMap, _ := getDepartmentsMap()
 	deptMappings := getDepartmentMappingsMap()
 	aggregatedMap := make(map[string]*AggregatedDonor)
@@ -531,7 +549,9 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 						var targetDeptID int
 						var targetDeptCode string
 
-						if item.Notes != nil {
+						if txIsAnon, ok := txOverrides[item.ID]; ok {
+							isAnon = txIsAnon
+						} else if item.Notes != nil {
 							if e, ok := item.Notes["email"].(string); ok && e != "" {
 								email = e
 							}
@@ -703,6 +723,7 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 
 	var leaderboard []gin.H
 	overridesMap := getOverridesMap()
+	txOverrides := getTransactionOverridesMap()
 	deptMap, _ := getDepartmentsMap()
 	deptMappings := getDepartmentMappingsMap()
 	aggregatedMap := make(map[string]*AggregatedDonor)
@@ -737,7 +758,9 @@ func (h *SponsorsHandler) GetSponsorsLeaderboardAdmin(c *gin.Context) {
 						var targetDeptID int
 						var targetDeptCode string
 
-						if item.Notes != nil {
+						if txIsAnon, ok := txOverrides[item.ID]; ok {
+							isAnon = txIsAnon
+						} else if item.Notes != nil {
 							if e, ok := item.Notes["email"].(string); ok && e != "" {
 								email = e
 							}
@@ -983,6 +1006,71 @@ func (h *SponsorsHandler) DeleteSponsorNameOverride(c *gin.Context) {
 	})
 }
 
+func getTransactionOverridesMap() map[string]bool {
+	overrides := make(map[string]bool)
+	if config.DB == nil {
+		return overrides
+	}
+	rows, err := config.DB.Query("SELECT payment_id, is_anonymous FROM sponsor_transaction_overrides")
+	if err != nil {
+		return overrides
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var paymentID string
+		var isAnon bool
+		if err := rows.Scan(&paymentID, &isAnon); err == nil {
+			if paymentID != "" {
+				overrides[paymentID] = isAnon
+			}
+		}
+	}
+	return overrides
+}
+
+type UpdateSponsorTransactionOverrideRequest struct {
+	PaymentID   string `json:"payment_id"`
+	IsAnonymous bool   `json:"is_anonymous"`
+}
+
+func (h *SponsorsHandler) UpdateSponsorTransactionOverride(c *gin.Context) {
+	var req UpdateSponsorTransactionOverrideRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "Invalid request payload"})
+		return
+	}
+
+	paymentID := strings.TrimSpace(req.PaymentID)
+	if paymentID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "payment_id is required"})
+		return
+	}
+
+	if config.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Database connection not available"})
+		return
+	}
+
+	query := `
+		INSERT INTO sponsor_transaction_overrides (payment_id, is_anonymous)
+		VALUES (?, ?)
+		ON DUPLICATE KEY UPDATE
+			is_anonymous = VALUES(is_anonymous);
+	`
+
+	_, err := config.DB.Exec(query, paymentID, req.IsAnonymous)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to update transaction override: %v", err)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Transaction anonymous status updated successfully",
+	})
+}
+
 type ContributionCheckRequest struct {
 	Phone string `json:"phone"`
 	Email string `json:"email"`
@@ -1067,6 +1155,8 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 
 	aggregatedMap := make(map[string]*InternalDonor)
 
+	overridesMap := getOverridesMap()
+
 	for _, item := range rzpRes.Items {
 		st := strings.ToLower(item.Status)
 		if st != "captured" && st != "authorized" {
@@ -1098,9 +1188,6 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 		}
 
 		donorName := extractName(item.Notes, email)
-		if donorName == "Anonymous BITSian" {
-			isAnon = true
-		}
 
 		var normKey string
 		if phone != "" {
@@ -1109,6 +1196,22 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 			normKey = "email_" + email
 		} else {
 			normKey = "name_" + strings.ToLower(strings.TrimSpace(donorName))
+		}
+
+		if custom, ok := overridesMap[normKey]; ok && custom != "" {
+			donorName = custom
+		} else if phone != "" {
+			if custom, ok := overridesMap["phone_"+phone]; ok && custom != "" {
+				donorName = custom
+			}
+		} else if email != "" {
+			if custom, ok := overridesMap["email_"+email]; ok && custom != "" {
+				donorName = custom
+			}
+		}
+
+		if donorName == "Anonymous BITSian" {
+			isAnon = true
 		}
 
 		itemDate := time.Unix(item.CreatedAt, 0).Format("2006-01-02")
@@ -1191,7 +1294,6 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 		}
 		certID := fmt.Sprintf("BIT-PATRON-%d", hVal)
 
-		overridesMap := getOverridesMap()
 		displayName := matchedDonor.Name
 		if custom, ok := overridesMap[matchedDonor.Key]; ok && custom != "" {
 			displayName = custom
