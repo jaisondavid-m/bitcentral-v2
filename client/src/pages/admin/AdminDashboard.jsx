@@ -3901,6 +3901,7 @@ function SponsorsSection() {
   const [deptLeaderboard, setDeptLeaderboard] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [deptSearchQuery, setDeptSearchQuery] = useState("");
+  const [txSearchQuery, setTxSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
 
   const filteredDepartments = useMemo(() => {
@@ -3916,6 +3917,30 @@ function SponsorsSection() {
         String(dept.id).includes(q)
     );
   }, [departments, deptSearchQuery]);
+
+  const filteredTransactions = useMemo(() => {
+    const orders = data.orders || [];
+    const sorted = [...orders].sort((a, b) => {
+      const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+      return timeB - timeA;
+    });
+
+    if (!txSearchQuery.trim()) return sorted;
+    const q = txSearchQuery.toLowerCase().trim();
+    return sorted.filter((item) => {
+      return (
+        item.id?.toLowerCase().includes(q) ||
+        item.name?.toLowerCase().includes(q) ||
+        item.email?.toLowerCase().includes(q) ||
+        item.phone?.toLowerCase().includes(q) ||
+        String(item.amount).includes(q) ||
+        item.status?.toLowerCase().includes(q) ||
+        (item.is_anonymous ? "anonymous" : "public").includes(q) ||
+        item.created_at?.toLowerCase().includes(q)
+      );
+    });
+  }, [data.orders, txSearchQuery]);
   const [error, setError] = useState("");
   const [banner, setBanner] = useState({ type: "", message: "" });
 
@@ -4879,11 +4904,36 @@ function SponsorsSection() {
       ) : (
         /* Razorpay Transactions View */
         <div className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
-            <h3 className="font-bold text-slate-900 dark:text-white">Razorpay Payments History & Transaction Control</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Toggle visibility per specific transaction so individual donations can be made anonymous independently.
-            </p>
+          <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="font-bold text-slate-900 dark:text-white">
+                Razorpay Payments History & Transaction Control ({filteredTransactions.length}
+                {txSearchQuery.trim() ? ` / ${data.orders?.length || 0}` : ""})
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Toggle visibility per specific transaction so individual donations can be made anonymous independently.
+              </p>
+            </div>
+
+            <div className="relative w-full sm:w-72">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search ID, name, email, phone, status..."
+                value={txSearchQuery}
+                onChange={(e) => setTxSearchQuery(e.target.value)}
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-8 py-1.5 text-xs text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-blue-500"
+              />
+              {txSearchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setTxSearchQuery("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
           </div>
 
           {loading ? (
@@ -4893,6 +4943,10 @@ function SponsorsSection() {
           ) : (data.orders || []).length === 0 ? (
             <div className="p-12 text-center text-xs text-slate-500 dark:text-slate-400">
               No payment records found.
+            </div>
+          ) : filteredTransactions.length === 0 ? (
+            <div className="p-12 text-center text-xs text-slate-500 dark:text-slate-400">
+              No payment records found matching "{txSearchQuery}".
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -4910,7 +4964,7 @@ function SponsorsSection() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {data.orders.map((item) => (
+                  {filteredTransactions.map((item) => (
                     <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-950/50">
                       <td className="px-4 py-3 font-mono font-bold text-blue-600 dark:text-blue-400">{item.id}</td>
                       <td className="px-4 py-3 font-semibold text-slate-900 dark:text-white">{item.name || "Anonymous"}</td>
