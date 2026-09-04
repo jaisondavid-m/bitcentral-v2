@@ -107,6 +107,7 @@ func InitMySQL() {
 	createSponsorTransactionsTable()
 	dropAcademicTables()
 	createFeedbackMessagesTable()
+	createFacultyDirectoryTable()
 }
 
 func createAdminsTable() {
@@ -567,4 +568,29 @@ func createSponsorTransactionsTable() {
 		log.Println("✅ sponsor_transactions table ready")
 	}
 	_, _ = DB.Exec("CREATE INDEX idx_tx_status ON sponsor_transactions (payment_status)")
+}
+
+func createFacultyDirectoryTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS faculty_directory (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		email VARCHAR(255) NOT NULL UNIQUE,
+		name VARCHAR(255) NOT NULL,
+		phone VARCHAR(64) NOT NULL,
+		photo_url TEXT,
+		department VARCHAR(255) NOT NULL DEFAULT '',
+		job_title VARCHAR(255) NOT NULL DEFAULT '',
+		source VARCHAR(64) NOT NULL DEFAULT 'google_directory',
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		INDEX idx_fac_email (email),
+		INDEX idx_fac_phone (phone),
+		INDEX idx_fac_dept (department)
+	) ENGINE=InnoDB;`
+
+	if _, err := DB.Exec(query); err != nil {
+		log.Printf("ℹ️ faculty_directory table notice: %v", err)
+	} else {
+		log.Println("✅ faculty_directory table ready")
+	}
 }
