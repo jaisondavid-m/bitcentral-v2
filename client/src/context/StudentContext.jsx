@@ -200,12 +200,24 @@ export const StudentContext = ({ children }) => {
             setProfile(backendProfile);
             const decoded = decodeCollegeEmail(backendProfile.email);
             setStudent(toProfileStudent(backendProfile, decoded));
+            hydratedEmailRef.current = backendProfile.email;
           } else if (currentUser?.email && !cancelled) {
-            await hydrateAuthenticatedUser(currentUser);
+            const decoded = decodeCollegeEmail(currentUser.email);
+            setStudent(decoded);
           }
         } catch (err) {
-          if (currentUser?.email && !cancelled) {
-            await hydrateAuthenticatedUser(currentUser);
+          const status = err?.response?.status;
+          const message = err?.response?.data?.message || err?.message || "Failed to load profile from /me";
+          if (status === 403 || err?.response?.data?.status === "blocked") {
+            setAccessDeniedMessage(message);
+            setUser(null);
+            setStudent(null);
+            setProfile(null);
+            hydratedEmailRef.current = "";
+            logout().catch(() => {});
+          } else if (currentUser?.email && !cancelled) {
+            const decoded = decodeCollegeEmail(currentUser.email);
+            setStudent(decoded);
           }
         } finally {
           if (!cancelled) {

@@ -10,6 +10,7 @@ import { useAuth } from "@/context/StudentContext.jsx";
 function Login() {
   const { theme, toggleTheme } = useTheme();
   const [error, setError] = useState("");
+  const [isSigningIn, setIsSigningIn] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, loading, accessDeniedMessage } = useAuth();
@@ -36,10 +37,13 @@ function Login() {
   const handleSignIn = async () => {
     try {
       setError("");
+      setIsSigningIn(true);
       await signInWithGoogle();
     } catch (err) {
       console.log(err);
       setError(err?.message || "Sign in failed. Please try again.");
+    } finally {
+      setIsSigningIn(false);
     }
   };
 
@@ -49,16 +53,7 @@ function Login() {
     navigate("/home", { replace: true });
   };
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center dark:bg-black">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-          <p className="mt-2 text-sm text-gray-500 dark:text-slate-300">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  const isLoading = loading || isSigningIn;
 
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4 dark:bg-black">
@@ -93,16 +88,31 @@ function Login() {
             </div>
           )}
 
-          <button disabled={loading} onClick={handleSignIn} className={`flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${loading ? "cursor-not-allowed bg-blue-300 text-white" : "bg-blue-600 text-white hover:bg-blue-700"}`}>
-            <img src="https://img.icons8.com/color/48/google-logo.png" alt="Google" className="h-5 w-5 rounded-full" />
-            {loading ? "Initializing..." : "Sign in with Google"}
+          <button
+            disabled={isLoading}
+            onClick={handleSignIn}
+            className={`flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+              isLoading
+                ? "cursor-not-allowed bg-blue-400 text-white opacity-85"
+                : "bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-500/20 active:scale-[0.99]"
+            }`}
+          >
+            {isLoading ? (
+              <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-solid border-white border-r-transparent"></div>
+            ) : (
+              <img src="https://img.icons8.com/color/48/google-logo.png" alt="Google" className="h-5 w-5 rounded-full" />
+            )}
+            <span>{isLoading ? "Checking authentication..." : "Sign in with Google"}</span>
           </button>
 
           {isGuestLoginEnabled && (
             <button
               type="button"
+              disabled={isLoading}
               onClick={handleGuestLogin}
-              className="mt-3 flex w-full items-center justify-center gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700 transition-all hover:border-blue-300 hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-200 dark:hover:bg-blue-950"
+              className={`mt-3 flex w-full items-center justify-center gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700 transition-all hover:border-blue-300 hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-200 dark:hover:bg-blue-950 ${
+                isLoading ? "cursor-not-allowed opacity-50" : ""
+              }`}
             >
               <LogIn className="h-5 w-5" />
               Continue as Guest
