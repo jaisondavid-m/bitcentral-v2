@@ -267,17 +267,17 @@ func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int
 
 	// Check if authenticated user is admin
 	isAdmin := false
-	adminUID := strings.TrimSpace(os.Getenv("ADMIN_FIREBASE_UID"))
-	superAdminUID := strings.TrimSpace(os.Getenv("SUPER_ADMIN_FIREBASE_UID"))
-
-	if authenticatedUID != "" {
-		if (adminUID != "" && authenticatedUID == adminUID) || (superAdminUID != "" && authenticatedUID == superAdminUID) {
-			isAdmin = true
+	if h.DB != nil {
+		var role string
+		err := h.DB.QueryRow(`SELECT role FROM users WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, authenticatedUID, authenticatedUID, strings.ToLower(strings.TrimSpace(authenticatedEmail))).Scan(&role)
+		if err == nil {
+			r := strings.ToLower(strings.TrimSpace(role))
+			if r == "admin" || r == "superadmin" || r == "super_admin" {
+				isAdmin = true
+			}
 		}
-	}
 
-	if !isAdmin && h.DB != nil {
-		if authenticatedUID != "" {
+		if !isAdmin && authenticatedUID != "" {
 			var count int
 			_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins WHERE uid = ?`, authenticatedUID).Scan(&count)
 			if count > 0 {
@@ -286,7 +286,7 @@ func (h *AdminHandler) resolveAndAuthorizeStudentID(c *gin.Context) (string, int
 		}
 		if !isAdmin && authenticatedEmail != "" {
 			var count int
-			_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins a JOIN users u ON a.uid = u.uid WHERE LOWER(TRIM(u.email)) = ?`, authenticatedEmail).Scan(&count)
+			_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins a JOIN users u ON a.uid = u.uid WHERE LOWER(TRIM(u.email)) = ?`, strings.ToLower(strings.TrimSpace(authenticatedEmail))).Scan(&count)
 			if count > 0 {
 				isAdmin = true
 			}

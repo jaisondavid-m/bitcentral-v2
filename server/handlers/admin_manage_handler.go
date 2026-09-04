@@ -3,7 +3,6 @@ package handlers
 import (
     "database/sql"
     "net/http"
-    "os"
     "strings"
 
     "server/config"
@@ -159,22 +158,23 @@ func (h *AdminHandler) CheckSuper(c *gin.Context) {
         return
     }
 
-    client, err := config.FirebaseAuthClient()
-    if err != nil || client == nil {
+    claims, err := config.VerifyGoogleToken(token)
+    if err != nil || claims == nil {
         c.JSON(http.StatusOK, gin.H{"is_super": false})
         return
     }
 
-    decoded, err := client.VerifyIDToken(c.Request.Context(), token)
-    if err != nil || decoded == nil {
-        c.JSON(http.StatusOK, gin.H{"is_super": false})
-        return
-    }
-
-    superUID := strings.TrimSpace(os.Getenv("SUPER_ADMIN_FIREBASE_UID"))
-    if superUID != "" && decoded.UID == superUID {
-        c.JSON(http.StatusOK, gin.H{"is_super": true})
-        return
+    if h.DB != nil {
+        var role string
+        email := strings.ToLower(strings.TrimSpace(claims.Email))
+        err := h.DB.QueryRow(`SELECT role FROM users WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, claims.UID, claims.UID, email).Scan(&role)
+        if err == nil {
+            r := strings.ToLower(strings.TrimSpace(role))
+            if r == "superadmin" || r == "super_admin" {
+                c.JSON(http.StatusOK, gin.H{"is_super": true})
+                return
+            }
+        }
     }
 
     c.JSON(http.StatusOK, gin.H{"is_super": false})

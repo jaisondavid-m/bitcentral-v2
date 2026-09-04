@@ -23,7 +23,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import { FaHandHoldingHeart } from "react-icons/fa6";
-import { auth, logout } from "@/config/firebase.js";
+import { logout } from "@/config/auth.js";
 import { useAuth } from "@/context/StudentContext.jsx";
 import { getSponsorsLeaderboard, getMeProfile, checkUserContribution, createSponsorOrder, captureSponsorPayment } from "@/api/axios.js";
 import { processLeaderboardData, isCurrentUserSponsor } from "@/utils/sponsorUtils.js";

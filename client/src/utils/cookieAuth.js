@@ -16,6 +16,27 @@ export function getCookie(name) {
 }
 
 /**
+ * Sets a browser cookie with specified name, value, and expiration in days (default 30 days = 1 month).
+ * @param {string} name
+ * @param {string} value
+ * @param {number} days
+ */
+export function setCookie(name, value, days = 30) {
+  if (typeof document === "undefined") return;
+  const maxAge = days * 24 * 60 * 60;
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+}
+
+/**
+ * Deletes a cookie by name.
+ * @param {string} name
+ */
+export function deleteCookie(name) {
+  if (typeof document === "undefined") return;
+  document.cookie = `${name}=; path=/; max-age=0; SameSite=Lax`;
+}
+
+/**
  * Parses and checks if a JWT token is valid (not expired).
  * @param {string} token
  * @returns {boolean}
@@ -48,11 +69,11 @@ export function isJwtValid(token) {
 
 /**
  * Checks whether any known JWT auth cookie exists and is valid.
- * Checks common cookie names: 'jwt', 'token', 'auth_token', 'access_token', 'firebaseToken'.
+ * Checks common cookie names: 'jwt', 'token', 'auth_token', 'access_token', 'googleToken'.
  * @returns {boolean}
  */
 export function hasValidAuthCookie() {
-  const cookieNames = ["jwt", "token", "auth_token", "access_token", "firebaseToken"];
+  const cookieNames = ["jwt", "token", "auth_token", "access_token", "googleToken"];
   for (const name of cookieNames) {
     const cookieValue = getCookie(name);
     if (cookieValue && isJwtValid(cookieValue)) {

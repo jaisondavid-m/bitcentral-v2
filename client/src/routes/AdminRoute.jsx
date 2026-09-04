@@ -2,10 +2,8 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "@/context/StudentContext.jsx";
 import FullScreenLoader from "@/components/common/FullScreenLoader.jsx";
 
-const ADMIN_UID = import.meta.env.VITE_ADMIN_FIREBASE_UID?.trim();
-
 function AdminRoute({ children }) {
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
 
   if (loading) {
     return <FullScreenLoader />;
@@ -15,7 +13,14 @@ function AdminRoute({ children }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!ADMIN_UID || user.uid !== ADMIN_UID) {
+  const role = (user?.role || profile?.role || "").toLowerCase().trim();
+  const isAdmin =
+    role === "admin" ||
+    role === "superadmin" ||
+    role === "super_admin" ||
+    user?.isAdmin === true;
+
+  if (!isAdmin) {
     return <Navigate to="/home" replace />;
   }
 

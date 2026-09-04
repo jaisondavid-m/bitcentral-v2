@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/config/firebase.js";
+import { useAuth } from "@/context/StudentContext.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, X, Send, ShieldCheck, User, Sparkles, Loader2, LogIn, Headphones } from "lucide-react";
 import { BiSupport } from "react-icons/bi";
@@ -8,7 +7,7 @@ import { sendFeedbackMessage, getFeedbackMessages } from "@/api/feedback.js";
 import { useNavigate } from "react-router-dom";
 
 export default function FloatingFeedbackButton() {
-  const [user] = useAuthState(auth);
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");

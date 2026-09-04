@@ -1,19 +1,9 @@
 import api from "./axios";
-import { auth } from "@/config/firebase.js";
+import { auth } from "@/config/auth.js";
 import { getAuthenticatedHeaders } from "./axios.js";
 
 async function getAdminHeaders() {
-  const currentUser = auth.currentUser;
-
-  if (!currentUser) {
-    throw new Error("You must be signed in to use the admin dashboard");
-  }
-
-  const idToken = await currentUser.getIdToken();
-
-  return {
-    Authorization: `Bearer ${idToken}`,
-  };
+  return getAuthenticatedHeaders();
 }
 
 export async function listAdminUsers({ page = 1, limit = 25, search = "", batch = "" } = {}) {
@@ -70,6 +60,12 @@ export async function deleteAdminUsersBatch({ uids }) {
 export async function setAdminUserBlocked({ uid, blocked }) {
   const headers = await getAdminHeaders();
   const response = await api.put(`/admin/users/${uid}/block`, { blocked }, { headers });
+  return response.data;
+}
+
+export async function setAdminUserRole({ uid, role }) {
+  const headers = await getAdminHeaders();
+  const response = await api.put(`/admin/users/${uid}/role`, { role }, { headers });
   return response.data;
 }
 
@@ -550,7 +546,7 @@ export async function getAdminAnalytics() {
         activePages: ["/exam-hall", "/mess", "/guides/semester-exams", "/wifi-details", "/semester"],
         lastUpdatedTime: new Date().toLocaleTimeString(),
       },
-      source: "Firebase Auth & Analytics Engine",
+      source: "Google Auth & Analytics Engine",
     };
   }
 }

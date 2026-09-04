@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { logout } from "@/config/firebase.js";
+import { logout } from "@/config/auth.js";
 import { isAllowedEmail } from "@/services/authRules.js";
 import { useAuth } from "@/context/StudentContext.jsx";
 import FullScreenLoader from "@/components/common/FullScreenLoader.jsx";

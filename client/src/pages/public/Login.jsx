@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { signInWithGoogle } from "@/config/firebase.js";
+import { signInWithGoogle } from "@/config/auth.js";
 import { isAllowedEmail } from "@/services/authRules.js";
 import { AlertCircle, LogIn, Moon, Sun } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext.jsx";
@@ -39,7 +39,7 @@ function Login() {
       await signInWithGoogle();
     } catch (err) {
       console.log(err);
-      setError("Sign in failed. Please try again.");
+      setError(err?.message || "Sign in failed. Please try again.");
     }
   };
 

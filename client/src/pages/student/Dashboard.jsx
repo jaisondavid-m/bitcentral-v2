@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { logout } from "@/config/firebase.js";
+import { logout } from "@/config/auth.js";
 import { useAuth } from "@/context/StudentContext.jsx";
 import { Navigate } from "react-router-dom";
 import profileAvatar from "@/assets/profile.jpg";

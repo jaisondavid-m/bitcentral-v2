@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, X, Sparkles, Trophy, GraduationCap, Crown, Users } from "lucide-react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/config/firebase.js";
+import { useAuth } from "@/context/StudentContext.jsx";
 import { getSponsorsLeaderboard } from "@/api/axios.js";
 import { processLeaderboardData } from "@/utils/sponsorUtils.js";
 
@@ -11,7 +10,7 @@ const STORAGE_KEY = "bitcentral_support_modal_last_shown";
 const SHOW_DELAY_MS = 7000; // 7 seconds delay
 
 export default function DailySupportModal() {
-  const [user] = useAuthState(auth);
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [topDonor, setTopDonor] = useState(null);
   const [topDepartment, setTopDepartment] = useState(null);

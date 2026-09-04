@@ -1,6 +1,8 @@
 package models
 
 type User struct {
+	ID             int    `json:"id"`
+	GoogleID       string `json:"google_id"`
 	UID            string `json:"uid"`
 	Email          string `json:"email"`
 	DisplayName    string `json:"displayName"`
@@ -13,6 +15,7 @@ type User struct {
 	IsAdmin        bool   `json:"isAdmin"`
 	IsBlocked      bool   `json:"isBlocked"`
 	BlockedAt      string `json:"blockedAt"`
+	Role           string `json:"role"`
 }
 
 type UserWithRollNo struct {

@@ -187,7 +187,9 @@ func createTokenTable() {
 func createUsersTable() {
 	query := `
 	CREATE TABLE IF NOT EXISTS users (
-		uid VARCHAR(128) PRIMARY KEY,
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		google_id VARCHAR(255) NULL,
+		uid VARCHAR(128) NULL,
 		email VARCHAR(255),
 		display_name VARCHAR(255),
 		photo_url VARCHAR(1024),
@@ -196,30 +198,67 @@ func createUsersTable() {
 		last_seen_at VARCHAR(64),
 		blocked TINYINT(1) NOT NULL DEFAULT 0,
 		blocked_at DATETIME NULL,
+		phone VARCHAR(64) NULL,
+		role VARCHAR(64) NOT NULL DEFAULT 'user',
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 	) ENGINE=InnoDB;`
 
 	if _, err := DB.Exec(query); err != nil {
-		log.Fatalf("❌ Failed to create users table: %v", err)
+		log.Printf("ℹ️ createUsersTable notice: %v", err)
+	}
+
+	// 1. Add google_id column if missing
+	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN google_id VARCHAR(255) NULL`); err != nil {
+		log.Printf("ℹ️ google_id column status: %v", err)
+	}
+
+	// 2. Backfill google_id from uid for 4000+ existing users
+	if _, err := DB.Exec(`UPDATE users SET google_id = uid WHERE (google_id IS NULL OR google_id = '') AND (uid IS NOT NULL AND uid != '')`); err != nil {
+		log.Printf("ℹ️ google_id backfill status: %v", err)
+	}
+
+	// 3. Add id column auto-increment if missing
+	var hasID int
+	_ = DB.QueryRow(`SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'id'`).Scan(&hasID)
+	if hasID == 0 {
+		if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN id INT AUTO_INCREMENT UNIQUE KEY FIRST`); err != nil {
+			if _, err2 := DB.Exec(`ALTER TABLE users ADD COLUMN id INT AUTO_INCREMENT UNIQUE KEY`); err2 != nil {
+				log.Printf("⚠️ id column add error: %v / %v", err, err2)
+			} else {
+				log.Println("✅ Successfully added id AUTO_INCREMENT UNIQUE KEY column for 4000+ users")
+			}
+		} else {
+			log.Println("✅ Successfully added id AUTO_INCREMENT UNIQUE KEY column for 4000+ users")
+		}
+	}
+
+	// 4. Ensure unique index on google_id
+	if _, err := DB.Exec(`ALTER TABLE users ADD UNIQUE INDEX idx_google_id (google_id)`); err != nil {
+		log.Printf("ℹ️ idx_google_id index status: %v", err)
 	}
 
 	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN last_seen_at VARCHAR(64) NULL`); err != nil {
-		log.Printf("ℹ️ last_seen_at column not created (may already exist): %v", err)
+		log.Printf("ℹ️ last_seen_at column status: %v", err)
 	}
 
 	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN blocked TINYINT(1) NOT NULL DEFAULT 0`); err != nil {
-		log.Printf("ℹ️ blocked column not created (may already exist): %v", err)
+		log.Printf("ℹ️ blocked column status: %v", err)
 	}
 
 	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN blocked_at DATETIME NULL`); err != nil {
-		log.Printf("ℹ️ blocked_at column not created (may already exist): %v", err)
+		log.Printf("ℹ️ blocked_at column status: %v", err)
 	}
 
 	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN phone VARCHAR(64) NULL`); err != nil {
-		log.Printf("ℹ️ phone column not created (may already exist): %v", err)
+		log.Printf("ℹ️ phone column status: %v", err)
 	}
 
-	log.Println("✅ users table ready")
+	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN role VARCHAR(64) NOT NULL DEFAULT 'user'`); err != nil {
+		log.Printf("ℹ️ role column status: %v", err)
+	}
+
+	log.Println("✅ users table schema & 4000+ user migration ready")
 }
 
 func dropUserPresenceTable() {
