@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { getFacultyDirectory } from "@/api/axios.js";
 import {
   AlertCircle,
   Building2,
   Check,
+  ChevronDown,
   Copy,
   Mail,
   Phone,
@@ -36,10 +37,156 @@ function getAvatarColor(name = "") {
   return colors[Math.abs(hash) % colors.length];
 }
 
+function SearchableDeptDropdown({
+  departments,
+  selected,
+  onSelect,
+  placeholder = "Search department...",
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const dropdownRef = useRef(null);
+  const searchInputRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  const filteredDepts = useMemo(() => {
+    if (!query.trim()) return departments;
+    const q = query.toLowerCase().trim();
+    return departments.filter((d) => d.name.toLowerCase().includes(q));
+  }, [departments, query]);
+
+  const currentDept = departments.find((d) => d.id === selected) || departments[0];
+
+  return (
+    <div className="relative w-full sm:w-72 shrink-0" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex w-full items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-left text-sm font-semibold text-slate-800 shadow-xs transition-all hover:bg-slate-50 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800/80 cursor-pointer"
+      >
+        <div className="flex items-center gap-2.5 truncate">
+          <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0" />
+          <span className="truncate">
+            {selected && selected !== "ALL" ? currentDept?.name : "All Departments"}
+          </span>
+          {currentDept?.count !== undefined && (
+            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-bold text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 shrink-0">
+              {currentDept.count}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          {selected && selected !== "ALL" && (
+            <span
+              role="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelect("ALL");
+              }}
+              title="Clear department filter"
+              className="rounded-full p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-700 dark:hover:bg-slate-700 dark:hover:text-white cursor-pointer"
+            >
+              <X className="h-3.5 w-3.5" />
+            </span>
+          )}
+          <ChevronDown
+            className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${
+              isOpen ? "rotate-180 text-blue-600 dark:text-blue-400" : ""
+            }`}
+          />
+        </div>
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-full z-50 mt-2 w-full min-w-[280px] overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl dark:border-slate-800 dark:bg-slate-900 animate-in fade-in zoom-in-95 duration-150">
+          <div className="relative mb-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-950">
+            <Search className="h-4 w-4 text-slate-400 shrink-0 mr-2" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={placeholder}
+              className="w-full bg-transparent text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none dark:text-white"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+
+          <div className="max-h-60 overflow-y-auto space-y-1 pr-1 scrollbar-thin">
+            {filteredDepts.length === 0 ? (
+              <div className="py-4 text-center text-xs text-slate-400 italic">
+                No matching departments found
+              </div>
+            ) : (
+              filteredDepts.map((dept) => {
+                const isSelected = (selected || "ALL") === dept.id;
+                return (
+                  <button
+                    key={dept.id}
+                    type="button"
+                    onClick={() => {
+                      onSelect(dept.id);
+                      setIsOpen(false);
+                      setQuery("");
+                    }}
+                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs transition cursor-pointer ${
+                      isSelected
+                        ? "bg-blue-600 text-white font-bold shadow-xs"
+                        : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800/70"
+                    }`}
+                  >
+                    <span className="truncate pr-2">{dept.name}</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span
+                        className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold ${
+                          isSelected
+                            ? "bg-blue-700 text-white"
+                            : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                        }`}
+                      >
+                        {dept.count}
+                      </span>
+                      {isSelected && <Check className="h-3.5 w-3.5 text-white" />}
+                    </div>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function FacultyDirectory() {
   const [faculty, setFaculty] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("ALL");
   const [copiedId, setCopiedId] = useState(null);
   const [activeCallModal, setActiveCallModal] = useState(null);
 
@@ -86,42 +233,139 @@ export default function FacultyDirectory() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const filteredFaculty = useMemo(() => {
-    return faculty.filter((member) => {
-      const nameMatch = member.name?.toLowerCase().includes(search.toLowerCase());
-      const emailMatch = member.email?.toLowerCase().includes(search.toLowerCase());
-      const phoneMatch = member.phone?.includes(search);
-      const deptMatch = member.department?.toLowerCase().includes(search.toLowerCase());
-      return !search || nameMatch || emailMatch || phoneMatch || deptMatch;
+  const departmentOptions = useMemo(() => {
+    const counts = {};
+    faculty.forEach((member) => {
+      const dept = (member.department || "Other").trim();
+      if (dept) {
+        counts[dept] = (counts[dept] || 0) + 1;
+      }
     });
-  }, [faculty, search]);
+
+    const list = Object.entries(counts)
+      .map(([name, count]) => ({
+        id: name,
+        name: name,
+        count: count,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    return [
+      { id: "ALL", name: "All Departments", count: faculty.length },
+      ...list,
+    ];
+  }, [faculty]);
+
+  const filteredFaculty = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    return faculty.filter((member) => {
+      // Department filter
+      if (selectedDepartment && selectedDepartment !== "ALL") {
+        const memberDept = (member.department || "Other").trim().toLowerCase();
+        if (memberDept !== selectedDepartment.toLowerCase()) {
+          return false;
+        }
+      }
+
+      // Search filter
+      if (!q) return true;
+      const nameMatch = member.name?.toLowerCase().includes(q);
+      const emailMatch = member.email?.toLowerCase().includes(q);
+      const phoneMatch = member.phone?.includes(q);
+      const deptMatch = member.department?.toLowerCase().includes(q);
+      const jobMatch = member.job_title?.toLowerCase().includes(q);
+      return nameMatch || emailMatch || phoneMatch || deptMatch || jobMatch;
+    });
+  }, [faculty, search, selectedDepartment]);
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-8 dark:bg-slate-950 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Simple Page Title */}
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
             Faculty Directory
           </h1>
           <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">
-            {filteredFaculty.length} Members
+            {selectedDepartment !== "ALL" || search
+              ? `Showing ${filteredFaculty.length} of ${faculty.length} Members`
+              : `${filteredFaculty.length} Members`}
           </span>
         </div>
 
-        {/* Search Bar Only */}
-        <div className="mb-8">
-          <div className="relative">
+        {/* Search & Searchable Department Dropdown Filter */}
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name, email, department, or phone number..."
-              className="w-full rounded-2xl border border-slate-200 bg-white py-3.5 pl-12 pr-4 text-sm font-medium text-slate-900 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:focus:border-blue-500"
+              className="w-full rounded-2xl border border-slate-200 bg-white py-3.5 pl-12 pr-10 text-sm font-medium text-slate-900 shadow-xs transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:focus:border-blue-500"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200 cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
+
+          <SearchableDeptDropdown
+            departments={departmentOptions}
+            selected={selectedDepartment}
+            onSelect={setSelectedDepartment}
+            placeholder="Search departments..."
+          />
         </div>
+
+        {/* Active Filter Badges */}
+        {(selectedDepartment !== "ALL" || search) && (
+          <div className="mb-6 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              Active Filters:
+            </span>
+            {selectedDepartment !== "ALL" && (
+              <span className="inline-flex items-center gap-1.5 rounded-xl bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800">
+                <Building2 className="h-3 w-3" />
+                <span>Department: {selectedDepartment}</span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedDepartment("ALL")}
+                  className="rounded-full p-0.5 hover:bg-blue-200/50 dark:hover:bg-blue-800 cursor-pointer"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            {search && (
+              <span className="inline-flex items-center gap-1.5 rounded-xl bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                <span>Query: &ldquo;{search}&rdquo;</span>
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  className="rounded-full p-0.5 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedDepartment("ALL");
+                setSearch("");
+              }}
+              className="text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400 cursor-pointer ml-1"
+            >
+              Reset All
+            </button>
+          </div>
+        )}
 
         {/* Faculty Cards Grid */}
         {loading ? (
