@@ -41,6 +41,7 @@ const PSBiometricDetails = lazyWithRetry(() => import("@/pages/student/PSBiometr
 const SupportDev = lazyWithRetry(() => import("@/pages/student/SupportDev.jsx"));
 const PaymentSuccessful = lazyWithRetry(() => import("@/pages/student/PaymentSuccessful.jsx"));
 const WifiDetails = lazyWithRetry(() => import("@/pages/student/WifiDetails.jsx"));
+const FacultyDirectory = lazyWithRetry(() => import("@/pages/student/FacultyDirectory.jsx"));
 const AK22PH202 = lazyWithRetry(() => import("@/pages/answers/AK__22PH202.jsx"));
 const AnswerKey22HS006 = lazyWithRetry(() => import("@/pages/answers/AnswerKey22HS006.jsx"));
 // const DocsPage = lazyWithRetry(() => import("@/pages/public/AboutDocs.jsx"));
@@ -282,6 +283,8 @@ function App() {
               />
               <Route path="/profile" element={<ProfileV2 />} />
               <Route path="/profile/v2" element={<ProfileV2 />} />
+              <Route path="/faculty-directory" element={<FacultyDirectory />} />
+              <Route path="/faculty" element={<FacultyDirectory />} />
               {/* <Route path="/about" element={<About />} /> */}
               <Route path="/rpsite" element={<Rpsite />} />
               <Route path="/wifi-details" element={<WifiDetails />} />

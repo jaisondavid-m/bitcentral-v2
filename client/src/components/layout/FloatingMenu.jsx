@@ -12,6 +12,7 @@ import {
   Loader2,
   LogIn,
   MessageSquare,
+  Users,
 } from "lucide-react";
 import { BiSupport, BiDonateHeart } from "react-icons/bi";
 import { sendFeedbackMessage, getFeedbackMessages } from "@/api/feedback.js";
@@ -113,6 +114,11 @@ export default function FloatingMenu() {
     navigate("/home");
   };
 
+  const handleFacultyDirectory = () => {
+    setIsMenuOpen(false);
+    navigate("/faculty-directory");
+  };
+
   const handleSupportDev = () => {
     setIsMenuOpen(false);
     navigate("/support-dev");
@@ -202,6 +208,29 @@ export default function FloatingMenu() {
                         !
                       </span>
                     )}
+                  </button>
+                </div>
+              </motion.div>
+
+              {/* Faculty Directory Button */}
+              <motion.div
+                initial={{ opacity: 0, y: 15, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 15, scale: 0.8 }}
+                transition={{ duration: 0.18, delay: 0.02 }}
+                className="flex items-center gap-3 cursor-pointer group"
+                onClick={handleFacultyDirectory}
+              >
+                <span className="rounded-full bg-white/95 text-slate-800 border border-slate-200/90 shadow-xl backdrop-blur-md dark:bg-slate-900/95 dark:text-slate-100 dark:border-slate-700/70 px-3.5 py-1.5 text-xs font-bold whitespace-nowrap group-hover:bg-slate-100 dark:group-hover:bg-slate-800 transition-colors">
+                  Faculty Directory 📞
+                </span>
+
+                <div className="w-14 flex items-center justify-center shrink-0">
+                  <button
+                    className="flex items-center justify-center h-12 w-12 rounded-full bg-white/95 border border-slate-200/90 shadow-lg backdrop-blur-md group-hover:border-cyan-500/80 group-hover:bg-cyan-50 dark:bg-slate-900/95 dark:border-slate-700/80 dark:group-hover:bg-slate-800 group-hover:scale-110 active:scale-95 transition-all cursor-pointer"
+                    aria-label="Faculty Directory"
+                  >
+                    <Users className="h-5 w-5 text-cyan-600 dark:text-cyan-400 group-hover:text-cyan-700 dark:group-hover:text-cyan-300 transition-colors" />
                   </button>
                 </div>
               </motion.div>

@@ -26,6 +26,7 @@ func SetupRouter(
 	sponsorsHandler *handlers.SponsorsHandler,
 	feedbackHandler *handlers.FeedbackHandler,
 	analyticsHandler *handlers.AnalyticsHandler,
+	facultyDirectoryHandler *handlers.FacultyDirectoryHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -90,6 +91,8 @@ func SetupRouter(
 	r.GET("/auth/logout", studentLookupHandler.GoogleLogout)
 	r.GET("/exam-hall", examHallHandler.GetHall)
 	r.GET("/exam-hall/all", examHallHandler.GetAllHallsByRegNo)
+	r.GET("/faculty-directory", facultyDirectoryHandler.GetFacultyDirectory)
+	r.GET("/faculty", facultyDirectoryHandler.GetFacultyDirectory)
 
 	// Protected routes
 	api := r.Group("/")
@@ -157,6 +160,7 @@ func SetupRouter(
 		admin.POST("/sponsors/department-mapping", sponsorsHandler.UpdateSponsorDepartmentMapping)
 		admin.POST("/sponsors/department-mapping/batch", sponsorsHandler.UpdateSponsorDepartmentMappingsBatch)
 		admin.GET("/users", adminHandler.GetUsers)
+		admin.POST("/faculty-directory/sync", facultyDirectoryHandler.TriggerSyncAdmin)
 		admin.GET("/tracker-users", trackerUserHandler.GetTrackerUsersAdmin)
 		admin.GET("/users/update", adminHandler.UpdateUsers)
 		admin.PUT("/users/:uid/block", adminHandler.UpdateUserBlockStatus)

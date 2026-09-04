@@ -162,4 +162,16 @@ export async function getVerifiedCertificate(id) {
   }
 }
 
+export async function getFacultyDirectory({ query = "", department = "" } = {}) {
+  try {
+    const params = new URLSearchParams();
+    if (query) params.set("q", query);
+    if (department) params.set("dept", department);
+    const response = await api.get(`/faculty-directory?${params.toString()}`);
+    return response.data;
+  } catch (error) {
+    return { success: false, total: 0, data: [], error: error.message };
+  }
+}
+
 
