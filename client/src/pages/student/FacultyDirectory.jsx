@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getFacultyDirectory } from "@/api/axios.js";
 import {
+  AlertCircle,
   Building2,
   Check,
   Copy,
@@ -8,22 +9,9 @@ import {
   Phone,
   PhoneCall,
   Search,
-  UserCheck,
   Users,
+  X,
 } from "lucide-react";
-
-const DEPARTMENTS = [
-  { id: "all", label: "All Departments" },
-  { id: "Computer Science", label: "CSE" },
-  { id: "Electronics", label: "ECE" },
-  { id: "Electrical", label: "EEE" },
-  { id: "Mechanical", label: "MECH" },
-  { id: "AI & Data Science", label: "AI & DS" },
-  { id: "AI & Machine Learning", label: "AI & ML" },
-  { id: "Biotechnology", label: "BIOTECH" },
-  { id: "Information Technology", label: "IT" },
-  { id: "Computer Technology", label: "CT" },
-];
 
 function getInitials(name = "") {
   if (!name) return "FC";
@@ -52,8 +40,8 @@ export default function FacultyDirectory() {
   const [faculty, setFaculty] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [selectedDept, setSelectedDept] = useState("all");
   const [copiedId, setCopiedId] = useState(null);
+  const [activeCallModal, setActiveCallModal] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -80,6 +68,17 @@ export default function FacultyDirectory() {
     };
   }, []);
 
+  // Handle escape key to close call modal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && activeCallModal) {
+        setActiveCallModal(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeCallModal]);
+
   const handleCopyPhone = (phone, id) => {
     if (!phone) return;
     navigator.clipboard.writeText(phone);
@@ -93,46 +92,25 @@ export default function FacultyDirectory() {
       const emailMatch = member.email?.toLowerCase().includes(search.toLowerCase());
       const phoneMatch = member.phone?.includes(search);
       const deptMatch = member.department?.toLowerCase().includes(search.toLowerCase());
-      const matchesSearch = !search || nameMatch || emailMatch || phoneMatch || deptMatch;
-
-      const matchesDept =
-        selectedDept === "all" ||
-        member.department?.toLowerCase().includes(selectedDept.toLowerCase());
-
-      return matchesSearch && matchesDept;
+      return !search || nameMatch || emailMatch || phoneMatch || deptMatch;
     });
-  }, [faculty, search, selectedDept]);
+  }, [faculty, search]);
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-8 dark:bg-slate-950 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        {/* Header section */}
-        <div className="mb-8 overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 p-6 text-white shadow-xl dark:from-slate-900 dark:via-blue-950 dark:to-slate-900 sm:p-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-blue-100 backdrop-blur-md">
-                <Users className="h-3.5 w-3.5" />
-                <span>Verified Contacts</span>
-              </div>
-              <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
-                Faculty & Staff Directory
-              </h1>
-              <p className="mt-2 text-sm text-blue-100 max-w-2xl">
-                Access official directory contacts for department faculty and staff. Phone numbers updated automatically every 24 hours.
-              </p>
-            </div>
-            <div className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 backdrop-blur-md">
-              <UserCheck className="h-6 w-6 text-blue-200" />
-              <div>
-                <div className="text-2xl font-bold">{filteredFaculty.length}</div>
-                <div className="text-xs text-blue-100">Faculty Members</div>
-              </div>
-            </div>
-          </div>
+        {/* Simple Page Title */}
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
+            Faculty Directory
+          </h1>
+          <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">
+            {filteredFaculty.length} Members
+          </span>
         </div>
 
-        {/* Search & Department Filters */}
-        <div className="mb-8 space-y-4">
+        {/* Search Bar Only */}
+        <div className="mb-8">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
             <input
@@ -142,25 +120,6 @@ export default function FacultyDirectory() {
               placeholder="Search by name, email, department, or phone number..."
               className="w-full rounded-2xl border border-slate-200 bg-white py-3.5 pl-12 pr-4 text-sm font-medium text-slate-900 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:focus:border-blue-500"
             />
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            {DEPARTMENTS.map((dept) => {
-              const active = selectedDept === dept.id;
-              return (
-                <button
-                  key={dept.id}
-                  onClick={() => setSelectedDept(dept.id)}
-                  className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all ${
-                    active
-                      ? "bg-blue-600 text-white shadow-md shadow-blue-500/20 dark:bg-blue-600"
-                      : "bg-white text-slate-600 hover:bg-slate-100 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800"
-                  }`}
-                >
-                  {dept.label}
-                </button>
-              );
-            })}
           </div>
         </div>
 
@@ -193,7 +152,7 @@ export default function FacultyDirectory() {
               No Faculty Contacts Found
             </h3>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              Try adjusting your search terms or department filter.
+              Try adjusting your search terms.
             </p>
           </div>
         ) : (
@@ -272,18 +231,139 @@ export default function FacultyDirectory() {
 
                   {member.phone && (
                     <div className="mt-4 pt-2">
-                      <a
-                        href={`tel:${member.phone}`}
-                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-50 py-2 text-xs font-semibold text-blue-600 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-950 transition-colors"
+                      <button
+                        onClick={() => setActiveCallModal(member)}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-50 py-2.5 text-xs font-semibold text-blue-600 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-900/60 transition-all cursor-pointer active:scale-[0.98]"
                       >
                         <PhoneCall className="h-3.5 w-3.5" />
                         Call Faculty
-                      </a>
+                      </button>
                     </div>
                   )}
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Big Confirmation Call Modal */}
+        {activeCallModal && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 p-4 backdrop-blur-md transition-all animate-in fade-in duration-200"
+            onClick={() => setActiveCallModal(null)}
+          >
+            <div
+              className="relative w-full max-w-md scale-100 overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl transition-all dark:border-slate-800 dark:bg-slate-900 sm:p-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setActiveCallModal(null)}
+                className="absolute right-4 top-4 rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              {/* Faculty Big Picture & Details */}
+              <div className="flex flex-col items-center text-center">
+                {activeCallModal.photo_url ? (
+                  <img
+                    src={activeCallModal.photo_url}
+                    alt={activeCallModal.name}
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                      e.target.nextSibling.style.display = "flex";
+                    }}
+                    className="h-28 w-28 rounded-3xl object-cover shadow-lg ring-4 ring-blue-500/20"
+                  />
+                ) : null}
+                <div
+                  style={{ display: activeCallModal.photo_url ? "none" : "flex" }}
+                  className={`h-28 w-28 items-center justify-center rounded-3xl text-3xl font-bold text-white shadow-lg ring-4 ring-blue-500/20 ${getAvatarColor(
+                    activeCallModal.name
+                  )}`}
+                >
+                  {getInitials(activeCallModal.name)}
+                </div>
+
+                <h2 className="mt-4 text-xl font-bold text-slate-900 dark:text-white sm:text-2xl">
+                  {activeCallModal.name}
+                </h2>
+
+                <div className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 dark:bg-blue-950/60 dark:text-blue-300">
+                  <Building2 className="h-3.5 w-3.5" />
+                  <span>{activeCallModal.department || "Faculty & Staff"}</span>
+                </div>
+
+                {activeCallModal.job_title && activeCallModal.job_title !== "Faculty / Staff" && (
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    {activeCallModal.job_title}
+                  </p>
+                )}
+
+                <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
+                  <Mail className="h-3.5 w-3.5 text-slate-400" />
+                  <span>{activeCallModal.email}</span>
+                </div>
+
+                {/* Big Phone Number Box */}
+                <div className="mt-6 flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-800/60">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-xl bg-blue-600/10 p-2 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400">
+                      <Phone className="h-5 w-5" />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                        Phone Number
+                      </div>
+                      <div className="font-mono text-base font-bold text-slate-900 dark:text-white">
+                        {activeCallModal.phone}
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleCopyPhone(activeCallModal.phone, activeCallModal.id)}
+                    title="Copy phone number"
+                    className="rounded-xl border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors"
+                  >
+                    {copiedId === activeCallModal.id ? (
+                      <Check className="h-4 w-4 text-emerald-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+
+                {/* Confirmation Notice */}
+                <div className="mt-4 flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-left text-xs text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/60 dark:border-amber-900/50">
+                  <AlertCircle className="h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+                  <span>
+                    Please confirm before placing the call. Only contact faculty during official working hours for academic queries.
+                  </span>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="mt-6 flex w-full gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setActiveCallModal(null)}
+                    className="flex-1 rounded-2xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+
+                  <a
+                    href={`tel:${activeCallModal.phone}`}
+                    onClick={() => setActiveCallModal(null)}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:from-emerald-700 hover:to-teal-700 transition-all cursor-pointer active:scale-[0.98]"
+                  >
+                    <PhoneCall className="h-4 w-4" />
+                    Call Now
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

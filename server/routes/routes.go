@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"encoding/json"
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -85,13 +87,40 @@ func SetupRouter(
 
 	// Public routes
 	r.GET("/auth/login", handler.HandleLogin)
-	r.GET("/auth/callback", handler.HandleCallback)
+	r.GET("/auth/callback", func(c *gin.Context) {
+		code := c.Query("code")
+		if code == "" {
+			c.JSON(400, gin.H{"error": "Missing authorization code"})
+			return
+		}
+
+		// Try Directory OAuth token exchange first
+		dirCfg := facultyDirectoryHandler.GetOAuthConfig()
+		token, err := dirCfg.Exchange(c.Request.Context(), code)
+		if err == nil && token != nil && token.AccessToken != "" {
+			f, err := os.Create("token.json")
+			if err == nil {
+				_ = json.NewEncoder(f).Encode(token)
+				f.Close()
+			}
+			go facultyDirectoryHandler.SyncGoogleDirectory()
+			c.JSON(200, gin.H{
+				"success": true,
+				"message": "Google Contacts & Directory authentication successful! Faculty Directory synced.",
+			})
+			return
+		}
+
+		// Fallback to SheetHandler callback
+		handler.HandleCallback(c)
+	})
 	r.POST("/auth/google", studentLookupHandler.GoogleLogin)
 	r.POST("/auth/logout", studentLookupHandler.GoogleLogout)
 	r.GET("/auth/logout", studentLookupHandler.GoogleLogout)
 	r.GET("/exam-hall", examHallHandler.GetHall)
 	r.GET("/exam-hall/all", examHallHandler.GetAllHallsByRegNo)
 	r.GET("/faculty-directory", facultyDirectoryHandler.GetFacultyDirectory)
+	r.GET("/faculty-directory/auth/login", facultyDirectoryHandler.HandleDirectoryLogin)
 	r.GET("/faculty", facultyDirectoryHandler.GetFacultyDirectory)
 
 	// Protected routes

@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"sync"
@@ -16,6 +17,8 @@ import (
 	"server/config"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 	"google.golang.org/api/people/v1"
 )
@@ -73,6 +76,45 @@ func (h *FacultyDirectoryHandler) checkAndRunInitialSync() {
 	h.SyncGoogleDirectory()
 }
 
+type DirectoryPersonItem struct {
+	Person struct {
+		Names          []*people.Name         `json:"names"`
+		EmailAddresses []*people.EmailAddress `json:"emailAddresses"`
+		PhoneNumbers   []*people.PhoneNumber  `json:"phoneNumbers"`
+		Photos         []*people.Photo        `json:"photos"`
+		Organizations  []*people.Organization `json:"organizations"`
+	} `json:"person"`
+	Names          []*people.Name         `json:"names"`
+	EmailAddresses []*people.EmailAddress `json:"emailAddresses"`
+	PhoneNumbers   []*people.PhoneNumber  `json:"phoneNumbers"`
+	Photos         []*people.Photo        `json:"photos"`
+	Organizations  []*people.Organization `json:"organizations"`
+}
+
+func (item DirectoryPersonItem) Extract() ([]*people.Name, []*people.EmailAddress, []*people.PhoneNumber, []*people.Photo, []*people.Organization) {
+	names := item.Names
+	if len(names) == 0 {
+		names = item.Person.Names
+	}
+	emails := item.EmailAddresses
+	if len(emails) == 0 {
+		emails = item.Person.EmailAddresses
+	}
+	phones := item.PhoneNumbers
+	if len(phones) == 0 {
+		phones = item.Person.PhoneNumbers
+	}
+	photos := item.Photos
+	if len(photos) == 0 {
+		photos = item.Person.Photos
+	}
+	orgs := item.Organizations
+	if len(orgs) == 0 {
+		orgs = item.Person.Organizations
+	}
+	return names, emails, phones, photos, orgs
+}
+
 func isParentEmail(email string) bool {
 	lower := strings.ToLower(strings.TrimSpace(email))
 	return strings.Contains(lower, "parent") || strings.Contains(lower, "parents") || strings.HasSuffix(lower, "@parents.bitsathy.ac.in")
@@ -109,11 +151,70 @@ func isValidFacultyRecord(email, phone string) bool {
 	return true
 }
 
+func (h *FacultyDirectoryHandler) GetOAuthConfig() *oauth2.Config {
+	clientID := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_ID"))
+	if clientID == "" {
+		clientID = strings.TrimSpace(os.Getenv("CLIENT_ID"))
+	}
+	clientSecret := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_SECRET"))
+	if clientSecret == "" {
+		clientSecret = strings.TrimSpace(os.Getenv("CLIENT_SECRET"))
+	}
+
+	redirectURL := strings.TrimSpace(os.Getenv("GOOGLE_CONTACTS_REDIRECT_URI"))
+	if redirectURL == "" {
+		redirectURL = strings.TrimSpace(os.Getenv("GOOGLE_DIRECTORY_REDIRECT_URI"))
+	}
+	if redirectURL == "" {
+		redirectURL = strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_REDIRECT_URI"))
+	}
+	if redirectURL == "" {
+		redirectURIS := strings.Split(os.Getenv("GOOGLE_OAUTH_REDIRECT_URIS"), ",")
+		if len(redirectURIS) > 0 && strings.TrimSpace(redirectURIS[0]) != "" {
+			redirectURL = strings.TrimSpace(redirectURIS[0])
+		}
+	}
+	if redirectURL == "" {
+		redirectURL = strings.TrimSpace(os.Getenv("REDIRECT_URL"))
+	}
+	if redirectURL == "" {
+		redirectURL = "http://localhost:8080/auth/callback"
+	}
+
+	return &oauth2.Config{
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		RedirectURL:  redirectURL,
+		Scopes: []string{
+			"https://www.googleapis.com/auth/contacts.readonly",
+			"https://www.googleapis.com/auth/directory.readonly",
+			"https://www.googleapis.com/auth/userinfo.profile",
+			"https://www.googleapis.com/auth/userinfo.email",
+		},
+		Endpoint: google.Endpoint,
+	}
+}
+
+func (h *FacultyDirectoryHandler) HandleDirectoryLogin(c *gin.Context) {
+	if customLoginURL := strings.TrimSpace(os.Getenv("GOOGLE_CONTACTS_LOGIN_URL")); customLoginURL != "" {
+		c.Redirect(http.StatusTemporaryRedirect, customLoginURL)
+		return
+	}
+	if customLoginURL := strings.TrimSpace(os.Getenv("GOOGLE_DIRECTORY_LOGIN_URL")); customLoginURL != "" {
+		c.Redirect(http.StatusTemporaryRedirect, customLoginURL)
+		return
+	}
+
+	cfg := h.GetOAuthConfig()
+	url := cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
+	c.Redirect(http.StatusTemporaryRedirect, url)
+}
+
 func (h *FacultyDirectoryHandler) SyncGoogleDirectory() {
 	h.syncMu.Lock()
 	defer h.syncMu.Unlock()
 
-	log.Println("🔄 Syncing Faculty Directory from Google People/Contacts API...")
+	log.Println("🔄 Syncing Faculty Directory strictly from Google People/Contacts API...")
 
 	// Purge legacy/invalid records from database first
 	if h.DB != nil {
@@ -139,242 +240,141 @@ func (h *FacultyDirectoryHandler) SyncGoogleDirectory() {
 		httpClient = h.sheetsHandler.oauthConfig.Client(context.Background(), h.sheetsHandler.oauthToken)
 	}
 
-	// Fallback to loading token.json
+	// Fallback to loading token.json with Bearer authorization header
 	if httpClient == nil {
 		if f, err := os.Open("token.json"); err == nil {
 			defer f.Close()
-			var tok struct {
-				AccessToken string `json:"access_token"`
-			}
-			if err := json.NewDecoder(f).Decode(&tok); err == nil && tok.AccessToken != "" {
-				httpClient = &http.Client{Timeout: 10 * time.Second}
+			var tok oauth2.Token
+			if err := json.NewDecoder(f).Decode(&tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
+				ctx := context.Background()
+				cfg := h.GetOAuthConfig()
+				httpClient = cfg.Client(ctx, &tok)
 			}
 		}
+	}
+
+	if httpClient == nil {
+		log.Println("⚠️ Google OAuth client is not authenticated. Skipping Google Directory sync.")
+		return
 	}
 
 	syncedCount := 0
 
-	// 1. Try Google People SDK if httpClient is available
-	if httpClient != nil {
-		srv, err := people.NewService(context.Background(), option.WithHTTPClient(httpClient))
-		if err == nil {
-			// Search Connections with pagination
-			pageToken := ""
-			for {
-				call := srv.People.Connections.List("people/me").
-					PersonFields("names,emailAddresses,phoneNumbers,photos,organizations").
-					PageSize(1000)
-				if pageToken != "" {
-					call.PageToken(pageToken)
-				}
-				resp, err := call.Do()
-				if err != nil || resp == nil {
-					break
-				}
-				for _, p := range resp.Connections {
-					syncedCount += h.savePersonToDB(p.Names, p.EmailAddresses, p.PhoneNumbers, p.Photos, p.Organizations)
-				}
-				pageToken = resp.NextPageToken
-				if pageToken == "" {
-					break
-				}
+	// 1. Try Google People SDK
+	srv, err := people.NewService(context.Background(), option.WithHTTPClient(httpClient))
+	if err == nil {
+		// Search Connections with pagination
+		pageToken := ""
+		for {
+			call := srv.People.Connections.List("people/me").
+				PersonFields("names,emailAddresses,phoneNumbers,photos,organizations").
+				PageSize(1000)
+			if pageToken != "" {
+				call.PageToken(pageToken)
 			}
-
-			// Query Other Contacts API with pagination
-			otherPageToken := ""
-			for {
-				reqUrl := "https://people.googleapis.com/v1/otherContacts?readMask=names,emailAddresses,phoneNumbers,photos,organizations&pageSize=1000"
-				if otherPageToken != "" {
-					reqUrl += "&pageToken=" + otherPageToken
-				}
-				req, err := http.NewRequest("GET", reqUrl, nil)
+			resp, err := call.Do()
+			if err != nil || resp == nil {
 				if err != nil {
-					break
+					log.Printf("⚠️ Google Connections.List error: %v", err)
 				}
-				respHttp, err := httpClient.Do(req)
-				if err != nil || respHttp.StatusCode != http.StatusOK {
-					if respHttp != nil {
-						respHttp.Body.Close()
-					}
-					break
-				}
-				body, _ := io.ReadAll(respHttp.Body)
-				respHttp.Body.Close()
-
-				var otherResp struct {
-					OtherContacts []struct {
-						Names          []*people.Name         `json:"names"`
-						EmailAddresses []*people.EmailAddress `json:"emailAddresses"`
-						PhoneNumbers   []*people.PhoneNumber  `json:"phoneNumbers"`
-						Photos         []*people.Photo        `json:"photos"`
-						Organizations  []*people.Organization `json:"organizations"`
-					} `json:"otherContacts"`
-					NextPageToken string `json:"nextPageToken"`
-				}
-				if err := json.Unmarshal(body, &otherResp); err == nil {
-					for _, oc := range otherResp.OtherContacts {
-						syncedCount += h.savePersonToDB(oc.Names, oc.EmailAddresses, oc.PhoneNumbers, oc.Photos, oc.Organizations)
-					}
-					otherPageToken = otherResp.NextPageToken
-					if otherPageToken == "" {
-						break
-					}
-				} else {
-					break
-				}
+				break
 			}
-
-			// Query Directory People API with pagination
-			dirPageToken := ""
-			for {
-				dirUrl := "https://people.googleapis.com/v1/people:searchDirectoryPeople?query=&readMask=names,emailAddresses,phoneNumbers,photos,organizations&sources=DIRECTORY_SOURCE_TYPE_DOMAIN_PROFILE&sources=DIRECTORY_SOURCE_TYPE_DOMAIN_CONTACT&pageSize=1000"
-				if dirPageToken != "" {
-					dirUrl += "&pageToken=" + dirPageToken
-				}
-				req, err := http.NewRequest("GET", dirUrl, nil)
-				if err != nil {
-					break
-				}
-				respHttp, err := httpClient.Do(req)
-				if err != nil || respHttp.StatusCode != http.StatusOK {
-					if respHttp != nil {
-						respHttp.Body.Close()
-					}
-					break
-				}
-				body, _ := io.ReadAll(respHttp.Body)
-				respHttp.Body.Close()
-
-				var dirResp struct {
-					People []struct {
-						Names          []*people.Name         `json:"names"`
-						EmailAddresses []*people.EmailAddress `json:"emailAddresses"`
-						PhoneNumbers   []*people.PhoneNumber  `json:"phoneNumbers"`
-						Photos         []*people.Photo        `json:"photos"`
-						Organizations  []*people.Organization `json:"organizations"`
-					} `json:"people"`
-					NextPageToken string `json:"nextPageToken"`
-				}
-				if err := json.Unmarshal(body, &dirResp); err == nil {
-					for _, p := range dirResp.People {
-						syncedCount += h.savePersonToDB(p.Names, p.EmailAddresses, p.PhoneNumbers, p.Photos, p.Organizations)
-					}
-					dirPageToken = dirResp.NextPageToken
-					if dirPageToken == "" {
-						break
-					}
-				} else {
-					break
-				}
+			for _, p := range resp.Connections {
+				syncedCount += h.savePersonToDB(p.Names, p.EmailAddresses, p.PhoneNumbers, p.Photos, p.Organizations)
 			}
+			pageToken = resp.NextPageToken
+			if pageToken == "" {
+				break
+			}
+		}
 
-			// A-Z Alphabetical Directory Search with full pagination for complete coverage
-			alphabet := []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
-			for _, letter := range alphabet {
-				letterPageToken := ""
-				for {
-					searchUrl := fmt.Sprintf("https://people.googleapis.com/v1/people:searchDirectoryPeople?query=%s&readMask=names,emailAddresses,phoneNumbers,photos,organizations&sources=DIRECTORY_SOURCE_TYPE_DOMAIN_PROFILE&sources=DIRECTORY_SOURCE_TYPE_DOMAIN_CONTACT&pageSize=1000", letter)
-					if letterPageToken != "" {
-						searchUrl += "&pageToken=" + letterPageToken
-					}
-					req, err := http.NewRequest("GET", searchUrl, nil)
-					if err != nil {
-						break
-					}
-					respHttp, err := httpClient.Do(req)
-					if err != nil || respHttp.StatusCode != http.StatusOK {
-						if respHttp != nil {
-							respHttp.Body.Close()
-						}
-						break
-					}
-					body, _ := io.ReadAll(respHttp.Body)
+		// Query Other Contacts API with pagination
+		otherPageToken := ""
+		for {
+			reqUrl := "https://people.googleapis.com/v1/otherContacts?readMask=names,emailAddresses,phoneNumbers,photos,organizations&pageSize=1000"
+			if otherPageToken != "" {
+				reqUrl += "&pageToken=" + otherPageToken
+			}
+			req, err := http.NewRequest("GET", reqUrl, nil)
+			if err != nil {
+				break
+			}
+			respHttp, err := httpClient.Do(req)
+			if err != nil || respHttp.StatusCode != http.StatusOK {
+				if respHttp != nil {
+					log.Printf("⚠️ Google otherContacts API error status: %d", respHttp.StatusCode)
 					respHttp.Body.Close()
-					var searchResp struct {
-						People []struct {
-							Names          []*people.Name         `json:"names"`
-							EmailAddresses []*people.EmailAddress `json:"emailAddresses"`
-							PhoneNumbers   []*people.PhoneNumber  `json:"phoneNumbers"`
-							Photos         []*people.Photo        `json:"photos"`
-							Organizations  []*people.Organization `json:"organizations"`
-						} `json:"people"`
-						NextPageToken string `json:"nextPageToken"`
+				}
+				break
+			}
+			body, _ := io.ReadAll(respHttp.Body)
+			respHttp.Body.Close()
+
+			var otherResp struct {
+				OtherContacts []DirectoryPersonItem `json:"otherContacts"`
+				NextPageToken string                `json:"nextPageToken"`
+			}
+			if err := json.Unmarshal(body, &otherResp); err == nil {
+				for _, oc := range otherResp.OtherContacts {
+					names, emails, phones, photos, orgs := oc.Extract()
+					syncedCount += h.savePersonToDB(names, emails, phones, photos, orgs)
+				}
+				otherPageToken = otherResp.NextPageToken
+				if otherPageToken == "" {
+					break
+				}
+			} else {
+				break
+			}
+		}
+
+		// Alphabetical & Domain Search for Google Workspace Directory
+		queries := []string{"bitsathy", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+		for _, q := range queries {
+			letterPageToken := ""
+			for {
+				searchUrl := fmt.Sprintf("https://people.googleapis.com/v1/people:searchDirectoryPeople?query=%s&readMask=names,emailAddresses,phoneNumbers,photos,organizations&sources=DIRECTORY_SOURCE_TYPE_DOMAIN_PROFILE&sources=DIRECTORY_SOURCE_TYPE_DOMAIN_CONTACT&pageSize=500", url.QueryEscape(q))
+				if letterPageToken != "" {
+					searchUrl += "&pageToken=" + url.QueryEscape(letterPageToken)
+				}
+				req, err := http.NewRequest("GET", searchUrl, nil)
+				if err != nil {
+					break
+				}
+				respHttp, err := httpClient.Do(req)
+				if err != nil || respHttp.StatusCode != http.StatusOK {
+					if respHttp != nil {
+						if respHttp.StatusCode != http.StatusBadRequest {
+							log.Printf("⚠️ Directory search query '%s' status: %d", q, respHttp.StatusCode)
+						}
+						respHttp.Body.Close()
 					}
-					if err := json.Unmarshal(body, &searchResp); err == nil {
-						for _, p := range searchResp.People {
-							syncedCount += h.savePersonToDB(p.Names, p.EmailAddresses, p.PhoneNumbers, p.Photos, p.Organizations)
-						}
-						letterPageToken = searchResp.NextPageToken
-						if letterPageToken == "" {
-							break
-						}
-					} else {
+					break
+				}
+				body, _ := io.ReadAll(respHttp.Body)
+				respHttp.Body.Close()
+
+				var searchResp struct {
+					People        []DirectoryPersonItem `json:"people"`
+					NextPageToken string                `json:"nextPageToken"`
+				}
+				if err := json.Unmarshal(body, &searchResp); err == nil {
+					for _, p := range searchResp.People {
+						names, emails, phones, photos, orgs := p.Extract()
+						syncedCount += h.savePersonToDB(names, emails, phones, photos, orgs)
+					}
+					letterPageToken = searchResp.NextPageToken
+					if letterPageToken == "" {
 						break
 					}
+				} else {
+					break
 				}
 			}
 		}
 	}
 
-	// 2. Enrich/Sync with users and tracker_users tables in MySQL DB
-	if h.DB != nil {
-		rowsUser, err := h.DB.Query(`
-			SELECT 
-				COALESCE(email, ''), 
-				COALESCE(NULLIF(TRIM(display_name), ''), COALESCE(email, '')) AS name,
-				COALESCE(phone, ''),
-				COALESCE(photo_url, '')
-			FROM users 
-			WHERE COALESCE(TRIM(phone), '') != ''
-			  AND email NOT LIKE '%parent%' AND email NOT LIKE '%parents%'
-			  AND email NOT LIKE '%gmail.com'
-			  AND (email LIKE '%bitsathy.ac.in' OR email LIKE '%bitsathy.in')
-		`)
-		if err == nil {
-			defer rowsUser.Close()
-			for rowsUser.Next() {
-				var email, name, phone, photoURL string
-				if err := rowsUser.Scan(&email, &name, &phone, &photoURL); err == nil {
-					cleanEmail := strings.ToLower(strings.TrimSpace(email))
-					cleanPhone := strings.TrimSpace(phone)
-					if isValidFacultyRecord(cleanEmail, cleanPhone) {
-						dept := extractDeptFromEmail(cleanEmail)
-						h.upsertFacultyRecord(cleanEmail, name, cleanPhone, photoURL, dept, "Faculty / Staff")
-						syncedCount++
-					}
-				}
-			}
-		}
-
-		rowsTrack, err := h.DB.Query(`
-			SELECT 
-				COALESCE(email, ''), 
-				COALESCE(NULLIF(TRIM(user_id), ''), COALESCE(email, '')) AS name,
-				COALESCE(phone, '')
-			FROM tracker_users 
-			WHERE COALESCE(TRIM(phone), '') != ''
-			  AND email NOT LIKE '%parent%' AND email NOT LIKE '%parents%'
-			  AND email NOT LIKE '%gmail.com'
-			  AND (email LIKE '%bitsathy.ac.in' OR email LIKE '%bitsathy.in')
-		`)
-		if err == nil {
-			defer rowsTrack.Close()
-			for rowsTrack.Next() {
-				var email, name, phone string
-				if err := rowsTrack.Scan(&email, &name, &phone); err == nil {
-					cleanEmail := strings.ToLower(strings.TrimSpace(email))
-					cleanPhone := strings.TrimSpace(phone)
-					if isValidFacultyRecord(cleanEmail, cleanPhone) {
-						dept := extractDeptFromEmail(cleanEmail)
-						h.upsertFacultyRecord(cleanEmail, name, cleanPhone, "", dept, "Faculty / Staff")
-						syncedCount++
-					}
-				}
-			}
-		}
-	}
-
-	log.Printf("✅ Faculty Directory full sync completed. Processed records: %d", syncedCount)
+	log.Printf("✅ Google Contacts/Directory full sync completed. Processed records: %d", syncedCount)
 }
 
 func (h *FacultyDirectoryHandler) savePersonToDB(
@@ -394,21 +394,6 @@ func (h *FacultyDirectoryHandler) savePersonToDB(
 		phone = strings.TrimSpace(phones[0].Value)
 	}
 
-	// Fallback: Check MySQL DB for phone number if not present in Google Contacts
-	if phone == "" && h.DB != nil {
-		var dbPhone sql.NullString
-		_ = h.DB.QueryRow(`
-			SELECT COALESCE(NULLIF(TRIM(phone), ''), '') FROM (
-				SELECT phone FROM tracker_users WHERE LOWER(TRIM(email)) = ? AND COALESCE(TRIM(phone), '') != ''
-				UNION
-				SELECT phone FROM users WHERE LOWER(TRIM(email)) = ? AND COALESCE(TRIM(phone), '') != ''
-			) AS combined LIMIT 1
-		`, email, email).Scan(&dbPhone)
-		if dbPhone.Valid {
-			phone = strings.TrimSpace(dbPhone.String)
-		}
-	}
-
 	if !isValidFacultyRecord(email, phone) {
 		return 0
 	}
@@ -419,8 +404,15 @@ func (h *FacultyDirectoryHandler) savePersonToDB(
 	}
 
 	photoURL := ""
-	if len(photos) > 0 && strings.TrimSpace(photos[0].Url) != "" {
-		photoURL = strings.TrimSpace(photos[0].Url)
+	if len(photos) > 0 {
+		for _, ph := range photos {
+			if strings.TrimSpace(ph.Url) != "" {
+				photoURL = strings.TrimSpace(ph.Url)
+				if !ph.Default {
+					break
+				}
+			}
+		}
 	}
 
 	dept := extractDeptFromEmail(email)
@@ -454,11 +446,18 @@ func (h *FacultyDirectoryHandler) upsertFacultyRecord(email, name, phone, photoU
 		INSERT INTO faculty_directory (email, name, phone, photo_url, department, job_title, source, updated_at)
 		VALUES (?, ?, ?, ?, ?, ?, 'google_directory', NOW())
 		ON DUPLICATE KEY UPDATE
-			name = COALESCE(NULLIF(VALUES(name), ''), name),
+			name = CASE 
+				WHEN VALUES(name) != '' AND VALUES(name) NOT REGEXP '^[A-Za-z]{1,4}[0-9]{2,6}$' THEN VALUES(name)
+				WHEN (name IS NULL OR name = '' OR name = email OR name REGEXP '^[A-Za-z]{1,4}[0-9]{2,6}$') AND VALUES(name) != '' THEN VALUES(name)
+				ELSE name 
+			END,
 			phone = CASE WHEN VALUES(phone) != '' THEN VALUES(phone) ELSE phone END,
-			photo_url = CASE WHEN VALUES(photo_url) != '' THEN VALUES(photo_url) ELSE photo_url END,
-			department = CASE WHEN VALUES(department) != '' THEN VALUES(department) ELSE department END,
-			job_title = CASE WHEN VALUES(job_title) != '' THEN VALUES(job_title) ELSE job_title END,
+			photo_url = CASE 
+				WHEN VALUES(photo_url) IS NOT NULL AND VALUES(photo_url) != '' THEN VALUES(photo_url) 
+				ELSE faculty_directory.photo_url 
+			END,
+			department = CASE WHEN VALUES(department) != '' AND (department = '' OR department = 'Faculty & Staff') THEN VALUES(department) ELSE department END,
+			job_title = CASE WHEN VALUES(job_title) != '' AND (job_title = '' OR job_title = 'Faculty / Staff') THEN VALUES(job_title) ELSE job_title END,
 			updated_at = NOW();
 	`
 
