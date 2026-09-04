@@ -50,16 +50,40 @@ export async function getAuthenticatedHeaders() {
   };
 }
 
+let inFlightMePromise = null;
+
 export async function getMeProfile() {
-  const headers = await getAuthenticatedHeaders();
-  const response = await api.get("/me", { headers });
-  return response.data?.data || null;
+  if (inFlightMePromise) {
+    return inFlightMePromise;
+  }
+  inFlightMePromise = (async () => {
+    try {
+      const headers = await getAuthenticatedHeaders();
+      const response = await api.get("/me", { headers });
+      return response.data?.data || null;
+    } finally {
+      inFlightMePromise = null;
+    }
+  })();
+  return inFlightMePromise;
 }
 
+let inFlightV2Promise = null;
+
 export async function getV2Profile() {
-  const headers = await getAuthenticatedHeaders();
-  const response = await api.get("/v2/profile", { headers });
-  return response.data?.data || null;
+  if (inFlightV2Promise) {
+    return inFlightV2Promise;
+  }
+  inFlightV2Promise = (async () => {
+    try {
+      const headers = await getAuthenticatedHeaders();
+      const response = await api.get("/v2/profile", { headers });
+      return response.data?.data || null;
+    } finally {
+      inFlightV2Promise = null;
+    }
+  })();
+  return inFlightV2Promise;
 }
 
 export async function getSponsorsLeaderboard() {
