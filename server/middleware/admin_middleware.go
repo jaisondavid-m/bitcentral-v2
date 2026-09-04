@@ -9,10 +9,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func getToken(c *gin.Context) string {
+	authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
+	if token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer")); token != "" && token != authHeader {
+		return token
+	}
+	if authHeader != "" && !strings.HasPrefix(authHeader, "Bearer ") {
+		return authHeader
+	}
+	cookieNames := []string{"google_auth_token", "jwt", "token", "auth_token", "access_token"}
+	for _, name := range cookieNames {
+		if cookieVal, err := c.Cookie(name); err == nil && strings.TrimSpace(cookieVal) != "" {
+			return strings.TrimSpace(cookieVal)
+		}
+	}
+	return ""
+}
+
 func RequireAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-		token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
+		token := getToken(c)
 		if token == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"success": false,
@@ -65,8 +81,7 @@ func RequireAdmin() gin.HandlerFunc {
 
 func RequireSuperAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-		token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
+		token := getToken(c)
 		if token == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized"})
 			c.Abort()

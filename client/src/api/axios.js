@@ -4,10 +4,30 @@ import { auth, getStoredToken } from "@/config/auth.js";
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 1000000,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
+
+export async function postGoogleAuth(credential) {
+  try {
+    const res = await api.post("/auth/google", { credential });
+    return res.data;
+  } catch (err) {
+    console.error("Backend google auth call failed:", err);
+    return null;
+  }
+}
+
+export async function postGoogleLogout() {
+  try {
+    const res = await api.post("/auth/logout");
+    return res.data;
+  } catch (err) {
+    return null;
+  }
+}
 
 export async function listQBAnswerKeys({ semester } = {}) {
   const params = new URLSearchParams();

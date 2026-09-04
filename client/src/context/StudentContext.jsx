@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { auth, logout } from "@/config/auth.js";
+import { auth, logout, getStoredToken, getCurrentUser } from "@/config/auth.js";
 import { getMeProfile } from "@/api/axios.js";
 import {
   clearGuestSession,
@@ -99,10 +99,17 @@ function getPresenceRouteLabel(pathname = "") {
 export const StudentContext = ({ children }) => {
   const location = useLocation();
   const initialGuestSession = readGuestSession();
-  const [user, setUser] = useState(initialGuestSession ? createGuestUser(initialGuestSession) : null);
+  const initialToken = getStoredToken();
+  const initialUser = initialGuestSession
+    ? createGuestUser(initialGuestSession)
+    : initialToken
+    ? getCurrentUser()
+    : null;
+
+  const [user, setUser] = useState(initialUser);
   const [student, setStudent] = useState(initialGuestSession ? createGuestStudent() : null);
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(!initialGuestSession);
+  const [loading, setLoading] = useState(Boolean(initialGuestSession || initialToken));
   const [accessDeniedMessage, setAccessDeniedMessage] = useState("");
   const currentRouteLabel = useMemo(() => getPresenceRouteLabel(location.pathname), [location.pathname]);
   const hydratedEmailRef = useRef("");

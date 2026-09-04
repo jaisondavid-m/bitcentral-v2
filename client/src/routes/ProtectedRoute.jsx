@@ -7,17 +7,17 @@ import FullScreenLoader from "@/components/common/FullScreenLoader.jsx";
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
 
-  if (user && !isAllowedEmail(user.email)) {
-    logout();
-    return <Navigate to="/login" replace state={{ error: "unauthorized" }} />;
-  }
-
   if (loading) {
     return <FullScreenLoader />;
   }
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (user?.email && !isAllowedEmail(user.email)) {
+    logout();
+    return <Navigate to="/login" replace state={{ error: "unauthorized" }} />;
   }
 
   return children;

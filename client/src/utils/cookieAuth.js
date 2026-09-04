@@ -24,16 +24,35 @@ export function getCookie(name) {
 export function setCookie(name, value, days = 30) {
   if (typeof document === "undefined") return;
   const maxAge = days * 24 * 60 * 60;
-  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+  const isHttps = typeof window !== "undefined" && window.location.protocol === "https:";
+  const secureFlag = isHttps ? "; Secure" : "";
+  const encodedVal = encodeURIComponent(value);
+
+  document.cookie = `${name}=${encodedVal}; path=/; max-age=${maxAge}; SameSite=Lax${secureFlag}`;
+
+  if (typeof window !== "undefined" && window.location?.hostname?.includes("bitsathy.in")) {
+    document.cookie = `${name}=${encodedVal}; path=/; domain=.bitsathy.in; max-age=${maxAge}; SameSite=Lax${secureFlag}`;
+    document.cookie = `${name}=${encodedVal}; path=/; domain=bitcentral.bitsathy.in; max-age=${maxAge}; SameSite=Lax${secureFlag}`;
+  }
 }
 
 /**
- * Deletes a cookie by name.
+ * Deletes a cookie by name across path and domain variations.
  * @param {string} name
  */
 export function deleteCookie(name) {
   if (typeof document === "undefined") return;
-  document.cookie = `${name}=; path=/; max-age=0; SameSite=Lax`;
+  const isHttps = typeof window !== "undefined" && window.location.protocol === "https:";
+  const secureFlag = isHttps ? "; Secure" : "";
+
+  document.cookie = `${name}=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax${secureFlag}`;
+  if (typeof window !== "undefined" && window.location?.hostname) {
+    document.cookie = `${name}=; path=/; domain=${window.location.hostname}; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax${secureFlag}`;
+    if (window.location.hostname.includes("bitsathy.in")) {
+      document.cookie = `${name}=; path=/; domain=.bitsathy.in; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax${secureFlag}`;
+      document.cookie = `${name}=; path=/; domain=bitcentral.bitsathy.in; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax${secureFlag}`;
+    }
+  }
 }
 
 /**
