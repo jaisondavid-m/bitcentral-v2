@@ -89,7 +89,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		orderQuery = "id DESC"
 	}
 
-	queryStr := fmt.Sprintf(`SELECT %s, COALESCE(google_id, COALESCE(uid, '')), COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(creation_time, ''), COALESCE(last_sign_in_time, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%%Y-%%m-%%dT%%H:%%i:%%sZ'), ''), COALESCE(role, 'user') FROM users WHERE email LIKE '%%@bitsathy.ac.in' ORDER BY %s`, idQuery, orderQuery)
+	queryStr := fmt.Sprintf(`SELECT %s, COALESCE(google_id, COALESCE(uid, '')), COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(creation_time, ''), COALESCE(last_sign_in_time, ''), COALESCE(last_seen_at, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%%Y-%%m-%%dT%%H:%%i:%%sZ'), ''), COALESCE(role, 'user') FROM users WHERE email LIKE '%%@bitsathy.ac.in' ORDER BY %s`, idQuery, orderQuery)
 
 	rows, err := h.DB.Query(queryStr)
 	if err != nil {
@@ -105,7 +105,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		var u models.User
 		var blocked int
 		var blockedAt string
-		if err := rows.Scan(&u.ID, &u.GoogleID, &u.Email, &u.DisplayName, &u.PhotoURL, &u.CreationTime, &u.LastSignInTime, &blocked, &blockedAt, &u.Role); err != nil {
+		if err := rows.Scan(&u.ID, &u.GoogleID, &u.Email, &u.DisplayName, &u.PhotoURL, &u.CreationTime, &u.LastSignInTime, &u.LastSeenAt, &blocked, &blockedAt, &u.Role); err != nil {
 			continue
 		}
 		u.UID = u.GoogleID

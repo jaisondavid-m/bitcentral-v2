@@ -286,6 +286,13 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		}
 	}
 
+	// Update last_seen_at timestamp on every /me call
+	nowSeen := time.Now().Format("2006-01-02 15:04:05")
+	if h.DB != nil {
+		_, _ = h.DB.Exec(`UPDATE users SET last_seen_at = ? WHERE email = ? OR LOWER(TRIM(email)) = ?`, nowSeen, emailID, cleanEmail)
+		user.LastSeenAt = nowSeen
+	}
+
 	if user.IsBlocked {
 		c.JSON(http.StatusForbidden, gin.H{
 			"success": false,
