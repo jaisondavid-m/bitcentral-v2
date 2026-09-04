@@ -1,6 +1,7 @@
 import { isAllowedEmail } from "@/services/authRules.js";
 import { clearGuestSession } from "@/services/guestSession.js";
 import { getCookie, setCookie, deleteCookie } from "@/utils/cookieAuth.js";
+import { postGoogleAuth, postGoogleLogout } from "@/api/axios.js";
 
 const TOKEN_KEY = "google_auth_token";
 const COOKIE_NAMES = ["google_auth_token", "jwt", "token", "auth_token", "access_token"];
@@ -122,6 +123,7 @@ export const signInWithGoogle = async () => {
         }
 
         setStoredToken(token);
+        await postGoogleAuth(token);
         clearGuestSession();
         window.dispatchEvent(new Event("auth_state_changed"));
 
@@ -160,6 +162,7 @@ export const signInWithGoogle = async () => {
           if (tokenResponse.access_token) {
             const token = tokenResponse.access_token;
             setStoredToken(token);
+            await postGoogleAuth(token);
             clearGuestSession();
             window.dispatchEvent(new Event("auth_state_changed"));
             resolved = true;
@@ -180,6 +183,9 @@ export const signInWithGoogle = async () => {
 
 export const logout = async () => {
   clearGuestSession();
+  try {
+    await postGoogleLogout();
+  } catch (e) {}
   setStoredToken(null);
   window.dispatchEvent(new Event("auth_state_changed"));
   if (window.google?.accounts?.id) {

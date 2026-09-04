@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"server/config"
 	"server/models"
@@ -79,6 +80,65 @@ func (h *StudentLookupHandler) GetRollNoByEmail(c *gin.Context) {
 	})
 }
 
+func ExtractAuthToken(c *gin.Context) string {
+	authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
+	if token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer")); token != "" && token != authHeader {
+		return token
+	}
+	if authHeader != "" && !strings.HasPrefix(authHeader, "Bearer ") {
+		return authHeader
+	}
+	cookieNames := []string{"google_auth_token", "jwt", "token", "auth_token", "access_token"}
+	for _, name := range cookieNames {
+		if cookieVal, err := c.Cookie(name); err == nil && strings.TrimSpace(cookieVal) != "" {
+			return strings.TrimSpace(cookieVal)
+		}
+	}
+	return ""
+}
+
+func setAuthCookies(c *gin.Context, token string) {
+	maxAge := 30 * 24 * 3600 // 30 days (2592000 seconds)
+	host := c.Request.Host
+	secure := c.Request.TLS != nil || c.GetHeader("X-Forwarded-Proto") == "https" || strings.Contains(host, "bitsathy.in")
+
+	domains := []string{""}
+	if strings.Contains(host, "bitcentral.bitsathy.in") {
+		domains = append(domains, "bitcentral.bitsathy.in", ".bitsathy.in")
+	} else if strings.Contains(host, "bitsathy.in") {
+		domains = append(domains, ".bitsathy.in")
+	}
+	if envDomain := strings.TrimSpace(os.Getenv("COOKIE_DOMAIN")); envDomain != "" {
+		domains = append(domains, envDomain)
+	}
+
+	cookieNames := []string{"google_auth_token", "jwt", "token", "auth_token"}
+
+	for _, dom := range domains {
+		for _, name := range cookieNames {
+			c.SetCookie(name, token, maxAge, "/", dom, secure, false)
+		}
+	}
+}
+
+func clearAuthCookies(c *gin.Context) {
+	host := c.Request.Host
+	secure := c.Request.TLS != nil || c.GetHeader("X-Forwarded-Proto") == "https" || strings.Contains(host, "bitsathy.in")
+
+	domains := []string{"", "bitcentral.bitsathy.in", ".bitsathy.in"}
+	if envDomain := strings.TrimSpace(os.Getenv("COOKIE_DOMAIN")); envDomain != "" {
+		domains = append(domains, envDomain)
+	}
+
+	cookieNames := []string{"google_auth_token", "jwt", "token", "auth_token", "access_token", "googleToken"}
+
+	for _, dom := range domains {
+		for _, name := range cookieNames {
+			c.SetCookie(name, "", -1, "/", dom, secure, false)
+		}
+	}
+}
+
 func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 	emailID := strings.TrimSpace(c.Query("emailid"))
 	if emailID == "" {
@@ -86,8 +146,7 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 	}
 
 	var claims *config.GoogleUserClaims
-	authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-	token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
+	token := ExtractAuthToken(c)
 	if token != "" {
 		if cClaims, err := config.VerifyGoogleToken(token); err == nil && cClaims != nil {
 			claims = cClaims
@@ -274,5 +333,113 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 			"phone":             phoneNo,
 			"phone_no":          phoneNo,
 		},
+	})
+}
+
+type GoogleLoginRequest struct {
+	Credential string `json:"credential"`
+	Token      string `json:"token"`
+	IDToken    string `json:"id_token"`
+}
+
+func (h *StudentLookupHandler) GoogleLogin(c *gin.Context) {
+	var req GoogleLoginRequest
+	_ = c.ShouldBindJSON(&req)
+
+	tokenStr := strings.TrimSpace(req.Credential)
+	if tokenStr == "" {
+		tokenStr = strings.TrimSpace(req.Token)
+	}
+	if tokenStr == "" {
+		tokenStr = strings.TrimSpace(req.IDToken)
+	}
+	if tokenStr == "" {
+		tokenStr = ExtractAuthToken(c)
+	}
+
+	if tokenStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "Google authentication token is required",
+		})
+		return
+	}
+
+	claims, err := config.VerifyGoogleToken(tokenStr)
+	if err != nil || claims == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"error":   "Invalid Google authentication token: " + err.Error(),
+		})
+		return
+	}
+
+	email := strings.ToLower(strings.TrimSpace(claims.Email))
+	googleID := claims.UID
+	displayName := claims.Name
+	photoURL := claims.Picture
+
+	// Enforce email domain if configured
+	if strings.ToLower(strings.TrimSpace(os.Getenv("ENFORCE_EMAIL_DOMAIN"))) == "true" {
+		if !(strings.HasSuffix(email, "@bitsathy.ac.in") || strings.HasSuffix(email, "@bitsathy.in")) {
+			domain := ""
+			if at := strings.LastIndex(email, "@"); at >= 0 {
+				domain = email[at+1:]
+			}
+			var count int
+			if h.DB != nil {
+				_ = h.DB.QueryRow(`SELECT COUNT(*) FROM allowed_emails WHERE (type='email' AND LOWER(value)=?) OR (type='domain' AND LOWER(value)=?)`, email, domain).Scan(&count)
+				if count == 0 {
+					c.JSON(http.StatusForbidden, gin.H{"success": false, "error": "Access restricted to allowed email domain."})
+					return
+				}
+			}
+		}
+	}
+
+	// Sync user profile in database
+	userRole := "user"
+	if h.DB != nil {
+		now := time.Now().Format("2006-01-02 15:04:05")
+		var existingRole, existingUID string
+		err := h.DB.QueryRow(`SELECT uid, role FROM users WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?) LIMIT 1`, googleID, googleID, email).Scan(&existingUID, &existingRole)
+		if err == nil {
+			if strings.TrimSpace(existingRole) != "" {
+				userRole = strings.TrimSpace(existingRole)
+			}
+			_, _ = h.DB.Exec(`UPDATE users SET google_id = ?, display_name = COALESCE(NULLIF(?, ''), display_name), photo_url = COALESCE(NULLIF(?, ''), photo_url), last_sign_in_time = ? WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`,
+				googleID, displayName, photoURL, now, googleID, googleID, email)
+		} else {
+			newUID := googleID
+			if newUID == "" {
+				newUID = email
+			}
+			_, _ = h.DB.Exec(`INSERT INTO users (uid, google_id, email, display_name, photo_url, role, creation_time, last_sign_in_time) VALUES (?, ?, ?, ?, ?, 'user', ?, ?) ON DUPLICATE KEY UPDATE google_id = VALUES(google_id), display_name = VALUES(display_name), photo_url = VALUES(photo_url), last_sign_in_time = VALUES(last_sign_in_time)`,
+				newUID, googleID, email, displayName, photoURL, now, now)
+		}
+	}
+
+	// Set 30-day authentication cookies
+	setAuthCookies(c, tokenStr)
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Authentication successful",
+		"token":   tokenStr,
+		"user": gin.H{
+			"google_id":    googleID,
+			"email":        email,
+			"display_name": displayName,
+			"photo_url":    photoURL,
+			"role":         userRole,
+		},
+	})
+}
+
+func (h *StudentLookupHandler) GoogleLogout(c *gin.Context) {
+	clearAuthCookies(c)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Logged out successfully",
 	})
 }

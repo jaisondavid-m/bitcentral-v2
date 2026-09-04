@@ -85,6 +85,9 @@ func SetupRouter(
 	// Public routes
 	r.GET("/auth/login", handler.HandleLogin)
 	r.GET("/auth/callback", handler.HandleCallback)
+	r.POST("/auth/google", studentLookupHandler.GoogleLogin)
+	r.POST("/auth/logout", studentLookupHandler.GoogleLogout)
+	r.GET("/auth/logout", studentLookupHandler.GoogleLogout)
 	r.GET("/exam-hall", examHallHandler.GetHall)
 	r.GET("/exam-hall/all", examHallHandler.GetAllHallsByRegNo)
 
