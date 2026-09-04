@@ -1,6 +1,6 @@
 import { isAllowedEmail } from "@/services/authRules.js";
 import { clearGuestSession } from "@/services/guestSession.js";
-import { getCookie, setCookie, deleteCookie } from "@/utils/cookieAuth.js";
+import { getCookie, setCookie, deleteCookie, isJwtValid } from "@/utils/cookieAuth.js";
 import { postGoogleAuth, postGoogleLogout } from "@/api/axios.js";
 
 const TOKEN_KEY = "google_auth_token";
