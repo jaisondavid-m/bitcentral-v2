@@ -68,6 +68,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 
 	search := strings.ToLower(strings.TrimSpace(c.Query("search")))
 	batch := strings.TrimSpace(c.Query("batch"))
+	status := strings.ToLower(strings.TrimSpace(c.Query("status")))
 
 	var totalInDB int
 	_ = h.DB.QueryRow(`SELECT COUNT(*) FROM users`).Scan(&totalInDB)
@@ -98,8 +99,28 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 	}
 	defer rows.Close()
 
+	adminRows, err := h.DB.Query(`SELECT uid FROM admins`)
+	adminByUID := make(map[string]bool)
+	if err == nil {
+		defer adminRows.Close()
+		for adminRows.Next() {
+			var uid string
+			if err := adminRows.Scan(&uid); err == nil {
+				adminByUID[uid] = true
+			}
+		}
+	}
+
 	var allUsers []models.User
 	batchCounts := make(map[string]int)
+
+	// Time in IST (UTC+5:30) and local server time for active today matching
+	todayIST := time.Now().UTC().Add(5*time.Hour + 30*time.Minute).Format("2006-01-02")
+	todayLocal := time.Now().Format("2006-01-02")
+
+	activeTodayCount := 0
+	adminCount := 0
+	blockedCount := 0
 
 	for rows.Next() {
 		var u models.User
@@ -111,9 +132,20 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		u.UID = u.GoogleID
 		u.IsBlocked = blocked == 1
 		u.BlockedAt = blockedAt
+		u.IsAdmin = adminByUID[u.UID] || u.Role == "admin" || u.Role == "superadmin" || u.Role == "super_admin"
 
 		batchLabel := getBatchLabelFromEmail(u.Email)
 		batchCounts[batchLabel]++
+
+		if u.LastSeenAt != "" && (strings.HasPrefix(u.LastSeenAt, todayIST) || strings.HasPrefix(u.LastSeenAt, todayLocal)) {
+			activeTodayCount++
+		}
+		if u.IsBlocked {
+			blockedCount++
+		}
+		if u.IsAdmin {
+			adminCount++
+		}
 
 		allUsers = append(allUsers, u)
 	}
@@ -124,6 +156,23 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 			label := getBatchLabelFromEmail(u.Email)
 			if label != batch {
 				continue
+			}
+		}
+
+		if status != "" && status != "all" {
+			switch status {
+			case "active_today", "today":
+				if u.LastSeenAt == "" || (!strings.HasPrefix(u.LastSeenAt, todayIST) && !strings.HasPrefix(u.LastSeenAt, todayLocal)) {
+					continue
+				}
+			case "admin", "admins":
+				if !u.IsAdmin {
+					continue
+				}
+			case "blocked":
+				if !u.IsBlocked {
+					continue
+				}
 			}
 		}
 
@@ -158,26 +207,13 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 
 	paginatedSlice := filtered[startIndex:endIndex]
 
-	adminRows, err := h.DB.Query(`SELECT uid FROM admins`)
-	adminByUID := make(map[string]bool)
-	if err == nil {
-		defer adminRows.Close()
-		for adminRows.Next() {
-			var uid string
-			if err := adminRows.Scan(&uid); err == nil {
-				adminByUID[uid] = true
-			}
-		}
-	}
-
-	for i := range paginatedSlice {
-		paginatedSlice[i].IsAdmin = adminByUID[paginatedSlice[i].UID] || paginatedSlice[i].Role == "admin" || paginatedSlice[i].Role == "superadmin" || paginatedSlice[i].Role == "super_admin"
-	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"success":       true,
 		"users":         paginatedSlice,
 		"total":         len(allUsers),
+		"activeToday":   activeTodayCount,
+		"totalAdmins":   adminCount,
+		"totalBlocked":  blockedCount,
 		"filteredTotal": totalFiltered,
 		"page":          page,
 		"pageSize":      limit,

@@ -70,6 +70,8 @@ import {
   Plus,
   RefreshCw,
   Search,
+  ShieldAlert,
+  ShieldCheck,
   Smartphone,
   Tablet,
   Trash2,
@@ -99,6 +101,44 @@ function formatDateTime(value) {
   }
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleString();
+}
+
+function isSeenToday(value) {
+  if (!value) return false;
+  let date = new Date(value);
+  if (Number.isNaN(date.getTime()) && typeof value === "string") {
+    date = new Date(value.replace(" ", "T"));
+  }
+  if (Number.isNaN(date.getTime())) return false;
+  const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+  const itemStr = date.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+  return todayStr === itemStr;
+}
+
+function formatLastSeen(value) {
+  if (!value) return "-";
+  let date = new Date(value);
+  if (Number.isNaN(date.getTime()) && typeof value === "string") {
+    date = new Date(value.replace(" ", "T"));
+  }
+  if (Number.isNaN(date.getTime())) return value;
+
+  const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+  const itemStr = date.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+
+  const timePart = date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
+
+  if (todayStr === itemStr) {
+    return `Today, ${timePart}`;
+  }
+
+  return date.toLocaleString([], {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
 }
 
 function fileToDataURL(file) {
@@ -677,112 +717,140 @@ function AdminDashboardShell({ activeTab, children }) {
 function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showStatus, isSuper, onToggleAdmin, adminActionUid, isSelected, onToggleSelect }) {
   const [expanded, setExpanded] = useState(false);
   const isBlocked = Boolean(userItem.isBlocked);
+  const activeToday = isSeenToday(userItem.lastSeenAt);
+
   return (
-    <div className={`rounded-xl border bg-white shadow-sm transition dark:bg-slate-950 ${
-      isSelected ? "border-blue-500 ring-2 ring-blue-500/20 dark:border-blue-500" : "border-gray-200 dark:border-blue-900"
-    }`}>
+    <div
+      className={`rounded-2xl border bg-white shadow-xs transition-all duration-200 dark:bg-slate-900/90 ${
+        isSelected
+          ? "border-blue-500 ring-2 ring-blue-500/20 dark:border-blue-500"
+          : activeToday
+            ? "border-emerald-200/80 dark:border-emerald-900/40"
+            : "border-slate-200/80 dark:border-slate-800"
+      }`}
+    >
       {/* Card header -- always visible */}
-      <div className="flex items-center gap-3 px-4 py-3">
+      <div className="flex items-center gap-3 p-3.5">
         <input
           type="checkbox"
           checked={Boolean(isSelected)}
           onChange={() => onToggleSelect(userItem.uid)}
-          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800"
         />
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
           className="flex min-w-0 flex-1 items-center gap-3 text-left"
         >
-        {userItem.photoURL ? (
-          <img
-            src={userItem.photoURL}
-            alt={userItem.displayName || userItem.email || "User"}
-            className="h-10 w-10 shrink-0 rounded-full border border-gray-200 object-cover dark:border-blue-900"
-            loading="lazy"
-          />
-        ) : (
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-            {(userItem.displayName || userItem.email || "U").charAt(0).toUpperCase()}
-          </div>
-        )}
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-gray-900 dark:text-slate-100">
-            {userItem.displayName || userItem.email || userItem.uid}
-          </p>
-          <p className="truncate text-xs text-gray-500 dark:text-slate-400">{userItem.email || userItem.uid}</p>
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
-          {isBlocked && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-950 dark:text-red-300">
-              Blocked
-            </span>
+          {userItem.photoURL ? (
+            <img
+              src={userItem.photoURL}
+              alt={userItem.displayName || userItem.email || "User"}
+              className="h-10 w-10 shrink-0 rounded-full border border-slate-200 object-cover dark:border-slate-700"
+              loading="lazy"
+            />
+          ) : (
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-bold text-blue-600 dark:bg-blue-950 dark:text-blue-300 border border-blue-100 dark:border-blue-900">
+              {(userItem.displayName || userItem.email || "U").charAt(0).toUpperCase()}
+            </div>
           )}
-          {expanded ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
-        </div>
-      </button>
-    </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5">
+              <p className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">
+                {userItem.displayName || userItem.email || userItem.uid}
+              </p>
+              {activeToday && (
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                </span>
+              )}
+            </div>
+            <p className="truncate text-xs text-slate-500 dark:text-slate-400">{userItem.email || userItem.uid}</p>
+          </div>
+          <div className="flex shrink-0 items-center gap-1.5">
+            {activeToday && (
+              <span className="hidden xs:inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
+                Active today
+              </span>
+            )}
+            {isBlocked && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-red-50 px-2 py-0.5 text-[10px] font-bold text-red-700 dark:bg-red-950/80 dark:text-red-300 border border-red-200/60 dark:border-red-800/60">
+                Blocked
+              </span>
+            )}
+            {expanded ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+          </div>
+        </button>
+      </div>
 
       {/* Expanded details */}
       {expanded && (
-        <div className="border-t border-gray-100 px-4 pb-4 pt-3 dark:border-blue-900">
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div>
-              <p className="font-semibold text-gray-500 dark:text-slate-400">Created at</p>
-              <p className="mt-0.5 text-gray-800 dark:text-slate-200">{formatDateTime(userItem.creationTime)}</p>
+        <div className="border-t border-slate-100 p-4 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 rounded-b-2xl space-y-3">
+          <div className="grid grid-cols-2 gap-2.5 text-xs">
+            <div className="rounded-xl border border-slate-200/60 bg-white p-2.5 dark:border-slate-800 dark:bg-slate-900">
+              <p className="font-medium text-slate-400 dark:text-slate-500 text-[11px]">Last seen</p>
+              <p className={`mt-0.5 font-semibold ${activeToday ? "text-emerald-600 dark:text-emerald-400" : "text-slate-700 dark:text-slate-300"}`}>
+                {formatLastSeen(userItem.lastSeenAt)}
+              </p>
             </div>
-            <div>
-              <p className="font-semibold text-gray-500 dark:text-slate-400">Last sign in</p>
-              <p className="mt-0.5 text-gray-800 dark:text-slate-200">{formatDateTime(userItem.lastSignInTime)}</p>
+            <div className="rounded-xl border border-slate-200/60 bg-white p-2.5 dark:border-slate-800 dark:bg-slate-900">
+              <p className="font-medium text-slate-400 dark:text-slate-500 text-[11px]">Role</p>
+              <p className="mt-0.5 font-semibold uppercase text-slate-800 dark:text-slate-200 text-[11px]">
+                {userItem.role || (userItem.isAdmin ? "admin" : "user")}
+              </p>
             </div>
-            <div>
-              <p className="font-semibold text-gray-500 dark:text-slate-400">Last seen</p>
-              <p className="mt-0.5 text-blue-600 dark:text-blue-400 font-medium">{formatDateTime(userItem.lastSeenAt)}</p>
+            <div className="rounded-xl border border-slate-200/60 bg-white p-2.5 dark:border-slate-800 dark:bg-slate-900">
+              <p className="font-medium text-slate-400 dark:text-slate-500 text-[11px]">Created at</p>
+              <p className="mt-0.5 text-slate-700 dark:text-slate-300">{formatDateTime(userItem.creationTime)}</p>
             </div>
-            <div>
-              <p className="font-semibold text-gray-500 dark:text-slate-400">Role</p>
-              <p className="mt-0.5 text-gray-800 dark:text-slate-200 uppercase font-semibold">{userItem.role || (userItem.isAdmin ? "admin" : "user")}</p>
+            <div className="rounded-xl border border-slate-200/60 bg-white p-2.5 dark:border-slate-800 dark:bg-slate-900">
+              <p className="font-medium text-slate-400 dark:text-slate-500 text-[11px]">Last sign in</p>
+              <p className="mt-0.5 text-slate-700 dark:text-slate-300">{formatDateTime(userItem.lastSignInTime)}</p>
             </div>
             {isBlocked && (
-              <div className="col-span-2">
-                <p className="font-semibold text-gray-500 dark:text-slate-400">Blocked at</p>
-                <p className="mt-0.5 text-gray-800 dark:text-slate-200">{formatBlockedAt(userItem.blockedAt)}</p>
+              <div className="col-span-2 rounded-xl border border-red-200/60 bg-red-50/50 p-2.5 dark:border-red-900/60 dark:bg-red-950/30">
+                <p className="font-medium text-red-500 dark:text-red-400 text-[11px]">Blocked at</p>
+                <p className="mt-0.5 font-semibold text-red-700 dark:text-red-300">{formatBlockedAt(userItem.blockedAt)}</p>
               </div>
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => onDelete(userItem.uid)}
-            disabled={deletingUid === userItem.uid}
-            className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-red-200 bg-white px-3 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-900 dark:bg-slate-950 dark:text-red-300 dark:hover:bg-slate-900"
-          >
-            {deletingUid === userItem.uid ? <Loader className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-            Delete user
-          </button>
-          {isSuper && (
+
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            {isSuper && (
+              <button
+                type="button"
+                onClick={() => onToggleAdmin(userItem)}
+                disabled={adminActionUid === userItem.uid}
+                className={`inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition disabled:opacity-50 ${
+                  userItem.isAdmin
+                    ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200"
+                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                }`}
+              >
+                {adminActionUid === userItem.uid ? <Loader className="h-3.5 w-3.5 animate-spin" /> : userItem.isAdmin ? <UserMinus className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+                <span>{userItem.isAdmin ? "Depromote" : "Promote to admin"}</span>
+              </button>
+            )}
             <button
               type="button"
-              onClick={() => onToggleAdmin(userItem)}
-              disabled={adminActionUid === userItem.uid}
-              className={`mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
-                userItem.isAdmin
-                  ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200 dark:hover:bg-amber-950/60"
-                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+              onClick={() => onToggleBlock(userItem.uid, !isBlocked)}
+              className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold text-white transition ${
+                isBlocked ? "bg-emerald-600 hover:bg-emerald-700" : "bg-amber-600 hover:bg-amber-700"
               }`}
             >
-              {adminActionUid === userItem.uid ? <Loader className="h-4 w-4 animate-spin" /> : userItem.isAdmin ? <UserMinus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-              {userItem.isAdmin ? "Depromote" : "Promote to admin"}
+              <span>{isBlocked ? "Unblock user" : "Block user"}</span>
             </button>
-          )}
-          <button
-            type="button"
-            onClick={() => onToggleBlock(userItem.uid, !isBlocked)}
-            className={`mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-white transition ${
-              isBlocked ? "bg-emerald-600 hover:bg-emerald-700" : "bg-red-600 hover:bg-red-700"
-            }`}
-          >
-            {isBlocked ? "Unblock user" : "Block user"}
-          </button>
+            <button
+              type="button"
+              onClick={() => onDelete(userItem.uid)}
+              disabled={deletingUid === userItem.uid}
+              className="col-span-2 inline-flex items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-white px-3 py-2 text-xs font-bold text-red-600 transition hover:bg-red-50 disabled:opacity-50 dark:border-red-900/60 dark:bg-slate-900 dark:text-red-400 dark:hover:bg-red-950/40"
+            >
+              {deletingUid === userItem.uid ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+              <span>Delete user permanently</span>
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -808,9 +876,9 @@ function UserTable({
   const somePageSelected = users.some((u) => selectedUids.has(u.uid)) && !allPageSelected;
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-blue-900/60">
-      <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-blue-900/60">
-        <thead className="bg-gray-50/80 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:bg-slate-900/80 dark:text-slate-400">
+    <div className="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900/90">
+      <table className="min-w-full divide-y divide-slate-100 text-sm dark:divide-slate-800/80">
+        <thead className="bg-slate-50/90 text-xs font-bold uppercase tracking-wider text-slate-500 dark:bg-slate-900 dark:text-slate-400">
           <tr>
             <th className="w-10 px-4 py-3.5 text-center">
               <input
@@ -820,48 +888,55 @@ function UserTable({
                   if (el) el.indeterminate = somePageSelected;
                 }}
                 onChange={onToggleSelectAll}
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800"
                 title="Select / Deselect all on current page"
               />
             </th>
-            <th className="px-4 py-3.5 text-left">#</th>
-            <th className="px-4 py-3.5 text-left">User</th>
-            <th className="px-4 py-3.5 text-left">Created at</th>
-            <th className="px-4 py-3.5 text-left">Last sign in</th>
-            <th className="px-4 py-3.5 text-left">Last seen</th>
-            <th className="px-4 py-3.5 text-left">Role</th>
-            <th className="px-4 py-3.5 text-left">Status</th>
-            <th className="px-4 py-3.5 text-left">Action</th>
+            <th className="px-4 py-3.5 text-left font-bold">#</th>
+            <th className="px-4 py-3.5 text-left font-bold">User</th>
+            <th className="px-4 py-3.5 text-left font-bold">Last Seen</th>
+            <th className="px-4 py-3.5 text-left font-bold">Last Sign In</th>
+            <th className="px-4 py-3.5 text-left font-bold">Created At</th>
+            <th className="px-4 py-3.5 text-left font-bold">Role</th>
+            <th className="px-4 py-3.5 text-left font-bold">Status</th>
+            <th className="px-4 py-3.5 text-right font-bold">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100 bg-white dark:divide-blue-900/40 dark:bg-slate-950">
+        <tbody className="divide-y divide-slate-100 bg-white dark:divide-slate-800/60 dark:bg-slate-900/40">
           {users.map((userItem, index) => {
             const rowNumber = (page - 1) * pageSize + index + 1;
-            const isBlocked = userItem.isBlocked;
+            const isBlocked = Boolean(userItem.isBlocked);
             const isSelected = selectedUids.has(userItem.uid);
+            const activeToday = isSeenToday(userItem.lastSeenAt);
+
             return (
               <tr
                 key={userItem.uid}
-                className={`transition hover:bg-gray-50/80 dark:hover:bg-slate-900/50 ${
-                  isSelected ? "bg-blue-50/50 dark:bg-blue-950/30" : ""
+                className={`transition-colors duration-150 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 ${
+                  isSelected ? "bg-blue-50/60 dark:bg-blue-950/30" : ""
                 }`}
               >
+                {/* Select checkbox */}
                 <td className="px-4 py-3.5 text-center">
                   <input
                     type="checkbox"
                     checked={isSelected}
                     onChange={() => onToggleSelectUser(userItem.uid)}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800"
                   />
                 </td>
-                <td className="px-4 py-3.5 text-xs font-medium text-gray-400 dark:text-slate-500">{rowNumber}</td>
+
+                {/* Index */}
+                <td className="px-4 py-3.5 text-xs font-semibold text-slate-400 dark:text-slate-500">{rowNumber}</td>
+
+                {/* User Info */}
                 <td className="px-4 py-3.5">
                   <div className="flex items-center gap-3">
                     {userItem.photoURL ? (
                       <img
                         src={userItem.photoURL}
                         alt={userItem.displayName || userItem.email || "User photo"}
-                        className="h-9 w-9 shrink-0 rounded-full border border-gray-200 object-cover dark:border-slate-700"
+                        className="h-9 w-9 shrink-0 rounded-full border border-slate-200 object-cover dark:border-slate-700"
                         loading="lazy"
                         decoding="async"
                       />
@@ -870,60 +945,99 @@ function UserTable({
                         {(userItem.displayName || userItem.email || "U").charAt(0).toUpperCase()}
                       </div>
                     )}
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-gray-900 dark:text-slate-100">
-                        {userItem.displayName || "No Name"}
-                      </p>
-                      <p className="truncate text-xs text-gray-500 dark:text-slate-400">{userItem.email || userItem.uid}</p>
+                    <div className="min-w-0 max-w-[200px] xl:max-w-[260px]">
+                      <div className="flex items-center gap-1.5">
+                        <p className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">
+                          {userItem.displayName || "No Name"}
+                        </p>
+                        {activeToday && (
+                          <span className="relative flex h-2 w-2 shrink-0" title="Active today">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                          </span>
+                        )}
+                      </div>
+                      <p className="truncate text-xs text-slate-500 dark:text-slate-400">{userItem.email || userItem.uid}</p>
                     </div>
                   </div>
                 </td>
-                <td className="whitespace-nowrap px-4 py-3.5 text-xs text-gray-600 dark:text-slate-300">{formatDateTime(userItem.creationTime)}</td>
-                <td className="whitespace-nowrap px-4 py-3.5 text-xs text-gray-600 dark:text-slate-300">{formatDateTime(userItem.lastSignInTime)}</td>
-                <td className="whitespace-nowrap px-4 py-3.5 text-xs">
+
+                {/* Last Seen */}
+                <td className="whitespace-nowrap px-4 py-3.5">
                   {userItem.lastSeenAt ? (
-                    <span className="font-mono text-[11px] text-blue-600 dark:text-blue-400 font-medium">
-                      {formatDateTime(userItem.lastSeenAt)}
-                    </span>
+                    activeToday ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60 font-mono">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        {formatLastSeen(userItem.lastSeenAt)}
+                      </span>
+                    ) : (
+                      <span className="font-mono text-xs text-slate-600 dark:text-slate-300">
+                        {formatLastSeen(userItem.lastSeenAt)}
+                      </span>
+                    )
                   ) : (
-                    <span className="text-gray-400 dark:text-slate-500">-</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-600">-</span>
                   )}
                 </td>
+
+                {/* Last Sign In */}
+                <td className="whitespace-nowrap px-4 py-3.5 text-xs text-slate-500 dark:text-slate-400">
+                  {formatDateTime(userItem.lastSignInTime)}
+                </td>
+
+                {/* Created At */}
+                <td className="whitespace-nowrap px-4 py-3.5 text-xs text-slate-500 dark:text-slate-400">
+                  {formatDateTime(userItem.creationTime)}
+                </td>
+
+                {/* Role */}
                 <td className="whitespace-nowrap px-4 py-3.5">
-                  <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold border ${
-                    userItem.role === 'admin' || userItem.role === 'superadmin' || userItem.role === 'super_admin' || userItem.isAdmin
-                      ? "bg-purple-50 text-purple-800 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-900"
-                      : "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-900"
-                  }`}>
+                  <span
+                    className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-bold border ${
+                      userItem.role === "superadmin" || userItem.role === "super_admin"
+                        ? "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-900"
+                        : userItem.role === "admin" || userItem.isAdmin
+                          ? "bg-purple-50 text-purple-800 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-900"
+                          : "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                    }`}
+                  >
                     {userItem.role || (userItem.isAdmin ? "admin" : "user")}
                   </span>
                 </td>
+
+                {/* Status */}
                 <td className="whitespace-nowrap px-4 py-3.5">
                   {isBlocked ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700 dark:bg-red-950/60 dark:text-red-300 border border-red-200 dark:border-red-900">
+                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700 dark:bg-red-950/60 dark:text-red-300 border border-red-200 dark:border-red-900">
+                      <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
                       Blocked
                     </span>
-                  ) : userItem.isAdmin ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-900">
-                      Admin
+                  ) : activeToday ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Active
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900">
-                      Active
+                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                      <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+                      Normal
                     </span>
                   )}
                 </td>
-                <td className="whitespace-nowrap px-4 py-3.5">
-                  <div className="flex items-center gap-2">
+
+                {/* Actions */}
+                <td className="whitespace-nowrap px-4 py-3.5 text-right">
+                  <div className="inline-flex items-center justify-end gap-1.5">
                     {isSuper && (
                       <button
                         type="button"
                         onClick={() => onToggleAdmin(userItem)}
                         disabled={adminActionUid === userItem.uid}
-                        className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition disabled:opacity-50 ${
+                        title={userItem.isAdmin ? "Depromote to regular user" : "Promote to admin"}
+                        className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs font-bold transition disabled:opacity-50 ${
                           userItem.isAdmin
                             ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200"
-                            : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                            : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                         }`}
                       >
                         {adminActionUid === userItem.uid ? (
@@ -939,7 +1053,7 @@ function UserTable({
                     <button
                       type="button"
                       onClick={() => onToggleBlock(userItem.uid, !userItem.isBlocked)}
-                      className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-white transition ${
+                      className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white transition ${
                         userItem.isBlocked ? "bg-emerald-600 hover:bg-emerald-700" : "bg-amber-600 hover:bg-amber-700"
                       }`}
                     >
@@ -949,7 +1063,8 @@ function UserTable({
                       type="button"
                       onClick={() => onDelete(userItem.uid)}
                       disabled={deletingUid === userItem.uid}
-                      className="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-50 dark:border-red-900/60 dark:bg-slate-950 dark:text-red-400 dark:hover:bg-red-950/40"
+                      title="Delete account permanently"
+                      className="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-white px-2.5 py-1.5 text-xs font-bold text-red-600 transition hover:bg-red-50 disabled:opacity-50 dark:border-red-900/60 dark:bg-slate-900 dark:text-red-400 dark:hover:bg-red-950/40"
                     >
                       {deletingUid === userItem.uid ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                       <span>Delete</span>
@@ -969,6 +1084,9 @@ function UserTable({
 function UsersSection({ isSuper }) {
   const [users, setUsers] = useState([]);
   const [total, setTotal] = useState(0);
+  const [activeToday, setActiveToday] = useState(0);
+  const [totalAdmins, setTotalAdmins] = useState(0);
+  const [totalBlocked, setTotalBlocked] = useState(0);
   const [filteredTotal, setFilteredTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
@@ -977,6 +1095,7 @@ function UsersSection({ isSuper }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [batchFilter, setBatchFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [deletingUid, setDeletingUid] = useState("");
   const [isUpdatingUsers, setIsUpdatingUsers] = useState(false);
@@ -1041,9 +1160,13 @@ function UsersSection({ isSuper }) {
         limit: pageSize,
         search: debouncedSearch,
         batch: batchFilter,
+        status: statusFilter,
       });
       setUsers(result.users || []);
       setTotal(result.total || 0);
+      setActiveToday(result.activeToday || 0);
+      setTotalAdmins(result.totalAdmins || 0);
+      setTotalBlocked(result.totalBlocked || 0);
       setFilteredTotal(result.filteredTotal || 0);
       setTotalPages(result.totalPages || 1);
       setBatchCounts(result.batchCounts || {});
@@ -1053,7 +1176,7 @@ function UsersSection({ isSuper }) {
     } finally {
       setIsLoadingUsers(false);
     }
-  }, [page, pageSize, debouncedSearch, batchFilter]);
+  }, [page, pageSize, debouncedSearch, batchFilter, statusFilter]);
 
   useEffect(() => {
     loadUsers();
@@ -1192,310 +1315,523 @@ function UsersSection({ isSuper }) {
   const allowedBatches = ["2026-2030", "2025-2029", "2024-2028", "2023-2027", "2022-2026", "others"];
 
   return (
-    <section className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-blue-900 dark:bg-slate-950">
-      {/* Section header */}
-      <div className="flex flex-col gap-3 border-b border-gray-100 p-4 dark:border-blue-900 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100">Users</h2>
-            <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-              {total.toLocaleString()} total
-            </span>
+    <div className="space-y-6">
+      {/* Top 4 KPI Metrics Overview */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+        {/* Total Users */}
+        <button
+          type="button"
+          onClick={() => {
+            setStatusFilter("all");
+            setPage(1);
+          }}
+          className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 ${
+            statusFilter === "all"
+              ? "border-blue-500 bg-blue-50/50 shadow-xs ring-2 ring-blue-500/20 dark:border-blue-500 dark:bg-blue-950/30"
+              : "border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-xs dark:border-slate-800 dark:bg-slate-900/90 dark:hover:border-slate-700"
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Users</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/80 dark:text-blue-400">
+              <Users className="h-4 w-4" />
+            </div>
           </div>
-          <p className="mt-0.5 text-sm text-gray-500 dark:text-slate-400">
-            Search across all user accounts and manage permissions.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={onUpdateUsers}
-            disabled={isUpdatingUsers}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60 sm:flex-none"
-          >
-            {isUpdatingUsers ? <Loader className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-            <span>{isUpdatingUsers ? "Syncing..." : "Sync users"}</span>
-          </button>
-          <button
-            type="button"
-            onClick={loadUsers}
-            disabled={isLoadingUsers}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60 sm:flex-none"
-          >
-            {isLoadingUsers ? <Loader className="h-4 w-4 animate-spin" /> : <Users className="h-4 w-4" />}
-            <span>{isLoadingUsers ? "Loading..." : "Refresh"}</span>
-          </button>
-        </div>
+          <div className="mt-3">
+            <div className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              {total.toLocaleString()}
+            </div>
+            <p className="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500">All registered accounts</p>
+          </div>
+        </button>
+
+        {/* Active Today - PRIMARY FOCUS */}
+        <button
+          type="button"
+          onClick={() => {
+            setStatusFilter(statusFilter === "active_today" ? "all" : "active_today");
+            setPage(1);
+          }}
+          className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 ${
+            statusFilter === "active_today"
+              ? "border-emerald-500 bg-emerald-50/50 shadow-xs ring-2 ring-emerald-500/20 dark:border-emerald-500 dark:bg-emerald-950/30"
+              : "border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-xs dark:border-slate-800 dark:bg-slate-900/90 dark:hover:border-slate-700"
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Used Site Today</span>
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+              </span>
+            </div>
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/80 dark:text-emerald-400">
+              <Zap className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-black tracking-tight text-emerald-600 dark:text-emerald-400">
+                {activeToday.toLocaleString()}
+              </span>
+              {total > 0 && (
+                <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100/70 dark:bg-emerald-950 px-1.5 py-0.5 rounded-md">
+                  {Math.round((activeToday / total) * 100)}%
+                </span>
+              )}
+            </div>
+            <p className="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500">Active today in system</p>
+          </div>
+        </button>
+
+        {/* Administrators */}
+        <button
+          type="button"
+          onClick={() => {
+            setStatusFilter(statusFilter === "admins" ? "all" : "admins");
+            setPage(1);
+          }}
+          className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 ${
+            statusFilter === "admins"
+              ? "border-purple-500 bg-purple-50/50 shadow-xs ring-2 ring-purple-500/20 dark:border-purple-500 dark:bg-purple-950/30"
+              : "border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-xs dark:border-slate-800 dark:bg-slate-900/90 dark:hover:border-slate-700"
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Admins</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/80 dark:text-purple-400">
+              <ShieldCheck className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              {totalAdmins.toLocaleString()}
+            </div>
+            <p className="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500">Elevated privileges</p>
+          </div>
+        </button>
+
+        {/* Blocked Accounts */}
+        <button
+          type="button"
+          onClick={() => {
+            setStatusFilter(statusFilter === "blocked" ? "all" : "blocked");
+            setPage(1);
+          }}
+          className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 ${
+            statusFilter === "blocked"
+              ? "border-red-500 bg-red-50/50 shadow-xs ring-2 ring-red-500/20 dark:border-red-500 dark:bg-red-950/30"
+              : "border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-xs dark:border-slate-800 dark:bg-slate-900/90 dark:hover:border-slate-700"
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Blocked</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-red-50 text-red-600 dark:bg-red-950/80 dark:text-red-400">
+              <ShieldAlert className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              {totalBlocked.toLocaleString()}
+            </div>
+            <p className="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500">Access restricted</p>
+          </div>
+        </button>
       </div>
 
-      <div className="p-4 sm:p-6">
-        {banner.message && (
-          <div className="mb-4">
-            <Banner banner={banner} onDismiss={() => setBanner({ type: "", message: "" })} />
-          </div>
-        )}
-
-        <ConfirmModal
-          open={Boolean(confirmation)}
-          title={
-            confirmation?.type === "delete"
-              ? "Delete this user?"
-              : confirmation?.type === "batchDelete"
-                ? `Delete ${confirmation?.count} selected user${confirmation?.count === 1 ? "" : "s"}?`
-                : confirmation?.type === "block"
-                  ? "Block this user?"
-                  : confirmation?.isAdmin
-                    ? "Depromote this user?"
-                    : "Promote this user?"
-          }
-          description={
-            confirmation?.type === "delete"
-              ? "This permanently removes the user from the database and cannot be undone."
-              : confirmation?.type === "batchDelete"
-                ? `This will permanently delete all ${confirmation?.count} selected user accounts from the database. This action cannot be undone.`
-                : confirmation?.type === "block"
-                  ? "The user will be blocked from signing in and will see the support contact message."
-                  : confirmation?.isAdmin
-                    ? `This will remove admin access from ${confirmation?.label || "this user"}.`
-                    : `This will add ${confirmation?.label || "this user"} to the admins table and grant admin access.`
-          }
-          confirmLabel={
-            confirmation?.type === "delete"
-              ? "Delete user"
-              : confirmation?.type === "batchDelete"
-                ? `Delete ${confirmation?.count} users`
-                : confirmation?.type === "block"
-                  ? "Block user"
-                  : confirmation?.isAdmin
-                    ? "Depromote user"
-                    : "Promote user"
-          }
-          cancelLabel="Cancel"
-          tone={confirmation?.type === "admin" && !confirmation?.isAdmin ? "success" : "danger"}
-          busy={isConfirming || Boolean(deletingUid) || Boolean(adminActionUid)}
-          onConfirm={confirmation?.type === "delete" || confirmation?.type === "batchDelete" ? onConfirmDelete : confirmation?.type === "block" ? onConfirmBlock : onConfirmAdminToggle}
-          onCancel={closeConfirmation}
-        />
-
-        {/* Batch badges */}
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => { setBatchFilter(""); setPage(1); }}
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-              batchFilter === "" ? "bg-blue-600 text-white shadow-sm" : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
-            }`}
-          >
-            <span>All</span>
-            <span className={`rounded-full px-1.5 py-0.5 text-[11px] font-bold ${batchFilter === "" ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700 dark:bg-slate-800 dark:text-slate-300"}`}>
-              {total.toLocaleString()}
-            </span>
-          </button>
-          {allowedBatches.map((label) => {
-            const count = batchCounts[label] || 0;
-            return (
-              <button
-                key={label}
-                type="button"
-                onClick={() => { setBatchFilter(label); setPage(1); }}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-                  batchFilter === label ? "bg-blue-600 text-white shadow-sm" : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
-                }`}
-              >
-                <span>{label}</span>
-                <span className={`rounded-full px-1.5 py-0.5 text-[11px] font-bold ${batchFilter === label ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700 dark:bg-slate-800 dark:text-slate-300"}`}>
-                  {count.toLocaleString()}
-                </span>
-              </button>
-            );
-          })}
-          {batchFilter && (
-            <button type="button" onClick={() => { setBatchFilter(""); setPage(1); }} className="ml-auto text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400">
-              Clear filter
-            </button>
-          )}
-        </div>
-
-        {/* Bulk Selection Banner */}
-        {selectedUids.size > 0 && (
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900/80 dark:bg-blue-950/50">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-sm font-bold text-blue-900 dark:text-blue-100">
-                {selectedUids.size} user{selectedUids.size === 1 ? "" : "s"} selected
+      {/* Main Container Card */}
+      <section className="rounded-2xl border border-slate-200/80 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-950">
+        {/* Section Header */}
+        <div className="flex flex-col gap-4 border-b border-slate-100 p-5 dark:border-slate-800/80 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">User Accounts</h2>
+              <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-blue-700 dark:bg-blue-950 dark:text-blue-300 border border-blue-200/60 dark:border-blue-900">
+                {total.toLocaleString()} users
               </span>
-              <button
-                type="button"
-                onClick={onToggleSelectAllOnPage}
-                className="text-xs font-semibold text-blue-700 hover:underline dark:text-blue-300"
-              >
-                {users.length > 0 && users.every((u) => selectedUids.has(u.uid)) ? "Deselect all on page" : "Select all on page"}
-              </button>
-              {users.some((u) => u.email && !u.email.toLowerCase().endsWith("@bitsathy.ac.in")) && (
-                <button
-                  type="button"
-                  onClick={selectNonBitsathyUsers}
-                  className="rounded-lg bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800 hover:bg-amber-200 dark:bg-amber-950/60 dark:text-amber-300"
-                >
-                  Select non-@bitsathy users
-                </button>
+              {activeToday > 0 && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-900">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  {activeToday.toLocaleString()} today
+                </span>
               )}
-              <button
-                type="button"
-                onClick={clearSelection}
-                className="text-xs font-medium text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200"
-              >
-                Clear selection
-              </button>
             </div>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Manage student & faculty authentication records, privilege levels, and security blocks.
+            </p>
+          </div>
 
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={onBatchDeleteClick}
-              className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-red-700"
+              onClick={onUpdateUsers}
+              disabled={isUpdatingUsers}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 disabled:opacity-60 sm:flex-none"
             >
-              <Trash2 className="h-4 w-4" />
-              <span>Delete selected ({selectedUids.size})</span>
+              {isUpdatingUsers ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+              <span>{isUpdatingUsers ? "Syncing..." : "Sync Users"}</span>
+            </button>
+            <button
+              type="button"
+              onClick={loadUsers}
+              disabled={isLoadingUsers}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-xs transition hover:bg-slate-50 disabled:opacity-60 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 sm:flex-none"
+            >
+              {isLoadingUsers ? <Loader className="h-3.5 w-3.5 animate-spin text-blue-600" /> : <Users className="h-3.5 w-3.5" />}
+              <span>{isLoadingUsers ? "Refreshing..." : "Refresh"}</span>
             </button>
           </div>
-        )}
-
-        {/* Search Bar */}
-        <div className="mb-4 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50/70 px-3.5 py-2.5 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 dark:border-blue-900 dark:bg-slate-900 dark:focus-within:bg-slate-950">
-          <Search className="h-4 w-4 shrink-0 text-gray-400 dark:text-slate-500" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search all users by email, name, or UID..."
-            className="w-full bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400 dark:text-slate-100 dark:placeholder:text-slate-500"
-          />
-          {searchQuery && (
-            <button type="button" onClick={() => setSearchQuery("")} className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300">
-              <X className="h-4 w-4" />
-            </button>
-          )}
         </div>
 
-        {/* Table Content */}
-        {isLoadingUsers ? (
-          <div className="flex h-48 items-center justify-center">
-            <Loader className="h-6 w-6 animate-spin text-blue-600" />
+        <div className="p-4 sm:p-6 space-y-4">
+          {banner.message && (
+            <Banner banner={banner} onDismiss={() => setBanner({ type: "", message: "" })} />
+          )}
+
+          <ConfirmModal
+            open={Boolean(confirmation)}
+            title={
+              confirmation?.type === "delete"
+                ? "Delete this user?"
+                : confirmation?.type === "batchDelete"
+                  ? `Delete ${confirmation?.count} selected user${confirmation?.count === 1 ? "" : "s"}?`
+                  : confirmation?.type === "block"
+                    ? "Block this user?"
+                    : confirmation?.isAdmin
+                      ? "Depromote this user?"
+                      : "Promote this user?"
+            }
+            description={
+              confirmation?.type === "delete"
+                ? "This permanently removes the user from the database and cannot be undone."
+                : confirmation?.type === "batchDelete"
+                  ? `This will permanently delete all ${confirmation?.count} selected user accounts from the database. This action cannot be undone.`
+                  : confirmation?.type === "block"
+                    ? "The user will be blocked from signing in and will see the support contact message."
+                    : confirmation?.isAdmin
+                      ? `This will remove admin access from ${confirmation?.label || "this user"}.`
+                      : `This will add ${confirmation?.label || "this user"} to the admins table and grant admin access.`
+            }
+            confirmLabel={
+              confirmation?.type === "delete"
+                ? "Delete user"
+                : confirmation?.type === "batchDelete"
+                  ? `Delete ${confirmation?.count} users`
+                  : confirmation?.type === "block"
+                    ? "Block user"
+                    : confirmation?.isAdmin
+                      ? "Depromote user"
+                      : "Promote user"
+            }
+            cancelLabel="Cancel"
+            tone={confirmation?.type === "admin" && !confirmation?.isAdmin ? "success" : "danger"}
+            busy={isConfirming || Boolean(deletingUid) || Boolean(adminActionUid)}
+            onConfirm={
+              confirmation?.type === "delete" || confirmation?.type === "batchDelete"
+                ? onConfirmDelete
+                : confirmation?.type === "block"
+                  ? onConfirmBlock
+                  : onConfirmAdminToggle
+            }
+            onCancel={closeConfirmation}
+          />
+
+          {/* Quick Status Filter Tabs */}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4 dark:border-slate-800/80">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {[
+                { key: "all", label: "All Users", count: total },
+                { key: "active_today", label: "Active Today", count: activeToday, hasDot: true },
+                { key: "admins", label: "Admins", count: totalAdmins },
+                { key: "blocked", label: "Blocked", count: totalBlocked },
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => {
+                    setStatusFilter(tab.key);
+                    setPage(1);
+                  }}
+                  className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
+                    statusFilter === tab.key
+                      ? "bg-slate-900 text-white shadow-xs dark:bg-blue-600 dark:text-white"
+                      : "bg-slate-100/80 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                  }`}
+                >
+                  {tab.hasDot && (
+                    <span className={`h-1.5 w-1.5 rounded-full ${statusFilter === tab.key ? "bg-emerald-300" : "bg-emerald-500"}`} />
+                  )}
+                  <span>{tab.label}</span>
+                  <span
+                    className={`rounded-md px-1.5 py-0.5 text-[10px] font-extrabold ${
+                      statusFilter === tab.key
+                        ? "bg-slate-800 text-slate-200 dark:bg-blue-700 dark:text-white"
+                        : "bg-slate-200/80 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                    }`}
+                  >
+                    {tab.count.toLocaleString()}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {(batchFilter || statusFilter !== "all" || debouncedSearch) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setBatchFilter("");
+                  setStatusFilter("all");
+                  setSearchQuery("");
+                  setPage(1);
+                }}
+                className="text-xs font-bold text-blue-600 hover:underline dark:text-blue-400"
+              >
+                Reset filters
+              </button>
+            )}
           </div>
-        ) : users.length === 0 ? (
-          <div className="flex h-36 flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 p-6 dark:border-slate-800">
-            <p className="text-sm font-semibold text-gray-600 dark:text-slate-300">No users found</p>
-            <p className="mt-1 text-xs text-gray-400 dark:text-slate-500">Try adjusting your search query or batch filter.</p>
+
+          {/* Batch Badges & Search Row */}
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            {/* Batch Filter Pills */}
+            <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1">
+              <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 mr-1">Batch:</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setBatchFilter("");
+                  setPage(1);
+                }}
+                className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
+                  batchFilter === ""
+                    ? "bg-blue-600 text-white shadow-xs"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
+                }`}
+              >
+                <span>All</span>
+              </button>
+              {allowedBatches.map((label) => {
+                const count = batchCounts[label] || 0;
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => {
+                      setBatchFilter(batchFilter === label ? "" : label);
+                      setPage(1);
+                    }}
+                    className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
+                      batchFilter === label
+                        ? "bg-blue-600 text-white shadow-xs"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
+                    }`}
+                  >
+                    <span>{label}</span>
+                    <span
+                      className={`rounded-sm px-1 py-0.2 text-[10px] font-bold ${
+                        batchFilter === label
+                          ? "bg-blue-700 text-white"
+                          : "bg-slate-200/80 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+                      }`}
+                    >
+                      {count.toLocaleString()}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Search Bar */}
+            <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 dark:border-slate-800 dark:bg-slate-900 dark:focus-within:bg-slate-950 lg:w-80">
+              <Search className="h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by name, email, UID..."
+                className="w-full bg-transparent text-xs text-slate-800 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
           </div>
-        ) : (
-          <>
-            {/* Mobile: cards */}
-            <div className="space-y-2.5 sm:hidden">
-              {users.map((u, i) => (
-                <UserCard
-                  key={u.uid}
-                  userItem={u}
-                  index={i}
+
+          {/* Bulk Selection Banner */}
+          {selectedUids.size > 0 && (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900/80 dark:bg-blue-950/50">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-xs font-bold text-blue-900 dark:text-blue-100">
+                  {selectedUids.size} user{selectedUids.size === 1 ? "" : "s"} selected
+                </span>
+                <button
+                  type="button"
+                  onClick={onToggleSelectAllOnPage}
+                  className="text-xs font-bold text-blue-700 hover:underline dark:text-blue-300"
+                >
+                  {users.length > 0 && users.every((u) => selectedUids.has(u.uid)) ? "Deselect page" : "Select all on page"}
+                </button>
+                {users.some((u) => u.email && !u.email.toLowerCase().endsWith("@bitsathy.ac.in")) && (
+                  <button
+                    type="button"
+                    onClick={selectNonBitsathyUsers}
+                    className="rounded-lg bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800 hover:bg-amber-200 dark:bg-amber-950/60 dark:text-amber-300"
+                  >
+                    Select non-@bitsathy
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={clearSelection}
+                  className="text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                >
+                  Clear selection
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={onBatchDeleteClick}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition hover:bg-red-700"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                <span>Delete ({selectedUids.size})</span>
+              </button>
+            </div>
+          )}
+
+          {/* Table Content */}
+          {isLoadingUsers ? (
+            <div className="flex h-56 flex-col items-center justify-center gap-3 rounded-2xl border border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/30">
+              <Loader className="h-7 w-7 animate-spin text-blue-600" />
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Loading user accounts...</p>
+            </div>
+          ) : users.length === 0 ? (
+            <div className="flex h-48 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 p-6 text-center dark:border-slate-800">
+              <Users className="h-8 w-8 text-slate-300 dark:text-slate-700 mb-2" />
+              <p className="text-sm font-bold text-slate-700 dark:text-slate-300">No users found</p>
+              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                Try adjusting your search query, status tab, or batch filter.
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Mobile: cards */}
+              <div className="space-y-2.5 sm:hidden">
+                {users.map((u, i) => (
+                  <UserCard
+                    key={u.uid}
+                    userItem={u}
+                    index={i}
+                    onDelete={onDeleteUser}
+                    onToggleBlock={onToggleBlock}
+                    deletingUid={deletingUid}
+                    isSuper={isSuper}
+                    onToggleAdmin={onToggleAdmin}
+                    adminActionUid={adminActionUid}
+                    isSelected={selectedUids.has(u.uid)}
+                    onToggleSelect={onToggleSelectUser}
+                  />
+                ))}
+              </div>
+
+              {/* Desktop: table */}
+              <div className="hidden sm:block">
+                <UserTable
+                  users={users}
                   onDelete={onDeleteUser}
                   onToggleBlock={onToggleBlock}
                   deletingUid={deletingUid}
                   isSuper={isSuper}
                   onToggleAdmin={onToggleAdmin}
                   adminActionUid={adminActionUid}
-                  isSelected={selectedUids.has(u.uid)}
-                  onToggleSelect={onToggleSelectUser}
+                  page={page}
+                  pageSize={pageSize}
+                  selectedUids={selectedUids}
+                  onToggleSelectUser={onToggleSelectUser}
+                  onToggleSelectAll={onToggleSelectAllOnPage}
                 />
-              ))}
-            </div>
+              </div>
 
-            {/* Desktop: table */}
-            <div className="hidden sm:block">
-              <UserTable
-                users={users}
-                onDelete={onDeleteUser}
-                onToggleBlock={onToggleBlock}
-                deletingUid={deletingUid}
-                isSuper={isSuper}
-                onToggleAdmin={onToggleAdmin}
-                adminActionUid={adminActionUid}
-                page={page}
-                pageSize={pageSize}
-                selectedUids={selectedUids}
-                onToggleSelectUser={onToggleSelectUser}
-                onToggleSelectAll={onToggleSelectAllOnPage}
-              />
-            </div>
+              {/* Pagination Controls Footer */}
+              <div className="flex flex-col gap-3 border-t border-slate-100 pt-4 dark:border-slate-800/80 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                  <span>
+                    Showing{" "}
+                    <span className="font-bold text-slate-800 dark:text-slate-200">
+                      {filteredTotal === 0 ? 0 : (page - 1) * pageSize + 1}
+                    </span>{" "}
+                    to{" "}
+                    <span className="font-bold text-slate-800 dark:text-slate-200">
+                      {Math.min(page * pageSize, filteredTotal)}
+                    </span>{" "}
+                    of{" "}
+                    <span className="font-bold text-slate-800 dark:text-slate-200">
+                      {filteredTotal.toLocaleString()}
+                    </span>{" "}
+                    users {batchFilter || statusFilter !== "all" || debouncedSearch ? `(filtered from ${total.toLocaleString()})` : ""}
+                  </span>
 
-            {/* Pagination Controls Footer */}
-            <div className="mt-4 flex flex-col gap-3 border-t border-gray-100 pt-4 dark:border-blue-900/50 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-slate-400">
-                <span>
-                  Showing{" "}
-                  <span className="font-semibold text-gray-800 dark:text-slate-200">
-                    {filteredTotal === 0 ? 0 : (page - 1) * pageSize + 1}
-                  </span>{" "}
-                  to{" "}
-                  <span className="font-semibold text-gray-800 dark:text-slate-200">
-                    {Math.min(page * pageSize, filteredTotal)}
-                  </span>{" "}
-                  of{" "}
-                  <span className="font-semibold text-gray-800 dark:text-slate-200">
-                    {filteredTotal.toLocaleString()}
-                  </span>{" "}
-                  users {batchFilter || debouncedSearch ? `(filtered from ${total.toLocaleString()})` : ""}
-                </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-slate-300 dark:text-slate-700">|</span>
+                    <span>Per page:</span>
+                    <select
+                      value={pageSize}
+                      onChange={(e) => {
+                        setPageSize(Number(e.target.value));
+                        setPage(1);
+                      }}
+                      className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-bold text-slate-700 outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                    >
+                      <option value={10}>10</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
+                </div>
 
+                {/* Page Navigation Buttons */}
                 <div className="flex items-center gap-1.5">
-                  <span className="text-gray-400">|</span>
-                  <span>Per page:</span>
-                  <select
-                    value={pageSize}
-                    onChange={(e) => {
-                      setPageSize(Number(e.target.value));
-                      setPage(1);
-                    }}
-                    className="rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-semibold text-gray-700 outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                  <button
+                    type="button"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page <= 1 || isLoadingUsers}
+                    className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
                   >
-                    <option value={10}>10</option>
-                    <option value={25}>25</option>
-                    <option value={50}>50</option>
-                    <option value={100}>100</option>
-                  </select>
+                    <ChevronLeft className="h-3.5 w-3.5" />
+                    <span>Previous</span>
+                  </button>
+
+                  <div className="flex items-center gap-1 px-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                    <span>Page {page}</span>
+                    <span className="font-normal text-slate-400">of</span>
+                    <span>{totalPages}</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page >= totalPages || isLoadingUsers}
+                    className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                  >
+                    <span>Next</span>
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
                 </div>
               </div>
-
-              {/* Page buttons */}
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page <= 1 || isLoadingUsers}
-                  className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-                >
-                  <ChevronLeft className="h-3.5 w-3.5" />
-                  <span>Previous</span>
-                </button>
-
-                <div className="flex items-center gap-1 px-2 text-xs font-bold text-gray-700 dark:text-slate-300">
-                  <span>Page {page}</span>
-                  <span className="font-normal text-gray-400">of</span>
-                  <span>{totalPages}</span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page >= totalPages || isLoadingUsers}
-                  className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-40 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-                >
-                  <span>Next</span>
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    </section>
+            </>
+          )}
+        </div>
+      </section>
+    </div>
   );
 }
 
