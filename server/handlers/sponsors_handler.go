@@ -164,7 +164,7 @@ func (h *SponsorsHandler) GetSponsorsAdmin(c *gin.Context) {
 					}
 
 					sort.Slice(sponsors, func(i, j int) bool {
-						return sponsors[i].Amount > sponsors[j].Amount
+						return sponsors[i].CreatedAt > sponsors[j].CreatedAt
 					})
 				}
 			}
