@@ -10,9 +10,18 @@ const ONE_MONTH_DAYS = 30; // 1 month cookie duration
 export const getStoredToken = () => {
   for (const name of COOKIE_NAMES) {
     const val = getCookie(name);
-    if (val) return val;
+    if (val && isJwtValid(val)) return val;
   }
-  return localStorage.getItem(TOKEN_KEY) || localStorage.getItem("jwt") || localStorage.getItem("token") || "";
+  const localVal =
+    localStorage.getItem(TOKEN_KEY) ||
+    localStorage.getItem("jwt") ||
+    localStorage.getItem("token") ||
+    localStorage.getItem("access_token") ||
+    "";
+  if (localVal && isJwtValid(localVal)) {
+    return localVal;
+  }
+  return localVal && localVal.split(".").length !== 3 ? localVal : "";
 };
 
 export const setStoredToken = (token) => {
@@ -64,6 +73,7 @@ export const getCurrentUser = () => {
     email: claims.email,
     displayName: claims.name || claims.email.split("@")[0],
     photoURL: claims.picture || null,
+    role: claims.role || "user",
     getIdToken: async () => token,
   };
 };
@@ -122,18 +132,24 @@ export const signInWithGoogle = async () => {
           throw new Error("Only @bitsathy.ac.in email accounts are allowed.");
         }
 
+        // Store initial credential and exchange for 30-day backend application JWT
         setStoredToken(token);
-        await postGoogleAuth(token);
+        const backendAuth = await postGoogleAuth(token);
+        const finalToken = backendAuth?.token || token;
+        setStoredToken(finalToken);
+
         clearGuestSession();
         window.dispatchEvent(new Event("auth_state_changed"));
 
         resolved = true;
+        const finalClaims = parseJwt(finalToken) || claims;
         const userObj = {
-          uid: claims?.sub || claims?.email,
-          email: claims?.email,
-          displayName: claims?.name,
-          photoURL: claims?.picture,
-          getIdToken: async () => token,
+          uid: finalClaims?.sub || claims?.sub || claims?.email,
+          email: finalClaims?.email || claims?.email,
+          displayName: backendAuth?.user?.display_name || finalClaims?.name || claims?.name,
+          photoURL: backendAuth?.user?.photo_url || finalClaims?.picture || claims?.picture,
+          role: backendAuth?.user?.role || finalClaims?.role || "user",
+          getIdToken: async () => finalToken,
         };
         resolve({ user: userObj });
       } catch (err) {
@@ -162,11 +178,25 @@ export const signInWithGoogle = async () => {
           if (tokenResponse.access_token) {
             const token = tokenResponse.access_token;
             setStoredToken(token);
-            await postGoogleAuth(token);
+            const backendAuth = await postGoogleAuth(token);
+            const finalToken = backendAuth?.token || token;
+            setStoredToken(finalToken);
+
             clearGuestSession();
             window.dispatchEvent(new Event("auth_state_changed"));
             resolved = true;
-            resolve({ user: { accessToken: token, getIdToken: async () => token } });
+            const finalClaims = parseJwt(finalToken);
+            resolve({
+              user: {
+                uid: finalClaims?.sub || backendAuth?.user?.google_id || backendAuth?.user?.email,
+                email: backendAuth?.user?.email || finalClaims?.email,
+                displayName: backendAuth?.user?.display_name || finalClaims?.name,
+                photoURL: backendAuth?.user?.photo_url || finalClaims?.picture,
+                role: backendAuth?.user?.role || finalClaims?.role || "user",
+                accessToken: finalToken,
+                getIdToken: async () => finalToken,
+              },
+            });
           }
         },
       });

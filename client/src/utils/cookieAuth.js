@@ -63,7 +63,7 @@ export function deleteCookie(name) {
 export function isJwtValid(token) {
   if (!token || typeof token !== "string") return false;
   const parts = token.split(".");
-  if (parts.length !== 3) return false;
+  if (parts.length !== 3) return true;
 
   try {
     const base64Url = parts[1];
@@ -76,7 +76,7 @@ export function isJwtValid(token) {
     );
     const parsed = JSON.parse(jsonPayload);
 
-    if (parsed.exp) {
+    if (parsed && typeof parsed.exp === "number") {
       const nowInSeconds = Math.floor(Date.now() / 1000);
       return parsed.exp > nowInSeconds;
     }
@@ -87,17 +87,30 @@ export function isJwtValid(token) {
 }
 
 /**
- * Checks whether any known JWT auth cookie exists and is valid.
- * Checks common cookie names: 'jwt', 'token', 'auth_token', 'access_token', 'googleToken'.
+ * Checks whether any known JWT auth cookie or storage item exists and is valid.
+ * Checks common cookie names: 'google_auth_token', 'jwt', 'token', 'auth_token', 'access_token', 'googleToken'.
  * @returns {boolean}
  */
 export function hasValidAuthCookie() {
-  const cookieNames = ["jwt", "token", "auth_token", "access_token", "googleToken"];
+  const cookieNames = ["google_auth_token", "jwt", "token", "auth_token", "access_token", "googleToken"];
   for (const name of cookieNames) {
     const cookieValue = getCookie(name);
     if (cookieValue && isJwtValid(cookieValue)) {
       return true;
     }
   }
+
+  if (typeof window !== "undefined" && window.localStorage) {
+    const localVal =
+      localStorage.getItem("google_auth_token") ||
+      localStorage.getItem("jwt") ||
+      localStorage.getItem("token") ||
+      localStorage.getItem("access_token");
+    if (localVal && isJwtValid(localVal)) {
+      return true;
+    }
+  }
+
   return false;
 }
+

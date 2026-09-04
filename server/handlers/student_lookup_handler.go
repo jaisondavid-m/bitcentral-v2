@@ -419,13 +419,26 @@ func (h *StudentLookupHandler) GoogleLogin(c *gin.Context) {
 		}
 	}
 
+	// Generate 30-day persistent application session JWT
+	appClaims := &config.GoogleUserClaims{
+		UID:     googleID,
+		Email:   email,
+		Name:    displayName,
+		Picture: photoURL,
+		Role:    userRole,
+	}
+	appToken, err := config.GenerateAppJWT(appClaims, 30*24*time.Hour)
+	if err != nil || appToken == "" {
+		appToken = tokenStr
+	}
+
 	// Set 30-day authentication cookies
-	setAuthCookies(c, tokenStr)
+	setAuthCookies(c, appToken)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Authentication successful",
-		"token":   tokenStr,
+		"token":   appToken,
 		"user": gin.H{
 			"google_id":    googleID,
 			"email":        email,
