@@ -1,13 +1,7 @@
 import api, { getAuthenticatedHeaders } from "./axios.js";
-import { auth } from "@/config/firebase.js";
 
 async function getAdminHeaders() {
-  const currentUser = auth.currentUser;
-  if (!currentUser) {
-    throw new Error("You must be signed in as admin");
-  }
-  const idToken = await currentUser.getIdToken();
-  return { Authorization: `Bearer ${idToken}` };
+  return getAuthenticatedHeaders();
 }
 
 // User Feedback Chat Endpoints

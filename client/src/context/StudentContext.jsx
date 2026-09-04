@@ -1,9 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { auth } from "@/config/firebase.js";
-import { onAuthStateChanged } from "firebase/auth";
+import { auth, logout } from "@/config/auth.js";
 import { getMeProfile } from "@/api/axios.js";
-import { logout } from "@/config/firebase.js";
 import {
   clearGuestSession,
   createGuestStudent,
@@ -133,6 +131,12 @@ export const StudentContext = ({ children }) => {
       if (backendProfile?.email) {
         setProfile(backendProfile);
         setStudent((prev) => toProfileStudent(backendProfile, decoded || prev));
+        const userRole = (backendProfile.role || "").toLowerCase().trim();
+        setUser((prev) => ({
+          ...prev,
+          role: userRole || "user",
+          isAdmin: userRole === "admin" || userRole === "superadmin" || userRole === "super_admin",
+        }));
       } else {
         setProfile(null);
       }
@@ -156,36 +160,7 @@ export const StudentContext = ({ children }) => {
   useEffect(() => {
     let cancelled = false;
 
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      const guestSession = readGuestSession();
-
-      if (guestSession) {
-        setUser(createGuestUser(guestSession));
-        setStudent(createGuestStudent());
-        setProfile(null);
-        hydratedEmailRef.current = "";
-        setLoading(false);
-        return;
-      }
-
-      setUser(currentUser);
-
-      if (currentUser?.email) {
-        setLoading(true);
-        hydrateAuthenticatedUser(currentUser).finally(() => {
-          if (!cancelled) {
-            setLoading(false);
-          }
-        });
-      } else {
-        setStudent(null);
-        setProfile(null);
-        hydratedEmailRef.current = "";
-        setLoading(false);
-      }
-    });
-
-    const unsubscribeGuest = subscribeToGuestSessionChanges(() => {
+    const checkAuthState = async () => {
       const guestSession = readGuestSession();
 
       if (guestSession) {
@@ -199,19 +174,56 @@ export const StudentContext = ({ children }) => {
 
       const currentUser = auth.currentUser;
       setUser(currentUser);
-      if (currentUser?.email) {
+
+      if (currentUser?.email || currentUser?.token) {
         setLoading(true);
-        hydrateAuthenticatedUser(currentUser).finally(() => {
+        try {
+          const backendProfile = await getMeProfile();
+          if (backendProfile?.email && !cancelled) {
+            const userRole = (backendProfile.role || "").toLowerCase().trim();
+            setUser((prev) => ({
+              ...prev,
+              uid: backendProfile.uid || prev?.uid,
+              email: backendProfile.email,
+              displayName: backendProfile.display_name || prev?.displayName,
+              photoURL: backendProfile.photo_url || prev?.photoURL,
+              role: userRole || "user",
+              isAdmin: userRole === "admin" || userRole === "superadmin" || userRole === "super_admin",
+            }));
+            setProfile(backendProfile);
+            const decoded = decodeCollegeEmail(backendProfile.email);
+            setStudent(toProfileStudent(backendProfile, decoded));
+          } else if (currentUser?.email && !cancelled) {
+            await hydrateAuthenticatedUser(currentUser);
+          }
+        } catch (err) {
+          if (currentUser?.email && !cancelled) {
+            await hydrateAuthenticatedUser(currentUser);
+          }
+        } finally {
           if (!cancelled) {
             setLoading(false);
           }
-        });
+        }
       } else {
         setStudent(null);
         setProfile(null);
         hydratedEmailRef.current = "";
         setLoading(false);
       }
+    };
+
+    checkAuthState();
+
+    const handleAuthChange = () => {
+      checkAuthState();
+    };
+
+    window.addEventListener("auth_state_changed", handleAuthChange);
+    window.addEventListener("storage", handleAuthChange);
+
+    const unsubscribeGuest = subscribeToGuestSessionChanges(() => {
+      checkAuthState();
     });
 
     const checkGuestExpiration = () => {
@@ -223,7 +235,8 @@ export const StudentContext = ({ children }) => {
 
     return () => {
       cancelled = true;
-      unsubscribe();
+      window.removeEventListener("auth_state_changed", handleAuthChange);
+      window.removeEventListener("storage", handleAuthChange);
       unsubscribeGuest();
       clearInterval(intervalId);
       window.removeEventListener("focus", checkGuestExpiration);
@@ -239,5 +252,20 @@ export const StudentContext = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+const defaultAuthContext = {
+  user: null,
+  student: null,
+  profile: null,
+  loading: false,
+  accessDeniedMessage: "",
+  setAccessDeniedMessage: () => {},
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  return context || {
+    ...defaultAuthContext,
+    user: getCurrentUser(),
+  };
+};
 export { decodeCollegeEmail };

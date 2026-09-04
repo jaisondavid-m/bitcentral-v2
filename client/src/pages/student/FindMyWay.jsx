@@ -99,7 +99,7 @@ const techStack = [
 		detail: "Cross-platform UI and fast native-like performance.",
 	},
 	{
-		name: "Firebase",
+		name: "Cloud Auth & Sync",
 		detail: "Authentication and academic calendar data.",
 	},
 	{

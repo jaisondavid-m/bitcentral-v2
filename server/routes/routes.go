@@ -157,6 +157,7 @@ func SetupRouter(
 		admin.GET("/tracker-users", trackerUserHandler.GetTrackerUsersAdmin)
 		admin.GET("/users/update", adminHandler.UpdateUsers)
 		admin.PUT("/users/:uid/block", adminHandler.UpdateUserBlockStatus)
+		admin.PUT("/users/:uid/role", adminHandler.UpdateUserRole)
 		admin.DELETE("/users/:uid", adminHandler.DeleteUser)
 		admin.POST("/users/delete-batch", adminHandler.DeleteUsersBatch)
 		// admin.GET("/qb", qbHandler.List)

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { auth } from "@/config/firebase.js";
+import { auth, getStoredToken } from "@/config/auth.js";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -19,16 +19,14 @@ export async function listQBAnswerKeys({ semester } = {}) {
 export default api;
 
 export async function getAuthenticatedHeaders() {
-  const currentUser = auth.currentUser;
+  const token = getStoredToken();
 
-  if (!currentUser) {
+  if (!token) {
     throw new Error("You must be signed in");
   }
 
-  const idToken = await currentUser.getIdToken();
-
   return {
-    Authorization: `Bearer ${idToken}`,
+    Authorization: `Bearer ${token}`,
   };
 }
 

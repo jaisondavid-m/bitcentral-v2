@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Home } from "lucide-react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/config/firebase.js";
+import { useAuth } from "@/context/StudentContext.jsx";
 
 export default function FloatingHomeButton() {
-  const [user] = useAuthState(auth);
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);

@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"net/http"
-	"os"
 	"strings"
 
 	"server/config"
@@ -12,26 +11,6 @@ import (
 
 func RequireAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		adminUID := strings.TrimSpace(os.Getenv("ADMIN_FIREBASE_UID"))
-		superAdminUID := strings.TrimSpace(os.Getenv("SUPER_ADMIN_FIREBASE_UID"))
-		if adminUID == "" && superAdminUID == "" {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"success": false,
-				"message": "Admin or Super Admin UID is not configured",
-			})
-			c.Abort()
-			return
-		}
-
-		if config.FirebaseApp == nil {
-			c.JSON(http.StatusServiceUnavailable, gin.H{
-				"success": false,
-				"message": "Firebase is not initialized",
-			})
-			c.Abort()
-			return
-		}
-
 		authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
 		token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
 		if token == "" {
@@ -43,46 +22,35 @@ func RequireAdmin() gin.HandlerFunc {
 			return
 		}
 
-		client, err := config.FirebaseAuthClient()
-		if err != nil || client == nil {
-			msg := "Failed to initialize Firebase auth"
-			if err != nil {
-				msg = "Failed to initialize Firebase auth: " + err.Error()
-			}
-			c.JSON(http.StatusInternalServerError, gin.H{
+		claims, err := config.VerifyGoogleToken(token)
+		if err != nil || claims == nil {
+			c.JSON(http.StatusUnauthorized, gin.H{
 				"success": false,
-				"message": msg,
+				"message": "Invalid authentication token",
 			})
 			c.Abort()
 			return
 		}
 
-		decodedToken, err := client.VerifyIDToken(c.Request.Context(), token)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized"})
-			c.Abort()
-			return
-		}
+		uid := claims.UID
+		email := strings.ToLower(strings.TrimSpace(claims.Email))
 
-		uid := decodedToken.UID
-		// allow if matches configured single admin
-		if adminUID != "" && uid == adminUID {
-			c.Set("actor_uid", uid)
-			c.Next()
-			return
-		}
-
-		// allow super admin
-		if superAdminUID != "" && uid == superAdminUID {
-			c.Set("actor_uid", uid)
-			c.Next()
-			return
-		}
-
-		// fallback: check admins table in DB
+		// Check role in users table
 		if config.DB != nil {
+			var role string
+			err := config.DB.QueryRow(`SELECT role FROM users WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, uid, uid, email).Scan(&role)
+			if err == nil {
+				r := strings.ToLower(strings.TrimSpace(role))
+				if r == "admin" || r == "superadmin" || r == "super_admin" {
+					c.Set("actor_uid", uid)
+					c.Next()
+					return
+				}
+			}
+
+			// Fallback: check admins table in DB
 			var count int
-			err := config.DB.QueryRow(`SELECT COUNT(*) FROM admins WHERE uid = ?`, uid).Scan(&count)
+			err = config.DB.QueryRow(`SELECT COUNT(*) FROM admins a LEFT JOIN users u ON a.uid = u.uid WHERE a.uid = ? OR LOWER(TRIM(u.email)) = ?`, uid, email).Scan(&count)
 			if err == nil && count > 0 {
 				c.Set("actor_uid", uid)
 				c.Next()
@@ -90,27 +58,13 @@ func RequireAdmin() gin.HandlerFunc {
 			}
 		}
 
-		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized admin access"})
 		c.Abort()
-		return
 	}
 }
 
 func RequireSuperAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		superAdminUID := strings.TrimSpace(os.Getenv("SUPER_ADMIN_FIREBASE_UID"))
-		if superAdminUID == "" {
-			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Super admin UID is not configured"})
-			c.Abort()
-			return
-		}
-
-		if config.FirebaseApp == nil {
-			c.JSON(http.StatusServiceUnavailable, gin.H{"success": false, "message": "Firebase is not initialized"})
-			c.Abort()
-			return
-		}
-
 		authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
 		token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
 		if token == "" {
@@ -119,25 +73,31 @@ func RequireSuperAdmin() gin.HandlerFunc {
 			return
 		}
 
-		client, err := config.FirebaseAuthClient()
-		if err != nil || client == nil {
-			msg := "Failed to initialize Firebase auth"
-			if err != nil {
-				msg = "Failed to initialize Firebase auth: " + err.Error()
-			}
-			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": msg})
-			c.Abort()
-			return
-		}
-
-		decodedToken, err := client.VerifyIDToken(c.Request.Context(), token)
-		if err != nil || decodedToken.UID != superAdminUID {
+		claims, err := config.VerifyGoogleToken(token)
+		if err != nil || claims == nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized"})
 			c.Abort()
 			return
 		}
 
-		c.Set("actor_uid", decodedToken.UID)
-		c.Next()
+		uid := claims.UID
+		email := strings.ToLower(strings.TrimSpace(claims.Email))
+
+		// Check role in users table
+		if config.DB != nil {
+			var role string
+			err := config.DB.QueryRow(`SELECT role FROM users WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, uid, uid, email).Scan(&role)
+			if err == nil {
+				r := strings.ToLower(strings.TrimSpace(role))
+				if r == "superadmin" || r == "super_admin" {
+					c.Set("actor_uid", uid)
+					c.Next()
+					return
+				}
+			}
+		}
+
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized super admin access"})
+		c.Abort()
 	}
 }

@@ -18,13 +18,12 @@ func main() {
 	}
 
 	// config.InitMySQL()
-	// config.InitFirebase()
 
 	if os.Getenv("SKIP_SERVICE_INIT") == "true" {
-		log.Println("⚠️ SKIPPING MySQL and Firebase initialization because SKIP_SERVICE_INIT=true")
+		log.Println("⚠️ SKIPPING MySQL and Google OAuth initialization because SKIP_SERVICE_INIT=true")
 	} else {
 		config.InitMySQL()
-		config.InitFirebase()
+		config.InitGoogleOAuth()
 	}
 
 	sheetHandler := handlers.NewSheetHandler()

@@ -98,7 +98,7 @@ export default function SuperAdminPanel() {
         <p className="mt-1 text-sm text-gray-500">Manage admin users who can access the admin console.</p>
 
         <div className="mt-4 flex gap-2">
-          <input value={newAdminUid} onChange={(e)=>setNewAdminUid(e.target.value)} placeholder="Firebase UID of new admin" className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+          <input value={newAdminUid} onChange={(e)=>setNewAdminUid(e.target.value)} placeholder="User UID or Email of new admin" className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm" />
           <button onClick={handleAddAdmin} disabled={busy} className="rounded-lg bg-blue-600 px-3 py-2 text-sm text-white">{busy? 'Working...' : 'Add'}</button>
         </div>
 

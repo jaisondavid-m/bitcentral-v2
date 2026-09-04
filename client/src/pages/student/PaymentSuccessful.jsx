@@ -17,8 +17,7 @@ import {
   ShieldAlert,
   Loader2,
 } from "lucide-react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/config/firebase.js";
+import { useAuth } from "@/context/StudentContext.jsx";
 import { getVerifiedCertificate } from "@/api/axios.js";
 
 const PROUD_QUOTES = [

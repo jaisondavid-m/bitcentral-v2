@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/config/firebase.js";
+import { useAuth } from "@/context/StudentContext.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutGrid,
@@ -19,7 +18,7 @@ import { sendFeedbackMessage, getFeedbackMessages } from "@/api/feedback.js";
 import { useNavigate, useLocation } from "react-router-dom";
 
 export default function FloatingMenu() {
-  const [user] = useAuthState(auth);
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 

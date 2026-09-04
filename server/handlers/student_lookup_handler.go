@@ -1,9 +1,10 @@
 package handlers
 
 import (
-	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -20,21 +21,11 @@ func emailFromToken(token string) (string, error) {
 }
 
 func userFromToken(token string) (string, string, error) {
-	client, err := config.FirebaseAuthClient()
-	if err != nil || client == nil {
-		if err != nil {
-			return "", "", errors.New("failed to initialize Firebase auth: " + err.Error())
-		}
-		return "", "", errors.New("failed to initialize Firebase auth: client is nil")
+	claims, err := config.VerifyGoogleToken(token)
+	if err != nil || claims == nil {
+		return "", "", errors.New("unauthorized: " + err.Error())
 	}
-
-	decodedToken, err := client.VerifyIDToken(context.Background(), token)
-	if err != nil || decodedToken == nil {
-		return "", "", errors.New("unauthorized")
-	}
-
-	emailClaim, _ := decodedToken.Claims["email"].(string)
-	return decodedToken.UID, strings.TrimSpace(emailClaim), nil
+	return claims.UID, strings.TrimSpace(claims.Email), nil
 }
 
 type StudentLookupHandler struct {
@@ -93,55 +84,43 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 	if emailID == "" {
 		emailID = strings.TrimSpace(c.Query("mailid"))
 	}
-	if emailID == "" {
-		authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-		token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
-		if token == "" {
+
+	var claims *config.GoogleUserClaims
+	authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
+	token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
+	if token != "" {
+		if cClaims, err := config.VerifyGoogleToken(token); err == nil && cClaims != nil {
+			claims = cClaims
+			if emailID == "" {
+				emailID = claims.Email
+			}
+		} else if emailID == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"success": false,
-				"error":   "Query param 'emailid' is required or send a Bearer token",
+				"error":   "Invalid authentication token",
 			})
 			return
 		}
-
-		resolvedEmail, err := emailFromToken(token)
-		if err != nil {
-			status := http.StatusUnauthorized
-			if strings.HasPrefix(err.Error(), "failed to initialize Firebase auth") {
-				status = http.StatusInternalServerError
-			}
-			c.JSON(status, gin.H{
-				"success": false,
-				"error":   err.Error(),
-			})
-			return
-		}
-
-		emailID = resolvedEmail
 	}
 
 	if emailID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
-			"error":   "Query param 'emailid' is required",
+			"error":   "Query param 'emailid' is required or send a Bearer token",
 		})
 		return
 	}
 
 	// Optional enforcement: restrict emails to internal domain unless explicitly allowed.
-	// Set ENFORCE_EMAIL_DOMAIN=true to enable. Super-admin can add exceptions via /admin/super/allowed
 	if strings.ToLower(strings.TrimSpace(os.Getenv("ENFORCE_EMAIL_DOMAIN"))) == "true" {
-		// allow internal domain by suffix
 		lower := strings.ToLower(strings.TrimSpace(emailID))
 		if !(strings.HasSuffix(lower, "@bitsathy.ac.in") || strings.HasSuffix(lower, "@bitsathy.in")) {
-			// check allowed_emails table for exact email or domain
 			domain := ""
 			if at := strings.LastIndex(lower, "@"); at >= 0 {
 				domain = lower[at+1:]
 			}
 			var count int
 			if h.DB != nil {
-				// check for email or domain entries
 				err := h.DB.QueryRow(`SELECT COUNT(*) FROM allowed_emails WHERE (type='email' AND LOWER(value)=?) OR (type='domain' AND LOWER(value)=?)`, lower, domain).Scan(&count)
 				if err != nil || count == 0 {
 					c.JSON(http.StatusForbidden, gin.H{"success": false, "message": "Access restricted. Contact admin to allow your email."})
@@ -151,15 +130,30 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		}
 	}
 
+	var hasIDCol bool
+	if h.DB != nil {
+		var cnt int
+		_ = h.DB.QueryRow(`SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'id'`).Scan(&cnt)
+		hasIDCol = cnt > 0
+	}
+
+	idQuery := "0 AS id"
+	if hasIDCol {
+		idQuery = "COALESCE(id, 0)"
+	}
+
 	var user models.User
-	if err := h.DB.QueryRow(
-		`SELECT uid, email, display_name, photo_url, creation_time, last_sign_in_time, COALESCE(last_seen_at, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%Y-%m-%dT%H:%i:%sZ'), '')
+	cleanEmail := strings.ToLower(strings.TrimSpace(emailID))
+	queryStr := fmt.Sprintf(
+		`SELECT %s, COALESCE(google_id, COALESCE(uid, '')), COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(creation_time, ''), COALESCE(last_sign_in_time, ''), COALESCE(last_seen_at, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%%Y-%%m-%%dT%%H:%%i:%%sZ'), ''), COALESCE(role, 'user')
 		 FROM users
-		 WHERE LOWER(TRIM(email)) = LOWER(TRIM(?))
+		 WHERE email = ? OR LOWER(TRIM(email)) = ?
 		 LIMIT 1`,
-		emailID,
-	).Scan(
-		&user.UID,
+		idQuery,
+	)
+	err := h.DB.QueryRow(queryStr, emailID, cleanEmail).Scan(
+		&user.ID,
+		&user.GoogleID,
 		&user.Email,
 		&user.DisplayName,
 		&user.PhotoURL,
@@ -168,19 +162,69 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		&user.LastSeenAt,
 		&user.IsBlocked,
 		&user.BlockedAt,
-	); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"success": false,
-				"message": "No user found for that email id",
-			})
-			return
+		&user.Role,
+	)
+	user.UID = user.GoogleID
+
+	if errors.Is(err, sql.ErrNoRows) {
+		// Auto-register user from Google claims if email is valid
+		uid := emailID
+		name := ""
+		photo := ""
+		if claims != nil {
+			if claims.UID != "" {
+				uid = claims.UID
+			}
+			if claims.Name != "" {
+				name = claims.Name
+			}
+			if claims.Picture != "" {
+				photo = claims.Picture
+			}
 		}
+		nowStr := strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(os.Getenv("NOW"), "\"", ""), "'", ""))
+		if nowStr == "" {
+			nowStr = "2026-09-04T14:40:00Z"
+		}
+		_, _ = h.DB.Exec(
+			`INSERT INTO users (google_id, uid, email, display_name, photo_url, creation_time, last_sign_in_time, last_seen_at, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'user')`,
+			uid, uid, emailID, name, photo, nowStr, nowStr, nowStr,
+		)
+		queryStr2 := fmt.Sprintf(
+			`SELECT %s, COALESCE(google_id, COALESCE(uid, '')), COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(creation_time, ''), COALESCE(last_sign_in_time, ''), COALESCE(last_seen_at, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%%Y-%%m-%%dT%%H:%%i:%%sZ'), ''), COALESCE(role, 'user')
+			 FROM users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
+			idQuery,
+		)
+		_ = h.DB.QueryRow(queryStr2, emailID).Scan(&user.ID, &user.GoogleID, &user.Email, &user.DisplayName, &user.PhotoURL, &user.CreationTime, &user.LastSignInTime, &user.LastSeenAt, &user.IsBlocked, &user.BlockedAt, &user.Role)
+		user.UID = user.GoogleID
+	} else if err != nil {
+		log.Printf("❌ GetMe DB query error for %s: %v", emailID, err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
-			"error":   "Failed to load user profile",
+			"error":   "Failed to load user profile: " + err.Error(),
 		})
 		return
+	}
+
+	// Seamlessly update UID and user profile details if claims provide updated info
+	if claims != nil {
+		if claims.UID != "" && user.GoogleID != claims.UID {
+			oldUID := user.GoogleID
+			newUID := claims.UID
+			_, _ = h.DB.Exec(`UPDATE users SET google_id = ?, uid = ? WHERE LOWER(TRIM(email)) = LOWER(TRIM(?))`, newUID, newUID, emailID)
+			_, _ = h.DB.Exec(`UPDATE admins SET uid = ? WHERE uid = ?`, newUID, oldUID)
+			_, _ = h.DB.Exec(`UPDATE feedback_messages SET user_uid = ? WHERE user_uid = ?`, newUID, oldUID)
+			user.GoogleID = newUID
+			user.UID = newUID
+		}
+		if claims.Name != "" && user.DisplayName == "" {
+			_, _ = h.DB.Exec(`UPDATE users SET display_name = ? WHERE LOWER(TRIM(email)) = LOWER(TRIM(?))`, claims.Name, emailID)
+			user.DisplayName = claims.Name
+		}
+		if claims.Picture != "" && user.PhotoURL == "" {
+			_, _ = h.DB.Exec(`UPDATE users SET photo_url = ? WHERE LOWER(TRIM(email)) = LOWER(TRIM(?))`, claims.Picture, emailID)
+			user.PhotoURL = claims.Picture
+		}
 	}
 
 	if user.IsBlocked {
@@ -192,40 +236,31 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		return
 	}
 
-	var rollNo string
-	rollErr := h.DB.QueryRow(
-		`SELECT COALESCE(user_id, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
-		emailID,
-	).Scan(&rollNo)
-	if rollErr != nil && !errors.Is(rollErr, sql.ErrNoRows) {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"error":   "Failed to look up roll number",
-		})
-		return
-	}
-
 	var trackerID, trackerUserID, phoneNo string
 	if h.DB != nil {
 		_ = h.DB.QueryRow(
-			`SELECT COALESCE(id, ''), COALESCE(user_id, ''), COALESCE(phone, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
-			emailID,
+			`SELECT COALESCE(id, ''), COALESCE(user_id, ''), COALESCE(phone, '') FROM tracker_users WHERE email = ? OR LOWER(TRIM(email)) = ? LIMIT 1`,
+			emailID, cleanEmail,
 		).Scan(&trackerID, &trackerUserID, &phoneNo)
+	}
+
+	rollNo := trackerUserID
+	if rollNo == "" {
+		rollNo = trackerID
 	}
 
 	userID := trackerID
 	if userID == "" {
 		userID = trackerUserID
 	}
-	if userID == "" {
-		userID = rollNo
-	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"data": gin.H{
+			"id":                user.ID,
+			"google_id":         user.GoogleID,
 			"user_id":           userID,
-			"uid":               user.UID,
+			"uid":               user.GoogleID,
 			"email":             user.Email,
 			"display_name":      user.DisplayName,
 			"photo_url":         user.PhotoURL,
@@ -234,6 +269,7 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 			"last_seen_at":      user.LastSeenAt,
 			"is_blocked":        user.IsBlocked,
 			"blocked_at":        user.BlockedAt,
+			"role":              user.Role,
 			"roll_no":           rollNo,
 			"phone":             phoneNo,
 			"phone_no":          phoneNo,

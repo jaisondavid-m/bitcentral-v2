@@ -2,22 +2,27 @@ import React, { useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Hamburger from "hamburger-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { auth, logout } from "@/config/firebase.js";
+import { logout } from "@/config/auth.js";
 import { LogOut, Moon, Star, Sun, X } from "lucide-react";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { useAuth } from "@/context/StudentContext.jsx";
 import { useTheme } from "@/context/ThemeContext.jsx";
 
 function Navbar() {
-  const [user] = useAuthState(auth);
+  const { user, profile } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
 
   const isAdmin = useMemo(() => {
-    const adminUID = import.meta.env.VITE_ADMIN_FIREBASE_UID?.trim();
-    return Boolean(adminUID && user?.uid === adminUID);
-  }, [user?.uid]);
+    const role = (user?.role || profile?.role || "").toLowerCase().trim();
+    return Boolean(
+      role === "admin" ||
+      role === "superadmin" ||
+      role === "super_admin" ||
+      user?.isAdmin === true
+    );
+  }, [user, profile]);
 
   const navItems = [
     { to: "/home", label: "Home" },

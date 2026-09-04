@@ -156,7 +156,7 @@ export const impactStats = {
   description:
     "BIT-CENTRAL brings academic resources, examination utilities, campus information, and student-focused tools together in one platform for the BIT student community.",
   disclaimer:
-    "Registration statistics are based on BIT-CENTRAL's Firebase Authentication records and verified analytics metrics.",
+    "Registration statistics are based on BIT-CENTRAL's Google Authentication records and verified analytics metrics.",
   metrics: [
     {
       value: "4,500+",

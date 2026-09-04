@@ -732,6 +732,10 @@ function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showS
               <p className="font-semibold text-gray-500 dark:text-slate-400">Last sign in</p>
               <p className="mt-0.5 text-gray-800 dark:text-slate-200">{formatDateTime(userItem.lastSignInTime)}</p>
             </div>
+            <div>
+              <p className="font-semibold text-gray-500 dark:text-slate-400">Role</p>
+              <p className="mt-0.5 text-gray-800 dark:text-slate-200 uppercase font-semibold">{userItem.role || (userItem.isAdmin ? "admin" : "user")}</p>
+            </div>
             {isBlocked && (
               <div className="col-span-2">
                 <p className="font-semibold text-gray-500 dark:text-slate-400">Blocked at</p>
@@ -817,6 +821,7 @@ function UserTable({
             <th className="px-4 py-3.5 text-left">User</th>
             <th className="px-4 py-3.5 text-left">Created at</th>
             <th className="px-4 py-3.5 text-left">Last sign in</th>
+            <th className="px-4 py-3.5 text-left">Role</th>
             <th className="px-4 py-3.5 text-left">Status</th>
             <th className="px-4 py-3.5 text-left">Action</th>
           </tr>
@@ -867,6 +872,15 @@ function UserTable({
                 </td>
                 <td className="whitespace-nowrap px-4 py-3.5 text-xs text-gray-600 dark:text-slate-300">{formatDateTime(userItem.creationTime)}</td>
                 <td className="whitespace-nowrap px-4 py-3.5 text-xs text-gray-600 dark:text-slate-300">{formatDateTime(userItem.lastSignInTime)}</td>
+                <td className="whitespace-nowrap px-4 py-3.5">
+                  <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold border ${
+                    userItem.role === 'admin' || userItem.role === 'superadmin' || userItem.role === 'super_admin' || userItem.isAdmin
+                      ? "bg-purple-50 text-purple-800 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-900"
+                      : "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-900"
+                  }`}>
+                    {userItem.role || (userItem.isAdmin ? "admin" : "user")}
+                  </span>
+                </td>
                 <td className="whitespace-nowrap px-4 py-3.5">
                   {isBlocked ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700 dark:bg-red-950/60 dark:text-red-300 border border-red-200 dark:border-red-900">
@@ -1221,7 +1235,7 @@ function UsersSection({ isSuper }) {
             confirmation?.type === "delete"
               ? "This permanently removes the user from the database and cannot be undone."
               : confirmation?.type === "batchDelete"
-                ? `This will permanently delete all ${confirmation?.count} selected user accounts from Firebase Auth and MySQL. This action cannot be undone.`
+                ? `This will permanently delete all ${confirmation?.count} selected user accounts from the database. This action cannot be undone.`
                 : confirmation?.type === "block"
                   ? "The user will be blocked from signing in and will see the support contact message."
                   : confirmation?.isAdmin
@@ -5407,7 +5421,7 @@ function AnalyticsSection() {
             </h2>
           </div>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Real-time analytics powered by {data?.source || "Firebase Auth & Google Analytics API"}
+            Real-time analytics powered by {data?.source || "Google Auth & Google Analytics API"}
           </p>
         </div>
 
@@ -5438,7 +5452,7 @@ function AnalyticsSection() {
             {summary.registered_users?.toLocaleString() || "4,546"}
           </div>
           <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
-            Firebase Auth verified student accounts
+            Google Auth verified student accounts
           </p>
         </div>
 

@@ -73,7 +73,7 @@ type RealtimeAnalyticsData struct {
 func (h *AnalyticsHandler) GetAnalytics(c *gin.Context) {
 	ctx := context.Background()
 	gaPropertyID := os.Getenv("GA4_PROPERTY_ID")
-	gaCredentialsJSON := os.Getenv("FIREBASE_CREDENTIALS_JSON")
+	gaCredentialsJSON := os.Getenv("GA_CREDENTIALS_JSON")
 
 	var registeredCount int = 4546
 	if h.DB != nil {
@@ -164,6 +164,6 @@ func (h *AnalyticsHandler) GetAnalytics(c *gin.Context) {
 		Features: featureItems,
 		Devices:  deviceDistribution,
 		Realtime: realtime,
-		Source:   "Firebase Auth & Google Analytics Data API Service",
+		Source:   "Google Auth & Google Analytics Data API Service",
 	})
 }

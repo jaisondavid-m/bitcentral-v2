@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -14,11 +13,8 @@ import (
 
 	"server/config"
 	"server/models"
-	"server/utils"
 
 	"github.com/gin-gonic/gin"
-	"google.golang.org/api/iterator"
-	"firebase.google.com/go/auth"
 )
 
 type AdminHandler struct {
@@ -51,61 +47,8 @@ func getBatchLabelFromEmail(email string) string {
 	return fmt.Sprintf("%d-%d", start, end)
 }
 
-func (h *AdminHandler) syncFirebaseUsersToDB() error {
-	client, err := config.FirebaseAuthClient()
-	if err != nil || client == nil {
-		return err
-	}
-
-	iter := client.Users(context.Background(), "")
-	var batchUsers []models.User
-	batchSize := 100
-	totalSynced := 0
-
-	for {
-		u, err := iter.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			log.Printf("⚠️ Error iterating Firebase users: %v", err)
-			break
-		}
-
-		email := strings.ToLower(strings.TrimSpace(u.Email))
-		if !strings.HasSuffix(email, "@bitsathy.ac.in") {
-			continue
-		}
-
-		batchUsers = append(batchUsers, models.User{
-			UID:            u.UID,
-			Email:          u.Email,
-			DisplayName:    u.DisplayName,
-			PhotoURL:       u.PhotoURL,
-			CreationTime:   utils.TsToString(u.UserMetadata.CreationTimestamp),
-			LastSignInTime: utils.TsToString(u.UserMetadata.LastLogInTimestamp),
-		})
-		totalSynced++
-
-		if len(batchUsers) >= batchSize {
-			if err := h.syncUsersToMySQL(batchUsers); err != nil {
-				log.Printf("❌ Failed to sync batch of %d users to MySQL: %v", len(batchUsers), err)
-				return err
-			}
-			batchUsers = batchUsers[:0]
-		}
-	}
-
-	if len(batchUsers) > 0 {
-		if err := h.syncUsersToMySQL(batchUsers); err != nil {
-			log.Printf("❌ Failed to sync final batch of %d users to MySQL: %v", len(batchUsers), err)
-			return err
-		}
-	}
-
-	_, _ = h.DB.Exec(`DELETE FROM users WHERE email NOT LIKE '%@bitsathy.ac.in'`)
-
-	log.Printf("✅ Synced %d total @bitsathy.ac.in users from Firebase to MySQL", totalSynced)
+func (h *AdminHandler) syncUsersToDB() error {
+	log.Println("✅ Users synced from local MySQL database")
 	return nil
 }
 
@@ -129,10 +72,26 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 	var totalInDB int
 	_ = h.DB.QueryRow(`SELECT COUNT(*) FROM users`).Scan(&totalInDB)
 	if totalInDB == 0 {
-		_ = h.syncFirebaseUsersToDB()
+		_ = h.syncUsersToDB()
 	}
 
-	rows, err := h.DB.Query(`SELECT uid, COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(creation_time, ''), COALESCE(last_sign_in_time, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%Y-%m-%dT%H:%i:%sZ'), '') FROM users WHERE email LIKE '%@bitsathy.ac.in' ORDER BY creation_time DESC, uid DESC`)
+	var hasIDCol bool
+	if h.DB != nil {
+		var cnt int
+		_ = h.DB.QueryRow(`SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'id'`).Scan(&cnt)
+		hasIDCol = cnt > 0
+	}
+
+	idQuery := "0 AS id"
+	orderQuery := "creation_time DESC"
+	if hasIDCol {
+		idQuery = "COALESCE(id, 0)"
+		orderQuery = "id DESC"
+	}
+
+	queryStr := fmt.Sprintf(`SELECT %s, COALESCE(google_id, COALESCE(uid, '')), COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(creation_time, ''), COALESCE(last_sign_in_time, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%%Y-%%m-%%dT%%H:%%i:%%sZ'), ''), COALESCE(role, 'user') FROM users WHERE email LIKE '%%@bitsathy.ac.in' ORDER BY %s`, idQuery, orderQuery)
+
+	rows, err := h.DB.Query(queryStr)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -146,9 +105,10 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		var u models.User
 		var blocked int
 		var blockedAt string
-		if err := rows.Scan(&u.UID, &u.Email, &u.DisplayName, &u.PhotoURL, &u.CreationTime, &u.LastSignInTime, &blocked, &blockedAt); err != nil {
+		if err := rows.Scan(&u.ID, &u.GoogleID, &u.Email, &u.DisplayName, &u.PhotoURL, &u.CreationTime, &u.LastSignInTime, &blocked, &blockedAt, &u.Role); err != nil {
 			continue
 		}
+		u.UID = u.GoogleID
 		u.IsBlocked = blocked == 1
 		u.BlockedAt = blockedAt
 
@@ -171,51 +131,13 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 			emailLower := strings.ToLower(u.Email)
 			nameLower := strings.ToLower(u.DisplayName)
 			uidLower := strings.ToLower(u.UID)
-			if !strings.Contains(emailLower, search) && !strings.Contains(nameLower, search) && !strings.Contains(uidLower, search) {
+			roleLower := strings.ToLower(u.Role)
+			if !strings.Contains(emailLower, search) && !strings.Contains(nameLower, search) && !strings.Contains(uidLower, search) && !strings.Contains(roleLower, search) {
 				continue
 			}
 		}
 
 		filtered = append(filtered, u)
-	}
-
-	// If search query returned 0 matches in local DB, attempt direct Firebase lookup (by email or UID)
-	if len(filtered) == 0 && search != "" {
-		client, err := config.FirebaseAuthClient()
-		if err == nil && client != nil {
-			var fbUser *auth.UserRecord
-			if strings.Contains(search, "@") {
-				fbUser, _ = client.GetUserByEmail(context.Background(), search)
-			} else {
-				fbUser, _ = client.GetUser(context.Background(), search)
-			}
-
-			if fbUser != nil && strings.HasSuffix(strings.ToLower(strings.TrimSpace(fbUser.Email)), "@bitsathy.ac.in") {
-				u := models.User{
-					UID:            fbUser.UID,
-					Email:          fbUser.Email,
-					DisplayName:    fbUser.DisplayName,
-					PhotoURL:       fbUser.PhotoURL,
-					CreationTime:   utils.TsToString(fbUser.UserMetadata.CreationTimestamp),
-					LastSignInTime: utils.TsToString(fbUser.UserMetadata.LastLogInTimestamp),
-				}
-
-				label := getBatchLabelFromEmail(u.Email)
-				if batch == "" || batch == label {
-					_ = h.syncUsersToMySQL([]models.User{u})
-
-					statusMap, _ := h.loadUserStatusMap()
-					if st, ok := statusMap[u.UID]; ok {
-						u.IsBlocked = st.IsBlocked
-						u.BlockedAt = st.BlockedAt
-					}
-
-					filtered = append(filtered, u)
-					allUsers = append(allUsers, u)
-					batchCounts[label]++
-				}
-			}
-		}
 	}
 
 	totalFiltered := len(filtered)
@@ -249,7 +171,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 	}
 
 	for i := range paginatedSlice {
-		paginatedSlice[i].IsAdmin = adminByUID[paginatedSlice[i].UID]
+		paginatedSlice[i].IsAdmin = adminByUID[paginatedSlice[i].UID] || paginatedSlice[i].Role == "admin" || paginatedSlice[i].Role == "superadmin" || paginatedSlice[i].Role == "super_admin"
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -264,7 +186,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 	})
 }
 func (h *AdminHandler) UpdateUsers(c *gin.Context) {
-	if err := h.syncFirebaseUsersToDB(); err != nil {
+	if err := h.syncUsersToDB(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
@@ -274,7 +196,7 @@ func (h *AdminHandler) UpdateUsers(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": fmt.Sprintf("Successfully synced all %d users from Firebase", totalInDB),
+		"message": fmt.Sprintf("Successfully synced all %d users", totalInDB),
 		"total":   totalInDB,
 	})
 }
@@ -364,47 +286,12 @@ func (h *AdminHandler) UpdateUserBlockStatus(c *gin.Context) {
 		return
 	}
 
-	client, err := config.FirebaseAuthClient()
-	if err != nil || client == nil {
-		msg := "Failed to initialize Firebase auth"
-		if err != nil {
-			msg = "Failed to initialize Firebase auth: " + err.Error()
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": msg})
-		return
-	}
-
-	userRecord, err := client.GetUser(context.Background(), uid)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"success": false, "error": "Firebase user not found"})
-		return
-	}
-
 	var blockedAt any = nil
 	if body.Blocked {
 		blockedAt = time.Now().UTC()
 	}
 
-	_, err = h.DB.Exec(`
-		INSERT INTO users (uid, email, display_name, photo_url, creation_time, last_sign_in_time, last_seen_at, blocked, blocked_at)
-		VALUES (?, ?, ?, ?, ?, ?, NULL, ?, ?)
-		ON DUPLICATE KEY UPDATE
-			email = VALUES(email),
-			display_name = VALUES(display_name),
-			photo_url = VALUES(photo_url),
-			creation_time = VALUES(creation_time),
-			last_sign_in_time = VALUES(last_sign_in_time),
-			blocked = VALUES(blocked),
-			blocked_at = VALUES(blocked_at)`,
-		userRecord.UID,
-		userRecord.Email,
-		userRecord.DisplayName,
-		userRecord.PhotoURL,
-		utils.TsToString(userRecord.UserMetadata.CreationTimestamp),
-		utils.TsToString(userRecord.UserMetadata.LastLogInTimestamp),
-		body.Blocked,
-		blockedAt,
-	)
+	_, err := h.DB.Exec(`UPDATE users SET blocked = ?, blocked_at = ? WHERE CAST(id AS CHAR) = ? OR google_id = ? OR uid = ? OR LOWER(TRIM(email)) = LOWER(TRIM(?))`, body.Blocked, blockedAt, uid, uid, uid, uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -435,21 +322,7 @@ func (h *AdminHandler) UpdateUserBlockStatus(c *gin.Context) {
 func (h *AdminHandler) DeleteUser(c *gin.Context) {
 	uid := c.Param("uid")
 
-	client, err := config.FirebaseAuthClient()
-	if err != nil || client == nil {
-		msg := "Failed to initialize Firebase auth"
-		if err != nil {
-			msg = "Failed to initialize Firebase auth: " + err.Error()
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": msg})
-		return
-	}
-	if err := client.DeleteUser(context.Background(), uid); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
-		return
-	}
-
-	_, _ = h.DB.Exec("DELETE FROM users WHERE uid = ?", uid)
+	_, _ = h.DB.Exec("DELETE FROM users WHERE CAST(id AS CHAR) = ? OR google_id = ? OR uid = ?", uid, uid, uid)
 	_, _ = h.DB.Exec("DELETE FROM admins WHERE uid = ?", uid)
 
 	c.JSON(http.StatusOK, gin.H{"success": true})
@@ -467,19 +340,12 @@ func (h *AdminHandler) DeleteUsersBatch(c *gin.Context) {
 		return
 	}
 
-	client, err := config.FirebaseAuthClient()
-	if err != nil || client == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Failed to initialize Firebase auth"})
-		return
-	}
-
 	deletedCount := 0
 	for _, uid := range req.UIDs {
 		if uid == "" {
 			continue
 		}
-		_ = client.DeleteUser(context.Background(), uid)
-		_, _ = h.DB.Exec("DELETE FROM users WHERE uid = ?", uid)
+		_, _ = h.DB.Exec("DELETE FROM users WHERE CAST(id AS CHAR) = ? OR google_id = ? OR uid = ?", uid, uid, uid)
 		_, _ = h.DB.Exec("DELETE FROM admins WHERE uid = ?", uid)
 		deletedCount++
 	}
@@ -488,5 +354,46 @@ func (h *AdminHandler) DeleteUsersBatch(c *gin.Context) {
 		"success": true,
 		"message": fmt.Sprintf("Successfully deleted %d user(s)", deletedCount),
 		"count":   deletedCount,
+	})
+}
+
+func (h *AdminHandler) UpdateUserRole(c *gin.Context) {
+	uid := strings.TrimSpace(c.Param("uid"))
+	if uid == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "uid is required"})
+		return
+	}
+
+	var body struct {
+		Role string `json:"role"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	role := strings.TrimSpace(strings.ToLower(body.Role))
+	if role == "" {
+		role = "user"
+	}
+
+	_, err := h.DB.Exec(`UPDATE users SET role = ? WHERE CAST(id AS CHAR) = ? OR google_id = ? OR uid = ? OR LOWER(TRIM(email)) = LOWER(TRIM(?))`, role, uid, uid, uid, uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	if role == "admin" || role == "superadmin" || role == "super_admin" {
+		actorUID, _ := c.Get("actor_uid")
+		_, _ = h.DB.Exec(`INSERT IGNORE INTO admins (uid, created_by) VALUES (?, ?)`, uid, actorUID)
+	} else {
+		_, _ = h.DB.Exec(`DELETE FROM admins WHERE uid = ?`, uid)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "User role updated successfully",
+		"uid":     uid,
+		"role":    role,
 	})
 }
