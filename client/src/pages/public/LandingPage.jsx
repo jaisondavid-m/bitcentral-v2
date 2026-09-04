@@ -53,19 +53,19 @@ export default function LandingPage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                to="/guides"
-                className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700 shadow-xs"
-              >
-                <BookOpen className="h-4 w-4" aria-hidden="true" />
-                Explore Public Guides
-              </Link>
-              <Link
                 to="/login"
                 onClick={() => localStorage.setItem("visitedLogin", "true")}
-                className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900"
+                className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700 shadow-xs"
               >
                 <LogIn className="h-4 w-4" aria-hidden="true" />
                 Login to Portal
+              </Link>
+              <Link
+                to="/guides"
+                className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900"
+              >
+                <BookOpen className="h-4 w-4" aria-hidden="true" />
+                Explore Public Guides
               </Link>
             </div>
           </div>
