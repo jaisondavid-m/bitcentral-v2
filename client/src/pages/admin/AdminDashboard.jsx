@@ -93,8 +93,11 @@ function normalizeError(error, fallback) {
 
 function formatDateTime(value) {
   if (!value) return "-";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "-";
+  let date = new Date(value);
+  if (Number.isNaN(date.getTime()) && typeof value === "string") {
+    date = new Date(value.replace(" ", "T"));
+  }
+  if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleString();
 }
 
@@ -733,6 +736,10 @@ function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showS
               <p className="mt-0.5 text-gray-800 dark:text-slate-200">{formatDateTime(userItem.lastSignInTime)}</p>
             </div>
             <div>
+              <p className="font-semibold text-gray-500 dark:text-slate-400">Last seen</p>
+              <p className="mt-0.5 text-blue-600 dark:text-blue-400 font-medium">{formatDateTime(userItem.lastSeenAt)}</p>
+            </div>
+            <div>
               <p className="font-semibold text-gray-500 dark:text-slate-400">Role</p>
               <p className="mt-0.5 text-gray-800 dark:text-slate-200 uppercase font-semibold">{userItem.role || (userItem.isAdmin ? "admin" : "user")}</p>
             </div>
@@ -821,6 +828,7 @@ function UserTable({
             <th className="px-4 py-3.5 text-left">User</th>
             <th className="px-4 py-3.5 text-left">Created at</th>
             <th className="px-4 py-3.5 text-left">Last sign in</th>
+            <th className="px-4 py-3.5 text-left">Last seen</th>
             <th className="px-4 py-3.5 text-left">Role</th>
             <th className="px-4 py-3.5 text-left">Status</th>
             <th className="px-4 py-3.5 text-left">Action</th>
@@ -872,6 +880,15 @@ function UserTable({
                 </td>
                 <td className="whitespace-nowrap px-4 py-3.5 text-xs text-gray-600 dark:text-slate-300">{formatDateTime(userItem.creationTime)}</td>
                 <td className="whitespace-nowrap px-4 py-3.5 text-xs text-gray-600 dark:text-slate-300">{formatDateTime(userItem.lastSignInTime)}</td>
+                <td className="whitespace-nowrap px-4 py-3.5 text-xs">
+                  {userItem.lastSeenAt ? (
+                    <span className="font-mono text-[11px] text-blue-600 dark:text-blue-400 font-medium">
+                      {formatDateTime(userItem.lastSeenAt)}
+                    </span>
+                  ) : (
+                    <span className="text-gray-400 dark:text-slate-500">-</span>
+                  )}
+                </td>
                 <td className="whitespace-nowrap px-4 py-3.5">
                   <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold border ${
                     userItem.role === 'admin' || userItem.role === 'superadmin' || userItem.role === 'super_admin' || userItem.isAdmin
