@@ -6,13 +6,14 @@ async function getAdminHeaders() {
   return getAuthenticatedHeaders();
 }
 
-export async function listAdminUsers({ page = 1, limit = 25, search = "", batch = "" } = {}) {
+export async function listAdminUsers({ page = 1, limit = 25, search = "", batch = "", status = "" } = {}) {
   const headers = await getAdminHeaders();
   const params = new URLSearchParams();
   if (page) params.set("page", page);
   if (limit) params.set("limit", limit);
   if (search) params.set("search", search);
   if (batch) params.set("batch", batch);
+  if (status) params.set("status", status);
 
   const response = await api.get(`/admin/users?${params.toString()}`, {
     headers,
@@ -22,6 +23,9 @@ export async function listAdminUsers({ page = 1, limit = 25, search = "", batch 
     success: response.data.success,
     users: response.data.users || [],
     total: response.data.total || 0,
+    activeToday: response.data.activeToday || 0,
+    totalAdmins: response.data.totalAdmins || 0,
+    totalBlocked: response.data.totalBlocked || 0,
     filteredTotal: response.data.filteredTotal || 0,
     page: response.data.page || 1,
     pageSize: response.data.pageSize || 25,
