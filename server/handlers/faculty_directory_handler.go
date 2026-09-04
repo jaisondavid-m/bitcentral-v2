@@ -196,18 +196,9 @@ func (h *FacultyDirectoryHandler) GetOAuthConfig() *oauth2.Config {
 }
 
 func (h *FacultyDirectoryHandler) HandleDirectoryLogin(c *gin.Context) {
-	if customLoginURL := strings.TrimSpace(os.Getenv("GOOGLE_CONTACTS_LOGIN_URL")); customLoginURL != "" {
-		c.Redirect(http.StatusTemporaryRedirect, customLoginURL)
-		return
-	}
-	if customLoginURL := strings.TrimSpace(os.Getenv("GOOGLE_DIRECTORY_LOGIN_URL")); customLoginURL != "" {
-		c.Redirect(http.StatusTemporaryRedirect, customLoginURL)
-		return
-	}
-
 	cfg := h.GetOAuthConfig()
-	url := cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
-	c.Redirect(http.StatusTemporaryRedirect, url)
+	authURL := cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
+	c.Redirect(http.StatusTemporaryRedirect, authURL)
 }
 
 func (h *FacultyDirectoryHandler) SyncGoogleDirectory() {
