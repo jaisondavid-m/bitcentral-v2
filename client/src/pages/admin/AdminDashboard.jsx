@@ -93,52 +93,87 @@ function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
 }
 
-function formatDateTime(value) {
-  if (!value) return "-";
-  let date = new Date(value);
-  if (Number.isNaN(date.getTime()) && typeof value === "string") {
-    date = new Date(value.replace(" ", "T"));
+function parseISTDate(value) {
+  if (!value) return null;
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value;
   }
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString();
+  if (typeof value === "number") {
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed || trimmed === "-") return null;
+
+    if (/^\d{10,}$/.test(trimmed)) {
+      const d = new Date(Number(trimmed));
+      if (!Number.isNaN(d.getTime())) return d;
+    }
+
+    // Backend produces UTC timestamps formatted as "YYYY-MM-DD HH:mm:ss" without offset
+    if (/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(:\d{2})?(\.\d+)?$/.test(trimmed)) {
+      const d = new Date(trimmed.replace(" ", "T") + "Z");
+      if (!Number.isNaN(d.getTime())) return d;
+    }
+
+    const d = new Date(trimmed);
+    if (!Number.isNaN(d.getTime())) return d;
+
+    const fallback = new Date(trimmed.replace(" ", "T"));
+    if (!Number.isNaN(fallback.getTime())) return fallback;
+  }
+  return null;
+}
+
+function formatDateTime(value) {
+  const date = parseISTDate(value);
+  if (!date) return "-";
+  return date.toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
 }
 
 function isSeenToday(value) {
-  if (!value) return false;
-  let date = new Date(value);
-  if (Number.isNaN(date.getTime()) && typeof value === "string") {
-    date = new Date(value.replace(" ", "T"));
-  }
-  if (Number.isNaN(date.getTime())) return false;
+  const date = parseISTDate(value);
+  if (!date) return false;
   const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
   const itemStr = date.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
   return todayStr === itemStr;
 }
 
 function formatLastSeen(value) {
-  if (!value) return "-";
-  let date = new Date(value);
-  if (Number.isNaN(date.getTime()) && typeof value === "string") {
-    date = new Date(value.replace(" ", "T"));
-  }
-  if (Number.isNaN(date.getTime())) return value;
+  const date = parseISTDate(value);
+  if (!date) return "-";
 
   const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
   const itemStr = date.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
 
-  const timePart = date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
+  const timePart = date.toLocaleTimeString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
 
   if (todayStr === itemStr) {
     return `Today, ${timePart}`;
   }
 
-  return date.toLocaleString([], {
+  const datePart = date.toLocaleDateString("en-IN", {
+    timeZone: "Asia/Kolkata",
     month: "short",
     day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
   });
+
+  return `${datePart}, ${timePart}`;
 }
 
 function fileToDataURL(file) {
@@ -161,9 +196,8 @@ function formatBlockedAt(value) {
 }
 
 function parseDateValue(value) {
-  if (!value) return 0;
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? 0 : date.getTime();
+  const date = parseISTDate(value);
+  return date ? date.getTime() : 0;
 }
 
 function todayIST() {
@@ -171,9 +205,8 @@ function todayIST() {
 }
 
 function dateKeyFromValue(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
+  const date = parseISTDate(value);
+  if (!date) return "";
   return date.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
 }
 
@@ -1316,8 +1349,8 @@ function UsersSection({ isSuper }) {
 
   return (
     <div className="space-y-6">
-      {/* Top 4 KPI Metrics Overview */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+      {/* Top KPI Metrics Overview - Minimal 2-Card Layout */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
         {/* Total Users */}
         <button
           type="button"
@@ -1325,10 +1358,10 @@ function UsersSection({ isSuper }) {
             setStatusFilter("all");
             setPage(1);
           }}
-          className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 ${
+          className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-4 sm:p-5 text-left transition-all duration-200 ${
             statusFilter === "all"
-              ? "border-blue-500 bg-blue-50/50 shadow-xs ring-2 ring-blue-500/20 dark:border-blue-500 dark:bg-blue-950/30"
-              : "border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-xs dark:border-slate-800 dark:bg-slate-900/90 dark:hover:border-slate-700"
+              ? "border-blue-500/80 bg-blue-50/40 shadow-xs ring-2 ring-blue-500/10 dark:border-blue-500 dark:bg-blue-950/20"
+              : "border-slate-200/80 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900/80 dark:hover:border-slate-700"
           }`}
         >
           <div className="flex items-center justify-between gap-2">
@@ -1345,17 +1378,17 @@ function UsersSection({ isSuper }) {
           </div>
         </button>
 
-        {/* Active Today - PRIMARY FOCUS */}
+        {/* Active Today */}
         <button
           type="button"
           onClick={() => {
             setStatusFilter(statusFilter === "active_today" ? "all" : "active_today");
             setPage(1);
           }}
-          className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 ${
+          className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-4 sm:p-5 text-left transition-all duration-200 ${
             statusFilter === "active_today"
-              ? "border-emerald-500 bg-emerald-50/50 shadow-xs ring-2 ring-emerald-500/20 dark:border-emerald-500 dark:bg-emerald-950/30"
-              : "border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-xs dark:border-slate-800 dark:bg-slate-900/90 dark:hover:border-slate-700"
+              ? "border-emerald-500/80 bg-emerald-50/40 shadow-xs ring-2 ring-emerald-500/10 dark:border-emerald-500 dark:bg-emerald-950/20"
+              : "border-slate-200/80 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900/80 dark:hover:border-slate-700"
           }`}
         >
           <div className="flex items-center justify-between gap-2">
@@ -1382,60 +1415,6 @@ function UsersSection({ isSuper }) {
               )}
             </div>
             <p className="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500">Active today in system</p>
-          </div>
-        </button>
-
-        {/* Administrators */}
-        <button
-          type="button"
-          onClick={() => {
-            setStatusFilter(statusFilter === "admins" ? "all" : "admins");
-            setPage(1);
-          }}
-          className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 ${
-            statusFilter === "admins"
-              ? "border-purple-500 bg-purple-50/50 shadow-xs ring-2 ring-purple-500/20 dark:border-purple-500 dark:bg-purple-950/30"
-              : "border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-xs dark:border-slate-800 dark:bg-slate-900/90 dark:hover:border-slate-700"
-          }`}
-        >
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Admins</span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/80 dark:text-purple-400">
-              <ShieldCheck className="h-4 w-4" />
-            </div>
-          </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-              {totalAdmins.toLocaleString()}
-            </div>
-            <p className="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500">Elevated privileges</p>
-          </div>
-        </button>
-
-        {/* Blocked Accounts */}
-        <button
-          type="button"
-          onClick={() => {
-            setStatusFilter(statusFilter === "blocked" ? "all" : "blocked");
-            setPage(1);
-          }}
-          className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 ${
-            statusFilter === "blocked"
-              ? "border-red-500 bg-red-50/50 shadow-xs ring-2 ring-red-500/20 dark:border-red-500 dark:bg-red-950/30"
-              : "border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-xs dark:border-slate-800 dark:bg-slate-900/90 dark:hover:border-slate-700"
-          }`}
-        >
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Blocked</span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-red-50 text-red-600 dark:bg-red-950/80 dark:text-red-400">
-              <ShieldAlert className="h-4 w-4" />
-            </div>
-          </div>
-          <div className="mt-3">
-            <div className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-              {totalBlocked.toLocaleString()}
-            </div>
-            <p className="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500">Access restricted</p>
           </div>
         </button>
       </div>
