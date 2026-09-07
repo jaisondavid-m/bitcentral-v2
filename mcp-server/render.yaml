@@ -11,6 +11,5 @@ services:
         value: 10000
       - key: BACKEND_URL
         sync: false
-        # Set this to your deployed Render backend URL e.g. https://bitcentral-backend.onrender.com
       - key: BACKEND_AUTH_TOKEN
         sync: false

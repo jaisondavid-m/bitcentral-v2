@@ -27,7 +27,7 @@ COPY --from=builder /app/mcp-server /app/mcp-server
 
 # Default port for Render
 ENV PORT=10000
-ENV BACKEND_URL=http://localhost:8080
+ENV BACKEND_URL=https://bitcentral-v2.onrender.com
 
 EXPOSE 10000
 
