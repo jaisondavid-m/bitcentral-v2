@@ -169,7 +169,7 @@ export default function FloatingMenu() {
 
             {/* Menu options container stacked neatly above main FAB */}
             <div className="fixed bottom-[5.75rem] right-6 z-40 flex flex-col items-end gap-3.5 pointer-events-auto">
-              {/* BitBot AI Assistant (Ollama Qwen2.5 1.5B) */}
+              {/* BitBot AI Assistant (Temporarily hidden)
               <motion.div
                 initial={{ opacity: 0, y: 15, scale: 0.8 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -191,6 +191,7 @@ export default function FloatingMenu() {
                   </button>
                 </div>
               </motion.div>
+              */}
               {/* 3. Support Developer Button (Top) */}
               <motion.div
                 initial={{ opacity: 0, y: 15, scale: 0.8 }}
