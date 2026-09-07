@@ -29,6 +29,7 @@ func SetupRouter(
 	feedbackHandler *handlers.FeedbackHandler,
 	analyticsHandler *handlers.AnalyticsHandler,
 	facultyDirectoryHandler *handlers.FacultyDirectoryHandler,
+	chatHandler *handlers.ChatHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -122,6 +123,8 @@ func SetupRouter(
 	r.GET("/faculty-directory", facultyDirectoryHandler.GetFacultyDirectory)
 	r.GET("/faculty-directory/auth/login", facultyDirectoryHandler.HandleDirectoryLogin)
 	r.GET("/faculty", facultyDirectoryHandler.GetFacultyDirectory)
+	r.POST("/api/chat", chatHandler.HandleChat)
+	r.POST("/chat", chatHandler.HandleChat)
 
 	// Protected routes
 	api := r.Group("/")
