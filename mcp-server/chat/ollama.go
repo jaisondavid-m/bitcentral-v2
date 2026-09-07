@@ -12,8 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mark3labs/mcp-go/mcp"
 	"mcp-server/tools"
+
+	"github.com/mark3labs/mcp-go/mcp"
 )
 
 type ChatMessage struct {
