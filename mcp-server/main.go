@@ -10,6 +10,7 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 
+	"mcp-server/chat"
 	"mcp-server/tools"
 )
 
@@ -207,6 +208,10 @@ func main() {
 	// SSE and Message handlers
 	mux.Handle("/sse", sseServer.SSEHandler())
 	mux.Handle("/message", sseServer.MessageHandler())
+
+	// AI Chat Assistant endpoint powered by Ollama (Qwen2.5 1.5B) + MCP Tools
+	mux.HandleFunc("/api/chat", chat.HandleChat)
+	mux.HandleFunc("/chat", chat.HandleChat)
 
 	// CORS wrapper
 	handler := corsMiddleware(mux)
