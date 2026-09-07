@@ -338,7 +338,7 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 	toolsList := GetToolDefinitions()
 	toolsUsed := []string{}
 
-	ctx, cancel := context.WithTimeout(r.Context(), 45*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), 120*time.Second)
 	defer cancel()
 
 	// Max 3 tool iteration steps
@@ -367,7 +367,7 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 		}
 		httpReq.Header.Set("Content-Type", "application/json")
 
-		client := &http.Client{Timeout: 35 * time.Second}
+		client := &http.Client{Timeout: 90 * time.Second}
 		resp, err := client.Do(httpReq)
 		if err != nil {
 			log.Printf("Ollama connection error: %v", err)
