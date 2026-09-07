@@ -31,7 +31,7 @@ func NewChatHandler() *ChatHandler {
 	return &ChatHandler{
 		MCPServerURL: mcpURL,
 		HTTPClient: &http.Client{
-			Timeout: 45 * time.Second,
+			Timeout: 120 * time.Second,
 		},
 	}
 }
