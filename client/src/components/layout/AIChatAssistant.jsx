@@ -224,20 +224,6 @@ export default function AIChatAssistant({ isOpen, onClose, currentRollNo = "" })
                 >
                   {renderFormattedMessage(msg.content)}
                 </div>
-
-                {/* Show tools executed */}
-                {msg.toolsUsed && msg.toolsUsed.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {msg.toolsUsed.map((tool, tIdx) => (
-                      <span
-                        key={tIdx}
-                        className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200/80 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700/40 font-mono shadow-2xs"
-                      >
-                        ⚡ MCP Tool: {tool}
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
           ))}

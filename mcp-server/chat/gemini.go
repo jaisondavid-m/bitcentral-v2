@@ -132,7 +132,7 @@ func GetToolDefinitions() []GeminiTool {
 		},
 		{
 			Name:        "get_mess_menu",
-			Description: "Get today's or a specific date's hostel mess menu for 'boys' or 'girls' hostel.",
+			Description: "Get today's or a specific date's hostel mess menu for 'boys' or 'girls' hostel. When asked for mess menu, invoke this tool for BOTH 'boys' and 'girls' hostels.",
 			Parameters: map[string]interface{}{
 				"type": "OBJECT",
 				"properties": map[string]interface{}{
@@ -359,9 +359,28 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Build System Prompt
-	systemPrompt := "You are BitBot, the intelligent official AI assistant for BitCentral at Bannari Amman Institute of Technology (BIT Sathy). You have access to real-time tools for looking up student reward points, mess menus, exam hall allocations, faculty phone numbers, and college leaves. Always be polite, helpful, concise, and accurate. When presenting information from tool results, format it cleanly using bullet points or standard Markdown."
+	loc, err := time.LoadLocation("Asia/Kolkata")
+	if err != nil {
+		loc = time.FixedZone("IST", 5*3600+1800)
+	}
+	currentTimeStr := time.Now().In(loc).Format("Monday, 02 Jan 2006, 03:04 PM IST")
+
+	systemPrompt := fmt.Sprintf(`You are BitBot, the intelligent official AI assistant for BitCentral at Bannari Amman Institute of Technology (BIT Sathy).
+Current time: %s.
+
+CRITICAL GUIDELINES FOR RESPONSES:
+1. MESS MENU INQUIRIES:
+   - When asked for the mess menu (e.g. "What is today's boys mess menu?"), retrieve the mess menu for BOTH "boys" AND "girls" hostels (by invoking 'get_mess_menu' with hostel="boys" and 'get_mess_menu' with hostel="girls").
+   - Display the Boys' Hostel Mess Menu first, followed immediately by the Girls' Hostel Mess Menu below it.
+   - Pay close attention to the current time (%s):
+     * If the current time is in the late afternoon/evening (e.g. 5:30 PM / after lunch), focus on and highlight the upcoming NIGHT MESS / DINNER menu for today.
+     * Clearly indicate the meal status (e.g., "🌙 Upcoming Night Mess / Dinner (7:00 PM – 8:30 PM)").
+2. GENERAL FORMATTING:
+   - Format cleanly with standard Markdown headers (###), bold items (**item**), and bullet points (- item).
+   - Never mention internal technical details or MCP tools.`, currentTimeStr, currentTimeStr)
+
 	if req.RollNo != "" {
-		systemPrompt += fmt.Sprintf(" The current logged-in student's roll number is %s.", req.RollNo)
+		systemPrompt += fmt.Sprintf(" Current logged-in student's roll number is %s.", req.RollNo)
 	}
 
 	systemInstruction := &GeminiSystemInstruction{
