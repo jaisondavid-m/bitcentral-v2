@@ -45,11 +45,13 @@ type GeminiPart struct {
 	Text             string                  `json:"text,omitempty"`
 	FunctionCall     *GeminiFunctionCall     `json:"functionCall,omitempty"`
 	FunctionResponse *GeminiFunctionResponse `json:"functionResponse,omitempty"`
+	ThoughtSignature string                  `json:"thought_signature,omitempty"`
 }
 
 type GeminiFunctionCall struct {
-	Name string                 `json:"name"`
-	Args map[string]interface{} `json:"args,omitempty"`
+	Name             string                 `json:"name"`
+	Args             map[string]interface{} `json:"args,omitempty"`
+	ThoughtSignature string                 `json:"thought_signature,omitempty"`
 }
 
 type GeminiFunctionResponse struct {
@@ -72,15 +74,15 @@ type GeminiSystemInstruction struct {
 }
 
 type GeminiRequest struct {
-	Contents          []GeminiContent          `json:"contents"`
+	Contents          []interface{}            `json:"contents"`
 	SystemInstruction *GeminiSystemInstruction `json:"systemInstruction,omitempty"`
 	Tools             []GeminiTool             `json:"tools,omitempty"`
 }
 
 type GeminiResponse struct {
 	Candidates []struct {
-		Content      GeminiContent `json:"content"`
-		FinishReason string        `json:"finishReason"`
+		Content      map[string]interface{} `json:"content"`
+		FinishReason string                 `json:"finishReason"`
 	} `json:"candidates"`
 	Error *struct {
 		Code    int    `json:"code"`
@@ -340,7 +342,7 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 
 	modelName := os.Getenv("GEMINI_MODEL")
 	if modelName == "" {
-		modelName = "gemini-2.0-flash"
+		modelName = "gemini-3.6-flash"
 	}
 
 	var req RequestBody
@@ -367,7 +369,7 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Prepare history in Gemini contents format
-	var contents []GeminiContent
+	var contents []interface{}
 	for _, h := range req.History {
 		role := "user"
 		if h.Role == "assistant" || h.Role == "model" {
@@ -460,8 +462,9 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 		}
 
 		candidate := geminiResp.Candidates[0]
-		parts := candidate.Content.Parts
+		rawContentMap := candidate.Content
 
+		parts, _ := rawContentMap["parts"].([]interface{})
 		if len(parts) == 0 {
 			w.WriteHeader(http.StatusInternalServerError)
 			_ = json.NewEncoder(w).Encode(ChatResponse{Success: false, Error: "No parts in candidate response from Gemini"})
@@ -470,38 +473,47 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 
 		// Check if candidate contains function call(s) or text
 		hasFunctionCall := false
-		// Append model's response to conversation contents
-		contents = append(contents, candidate.Content)
+		// Append model's response to conversation contents (preserves all fields including thought_signature!)
+		contents = append(contents, rawContentMap)
 
-		for _, part := range parts {
-			if part.FunctionCall != nil {
-				hasFunctionCall = true
-				fc := part.FunctionCall
-				toolsUsed = append(toolsUsed, fc.Name)
-				log.Printf("🤖 Gemini executing tool [%s] args: %v", fc.Name, fc.Args)
+		for _, p := range parts {
+			partMap, ok := p.(map[string]interface{})
+			if !ok {
+				continue
+			}
 
-				toolResultStr, toolErr := ExecuteMCPTool(ctx, fc.Name, fc.Args)
-				if toolErr != nil {
-					toolResultStr = fmt.Sprintf(`{"error": %q}`, toolErr.Error())
-				}
+			if fcVal, exists := partMap["functionCall"]; exists && fcVal != nil {
+				fcMap, ok := fcVal.(map[string]interface{})
+				if ok {
+					hasFunctionCall = true
+					funcName, _ := fcMap["name"].(string)
+					args, _ := fcMap["args"].(map[string]interface{})
+					toolsUsed = append(toolsUsed, funcName)
+					log.Printf("🤖 Gemini executing tool [%s] args: %v", funcName, args)
 
-				// Provide tool result back as user role functionResponse
-				contents = append(contents, GeminiContent{
-					Role: "user",
-					Parts: []GeminiPart{
-						{
-							FunctionResponse: &GeminiFunctionResponse{
-								Name: fc.Name,
-								Response: map[string]interface{}{
-									"name":   fc.Name,
-									"result": toolResultStr,
+					toolResultStr, toolErr := ExecuteMCPTool(ctx, funcName, args)
+					if toolErr != nil {
+						toolResultStr = fmt.Sprintf(`{"error": %q}`, toolErr.Error())
+					}
+
+					// Provide tool result back as user role functionResponse
+					contents = append(contents, map[string]interface{}{
+						"role": "user",
+						"parts": []map[string]interface{}{
+							{
+								"functionResponse": map[string]interface{}{
+									"name": funcName,
+									"response": map[string]interface{}{
+										"name":   funcName,
+										"result": toolResultStr,
+									},
 								},
 							},
 						},
-					},
-				})
-			} else if part.Text != "" {
-				finalAnswer = part.Text
+					})
+				}
+			} else if textVal, ok := partMap["text"].(string); ok && textVal != "" {
+				finalAnswer = textVal
 			}
 		}
 

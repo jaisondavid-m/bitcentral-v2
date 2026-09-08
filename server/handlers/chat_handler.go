@@ -61,7 +61,11 @@ func (h *ChatHandler) HandleChat(c *gin.Context) {
 		return
 	}
 
-	targetURL := fmtChatURL(h.MCPServerURL)
+	mcpURL := os.Getenv("MCP_SERVER_URL")
+	if mcpURL == "" {
+		mcpURL = h.MCPServerURL
+	}
+	targetURL := fmtChatURL(mcpURL)
 	req, err := http.NewRequestWithContext(c.Request.Context(), http.MethodPost, targetURL, bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
