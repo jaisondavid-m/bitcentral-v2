@@ -91,6 +91,73 @@ type GeminiResponse struct {
 	} `json:"error,omitempty"`
 }
 
+// OpenAI / Groq Compatible Data Structures
+type OpenAIFunction struct {
+	Name        string                 `json:"name"`
+	Description string                 `json:"description"`
+	Parameters  map[string]interface{} `json:"parameters"`
+}
+
+type OpenAITool struct {
+	Type     string         `json:"type"`
+	Function OpenAIFunction `json:"function"`
+}
+
+type OpenAIToolCallFunction struct {
+	Name      string `json:"name"`
+	Arguments string `json:"arguments"`
+}
+
+type OpenAIToolCall struct {
+	ID       string                 `json:"id"`
+	Type     string                 `json:"type"`
+	Function OpenAIToolCallFunction `json:"function"`
+}
+
+type OpenAIMessage struct {
+	Role       string           `json:"role"`
+	Content    string           `json:"content,omitempty"`
+	ToolCalls  []OpenAIToolCall `json:"tool_calls,omitempty"`
+	ToolCallID string           `json:"tool_call_id,omitempty"`
+}
+
+type OpenAIRequest struct {
+	Model       string          `json:"model"`
+	Messages    []OpenAIMessage `json:"messages"`
+	Tools       []OpenAITool    `json:"tools,omitempty"`
+	Temperature float64         `json:"temperature,omitempty"`
+}
+
+type OpenAIResponse struct {
+	Choices []struct {
+		Message      OpenAIMessage `json:"message"`
+		FinishReason string        `json:"finish_reason"`
+	} `json:"choices"`
+	Error *struct {
+		Message string `json:"message"`
+		Type    string `json:"type"`
+		Code    string `json:"code"`
+	} `json:"error,omitempty"`
+}
+
+func GetOpenAIToolDefinitions() []OpenAITool {
+	geminiTools := GetToolDefinitions()
+	var openAITools []OpenAITool
+	if len(geminiTools) > 0 {
+		for _, decl := range geminiTools[0].FunctionDeclarations {
+			openAITools = append(openAITools, OpenAITool{
+				Type: "function",
+				Function: OpenAIFunction{
+					Name:        decl.Name,
+					Description: decl.Description,
+					Parameters:  decl.Parameters,
+				},
+			})
+		}
+	}
+	return openAITools
+}
+
 // GetToolDefinitions returns Gemini-compatible function declarations
 func GetToolDefinitions() []GeminiTool {
 	declarations := []GeminiFunctionDeclaration{
@@ -330,17 +397,23 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type InternalAIKeyResp struct {
-		Success bool   `json:"success"`
-		APIKey  string `json:"api_key"`
-		Model   string `json:"model"`
-		Status  string `json:"status"`
+		Success  bool   `json:"success"`
+		APIKey   string `json:"api_key"`
+		Provider string `json:"provider"`
+		Model    string `json:"model"`
+		Status   string `json:"status"`
 	}
 
 	apiKey := os.Getenv("GEMINI_API_KEY")
-	modelName := os.Getenv("GEMINI_MODEL")
-	if modelName == "" {
-		modelName = "gemini-2.0-flash"
+	if apiKey == "" {
+		apiKey = os.Getenv("GROQ_API_KEY")
 	}
+	if apiKey == "" {
+		apiKey = os.Getenv("OPENAI_API_KEY")
+	}
+
+	modelName := os.Getenv("GEMINI_MODEL")
+	provider := os.Getenv("AI_PROVIDER")
 
 	// Query live AI Key & status stored in database via main backend
 	var dbKeyResp InternalAIKeyResp
@@ -361,16 +434,28 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 		if dbKeyResp.Model != "" {
 			modelName = dbKeyResp.Model
 		}
+		if dbKeyResp.Provider != "" {
+			provider = dbKeyResp.Provider
+		}
 	}
 
 	if apiKey == "" {
-		log.Printf("⚠️ GEMINI_API_KEY is missing in database and environment")
+		log.Printf("⚠️ AI_API_KEY is missing in database and environment")
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = json.NewEncoder(w).Encode(ChatResponse{
 			Success: false,
-			Error:   "GEMINI_API_KEY is not configured in database or environment. Please configure it in Admin Dashboard.",
+			Error:   "AI API Key is not configured in database or environment. Please configure it in Admin Dashboard.",
 		})
 		return
+	}
+
+	// Auto-detect provider if needed
+	if strings.HasPrefix(apiKey, "gsk_") {
+		provider = "groq"
+	} else if strings.HasPrefix(apiKey, "sk-") {
+		provider = "openai"
+	} else if provider == "" {
+		provider = "google_gemini"
 	}
 
 	var req RequestBody
@@ -411,6 +496,158 @@ CRITICAL GUIDELINES FOR RESPONSES:
 		systemPrompt += fmt.Sprintf(" Current logged-in student's roll number is %s.", req.RollNo)
 	}
 
+	toolsUsed := []string{}
+	ctx, cancel := context.WithTimeout(r.Context(), 60*time.Second)
+	defer cancel()
+
+	var finalAnswer string
+	client := &http.Client{Timeout: 45 * time.Second}
+
+	// Route to OpenAI/Groq if provider is groq or openai
+	if provider == "groq" || provider == "openai" {
+		endpointURL := "https://api.groq.com/openai/v1/chat/completions"
+		providerName := "Groq"
+		if provider == "openai" {
+			endpointURL = "https://api.openai.com/v1/chat/completions"
+			providerName = "OpenAI"
+		}
+
+		if modelName == "" || modelName == "gemini-2.0-flash" {
+			if provider == "groq" {
+				modelName = "llama-3.3-70b-versatile"
+			} else {
+				modelName = "gpt-4o-mini"
+			}
+		}
+
+		messages := []OpenAIMessage{
+			{Role: "system", Content: systemPrompt},
+		}
+		for _, h := range req.History {
+			role := "user"
+			if h.Role == "assistant" || h.Role == "model" {
+				role = "assistant"
+			}
+			messages = append(messages, OpenAIMessage{Role: role, Content: h.Content})
+		}
+		messages = append(messages, OpenAIMessage{Role: "user", Content: req.Message})
+
+		openAITools := GetOpenAIToolDefinitions()
+
+		for step := 0; step < 4; step++ {
+			openAIReq := OpenAIRequest{
+				Model:    modelName,
+				Messages: messages,
+				Tools:    openAITools,
+			}
+			reqBytes, err := json.Marshal(openAIReq)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				_ = json.NewEncoder(w).Encode(ChatResponse{Success: false, Error: "Failed to construct request"})
+				return
+			}
+
+			httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, endpointURL, bytes.NewBuffer(reqBytes))
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				_ = json.NewEncoder(w).Encode(ChatResponse{Success: false, Error: "Failed to create HTTP request"})
+				return
+			}
+			httpReq.Header.Set("Content-Type", "application/json")
+			httpReq.Header.Set("Authorization", "Bearer "+apiKey)
+
+			resp, err := client.Do(httpReq)
+			if err != nil {
+				log.Printf("%s API connection error: %v", providerName, err)
+				w.WriteHeader(http.StatusServiceUnavailable)
+				_ = json.NewEncoder(w).Encode(ChatResponse{
+					Success: false,
+					Error:   fmt.Sprintf("Unable to connect to %s API.", providerName),
+				})
+				return
+			}
+
+			respBytes, err := io.ReadAll(resp.Body)
+			resp.Body.Close()
+
+			if resp.StatusCode >= 400 {
+				log.Printf("%s API error status %d: %s", providerName, resp.StatusCode, string(respBytes))
+				w.WriteHeader(http.StatusInternalServerError)
+				_ = json.NewEncoder(w).Encode(ChatResponse{
+					Success: false,
+					Error:   fmt.Sprintf("%s API error status %d: %s", providerName, resp.StatusCode, string(respBytes)),
+				})
+				return
+			}
+
+			var oaiResp OpenAIResponse
+			if err := json.Unmarshal(respBytes, &oaiResp); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				_ = json.NewEncoder(w).Encode(ChatResponse{Success: false, Error: "Failed to parse AI response"})
+				return
+			}
+
+			if oaiResp.Error != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				_ = json.NewEncoder(w).Encode(ChatResponse{Success: false, Error: oaiResp.Error.Message})
+				return
+			}
+
+			if len(oaiResp.Choices) == 0 {
+				w.WriteHeader(http.StatusInternalServerError)
+				_ = json.NewEncoder(w).Encode(ChatResponse{Success: false, Error: "Empty response from AI model"})
+				return
+			}
+
+			choice := oaiResp.Choices[0]
+			messages = append(messages, choice.Message)
+
+			if choice.Message.Content != "" {
+				finalAnswer = choice.Message.Content
+			}
+
+			if len(choice.Message.ToolCalls) == 0 {
+				break
+			}
+
+			for _, tc := range choice.Message.ToolCalls {
+				funcName := tc.Function.Name
+				var args map[string]interface{}
+				if tc.Function.Arguments != "" {
+					_ = json.Unmarshal([]byte(tc.Function.Arguments), &args)
+				}
+				toolsUsed = append(toolsUsed, funcName)
+				log.Printf("🤖 %s executing tool [%s] args: %v", providerName, funcName, args)
+
+				toolResultStr, toolErr := ExecuteMCPTool(ctx, funcName, args)
+				if toolErr != nil {
+					toolResultStr = fmt.Sprintf(`{"error": %q}`, toolErr.Error())
+				}
+
+				messages = append(messages, OpenAIMessage{
+					Role:       "tool",
+					ToolCallID: tc.ID,
+					Content:    toolResultStr,
+				})
+			}
+		}
+
+		if finalAnswer == "" {
+			finalAnswer = "I evaluated your request, but could not produce a text response."
+		}
+
+		_ = json.NewEncoder(w).Encode(ChatResponse{
+			Success:   true,
+			Message:   finalAnswer,
+			ToolsUsed: toolsUsed,
+		})
+		return
+	}
+
+	if modelName == "" {
+		modelName = "gemini-2.0-flash"
+	}
+
 	systemInstruction := &GeminiSystemInstruction{
 		Parts: []GeminiPart{{Text: systemPrompt}},
 	}
@@ -433,13 +670,6 @@ CRITICAL GUIDELINES FOR RESPONSES:
 	})
 
 	toolsList := GetToolDefinitions()
-	toolsUsed := []string{}
-
-	ctx, cancel := context.WithTimeout(r.Context(), 60*time.Second)
-	defer cancel()
-
-	var finalAnswer string
-	client := &http.Client{Timeout: 45 * time.Second}
 
 	// Up to 4 multi-turn tool interaction steps
 	for step := 0; step < 4; step++ {
