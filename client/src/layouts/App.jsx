@@ -50,39 +50,7 @@ const ProtectedRoute = lazyWithRetry(() => import("../routes/ProtectedRoute.jsx"
 const AdminRoute = lazyWithRetry(() => import("../routes/AdminRoute.jsx"));
 const ProtectedLayout = lazyWithRetry(() => import("../routes/ProtectedLayout.jsx"));
 
-const AdminDashboard = lazyWithRetry(() =>
-  import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.default }))
-);
-const AdminAnalyticsPage = lazyWithRetry(() =>
-  import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminAnalyticsPage }))
-);
-const AdminUsersPage = lazyWithRetry(() =>
-  import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminUsersPage }))
-);
-const AdminUserDirectoryPage = lazyWithRetry(() =>
-  import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminUserDirectoryPage }))
-);
-const AdminSponsorsPage = lazyWithRetry(() =>
-  import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminSponsorsPage }))
-);
-const AdminQBPage = lazyWithRetry(() =>
-  import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminQBPage }))
-);
-const AdminPSRewardsPage = lazyWithRetry(() =>
-  import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminPSRewardsPage }))
-);
-const AdminCardsPage = lazyWithRetry(() =>
-  import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminCardsPage }))
-);
-const AdminMessPage = lazyWithRetry(() =>
-  import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminMessPage }))
-);
-const AdminFeedbackPage = lazyWithRetry(() =>
-  import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminFeedbackPage }))
-);
-const AdminAIKeyPage = lazyWithRetry(() =>
-  import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminAIKeyPage }))
-);
+const AdminDashboard = lazyWithRetry(() => import("@/pages/admin/AdminDashboard.jsx"));
 
 function App() {
   const location = useLocation();
@@ -208,7 +176,7 @@ function App() {
                 path="/admin/analytics"
                 element={
                   <AdminRoute>
-                    <AdminAnalyticsPage />
+                    <AdminDashboard />
                   </AdminRoute>
                 }
               />
@@ -216,7 +184,7 @@ function App() {
                 path="/admin/users"
                 element={
                   <AdminRoute>
-                    <AdminUsersPage />
+                    <AdminDashboard />
                   </AdminRoute>
                 }
               />
@@ -224,7 +192,7 @@ function App() {
                 path="/admin/user-directory"
                 element={
                   <AdminRoute>
-                    <AdminUserDirectoryPage />
+                    <AdminDashboard />
                   </AdminRoute>
                 }
               />
@@ -232,7 +200,7 @@ function App() {
                 path="/admin/sponsors"
                 element={
                   <AdminRoute>
-                    <AdminSponsorsPage />
+                    <AdminDashboard />
                   </AdminRoute>
                 }
               />
@@ -240,7 +208,7 @@ function App() {
                 path="/admin/qb"
                 element={
                   <AdminRoute>
-                    <AdminQBPage />
+                    <AdminDashboard />
                   </AdminRoute>
                 }
               />
@@ -248,7 +216,7 @@ function App() {
                 path="/admin/ps-rewards"
                 element={
                   <AdminRoute>
-                    <AdminPSRewardsPage />
+                    <AdminDashboard />
                   </AdminRoute>
                 }
               />
@@ -256,7 +224,7 @@ function App() {
                 path="/admin/cards"
                 element={
                   <AdminRoute>
-                    <AdminCardsPage />
+                    <AdminDashboard />
                   </AdminRoute>
                 }
               />
@@ -264,7 +232,7 @@ function App() {
                 path="/admin/mess"
                 element={
                   <AdminRoute>
-                    <AdminMessPage />
+                    <AdminDashboard />
                   </AdminRoute>
                 }
               />
@@ -272,7 +240,7 @@ function App() {
                 path="/admin/feedback"
                 element={
                   <AdminRoute>
-                    <AdminFeedbackPage />
+                    <AdminDashboard />
                   </AdminRoute>
                 }
               />
@@ -280,7 +248,7 @@ function App() {
                 path="/admin/ai-key"
                 element={
                   <AdminRoute>
-                    <AdminAIKeyPage />
+                    <AdminDashboard />
                   </AdminRoute>
                 }
               />

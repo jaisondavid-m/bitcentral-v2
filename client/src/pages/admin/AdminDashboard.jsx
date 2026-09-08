@@ -57,6 +57,7 @@ import {
   ChevronUp,
   Clock,
   Contact,
+  Cpu,
   Database,
   Download,
   Edit2,
