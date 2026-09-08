@@ -75,13 +75,14 @@ func (h *ChatHandler) HandleChat(c *gin.Context) {
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("User-Agent", "BitCentral-Backend/1.0")
 
 	resp, err := h.HTTPClient.Do(req)
 	if err != nil {
 		log.Printf("⚠️ MCP VPS Chat server unreachable (%s): %v", targetURL, err)
 		c.JSON(http.StatusServiceUnavailable, gin.H{
 			"success": false,
-			"error":   "BitBot AI Assistant (Google Gemini AI) on VPS is currently starting up or offline. Please verify VPS service status.",
+			"error":   fmt.Sprintf("BitBot AI Assistant on VPS unreachable (%s): %v", targetURL, err),
 		})
 		return
 	}
