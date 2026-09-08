@@ -30,6 +30,7 @@ func SetupRouter(
 	analyticsHandler *handlers.AnalyticsHandler,
 	facultyDirectoryHandler *handlers.FacultyDirectoryHandler,
 	chatHandler *handlers.ChatHandler,
+	aiHandler *handlers.AIHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -85,6 +86,9 @@ func SetupRouter(
 			},
 		})
 	})
+
+	// Public / Internal AI Key route for mcp-server
+	r.GET("/internal/ai-key", aiHandler.GetInternalAIKey)
 
 	// Public routes
 	r.GET("/auth/login", handler.HandleLogin)
@@ -216,6 +220,11 @@ func SetupRouter(
 		admin.DELETE("/mess/:id", messHandler.DeleteAdmin)
 		admin.PUT("/semesters/:year", semesterHandler.UpdateSemesterByYear)
 		admin.POST("/upload", uploadHandler.Upload)
+
+		// AI API Key management
+		admin.GET("/ai-key", aiHandler.GetAIKeyAdmin)
+		admin.PUT("/ai-key", aiHandler.UpdateAIKeyAdmin)
+		admin.POST("/ai-key/test", aiHandler.TestAIKey)
 
 		// Cards admin CRUD
 		admin.GET("/cards", handlers.GetCards)

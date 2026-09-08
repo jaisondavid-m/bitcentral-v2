@@ -80,6 +80,9 @@ const AdminMessPage = lazyWithRetry(() =>
 const AdminFeedbackPage = lazyWithRetry(() =>
   import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminFeedbackPage }))
 );
+const AdminAIKeyPage = lazyWithRetry(() =>
+  import("@/pages/admin/AdminDashboard.jsx").then((module) => ({ default: module.AdminAIKeyPage }))
+);
 
 function App() {
   const location = useLocation();
@@ -270,6 +273,14 @@ function App() {
                 element={
                   <AdminRoute>
                     <AdminFeedbackPage />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/ai-key"
+                element={
+                  <AdminRoute>
+                    <AdminAIKeyPage />
                   </AdminRoute>
                 }
               />

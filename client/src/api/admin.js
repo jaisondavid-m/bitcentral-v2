@@ -553,4 +553,22 @@ export async function getAdminAnalytics() {
       source: "Google Auth & Analytics Engine",
     };
   }
+}
+
+export async function getAIKeyConfig() {
+  const headers = await getAdminHeaders();
+  const response = await api.get("/admin/ai-key", { headers });
+  return response.data;
+}
+
+export async function updateAIKeyConfig(payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.put("/admin/ai-key", payload, { headers });
+  return response.data;
+}
+
+export async function testAIKeyConfig(payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.post("/admin/ai-key/test", payload, { headers });
+  return response.data;
 }
