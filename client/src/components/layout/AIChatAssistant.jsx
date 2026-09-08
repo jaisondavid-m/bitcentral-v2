@@ -28,7 +28,7 @@ export default function AIChatAssistant({ isOpen, onClose, currentRollNo = "" })
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-      content: "👋 Hi! I'm **BitBot**, your AI assistant powered by **Qwen2.5 1.5B** on BitCentral's MCP Server. How can I help you today?",
+      content: "👋 Hi! I'm **BitBot**, your AI assistant powered by **Google Gemini 2.0 Flash** on BitCentral's MCP Server. How can I help you today?",
       toolsUsed: [],
     },
   ]);

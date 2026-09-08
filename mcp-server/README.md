@@ -51,6 +51,8 @@ go run . --stdio
    - **Dockerfile Path:** `Dockerfile`
 4. In **Environment Variables**, add:
    - `PORT`: `10000` (Render's default)
+   - `GEMINI_API_KEY`: Your Google Gemini API key
+   - `GEMINI_MODEL`: `gemini-2.0-flash` (optional, defaults to `gemini-2.0-flash`)
    - `BACKEND_URL`: Your deployed BitCentral backend URL (e.g. `https://bitcentral.bitsathy.in` or `https://bitcentral-server.onrender.com`)
    - `BACKEND_AUTH_TOKEN`: *(Optional, if backend requires token)*
 5. Click **Create Web Service**.
