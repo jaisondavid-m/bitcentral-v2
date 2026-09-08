@@ -5,23 +5,12 @@ import {
   X, 
   Sparkles, 
   User, 
-  Utensils, 
-  Award, 
-  BookOpen, 
-  Search, 
-  Calendar, 
   RefreshCw,
   Cpu
 } from "lucide-react";
 import { sendChatMessage } from "@/api/chat";
 
-const QUICK_PROMPTS = [
-  { label: "Today's Mess Menu 🍱", prompt: "What is today's boys mess menu?", icon: Utensils },
-  { label: "Check Reward Points 🏆", prompt: "Check reward points balance for 7376251CS221", icon: Award },
-  { label: "Search Faculty Phone 📞", prompt: "Search contact details of CSE faculty", icon: Search },
-  { label: "Exam Hall Location 📍", prompt: "What is my exam hall location?", icon: BookOpen },
-  { label: "Upcoming Leaves 🌴", prompt: "Show upcoming college leaves and holidays", icon: Calendar },
-];
+
 
 function parseInlineFormatting(str) {
   if (!str) return null;
@@ -385,23 +374,7 @@ export default function AIChatAssistant({ isOpen, onClose, currentRollNo = "" })
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Suggestion Pills */}
-        <div className="px-3 py-2.5 bg-slate-100/90 dark:bg-slate-900/90 border-t border-slate-200/80 dark:border-slate-800 flex gap-2 overflow-x-auto no-scrollbar shrink-0">
-          {QUICK_PROMPTS.map((promptObj, pIdx) => {
-            const Icon = promptObj.icon;
-            return (
-              <button
-                key={pIdx}
-                onClick={() => handleSend(promptObj.prompt)}
-                disabled={isLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-600 border border-slate-200/90 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-700 shadow-2xs whitespace-nowrap transition-all duration-150 shrink-0 cursor-pointer"
-              >
-                <Icon className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                {promptObj.label}
-              </button>
-            );
-          })}
-        </div>
+
 
         {/* Input Bar */}
         <form
