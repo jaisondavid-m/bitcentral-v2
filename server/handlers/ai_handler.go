@@ -178,56 +178,78 @@ func (h *AIHandler) UpdateAIKeyAdmin(c *gin.Context) {
 	})
 }
 
-// GetInternalAIKey returns unmasked API key for mcp-server background requests
+// GetInternalAIKey returns unmasked API key and provider info for mcp-server background requests
 func (h *AIHandler) GetInternalAIKey(c *gin.Context) {
 	h.ensureTableExists()
 
-	var apiKey, model, status sql.NullString
-	query := `SELECT api_key, model, status FROM ai_api_keys WHERE key_name = 'default_gemini' LIMIT 1`
-	err := h.DB.QueryRow(query).Scan(&apiKey, &model, &status)
+	var apiKey, provider, model, status sql.NullString
+	query := `SELECT api_key, provider, model, status FROM ai_api_keys WHERE key_name = 'default_gemini' LIMIT 1`
+	err := h.DB.QueryRow(query).Scan(&apiKey, &provider, &model, &status)
 	if err != nil && err != sql.ErrNoRows {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
 	}
 
 	keyStr := strings.TrimSpace(apiKey.String)
+	providerStr := strings.TrimSpace(provider.String)
 	modelStr := strings.TrimSpace(model.String)
 	statusStr := strings.TrimSpace(status.String)
 
 	if statusStr == "" {
 		statusStr = "active"
 	}
+	if strings.HasPrefix(keyStr, "gsk_") && (providerStr == "" || providerStr == "google_gemini") {
+		providerStr = "groq"
+	}
+	if strings.HasPrefix(keyStr, "sk-") && (providerStr == "" || providerStr == "google_gemini") {
+		providerStr = "openai"
+	}
+	if providerStr == "" {
+		providerStr = "google_gemini"
+	}
 	if modelStr == "" {
-		modelStr = "gemini-2.0-flash"
+		if providerStr == "groq" {
+			modelStr = "llama-3.3-70b-versatile"
+		} else if providerStr == "openai" {
+			modelStr = "gpt-4o-mini"
+		} else {
+			modelStr = "gemini-2.0-flash"
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"api_key": keyStr,
-		"model":   modelStr,
-		"status":  statusStr,
+		"success":  true,
+		"api_key":  keyStr,
+		"provider": providerStr,
+		"model":    modelStr,
+		"status":   statusStr,
 	})
 }
 
-// TestAIKey sends a quick verification request to Google Gemini API to test the key
+// TestAIKey sends a verification request to the appropriate AI provider (Gemini, Groq, OpenAI) to test the key
 func (h *AIHandler) TestAIKey(c *gin.Context) {
 	var body struct {
-		APIKey string `json:"api_key"`
-		Model  string `json:"model"`
+		APIKey   string `json:"api_key"`
+		Provider string `json:"provider"`
+		Model    string `json:"model"`
 	}
 	_ = c.ShouldBindJSON(&body)
 
 	keyToTest := strings.TrimSpace(body.APIKey)
+	providerToTest := strings.TrimSpace(body.Provider)
 	modelToTest := strings.TrimSpace(body.Model)
-	if modelToTest == "" {
-		modelToTest = "gemini-2.0-flash"
-	}
 
 	if keyToTest == "" || strings.Contains(keyToTest, "••••") {
-		var existingKey string
-		err := h.DB.QueryRow(`SELECT api_key FROM ai_api_keys WHERE key_name = 'default_gemini'`).Scan(&existingKey)
+		var existingKey, existingProvider, existingModel string
+		err := h.DB.QueryRow(`SELECT api_key, provider, model FROM ai_api_keys WHERE key_name = 'default_gemini'`).Scan(&existingKey, &existingProvider, &existingModel)
 		if err == nil {
 			keyToTest = existingKey
+			if providerToTest == "" {
+				providerToTest = existingProvider
+			}
+			if modelToTest == "" {
+				modelToTest = existingModel
+			}
 		}
 	}
 
@@ -236,7 +258,77 @@ func (h *AIHandler) TestAIKey(c *gin.Context) {
 		return
 	}
 
-	// Send tiny test payload to Gemini API
+	// Auto-detect provider if prefix matches
+	if strings.HasPrefix(keyToTest, "gsk_") {
+		providerToTest = "groq"
+	} else if strings.HasPrefix(keyToTest, "sk-") {
+		providerToTest = "openai"
+	} else if providerToTest == "" {
+		providerToTest = "google_gemini"
+	}
+
+	client := &http.Client{Timeout: 15 * time.Second}
+
+	if providerToTest == "groq" || providerToTest == "openai" {
+		if modelToTest == "" || modelToTest == "gemini-2.0-flash" {
+			if providerToTest == "groq" {
+				modelToTest = "llama-3.3-70b-versatile"
+			} else {
+				modelToTest = "gpt-4o-mini"
+			}
+		}
+
+		endpointURL := "https://api.groq.com/openai/v1/chat/completions"
+		providerName := "Groq"
+		if providerToTest == "openai" {
+			endpointURL = "https://api.openai.com/v1/chat/completions"
+			providerName = "OpenAI"
+		}
+
+		payload := map[string]interface{}{
+			"model": modelToTest,
+			"messages": []map[string]string{
+				{"role": "user", "content": "Hello, respond with 'OK'."},
+			},
+			"max_tokens": 10,
+		}
+		reqBytes, _ := json.Marshal(payload)
+		httpReq, err := http.NewRequest(http.MethodPost, endpointURL, bytes.NewBuffer(reqBytes))
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{"success": false, "message": fmt.Sprintf("Failed to construct test request: %v", err)})
+			return
+		}
+		httpReq.Header.Set("Content-Type", "application/json")
+		httpReq.Header.Set("Authorization", "Bearer "+keyToTest)
+
+		resp, err := client.Do(httpReq)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{"success": false, "message": fmt.Sprintf("Connection test failed: %v", err)})
+			return
+		}
+		defer resp.Body.Close()
+
+		respBytes, _ := io.ReadAll(resp.Body)
+		if resp.StatusCode >= 400 {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": fmt.Sprintf("%s API returned status %d: %s", providerName, resp.StatusCode, string(respBytes)),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"message": fmt.Sprintf("✅ API Key verified successfully! %s Provider with Model %s is active.", providerName, modelToTest),
+		})
+		return
+	}
+
+	// Default Google Gemini
+	if modelToTest == "" {
+		modelToTest = "gemini-2.0-flash"
+	}
+
 	testReqPayload := map[string]interface{}{
 		"contents": []map[string]interface{}{
 			{
@@ -249,7 +341,6 @@ func (h *AIHandler) TestAIKey(c *gin.Context) {
 	reqBytes, _ := json.Marshal(testReqPayload)
 	apiURL := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s", modelToTest, keyToTest)
 
-	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Post(apiURL, "application/json", bytes.NewBuffer(reqBytes))
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -271,6 +362,6 @@ func (h *AIHandler) TestAIKey(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": fmt.Sprintf("✅ API Key verified successfully! Model %s is active.", modelToTest),
+		"message": fmt.Sprintf("✅ API Key verified successfully! Google Gemini Model %s is active.", modelToTest),
 	})
 }

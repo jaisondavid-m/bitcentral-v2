@@ -6029,6 +6029,7 @@ function AIKeySection() {
   const [inputKey, setInputKey] = useState("");
   const [showKey, setShowKey] = useState(false);
   const [status, setStatus] = useState("active");
+  const [provider, setProvider] = useState("google_gemini");
   const [model, setModel] = useState("gemini-2.0-flash");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -6044,6 +6045,7 @@ function AIKeySection() {
         setConfigData(res.data);
         setInputKey(res.data.masked_key || "");
         setStatus(res.data.status || "active");
+        setProvider(res.data.provider || "google_gemini");
         setModel(res.data.model || "gemini-2.0-flash");
       }
     } catch (err) {
@@ -6057,6 +6059,38 @@ function AIKeySection() {
     fetchConfig();
   }, [fetchConfig]);
 
+  const handleKeyInputChange = (val) => {
+    setInputKey(val);
+    const trimmed = val.trim();
+    if (trimmed.startsWith("gsk_")) {
+      setProvider("groq");
+      if (model === "gemini-2.0-flash" || model.startsWith("gemini-") || model.startsWith("gpt-")) {
+        setModel("llama-3.3-70b-versatile");
+      }
+    } else if (trimmed.startsWith("sk-")) {
+      setProvider("openai");
+      if (model === "gemini-2.0-flash" || model.startsWith("gemini-") || model.startsWith("llama-")) {
+        setModel("gpt-4o-mini");
+      }
+    } else if (trimmed.startsWith("AIza")) {
+      setProvider("google_gemini");
+      if (model.startsWith("llama-") || model.startsWith("gpt-")) {
+        setModel("gemini-2.0-flash");
+      }
+    }
+  };
+
+  const handleProviderChange = (newProv) => {
+    setProvider(newProv);
+    if (newProv === "groq") {
+      setModel("llama-3.3-70b-versatile");
+    } else if (newProv === "openai") {
+      setModel("gpt-4o-mini");
+    } else {
+      setModel("gemini-2.0-flash");
+    }
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -6068,7 +6102,7 @@ function AIKeySection() {
         api_key: inputKey,
         status: status,
         model: model,
-        provider: "google_gemini",
+        provider: provider,
       });
 
       if (res?.success) {
@@ -6095,6 +6129,7 @@ function AIKeySection() {
     try {
       const res = await testAIKeyConfig({
         api_key: inputKey,
+        provider: provider,
         model: model,
       });
 
@@ -6125,10 +6160,10 @@ function AIKeySection() {
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2.5">
             <Cpu className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-            AI API Key & Model Management
+            AI API Key & Provider Management
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Store and manage Google Gemini API keys in MySQL database table. BitBot MCP server reads live settings dynamically.
+            Store and manage Google Gemini, Groq, or OpenAI API keys in MySQL database. BitBot MCP server uses live settings dynamically.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -6148,17 +6183,64 @@ function AIKeySection() {
       {/* Settings Form */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <form onSubmit={handleSave} className="space-y-6">
+          {/* Provider Selection */}
+          <div className="space-y-2">
+            <label className="block text-sm font-bold text-slate-900 dark:text-white">
+              AI Provider
+            </label>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <button
+                type="button"
+                onClick={() => handleProviderChange("groq")}
+                className={`flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-bold transition ${
+                  provider === "groq"
+                    ? "border-blue-500 bg-blue-50/60 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 ring-2 ring-blue-500/20"
+                    : "border-slate-200 bg-slate-50/50 text-slate-700 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-300"
+                }`}
+              >
+                <span className="text-sm font-extrabold">Groq</span>
+                <span className="text-[10px] font-normal text-slate-500 dark:text-slate-400 mt-0.5">Ultra Fast Llama / DeepSeek</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleProviderChange("google_gemini")}
+                className={`flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-bold transition ${
+                  provider === "google_gemini"
+                    ? "border-blue-500 bg-blue-50/60 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 ring-2 ring-blue-500/20"
+                    : "border-slate-200 bg-slate-50/50 text-slate-700 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-300"
+                }`}
+              >
+                <span className="text-sm font-extrabold">Google Gemini</span>
+                <span className="text-[10px] font-normal text-slate-500 dark:text-slate-400 mt-0.5">Gemini 2.0 Flash / Pro</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleProviderChange("openai")}
+                className={`flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-bold transition ${
+                  provider === "openai"
+                    ? "border-blue-500 bg-blue-50/60 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 ring-2 ring-blue-500/20"
+                    : "border-slate-200 bg-slate-50/50 text-slate-700 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-300"
+                }`}
+              >
+                <span className="text-sm font-extrabold">OpenAI</span>
+                <span className="text-[10px] font-normal text-slate-500 dark:text-slate-400 mt-0.5">GPT-4o / GPT-4o-mini</span>
+              </button>
+            </div>
+          </div>
+
           {/* API Key Input */}
           <div className="space-y-2">
             <label className="block text-sm font-bold text-slate-900 dark:text-white">
-              Google Gemini API Key
+              {provider === "groq" ? "Groq API Key" : provider === "openai" ? "OpenAI API Key" : "Google Gemini API Key"}
             </label>
             <div className="relative">
               <input
                 type={showKey ? "text" : "password"}
                 value={inputKey}
-                onChange={(e) => setInputKey(e.target.value)}
-                placeholder="Paste your Gemini API key (e.g. AIzaSy...)"
+                onChange={(e) => handleKeyInputChange(e.target.value)}
+                placeholder={provider === "groq" ? "Paste your Groq API key (e.g. gsk_...)" : provider === "openai" ? "Paste OpenAI key (e.g. sk-...)" : "Paste Gemini API key (e.g. AIzaSy...)"}
                 required
                 className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-blue-400 font-mono"
               />
@@ -6187,9 +6269,27 @@ function AIKeySection() {
                 onChange={(e) => setModel(e.target.value)}
                 className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
               >
-                <option value="gemini-2.0-flash">gemini-2.0-flash (Recommended - Fast & Powerful)</option>
-                <option value="gemini-1.5-flash">gemini-1.5-flash (Standard Flash)</option>
-                <option value="gemini-1.5-pro">gemini-1.5-pro (High Reasoning)</option>
+                {provider === "groq" ? (
+                  <>
+                    <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Recommended - Llama 3.3 70B)</option>
+                    <option value="mixtral-8x7b-32768">mixtral-8x7b-32768 (Mixtral 8x7B)</option>
+                    <option value="qwen-2.5-coder-32b">qwen-2.5-coder-32b (Qwen 2.5 Coder)</option>
+                    <option value="deepseek-r1-distill-llama-70b">deepseek-r1-distill-llama-70b (DeepSeek R1 70B)</option>
+                    <option value="gemma2-9b-it">gemma2-9b-it (Gemma 2 9B)</option>
+                  </>
+                ) : provider === "openai" ? (
+                  <>
+                    <option value="gpt-4o-mini">gpt-4o-mini (Recommended - Fast & Cost Efficient)</option>
+                    <option value="gpt-4o">gpt-4o (GPT-4 Omni Flagship)</option>
+                    <option value="gpt-4-turbo">gpt-4-turbo (GPT-4 Turbo)</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="gemini-2.0-flash">gemini-2.0-flash (Recommended - Fast & Powerful)</option>
+                    <option value="gemini-1.5-flash">gemini-1.5-flash (Standard Flash)</option>
+                    <option value="gemini-1.5-pro">gemini-1.5-pro (High Reasoning)</option>
+                  </>
+                )}
               </select>
             </div>
 
