@@ -208,7 +208,7 @@ export default function BitBot() {
       </main>
 
       {/* ── Input ── */}
-      <div className="sticky bottom-0 bg-white border-t border-slate-200 px-4 sm:px-6 py-3">
+      <div className="sticky bottom-0 z-50 bg-white border-t border-slate-200 px-4 sm:px-6 py-3">
         <form
           onSubmit={e => { e.preventDefault(); handleSend(); }}
           className="flex items-center gap-2 max-w-2xl mx-auto"
