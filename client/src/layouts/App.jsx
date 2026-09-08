@@ -42,6 +42,8 @@ const SupportDev = lazyWithRetry(() => import("@/pages/student/SupportDev.jsx"))
 const PaymentSuccessful = lazyWithRetry(() => import("@/pages/student/PaymentSuccessful.jsx"));
 const WifiDetails = lazyWithRetry(() => import("@/pages/student/WifiDetails.jsx"));
 const FacultyDirectory = lazyWithRetry(() => import("@/pages/student/FacultyDirectory.jsx"));
+const BitBot = lazyWithRetry(() => import("@/pages/student/BitBot.jsx"));
+
 const AK22PH202 = lazyWithRetry(() => import("@/pages/answers/AK__22PH202.jsx"));
 const AnswerKey22HS006 = lazyWithRetry(() => import("@/pages/answers/AnswerKey22HS006.jsx"));
 // const DocsPage = lazyWithRetry(() => import("@/pages/public/AboutDocs.jsx"));
@@ -287,6 +289,8 @@ function App() {
               <Route path="/payment-successful/:id" element={<PaymentSuccessful />} />
               <Route path="/payment-successfull" element={<PaymentSuccessful />} />
               <Route path="/payment-successfull/:id" element={<PaymentSuccessful />} />
+              <Route path="/bitbot" element={<BitBot />} />
+
               <Route path="*" element={<NotFound />} />
               <Route path="/ak_22ph202" element={<AK22PH202 />} />
               <Route path="/tamil_ak" element={<AnswerKey22HS006 />} />

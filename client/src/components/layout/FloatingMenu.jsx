@@ -18,7 +18,7 @@ import {
 import { BiSupport, BiDonateHeart } from "react-icons/bi";
 import { sendFeedbackMessage, getFeedbackMessages } from "@/api/feedback.js";
 import { useNavigate, useLocation } from "react-router-dom";
-import AIChatAssistant from "./AIChatAssistant.jsx";
+
 
 export default function FloatingMenu() {
   const { user } = useAuth();
@@ -27,12 +27,12 @@ export default function FloatingMenu() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
 
   const handleOpenAIAssistant = () => {
     setIsMenuOpen(false);
-    setIsAIAssistantOpen(true);
+    navigate("/bitbot");
   };
+
 
   // Feedback Chat state
   const [messages, setMessages] = useState([]);
@@ -424,11 +424,6 @@ export default function FloatingMenu() {
         )}
       </AnimatePresence>
 
-      <AIChatAssistant
-        isOpen={isAIAssistantOpen}
-        onClose={() => setIsAIAssistantOpen(false)}
-        currentRollNo={user?.roll_no || user?.rollNo || ""}
-      />
     </>
   );
 }
