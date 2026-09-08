@@ -26,9 +26,10 @@ RUN apk add --no-cache ca-certificates tzdata
 
 COPY --from=builder /app/mcp-server /app/mcp-server
 
-# Default port
+# Default port & environment
 ENV PORT=8081
 ENV BACKEND_URL=https://bitcentral.bitsathy.in
+ENV GEMINI_MODEL=gemini-3.6-flash
 
 EXPOSE 8081
 
