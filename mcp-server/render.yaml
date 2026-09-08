@@ -17,3 +17,7 @@ services:
         sync: false
       - key: BACKEND_AUTH_TOKEN
         sync: false
+      - key: GOOGLE_SEARCH_API_KEY
+        sync: false
+      - key: GOOGLE_SEARCH_CX
+        value: 73b083242e5504271
