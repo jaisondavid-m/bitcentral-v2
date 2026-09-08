@@ -140,17 +140,46 @@ type OpenAIResponse struct {
 	} `json:"error,omitempty"`
 }
 
+func normalizeJSONSchemaTypes(v interface{}) interface{} {
+	switch val := v.(type) {
+	case map[string]interface{}:
+		res := make(map[string]interface{})
+		for k, item := range val {
+			if k == "type" {
+				if strType, ok := item.(string); ok {
+					res[k] = strings.ToLower(strType)
+					continue
+				}
+			}
+			res[k] = normalizeJSONSchemaTypes(item)
+		}
+		return res
+	case []interface{}:
+		res := make([]interface{}, len(val))
+		for i, item := range val {
+			res[i] = normalizeJSONSchemaTypes(item)
+		}
+		return res
+	default:
+		return v
+	}
+}
+
 func GetOpenAIToolDefinitions() []OpenAITool {
 	geminiTools := GetToolDefinitions()
 	var openAITools []OpenAITool
 	if len(geminiTools) > 0 {
 		for _, decl := range geminiTools[0].FunctionDeclarations {
+			normParams, ok := normalizeJSONSchemaTypes(decl.Parameters).(map[string]interface{})
+			if !ok {
+				normParams = decl.Parameters
+			}
 			openAITools = append(openAITools, OpenAITool{
 				Type: "function",
 				Function: OpenAIFunction{
 					Name:        decl.Name,
 					Description: decl.Description,
-					Parameters:  decl.Parameters,
+					Parameters:  normParams,
 				},
 			})
 		}
@@ -158,17 +187,17 @@ func GetOpenAIToolDefinitions() []OpenAITool {
 	return openAITools
 }
 
-// GetToolDefinitions returns Gemini-compatible function declarations
+// GetToolDefinitions returns Gemini & OpenAI-compatible function declarations
 func GetToolDefinitions() []GeminiTool {
 	declarations := []GeminiFunctionDeclaration{
 		{
 			Name:        "get_student_reward_points",
 			Description: "Get reward points balance and student profile by roll number (e.g. 7376231CS106) or student name.",
 			Parameters: map[string]interface{}{
-				"type": "OBJECT",
+				"type": "object",
 				"properties": map[string]interface{}{
 					"query": map[string]interface{}{
-						"type":        "STRING",
+						"type":        "string",
 						"description": "Student roll number (e.g. '7376231CS106') or student name",
 					},
 				},
@@ -179,10 +208,10 @@ func GetToolDefinitions() []GeminiTool {
 			Name:        "get_student_reward_history",
 			Description: "Get detailed activity history of reward points for a student roll number.",
 			Parameters: map[string]interface{}{
-				"type": "OBJECT",
+				"type": "object",
 				"properties": map[string]interface{}{
 					"roll_no": map[string]interface{}{
-						"type":        "STRING",
+						"type":        "string",
 						"description": "Student roll number (e.g. '7376231CS106')",
 					},
 				},
@@ -193,7 +222,7 @@ func GetToolDefinitions() []GeminiTool {
 			Name:        "get_reward_points_averages",
 			Description: "Get overall college batch/year-wise average reward points.",
 			Parameters: map[string]interface{}{
-				"type":       "OBJECT",
+				"type":       "object",
 				"properties": map[string]interface{}{},
 			},
 		},
@@ -201,15 +230,15 @@ func GetToolDefinitions() []GeminiTool {
 			Name:        "get_mess_menu",
 			Description: "Get today's or a specific date's hostel mess menu for 'boys' or 'girls' hostel. When asked for mess menu, invoke this tool for BOTH 'boys' and 'girls' hostels.",
 			Parameters: map[string]interface{}{
-				"type": "OBJECT",
+				"type": "object",
 				"properties": map[string]interface{}{
 					"hostel": map[string]interface{}{
-						"type":        "STRING",
+						"type":        "string",
 						"enum":        []string{"boys", "girls"},
 						"description": "Hostel category: 'boys' or 'girls'",
 					},
 					"date": map[string]interface{}{
-						"type":        "STRING",
+						"type":        "string",
 						"description": "Date in YYYY-MM-DD format (optional)",
 					},
 				},
@@ -220,7 +249,7 @@ func GetToolDefinitions() []GeminiTool {
 			Name:        "get_mess_timings",
 			Description: "Get timing schedule for breakfast, lunch, and dinner in the hostel mess.",
 			Parameters: map[string]interface{}{
-				"type":       "OBJECT",
+				"type":       "object",
 				"properties": map[string]interface{}{},
 			},
 		},
@@ -228,14 +257,14 @@ func GetToolDefinitions() []GeminiTool {
 			Name:        "search_faculty_directory",
 			Description: "Search faculty phone numbers, emails, department, and designation by name or department.",
 			Parameters: map[string]interface{}{
-				"type": "OBJECT",
+				"type": "object",
 				"properties": map[string]interface{}{
 					"query": map[string]interface{}{
-						"type":        "STRING",
+						"type":        "string",
 						"description": "Faculty name or keyword",
 					},
 					"department": map[string]interface{}{
-						"type":        "STRING",
+						"type":        "string",
 						"description": "Department name (e.g. 'CSE', 'ECE', 'MECH')",
 					},
 				},
@@ -245,10 +274,10 @@ func GetToolDefinitions() []GeminiTool {
 			Name:        "get_student_exam_halls",
 			Description: "Get all exam sessions, hall numbers, block names, and timings for a student by roll number.",
 			Parameters: map[string]interface{}{
-				"type": "OBJECT",
+				"type": "object",
 				"properties": map[string]interface{}{
 					"register_no": map[string]interface{}{
-						"type":        "STRING",
+						"type":        "string",
 						"description": "Student register/roll number (e.g. '7376231CS106')",
 					},
 				},
@@ -259,14 +288,14 @@ func GetToolDefinitions() []GeminiTool {
 			Name:        "get_exam_hall_by_course",
 			Description: "Lookup specific exam hall number and block for a student register number and course code.",
 			Parameters: map[string]interface{}{
-				"type": "OBJECT",
+				"type": "object",
 				"properties": map[string]interface{}{
 					"register_no": map[string]interface{}{
-						"type":        "STRING",
+						"type":        "string",
 						"description": "Student register number (e.g. '7376231CS106')",
 					},
 					"course_code": map[string]interface{}{
-						"type":        "STRING",
+						"type":        "string",
 						"description": "Course/Subject code (e.g. '22CS501')",
 					},
 				},
@@ -277,10 +306,10 @@ func GetToolDefinitions() []GeminiTool {
 			Name:        "get_leave_details",
 			Description: "Get college leaves, holidays, and days countdown notice.",
 			Parameters: map[string]interface{}{
-				"type": "OBJECT",
+				"type": "object",
 				"properties": map[string]interface{}{
 					"status": map[string]interface{}{
-						"type":        "STRING",
+						"type":        "string",
 						"enum":        []string{"upcoming", "past", "all"},
 						"description": "Leave filter status: 'upcoming', 'past', or 'all'",
 					},
@@ -291,14 +320,14 @@ func GetToolDefinitions() []GeminiTool {
 			Name:        "get_reward_points_leaderboard",
 			Description: "Get top 10 ranked students by reward points.",
 			Parameters: map[string]interface{}{
-				"type": "OBJECT",
+				"type": "object",
 				"properties": map[string]interface{}{
 					"year": map[string]interface{}{
-						"type":        "STRING",
+						"type":        "string",
 						"description": "Year: 'I', 'II', 'III', or 'IV'",
 					},
 					"department": map[string]interface{}{
-						"type":        "STRING",
+						"type":        "string",
 						"description": "Department filter (e.g. 'CSE')",
 					},
 				},
@@ -308,10 +337,10 @@ func GetToolDefinitions() []GeminiTool {
 			Name:        "get_sponsors_leaderboard",
 			Description: "Get top contributors and department sponsor leaderboards.",
 			Parameters: map[string]interface{}{
-				"type": "OBJECT",
+				"type": "object",
 				"properties": map[string]interface{}{
 					"type": map[string]interface{}{
-						"type":        "STRING",
+						"type":        "string",
 						"enum":        []string{"individual", "department"},
 						"description": "Leaderboard type: 'individual' or 'department'",
 					},
