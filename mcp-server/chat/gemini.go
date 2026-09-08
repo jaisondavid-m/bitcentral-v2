@@ -350,6 +350,20 @@ func GetToolDefinitions() []GeminiTool {
 				},
 			},
 		},
+		{
+			Name:        "google_search",
+			Description: "Search Google for real-time information strictly about BIT Sathy (Bannari Amman Institute of Technology), BitCentral, or Jaison David. Only use this tool when the question is about these topics AND cannot be answered by the other available tools.",
+			Parameters: map[string]interface{}{
+				"type": "object",
+				"properties": map[string]interface{}{
+					"query": map[string]interface{}{
+						"type":        "string",
+						"description": "Search query. Must include 'BIT Sathy', 'BitCentral', or 'Jaison David' as context.",
+					},
+				},
+				"required": []string{"query"},
+			},
+		},
 	}
 
 	return []GeminiTool{
@@ -393,6 +407,8 @@ func ExecuteMCPTool(ctx context.Context, name string, args map[string]interface{
 		res, err = tools.GetRewardPointsLeaderboardHandler(ctx, req)
 	case "get_sponsors_leaderboard":
 		res, err = tools.GetSponsorsLeaderboardHandler(ctx, req)
+	case "google_search":
+		res, err = tools.GoogleSearchHandler(ctx, req)
 	default:
 		return "", fmt.Errorf("unknown tool: %s", name)
 	}
@@ -560,20 +576,32 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 	systemPrompt := fmt.Sprintf(`You are BitBot, the intelligent official AI assistant for BitCentral at Bannari Amman Institute of Technology (BIT Sathy).
 Current time: %s.
 
-CRITICAL GUIDELINES FOR RESPONSES:
-1. MESS MENU INQUIRIES:
-   - When asked for the mess menu (e.g. "What is today's boys mess menu?"), retrieve the mess menu for BOTH "boys" AND "girls" hostels (by invoking 'get_mess_menu' with hostel="boys" and 'get_mess_menu' with hostel="girls").
-   - Display the Boys' Hostel Mess Menu first, followed immediately by the Girls' Hostel Mess Menu below it.
-   - Pay close attention to the current time (%s):
-     * If the current time is in the late afternoon/evening (e.g. 5:30 PM / after lunch), focus on and highlight the upcoming NIGHT MESS / DINNER menu for today.
-     * Clearly indicate the meal status (e.g., "🌙 Upcoming Night Mess / Dinner (7:00 PM – 8:30 PM)").
-2. GENERAL FORMATTING:
-   - Format cleanly with standard Markdown headers (###), bold items (**item**), and bullet points (- item).
-   - Never mention internal technical details or MCP tools.`, currentTimeStr, currentTimeStr)
+STRICT DATA INTEGRITY RULES — MUST FOLLOW AT ALL TIMES:
+1. ONLY use data returned by the available tools. Never invent, guess, or recall information from your training data.
+2. If a question cannot be answered by the other tools (e.g. who is the principal, placement info, events, rankings, general college facts), use the 'google_search' tool — but ONLY if the question is about BIT Sathy, BitCentral, or Jaison David.
+3. For completely unrelated topics (other colleges, general knowledge, etc.), respond: "I'm sorry, I can only answer questions related to BIT Sathy or BitCentral."
+4. Never fabricate names, phone numbers, emails, or any facts. If a tool returns no results, say "I couldn't find that information in our system."
+5. Always prefer the dedicated tools (mess, rewards, faculty, exam halls, leaves) over google_search for topics they cover.
+6. When using google_search results, clearly summarise from the search snippets. Do not add any information beyond what the search returned.
+
+GOOGLE SEARCH RULES:
+- Only invoke 'google_search' for queries about BIT Sathy, BitCentral, or Jaison David.
+- Always include "BIT Sathy" or "BitCentral" or "Jaison David" in the search query so results are scoped correctly.
+- If google_search returns no results or an error, say so honestly.
+
+MESS MENU GUIDELINES:
+- When asked for the mess menu, invoke 'get_mess_menu' for BOTH "boys" AND "girls" hostels.
+- Display Boys' Hostel first, then Girls' Hostel.
+- Pay attention to the current time (%s) and highlight the upcoming meal if it's late afternoon/evening.
+
+GENERAL FORMATTING:
+- Format cleanly with Markdown (### headers, **bold**, - bullets).
+- Never mention internal tool names or technical implementation details.`, currentTimeStr, currentTimeStr)
 
 	if req.RollNo != "" {
 		systemPrompt += fmt.Sprintf(" Current logged-in student's roll number is %s.", req.RollNo)
 	}
+
 
 	toolsUsed := []string{}
 	ctx, cancel := context.WithTimeout(r.Context(), 60*time.Second)
