@@ -116,10 +116,13 @@ type OpenAIToolCall struct {
 
 type OpenAIMessage struct {
 	Role       string           `json:"role"`
-	Content    string           `json:"content,omitempty"`
+	Content    *string          `json:"content"`
 	ToolCalls  []OpenAIToolCall `json:"tool_calls,omitempty"`
 	ToolCallID string           `json:"tool_call_id,omitempty"`
 }
+
+// strPtr returns a pointer to the given string
+func strPtr(s string) *string { return &s }
 
 type OpenAIRequest struct {
 	Model       string          `json:"model"`
@@ -597,16 +600,16 @@ CRITICAL GUIDELINES FOR RESPONSES:
 		}
 
 		messages := []OpenAIMessage{
-			{Role: "system", Content: systemPrompt},
+			{Role: "system", Content: strPtr(systemPrompt)},
 		}
 		for _, h := range req.History {
 			role := "user"
 			if h.Role == "assistant" || h.Role == "model" {
 				role = "assistant"
 			}
-			messages = append(messages, OpenAIMessage{Role: role, Content: h.Content})
+			messages = append(messages, OpenAIMessage{Role: role, Content: strPtr(h.Content)})
 		}
-		messages = append(messages, OpenAIMessage{Role: "user", Content: req.Message})
+		messages = append(messages, OpenAIMessage{Role: "user", Content: strPtr(req.Message)})
 
 		openAITools := GetOpenAIToolDefinitions()
 
@@ -678,17 +681,24 @@ CRITICAL GUIDELINES FOR RESPONSES:
 			}
 
 			choice := oaiResp.Choices[0]
-			messages = append(messages, choice.Message)
 
-			if choice.Message.Content != "" {
-				finalAnswer = choice.Message.Content
+			// Groq/OpenAI requires tool-calling assistant messages to have content=null
+			// Ensure content is nil (JSON null) when tool calls are present
+			assistantMsg := choice.Message
+			if len(assistantMsg.ToolCalls) > 0 && (assistantMsg.Content == nil || (assistantMsg.Content != nil && *assistantMsg.Content == "")) {
+				assistantMsg.Content = nil
+			}
+			messages = append(messages, assistantMsg)
+
+			if assistantMsg.Content != nil && *assistantMsg.Content != "" {
+				finalAnswer = *assistantMsg.Content
 			}
 
-			if len(choice.Message.ToolCalls) == 0 {
+			if len(assistantMsg.ToolCalls) == 0 {
 				break
 			}
 
-			for _, tc := range choice.Message.ToolCalls {
+			for _, tc := range assistantMsg.ToolCalls {
 				funcName := tc.Function.Name
 				var args map[string]interface{}
 				if tc.Function.Arguments != "" {
@@ -705,7 +715,7 @@ CRITICAL GUIDELINES FOR RESPONSES:
 				messages = append(messages, OpenAIMessage{
 					Role:       "tool",
 					ToolCallID: tc.ID,
-					Content:    toolResultStr,
+					Content:    strPtr(toolResultStr),
 				})
 			}
 		}
