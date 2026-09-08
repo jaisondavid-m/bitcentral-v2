@@ -169,7 +169,7 @@ export default function FloatingMenu() {
 
             {/* Menu options container stacked neatly above main FAB */}
             <div className="fixed bottom-[5.75rem] right-6 z-40 flex flex-col items-end gap-3.5 pointer-events-auto">
-              {/* BitBot AI Assistant (Temporarily hidden)
+              {/* BitBot AI Assistant */}
               <motion.div
                 initial={{ opacity: 0, y: 15, scale: 0.8 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -179,7 +179,7 @@ export default function FloatingMenu() {
                 onClick={handleOpenAIAssistant}
               >
                 <span className="rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl backdrop-blur-md px-3.5 py-1.5 text-xs font-bold whitespace-nowrap hover:from-indigo-500 hover:to-purple-500 transition-all flex items-center gap-1.5">
-                  BitBot AI (Qwen2.5) 🤖
+                  BitBot AI (Gemini) 🤖
                 </span>
 
                 <div className="w-14 flex items-center justify-center shrink-0">
@@ -191,7 +191,6 @@ export default function FloatingMenu() {
                   </button>
                 </div>
               </motion.div>
-              */}
               {/* 3. Support Developer Button (Top) */}
               <motion.div
                 initial={{ opacity: 0, y: 15, scale: 0.8 }}
@@ -243,28 +242,6 @@ export default function FloatingMenu() {
                 </div>
               </motion.div>
 
-              {/* Faculty Directory Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 15, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 15, scale: 0.8 }}
-                transition={{ duration: 0.18, delay: 0.02 }}
-                className="flex items-center gap-3 cursor-pointer group"
-                onClick={handleFacultyDirectory}
-              >
-                <span className="rounded-full bg-white/95 text-slate-800 border border-slate-200/90 shadow-xl backdrop-blur-md dark:bg-slate-900/95 dark:text-slate-100 dark:border-slate-700/70 px-3.5 py-1.5 text-xs font-bold whitespace-nowrap group-hover:bg-slate-100 dark:group-hover:bg-slate-800 transition-colors">
-                  Faculty Directory 📞
-                </span>
-
-                <div className="w-14 flex items-center justify-center shrink-0">
-                  <button
-                    className="flex items-center justify-center h-12 w-12 rounded-full bg-white/95 border border-slate-200/90 shadow-lg backdrop-blur-md group-hover:border-cyan-500/80 group-hover:bg-cyan-50 dark:bg-slate-900/95 dark:border-slate-700/80 dark:group-hover:bg-slate-800 group-hover:scale-110 active:scale-95 transition-all cursor-pointer"
-                    aria-label="Faculty Directory"
-                  >
-                    <Users className="h-5 w-5 text-cyan-600 dark:text-cyan-400 group-hover:text-cyan-700 dark:group-hover:text-cyan-300 transition-colors" />
-                  </button>
-                </div>
-              </motion.div>
 
               {/* 1. Home Button (Bottom-most above main fab) */}
               <motion.div
