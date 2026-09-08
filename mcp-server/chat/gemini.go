@@ -329,20 +329,48 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	type InternalAIKeyResp struct {
+		Success bool   `json:"success"`
+		APIKey  string `json:"api_key"`
+		Model   string `json:"model"`
+		Status  string `json:"status"`
+	}
+
 	apiKey := os.Getenv("GEMINI_API_KEY")
+	modelName := os.Getenv("GEMINI_MODEL")
+	if modelName == "" {
+		modelName = "gemini-2.0-flash"
+	}
+
+	// Query live AI Key & status stored in database via main backend
+	var dbKeyResp InternalAIKeyResp
+	ctxKey, cancelKey := context.WithTimeout(r.Context(), 5*time.Second)
+	errKey := tools.DefaultClient.Get(ctxKey, "/internal/ai-key", nil, &dbKeyResp)
+	cancelKey()
+
+	if errKey == nil && dbKeyResp.Success && dbKeyResp.APIKey != "" {
+		if dbKeyResp.Status == "inactive" || dbKeyResp.Status == "disabled" {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			_ = json.NewEncoder(w).Encode(ChatResponse{
+				Success: false,
+				Error:   "BitBot AI Assistant service has been temporarily disabled by administrator.",
+			})
+			return
+		}
+		apiKey = dbKeyResp.APIKey
+		if dbKeyResp.Model != "" {
+			modelName = dbKeyResp.Model
+		}
+	}
+
 	if apiKey == "" {
-		log.Printf("⚠️ GEMINI_API_KEY environment variable is missing")
+		log.Printf("⚠️ GEMINI_API_KEY is missing in database and environment")
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = json.NewEncoder(w).Encode(ChatResponse{
 			Success: false,
-			Error:   "GEMINI_API_KEY environment variable is not configured on server. Please set GEMINI_API_KEY in environment variables.",
+			Error:   "GEMINI_API_KEY is not configured in database or environment. Please configure it in Admin Dashboard.",
 		})
 		return
-	}
-
-	modelName := os.Getenv("GEMINI_MODEL")
-	if modelName == "" {
-		modelName = "gemini-3.6-flash"
 	}
 
 	var req RequestBody

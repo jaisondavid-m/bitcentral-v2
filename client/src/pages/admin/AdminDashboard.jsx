@@ -36,6 +36,9 @@ import {
   updateSponsorTransactionOverride,
   listTrackerUsers,
   getAdminAnalytics,
+  getAIKeyConfig,
+  updateAIKeyConfig,
+  testAIKeyConfig,
 } from "@/api/admin.js";
 import { MealCard } from "@/components/cards/MealCard.jsx";
 import {
@@ -329,6 +332,15 @@ const ADMIN_TABS = [
     description: "Flexible search and view directory of tracker_users data (user_id, id, name, email, batch, phone, department).",
   },
   {
+    key: "ai-key",
+    label: "AI Key Management",
+    href: "/admin/ai-key",
+    icon: Cpu,
+    gradient: "from-blue-600 to-indigo-600",
+    badge: "Gemini API Key",
+    description: "Manage Google Gemini API key, model selection, status, and live AI assistant settings stored in DB.",
+  },
+  {
     key: "super",
     label: "Super Admin",
     href: "/admin/super",
@@ -349,6 +361,7 @@ function getAdminTabFromPath(pathname) {
   if (pathname.startsWith("/admin/cards")) return "cards";
   if (pathname.startsWith("/admin/mess")) return "mess";
   if (pathname.startsWith("/admin/feedback")) return "feedback";
+  if (pathname.startsWith("/admin/ai-key")) return "ai-key";
   if (pathname.startsWith("/admin/super")) return "super";
   if (pathname.startsWith("/admin/users")) return "users";
   return "overview";
@@ -6001,6 +6014,249 @@ function AnalyticsSection() {
   );
 }
 
+/* -- AI API Key Section -------------------------------------------------------- */
+function AIKeySection() {
+  const [configData, setConfigData] = useState({
+    api_key: "",
+    masked_key: "",
+    model: "gemini-2.0-flash",
+    status: "active",
+    provider: "google_gemini",
+    updated_at: "",
+    updated_by: "",
+  });
+  const [inputKey, setInputKey] = useState("");
+  const [showKey, setShowKey] = useState(false);
+  const [status, setStatus] = useState("active");
+  const [model, setModel] = useState("gemini-2.0-flash");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [banner, setBanner] = useState({ type: "", message: "" });
+  const [testResult, setTestResult] = useState(null);
+
+  const fetchConfig = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await getAIKeyConfig();
+      if (res?.success && res.data) {
+        setConfigData(res.data);
+        setInputKey(res.data.masked_key || "");
+        setStatus(res.data.status || "active");
+        setModel(res.data.model || "gemini-2.0-flash");
+      }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to load AI Key config") });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchConfig();
+  }, [fetchConfig]);
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setBanner({ type: "", message: "" });
+    setTestResult(null);
+
+    try {
+      const res = await updateAIKeyConfig({
+        api_key: inputKey,
+        status: status,
+        model: model,
+        provider: "google_gemini",
+      });
+
+      if (res?.success) {
+        setBanner({ type: "success", message: res.message || "AI API Key configuration saved to database successfully!" });
+        if (res.data) {
+          setConfigData((prev) => ({ ...prev, ...res.data }));
+          setInputKey(res.data.masked_key || inputKey);
+        }
+      } else {
+        setBanner({ type: "error", message: res?.message || "Failed to update AI API Key" });
+      }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to save AI configuration") });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleTestKey = async () => {
+    setTesting(true);
+    setBanner({ type: "", message: "" });
+    setTestResult(null);
+
+    try {
+      const res = await testAIKeyConfig({
+        api_key: inputKey,
+        model: model,
+      });
+
+      if (res?.success) {
+        setTestResult({ success: true, message: res.message });
+      } else {
+        setTestResult({ success: false, message: res.message || "Key verification failed" });
+      }
+    } catch (err) {
+      setTestResult({ success: false, message: normalizeError(err, "Test connection failed") });
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Loader className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6 max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2.5">
+            <Cpu className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            AI API Key & Model Management
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Store and manage Google Gemini API keys in MySQL database table. BitBot MCP server reads live settings dynamically.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
+            status === "active"
+              ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-800"
+              : "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/80 dark:text-rose-300 dark:border-rose-800"
+          }`}>
+            <span className={`h-2 w-2 rounded-full ${status === "active" ? "bg-emerald-500 animate-pulse" : "bg-rose-500"}`} />
+            {status === "active" ? "AI Assistant Active" : "AI Assistant Disabled"}
+          </span>
+        </div>
+      </div>
+
+      <Banner banner={banner} onDismiss={() => setBanner({ type: "", message: "" })} />
+
+      {/* Settings Form */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <form onSubmit={handleSave} className="space-y-6">
+          {/* API Key Input */}
+          <div className="space-y-2">
+            <label className="block text-sm font-bold text-slate-900 dark:text-white">
+              Google Gemini API Key
+            </label>
+            <div className="relative">
+              <input
+                type={showKey ? "text" : "password"}
+                value={inputKey}
+                onChange={(e) => setInputKey(e.target.value)}
+                placeholder="Paste your Gemini API key (e.g. AIzaSy...)"
+                required
+                className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-blue-400 font-mono"
+              />
+              <button
+                type="button"
+                onClick={() => setShowKey((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                title={showKey ? "Hide key" : "Show key"}
+              >
+                {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              Key is securely saved in MySQL table <code className="font-mono text-blue-600 dark:text-blue-400">ai_api_keys</code> and loaded directly by MCP server without restarting.
+            </p>
+          </div>
+
+          {/* Model Selection & Status */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <label className="block text-sm font-bold text-slate-900 dark:text-white">
+                AI Model Engine
+              </label>
+              <select
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              >
+                <option value="gemini-2.0-flash">gemini-2.0-flash (Recommended - Fast & Powerful)</option>
+                <option value="gemini-1.5-flash">gemini-1.5-flash (Standard Flash)</option>
+                <option value="gemini-1.5-pro">gemini-1.5-pro (High Reasoning)</option>
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-bold text-slate-900 dark:text-white">
+                AI Assistant Status
+              </label>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              >
+                <option value="active">Active (Online & Responding)</option>
+                <option value="inactive">Disabled (Pause AI Assistant)</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Last Updated Info */}
+          {configData.updated_at && (
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/50 p-3 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between border border-slate-200/60 dark:border-slate-700/60">
+              <div className="flex items-center gap-2">
+                <Clock className="h-3.5 w-3.5 text-slate-400" />
+                <span>Last updated: {formatDateTime(configData.updated_at)}</span>
+              </div>
+              {configData.updated_by && <span>Updated by UID: {configData.updated_by}</span>}
+            </div>
+          )}
+
+          {/* Test connection results banner */}
+          {testResult && (
+            <div className={`p-4 rounded-xl border text-xs font-medium flex items-start gap-2.5 ${
+              testResult.success
+                ? "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-200 dark:border-emerald-800"
+                : "bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-800"
+            }`}>
+              {testResult.success ? <CheckCircle className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" /> : <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600 mt-0.5" />}
+              <span>{testResult.message}</span>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex flex-col gap-2 sm:flex-row sm:justify-end pt-2 border-t border-slate-100 dark:border-slate-800">
+            <button
+              type="button"
+              onClick={handleTestKey}
+              disabled={testing || !inputKey.trim()}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+            >
+              {testing ? <Loader className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4 text-amber-500" />}
+              {testing ? "Testing..." : "Test Connection"}
+            </button>
+
+            <button
+              type="submit"
+              disabled={saving}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50 shadow-md shadow-blue-500/20"
+            >
+              {saving ? <Loader className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+              {saving ? "Saving to DB..." : "Save AI Key Settings"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 /* -- Pages ------------------------------------------------------------------- */
 function AdminDashboard({ initialTab } = {}) {
   const location = useLocation();
@@ -6041,6 +6297,8 @@ function AdminDashboard({ initialTab } = {}) {
         <AdminFeedbackPage />
       ) : activeTab === "user-directory" ? (
         <UserDirectorySection />
+      ) : activeTab === "ai-key" ? (
+        <AIKeySection />
       ) : activeTab === "super" ? (
         <SuperAdminPanel />
       ) : (
@@ -6086,6 +6344,10 @@ function AdminFeedbackPageRoute() {
   return <AdminDashboard initialTab="feedback" />;
 }
 
+function AdminAIKeyPage() {
+  return <AdminDashboard initialTab="ai-key" />;
+}
+
 export {
   AdminAnalyticsPage,
   AdminUsersPage,
@@ -6096,5 +6358,6 @@ export {
   AdminCardsPage,
   AdminMessPage,
   AdminFeedbackPageRoute as AdminFeedbackPage,
+  AdminAIKeyPage,
 };
 export default AdminDashboard;

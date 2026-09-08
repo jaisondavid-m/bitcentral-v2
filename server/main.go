@@ -51,6 +51,7 @@ func main() {
 	analyticsHandler := handlers.NewAnalyticsHandler()
 	facultyDirectoryHandler := handlers.NewFacultyDirectoryHandler(sheetHandler)
 	chatHandler := handlers.NewChatHandler()
+	aiHandler := handlers.NewAIHandler()
 
 	r := routes.SetupRouter(
 		sheetHandler,
@@ -70,6 +71,7 @@ func main() {
 		analyticsHandler,
 		facultyDirectoryHandler,
 		chatHandler,
+		aiHandler,
 	)
 	r.Static("/pdfs", "./pdfs")
 
