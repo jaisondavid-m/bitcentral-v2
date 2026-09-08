@@ -26,10 +26,10 @@ RUN apk add --no-cache ca-certificates tzdata
 
 COPY --from=builder /app/mcp-server /app/mcp-server
 
-# Default port for Render
-ENV PORT=10000
-ENV BACKEND_URL=https://bitcentral-v2.onrender.com
+# Default port
+ENV PORT=8081
+ENV BACKEND_URL=https://bitcentral.bitsathy.in
 
-EXPOSE 10000
+EXPOSE 8081
 
 CMD ["/app/mcp-server"]
