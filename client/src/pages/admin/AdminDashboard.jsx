@@ -6261,36 +6261,80 @@ function AIKeySection() {
           {/* Model Selection & Status */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label className="block text-sm font-bold text-slate-900 dark:text-white">
-                AI Model Engine
-              </label>
-              <select
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-              >
-                {provider === "groq" ? (
-                  <>
-                    <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Recommended - Llama 3.3 70B)</option>
-                    <option value="mixtral-8x7b-32768">mixtral-8x7b-32768 (Mixtral 8x7B)</option>
-                    <option value="qwen-2.5-coder-32b">qwen-2.5-coder-32b (Qwen 2.5 Coder)</option>
-                    <option value="deepseek-r1-distill-llama-70b">deepseek-r1-distill-llama-70b (DeepSeek R1 70B)</option>
-                    <option value="gemma2-9b-it">gemma2-9b-it (Gemma 2 9B)</option>
-                  </>
-                ) : provider === "openai" ? (
-                  <>
-                    <option value="gpt-4o-mini">gpt-4o-mini (Recommended - Fast & Cost Efficient)</option>
-                    <option value="gpt-4o">gpt-4o (GPT-4 Omni Flagship)</option>
-                    <option value="gpt-4-turbo">gpt-4-turbo (GPT-4 Turbo)</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="gemini-2.0-flash">gemini-2.0-flash (Recommended - Fast & Powerful)</option>
-                    <option value="gemini-1.5-flash">gemini-1.5-flash (Standard Flash)</option>
-                    <option value="gemini-1.5-pro">gemini-1.5-pro (High Reasoning)</option>
-                  </>
-                )}
-              </select>
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-bold text-slate-900 dark:text-white">
+                  AI Model Engine
+                </label>
+                <span className="text-[11px] text-slate-400">Type custom or select preset</span>
+              </div>
+              <div className="relative">
+                <input
+                  type="text"
+                  list="ai-model-options"
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                  placeholder="Select preset or type model identifier (e.g. llama-3.3-70b-versatile or openai/gpt-oss-120b)"
+                  required
+                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-mono"
+                />
+                <datalist id="ai-model-options">
+                  {provider === "groq" ? (
+                    <>
+                      <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Recommended - Llama 3.3 70B)</option>
+                      <option value="openai/gpt-oss-120b">openai/gpt-oss-120b (Groq GPT-OSS 120B)</option>
+                      <option value="qwen-2.5-coder-32b">qwen-2.5-coder-32b (Qwen 2.5 Coder)</option>
+                      <option value="deepseek-r1-distill-llama-70b">deepseek-r1-distill-llama-70b (DeepSeek R1 70B)</option>
+                      <option value="mixtral-8x7b-32768">mixtral-8x7b-32768 (Mixtral 8x7B)</option>
+                      <option value="gemma2-9b-it">gemma2-9b-it (Gemma 2 9B)</option>
+                    </>
+                  ) : provider === "openai" ? (
+                    <>
+                      <option value="gpt-4o-mini">gpt-4o-mini (Recommended - Fast & Cost Efficient)</option>
+                      <option value="gpt-4o">gpt-4o (GPT-4 Omni Flagship)</option>
+                      <option value="gpt-4-turbo">gpt-4-turbo (GPT-4 Turbo)</option>
+                      <option value="o1-mini">o1-mini (OpenAI o1 Reasoning Mini)</option>
+                      <option value="o3-mini">o3-mini (OpenAI o3 Reasoning Mini)</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="gemini-2.0-flash">gemini-2.0-flash (Recommended - Fast & Powerful)</option>
+                      <option value="gemini-1.5-flash">gemini-1.5-flash (Standard Flash)</option>
+                      <option value="gemini-1.5-pro">gemini-1.5-pro (High Reasoning)</option>
+                      <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite (Flash Lite)</option>
+                    </>
+                  )}
+                </datalist>
+              </div>
+
+              {/* Quick Preset Buttons */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                <span className="text-[11px] font-medium text-slate-400 shrink-0">Popular:</span>
+                {(provider === "groq"
+                  ? [
+                      "llama-3.3-70b-versatile",
+                      "openai/gpt-oss-120b",
+                      "qwen-2.5-coder-32b",
+                      "deepseek-r1-distill-llama-70b",
+                      "mixtral-8x7b-32768",
+                    ]
+                  : provider === "openai"
+                  ? ["gpt-4o-mini", "gpt-4o", "gpt-4-turbo", "o3-mini"]
+                  : ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
+                ).map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => setModel(preset)}
+                    className={`px-2 py-0.5 rounded-md text-[11px] font-mono transition ${
+                      model === preset
+                        ? "bg-blue-600 text-white font-bold"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                    }`}
+                  >
+                    {preset}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="space-y-2">
