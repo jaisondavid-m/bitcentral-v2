@@ -1,7 +1,7 @@
 import api from "./axios";
 
 /**
- * Sends a message to the BitBot AI assistant (Ollama Qwen2.5 1.5B + BitCentral MCP tools)
+ * Sends a message to the BitBot AI assistant (Google Gemini 2.0 Flash + BitCentral MCP tools)
  * @param {Object} params
  * @param {string} params.message - The user's query text
  * @param {Array} params.history - Previous chat history [{role: 'user'|'assistant', content: string}]

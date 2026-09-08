@@ -9,6 +9,10 @@ services:
     envVars:
       - key: PORT
         value: 10000
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash
       - key: BACKEND_URL
         sync: false
       - key: BACKEND_AUTH_TOKEN

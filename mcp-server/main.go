@@ -209,7 +209,7 @@ func main() {
 	mux.Handle("/sse", sseServer.SSEHandler())
 	mux.Handle("/message", sseServer.MessageHandler())
 
-	// AI Chat Assistant endpoint powered by Ollama (Qwen2.5 1.5B) + MCP Tools
+	// AI Chat Assistant endpoint powered by Google Gemini API + MCP Tools
 	mux.HandleFunc("/api/chat", chat.HandleChat)
 	mux.HandleFunc("/chat", chat.HandleChat)
 
