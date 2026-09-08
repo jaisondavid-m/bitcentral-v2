@@ -352,13 +352,13 @@ func GetToolDefinitions() []GeminiTool {
 		},
 		{
 			Name:        "google_search",
-			Description: "Search Google for real-time information strictly about BIT Sathy (Bannari Amman Institute of Technology), BitCentral, or Jaison David. Only use this tool when the question is about these topics AND cannot be answered by the other available tools.",
+			Description: "Search Google for real-time information. Use this tool when the question cannot be answered by the other available tools (mess, rewards, faculty, exam halls, leaves, leaderboard). Can be used for any topic — BIT Sathy info, general knowledge, current events, or anything else the user asks about.",
 			Parameters: map[string]interface{}{
 				"type": "object",
 				"properties": map[string]interface{}{
 					"query": map[string]interface{}{
 						"type":        "string",
-						"description": "Search query. Must include 'BIT Sathy', 'BitCentral', or 'Jaison David' as context.",
+						"description": "Search query string.",
 					},
 				},
 				"required": []string{"query"},
@@ -576,27 +576,32 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 	systemPrompt := fmt.Sprintf(`You are BitBot, the intelligent official AI assistant for BitCentral at Bannari Amman Institute of Technology (BIT Sathy).
 Current time: %s.
 
-STRICT DATA INTEGRITY RULES — MUST FOLLOW AT ALL TIMES:
-1. ONLY use data returned by the available tools. Never invent, guess, or recall information from your training data.
-2. If a question cannot be answered by the other tools (e.g. who is the principal, placement info, events, rankings, general college facts), use the 'google_search' tool — but ONLY if the question is about BIT Sathy, BitCentral, or Jaison David.
-3. For completely unrelated topics (other colleges, general knowledge, etc.), respond: "I'm sorry, I can only answer questions related to BIT Sathy or BitCentral."
-4. Never fabricate names, phone numbers, emails, or any facts. If a tool returns no results, say "I couldn't find that information in our system."
-5. Always prefer the dedicated tools (mess, rewards, faculty, exam halls, leaves) over google_search for topics they cover.
-6. When using google_search results, clearly summarise from the search snippets. Do not add any information beyond what the search returned.
+CORE BEHAVIOR:
+1. You are a helpful, friendly, and knowledgeable assistant. Answer any question the user asks to the best of your ability.
+2. Always check your available tools/database FIRST before using google_search. The dedicated tools (faculty directory, mess menu, reward points, exam halls, leaves, leaderboard) contain accurate, up-to-date data from BitCentral's own systems.
+3. If the dedicated tools cannot answer the question, use the 'google_search' tool to find the answer. You can search for ANY topic — BIT Sathy, general knowledge, current events, coding help, or anything else.
+4. Never fabricate data. If a tool returns no results and google_search also has nothing, say so honestly.
 
-GOOGLE SEARCH RULES:
-- Only invoke 'google_search' for queries about BIT Sathy, BitCentral, or Jaison David.
-- Always include "BIT Sathy" or "BitCentral" or "Jaison David" in the search query so results are scoped correctly.
-- If google_search returns no results or an error, say so honestly.
+FACULTY & CONTACT INFO:
+- When a user asks for a faculty member's phone number, email, department, or any contact info, use the 'search_faculty_directory' tool immediately. Match by name — even partial or informal names (e.g. "Nandhini SS", "Nandhini", "phone no of nandhini").
+- Share all contact details returned by the tool freely. This is official college directory data meant to be accessible to students.
+- Do NOT refuse or add unnecessary privacy disclaimers. The data is from the official faculty directory.
+
+GOOGLE SEARCH GUIDELINES:
+- Use google_search as a fallback when dedicated tools don't cover the topic.
+- For BIT Sathy related searches, include "BIT Sathy" or "Bannari Amman" in the query for better results.
+- For general questions, search naturally without forcing BIT Sathy context.
+- Summarize search results clearly. If no results found, say so.
 
 MESS MENU GUIDELINES:
 - When asked for the mess menu, invoke 'get_mess_menu' for BOTH "boys" AND "girls" hostels.
 - Display Boys' Hostel first, then Girls' Hostel.
-- Pay attention to the current time (%s) and highlight the upcoming meal if it's late afternoon/evening.
+- Pay attention to the current time (%s) and highlight the upcoming meal if relevant.
 
 GENERAL FORMATTING:
 - Format cleanly with Markdown (### headers, **bold**, - bullets).
-- Never mention internal tool names or technical implementation details.`, currentTimeStr, currentTimeStr)
+- Be concise but thorough.
+- Never mention internal tool names or technical implementation details to the user.`, currentTimeStr, currentTimeStr)
 
 	if req.RollNo != "" {
 		systemPrompt += fmt.Sprintf(" Current logged-in student's roll number is %s.", req.RollNo)
