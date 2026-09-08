@@ -408,6 +408,53 @@ func ExecuteMCPTool(ctx context.Context, name string, args map[string]interface{
 	return string(b), nil
 }
 
+func formatUserFriendlyAIError(provider string, statusCode int, rawBody string) string {
+	var errObj struct {
+		Error struct {
+			Message string `json:"message"`
+			Type    string `json:"type"`
+			Code    string `json:"code"`
+		} `json:"error"`
+	}
+	_ = json.Unmarshal([]byte(rawBody), &errObj)
+
+	msg := errObj.Error.Message
+	if msg == "" {
+		msg = rawBody
+	}
+
+	// Token limit / TPM / Request too large
+	if statusCode == 413 || strings.Contains(msg, "tokens per minute") || strings.Contains(msg, "Request too large") || strings.Contains(msg, "TPM") || errObj.Error.Code == "rate_limit_exceeded" {
+		modelName := ""
+		if strings.Contains(msg, "model `") {
+			parts := strings.Split(msg, "model `")
+			if len(parts) > 1 {
+				modelName = strings.Split(parts[1], "`")[0]
+			}
+		}
+		if modelName != "" {
+			return fmt.Sprintf("⚠️ Token limit / TPM exceeded for model '%s'. Please select another model (such as 'llama-3.3-70b-versatile' or 'gemini-2.0-flash') in Admin AI Management.", modelName)
+		}
+		return "⚠️ Token limit / TPM limit exceeded for this AI model. Please select a higher capacity model in Admin AI Management."
+	}
+
+	// Rate limit 429
+	if statusCode == 429 || strings.Contains(msg, "rate_limit") || strings.Contains(msg, "Quota exceeded") {
+		return fmt.Sprintf("⚠️ %s API rate limit reached. Please wait a moment before sending another request.", provider)
+	}
+
+	// Invalid API key 400 / 401
+	if statusCode == 401 || strings.Contains(msg, "API key not valid") || strings.Contains(msg, "API_KEY_INVALID") || strings.Contains(msg, "invalid_api_key") {
+		return fmt.Sprintf("⚠️ %s API Key is invalid or expired. Please update your API key in Admin Dashboard.", provider)
+	}
+
+	if len(msg) > 250 {
+		msg = msg[:247] + "..."
+	}
+
+	return fmt.Sprintf("⚠️ %s Assistant Error: %s", provider, msg)
+}
+
 // HandleChat processes an incoming user message using Google Gemini API + MCP tools
 func HandleChat(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -601,24 +648,26 @@ CRITICAL GUIDELINES FOR RESPONSES:
 
 			if resp.StatusCode >= 400 {
 				log.Printf("%s API error status %d: %s", providerName, resp.StatusCode, string(respBytes))
-				w.WriteHeader(http.StatusInternalServerError)
+				userErrMsg := formatUserFriendlyAIError(providerName, resp.StatusCode, string(respBytes))
+				w.WriteHeader(http.StatusOK)
 				_ = json.NewEncoder(w).Encode(ChatResponse{
 					Success: false,
-					Error:   fmt.Sprintf("%s API error status %d: %s", providerName, resp.StatusCode, string(respBytes)),
+					Error:   userErrMsg,
 				})
 				return
 			}
 
 			var oaiResp OpenAIResponse
 			if err := json.Unmarshal(respBytes, &oaiResp); err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				_ = json.NewEncoder(w).Encode(ChatResponse{Success: false, Error: "Failed to parse AI response"})
+				w.WriteHeader(http.StatusOK)
+				_ = json.NewEncoder(w).Encode(ChatResponse{Success: false, Error: "Failed to parse AI response."})
 				return
 			}
 
 			if oaiResp.Error != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				_ = json.NewEncoder(w).Encode(ChatResponse{Success: false, Error: oaiResp.Error.Message})
+				userErrMsg := formatUserFriendlyAIError(providerName, 400, oaiResp.Error.Message)
+				w.WriteHeader(http.StatusOK)
+				_ = json.NewEncoder(w).Encode(ChatResponse{Success: false, Error: userErrMsg})
 				return
 			}
 

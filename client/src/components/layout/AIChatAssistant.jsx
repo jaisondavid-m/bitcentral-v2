@@ -23,55 +23,197 @@ const QUICK_PROMPTS = [
   { label: "Upcoming Leaves 🌴", prompt: "Show upcoming college leaves and holidays", icon: Calendar },
 ];
 
+function parseInlineFormatting(str) {
+  if (!str) return null;
+  const regex = /(\*\*.*?\*\*|`.*?`|\[.*?\]\(.*?\))/g;
+  const parts = str.split(regex);
+
+  return parts.map((part, pIdx) => {
+    if (!part) return null;
+
+    if (part.startsWith("**") && part.endsWith("**") && part.length >= 4) {
+      return (
+        <strong key={pIdx} className="font-bold text-slate-900 dark:text-white">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+
+    if (part.startsWith("`") && part.endsWith("`") && part.length >= 2) {
+      return (
+        <code key={pIdx} className="font-mono text-xs bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+
+    const linkMatch = part.match(/^\[(.*?)\]\((.*?)\)$/);
+    if (linkMatch) {
+      return (
+        <a
+          key={pIdx}
+          href={linkMatch[2]}
+          target="_blank"
+          rel="noreferrer"
+          className="text-blue-600 dark:text-blue-400 underline hover:text-blue-700 font-semibold"
+        >
+          {linkMatch[1]}
+        </a>
+      );
+    }
+
+    return part;
+  });
+}
+
 function renderFormattedMessage(text) {
   if (!text) return null;
 
   const lines = text.split("\n");
-  return lines.map((line, lIdx) => {
-    const parseBold = (str) => {
-      const parts = str.split(/(\*\*.*?\*\*)/g);
-      return parts.map((part, pIdx) => {
-        if (part.startsWith("**") && part.endsWith("**")) {
-          return (
-            <strong key={pIdx} className="font-semibold text-blue-600 dark:text-blue-400">
-              {part.slice(2, -2)}
-            </strong>
-          );
-        }
-        return part;
-      });
-    };
+  const elements = [];
+  let i = 0;
 
+  while (i < lines.length) {
+    const line = lines[i];
     const trimmed = line.trim();
+
+    // Markdown Table block detection (| Col 1 | Col 2 |)
+    if (trimmed.startsWith("|") && trimmed.endsWith("|") && trimmed.includes("|")) {
+      const tableLines = [];
+      while (i < lines.length && lines[i].trim().startsWith("|") && lines[i].trim().endsWith("|")) {
+        tableLines.push(lines[i].trim());
+        i++;
+      }
+
+      if (tableLines.length >= 2) {
+        const headerRow = tableLines[0];
+        const dataRows = tableLines.slice(1).filter((l) => !/^\|[\s\-:|]+\|$/.test(l));
+
+        const headers = headerRow
+          .split("|")
+          .slice(1, -1)
+          .map((h) => h.trim());
+
+        elements.push(
+          <div key={`table-${i}`} className="my-2.5 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700/80 shadow-xs bg-white dark:bg-slate-900">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-slate-100/90 dark:bg-slate-800/90 text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-700">
+                  {headers.map((h, hIdx) => (
+                    <th key={hIdx} className="px-3 py-2 font-bold tracking-tight">
+                      {parseInlineFormatting(h)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {dataRows.map((rowStr, rIdx) => {
+                  const cells = rowStr
+                    .split("|")
+                    .slice(1, -1)
+                    .map((c) => c.trim());
+                  return (
+                    <tr
+                      key={rIdx}
+                      className="transition-colors hover:bg-blue-50/40 dark:hover:bg-slate-800/50 odd:bg-white even:bg-slate-50/40 dark:odd:bg-slate-900 dark:even:bg-slate-900/60"
+                    >
+                      {cells.map((cell, cIdx) => (
+                        <td key={cIdx} className="px-3 py-1.5 text-slate-700 dark:text-slate-200 align-top">
+                          {parseInlineFormatting(cell)}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        );
+        continue;
+      }
+    }
+
+    // Horizontal Divider
+    if (trimmed === "---" || trimmed === "***" || trimmed === "___") {
+      elements.push(<hr key={i} className="my-2.5 border-slate-200 dark:border-slate-800" />);
+      i++;
+      continue;
+    }
+
+    // Headers
     if (trimmed.startsWith("### ")) {
-      return (
-        <h4 key={lIdx} className="font-bold text-base mt-2 mb-1 text-slate-900 dark:text-white">
-          {parseBold(trimmed.slice(4))}
+      elements.push(
+        <h4 key={i} className="font-bold text-sm mt-3 mb-1 text-slate-900 dark:text-white">
+          {parseInlineFormatting(trimmed.slice(4))}
         </h4>
       );
+      i++;
+      continue;
     }
     if (trimmed.startsWith("## ")) {
-      return (
-        <h3 key={lIdx} className="font-bold text-lg mt-3 mb-1 text-slate-900 dark:text-white">
-          {parseBold(trimmed.slice(3))}
+      elements.push(
+        <h3 key={i} className="font-extrabold text-base mt-3.5 mb-1.5 text-slate-900 dark:text-white">
+          {parseInlineFormatting(trimmed.slice(3))}
         </h3>
       );
+      i++;
+      continue;
     }
-    if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
-      return (
-        <div key={lIdx} className="flex items-start gap-2 my-0.5 pl-1">
-          <span className="text-blue-500 font-bold">•</span>
-          <span className="flex-1">{parseBold(trimmed.slice(2))}</span>
-        </div>
+    if (trimmed.startsWith("# ")) {
+      elements.push(
+        <h2 key={i} className="font-black text-lg mt-4 mb-2 text-slate-900 dark:text-white">
+          {parseInlineFormatting(trimmed.slice(2))}
+        </h2>
       );
+      i++;
+      continue;
     }
 
-    return (
-      <p key={lIdx} className={line === "" ? "h-2" : "my-0.5"}>
-        {parseBold(line)}
-      </p>
-    );
-  });
+    // Bullet list
+    if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+      elements.push(
+        <div key={i} className="flex items-start gap-2 my-0.5 pl-1">
+          <span className="text-blue-500 font-bold shrink-0 mt-0.5">•</span>
+          <span className="flex-1 text-slate-700 dark:text-slate-200 leading-normal">
+            {parseInlineFormatting(trimmed.slice(2))}
+          </span>
+        </div>
+      );
+      i++;
+      continue;
+    }
+
+    // Numbered list
+    const numMatch = trimmed.match(/^(\d+)\.\s+(.*)/);
+    if (numMatch) {
+      elements.push(
+        <div key={i} className="flex items-start gap-2 my-0.5 pl-1">
+          <span className="text-blue-600 dark:text-blue-400 font-bold text-[11px] shrink-0 mt-0.5 bg-blue-50 dark:bg-blue-950/80 px-1.5 py-0.5 rounded">
+            {numMatch[1]}.
+          </span>
+          <span className="flex-1 text-slate-700 dark:text-slate-200 leading-normal">
+            {parseInlineFormatting(numMatch[2])}
+          </span>
+        </div>
+      );
+      i++;
+      continue;
+    }
+
+    // Paragraph
+    if (trimmed === "") {
+      elements.push(<div key={i} className="h-1.5" />);
+    } else {
+      elements.push(
+        <p key={i} className="my-0.5 text-slate-700 dark:text-slate-200 leading-relaxed">
+          {parseInlineFormatting(line)}
+        </p>
+      );
+    }
+    i++;
+  }
+
+  return elements;
 }
 
 export default function AIChatAssistant({ isOpen, onClose, currentRollNo = "" }) {
