@@ -9,9 +9,18 @@ export function lazyWithRetry(componentImport) {
     const pageHasBeenReloaded = sessionStorage.getItem("page_reloaded_for_chunk_error");
 
     try {
-      const component = await componentImport();
+      const res = await componentImport();
       sessionStorage.removeItem("page_reloaded_for_chunk_error");
-      return component;
+
+      // Handle standard default export, named export fallback, or direct component
+      if (res && res.default) {
+        return res;
+      }
+      if (typeof res === "function" || (typeof res === "object" && res !== null)) {
+        return { default: res.default || res };
+      }
+
+      throw new TypeError("Lazy component import resolved to undefined export");
     } catch (error) {
       const errorMsg = error?.message || "";
       const isChunkError =
