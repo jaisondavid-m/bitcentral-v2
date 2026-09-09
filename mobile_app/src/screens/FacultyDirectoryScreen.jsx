@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -17,11 +17,7 @@ export default function FacultyDirectoryScreen({ navigation }) {
   const [faculty, setFaculty] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    searchFaculty();
-  }, []);
-
-  const searchFaculty = async () => {
+  const searchFaculty = useCallback(async () => {
     setLoading(true);
     const res = await fetchFacultyDirectory(query);
     if (res && res.data) {
@@ -35,7 +31,12 @@ export default function FacultyDirectoryScreen({ navigation }) {
       ]);
     }
     setLoading(false);
-  };
+  }, [query]);
+
+  useEffect(() => {
+    searchFaculty();
+  }, [searchFaculty]);
+
 
   const handleEmailPress = (email) => {
     Linking.openURL(`mailto:${email}`).catch(() => {});
