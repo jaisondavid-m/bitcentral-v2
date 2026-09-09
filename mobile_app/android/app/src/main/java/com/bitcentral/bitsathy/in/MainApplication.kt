@@ -1,4 +1,4 @@
-package com.bitcentral.bitsathy.in
+package com.bitcentral.bitsathy.`in`
 
 import android.app.Application
 import com.facebook.react.PackageList

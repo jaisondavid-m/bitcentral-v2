@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -30,11 +30,7 @@ export default function MessMenuScreen({ navigation }) {
   const [menuData, setMenuData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadMenu();
-  }, [tab]);
-
-  const loadMenu = async () => {
+  const loadMenu = useCallback(async () => {
     setLoading(true);
     const backendData = await fetchMessMenu(tab.toLowerCase());
     if (backendData && backendData.full_menu) {
@@ -43,7 +39,12 @@ export default function MessMenuScreen({ navigation }) {
       setMenuData(FALLBACK_MENU[tab]);
     }
     setLoading(false);
-  };
+  }, [tab]);
+
+  useEffect(() => {
+    loadMenu();
+  }, [loadMenu]);
+
 
   const displayMenu = menuData || FALLBACK_MENU[tab];
 

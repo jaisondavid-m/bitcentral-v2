@@ -4,7 +4,7 @@ import ENV from '../config/env';
 
 const api = axios.create({
   baseURL: ENV.API_BASE_URL,
-  timeout: 30000,
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -12,31 +12,49 @@ const api = axios.create({
 
 api.interceptors.request.use(
   async (config) => {
-    const token = await AsyncStorage.getItem('auth_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    try {
+      const token = await AsyncStorage.getItem('auth_token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (e) {
+      console.warn('Failed to retrieve auth_token from AsyncStorage', e);
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-export async function postGoogleAuth(credential) {
+export async function postGoogleAuth(payload) {
   try {
-    const res = await api.post('/auth/google', { credential });
+    const requestData = typeof payload === 'string' ? { credential: payload } : payload;
+    requestData.client_id = ENV.GOOGLE_WEB_CLIENT_ID;
+
+    // Call mobile app dedicated google auth endpoint first
+    try {
+      const res = await api.post('/auth/mobile/google', requestData);
+      if (res?.data && res.data.success) {
+        return res.data;
+      }
+    } catch (mobileErr) {
+      console.warn('Endpoint /auth/mobile/google unavailable, trying /auth/google fallback...');
+    }
+
+    const res = await api.post('/auth/google', requestData);
     return res.data;
   } catch (err) {
-    console.error('Backend Google Auth failed:', err);
-    return null;
+    console.error('Backend Google Auth error:', err?.response?.data || err?.message || err);
+    const errorMessage = err?.response?.data?.error || err?.response?.data?.message || err?.message || 'Authentication request failed';
+    return { success: false, error: errorMessage };
   }
 }
 
 export async function fetchHomeCards() {
   try {
     const res = await api.get('/cards');
-    return res?.data?.data || [];
+    return res?.data?.data || res?.data || [];
   } catch (err) {
-    console.error('Failed to fetch home cards from backend:', err);
+    console.error('Failed to fetch home cards from backend:', err?.message || err);
     return [];
   }
 }
@@ -49,7 +67,7 @@ export async function fetchFacultyDirectory(query = '', department = '') {
     const res = await api.get(`/faculty-directory?${params.toString()}`);
     return res?.data || { success: false, data: [] };
   } catch (err) {
-    console.error('Failed to fetch faculty directory from backend:', err);
+    console.error('Failed to fetch faculty directory from backend:', err?.message || err);
     return { success: false, data: [] };
   }
 }
@@ -62,7 +80,7 @@ export async function fetchMessMenu(hostel = 'boys', date = '') {
     const res = await api.get('/mess', { params });
     return res?.data || null;
   } catch (err) {
-    console.error('Failed to fetch mess menu from backend:', err);
+    console.error('Failed to fetch mess menu from backend:', err?.message || err);
     return null;
   }
 }
@@ -76,7 +94,7 @@ export async function sendChatMessage({ message, history = [], rollNo = '' }) {
     });
     return res.data;
   } catch (err) {
-    console.error('AI Chat API failed:', err);
+    console.error('AI Chat API failed:', err?.message || err);
     return {
       success: false,
       message: '⚠️ Unable to connect to BitBot AI service. Check connection or try again later.',
@@ -89,9 +107,10 @@ export async function fetchMeProfile() {
     const res = await api.get('/me');
     return res?.data?.data || null;
   } catch (err) {
-    console.error('Failed to fetch profile from backend:', err);
+    console.error('Failed to fetch profile from backend:', err?.message || err);
     return null;
   }
 }
 
 export default api;
+

@@ -120,6 +120,8 @@ func SetupRouter(
 		handler.HandleCallback(c)
 	})
 	r.POST("/auth/google", studentLookupHandler.GoogleLogin)
+	r.POST("/auth/mobile/google", studentLookupHandler.MobileGoogleLogin)
+	r.POST("/api/auth/mobile/google", studentLookupHandler.MobileGoogleLogin)
 	r.POST("/auth/logout", studentLookupHandler.GoogleLogout)
 	r.GET("/auth/logout", studentLookupHandler.GoogleLogout)
 	r.GET("/exam-hall", examHallHandler.GetHall)

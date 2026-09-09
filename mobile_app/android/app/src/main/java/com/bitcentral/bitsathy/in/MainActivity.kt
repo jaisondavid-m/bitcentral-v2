@@ -1,4 +1,4 @@
-package com.bitcentral.bitsathy.in
+package com.bitcentral.bitsathy.`in`
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
