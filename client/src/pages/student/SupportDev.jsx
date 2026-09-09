@@ -45,7 +45,7 @@ const loadRazorpayScript = () => {
 
 export default function SupportDev() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile, student } = useAuth();
   const isRealUser = Boolean(user && !user?.isGuest);
 
   const handleLoginToDonate = async () => {
@@ -133,79 +133,110 @@ export default function SupportDev() {
     fetchLeaderboard();
   }, []);
 
-  // Fetch Profile Details when Authenticated
+  // Fetch Profile Details when Authenticated via /me endpoint
   useEffect(() => {
     let isMounted = true;
-    (async () => {
+
+    async function loadProfileData() {
       try {
-        if (auth.currentUser) {
-          const meData = await getMeProfile();
-          if (isMounted) {
-            const displayNameFromMe =
-              meData?.display_name ||
-              meData?.displayName ||
-              meData?.name ||
-              meData?.full_name ||
-              auth.currentUser.displayName ||
-              "";
-            const emailToUse = meData?.email || auth.currentUser.email || "";
-            const phoneToUse = meData?.phone || meData?.phone_no || meData?.phoneNumber || "";
+        let meData = profile;
+        if (!meData) {
+          meData = await getMeProfile();
+        }
 
-            if (displayNameFromMe) {
-              setDonorName(displayNameFromMe);
-              setHasUserName(true);
-            } else {
-              setHasUserName(false);
-            }
+        if (!isMounted) return;
 
-            if (emailToUse) {
-              setDonorEmail(emailToUse);
-              setHasUserEmail(true);
-            } else {
-              setHasUserEmail(false);
-            }
+        const displayNameFromMe =
+          meData?.display_name ||
+          meData?.displayName ||
+          meData?.name ||
+          meData?.full_name ||
+          student?.displayName ||
+          user?.displayName ||
+          "";
 
-            if (phoneToUse) {
-              setDonorPhone(phoneToUse);
-              setHasUserPhone(true);
-            } else {
-              setHasUserPhone(false);
-            }
+        const emailToUse =
+          meData?.email ||
+          student?.email ||
+          user?.email ||
+          "";
 
-            fetchContributionStatus(phoneToUse, emailToUse);
-          }
+        const phoneToUse =
+          meData?.phone ||
+          meData?.phone_no ||
+          meData?.phoneNumber ||
+          meData?.mobile ||
+          profile?.phone ||
+          profile?.phone_no ||
+          student?.phone ||
+          student?.phone_no ||
+          "";
+
+        if (displayNameFromMe && displayNameFromMe.trim()) {
+          setDonorName(displayNameFromMe.trim());
+          setHasUserName(true);
         } else {
-          if (isMounted) {
-            setHasUserName(false);
-            setHasUserEmail(false);
-            setHasUserPhone(false);
-          }
+          setHasUserName(false);
+        }
+
+        if (emailToUse && emailToUse.trim()) {
+          setDonorEmail(emailToUse.trim());
+          setHasUserEmail(true);
+        } else {
+          setHasUserEmail(false);
+        }
+
+        if (phoneToUse && phoneToUse.trim()) {
+          setDonorPhone(phoneToUse.trim());
+          setHasUserPhone(true);
+        } else {
+          setHasUserPhone(false);
+        }
+
+        if (phoneToUse || emailToUse) {
+          fetchContributionStatus(phoneToUse, emailToUse);
         }
       } catch (err) {
-        if (isMounted && auth.currentUser) {
-          if (auth.currentUser.displayName) {
-            setDonorName(auth.currentUser.displayName);
-            setHasUserName(true);
-          } else {
-            setHasUserName(false);
-          }
+        if (!isMounted) return;
+        const fallbackName = student?.displayName || user?.displayName || "";
+        const fallbackEmail = student?.email || user?.email || "";
+        const fallbackPhone = student?.phone || student?.phone_no || "";
 
-          if (auth.currentUser.email) {
-            setDonorEmail(auth.currentUser.email);
-            setHasUserEmail(true);
-          } else {
-            setHasUserEmail(false);
-          }
+        if (fallbackName && fallbackName.trim()) {
+          setDonorName(fallbackName.trim());
+          setHasUserName(true);
+        } else {
+          setHasUserName(false);
+        }
 
+        if (fallbackEmail && fallbackEmail.trim()) {
+          setDonorEmail(fallbackEmail.trim());
+          setHasUserEmail(true);
+        } else {
+          setHasUserEmail(false);
+        }
+
+        if (fallbackPhone && fallbackPhone.trim()) {
+          setDonorPhone(fallbackPhone.trim());
+          setHasUserPhone(true);
+        } else {
           setHasUserPhone(false);
         }
       }
-    })();
+    }
+
+    if (isRealUser) {
+      loadProfileData();
+    } else {
+      setHasUserName(false);
+      setHasUserEmail(false);
+      setHasUserPhone(false);
+    }
 
     return () => {
       isMounted = false;
     };
-  }, [user]);
+  }, [user, profile, student, isRealUser]);
 
   // Helper to auto-detect department ID from user email
   const detectDepartmentFromEmail = (email, depts) => {
@@ -260,7 +291,7 @@ export default function SupportDev() {
   useEffect(() => {
     const depts = leaderboard.department_leaderboard || [];
     if (depts.length > 0) {
-      const emailToTest = donorEmail || user?.email || auth.currentUser?.email || "";
+      const emailToTest = donorEmail || user?.email || student?.email || "";
       const detectedId = detectDepartmentFromEmail(emailToTest, depts);
       if (detectedId) {
         setTargetDeptId(detectedId);
@@ -914,24 +945,27 @@ export default function SupportDev() {
                   </label>
 
                   <div className="space-y-2">
-                    <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
-                      <User className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
-                      <input
-                        type="text"
-                        placeholder="Full Name *"
-                        value={donorName}
-                        onChange={(e) => setDonorName(e.target.value)}
-                        className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
-                      />
-                    </div>
+                    {/* Name Input - Only if not from /me */}
+                    {!hasUserName && (
+                      <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
+                        <User className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
+                        <input
+                          type="text"
+                          placeholder="Full Name *"
+                          value={donorName}
+                          onChange={(e) => setDonorName(e.target.value)}
+                          className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
+                        />
+                      </div>
+                    )}
 
-                    {/* Email Input - Only if not from user */}
+                    {/* Email Input - Only if not from /me */}
                     {!hasUserEmail && (
                       <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
                         <Mail className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
                         <input
                           type="email"
-                          placeholder="Email Address"
+                          placeholder="Email Address *"
                           value={donorEmail}
                           onChange={(e) => setDonorEmail(e.target.value)}
                           className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
@@ -939,7 +973,7 @@ export default function SupportDev() {
                       </div>
                     )}
 
-                    {/* Phone Input - Only if not from user */}
+                    {/* Phone Input - Only if not from /me */}
                     {!hasUserPhone && (
                       <div className="relative rounded-xl border border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-800/40 px-3.5 py-2.5 flex items-center focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-colors">
                         <Phone className="h-4 w-4 text-slate-400 shrink-0 mr-3" />
@@ -950,6 +984,21 @@ export default function SupportDev() {
                           onChange={(e) => setDonorPhone(e.target.value)}
                           className="w-full text-xs font-medium text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none"
                         />
+                      </div>
+                    )}
+
+                    {/* Auto-filled Profile Details Chip */}
+                    {(hasUserName || hasUserEmail || hasUserPhone) && (
+                      <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-2.5 dark:border-blue-900/40 dark:bg-blue-950/30 text-xs flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                        <div className="min-w-0 text-slate-700 dark:text-slate-300 text-[11px]">
+                          <span className="font-semibold block text-slate-900 dark:text-white truncate">
+                            {donorName || "Student"}
+                          </span>
+                          <span className="truncate block text-slate-500 dark:text-slate-400">
+                            {[donorEmail, donorPhone].filter(Boolean).join(" • ")}
+                          </span>
+                        </div>
                       </div>
                     )}
                   </div>
