@@ -77,23 +77,23 @@ function FullScreenLoader({ message = 'Checking your session securely...' }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50 flex items-center justify-center px-4 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      <div className="rounded-3xl border border-blue-100 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 px-8 py-6 shadow-xl shadow-blue-100/40 dark:shadow-none backdrop-blur-sm text-center max-w-sm w-full">
-        <div className="mx-auto mb-2 flex items-center justify-center h-44 w-44 relative">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50/80 via-white to-blue-50/80 flex items-center justify-center px-4 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <div className="rounded-2xl border border-blue-100/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 px-5 py-4 shadow-lg shadow-blue-100/30 dark:shadow-none backdrop-blur-md text-center max-w-[240px] w-full flex flex-col items-center">
+        <div className="flex items-center justify-center h-28 w-28 relative -mt-1">
           {!isReady && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-8 w-8 animate-spin rounded-full border-3 border-blue-600 border-r-transparent" />
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-600 border-r-transparent" />
             </div>
           )}
           <canvas
             ref={canvasRef}
-            className={`w-44 h-44 object-contain transition-opacity duration-150 ${
+            className={`w-28 h-28 object-contain transition-opacity duration-150 ${
               isReady ? 'opacity-100' : 'opacity-0'
             }`}
           />
         </div>
-        <p className="text-base font-bold text-slate-900 dark:text-white">Loading BIT Central</p>
-        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-medium">{message}</p>
+        <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">Loading BIT Central</p>
+        <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-normal">{message}</p>
       </div>
     </div>
   );
