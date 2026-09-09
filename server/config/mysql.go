@@ -108,6 +108,7 @@ func InitMySQL() {
 	dropAcademicTables()
 	createFeedbackMessagesTable()
 	createFacultyDirectoryTable()
+	createAuditLogsTable()
 }
 
 func createAdminsTable() {
@@ -594,3 +595,33 @@ func createFacultyDirectoryTable() {
 		log.Println("✅ faculty_directory table ready")
 	}
 }
+
+func createAuditLogsTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS audit_logs (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		method VARCHAR(10) NOT NULL,
+		endpoint VARCHAR(512) NOT NULL,
+		query TEXT NULL,
+		payload LONGTEXT NULL,
+		ip_address VARCHAR(64) NOT NULL,
+		user_uid VARCHAR(128) NULL,
+		user_name VARCHAR(255) NULL,
+		roll_no VARCHAR(64) NULL,
+		role VARCHAR(64) NULL,
+		status_code INT NOT NULL DEFAULT 200,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		INDEX idx_audit_created (created_at),
+		INDEX idx_audit_user (user_uid),
+		INDEX idx_audit_roll (roll_no),
+		INDEX idx_audit_ip (ip_address),
+		INDEX idx_audit_method (method)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(query); err != nil {
+		log.Printf("ℹ️ audit_logs table notice: %v", err)
+	} else {
+		log.Println("✅ audit_logs table ready")
+	}
+}
+

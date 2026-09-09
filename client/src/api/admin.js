@@ -571,4 +571,24 @@ export async function testAIKeyConfig(payload) {
   const headers = await getAdminHeaders();
   const response = await api.post("/admin/ai-key/test", payload, { headers });
   return response.data;
-}
+}
+
+export async function getAuditLogs({ page = 1, limit = 50, search = "", method = "", status = "" } = {}) {
+  const headers = await getAdminHeaders();
+  const params = new URLSearchParams();
+  if (page) params.set("page", page);
+  if (limit) params.set("limit", limit);
+  if (search) params.set("search", search);
+  if (method) params.set("method", method);
+  if (status) params.set("status", status);
+
+  const response = await api.get(`/admin/audit-logs?${params.toString()}`, { headers });
+  return response.data;
+}
+
+export async function clearAuditLogs() {
+  const headers = await getAdminHeaders();
+  const response = await api.delete("/admin/audit-logs", { headers });
+  return response.data;
+}
+
