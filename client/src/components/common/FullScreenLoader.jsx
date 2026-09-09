@@ -1,34 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { DotLottie } from '@lottiefiles/dotlottie-web';
+import { getLottieBuffer as getPreloadedBuffer, getLottieBufferSync, LOTTIE_FILES } from '@/utils/lottiePreloader';
 
-// Persistent in-memory cache for Lottie ArrayBuffer to ensure 0ms instant loading
-let cachedBuffer = null;
-let fetchPromise = null;
-
+// Re-export for backward compatibility
 export function getLottieBuffer() {
-  if (cachedBuffer) return Promise.resolve(cachedBuffer);
-  if (!fetchPromise) {
-    fetchPromise = fetch('/lotties/cute-doggie.lottie')
-      .then((res) => res.arrayBuffer())
-      .then((buffer) => {
-        cachedBuffer = buffer;
-        return buffer;
-      })
-      .catch((err) => {
-        console.warn('Lottie pre-fetch failed:', err);
-        fetchPromise = null;
-        return null;
-      });
-  }
-  return fetchPromise;
+  return getPreloadedBuffer(LOTTIE_FILES.DOGGIE);
 }
-
-// Immediately trigger pre-fetch on module load
-getLottieBuffer();
 
 function FullScreenLoader({ message = 'Checking your session securely...' }) {
   const canvasRef = useRef(null);
-  const [isReady, setIsReady] = useState(Boolean(cachedBuffer));
+  const [isReady, setIsReady] = useState(Boolean(getLottieBufferSync(LOTTIE_FILES.DOGGIE)));
 
   useEffect(() => {
     let dotLottie = null;
@@ -44,9 +25,9 @@ function FullScreenLoader({ message = 'Checking your session securely...' }) {
         };
 
         if (buffer) {
-          options.data = buffer;
+          options.data = buffer.slice(0);
         } else {
-          options.src = '/lotties/cute-doggie.lottie';
+          options.src = LOTTIE_FILES.DOGGIE;
         }
 
         dotLottie = new DotLottie(options);
@@ -56,10 +37,11 @@ function FullScreenLoader({ message = 'Checking your session securely...' }) {
       }
     };
 
-    if (cachedBuffer) {
-      initAnimation(cachedBuffer);
+    const initialBuffer = getLottieBufferSync(LOTTIE_FILES.DOGGIE);
+    if (initialBuffer) {
+      initAnimation(initialBuffer);
     } else {
-      getLottieBuffer().then((buffer) => {
+      getPreloadedBuffer(LOTTIE_FILES.DOGGIE).then((buffer) => {
         if (mounted) {
           initAnimation(buffer);
         }
@@ -100,4 +82,3 @@ function FullScreenLoader({ message = 'Checking your session securely...' }) {
 }
 
 export default FullScreenLoader;
-

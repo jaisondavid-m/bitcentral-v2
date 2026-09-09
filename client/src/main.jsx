@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/context/ThemeContext.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HelmetProvider } from "react-helmet-async";
 import { StudentContext } from "@/context/StudentContext.jsx";
+import "@/utils/lottiePreloader.js";
 import "./index.css";
 
 const queryClient = new QueryClient();
