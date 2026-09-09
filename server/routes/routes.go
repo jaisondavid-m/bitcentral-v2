@@ -59,6 +59,8 @@ func SetupRouter(
 		MaxAge:           12 * time.Hour,
 	}))
 
+	r.Use(middleware.AuditLoggerMiddleware())
+
 	// Health check
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
@@ -239,6 +241,10 @@ func SetupRouter(
 		admin.GET("/feedback/conversations", feedbackHandler.GetAdminConversations)
 		admin.GET("/feedback/messages/:user_uid", feedbackHandler.GetAdminUserMessages)
 		admin.POST("/feedback/reply", feedbackHandler.AdminReply)
+
+		// Audit Logs Admin API
+		admin.GET("/audit-logs", adminHandler.GetAuditLogs)
+		admin.DELETE("/audit-logs", adminHandler.ClearAuditLogs)
 	}
 
 	// Super-admin routes: manage admins and allowed external emails/domains

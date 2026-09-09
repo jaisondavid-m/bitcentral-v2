@@ -91,6 +91,7 @@ import {
 import SuperAdminPanel from "./SuperAdminPanel.jsx";
 import AdminPSRewardsPage from "./AdminPSRewards.jsx";
 import AdminFeedbackPage from "./AdminFeedbackPage.jsx";
+import AdminAuditLogs from "./AdminAuditLogs.jsx";
 import { checkSuperAdmin } from "@/api/admin.js";
 
 function normalizeError(error, fallback) {
@@ -342,6 +343,15 @@ const ADMIN_TABS = [
     description: "Manage Google Gemini API key, model selection, status, and live AI assistant settings stored in DB.",
   },
   {
+    key: "audit-logs",
+    label: "Audit Logs",
+    href: "/admin/audit-logs",
+    icon: ShieldCheck,
+    gradient: "from-purple-600 to-indigo-600",
+    badge: "API History",
+    description: "View real-time HTTP request audit logs including IP, payload, query params, timestamp, and user details.",
+  },
+  {
     key: "super",
     label: "Super Admin",
     href: "/admin/super",
@@ -355,6 +365,7 @@ const ADMIN_TABS = [
 function getAdminTabFromPath(pathname) {
   if (pathname === "/admin" || pathname === "/admin/") return "overview";
   if (pathname.startsWith("/admin/analytics")) return "analytics";
+  if (pathname.startsWith("/admin/audit-logs")) return "audit-logs";
   if (pathname.startsWith("/admin/user-directory")) return "user-directory";
   if (pathname.startsWith("/admin/sponsors")) return "sponsors";
   if (pathname.startsWith("/admin/qb")) return "qb";
@@ -6428,6 +6439,8 @@ function AdminDashboard({ initialTab } = {}) {
         <AdminOverviewGrid isSuper={isSuper} />
       ) : activeTab === "analytics" ? (
         <AnalyticsSection />
+      ) : activeTab === "audit-logs" ? (
+        <AdminAuditLogs />
       ) : activeTab === "sponsors" ? (
         <SponsorsSection />
       ) : activeTab === "qb" ? (
@@ -6455,6 +6468,10 @@ function AdminDashboard({ initialTab } = {}) {
 
 function AdminAnalyticsPage() {
   return <AdminDashboard initialTab="analytics" />;
+}
+
+function AdminAuditLogsPage() {
+  return <AdminDashboard initialTab="audit-logs" />;
 }
 
 function AdminUsersPage() {
@@ -6495,6 +6512,7 @@ function AdminAIKeyPage() {
 
 export {
   AdminAnalyticsPage,
+  AdminAuditLogsPage,
   AdminUsersPage,
   AdminUserDirectoryPage,
   AdminSponsorsPage,
