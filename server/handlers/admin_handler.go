@@ -354,6 +354,65 @@ func (h *AdminHandler) UpdateUserBlockStatus(c *gin.Context) {
 	})
 }
 
+// UpdateUserFlagStatus updates flagged status of user for monitoring without blocking requests
+func (h *AdminHandler) UpdateUserFlagStatus(c *gin.Context) {
+	uid := strings.TrimSpace(c.Param("uid"))
+	if uid == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": "uid is required"})
+		return
+	}
+
+	var body struct {
+		Flagged bool   `json:"flagged"`
+		Reason  string `json:"reason"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	actorUID, _ := c.Get("actor_uid")
+	actorUIDStr, _ := actorUID.(string)
+
+	var flaggedAt any = nil
+	flagReason := strings.TrimSpace(body.Reason)
+	if body.Flagged {
+		flaggedAt = time.Now().UTC()
+		if flagReason == "" {
+			flagReason = "Flagged by Admin for monitoring"
+		}
+	} else {
+		flagReason = ""
+	}
+
+	_, err := h.DB.Exec(`UPDATE users SET flagged = ?, flagged_at = ?, flag_reason = ?, flagged_by = ? WHERE CAST(id AS CHAR) = ? OR google_id = ? OR uid = ? OR LOWER(TRIM(email)) = LOWER(TRIM(?))`, body.Flagged, flaggedAt, flagReason, actorUIDStr, uid, uid, uid, uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	message := "User unflagged successfully"
+	if body.Flagged {
+		message = "User flagged for monitoring successfully"
+	}
+
+	flaggedAtValue := ""
+	if body.Flagged {
+		flaggedAtValue = time.Now().UTC().Format(time.RFC3339)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": message,
+		"user": gin.H{
+			"uid":         uid,
+			"flagged":     body.Flagged,
+			"flagged_at":  flaggedAtValue,
+			"flag_reason": flagReason,
+		},
+	})
+}
+
 // DELETE USER
 func (h *AdminHandler) DeleteUser(c *gin.Context) {
 	uid := c.Param("uid")
