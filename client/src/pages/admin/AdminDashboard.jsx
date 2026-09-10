@@ -2216,12 +2216,12 @@ function UserDirectorySection() {
 /* -- Card form -------------------------------------------------------------- */
 function CardForm({ initial, onSubmit, onCancel, isLoading }) {
   const [form, setForm] = useState(
-    initial || { img: "", name: "", keywords: [], link: "", btntext: "" }
+    initial || { img: "", name: "", keywords: [], link: "", app_route: "", btntext: "" }
   );
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    setForm(initial || { img: "", name: "", keywords: [], link: "", btntext: "" });
+    setForm(initial || { img: "", name: "", keywords: [], link: "", app_route: "", btntext: "" });
   }, [initial]);
 
   const set = (key) => (val) =>
@@ -2249,6 +2249,7 @@ function CardForm({ initial, onSubmit, onCancel, isLoading }) {
       name: (form.name || "").trim(),
       keywords: Array.isArray(form.keywords) ? form.keywords : (form.keywords || "").split(",").map(s=>s.trim()).filter(Boolean),
       link: (form.link || "").trim() || null,
+      app_route: (form.app_route || "").trim() || null,
       btntext: (form.btntext || "").trim() || null,
     };
     if (!payload.name) return;
@@ -2276,14 +2277,43 @@ function CardForm({ initial, onSubmit, onCancel, isLoading }) {
           />
         </div>
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Link</label>
+          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Website Link</label>
           <input
             value={form.link}
             onChange={(e) => setForm({ ...form, link: e.target.value })}
+            placeholder="e.g. /mess-menu or https://..."
             className="w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
           />
         </div>
         <div className="space-y-1.5">
+          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">App Redirection Route (Mobile)</label>
+          <div className="flex gap-2">
+            <select
+              value={["MessMenu", "FacultyDirectory", "WifiDetails", "BitBot", "Profile", "Tools"].includes(form.app_route) ? form.app_route : "custom"}
+              onChange={(e) => {
+                if (e.target.value !== "custom") {
+                  setForm({ ...form, app_route: e.target.value });
+                }
+              }}
+              className="rounded-2xl border border-slate-200 bg-slate-50 px-2 py-2.5 text-xs font-medium dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+            >
+              <option value="custom">Preset...</option>
+              <option value="MessMenu">MessMenu</option>
+              <option value="FacultyDirectory">FacultyDirectory</option>
+              <option value="WifiDetails">WifiDetails</option>
+              <option value="BitBot">BitBot</option>
+              <option value="Profile">Profile</option>
+              <option value="Tools">Tools</option>
+            </select>
+            <input
+              value={form.app_route || ""}
+              onChange={(e) => setForm({ ...form, app_route: e.target.value })}
+              placeholder="e.g. MessMenu or /support-dev"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+            />
+          </div>
+        </div>
+        <div className="sm:col-span-2 space-y-1.5">
           <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Keywords</label>
           <input
             value={Array.isArray(form.keywords) ? form.keywords.join(", ") : form.keywords}
