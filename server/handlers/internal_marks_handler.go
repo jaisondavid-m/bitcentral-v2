@@ -45,9 +45,15 @@ type GradioSSEEvent struct {
 }
 
 const (
-	InternalMarksCacheDuration = 24 * time.Hour
+	InternalMarksCacheDuration = 48 * time.Hour
 	GradioSpaceHost            = "https://praneshjs-rewardpointssite.hf.space"
 )
+
+var istLocation = time.FixedZone("IST", 5*3600+30*60)
+
+func formatIST(t time.Time) string {
+	return t.In(istLocation).Format(time.RFC3339)
+}
 
 type InternalMarksHandler struct {
 	mu           sync.RWMutex
@@ -254,8 +260,8 @@ func (h *InternalMarksHandler) GetInternalMarksConversion(c *gin.Context) {
 			"roll_no":    normRoll,
 			"raw":        entry.RawData,
 			"cached":     true,
-			"cached_at":  entry.CachedAt.Format(time.RFC3339),
-			"expires_at": entry.ExpiresAt.Format(time.RFC3339),
+			"cached_at":  formatIST(entry.CachedAt),
+			"expires_at": formatIST(entry.ExpiresAt),
 		})
 		return
 	}
@@ -267,8 +273,8 @@ func (h *InternalMarksHandler) GetInternalMarksConversion(c *gin.Context) {
 			"roll_no":    normRoll,
 			"raw":        entry.RawData,
 			"cached":     true,
-			"cached_at":  entry.CachedAt.Format(time.RFC3339),
-			"expires_at": entry.ExpiresAt.Format(time.RFC3339),
+			"cached_at":  formatIST(entry.CachedAt),
+			"expires_at": formatIST(entry.ExpiresAt),
 		})
 		return
 	}
@@ -287,8 +293,8 @@ func (h *InternalMarksHandler) GetInternalMarksConversion(c *gin.Context) {
 				"roll_no":    normRoll,
 				"raw":        entry.RawData,
 				"cached":     true,
-				"cached_at":  entry.CachedAt.Format(time.RFC3339),
-				"expires_at": entry.ExpiresAt.Format(time.RFC3339),
+				"cached_at":  formatIST(entry.CachedAt),
+				"expires_at": formatIST(entry.ExpiresAt),
 			})
 			return
 		}
@@ -325,7 +331,7 @@ func (h *InternalMarksHandler) GetInternalMarksConversion(c *gin.Context) {
 		ExpiresAt: expiresAt,
 	}
 
-	// 5. Store in 24-hour cache (Memory + DB)
+	// 5. Store in 48-hour cache (Memory + DB)
 	h.saveToMemory(entry)
 	go h.saveToDB(entry)
 
@@ -334,7 +340,7 @@ func (h *InternalMarksHandler) GetInternalMarksConversion(c *gin.Context) {
 		"roll_no":    normRoll,
 		"raw":        rawData,
 		"cached":     false,
-		"cached_at":  now.Format(time.RFC3339),
-		"expires_at": expiresAt.Format(time.RFC3339),
+		"cached_at":  formatIST(now),
+		"expires_at": formatIST(expiresAt),
 	})
 }
