@@ -9,9 +9,16 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { useAuth } from '../context/StudentContext';
 import { postGoogleAuth } from '../api/axios';
 import { isGuestLoginEnabled } from '../services/guestSession';
+import ENV from '../config/env';
+
+GoogleSignin.configure({
+  webClientId: ENV.GOOGLE_WEB_CLIENT_ID,
+  offlineAccess: true,
+});
 
 export default function LoginScreen() {
   const { loginWithGoogleUser, loginAsGuest, accessDeniedMessage } = useAuth();
@@ -23,32 +30,63 @@ export default function LoginScreen() {
       setLoading(true);
       setError('');
 
-      // Student Sign-In payload with @bitsathy.ac.in account verification
-      const studentEmail = 'student@bitsathy.ac.in';
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      const response = await GoogleSignin.signIn();
+
+      const idToken = response?.data?.idToken || response?.idToken;
+      const googleUser = response?.data?.user || response?.user;
+
+      if (!googleUser || !googleUser.email) {
+        throw new Error('Google Sign-In failed to retrieve account info');
+      }
+
+      const userEmail = googleUser.email.toLowerCase().trim();
+
       const backendRes = await postGoogleAuth({
-        email: studentEmail,
-        name: 'BIT Student',
+        id_token: idToken,
+        credential: idToken,
+        email: userEmail,
+        name: googleUser.name || googleUser.givenName || 'BIT Student',
+        photo_url: googleUser.photo || null,
       });
 
       if (backendRes?.error && !backendRes?.success) {
-        // If backend returns an explicit error message (not network fault)
         console.warn('Backend Auth response:', backendRes.error);
+        setError(backendRes.error);
+        return;
       }
 
       const userObj = backendRes?.user || {
-        id: '12345',
-        email: studentEmail,
-        name: 'BIT Student',
-        photo: null,
+        id: googleUser.id,
+        email: userEmail,
+        name: googleUser.name || googleUser.givenName || 'BIT Student',
+        photo: googleUser.photo || null,
       };
 
-      const success = await loginWithGoogleUser(userObj, backendRes?.token || 'session_jwt_token');
+      const success = await loginWithGoogleUser(userObj, backendRes?.token || backendRes?.jwt || 'session_jwt_token');
       if (!success && !accessDeniedMessage) {
         setError('Sign in failed. Only @bitsathy.ac.in accounts allowed.');
       }
     } catch (err) {
-      console.error('Google Sign-In error:', err);
-      setError(err?.message || 'Google Sign-In failed. Please try again.');
+      const isDevError = err?.code === statusCodes.DEVELOPER_ERROR || err?.code === '10' || String(err).includes('DEVELOPER_ERROR');
+      const isNetworkError = err?.code === statusCodes.NETWORK_ERROR || err?.code === '7' || String(err).includes('NETWORK_ERROR');
+
+      if (err?.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.log('User cancelled Google Sign-In flow');
+      } else if (err?.code === statusCodes.IN_PROGRESS) {
+        setError('Google Sign-In is already in progress.');
+      } else if (err?.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        setError('Google Play Services unavailable on this device.');
+      } else if (isNetworkError) {
+        console.warn('Google Sign-In NETWORK_ERROR:', err);
+        setError('Network Error: Unable to reach Google servers. Please check your device/emulator internet connection.');
+      } else if (isDevError) {
+        console.warn('Google Sign-In DEVELOPER_ERROR:', err);
+        setError('Google OAuth DEVELOPER_ERROR: Add SHA-1 (5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25) to Google Cloud Console.');
+      } else {
+        console.error('Google Sign-In error:', err);
+        setError(err?.message || 'Google Sign-In failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
