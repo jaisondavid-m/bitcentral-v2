@@ -140,32 +140,80 @@ func clearAuthCookies(c *gin.Context) {
 }
 
 func (h *StudentLookupHandler) GetMe(c *gin.Context) {
-	emailID := strings.TrimSpace(c.Query("emailid"))
-	if emailID == "" {
-		emailID = strings.TrimSpace(c.Query("mailid"))
+	token := ExtractAuthToken(c)
+	if token == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"error":   "Authentication required: please sign in to access profile",
+		})
+		return
 	}
 
-	var claims *config.GoogleUserClaims
-	token := ExtractAuthToken(c)
-	if token != "" {
-		if cClaims, err := config.VerifyGoogleToken(token); err == nil && cClaims != nil {
-			claims = cClaims
-			if emailID == "" {
-				emailID = claims.Email
+	claims, err := config.VerifyGoogleToken(token)
+	if err != nil || claims == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"error":   "Invalid authentication token",
+		})
+		return
+	}
+
+	authenticatedUID := strings.TrimSpace(claims.UID)
+	authenticatedEmail := strings.ToLower(strings.TrimSpace(claims.Email))
+
+	requestedEmail := strings.TrimSpace(c.Query("emailid"))
+	if requestedEmail == "" {
+		requestedEmail = strings.TrimSpace(c.Query("mailid"))
+	}
+	if requestedEmail == "" {
+		requestedEmail = strings.TrimSpace(c.Query("email"))
+	}
+
+	emailID := authenticatedEmail
+	if requestedEmail != "" && !strings.EqualFold(requestedEmail, authenticatedEmail) && !strings.EqualFold(requestedEmail, authenticatedUID) {
+		// Check if requester is an admin
+		isAdmin := false
+		if h.DB != nil {
+			var role string
+			err := h.DB.QueryRow(`SELECT role FROM users WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, authenticatedUID, authenticatedUID, authenticatedEmail).Scan(&role)
+			if err == nil {
+				r := strings.ToLower(strings.TrimSpace(role))
+				if r == "admin" || r == "superadmin" || r == "super_admin" {
+					isAdmin = true
+				}
 			}
-		} else if emailID == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{
+
+			if !isAdmin && authenticatedUID != "" {
+				var count int
+				_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins WHERE uid = ?`, authenticatedUID).Scan(&count)
+				if count > 0 {
+					isAdmin = true
+				}
+			}
+			if !isAdmin && authenticatedEmail != "" {
+				var count int
+				_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins a JOIN users u ON a.uid = u.uid WHERE LOWER(TRIM(u.email)) = ?`, authenticatedEmail).Scan(&count)
+				if count > 0 {
+					isAdmin = true
+				}
+			}
+		}
+
+		if !isAdmin {
+			c.JSON(http.StatusForbidden, gin.H{
 				"success": false,
-				"error":   "Invalid authentication token",
+				"error":   "Forbidden: You are not authorized to access another user's profile",
 			})
 			return
 		}
+
+		emailID = requestedEmail
 	}
 
 	if emailID == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"error":   "Query param 'emailid' is required or send a Bearer token",
+			"error":   "Invalid user identity",
 		})
 		return
 	}
@@ -210,7 +258,7 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		 LIMIT 1`,
 		idQuery,
 	)
-	err := h.DB.QueryRow(queryStr, emailID, cleanEmail).Scan(
+	err = h.DB.QueryRow(queryStr, emailID, cleanEmail).Scan(
 		&user.ID,
 		&user.GoogleID,
 		&user.Email,
