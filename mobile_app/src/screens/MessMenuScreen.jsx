@@ -7,8 +7,13 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  StatusBar,
+  Platform,
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { fetchMessMenu } from '../api/axios';
+
+const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0;
 
 const FALLBACK_MENU = {
   Boys: {
@@ -45,16 +50,19 @@ export default function MessMenuScreen({ navigation }) {
     loadMenu();
   }, [loadMenu]);
 
-
   const displayMenu = menuData || FALLBACK_MENU[tab];
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor="#2563EB" barStyle="light-content" translucent={true} />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Text style={styles.backText}>‹ Back</Text>
+          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.title}>Mess Menu</Text>
+        <View style={styles.headerLeft}>
+          <Ionicons name="star" size={20} color="#FFFFFF" style={styles.starIcon} />
+          <Text style={styles.headerTitle}>BIT-CENTRAL</Text>
+        </View>
       </View>
 
       <View style={styles.tabContainer}>
@@ -73,7 +81,7 @@ export default function MessMenuScreen({ navigation }) {
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#2563EB" style={{ marginTop: 40 }} />
+        <ActivityIndicator size="large" color="#2563EB" style={styles.loadingIndicator} />
       ) : (
         <ScrollView contentContainerStyle={styles.content}>
           {Object.entries(displayMenu).map(([meal, items]) => (
@@ -102,21 +110,31 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#1E293B',
+    paddingHorizontal: 16,
+    paddingTop: STATUS_BAR_HEIGHT + 12,
+    paddingBottom: 14,
+    backgroundColor: '#2563EB',
+    elevation: 4,
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
   },
   backButton: {
-    paddingRight: 12,
+    paddingRight: 10,
   },
-  backText: {
-    color: '#38BDF8',
-    fontSize: 16,
-    fontWeight: '600',
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
+  starIcon: {
+    marginRight: 6,
+  },
+  headerTitle: {
+    fontSize: 19,
+    fontWeight: '800',
     color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   tabContainer: {
     flexDirection: 'row',
@@ -144,6 +162,9 @@ const styles = StyleSheet.create({
   },
   activeTabText: {
     color: '#FFFFFF',
+  },
+  loadingIndicator: {
+    marginTop: 40,
   },
   content: {
     padding: 16,

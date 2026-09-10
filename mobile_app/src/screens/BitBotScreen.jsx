@@ -10,9 +10,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  StatusBar,
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { sendChatMessage } from '../api/axios';
 import { useAuth } from '../context/StudentContext';
+
+const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0;
 
 export default function BitBotScreen() {
   const { user } = useAuth();
@@ -59,8 +63,12 @@ export default function BitBotScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor="#2563EB" barStyle="light-content" translucent={true} />
       <View style={styles.header}>
-        <Text style={styles.title}>BitBot AI Assistant</Text>
+        <View style={styles.headerLeft}>
+          <Ionicons name="star" size={22} color="#FFFFFF" style={styles.starIcon} />
+          <Text style={styles.headerTitle}>BIT-CENTRAL</Text>
+        </View>
       </View>
 
       <KeyboardAvoidingView
@@ -126,14 +134,36 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   header: {
-    padding: 16,
-    backgroundColor: '#1E293B',
+    backgroundColor: '#2563EB',
+    paddingHorizontal: 20,
+    paddingTop: STATUS_BAR_HEIGHT + 12,
+    paddingBottom: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    elevation: 4,
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+  },
+  headerLeft: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
+  starIcon: {
+    marginRight: 8,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '800',
     color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#1E3A8A',
   },
   chatArea: {
     flex: 1,
