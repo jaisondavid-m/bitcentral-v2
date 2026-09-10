@@ -181,6 +181,49 @@ func (h *MailHandler) GetMailConfig(c *gin.Context) {
 	})
 }
 
+func dialSMTP(cfg CustomSMTPConfig) (*gomail.Dialer, gomail.SendCloser, error) {
+	primaryDialer := gomail.NewDialer(cfg.Host, cfg.Port, cfg.User, cfg.Pass)
+	if cfg.Port == 465 {
+		primaryDialer.SSL = true
+	}
+	if cfg.InsecureSkipVerify {
+		primaryDialer.TLSConfig = &tls.Config{InsecureSkipVerify: true, ServerName: cfg.Host}
+	} else {
+		primaryDialer.TLSConfig = &tls.Config{ServerName: cfg.Host}
+	}
+
+	s, err := primaryDialer.Dial()
+	if err == nil {
+		return primaryDialer, s, nil
+	}
+
+	// Cloud hosting environments (Render, AWS, DigitalOcean, Railway, etc.) block outbound ports 25 and 587.
+	// Auto fallback to port 465 (SSL direct) if port 587 times out or fails.
+	fallbackPort := 465
+	if cfg.Port == 465 {
+		fallbackPort = 587
+	}
+
+	log.Printf("⚠️ SMTP dial on port %d failed (%v). Attempting fallback port %d...", cfg.Port, err, fallbackPort)
+	fallbackDialer := gomail.NewDialer(cfg.Host, fallbackPort, cfg.User, cfg.Pass)
+	if fallbackPort == 465 {
+		fallbackDialer.SSL = true
+	}
+	if cfg.InsecureSkipVerify {
+		fallbackDialer.TLSConfig = &tls.Config{InsecureSkipVerify: true, ServerName: cfg.Host}
+	} else {
+		fallbackDialer.TLSConfig = &tls.Config{ServerName: cfg.Host}
+	}
+
+	sFallback, errFallback := fallbackDialer.Dial()
+	if errFallback == nil {
+		log.Printf("✅ SMTP connected successfully using fallback port %d", fallbackPort)
+		return fallbackDialer, sFallback, nil
+	}
+
+	return primaryDialer, nil, fmt.Errorf("port %d failed (%v) and fallback port %d failed (%v)", cfg.Port, err, fallbackPort, errFallback)
+}
+
 // POST /admin/mail/test
 func (h *MailHandler) TestMailConnection(c *gin.Context) {
 	var req TestMailRequest
@@ -202,11 +245,6 @@ func (h *MailHandler) TestMailConnection(c *gin.Context) {
 			"message": "SMTP credentials not configured. Please define SMTP_USER and SMTP_PASSWORD in environment or payload.",
 		})
 		return
-	}
-
-	d := gomail.NewDialer(cfg.Host, cfg.Port, cfg.User, cfg.Pass)
-	if cfg.InsecureSkipVerify {
-		d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 
 	fromHeader := cfg.FromEmail
@@ -244,18 +282,29 @@ func (h *MailHandler) TestMailConnection(c *gin.Context) {
 
 	m.SetBody("text/html", testBody)
 
-	if err := d.DialAndSend(m); err != nil {
-		log.Printf("❌ SMTP Test failed: %v", err)
+	d, s, err := dialSMTP(cfg)
+	if err != nil {
+		log.Printf("❌ SMTP Test dial failed: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
-			"message": fmt.Sprintf("SMTP test failed: %v", err),
+			"message": fmt.Sprintf("SMTP connection failed: %v. In production, ensure SMTP_PORT=465 is set.", err),
+		})
+		return
+	}
+	defer s.Close()
+
+	if err := gomail.Send(s, m); err != nil {
+		log.Printf("❌ SMTP Test send failed: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": fmt.Sprintf("SMTP send failed: %v", err),
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": fmt.Sprintf("SMTP test email successfully sent to %s via %s:%d", target, cfg.Host, cfg.Port),
+		"message": fmt.Sprintf("SMTP test email successfully sent to %s via %s:%d (SSL/TLS)", target, d.Host, d.Port),
 	})
 }
 
@@ -515,17 +564,11 @@ func (h *MailHandler) SendAdminEmail(c *gin.Context) {
 		go func() {
 			defer wg.Done()
 
-			d := gomail.NewDialer(cfg.Host, cfg.Port, cfg.User, cfg.Pass)
-			if cfg.InsecureSkipVerify {
-				d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
-			}
-
-			// Open reusable sender connection per worker
-			s, err := d.Dial()
+			_, s, err := dialSMTP(cfg)
 			if err != nil {
 				mu.Lock()
 				failCount++
-				errorDetails = append(errorDetails, fmt.Sprintf("Dial error: %v", err))
+				errorDetails = append(errorDetails, fmt.Sprintf("Dial error: %v (Hint: set SMTP_PORT=465 in production)", err))
 				mu.Unlock()
 				return
 			}
