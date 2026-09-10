@@ -51,12 +51,12 @@ const FALLBACK_CARDS = [
     route: 'WifiDetails',
   },
   {
-    id: 'bitbot-ai',
-    name: 'BitBot AI Assistant',
-    description: 'Ask questions about courses, campus, and schedules.',
-    btntext: 'Chat with AI',
-    icon: 'chatbubbles-outline',
-    route: 'BitBot',
+    id: 'bitcentral-support',
+    name: 'BIT-CENTRAL Support',
+    description: 'Direct admin line for queries, feedback, and issue reporting.',
+    btntext: 'Get Support',
+    icon: 'headset-outline',
+    route: 'Support',
   },
 ];
 
@@ -111,8 +111,8 @@ export default function HomeScreen({ navigation }) {
         navigation.navigate('WifiDetails');
         return;
       }
-      if (routeLower === 'bitbot' || routeLower.includes('bot')) {
-        navigation.navigate('BitBot');
+      if (routeLower === 'support' || routeLower.includes('help') || routeLower === 'bitbot' || routeLower.includes('bot')) {
+        navigation.navigate('Support');
         return;
       }
       if (routeLower === 'profile') {
@@ -143,8 +143,8 @@ export default function HomeScreen({ navigation }) {
         navigation.navigate('WifiDetails');
         return;
       }
-      if (linkLower.includes('/bitbot') || linkLower.includes('/bot')) {
-        navigation.navigate('BitBot');
+      if (linkLower.includes('/support') || linkLower.includes('/feedback') || linkLower.includes('/bitbot') || linkLower.includes('/bot')) {
+        navigation.navigate('Support');
         return;
       }
       if (linkLower.includes('/profile')) {

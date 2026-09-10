@@ -21,25 +21,39 @@ import {
   fetchRpLeaderboard,
   fetchRpAverages,
   fetchMeProfile,
+  getCachedMeProfile,
 } from '../api/axios';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0;
 
 const DEPARTMENTS = [
-  { code: '', name: 'All' },
-  { code: 'CSE', name: 'CSE' },
-  { code: 'IT', name: 'IT' },
-  { code: 'AI&DS', name: 'AI & DS' },
-  { code: 'AIML', name: 'AI & ML' },
-  { code: 'ECE', name: 'ECE' },
-  { code: 'EEE', name: 'EEE' },
-  { code: 'MECH', name: 'MECH' },
-  { code: 'CIVIL', name: 'CIVIL' },
-  { code: 'AGRI', name: 'AGRI' },
-  { code: 'BT', name: 'BT' },
+  { code: '', name: 'All Departments' },
+  { code: 'CSE', name: 'Computer Science & Eng' },
+  { code: 'IT', name: 'Information Tech' },
+  { code: 'AI&DS', name: 'AI & Data Science' },
+  { code: 'AIML', name: 'AI & Machine Learning' },
+  { code: 'AGRI', name: 'Agricultural Eng' },
+  { code: 'ECE', name: 'Electronics & Comm' },
+  { code: 'EEE', name: 'Electrical & Elec' },
+  { code: 'MTRS', name: 'Mechatronics' },
+  { code: 'EIE', name: 'Electronics & Inst' },
+  { code: 'BT', name: 'Biotechnology' },
+  { code: 'MECH', name: 'Mechanical Eng' },
+  { code: 'CIVIL', name: 'Civil Eng' },
+  { code: 'CSBS', name: 'CS & Business Systems' },
+  { code: 'CSD', name: 'CS & Design' },
+  { code: 'CT', name: 'Computer Technology' },
+  { code: 'FT', name: 'Fashion Technology' },
+  { code: 'ISE', name: 'Info Science & Eng' },
+  { code: 'BIOMEDICAL', name: 'Biomedical Eng' },
 ];
 
-const YEARS = ['', 'I', 'II', 'III', 'IV'];
+const YEARS = [
+  { code: 'I', name: 'Year I' },
+  { code: 'II', name: 'Year II' },
+  { code: 'III', name: 'Year III' },
+  { code: 'IV', name: 'Year IV' },
+];
 
 export default function RpSiteScreen({ navigation }) {
   const { user } = useAuth();
@@ -95,32 +109,57 @@ export default function RpSiteScreen({ navigation }) {
 
   const hasAutoFilledRef = useRef(false);
 
-  // Auto pre-fill student roll number from /me endpoint once on screen mount
+  // Auto pre-fill student roll number from cached AsyncStorage profile or /me API on screen mount
   useEffect(() => {
     if (hasAutoFilledRef.current) return;
     hasAutoFilledRef.current = true;
 
     async function initAutoFill() {
       let rollNoToUse = '';
+
+      // 1. Instantly check AsyncStorage for cached /me profile
       try {
-        const meData = await fetchMeProfile();
-        if (meData?.roll_no) {
-          rollNoToUse = meData.roll_no;
-        } else if (meData?.user_id) {
-          rollNoToUse = meData.user_id;
+        const cachedProfile = await getCachedMeProfile();
+        if (cachedProfile?.roll_no) {
+          rollNoToUse = cachedProfile.roll_no;
+        } else if (cachedProfile?.user_id) {
+          rollNoToUse = cachedProfile.user_id;
         }
       } catch (e) {
-        console.warn('Failed to fetch /me profile for auto fill:', e);
+        console.warn('Failed to read cached profile:', e);
       }
 
-      if (!rollNoToUse) {
-        if (user?.roll_no) rollNoToUse = user.roll_no;
-        else if (user?.email) rollNoToUse = user.email.split('@')[0];
-      }
-
+      // If cached roll number found, trigger search instantly!
       if (rollNoToUse) {
         setSearchQuery(rollNoToUse);
         performSearch(rollNoToUse);
+      }
+
+      // 2. Fetch fresh /me profile from API in background and update AsyncStorage cache
+      try {
+        const meData = await fetchMeProfile();
+        const freshRoll = meData?.roll_no || meData?.user_id || '';
+        if (!rollNoToUse && freshRoll) {
+          rollNoToUse = freshRoll;
+          setSearchQuery(freshRoll);
+          performSearch(freshRoll);
+        }
+      } catch (e) {
+        console.warn('Failed to fetch /me profile in background:', e);
+      }
+
+      // Fallback if still no roll number found
+      if (!rollNoToUse) {
+        let fallbackRoll = '';
+        if (user?.roll_no) fallbackRoll = user.roll_no;
+        else if (user?.user_id) fallbackRoll = user.user_id;
+        else if (user?.display_name) fallbackRoll = user.display_name;
+        else if (user?.displayName) fallbackRoll = user.displayName;
+
+        if (fallbackRoll) {
+          setSearchQuery(fallbackRoll);
+          performSearch(fallbackRoll);
+        }
       }
     }
 
@@ -456,20 +495,20 @@ export default function RpSiteScreen({ navigation }) {
               <Ionicons name="filter-outline" size={14} color="#64748B" />
               <Text style={styles.filterTitle}>SELECT YEAR</Text>
             </View>
-            <View style={styles.chipRow}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.deptScroll}>
               {YEARS.map((y) => (
                 <TouchableOpacity
-                  key={y || 'all'}
-                  style={[styles.chip, selectedYear === y && styles.activeChip]}
-                  onPress={() => setSelectedYear(y)}
+                  key={y.code || 'all'}
+                  style={[styles.deptChip, selectedYear === y.code && styles.activeDeptChip]}
+                  onPress={() => setSelectedYear(y.code)}
                   activeOpacity={0.7}
                 >
-                  <Text style={[styles.chipText, selectedYear === y && styles.activeChipText]}>
-                    {y ? `Year ${y}` : 'All Years'}
+                  <Text style={[styles.deptChipText, selectedYear === y.code && styles.activeDeptChipText]}>
+                    {y.name}
                   </Text>
                 </TouchableOpacity>
               ))}
-            </View>
+            </ScrollView>
           </View>
 
           {/* Department Horizontal Selector */}
