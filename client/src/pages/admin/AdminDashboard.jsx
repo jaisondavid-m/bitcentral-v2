@@ -39,6 +39,9 @@ import {
   getAIKeyConfig,
   updateAIKeyConfig,
   testAIKeyConfig,
+  checkSuperAdmin,
+  addAdmin,
+  removeAdmin,
 } from "@/api/admin.js";
 import { MealCard } from "@/components/cards/MealCard.jsx";
 import {
@@ -92,7 +95,6 @@ import SuperAdminPanel from "./SuperAdminPanel.jsx";
 import AdminPSRewardsPage from "./AdminPSRewards.jsx";
 import AdminFeedbackPage from "./AdminFeedbackPage.jsx";
 import AdminAuditLogs from "./AdminAuditLogs.jsx";
-import { checkSuperAdmin } from "@/api/admin.js";
 
 function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
