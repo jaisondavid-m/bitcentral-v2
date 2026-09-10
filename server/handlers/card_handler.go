@@ -20,7 +20,7 @@ func NewCardHandler() *CardHandler {
 }
 
 func GetCards(c *gin.Context) {
-	rows, err := config.DB.Query(`SELECT id, card_order, img, name, keywords, link, btntext, click_count FROM cards ORDER BY card_order ASC, id ASC`)
+	rows, err := config.DB.Query(`SELECT id, card_order, img, name, keywords, link, COALESCE(app_route, ''), btntext, click_count FROM cards ORDER BY card_order ASC, id ASC`)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -31,9 +31,9 @@ func GetCards(c *gin.Context) {
 	for rows.Next() {
 		var id, order int
 		var clickCount int
-		var img, name, link, btntext string
+		var img, name, link, appRoute, btntext string
 		var keywords sql.NullString
-		if err := rows.Scan(&id, &order, &img, &name, &keywords, &link, &btntext, &clickCount); err != nil {
+		if err := rows.Scan(&id, &order, &img, &name, &keywords, &link, &appRoute, &btntext, &clickCount); err != nil {
 			continue
 		}
 		var kw []string
@@ -47,6 +47,7 @@ func GetCards(c *gin.Context) {
 			Name:       name,
 			Keywords:   kw,
 			Link:       link,
+			AppRoute:   appRoute,
 			BtnText:    btntext,
 			ClickCount: clickCount,
 		})
@@ -69,7 +70,7 @@ func CreateCard(c *gin.Context) {
 		}
 	}
 	kwBytes, _ := json.Marshal(payload.Keywords)
-	res, err := config.DB.Exec(`INSERT INTO cards (card_order, img, name, keywords, link, btntext) VALUES (?, ?, ?, ?, ?, ?)`, payload.Order, payload.Image, payload.Name, string(kwBytes), payload.Link, payload.BtnText)
+	res, err := config.DB.Exec(`INSERT INTO cards (card_order, img, name, keywords, link, app_route, btntext) VALUES (?, ?, ?, ?, ?, ?, ?)`, payload.Order, payload.Image, payload.Name, string(kwBytes), payload.Link, payload.AppRoute, payload.BtnText)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -103,7 +104,7 @@ func UpdateCard(c *gin.Context) {
 		}
 	}
 	kwBytes, _ := json.Marshal(payload.Keywords)
-	_, err = config.DB.Exec(`UPDATE cards SET card_order=?, img=?, name=?, keywords=?, link=?, btntext=? WHERE id=?`, payload.Order, payload.Image, payload.Name, string(kwBytes), payload.Link, payload.BtnText, id)
+	_, err = config.DB.Exec(`UPDATE cards SET card_order=?, img=?, name=?, keywords=?, link=?, app_route=?, btntext=? WHERE id=?`, payload.Order, payload.Image, payload.Name, string(kwBytes), payload.Link, payload.AppRoute, payload.BtnText, id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return

@@ -366,8 +366,8 @@ func createCardsTable() {
 		log.Printf("ℹ️ idx_cards_card_order not created (may already exist): %v", err)
 	}
 
-	if _, err := DB.Exec(`UPDATE cards SET card_order = id WHERE card_order = 0`); err != nil {
-		log.Printf("ℹ️ card_order backfill skipped: %v", err)
+	if _, err := DB.Exec(`ALTER TABLE cards ADD COLUMN app_route VARCHAR(255) NOT NULL DEFAULT '' AFTER link`); err != nil {
+		log.Printf("ℹ️ app_route column not created (may already exist): %v", err)
 	}
 
 	log.Println("✅ cards table ready")

@@ -7,6 +7,7 @@ type Card struct {
 	Name       string   `json:"name"`
 	Keywords   []string `json:"keywords"`
 	Link       string   `json:"link"`
+	AppRoute   string   `json:"app_route"`
 	BtnText    string   `json:"btntext"`
 	ClickCount int      `json:"click_count"`
 }
