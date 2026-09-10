@@ -112,5 +112,15 @@ export async function fetchMeProfile() {
   }
 }
 
+export async function fetchV2Profile() {
+  try {
+    const res = await api.get('/v2/profile');
+    return res?.data?.data || res?.data || null;
+  } catch (err) {
+    console.error('Failed to fetch /v2/profile from backend:', err?.message || err);
+    return null;
+  }
+}
+
 export default api;
 
