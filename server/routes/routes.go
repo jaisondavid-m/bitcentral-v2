@@ -31,6 +31,7 @@ func SetupRouter(
 	facultyDirectoryHandler *handlers.FacultyDirectoryHandler,
 	chatHandler *handlers.ChatHandler,
 	aiHandler *handlers.AIHandler,
+	mailHandler *handlers.MailHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -247,6 +248,13 @@ func SetupRouter(
 		admin.GET("/audit-logs", adminHandler.GetAuditLogs)
 		admin.GET("/audit-logs/users", adminHandler.GetUserAuditLogsSummary)
 		admin.DELETE("/audit-logs", adminHandler.ClearAuditLogs)
+
+		// Mail Sender Admin API (Gomail)
+		admin.GET("/mail/config", mailHandler.GetMailConfig)
+		admin.POST("/mail/test", mailHandler.TestMailConnection)
+		admin.POST("/mail/send", mailHandler.SendAdminEmail)
+		admin.GET("/mail/history", mailHandler.GetMailHistory)
+		admin.DELETE("/mail/history/:id", mailHandler.DeleteMailLog)
 	}
 
 	// Super-admin routes: manage admins and allowed external emails/domains

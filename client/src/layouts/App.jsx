@@ -256,6 +256,22 @@ function App() {
                 }
               />
               <Route
+                path="/admin/mail"
+                element={
+                  <AdminRoute>
+                    <AdminDashboard />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/mail-sender"
+                element={
+                  <AdminRoute>
+                    <AdminDashboard />
+                  </AdminRoute>
+                }
+              />
+              <Route
                 path="/admin/ai-key"
                 element={
                   <AdminRoute>
