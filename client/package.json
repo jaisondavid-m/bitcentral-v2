@@ -13,6 +13,7 @@
     "seo:prerender": "node ./scripts/prerender-public.mjs"
   },
   "dependencies": {
+    "@gradio/client": "^2.5.1",
     "@lottiefiles/dotlottie-web": "^0.80.0",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/react-query": "^5.95.2",

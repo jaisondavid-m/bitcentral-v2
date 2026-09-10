@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { GraduationCap, MapPin, User, Loader2, X, ChevronRight, ChevronLeft } from "lucide-react";
+import { GraduationCap, MapPin, User, Loader2, X, ChevronRight, ChevronLeft, Calculator, Sparkles } from "lucide-react";
 import api from "@/api/axios.js";
+import { fetchInternalMarkConversion } from "@/api/gradioRewardPoints.js";
+import InternalMarksConversionModal from "@/components/modals/InternalMarksConversionModal.jsx";
 
 const Meta = ({ icon: Icon, children }) => (
   <div className="flex items-start gap-2">
@@ -23,6 +25,13 @@ export default function RpCard({ student }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const pointsCache = React.useRef(new Map());
+
+  // Internal marks conversion state
+  const [internalModalOpen, setInternalModalOpen] = useState(false);
+  const [internalLoading, setInternalLoading] = useState(false);
+  const [internalError, setInternalError] = useState("");
+  const [internalData, setInternalData] = useState(null);
+  const internalCache = React.useRef(new Map());
 
   if (!student) return null;
 
@@ -125,6 +134,30 @@ export default function RpCard({ student }) {
     }
   };
 
+  const fetchInternalMarks = async (forceRefresh = false) => {
+    setInternalModalOpen(true);
+    setInternalError("");
+
+    if (!forceRefresh && internalCache.current.has(rollNo)) {
+      setInternalData(internalCache.current.get(rollNo));
+      setInternalLoading(false);
+      return;
+    }
+
+    setInternalLoading(true);
+    try {
+      const parsedData = await fetchInternalMarkConversion(rollNo);
+      internalCache.current.set(rollNo, parsedData);
+      setInternalData(parsedData);
+    } catch (err) {
+      setInternalError(
+        err?.message || "Failed to fetch internal mark conversion. Please try again."
+      );
+    } finally {
+      setInternalLoading(false);
+    }
+  };
+
   return (
     <>
       {/* Card */}
@@ -177,20 +210,39 @@ export default function RpCard({ student }) {
             ))}
           </div>
 
-          {/* CTA */}
-          <button
-            type="button"
-            onClick={() => fetchPoints(1)}
-            className="
-              flex w-full items-center justify-between
-              rounded-xl bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700
-              px-4 py-2.5 text-[12px] font-medium text-slate-700 dark:text-slate-300
-              transition-colors hover:bg-slate-200 dark:hover:bg-slate-700/70 hover:text-slate-900 dark:hover:text-white active:scale-[.98]
-            "
-          >
-            <span>View detailed points</span>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-500" strokeWidth={2} />
-          </button>
+          {/* CTA Buttons */}
+          <div className="flex flex-col gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => fetchPoints(1)}
+              className="
+                flex w-full items-center justify-between
+                rounded-xl bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700
+                px-4 py-2.5 text-[12px] font-medium text-slate-700 dark:text-slate-300
+                transition-colors hover:bg-slate-200 dark:hover:bg-slate-700/70 hover:text-slate-900 dark:hover:text-white active:scale-[.98] cursor-pointer
+              "
+            >
+              <span>View detailed points</span>
+              <ChevronRight className="h-3.5 w-3.5 text-slate-500" strokeWidth={2} />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => fetchInternalMarks()}
+              className="
+                flex w-full items-center justify-between
+                rounded-xl bg-gradient-to-r from-indigo-50/90 to-purple-50/90 border border-indigo-200/80 dark:from-indigo-950/40 dark:to-purple-950/30 dark:border-indigo-800/60
+                px-4 py-2.5 text-[12px] font-semibold text-indigo-900 dark:text-indigo-300
+                transition-all hover:from-indigo-100 hover:to-purple-100 dark:hover:from-indigo-900/50 dark:hover:to-purple-900/40 active:scale-[.98] cursor-pointer shadow-2xs
+              "
+            >
+              <div className="flex items-center gap-2">
+                <Calculator className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
+                <span>View internal mark conversion</span>
+              </div>
+              <ChevronRight className="h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400" strokeWidth={2} />
+            </button>
+          </div>
         </div>
       </article>
 
@@ -386,6 +438,17 @@ export default function RpCard({ student }) {
           </div>
         </div>
       )}
+
+      {/* Internal Marks Conversion Modal */}
+      <InternalMarksConversionModal
+        open={internalModalOpen}
+        onClose={() => setInternalModalOpen(false)}
+        student={student}
+        data={internalData}
+        loading={internalLoading}
+        error={internalError}
+        onRefresh={() => fetchInternalMarks(true)}
+      />
     </>
   );
 }
