@@ -7,7 +7,7 @@ import DailySupportModal from "@/components/modals/DailySupportModal.jsx";
 import FloatingMenu from "@/components/layout/FloatingMenu.jsx";
 import ErrorBoundary from "@/components/common/ErrorBoundary.jsx";
 import { lazyWithRetry } from "@/utils/lazyWithRetry.js";
-import { ROUTE_SEO } from "@/seo/routeSeo.js";
+import { getRouteSeo } from "@/seo/routeSeo.js";
 
 const Login = lazyWithRetry(() => import("@/pages/public/Login.jsx"));
 const LandingPage = lazyWithRetry(() => import("@/pages/public/LandingPage.jsx"));
@@ -57,7 +57,7 @@ const AdminDashboard = lazyWithRetry(() => import("@/pages/admin/AdminDashboard.
 function App() {
   const location = useLocation();
 
-  const currentMeta = ROUTE_SEO[location.pathname] || ROUTE_SEO["*"];
+  const currentMeta = getRouteSeo(location.pathname);
 
   // useEffect(() => {
   //   const handleKeyDown = (e) => {
@@ -138,6 +138,7 @@ function App() {
             <Route path="/disclaimer" element={<Disclaimer />} />
             <Route path="/guides" element={<GuidesIndex />} />
             <Route path="/guides/:slug" element={<GuideDetail />} />
+            <Route path="/wifi-details" element={<WifiDetails />} />
             <Route
               path="/"
               element={
@@ -276,7 +277,6 @@ function App() {
               <Route path="/faculty" element={<FacultyDirectory />} />
               {/* <Route path="/about" element={<About />} /> */}
               <Route path="/rpsite" element={<Rpsite />} />
-              <Route path="/wifi-details" element={<WifiDetails />} />
               <Route path="/pcdp" element={<PCDP />} />
               <Route path="/exam-hall" element={<ExamHallDownload />} />
               <Route path="/exam-hall-manual" element={<ExamHall />} />

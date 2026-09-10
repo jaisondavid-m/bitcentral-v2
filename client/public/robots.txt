@@ -5,6 +5,7 @@ User-agent: *
 Allow: /
 Disallow: /dashboard
 Disallow: /profile
+Disallow: /login
 Disallow: /admin
 Disallow: /semester
 Disallow: /mess
@@ -16,11 +17,21 @@ Disallow: /pcdp
 Disallow: /findmyway
 Disallow: /ak_22ph202
 Disallow: /tamil_ak
+Disallow: /faculty
+Disallow: /faculty-directory
+Disallow: /student-report
+Disallow: /ps-
+Disallow: /apsite
+Disallow: /support-dev
+Disallow: /payment-success
+Disallow: /bitbot
+Disallow: /*?
 
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /dashboard
 Disallow: /profile
+Disallow: /login
 Disallow: /admin
 Disallow: /semester
 Disallow: /mess
@@ -32,11 +43,21 @@ Disallow: /pcdp
 Disallow: /findmyway
 Disallow: /ak_22ph202
 Disallow: /tamil_ak
+Disallow: /faculty
+Disallow: /faculty-directory
+Disallow: /student-report
+Disallow: /ps-
+Disallow: /apsite
+Disallow: /support-dev
+Disallow: /payment-success
+Disallow: /bitbot
+Disallow: /*?
 
 User-agent: GPTBot
 Allow: /
 Disallow: /dashboard
 Disallow: /profile
+Disallow: /login
 Disallow: /admin
 Disallow: /semester
 Disallow: /mess
@@ -48,11 +69,21 @@ Disallow: /pcdp
 Disallow: /findmyway
 Disallow: /ak_22ph202
 Disallow: /tamil_ak
+Disallow: /faculty
+Disallow: /faculty-directory
+Disallow: /student-report
+Disallow: /ps-
+Disallow: /apsite
+Disallow: /support-dev
+Disallow: /payment-success
+Disallow: /bitbot
+Disallow: /*?
 
 User-agent: ChatGPT-User
 Allow: /
 Disallow: /dashboard
 Disallow: /profile
+Disallow: /login
 Disallow: /admin
 Disallow: /semester
 Disallow: /mess
@@ -64,11 +95,21 @@ Disallow: /pcdp
 Disallow: /findmyway
 Disallow: /ak_22ph202
 Disallow: /tamil_ak
+Disallow: /faculty
+Disallow: /faculty-directory
+Disallow: /student-report
+Disallow: /ps-
+Disallow: /apsite
+Disallow: /support-dev
+Disallow: /payment-success
+Disallow: /bitbot
+Disallow: /*?
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /dashboard
 Disallow: /profile
+Disallow: /login
 Disallow: /admin
 Disallow: /semester
 Disallow: /mess
@@ -80,5 +121,14 @@ Disallow: /pcdp
 Disallow: /findmyway
 Disallow: /ak_22ph202
 Disallow: /tamil_ak
+Disallow: /faculty
+Disallow: /faculty-directory
+Disallow: /student-report
+Disallow: /ps-
+Disallow: /apsite
+Disallow: /support-dev
+Disallow: /payment-success
+Disallow: /bitbot
+Disallow: /*?
 
 Sitemap: https://bitcentral.bitsathy.in/sitemap.xml

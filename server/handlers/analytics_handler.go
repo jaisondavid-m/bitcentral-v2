@@ -1,19 +1,15 @@
 package handlers
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
 	"server/config"
 	"github.com/gin-gonic/gin"
-	"google.golang.org/api/analyticsdata/v1beta"
-	"google.golang.org/api/option"
 )
 
 type AnalyticsHandler struct {
@@ -32,60 +28,30 @@ func NewAnalyticsHandler() *AnalyticsHandler {
 }
 
 type AnalyticsDataResponse struct {
-	Success      bool                   `json:"success"`
-	Summary      AnalyticsSummaryData   `json:"summary"`
-	Chart        []DailyTrafficPoint    `json:"chart"`
-	DailyHistory []DailyHistoryPoint    `json:"dailyHistory"`
-	Features     []FeatureUsageItem     `json:"features"`
-	Devices      []DeviceDistribution   `json:"devices"`
-	Realtime     RealtimeAnalyticsData  `json:"realtime"`
-	Source       string                 `json:"source"`
+	Success      bool                 `json:"success"`
+	Summary      AnalyticsSummaryData `json:"summary"`
+	DailyHistory []DailyHistoryPoint  `json:"dailyHistory"`
+	Source       string               `json:"source"`
 }
 
 type AnalyticsSummaryData struct {
-	RegisteredUsers    int    `json:"registered_users"`
-	DailyActiveUsers   int    `json:"daily_active_users"`
-	RealtimeActive     int    `json:"realtime_active"`
-	TotalPageviews30d  int    `json:"total_pageviews_30d"`
-	TotalSessions30d   int    `json:"total_sessions_30d"`
-	AvgSessionDuration string `json:"avg_session_duration"`
-	BounceRate         string `json:"bounce_rate"`
-}
-
-type DailyTrafficPoint struct {
-	TimeLabel   string `json:"timeLabel"`
-	ActiveUsers int    `json:"activeUsers"`
-	Pageviews   int    `json:"pageviews"`
+	RegisteredUsers  int    `json:"registered_users"`
+	DailyActiveUsers int    `json:"daily_active_users"`
+	PeakDAU          int    `json:"peak_dau"`
+	PeakDate         string `json:"peak_date"`
+	AvgDAU           int    `json:"avg_dau"`
+	TotalDaysTracked int    `json:"total_days_tracked"`
+	LastSyncedAt     string `json:"last_synced_at"`
 }
 
 type DailyHistoryPoint struct {
 	Date        string `json:"date"`        // e.g. "2026-09-10"
 	DateLabel   string `json:"dateLabel"`   // e.g. "10 Sep"
-	ActiveUsers int    `json:"activeUsers"` // Count of unique users active
-	TotalUsers  int    `json:"totalUsers"`  // Total registered users on that day
+	ActiveUsers int    `json:"activeUsers"` // Count of unique active users
+	TotalUsers  int    `json:"totalUsers"`  // Total registered users
 }
 
-type FeatureUsageItem struct {
-	Name       string  `json:"name"`
-	Category   string  `json:"category"`
-	UsageCount int     `json:"usageCount"`
-	Percentage float64 `json:"percentage"`
-	RoutePath  string  `json:"routePath"`
-}
-
-type DeviceDistribution struct {
-	Device     string  `json:"device"`
-	Percentage float64 `json:"percentage"`
-	Count      int     `json:"count"`
-}
-
-type RealtimeAnalyticsData struct {
-	ActiveNow       int      `json:"activeNow"`
-	ActivePages     []string `json:"activePages"`
-	LastUpdatedTime string   `json:"lastUpdatedTime"`
-}
-
-// Background worker that aggregates daily active users periodically and at midnight
+// Background worker that aggregates daily active users periodically
 func (h *AnalyticsHandler) startPeriodicDAUSync() {
 	time.Sleep(3 * time.Second)
 
@@ -101,7 +67,7 @@ func (h *AnalyticsHandler) startPeriodicDAUSync() {
 	}
 }
 
-// SyncDailyActiveUsers calculates and stores daily active users from users.last_seen_at into daily_active_user_stats
+// SyncDailyActiveUsers calculates and stores daily active users from users table into daily_active_user_stats
 func (h *AnalyticsHandler) SyncDailyActiveUsers() {
 	if h.DB == nil {
 		return
@@ -109,18 +75,16 @@ func (h *AnalyticsHandler) SyncDailyActiveUsers() {
 
 	var totalUsers int
 	_ = h.DB.QueryRow("SELECT COUNT(*) FROM users").Scan(&totalUsers)
-	if totalUsers == 0 {
-		totalUsers = 4546
-	}
 
-	// 1. Group all historical dates from last_seen_at
+	// 1. Group all historical dates from last_seen_at / last_sign_in_time
 	query := `
-		SELECT LEFT(last_seen_at, 10) AS activity_date, COUNT(DISTINCT id) AS active_count
+		SELECT LEFT(COALESCE(NULLIF(last_seen_at, ''), NULLIF(last_sign_in_time, '')), 10) AS activity_date,
+		       COUNT(DISTINCT id) AS active_count
 		FROM users
-		WHERE last_seen_at IS NOT NULL 
-		  AND last_seen_at != ''
-		  AND last_seen_at REGEXP '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
-		GROUP BY LEFT(last_seen_at, 10)
+		WHERE (last_seen_at IS NOT NULL AND last_seen_at != '')
+		   OR (last_sign_in_time IS NOT NULL AND last_sign_in_time != '')
+		GROUP BY LEFT(COALESCE(NULLIF(last_seen_at, ''), NULLIF(last_sign_in_time, '')), 10)
+		HAVING activity_date REGEXP '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
 		ORDER BY activity_date ASC;
 	`
 	rows, err := h.DB.Query(query)
@@ -144,7 +108,6 @@ func (h *AnalyticsHandler) SyncDailyActiveUsers() {
 	}
 	defer upsertStmt.Close()
 
-	syncedDates := make(map[string]bool)
 	for rows.Next() {
 		var actDate string
 		var actCount int
@@ -152,7 +115,6 @@ func (h *AnalyticsHandler) SyncDailyActiveUsers() {
 			actDate = strings.TrimSpace(actDate)
 			if len(actDate) == 10 {
 				_, _ = upsertStmt.Exec(actDate, actCount, totalUsers)
-				syncedDates[actDate] = true
 			}
 		}
 	}
@@ -164,28 +126,20 @@ func (h *AnalyticsHandler) SyncDailyActiveUsers() {
 	var todayCount int
 	_ = h.DB.QueryRow(`
 		SELECT COUNT(DISTINCT id) FROM users 
-		WHERE last_seen_at IS NOT NULL 
-		  AND (last_seen_at LIKE CONCAT(?, '%') OR last_seen_at LIKE CONCAT(?, '%'))
-	`, todayIST, todayLocal).Scan(&todayCount)
+		WHERE (last_seen_at IS NOT NULL AND (last_seen_at LIKE CONCAT(?, '%') OR last_seen_at LIKE CONCAT(?, '%')))
+		   OR (last_sign_in_time IS NOT NULL AND (last_sign_in_time LIKE CONCAT(?, '%') OR last_sign_in_time LIKE CONCAT(?, '%')))
+	`, todayIST, todayLocal, todayIST, todayLocal).Scan(&todayCount)
 
 	_, _ = upsertStmt.Exec(todayIST, todayCount, totalUsers)
 }
 
 func (h *AnalyticsHandler) GetAnalytics(c *gin.Context) {
-	ctx := context.Background()
-	gaPropertyID := os.Getenv("GA4_PROPERTY_ID")
-	gaCredentialsJSON := os.Getenv("GA_CREDENTIALS_JSON")
-
-	var registeredCount int = 4546
+	var registeredCount int = 0
 	if h.DB != nil {
-		var count int
-		err := h.DB.QueryRow("SELECT COUNT(*) FROM users").Scan(&count)
-		if err == nil && count > 0 {
-			registeredCount = count
-		}
+		_ = h.DB.QueryRow("SELECT COUNT(*) FROM users").Scan(&registeredCount)
 	}
 
-	// Live active today calculation
+	// Live active today calculation (IST & Local)
 	todayIST := time.Now().UTC().Add(5*time.Hour + 30*time.Minute).Format("2006-01-02")
 	todayLocal := time.Now().Format("2006-01-02")
 
@@ -193,16 +147,20 @@ func (h *AnalyticsHandler) GetAnalytics(c *gin.Context) {
 	if h.DB != nil {
 		_ = h.DB.QueryRow(`
 			SELECT COUNT(DISTINCT id) FROM users 
-			WHERE last_seen_at IS NOT NULL 
-			  AND (last_seen_at LIKE CONCAT(?, '%') OR last_seen_at LIKE CONCAT(?, '%'))
-		`, todayIST, todayLocal).Scan(&activeTodayCount)
+			WHERE (last_seen_at IS NOT NULL AND (last_seen_at LIKE CONCAT(?, '%') OR last_seen_at LIKE CONCAT(?, '%')))
+			   OR (last_sign_in_time IS NOT NULL AND (last_sign_in_time LIKE CONCAT(?, '%') OR last_sign_in_time LIKE CONCAT(?, '%')))
+		`, todayIST, todayLocal, todayIST, todayLocal).Scan(&activeTodayCount)
 	}
 
-	// Trigger quick sync to keep table fresh
-	go h.SyncDailyActiveUsers()
+	// Trigger sync to ensure table is fully updated
+	h.SyncDailyActiveUsers()
 
 	// Retrieve multi-day historical DAU records from daily_active_user_stats
 	var dailyHistory []DailyHistoryPoint
+	var peakDAU int = 0
+	var peakDate string = ""
+	var totalDAUSum int = 0
+
 	if h.DB != nil {
 		historyRows, err := h.DB.Query(`
 			SELECT date, active_users_count, total_users_count
@@ -222,10 +180,17 @@ func (h *AnalyticsHandler) GetAnalytics(c *gin.Context) {
 					if parsedDate, parseErr := time.Parse("2006-01-02", d); parseErr == nil {
 						label = parsedDate.Format("02 Jan")
 					}
-					// If this is today, ensure it uses live count if live count is higher
-					if d == todayIST && activeTodayCount > activeCount {
+					// If this is today, ensure it reflects the latest live count
+					if (d == todayIST || d == todayLocal) && activeTodayCount > activeCount {
 						activeCount = activeTodayCount
 					}
+
+					if activeCount > peakDAU {
+						peakDAU = activeCount
+						peakDate = label
+					}
+					totalDAUSum += activeCount
+
 					rawPoints = append(rawPoints, DailyHistoryPoint{
 						Date:        d,
 						DateLabel:   label,
@@ -251,93 +216,31 @@ func (h *AnalyticsHandler) GetAnalytics(c *gin.Context) {
 			ActiveUsers: activeTodayCount,
 			TotalUsers:  registeredCount,
 		})
+		peakDAU = activeTodayCount
+		peakDate = todayLabel
+		totalDAUSum = activeTodayCount
 	}
 
-	// Try querying Google Analytics 4 Data API if property ID and credentials exist
-	if gaPropertyID != "" && gaCredentialsJSON != "" {
-		service, err := analyticsdata.NewService(ctx, option.WithCredentialsJSON([]byte(gaCredentialsJSON)))
-		if err == nil {
-			reportReq := &analyticsdata.RunReportRequest{
-				DateRanges: []*analyticsdata.DateRange{
-					{StartDate: "30daysAgo", EndDate: "today"},
-				},
-				Metrics: []*analyticsdata.Metric{
-					{Name: "activeUsers"},
-					{Name: "screenPageViews"},
-					{Name: "sessions"},
-				},
-				Dimensions: []*analyticsdata.Dimension{
-					{Name: "date"},
-				},
-			}
-
-			reportResp, err := service.Properties.RunReport("properties/"+gaPropertyID, reportReq).Do()
-			if err == nil && reportResp != nil && len(reportResp.Rows) > 0 {
-				log.Println("✅ Analytics fetched successfully from Google Analytics Data API v1beta")
-			}
-		}
-	}
-
-	// Hourly traffic curve for today
-	dauToDisplay := activeTodayCount
-	if dauToDisplay == 0 {
-		dauToDisplay = 1420
-	}
-
-	chartData := []DailyTrafficPoint{
-		{TimeLabel: "1 am", ActiveUsers: int(float64(dauToDisplay) * 0.15), Pageviews: int(float64(dauToDisplay) * 0.25)},
-		{TimeLabel: "3 am", ActiveUsers: int(float64(dauToDisplay) * 0.22), Pageviews: int(float64(dauToDisplay) * 0.35)},
-		{TimeLabel: "5 am", ActiveUsers: int(float64(dauToDisplay) * 0.38), Pageviews: int(float64(dauToDisplay) * 0.55)},
-		{TimeLabel: "7 am", ActiveUsers: int(float64(dauToDisplay) * 0.62), Pageviews: int(float64(dauToDisplay) * 0.95)},
-		{TimeLabel: "9 am", ActiveUsers: int(float64(dauToDisplay) * 0.82), Pageviews: int(float64(dauToDisplay) * 1.35)},
-		{TimeLabel: "11 am", ActiveUsers: int(float64(dauToDisplay) * 0.88), Pageviews: int(float64(dauToDisplay) * 1.55)},
-		{TimeLabel: "1 pm", ActiveUsers: int(float64(dauToDisplay) * 0.89), Pageviews: int(float64(dauToDisplay) * 1.60)},
-		{TimeLabel: "3 pm", ActiveUsers: int(float64(dauToDisplay) * 0.88), Pageviews: int(float64(dauToDisplay) * 1.58)},
-		{TimeLabel: "5 pm", ActiveUsers: int(float64(dauToDisplay) * 0.90), Pageviews: int(float64(dauToDisplay) * 1.65)},
-		{TimeLabel: "7 pm", ActiveUsers: int(float64(dauToDisplay) * 0.92), Pageviews: int(float64(dauToDisplay) * 1.75)},
-		{TimeLabel: "9 pm", ActiveUsers: dauToDisplay, Pageviews: int(float64(dauToDisplay) * 2.10)},
-		{TimeLabel: "11 pm", ActiveUsers: int(float64(dauToDisplay) * 0.60), Pageviews: int(float64(dauToDisplay) * 1.15)},
-	}
-
-	featureItems := []FeatureUsageItem{
-		{Name: "Exam Hall Finder", Category: "Exam Utility", UsageCount: 3840, Percentage: 32.5, RoutePath: "/exam-hall"},
-		{Name: "Hostel Mess Schedule", Category: "Campus Life", UsageCount: 2950, Percentage: 25.0, RoutePath: "/mess"},
-		{Name: "Question Bank & Answer Keys", Category: "Academics", UsageCount: 2210, Percentage: 18.7, RoutePath: "/semester"},
-		{Name: "Wi-Fi Setup & Passwords Guide", Category: "Campus Tools", UsageCount: 1350, Percentage: 11.4, RoutePath: "/wifi-details"},
-		{Name: "Biometrics & Attendance Logs", Category: "Student Services", UsageCount: 890, Percentage: 7.5, RoutePath: "/ps-biometrics"},
-		{Name: "FindMyWay Campus Navigation", Category: "Navigation", UsageCount: 580, Percentage: 4.9, RoutePath: "/findmyway"},
-	}
-
-	deviceDistribution := []DeviceDistribution{
-		{Device: "Mobile (Android / iOS)", Percentage: 68.4, Count: 2980},
-		{Device: "Desktop (Chrome / Firefox)", Percentage: 27.6, Count: 1205},
-		{Device: "Tablet & iPad", Percentage: 4.0, Count: 175},
+	avgDAU := 0
+	if len(dailyHistory) > 0 {
+		avgDAU = totalDAUSum / len(dailyHistory)
 	}
 
 	summary := AnalyticsSummaryData{
-		RegisteredUsers:    registeredCount,
-		DailyActiveUsers:   dauToDisplay,
-		RealtimeActive:     84,
-		TotalPageviews30d:  48250,
-		TotalSessions30d:   23180,
-		AvgSessionDuration: "4m 18s",
-		BounceRate:         "24.2%",
-	}
-
-	realtime := RealtimeAnalyticsData{
-		ActiveNow:       84,
-		ActivePages:     []string{"/exam-hall", "/mess", "/guides/semester-exams", "/wifi-details", "/semester"},
-		LastUpdatedTime: fmt.Sprintf("%s IST", time.Now().UTC().Add(5*time.Hour+30*time.Minute).Format("15:04:05")),
+		RegisteredUsers:  registeredCount,
+		DailyActiveUsers: activeTodayCount,
+		PeakDAU:          peakDAU,
+		PeakDate:         peakDate,
+		AvgDAU:           avgDAU,
+		TotalDaysTracked: len(dailyHistory),
+		LastSyncedAt:     fmt.Sprintf("%s IST", time.Now().UTC().Add(5*time.Hour+30*time.Minute).Format("15:04:05")),
 	}
 
 	c.JSON(http.StatusOK, AnalyticsDataResponse{
 		Success:      true,
 		Summary:      summary,
-		Chart:        chartData,
 		DailyHistory: dailyHistory,
-		Features:     featureItems,
-		Devices:      deviceDistribution,
-		Realtime:     realtime,
-		Source:       "MySQL Database & Google Analytics API Service",
+		Source:       "MySQL Database (daily_active_user_stats)",
 	})
 }
+

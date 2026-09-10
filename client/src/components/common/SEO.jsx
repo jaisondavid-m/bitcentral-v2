@@ -141,7 +141,7 @@ export default function SEO({ pathname, meta = {} }) {
 
   const webpageSchema = {
     "@context": "https://schema.org",
-    "@type": meta.pageType || "WebPage",
+    "@type": meta.faq ? "WebPage" : meta.pageType || "WebPage",
     name: fullTitle,
     headline: title,
     description,

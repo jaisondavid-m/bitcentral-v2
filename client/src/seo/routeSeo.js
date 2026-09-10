@@ -48,14 +48,14 @@ export const ROUTE_SEO = {
 
   "/ps-assessment-history": {
     title: "PS Assessment History - BIT Central",
-    description: "View PS assessment details including cleared/not cleared results, timing, venue, and course names for student ID 2025UCS1023.",
+    description: "View protected PS assessment details including cleared or not cleared results, timing, venue, and course names.",
     keywords: ["PS Assessment History", "PS skills", "assessment logs", "BIT Central"],
     noIndex: true,
   },
 
   "/ps-assessment": {
     title: "PS Assessment History - BIT Central",
-    description: "View PS assessment details including cleared/not cleared results, timing, venue, and course names for student ID 2025UCS1023.",
+    description: "View protected PS assessment details including cleared or not cleared results, timing, venue, and course names.",
     keywords: ["PS Assessment History", "PS skills", "assessment logs", "BIT Central"],
     noIndex: true,
   },
@@ -388,3 +388,30 @@ export const SITEMAP_ROUTES = [
   "/guides/campus-facilities",
   "/guides/platform-guide",
 ];
+
+const GUIDE_ROUTE_PREFIX = "/guides/";
+
+function titleFromSlug(slug) {
+  return slug
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+export function getRouteSeo(pathname) {
+  if (ROUTE_SEO[pathname]) return ROUTE_SEO[pathname];
+
+  if (pathname.startsWith(GUIDE_ROUTE_PREFIX)) {
+    return {
+      title: `${titleFromSlug(pathname.slice(GUIDE_ROUTE_PREFIX.length))} | BIT Central`,
+      description: "This BIT Central guide is not available.",
+      noIndex: true,
+    };
+  }
+
+  if (/^\/(student-report|payment-successful|payment-successfull)(\/|$)/.test(pathname)) {
+    return ROUTE_SEO["/student-report"] || ROUTE_SEO["*"];
+  }
+
+  return ROUTE_SEO["*"];
+}
