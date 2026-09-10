@@ -113,22 +113,24 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 
 	type trackerProfile struct {
 		Name       string
-		RollNo     string
+		RegisterNo string
+		UserID     string
 		Department string
 		Batch      string
 		Phone      string
 	}
 	trackerMap := make(map[string]trackerProfile)
 	if h.DB != nil {
-		tRows, err := h.DB.Query(`SELECT LOWER(TRIM(COALESCE(email, ''))), COALESCE(id, COALESCE(user_id, '')), COALESCE(name, ''), COALESCE(department, ''), COALESCE(batch, ''), COALESCE(phone, '') FROM tracker_users WHERE email != ''`)
+		tRows, err := h.DB.Query(`SELECT LOWER(TRIM(COALESCE(email, ''))), COALESCE(user_id, ''), COALESCE(id, ''), COALESCE(name, ''), COALESCE(department, ''), COALESCE(batch, ''), COALESCE(phone, '') FROM tracker_users WHERE email != ''`)
 		if err == nil {
 			defer tRows.Close()
 			for tRows.Next() {
-				var email, rollNo, name, dept, bStr, phone string
-				if err := tRows.Scan(&email, &rollNo, &name, &dept, &bStr, &phone); err == nil && email != "" {
+				var email, regNo, uID, name, dept, bStr, phone string
+				if err := tRows.Scan(&email, &regNo, &uID, &name, &dept, &bStr, &phone); err == nil && email != "" {
 					trackerMap[email] = trackerProfile{
 						Name:       name,
-						RollNo:     rollNo,
+						RegisterNo: regNo,
+						UserID:     uID,
 						Department: dept,
 						Batch:      bStr,
 						Phone:      phone,
@@ -166,7 +168,9 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 			if tp.Name != "" && (u.DisplayName == "" || strings.EqualFold(u.DisplayName, "Student") || strings.EqualFold(u.DisplayName, "User")) {
 				u.DisplayName = tp.Name
 			}
-			u.RollNo = tp.RollNo
+			u.RegisterNo = tp.RegisterNo
+			u.UserID = tp.UserID
+			u.RollNo = tp.RegisterNo
 			u.Department = tp.Department
 			u.Batch = tp.Batch
 			u.Phone = tp.Phone
@@ -225,6 +229,8 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 			nameLower := strings.ToLower(u.DisplayName)
 			uidLower := strings.ToLower(u.UID)
 			rollLower := strings.ToLower(u.RollNo)
+			regLower := strings.ToLower(u.RegisterNo)
+			userIDLower := strings.ToLower(u.UserID)
 			deptLower := strings.ToLower(u.Department)
 			batchLower := strings.ToLower(u.Batch)
 			roleLower := strings.ToLower(u.Role)
@@ -232,6 +238,8 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 				!strings.Contains(nameLower, search) &&
 				!strings.Contains(uidLower, search) &&
 				!strings.Contains(rollLower, search) &&
+				!strings.Contains(regLower, search) &&
+				!strings.Contains(userIDLower, search) &&
 				!strings.Contains(deptLower, search) &&
 				!strings.Contains(batchLower, search) &&
 				!strings.Contains(roleLower, search) {

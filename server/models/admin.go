@@ -17,6 +17,8 @@ type User struct {
 	BlockedAt      string `json:"blockedAt"`
 	Role           string `json:"role"`
 	RollNo         string `json:"roll_no,omitempty"`
+	RegisterNo     string `json:"register_no,omitempty"`
+	UserID         string `json:"user_id,omitempty"`
 	Department     string `json:"department,omitempty"`
 	Batch          string `json:"batch,omitempty"`
 	Phone          string `json:"phone,omitempty"`
