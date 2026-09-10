@@ -32,6 +32,7 @@ func SetupRouter(
 	chatHandler *handlers.ChatHandler,
 	aiHandler *handlers.AIHandler,
 	mailHandler *handlers.MailHandler,
+	internalMarksHandler *handlers.InternalMarksHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -134,11 +135,14 @@ func SetupRouter(
 	r.GET("/faculty", facultyDirectoryHandler.GetFacultyDirectory)
 	r.POST("/api/chat", chatHandler.HandleChat)
 	r.POST("/chat", chatHandler.HandleChat)
+	r.GET("/internal-marks/conversion", internalMarksHandler.GetInternalMarksConversion)
+	r.GET("/api/internal-marks/conversion", internalMarksHandler.GetInternalMarksConversion)
 
 	// Protected routes
 	api := r.Group("/")
 	api.Use(handler.RequireAuth())
 	{
+		api.GET("/internal-marks/conversion", internalMarksHandler.GetInternalMarksConversion)
 		api.POST("/cards/:id/click", handlers.TrackCardClick)
 		api.GET("/cards", handlers.GetCards)
 		api.GET("/leaves", leaveHandler.GetAllLeaves)

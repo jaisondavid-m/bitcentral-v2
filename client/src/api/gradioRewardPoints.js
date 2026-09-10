@@ -1,9 +1,10 @@
+import api from "@/api/axios.js";
 import { Client } from "@gradio/client";
 
 // Read token from environment variable if provided
 const HF_AUTH_TOKEN = import.meta.env?.VITE_HF_TOKEN || "";
 
-// Cache client connection promise
+// Cache client connection promise as fallback
 let clientInstance = null;
 async function getGradioClient() {
   if (!clientInstance) {
@@ -114,6 +115,18 @@ export async function fetchInternalMarkConversion(rollNo) {
   }
 
   const cleanRollNo = String(rollNo).trim();
+
+  // 1. First, fetch through the server backend with 24-hour cache
+  try {
+    const res = await api.get(`/internal-marks/conversion?roll_no=${encodeURIComponent(cleanRollNo)}`);
+    if (res.data?.success && res.data?.raw) {
+      return parseInternalMarksSummary(res.data.raw);
+    }
+  } catch (err) {
+    console.warn("Backend internal marks cache route failed, falling back to direct Gradio client:", err);
+  }
+
+  // 2. Resilient fallback to direct Gradio client
   const client = await getGradioClient();
   const result = await client.predict("/extract_subjects_and_marks_for_gradio", {
     roll_no: cleanRollNo,
