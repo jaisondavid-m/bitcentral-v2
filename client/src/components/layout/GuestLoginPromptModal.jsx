@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/StudentContext.jsx";
-import { Sparkles, Mail, ArrowRight, X, ShieldCheck } from "lucide-react";
+import { Sparkles, Mail, ArrowRight, X, ShieldCheck, Loader2 } from "lucide-react";
+import { clearGuestSession } from "@/services/guestSession.js";
+import { logout, signInWithGoogle } from "@/config/auth.js";
 
 const GUEST_PROMPT_LAST_SHOWN_KEY = "bitcentral_guest_prompt_last_shown";
 const ONE_DAY_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -10,6 +12,7 @@ export default function GuestLoginPromptModal() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [isSigningIn, setIsSigningIn] = useState(false);
 
   useEffect(() => {
     // Only target guest users
@@ -52,9 +55,25 @@ export default function GuestLoginPromptModal() {
     }
   };
 
-  const handleLoginClick = () => {
-    handleDismiss();
-    navigate("/login");
+  const handleLoginClick = async () => {
+    try {
+      setIsSigningIn(true);
+      clearGuestSession();
+      await logout();
+      const res = await signInWithGoogle();
+      handleDismiss();
+      if (res?.user) {
+        navigate("/home", { replace: true });
+      } else {
+        navigate("/login");
+      }
+    } catch (err) {
+      console.warn("Google sign-in from guest prompt failed:", err);
+      handleDismiss();
+      navigate("/login");
+    } finally {
+      setIsSigningIn(false);
+    }
   };
 
   if (!open || !user?.isGuest) return null;
@@ -115,11 +134,21 @@ export default function GuestLoginPromptModal() {
         <div className="mt-7 flex flex-col gap-3">
           <button
             type="button"
+            disabled={isSigningIn}
             onClick={handleLoginClick}
-            className="group inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:scale-[1.02] hover:shadow-blue-600/40 active:scale-[0.98]"
+            className="group inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:scale-[1.02] hover:shadow-blue-600/40 active:scale-[0.98] disabled:opacity-75 disabled:cursor-not-allowed"
           >
-            Login with BIT Sathy Mail
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            {isSigningIn ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              <>
+                Login with BIT Sathy Mail
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </>
+            )}
           </button>
 
           <button
