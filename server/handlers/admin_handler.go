@@ -111,6 +111,33 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		}
 	}
 
+	type trackerProfile struct {
+		Name       string
+		RollNo     string
+		Department string
+		Batch      string
+		Phone      string
+	}
+	trackerMap := make(map[string]trackerProfile)
+	if h.DB != nil {
+		tRows, err := h.DB.Query(`SELECT LOWER(TRIM(COALESCE(email, ''))), COALESCE(id, COALESCE(user_id, '')), COALESCE(name, ''), COALESCE(department, ''), COALESCE(batch, ''), COALESCE(phone, '') FROM tracker_users WHERE email != ''`)
+		if err == nil {
+			defer tRows.Close()
+			for tRows.Next() {
+				var email, rollNo, name, dept, bStr, phone string
+				if err := tRows.Scan(&email, &rollNo, &name, &dept, &bStr, &phone); err == nil && email != "" {
+					trackerMap[email] = trackerProfile{
+						Name:       name,
+						RollNo:     rollNo,
+						Department: dept,
+						Batch:      bStr,
+						Phone:      phone,
+					}
+				}
+			}
+		}
+	}
+
 	var allUsers []models.User
 	batchCounts := make(map[string]int)
 
@@ -134,7 +161,21 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		u.BlockedAt = blockedAt
 		u.IsAdmin = adminByUID[u.UID] || u.Role == "admin" || u.Role == "superadmin" || u.Role == "super_admin"
 
-		batchLabel := getBatchLabelFromEmail(u.Email)
+		cleanEmail := strings.ToLower(strings.TrimSpace(u.Email))
+		if tp, ok := trackerMap[cleanEmail]; ok {
+			if tp.Name != "" && (u.DisplayName == "" || strings.EqualFold(u.DisplayName, "Student") || strings.EqualFold(u.DisplayName, "User")) {
+				u.DisplayName = tp.Name
+			}
+			u.RollNo = tp.RollNo
+			u.Department = tp.Department
+			u.Batch = tp.Batch
+			u.Phone = tp.Phone
+		}
+
+		batchLabel := u.Batch
+		if batchLabel == "" {
+			batchLabel = getBatchLabelFromEmail(u.Email)
+		}
 		batchCounts[batchLabel]++
 
 		if u.LastSeenAt != "" && (strings.HasPrefix(u.LastSeenAt, todayIST) || strings.HasPrefix(u.LastSeenAt, todayLocal)) {
@@ -153,8 +194,11 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 	var filtered []models.User
 	for _, u := range allUsers {
 		if batch != "" {
-			label := getBatchLabelFromEmail(u.Email)
-			if label != batch {
+			batchLabel := u.Batch
+			if batchLabel == "" {
+				batchLabel = getBatchLabelFromEmail(u.Email)
+			}
+			if batchLabel != batch {
 				continue
 			}
 		}
@@ -180,8 +224,17 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 			emailLower := strings.ToLower(u.Email)
 			nameLower := strings.ToLower(u.DisplayName)
 			uidLower := strings.ToLower(u.UID)
+			rollLower := strings.ToLower(u.RollNo)
+			deptLower := strings.ToLower(u.Department)
+			batchLower := strings.ToLower(u.Batch)
 			roleLower := strings.ToLower(u.Role)
-			if !strings.Contains(emailLower, search) && !strings.Contains(nameLower, search) && !strings.Contains(uidLower, search) && !strings.Contains(roleLower, search) {
+			if !strings.Contains(emailLower, search) &&
+				!strings.Contains(nameLower, search) &&
+				!strings.Contains(uidLower, search) &&
+				!strings.Contains(rollLower, search) &&
+				!strings.Contains(deptLower, search) &&
+				!strings.Contains(batchLower, search) &&
+				!strings.Contains(roleLower, search) {
 				continue
 			}
 		}

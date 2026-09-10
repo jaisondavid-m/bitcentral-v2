@@ -110,6 +110,7 @@ func InitMySQL() {
 	createFacultyDirectoryTable()
 	createAuditLogsTable()
 	createDailyActiveUserStatsTable()
+	createAdminSentEmailsTable()
 }
 
 func createAdminsTable() {
@@ -660,5 +661,32 @@ func createDailyActiveUserStatsTable() {
 		log.Println("✅ daily_active_user_stats table ready")
 	}
 }
+
+func createAdminSentEmailsTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS admin_sent_emails (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		admin_uid VARCHAR(128) NULL,
+		admin_email VARCHAR(255) NULL,
+		subject VARCHAR(500) NOT NULL,
+		body LONGTEXT NOT NULL,
+		is_html TINYINT(1) DEFAULT 1,
+		recipient_count INT DEFAULT 0,
+		success_count INT DEFAULT 0,
+		fail_count INT DEFAULT 0,
+		recipients_json LONGTEXT NULL,
+		error_details TEXT NULL,
+		sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		INDEX idx_sent_at (sent_at),
+		INDEX idx_admin_uid (admin_uid)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(query); err != nil {
+		log.Printf("ℹ️ admin_sent_emails table notice: %v", err)
+	} else {
+		log.Println("✅ admin_sent_emails table ready")
+	}
+}
+
 
 

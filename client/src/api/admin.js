@@ -638,4 +638,39 @@ export async function clearAuditLogs() {
   const response = await api.delete("/admin/audit-logs", { headers });
   return response.data;
 }
+
+export async function getAdminMailConfig() {
+  const headers = await getAdminHeaders();
+  const response = await api.get("/admin/mail/config", { headers });
+  return response.data;
+}
+
+export async function testAdminMailConnection({ target_email, smtp_config } = {}) {
+  const headers = await getAdminHeaders();
+  const response = await api.post("/admin/mail/test", { target_email, smtp_config }, { headers });
+  return response.data;
+}
+
+export async function sendAdminMail(payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.post("/admin/mail/send", payload, { headers });
+  return response.data;
+}
+
+export async function getAdminMailHistory({ page = 1, limit = 20 } = {}) {
+  const headers = await getAdminHeaders();
+  const params = new URLSearchParams();
+  if (page) params.set("page", page);
+  if (limit) params.set("limit", limit);
+
+  const response = await api.get(`/admin/mail/history?${params.toString()}`, { headers });
+  return response.data;
+}
+
+export async function deleteAdminMailLog(id) {
+  const headers = await getAdminHeaders();
+  const response = await api.delete(`/admin/mail/history/${encodeURIComponent(id)}`, { headers });
+  return response.data;
+}
+
 

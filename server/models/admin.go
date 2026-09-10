@@ -16,6 +16,10 @@ type User struct {
 	IsBlocked      bool   `json:"isBlocked"`
 	BlockedAt      string `json:"blockedAt"`
 	Role           string `json:"role"`
+	RollNo         string `json:"roll_no,omitempty"`
+	Department     string `json:"department,omitempty"`
+	Batch          string `json:"batch,omitempty"`
+	Phone          string `json:"phone,omitempty"`
 }
 
 type UserWithRollNo struct {

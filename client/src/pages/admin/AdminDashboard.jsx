@@ -72,6 +72,7 @@ import {
   Heart,
   LayoutGrid,
   Loader,
+  Mail,
   MessageSquare,
   Monitor,
   Plus,
@@ -95,6 +96,7 @@ import SuperAdminPanel from "./SuperAdminPanel.jsx";
 import AdminPSRewardsPage from "./AdminPSRewards.jsx";
 import AdminFeedbackPage from "./AdminFeedbackPage.jsx";
 import AdminAuditLogs from "./AdminAuditLogs.jsx";
+import AdminMailSender from "./AdminMailSender.jsx";
 
 function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
@@ -354,6 +356,15 @@ const ADMIN_TABS = [
     description: "View real-time HTTP request audit logs including IP, payload, query params, timestamp, and user details.",
   },
   {
+    key: "mail",
+    label: "Mail Sender",
+    href: "/admin/mail",
+    icon: Mail,
+    gradient: "from-teal-500 to-emerald-600",
+    badge: "Gomail SMTP",
+    description: "Select students or admins, compose personalized templates, and dispatch broadcast emails via Gomail SMTP.",
+  },
+  {
     key: "super",
     label: "Super Admin",
     href: "/admin/super",
@@ -375,6 +386,7 @@ function getAdminTabFromPath(pathname) {
   if (pathname.startsWith("/admin/cards")) return "cards";
   if (pathname.startsWith("/admin/mess")) return "mess";
   if (pathname.startsWith("/admin/feedback")) return "feedback";
+  if (pathname.startsWith("/admin/mail-sender") || pathname.startsWith("/admin/mail")) return "mail";
   if (pathname.startsWith("/admin/ai-key")) return "ai-key";
   if (pathname.startsWith("/admin/super")) return "super";
   if (pathname.startsWith("/admin/users")) return "users";
@@ -6496,6 +6508,8 @@ function AdminDashboard({ initialTab } = {}) {
         <MessSection />
       ) : activeTab === "feedback" ? (
         <AdminFeedbackPage />
+      ) : activeTab === "mail" || activeTab === "mail-sender" ? (
+        <AdminMailSender />
       ) : activeTab === "user-directory" ? (
         <UserDirectorySection />
       ) : activeTab === "ai-key" ? (
@@ -6553,6 +6567,10 @@ function AdminAIKeyPage() {
   return <AdminDashboard initialTab="ai-key" />;
 }
 
+function AdminMailSenderPage() {
+  return <AdminDashboard initialTab="mail" />;
+}
+
 export {
   AdminAnalyticsPage,
   AdminAuditLogsPage,
@@ -6565,5 +6583,6 @@ export {
   AdminMessPage,
   AdminFeedbackPageRoute as AdminFeedbackPage,
   AdminAIKeyPage,
+  AdminMailSenderPage,
 };
 export default AdminDashboard;
