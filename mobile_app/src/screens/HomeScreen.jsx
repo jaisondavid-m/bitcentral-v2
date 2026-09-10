@@ -79,13 +79,72 @@ export default function HomeScreen({ navigation }) {
   });
 
   const handleCardPress = (card) => {
-    if (card.route) {
-      navigation.navigate(card.route);
-    } else if (card.link) {
-      Linking.openURL(card.link).catch(() => {});
-    } else {
-      navigation.navigate('Features');
+    const targetRoute = (card.app_route || card.route || '').trim();
+
+    if (targetRoute) {
+      const routeLower = targetRoute.toLowerCase();
+      if (routeLower === 'messmenu' || routeLower.includes('mess')) {
+        navigation.navigate('MessMenu');
+        return;
+      }
+      if (routeLower === 'facultydirectory' || routeLower.includes('faculty')) {
+        navigation.navigate('FacultyDirectory');
+        return;
+      }
+      if (routeLower === 'wifidetails' || routeLower.includes('wifi')) {
+        navigation.navigate('WifiDetails');
+        return;
+      }
+      if (routeLower === 'bitbot' || routeLower.includes('bot')) {
+        navigation.navigate('BitBot');
+        return;
+      }
+      if (routeLower === 'profile') {
+        navigation.navigate('Profile');
+        return;
+      }
+      if (routeLower === 'tools' || routeLower.includes('features')) {
+        navigation.navigate('Tools');
+        return;
+      }
+
+      // Try direct navigation if route matches a screen name
+      try {
+        navigation.navigate(targetRoute);
+        return;
+      } catch (e) {}
     }
+
+    // Path matching fallback for website links
+    if (card.link) {
+      const linkLower = card.link.toLowerCase();
+      if (linkLower.includes('/mess')) {
+        navigation.navigate('MessMenu');
+        return;
+      }
+      if (linkLower.includes('/faculty')) {
+        navigation.navigate('FacultyDirectory');
+        return;
+      }
+      if (linkLower.includes('/wifi')) {
+        navigation.navigate('WifiDetails');
+        return;
+      }
+      if (linkLower.includes('/bitbot') || linkLower.includes('/bot')) {
+        navigation.navigate('BitBot');
+        return;
+      }
+      if (linkLower.includes('/profile')) {
+        navigation.navigate('Profile');
+        return;
+      }
+
+      // External / website fallback
+      Linking.openURL(card.link).catch((err) => console.warn('Unable to open URL:', err));
+      return;
+    }
+
+    navigation.navigate('Tools');
   };
 
   return (
