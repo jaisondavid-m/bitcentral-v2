@@ -109,6 +109,7 @@ func InitMySQL() {
 	createFeedbackMessagesTable()
 	createFacultyDirectoryTable()
 	createAuditLogsTable()
+	createDailyActiveUserStatsTable()
 }
 
 func createAdminsTable() {
@@ -624,4 +625,24 @@ func createAuditLogsTable() {
 		log.Println("✅ audit_logs table ready")
 	}
 }
+
+func createDailyActiveUserStatsTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS daily_active_user_stats (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		date VARCHAR(10) NOT NULL UNIQUE,
+		active_users_count INT NOT NULL DEFAULT 0,
+		total_users_count INT NOT NULL DEFAULT 0,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		INDEX idx_dau_date (date)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(query); err != nil {
+		log.Printf("ℹ️ daily_active_user_stats table notice: %v", err)
+	} else {
+		log.Println("✅ daily_active_user_stats table ready")
+	}
+}
+
 
