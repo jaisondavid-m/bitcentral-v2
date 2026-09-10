@@ -152,14 +152,14 @@ export default function InternalMarksConversionModal({
                     key={sub.code || idx}
                     className="
                       flex flex-col md:flex-row md:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl
-                      border border-slate-200/90 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/60
-                      hover:bg-white dark:hover:bg-slate-900/90 hover:border-indigo-200 dark:hover:border-indigo-800/60
+                      border border-slate-300/90 dark:border-slate-700/80 bg-slate-50/60 dark:bg-slate-900/70
+                      hover:bg-white dark:hover:bg-slate-900 hover:border-indigo-300 dark:hover:border-indigo-700/70
                       shadow-2xs transition-all
                     "
                   >
                     {/* Subject Header */}
                     <div className="flex items-center gap-3 shrink-0 md:min-w-[140px]">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-xs font-bold text-indigo-600 dark:text-indigo-400 font-mono shrink-0 shadow-2xs">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200/70 dark:border-indigo-800/80 text-xs font-bold text-indigo-600 dark:text-indigo-400 font-mono shrink-0 shadow-2xs">
                         #{idx + 1}
                       </div>
                       <div className="flex items-center gap-1.5 font-bold text-xs sm:text-sm text-slate-900 dark:text-white font-mono tracking-tight">
@@ -171,8 +171,8 @@ export default function InternalMarksConversionModal({
                     {/* Metrics row */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 flex-1 min-w-0">
                       {/* Box 1: Reward Points Redeemed */}
-                      <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/70 shadow-2xs">
-                        <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                      <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-300/70 dark:border-slate-700/90 shadow-2xs">
+                        <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                           Reward Points Redeemed
                         </span>
                         <div className="mt-1 flex flex-wrap items-baseline gap-2">
@@ -181,7 +181,7 @@ export default function InternalMarksConversionModal({
                               const hasOutOf = String(val).includes("/");
                               return (
                                 <div key={key} className="inline-flex items-baseline gap-1.5 font-mono">
-                                  <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/80 px-1.5 py-0.5 rounded-md border border-indigo-100 dark:border-indigo-900/50">
+                                  <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/80 px-1.5 py-0.5 rounded-md border border-indigo-200/70 dark:border-indigo-800/80">
                                     {key}
                                   </span>
                                   <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
@@ -202,7 +202,7 @@ export default function InternalMarksConversionModal({
                       </div>
 
                       {/* Box 2: Internal Marks Received */}
-                      <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-900/50 shadow-2xs">
+                      <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-300/70 dark:border-emerald-800/60 shadow-2xs">
                         <span className="text-[10px] font-semibold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider">
                           Internal Marks Received
                         </span>
@@ -212,7 +212,7 @@ export default function InternalMarksConversionModal({
                               const hasOutOf = String(val).includes("/");
                               return (
                                 <div key={key} className="inline-flex items-baseline gap-1.5 font-mono">
-                                  <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-900/60 px-1.5 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/50">
+                                  <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-900/60 px-1.5 py-0.5 rounded-md border border-emerald-300/60 dark:border-emerald-700/60">
                                     {key}
                                   </span>
                                   <span className="text-xs sm:text-sm font-bold text-emerald-950 dark:text-emerald-200">
