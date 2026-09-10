@@ -7,7 +7,7 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuth } from '../context/StudentContext';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
-import BitBotScreen from '../screens/BitBotScreen';
+import SupportScreen from '../screens/SupportScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import FacultyDirectoryScreen from '../screens/FacultyDirectoryScreen';
 import MessMenuScreen from '../screens/MessMenuScreen';
@@ -24,8 +24,8 @@ const renderTabBarIcon = (route, focused, color, size) => {
   let iconName;
   if (route.name === 'Home') {
     iconName = focused ? 'home' : 'home-outline';
-  } else if (route.name === 'BitBot') {
-    iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
+  } else if (route.name === 'Support') {
+    iconName = focused ? 'headset' : 'headset-outline';
   } else if (route.name === 'Profile') {
     iconName = focused ? 'person' : 'person-outline';
   }
@@ -40,6 +40,7 @@ function HomeStackNav() {
       <HomeStack.Screen name="MessMenu" component={MessMenuScreen} />
       <HomeStack.Screen name="WifiDetails" component={WifiDetailsScreen} />
       <HomeStack.Screen name="RpSite" component={RpSiteScreen} />
+      <HomeStack.Screen name="Support" component={SupportScreen} />
     </HomeStack.Navigator>
   );
 }
@@ -62,7 +63,7 @@ function MainTabs() {
       })}
     >
       <Tab.Screen name="Home" component={HomeStackNav} />
-      <Tab.Screen name="BitBot" component={BitBotScreen} />
+      <Tab.Screen name="Support" component={SupportScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );

@@ -57,7 +57,8 @@ export default function FloatingFeedbackButton() {
     setSending(true);
 
     try {
-      const displayName = user?.displayName || user?.email?.split("@")[0] || "Student";
+      const displayName =
+        user?.display_name || user?.displayName || user?.name || user?.roll_no || "Student";
       const sent = await sendFeedbackMessage(msgText, displayName);
       if (sent) {
         setMessages((prev) => [...prev, sent]);

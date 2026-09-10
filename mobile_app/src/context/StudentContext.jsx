@@ -17,8 +17,29 @@ export function StudentProvider({ children }) {
   const loadUserSession = async () => {
     try {
       const storedUser = await AsyncStorage.getItem('user_session');
+      const cachedMe = await AsyncStorage.getItem('me_profile');
+      let meObj = null;
+      if (cachedMe) {
+        try {
+          meObj = JSON.parse(cachedMe);
+        } catch (e) {
+          // ignore
+        }
+      }
+
       if (storedUser) {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        if (meObj) {
+          setUser({
+            ...parsedUser,
+            display_name: meObj.display_name || parsedUser.display_name || parsedUser.displayName,
+            displayName: meObj.display_name || parsedUser.displayName || parsedUser.display_name,
+            roll_no: meObj.roll_no || parsedUser.roll_no,
+            user_id: meObj.user_id || parsedUser.user_id,
+          });
+        } else {
+          setUser(parsedUser);
+        }
       }
     } catch (err) {
       console.error('Failed to load session', err);
@@ -37,7 +58,10 @@ export function StudentProvider({ children }) {
     const userData = {
       uid: googleUser.id || googleUser.uid,
       email: googleUser.email,
-      displayName: googleUser.name || googleUser.displayName,
+      display_name: googleUser.display_name || googleUser.name || googleUser.displayName,
+      displayName: googleUser.display_name || googleUser.displayName || googleUser.name,
+      roll_no: googleUser.roll_no || googleUser.rollNo,
+      user_id: googleUser.user_id || googleUser.userId,
       photoURL: googleUser.photo || googleUser.photoURL,
       isGuest: false,
     };

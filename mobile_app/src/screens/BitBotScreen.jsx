@@ -43,7 +43,7 @@ export default function BitBotScreen() {
     const response = await sendChatMessage({
       message: userText,
       history: historyPayload,
-      rollNo: user?.email ? user.email.split('@')[0] : '',
+      rollNo: user?.roll_no || user?.display_name || user?.displayName || '',
     });
 
     const replyText =

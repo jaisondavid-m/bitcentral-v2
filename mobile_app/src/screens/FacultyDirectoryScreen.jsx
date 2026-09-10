@@ -15,6 +15,7 @@ import {
   ScrollView,
   Modal,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { fetchFacultyDirectory } from '../api/axios';
 
@@ -81,12 +82,27 @@ export default function FacultyDirectoryScreen({ navigation }) {
   const [activeCallModal, setActiveCallModal] = useState(null);
 
   const loadDirectory = useCallback(async () => {
-    setLoading(true);
-    const res = await fetchFacultyDirectory(query, selectedDept !== 'ALL' ? selectedDept : '');
+    // 1. Instantly check AsyncStorage cache for 0ms load
+    try {
+      const cached = await AsyncStorage.getItem('faculty_directory_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setFaculty(parsed);
+          setLoading(false);
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    // 2. Fetch full directory from API in background
+    const res = await fetchFacultyDirectory('', '');
     if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
       setFaculty(res.data);
-    } else {
-      // Fallback data if server returns empty
+      AsyncStorage.setItem('faculty_directory_cache', JSON.stringify(res.data)).catch(() => {});
+    } else if (faculty.length === 0) {
+      // Fallback data if server returns empty and cache was empty
       setFaculty([
         {
           id: 1,
@@ -115,7 +131,7 @@ export default function FacultyDirectoryScreen({ navigation }) {
       ]);
     }
     setLoading(false);
-  }, [query, selectedDept]);
+  }, [faculty.length]);
 
   useEffect(() => {
     loadDirectory();
@@ -193,7 +209,6 @@ export default function FacultyDirectoryScreen({ navigation }) {
             placeholderTextColor="#94A3B8"
             value={query}
             onChangeText={setQuery}
-            onSubmitEditing={loadDirectory}
             returnKeyType="search"
           />
           {query.length > 0 && (

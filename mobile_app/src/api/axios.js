@@ -105,11 +105,31 @@ export async function sendChatMessage({ message, history = [], rollNo = '' }) {
 export async function fetchMeProfile() {
   try {
     const res = await api.get('/me');
-    return res?.data?.data || null;
+    const profile = res?.data?.data || null;
+    if (profile) {
+      AsyncStorage.setItem('me_profile', JSON.stringify(profile)).catch(() => {});
+    }
+    return profile;
   } catch (err) {
     console.error('Failed to fetch profile from backend:', err?.message || err);
+    try {
+      const cached = await AsyncStorage.getItem('me_profile');
+      if (cached) return JSON.parse(cached);
+    } catch (e) {
+      // ignore
+    }
     return null;
   }
+}
+
+export async function getCachedMeProfile() {
+  try {
+    const cached = await AsyncStorage.getItem('me_profile');
+    if (cached) return JSON.parse(cached);
+  } catch (e) {
+    console.warn('Failed to read me_profile from AsyncStorage:', e);
+  }
+  return null;
 }
 
 export async function fetchV2Profile() {
@@ -167,5 +187,30 @@ export async function fetchRpAverages() {
   }
 }
 
+export async function getFeedbackMessages(markRead = false) {
+  try {
+    const url = markRead ? '/feedback/messages?mark_read=true' : '/feedback/messages';
+    const res = await api.get(url);
+    return res?.data?.data || [];
+  } catch (err) {
+    console.error('Failed to fetch feedback messages:', err?.message || err);
+    return [];
+  }
+}
+
+export async function sendFeedbackMessage(message, senderName) {
+  try {
+    const res = await api.post('/feedback/messages', {
+      message,
+      sender_name: senderName,
+    });
+    return res?.data?.data || null;
+  } catch (err) {
+    console.error('Failed to send feedback message:', err?.message || err);
+    return null;
+  }
+}
+
 export default api;
+
 
