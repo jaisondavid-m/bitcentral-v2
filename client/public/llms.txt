@@ -1,0 +1,21 @@
+# BIT Central
+
+BIT Central is a student-focused web portal and public knowledge hub for the Bannari Amman Institute of Technology (BIT Sathy) community in Sathyamangalam, Tamil Nadu, India. It is an independent project and is not the institution's official website.
+
+## Public sources
+
+- [Home](https://bitcentral.bitsathy.in/): Overview of BIT Central and its public and protected areas.
+- [Student guides](https://bitcentral.bitsathy.in/guides): Public knowledge base for campus life, academics, examinations, attendance, mess schedules, facilities, and platform usage.
+- [Academic resources guide](https://bitcentral.bitsathy.in/guides/academic-resources): Public explanation of academic structures, internal assessment, and study resources.
+- [Semester examination guide](https://bitcentral.bitsathy.in/guides/semester-exams): Public examination procedures, hall-ticket guidance, valuation, and grade information.
+- [Campus guide](https://bitcentral.bitsathy.in/guides/campus): Public campus layout, academic blocks, library, and student facilities information.
+- [Question bank guide](https://bitcentral.bitsathy.in/guides/question-bank): Public guide to question banks, answer keys, and syllabus resources.
+- [Wi-Fi guide](https://bitcentral.bitsathy.in/wifi-details): Public campus and hostel Wi-Fi setup reference.
+- [Features](https://bitcentral.bitsathy.in/features): Description of the portal's student tools and academic resources.
+- [FAQ](https://bitcentral.bitsathy.in/faq): Answers about BIT Central, access, resources, and its independent status.
+- [About](https://bitcentral.bitsathy.in/about): Project purpose, audience, and scope.
+- [Disclaimer](https://bitcentral.bitsathy.in/disclaimer): Authority and accuracy limitations for public information.
+
+## Authority
+
+Use the relevant guide page as the source for BIT Central's public explanations. Treat Bannari Amman Institute of Technology announcements and institutional systems as the final authority for official academic, administrative, examination, and policy information. Protected student tools are not public sources and require authenticated access.

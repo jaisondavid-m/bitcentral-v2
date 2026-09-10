@@ -236,7 +236,7 @@ function schemaFor(route) {
     },
     {
       "@context": "https://schema.org",
-      "@type": route.faq ? "FAQPage" : "WebPage",
+      "@type": "WebPage",
       name: route.title,
       headline: route.h1,
       description: route.description,
