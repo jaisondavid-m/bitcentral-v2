@@ -9,6 +9,17 @@ import {
   BookOpen,
 } from "lucide-react";
 
+function getMaxRewardPoints(rollNo) {
+  const clean = String(rollNo || "").trim().toUpperCase().replace(/\s+/g, "");
+  if (clean.startsWith("737625") || /^25[A-Z]/i.test(clean) || clean.includes("737625")) {
+    return "672.00";
+  }
+  if (clean.startsWith("737624") || /^24[A-Z]/i.test(clean) || clean.includes("737624")) {
+    return "990.00";
+  }
+  return null;
+}
+
 export default function InternalMarksConversionModal({
   open,
   onClose,
@@ -20,9 +31,10 @@ export default function InternalMarksConversionModal({
 }) {
   if (!open) return null;
 
-  const rollNo = String(student?.roll_no || "").trim();
+  const rollNo = String(student?.roll_no || student?.user_id || student?.reg_no || data?.roll_no || "").trim();
   const studentName = student?.student_name || "Student";
   const hasParsedSubjects = Boolean(data?.subjects && data.subjects.length > 0);
+  const maxRewardPoints = getMaxRewardPoints(rollNo);
 
   return (
     <div
@@ -166,15 +178,23 @@ export default function InternalMarksConversionModal({
                         </span>
                         <div className="flex items-center gap-1.5 justify-end shrink-0 whitespace-nowrap">
                           {filteredRewardEntries.length > 0 ? (
-                            filteredRewardEntries.map(([key, val]) => (
-                              <span
-                                key={key}
-                                className="inline-flex items-center gap-1 font-mono font-bold text-slate-800 dark:text-slate-200 text-xs whitespace-nowrap"
-                              >
-                                <span className="text-[10px] text-slate-400 font-medium whitespace-nowrap shrink-0">{key}:</span>
-                                <span className="whitespace-nowrap">{val}</span>
-                              </span>
-                            ))
+                            filteredRewardEntries.map(([key, val]) => {
+                              const hasOutOf = String(val).includes("/");
+                              return (
+                                <span
+                                  key={key}
+                                  className="inline-flex items-center gap-1 font-mono font-bold text-slate-800 dark:text-slate-200 text-xs whitespace-nowrap"
+                                >
+                                  <span className="text-[10px] text-slate-400 font-medium whitespace-nowrap shrink-0">{key}:</span>
+                                  <span className="whitespace-nowrap">{val}</span>
+                                  {!hasOutOf && maxRewardPoints && (
+                                    <span className="text-[10px] text-slate-400/90 dark:text-slate-500 font-normal whitespace-nowrap">
+                                      / {maxRewardPoints}
+                                    </span>
+                                  )}
+                                </span>
+                              );
+                            })
                           ) : (
                             <span className="font-mono text-slate-400">—</span>
                           )}
