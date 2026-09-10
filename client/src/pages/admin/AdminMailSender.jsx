@@ -140,12 +140,12 @@ Bannari Amman Institute of Technology`,
   {
     id: "account_notice",
     name: "⚠️ Account Notice / Reminder",
-    subject: "Notice regarding your BIT Central account ({{roll_no}})",
+    subject: "Notice regarding your BIT Central account ({{user_id}})",
     body: `Dear {{name}},
 
 This is a formal notice regarding your BIT Central account associated with {{email}}.
 
-Please ensure your profile information, roll number ({{roll_no}}), and department details are accurate and up to date.
+Please ensure your profile information, User ID ({{user_id}}), Register No ({{register_no}}), and department details are accurate and up to date.
 
 If you have any questions, feel free to reply to this email or reach out through the in-app support chat.
 
@@ -186,7 +186,8 @@ const VARIABLE_TAGS = [
   { tag: "{{name}}", label: "Full Name", desc: "e.g. John Doe" },
   { tag: "{{first_name}}", label: "First Name", desc: "e.g. John" },
   { tag: "{{email}}", label: "Email Address", desc: "e.g. user@bitsathy.ac.in" },
-  { tag: "{{roll_no}}", label: "Roll No", desc: "e.g. 7376221CS101" },
+  { tag: "{{user_id}}", label: "User ID", desc: "e.g. 621324243105" },
+  { tag: "{{register_no}}", label: "Register No", desc: "e.g. 1045" },
   { tag: "{{department}}", label: "Department", desc: "e.g. CSE" },
   { tag: "{{batch}}", label: "Batch", desc: "e.g. 2022" },
   { tag: "{{date}}", label: "Current Date", desc: "e.g. 10-Sep-2026" },
@@ -356,7 +357,8 @@ export default function AdminMailSender() {
         next[email] = {
           email,
           name: formattedName,
-          roll_no: user.roll_no || "",
+          user_id: user.user_id || user.id || "",
+          register_no: user.register_no || user.roll_no || "",
           department: user.department || "",
           batch: user.batch || "",
         };
@@ -374,7 +376,8 @@ export default function AdminMailSender() {
           next[email] = {
             email,
             name: formatStudentDisplayName(u.display_name || u.name, u.email),
-            roll_no: u.roll_no || "",
+            user_id: u.user_id || u.id || "",
+            register_no: u.register_no || u.roll_no || "",
             department: u.department || "",
             batch: u.batch || "",
           };
@@ -412,7 +415,8 @@ export default function AdminMailSender() {
       [clean]: {
         email: clean,
         name: clean.split("@")[0],
-        roll_no: "",
+        user_id: "",
+        register_no: "",
         department: "",
         batch: "",
       },
@@ -470,7 +474,8 @@ export default function AdminMailSender() {
         name: displayName || "null",
         first_name: (displayName || "").split(" ")[0] || "null",
         email: u.email || "null",
-        roll_no: u.roll_no || "null",
+        user_id: u.user_id || u.id || "null",
+        register_no: u.register_no || u.roll_no || "null",
         department: u.department || "null",
         batch: u.batch || "null",
       };
@@ -479,7 +484,8 @@ export default function AdminMailSender() {
       name: "null",
       first_name: "null",
       email: "null",
-      roll_no: "null",
+      user_id: "null",
+      register_no: "null",
       department: "null",
       batch: "null",
     };
@@ -490,7 +496,9 @@ export default function AdminMailSender() {
     s = s.replace(/{{name}}/g, sampleRecipient.name || "null");
     s = s.replace(/{{first_name}}/g, sampleRecipient.first_name || (sampleRecipient.name || "null").split(" ")[0] || "null");
     s = s.replace(/{{email}}/g, sampleRecipient.email || "null");
-    s = s.replace(/{{roll_no}}/g, sampleRecipient.roll_no || "null");
+    s = s.replace(/{{user_id}}/g, sampleRecipient.user_id || "null");
+    s = s.replace(/{{register_no}}/g, sampleRecipient.register_no || "null");
+    s = s.replace(/{{roll_no}}/g, sampleRecipient.register_no || sampleRecipient.user_id || "null");
     s = s.replace(/{{department}}/g, sampleRecipient.department || "null");
     s = s.replace(/{{batch}}/g, sampleRecipient.batch || "null");
     s = s.replace(/{{date}}/g, new Date().toLocaleDateString("en-GB"));
@@ -503,7 +511,9 @@ export default function AdminMailSender() {
     b = b.replace(/{{name}}/g, sampleRecipient.name || "null");
     b = b.replace(/{{first_name}}/g, sampleRecipient.first_name || (sampleRecipient.name || "null").split(" ")[0] || "null");
     b = b.replace(/{{email}}/g, sampleRecipient.email || "null");
-    b = b.replace(/{{roll_no}}/g, sampleRecipient.roll_no || "null");
+    b = b.replace(/{{user_id}}/g, sampleRecipient.user_id || "null");
+    b = b.replace(/{{register_no}}/g, sampleRecipient.register_no || "null");
+    b = b.replace(/{{roll_no}}/g, sampleRecipient.register_no || sampleRecipient.user_id || "null");
     b = b.replace(/{{department}}/g, sampleRecipient.department || "null");
     b = b.replace(/{{batch}}/g, sampleRecipient.batch || "null");
     b = b.replace(/{{date}}/g, new Date().toLocaleDateString("en-GB"));
@@ -754,7 +764,7 @@ export default function AdminMailSender() {
                   type="text"
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
-                  placeholder="Search all users by name, email, roll no..."
+                  placeholder="Search all users by name, email, register no, user id..."
                   className="w-full rounded-xl border border-slate-200 bg-slate-50/60 pl-9 pr-3 py-2 text-xs text-slate-900 outline-none transition focus:border-teal-500 focus:bg-white focus:ring-2 focus:ring-teal-500/20 dark:border-slate-700 dark:bg-slate-800/80 dark:text-white"
                 />
                 {userSearch && (
@@ -907,6 +917,11 @@ export default function AdminMailSender() {
                             </p>
                             <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono">
                               {email}
+                              {(u.register_no || u.user_id) && (
+                                <span className="ml-1 text-slate-400 font-normal">
+                                  · {u.register_no ? `Reg: ${u.register_no}` : ""} {u.user_id ? `(ID: ${u.user_id})` : ""}
+                                </span>
+                              )}
                             </p>
                           </div>
                         </div>
@@ -1124,7 +1139,7 @@ export default function AdminMailSender() {
                     onChange={(e) => setBody(e.target.value)}
                     rows={9}
                     required
-                    placeholder="Write your email body here... You can use {{first_name}}, {{roll_no}}, etc."
+                    placeholder="Write your email body here... You can use {{first_name}}, {{user_id}}, {{register_no}}, etc."
                     className="w-full rounded-xl border border-slate-300 bg-white p-3.5 text-xs text-slate-900 font-sans outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white leading-relaxed resize-y"
                   />
                 ) : (

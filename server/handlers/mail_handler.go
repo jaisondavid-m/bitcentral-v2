@@ -32,7 +32,9 @@ func NewMailHandler() *MailHandler {
 type EmailRecipient struct {
 	Email      string `json:"email"`
 	Name       string `json:"name"`
-	RollNo     string `json:"roll_no"`
+	RegisterNo string `json:"register_no"`
+	UserID     string `json:"user_id"`
+	RollNo     string `json:"roll_no,omitempty"`
 	Department string `json:"department"`
 	Batch      string `json:"batch"`
 }
@@ -286,22 +288,30 @@ func extractCleanNameAndFirst(r EmailRecipient) (string, string) {
 
 func replaceTemplateVariables(db *sql.DB, templateStr string, r EmailRecipient) string {
 	fullName := strings.TrimSpace(r.Name)
-	rollNo := strings.TrimSpace(r.RollNo)
+	registerNo := strings.TrimSpace(r.RegisterNo)
+	userID := strings.TrimSpace(r.UserID)
 	dept := strings.TrimSpace(r.Department)
 	batch := strings.TrimSpace(r.Batch)
 
-	if db != nil && (fullName == "" || rollNo == "" || dept == "" || batch == "" || strings.EqualFold(fullName, "Student") || strings.EqualFold(fullName, "User")) {
-		var tName, tRoll, tDept, tBatch string
+	if registerNo == "" && r.RollNo != "" {
+		registerNo = strings.TrimSpace(r.RollNo)
+	}
+
+	if db != nil && (fullName == "" || registerNo == "" || userID == "" || dept == "" || batch == "" || strings.EqualFold(fullName, "Student") || strings.EqualFold(fullName, "User")) {
+		var tName, tUserID, tID, tDept, tBatch string
 		_ = db.QueryRow(
-			`SELECT COALESCE(name, ''), COALESCE(id, COALESCE(user_id, '')), COALESCE(department, ''), COALESCE(batch, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
+			`SELECT COALESCE(name, ''), COALESCE(user_id, ''), COALESCE(id, ''), COALESCE(department, ''), COALESCE(batch, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
 			r.Email,
-		).Scan(&tName, &tRoll, &tDept, &tBatch)
+		).Scan(&tName, &tUserID, &tID, &tDept, &tBatch)
 
 		if fullName == "" || strings.EqualFold(fullName, "Student") || strings.EqualFold(fullName, "User") {
 			fullName = tName
 		}
-		if rollNo == "" {
-			rollNo = tRoll
+		if registerNo == "" {
+			registerNo = tUserID
+		}
+		if userID == "" {
+			userID = tID
 		}
 		if dept == "" {
 			dept = tDept
@@ -322,8 +332,11 @@ func replaceTemplateVariables(db *sql.DB, templateStr string, r EmailRecipient) 
 		firstName = fullName
 	}
 
-	if rollNo == "" {
-		rollNo = "null"
+	if registerNo == "" {
+		registerNo = "null"
+	}
+	if userID == "" {
+		userID = "null"
 	}
 	if dept == "" {
 		dept = "null"
@@ -342,7 +355,9 @@ func replaceTemplateVariables(db *sql.DB, templateStr string, r EmailRecipient) 
 	res = strings.ReplaceAll(res, "{{name}}", fullName)
 	res = strings.ReplaceAll(res, "{{first_name}}", firstName)
 	res = strings.ReplaceAll(res, "{{email}}", r.Email)
-	res = strings.ReplaceAll(res, "{{roll_no}}", rollNo)
+	res = strings.ReplaceAll(res, "{{user_id}}", userID)
+	res = strings.ReplaceAll(res, "{{register_no}}", registerNo)
+	res = strings.ReplaceAll(res, "{{roll_no}}", registerNo) // backward compatibility fallback
 	res = strings.ReplaceAll(res, "{{department}}", dept)
 	res = strings.ReplaceAll(res, "{{batch}}", batch)
 	res = strings.ReplaceAll(res, "{{date}}", time.Now().Format("02-Jan-2006"))
