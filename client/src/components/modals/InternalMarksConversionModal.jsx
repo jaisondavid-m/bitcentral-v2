@@ -158,16 +158,13 @@ export default function InternalMarksConversionModal({
                     "
                   >
                     {/* Subject Header */}
-                    <div className="flex items-center gap-3 shrink-0 md:min-w-[150px]">
+                    <div className="flex items-center gap-3 shrink-0 md:min-w-[140px]">
                       <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-xs font-bold text-indigo-600 dark:text-indigo-400 font-mono shrink-0 shadow-2xs">
                         #{idx + 1}
                       </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5 font-bold text-xs sm:text-sm text-slate-900 dark:text-white font-mono tracking-tight">
-                          <BookOpen className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
-                          <span className="truncate">{sub.code}</span>
-                        </div>
-                        <p className="text-[10px] text-slate-400 font-medium">Theory Subject</p>
+                      <div className="flex items-center gap-1.5 font-bold text-xs sm:text-sm text-slate-900 dark:text-white font-mono tracking-tight">
+                        <BookOpen className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+                        <span className="truncate">{sub.code}</span>
                       </div>
                     </div>
 
