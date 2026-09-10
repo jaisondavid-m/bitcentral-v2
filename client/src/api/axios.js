@@ -10,6 +10,19 @@ const api = axios.create({
   },
 });
 
+api.interceptors.request.use(
+  (config) => {
+    try {
+      const token = getStoredToken();
+      if (token && !config.headers.Authorization) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (e) {}
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 export async function postGoogleAuth(credential) {
   try {
     const res = await api.post("/auth/google", { credential });

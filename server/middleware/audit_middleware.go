@@ -28,81 +28,103 @@ var (
 func resolveUserInfo(c *gin.Context) (uid, name, rollNo, role string) {
 	token := getToken(c)
 	if token == "" {
-		return "", "", "", ""
-	}
-
-	claims, err := config.VerifyGoogleToken(token)
-	if err != nil || claims == nil {
-		// Try verifying app JWT
-		claims, err = config.VerifyAppJWT(token)
-		if err != nil || claims == nil {
+		if val, ok := c.Get("actor_uid"); ok {
+			if uidStr, ok := val.(string); ok && uidStr != "" {
+				uid = uidStr
+			}
+		}
+		if uid == "" {
 			return "", "", "", ""
 		}
 	}
 
-	uid = claims.UID
-	name = claims.Name
-	role = claims.Role
-	email := strings.ToLower(strings.TrimSpace(claims.Email))
-
-	// Try extracting roll number from email prefix if it looks like roll_no (e.g., 7376241cs101@bitsathy.in)
-	if email != "" {
-		parts := strings.Split(email, "@")
-		if len(parts) == 2 && rollNoRegex.MatchString(parts[0]) {
-			rollNo = strings.ToUpper(parts[0])
+	var claims *config.GoogleUserClaims
+	var err error
+	if token != "" {
+		claims, err = config.VerifyGoogleToken(token)
+		if err != nil || claims == nil {
+			claims, err = config.VerifyAppJWT(token)
 		}
 	}
 
-	// Check cache
-	if email != "" {
-		if cached, ok := userCache.Load(email); ok {
-			item := cached.(userCacheItem)
-			if name == "" {
-				name = item.Name
+	if claims != nil {
+		uid = claims.UID
+		name = claims.Name
+		role = claims.Role
+		email := strings.ToLower(strings.TrimSpace(claims.Email))
+
+		// Try extracting roll number from email prefix if it looks like roll_no (e.g., 7376241cs101@bitsathy.in)
+		if email != "" {
+			parts := strings.Split(email, "@")
+			if len(parts) == 2 && rollNoRegex.MatchString(parts[0]) {
+				rollNo = strings.ToUpper(parts[0])
 			}
-			if rollNo == "" {
-				rollNo = item.RollNo
-			}
-			if role == "" {
-				role = item.Role
-			}
-			return uid, name, rollNo, role
 		}
-	}
 
-	// Query DB for name, roll_no, role if missing or to populate cache
-	if config.DB != nil && email != "" {
-		var dbName, dbRole, dbRoll string
+		// Check cache
+		if email != "" {
+			if cached, ok := userCache.Load(email); ok {
+				item := cached.(userCacheItem)
+				if name == "" {
+					name = item.Name
+				}
+				if rollNo == "" {
+					rollNo = item.RollNo
+				}
+				if role == "" {
+					role = item.Role
+				}
+				if name == "" {
+					parts := strings.Split(email, "@")
+					if len(parts) > 0 {
+						name = parts[0]
+					}
+				}
+				return uid, name, rollNo, role
+			}
+		}
 
-		// Lookup roll_no from tracker_users
-		_ = config.DB.QueryRow(
-			`SELECT COALESCE(user_id, ''), COALESCE(name, '') FROM tracker_users WHERE LOWER(TRIM(email)) = ? LIMIT 1`,
-			email,
-		).Scan(&dbRoll, &dbName)
+		// Query DB for name, roll_no, role if missing or to populate cache
+		if config.DB != nil && email != "" {
+			var dbName, dbRole, dbRoll string
 
-		// Lookup role from users
-		if dbRole == "" {
+			// Lookup roll_no from tracker_users
 			_ = config.DB.QueryRow(
-				`SELECT COALESCE(role, 'user'), COALESCE(display_name, '') FROM users WHERE LOWER(TRIM(email)) = ? LIMIT 1`,
+				`SELECT COALESCE(user_id, ''), COALESCE(name, '') FROM tracker_users WHERE LOWER(TRIM(email)) = ? LIMIT 1`,
 				email,
-			).Scan(&dbRole, &dbName)
+			).Scan(&dbRoll, &dbName)
+
+			// Lookup role from users
+			if dbRole == "" {
+				_ = config.DB.QueryRow(
+					`SELECT COALESCE(role, 'user'), COALESCE(display_name, '') FROM users WHERE LOWER(TRIM(email)) = ? LIMIT 1`,
+					email,
+				).Scan(&dbRole, &dbName)
+			}
+
+			if name == "" && dbName != "" {
+				name = dbName
+			}
+			if rollNo == "" && dbRoll != "" {
+				rollNo = dbRoll
+			}
+			if role == "" && dbRole != "" {
+				role = dbRole
+			}
+
+			userCache.Store(email, userCacheItem{
+				Name:   name,
+				RollNo: rollNo,
+				Role:   role,
+			})
 		}
 
-		if name == "" && dbName != "" {
-			name = dbName
+		if name == "" && email != "" {
+			parts := strings.Split(email, "@")
+			if len(parts) > 0 {
+				name = parts[0]
+			}
 		}
-		if rollNo == "" && dbRoll != "" {
-			rollNo = dbRoll
-		}
-		if role == "" && dbRole != "" {
-			role = dbRole
-		}
-
-		userCache.Store(email, userCacheItem{
-			Name:   name,
-			RollNo: rollNo,
-			Role:   role,
-		})
 	}
 
 	if role == "" {
@@ -151,6 +173,11 @@ func AuditLoggerMiddleware() gin.HandlerFunc {
 
 		// Execute downstream handlers
 		c.Next()
+
+		// If user wasn't identified before c.Next(), try resolving again in case downstream handlers set auth context
+		if userUID == "" && userName == "" {
+			userUID, userName, rollNo, userRole = resolveUserInfo(c)
+		}
 
 		statusCode := c.Writer.Status()
 
