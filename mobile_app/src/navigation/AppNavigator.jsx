@@ -7,24 +7,23 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuth } from '../context/StudentContext';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
-import FeaturesScreen from '../screens/FeaturesScreen';
 import BitBotScreen from '../screens/BitBotScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import FacultyDirectoryScreen from '../screens/FacultyDirectoryScreen';
 import MessMenuScreen from '../screens/MessMenuScreen';
 import WifiDetailsScreen from '../screens/WifiDetailsScreen';
+import RpSiteScreen from '../screens/RpSiteScreen';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
+const RootStack = createNativeStackNavigator();
+const HomeStack = createNativeStackNavigator();
 
 const renderTabBarIcon = (route, focused, color, size) => {
   let iconName;
   if (route.name === 'Home') {
     iconName = focused ? 'home' : 'home-outline';
-  } else if (route.name === 'Tools') {
-    iconName = focused ? 'grid' : 'grid-outline';
   } else if (route.name === 'BitBot') {
     iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
   } else if (route.name === 'Profile') {
@@ -32,6 +31,18 @@ const renderTabBarIcon = (route, focused, color, size) => {
   }
   return <Ionicons name={iconName} size={size || 22} color={color} />;
 };
+
+function HomeStackNav() {
+  return (
+    <HomeStack.Navigator screenOptions={{ headerShown: false }}>
+      <HomeStack.Screen name="HomeScreen" component={HomeScreen} />
+      <HomeStack.Screen name="FacultyDirectory" component={FacultyDirectoryScreen} />
+      <HomeStack.Screen name="MessMenu" component={MessMenuScreen} />
+      <HomeStack.Screen name="WifiDetails" component={WifiDetailsScreen} />
+      <HomeStack.Screen name="RpSite" component={RpSiteScreen} />
+    </HomeStack.Navigator>
+  );
+}
 
 function MainTabs() {
   return (
@@ -45,12 +56,12 @@ function MainTabs() {
           borderTopColor: '#E2E8F0',
           paddingBottom: 6,
           height: 60,
+          backgroundColor: '#FFFFFF',
         },
         tabBarIcon: ({ focused, color, size }) => renderTabBarIcon(route, focused, color, size),
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Tools" component={FeaturesScreen} />
+      <Tab.Screen name="Home" component={HomeStackNav} />
       <Tab.Screen name="BitBot" component={BitBotScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
@@ -70,18 +81,13 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <RootStack.Navigator screenOptions={{ headerShown: false }}>
         {!user ? (
-          <Stack.Screen name="Login" component={LoginScreen} />
+          <RootStack.Screen name="Login" component={LoginScreen} />
         ) : (
-          <>
-            <Stack.Screen name="MainTabs" component={MainTabs} />
-            <Stack.Screen name="FacultyDirectory" component={FacultyDirectoryScreen} />
-            <Stack.Screen name="MessMenu" component={MessMenuScreen} />
-            <Stack.Screen name="WifiDetails" component={WifiDetailsScreen} />
-          </>
+          <RootStack.Screen name="MainTabs" component={MainTabs} />
         )}
-      </Stack.Navigator>
+      </RootStack.Navigator>
     </NavigationContainer>
   );
 }

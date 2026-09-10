@@ -7,7 +7,12 @@ import {
   ScrollView,
   TouchableOpacity,
   Linking,
+  StatusBar,
+  Platform,
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0;
 
 export default function WifiDetailsScreen({ navigation }) {
   const handleOpenPortal = () => {
@@ -16,11 +21,15 @@ export default function WifiDetailsScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor="#2563EB" barStyle="light-content" translucent={true} />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Text style={styles.backText}>‹ Back</Text>
+          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.title}>Wi-Fi Details</Text>
+        <View style={styles.headerLeft}>
+          <Ionicons name="star" size={20} color="#FFFFFF" style={styles.starIcon} />
+          <Text style={styles.headerTitle}>BIT-CENTRAL</Text>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -50,21 +59,31 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#1E293B',
+    paddingHorizontal: 16,
+    paddingTop: STATUS_BAR_HEIGHT + 12,
+    paddingBottom: 14,
+    backgroundColor: '#2563EB',
+    elevation: 4,
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
   },
   backButton: {
-    paddingRight: 12,
+    paddingRight: 10,
   },
-  backText: {
-    color: '#38BDF8',
-    fontSize: 16,
-    fontWeight: '600',
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
+  starIcon: {
+    marginRight: 6,
+  },
+  headerTitle: {
+    fontSize: 19,
+    fontWeight: '800',
     color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   content: {
     padding: 16,

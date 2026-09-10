@@ -9,10 +9,14 @@ import {
   ActivityIndicator,
   Image,
   RefreshControl,
+  StatusBar,
+  Platform,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useAuth } from '../context/StudentContext';
 import { fetchV2Profile } from '../api/axios';
+
+const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0;
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
@@ -73,6 +77,16 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor="#2563EB" barStyle="light-content" translucent={true} />
+
+      {/* Top Navbar */}
+      <View style={styles.headerNavbar}>
+        <View style={styles.headerLeft}>
+          <Ionicons name="star" size={22} color="#FFFFFF" style={styles.starIcon} />
+          <Text style={styles.headerNavbarTitle}>BIT-CENTRAL</Text>
+        </View>
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#2563EB']} />}
@@ -215,6 +229,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',
+  },
+  headerNavbar: {
+    backgroundColor: '#2563EB',
+    paddingTop: STATUS_BAR_HEIGHT + 12,
+    paddingBottom: 14,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    elevation: 4,
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  starIcon: {
+    marginRight: 8,
+  },
+  headerNavbarTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   scrollContent: {
     padding: 16,

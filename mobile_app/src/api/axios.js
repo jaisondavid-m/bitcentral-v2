@@ -122,5 +122,50 @@ export async function fetchV2Profile() {
   }
 }
 
+export async function searchRpStudents(query = '') {
+  try {
+    const res = await api.get('/search', { params: { q: query } });
+    return res?.data?.data || [];
+  } catch (err) {
+    console.error('Failed to search RP students:', err?.message || err);
+    return [];
+  }
+}
+
+export async function fetchRpRewards(rollNo = '', page = 1, limit = 10) {
+  try {
+    const res = await api.get('/rewards', {
+      params: { roll_no: rollNo, page, limit },
+    });
+    return res?.data || { data: [], total: 0 };
+  } catch (err) {
+    console.error('Failed to fetch RP rewards:', err?.message || err);
+    return { data: [], total: 0, error: err?.response?.data?.error || err?.message };
+  }
+}
+
+export async function fetchRpLeaderboard(year = '', dept = '') {
+  try {
+    const params = {};
+    if (year) params.year = year;
+    if (dept) params.dept = dept;
+    const res = await api.get('/top10', { params });
+    return res?.data?.data || [];
+  } catch (err) {
+    console.error('Failed to fetch RP leaderboard:', err?.message || err);
+    return [];
+  }
+}
+
+export async function fetchRpAverages() {
+  try {
+    const res = await api.get('/averages');
+    return res?.data?.averages || {};
+  } catch (err) {
+    console.error('Failed to fetch RP averages:', err?.message || err);
+    return {};
+  }
+}
+
 export default api;
 

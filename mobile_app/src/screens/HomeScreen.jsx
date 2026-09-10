@@ -7,11 +7,15 @@ import {
   ScrollView,
   TextInput,
   ActivityIndicator,
-  Image,
   Linking,
   SafeAreaView,
+  StatusBar,
+  Platform,
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { fetchHomeCards } from '../api/axios';
+
+const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0;
 
 const FALLBACK_CARDS = [
   {
@@ -19,7 +23,7 @@ const FALLBACK_CARDS = [
     name: 'Faculty Directory',
     description: 'Find contact info, cabins, and emails for BIT faculty.',
     btntext: 'Search Faculty',
-    icon: 'people',
+    icon: 'people-outline',
     route: 'FacultyDirectory',
   },
   {
@@ -27,15 +31,23 @@ const FALLBACK_CARDS = [
     name: 'Mess Menu',
     description: 'Check daily food menus for boys and girls hostel mess.',
     btntext: 'View Menu',
-    icon: 'restaurant',
+    icon: 'restaurant-outline',
     route: 'MessMenu',
+  },
+  {
+    id: 'reward-points',
+    name: 'Reward Points (RP Site)',
+    description: 'Search student RP, leaderboard rankings, and year-wise averages.',
+    btntext: 'View RP Site',
+    icon: 'ribbon-outline',
+    route: 'RpSite',
   },
   {
     id: 'wifi-details',
     name: 'Wi-Fi Portal & Details',
     description: 'Quick credentials, setup guide, and login portal for campus Wi-Fi.',
     btntext: 'Connect Wi-Fi',
-    icon: 'wifi',
+    icon: 'wifi-outline',
     route: 'WifiDetails',
   },
   {
@@ -43,7 +55,7 @@ const FALLBACK_CARDS = [
     name: 'BitBot AI Assistant',
     description: 'Ask questions about courses, campus, and schedules.',
     btntext: 'Chat with AI',
-    icon: 'chatbubbles',
+    icon: 'chatbubbles-outline',
     route: 'BitBot',
   },
 ];
@@ -91,6 +103,10 @@ export default function HomeScreen({ navigation }) {
         navigation.navigate('FacultyDirectory');
         return;
       }
+      if (routeLower === 'rpsite' || routeLower.includes('reward') || routeLower.includes('rp')) {
+        navigation.navigate('RpSite');
+        return;
+      }
       if (routeLower === 'wifidetails' || routeLower.includes('wifi')) {
         navigation.navigate('WifiDetails');
         return;
@@ -103,19 +119,12 @@ export default function HomeScreen({ navigation }) {
         navigation.navigate('Profile');
         return;
       }
-      if (routeLower === 'tools' || routeLower.includes('features')) {
-        navigation.navigate('Tools');
-        return;
-      }
-
-      // Try direct navigation if route matches a screen name
       try {
         navigation.navigate(targetRoute);
         return;
       } catch (e) {}
     }
 
-    // Path matching fallback for website links
     if (card.link) {
       const linkLower = card.link.toLowerCase();
       if (linkLower.includes('/mess')) {
@@ -124,6 +133,10 @@ export default function HomeScreen({ navigation }) {
       }
       if (linkLower.includes('/faculty')) {
         navigation.navigate('FacultyDirectory');
+        return;
+      }
+      if (linkLower.includes('/rpsite') || linkLower.includes('/reward')) {
+        navigation.navigate('RpSite');
         return;
       }
       if (linkLower.includes('/wifi')) {
@@ -139,63 +152,72 @@ export default function HomeScreen({ navigation }) {
         return;
       }
 
-      // External / website fallback
       Linking.openURL(card.link).catch((err) => console.warn('Unable to open URL:', err));
       return;
     }
-
-    navigation.navigate('Tools');
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Top Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>BIT Central</Text>
-          <Text style={styles.headerSubtitle}>Student Hub & Resource Portal</Text>
+      <StatusBar backgroundColor="#2563EB" barStyle="light-content" translucent={true} />
 
-          {/* Search Bar */}
+      {/* Fixed Top Navbar separated from Status Bar */}
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <Ionicons name="star" size={22} color="#FFFFFF" style={styles.starIcon} />
+          <Text style={styles.headerTitle}>BIT-CENTRAL</Text>
+        </View>
+      </View>
+
+      {/* Scrollable Body Content */}
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Search Bar in Page Body */}
+        <View style={styles.searchSection}>
           <View style={styles.searchContainer}>
             <TextInput
               style={styles.searchInput}
-              placeholder="Search tools, notes, faculty..."
+              placeholder="Search..."
               placeholderTextColor="#94A3B8"
               value={search}
               onChangeText={setSearch}
             />
+            <Ionicons name="mic-outline" size={20} color="#64748B" style={styles.micIcon} />
           </View>
         </View>
 
         {/* Card Section */}
         <View style={styles.content}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Available Resources</Text>
-            {loading && <ActivityIndicator size="small" color="#2563EB" />}
-          </View>
+          {loading && (
+            <View style={styles.loadingRow}>
+              <ActivityIndicator size="small" color="#2563EB" />
+            </View>
+          )}
 
           {filteredCards.length > 0 ? (
             <View style={styles.grid}>
               {filteredCards.map((card, index) => (
-                <View key={card.id || index} style={styles.card}>
-                  {card.img ? (
-                    <Image source={{ uri: card.img }} style={styles.cardImage} />
-                  ) : null}
+                <TouchableOpacity
+                  key={card.id || index}
+                  style={styles.card}
+                  activeOpacity={0.85}
+                  onPress={() => handleCardPress(card)}
+                >
                   <View style={styles.cardBody}>
-                    <Text style={styles.cardTitle}>{card.name}</Text>
-                    <Text style={styles.cardDesc} numberOfLines={2}>
-                      {card.description}
+                    <Text style={styles.cardTitle} numberOfLines={2}>
+                      {card.name}
                     </Text>
-                    <TouchableOpacity
-                      style={styles.cardButton}
-                      onPress={() => handleCardPress(card)}
-                    >
-                      <Text style={styles.cardButtonText}>
-                        {card.btntext || 'Open Tool'}
+                    {card.description ? (
+                      <Text style={styles.cardDesc} numberOfLines={2}>
+                        {card.description}
                       </Text>
-                    </TouchableOpacity>
+                    ) : null}
                   </View>
-                </View>
+                  <View style={styles.cardButton}>
+                    <Text style={styles.cardButtonText}>
+                      {card.btntext || 'Open Tool'}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
               ))}
             </View>
           ) : (
@@ -215,52 +237,72 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   scrollContent: {
-    paddingBottom: 30,
+    paddingBottom: 24,
   },
   header: {
-    backgroundColor: '#1E293B',
+    backgroundColor: '#2563EB',
+    paddingTop: STATUS_BAR_HEIGHT + 12,
+    paddingBottom: 14,
     paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 28,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-  },
-  headerTitle: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: '#94A3B8',
-    marginTop: 4,
-    marginBottom: 16,
-  },
-  searchContainer: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-  },
-  searchInput: {
-    height: 44,
-    fontSize: 14,
-    color: '#1E293B',
-  },
-  content: {
-    paddingHorizontal: 16,
-    paddingTop: 20,
-  },
-  sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    elevation: 4,
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  starIcon: {
+    marginRight: 8,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
+  searchSection: {
+    paddingHorizontal: 14,
+    paddingTop: 14,
+    paddingBottom: 2,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    paddingHorizontal: 14,
+    height: 44,
+    borderWidth: 1,
+    borderColor: '#93C5FD',
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  searchInput: {
+    flex: 1,
+    height: 44,
+    fontSize: 14,
     color: '#0F172A',
+    paddingRight: 6,
+  },
+  micIcon: {
+    marginLeft: 4,
+  },
+  content: {
+    paddingHorizontal: 14,
+    paddingTop: 12,
+  },
+  loadingRow: {
+    alignItems: 'center',
+    marginBottom: 8,
   },
   grid: {
     flexDirection: 'row',
@@ -269,45 +311,41 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#FFFFFF',
-    width: '48%',
-    borderRadius: 16,
-    marginBottom: 16,
+    width: '48.5%',
+    borderRadius: 14,
+    padding: 15,
+    marginBottom: 14,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    overflow: 'hidden',
-    shadowColor: '#000',
+    justifyContent: 'space-between',
+    shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
+    shadowOpacity: 0.04,
+    shadowRadius: 5,
     elevation: 2,
   },
-  cardImage: {
-    width: '100%',
-    height: 90,
-    resizeMode: 'cover',
-  },
   cardBody: {
-    padding: 12,
-    justifyContent: 'space-between',
     flex: 1,
+    marginBottom: 12,
   },
   cardTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1E293B',
-    marginBottom: 4,
+    color: '#0F172A',
+    marginBottom: 6,
+    lineHeight: 20,
   },
   cardDesc: {
     fontSize: 12,
     color: '#64748B',
-    marginBottom: 12,
-    lineHeight: 16,
+    lineHeight: 17,
   },
   cardButton: {
     backgroundColor: '#2563EB',
-    paddingVertical: 8,
+    paddingVertical: 9,
     borderRadius: 8,
     alignItems: 'center',
+    marginTop: 8,
   },
   cardButtonText: {
     color: '#FFFFFF',
@@ -323,3 +361,4 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
 });
+
