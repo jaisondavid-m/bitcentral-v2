@@ -11,10 +11,13 @@ import (
 
 func getToken(c *gin.Context) string {
 	authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-	if token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer")); token != "" && token != authHeader {
-		return token
-	}
-	if authHeader != "" && !strings.HasPrefix(authHeader, "Bearer ") {
+	if authHeader != "" {
+		if len(authHeader) > 7 && strings.EqualFold(authHeader[:7], "bearer ") {
+			return strings.TrimSpace(authHeader[7:])
+		}
+		if token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer")); token != "" && token != authHeader {
+			return token
+		}
 		return authHeader
 	}
 	cookieNames := []string{"google_auth_token", "jwt", "token", "auth_token", "access_token"}
