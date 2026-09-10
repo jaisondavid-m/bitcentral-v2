@@ -31,7 +31,7 @@ export default function InternalMarksConversionModal({
     >
       <div
         className="
-          w-full sm:max-w-xl rounded-t-3xl sm:rounded-3xl
+          w-full sm:max-w-2xl rounded-t-3xl sm:rounded-3xl
           bg-white border border-slate-200/90 dark:bg-slate-900 dark:border-slate-800
           shadow-2xl shadow-slate-950/20 dark:shadow-black/70
           max-h-[92dvh] sm:max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200
@@ -139,40 +139,40 @@ export default function InternalMarksConversionModal({
                   <div
                     key={sub.code || idx}
                     className="
-                      flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl
+                      flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-3.5 rounded-2xl
                       border border-slate-200/90 bg-white dark:border-slate-800 dark:bg-slate-900/90
                       shadow-2xs hover:border-indigo-300 dark:hover:border-indigo-800/80 transition-all
                     "
                   >
                     {/* Subject Header */}
-                    <div className="flex items-center gap-2.5 shrink-0">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950/80 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 font-mono">
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950/80 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 font-mono shrink-0">
                         #{idx + 1}
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <BookOpen className="h-3.5 w-3.5 text-slate-400" />
-                        <span className="text-xs font-bold text-slate-900 dark:text-white font-mono tracking-tight">
+                        <BookOpen className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                        <span className="text-xs font-bold text-slate-900 dark:text-white font-mono tracking-tight whitespace-nowrap">
                           {sub.code}
                         </span>
                       </div>
                     </div>
 
                     {/* Metrics row */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 flex-1 sm:max-w-md">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 flex-1 sm:max-w-lg min-w-0">
                       {/* Reward Points Redeemed */}
-                      <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 text-[11px]">
-                        <span className="text-slate-500 dark:text-slate-400 font-medium">
+                      <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 text-[11px] min-w-0">
+                        <span className="text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap shrink-0 text-[10.5px]">
                           Reward Points Redeemed
                         </span>
-                        <div className="flex flex-wrap gap-1.5 justify-end">
+                        <div className="flex items-center gap-1.5 justify-end shrink-0 whitespace-nowrap">
                           {filteredRewardEntries.length > 0 ? (
                             filteredRewardEntries.map(([key, val]) => (
                               <span
                                 key={key}
-                                className="inline-flex items-center gap-1 font-mono font-bold text-slate-800 dark:text-slate-200 text-xs"
+                                className="inline-flex items-center gap-1 font-mono font-bold text-slate-800 dark:text-slate-200 text-xs whitespace-nowrap"
                               >
-                                <span className="text-[10px] text-slate-400 font-medium">{key}:</span>
-                                <span>{val}</span>
+                                <span className="text-[10px] text-slate-400 font-medium whitespace-nowrap shrink-0">{key}:</span>
+                                <span className="whitespace-nowrap">{val}</span>
                               </span>
                             ))
                           ) : (
@@ -181,22 +181,28 @@ export default function InternalMarksConversionModal({
                         </div>
                       </div>
 
-                      {/* Internal Marks Received */}
-                      <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-100/80 dark:border-emerald-900/40 text-[11px]">
-                        <span className="text-emerald-800 dark:text-emerald-300 font-semibold">
+                      {/* Internal Marks Received (always out of 15) */}
+                      <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-100/80 dark:border-emerald-900/40 text-[11px] min-w-0">
+                        <span className="text-emerald-800 dark:text-emerald-300 font-semibold whitespace-nowrap shrink-0 text-[10.5px]">
                           Internal Marks Received
                         </span>
-                        <div className="flex flex-wrap gap-1.5 justify-end">
+                        <div className="flex items-center gap-1.5 justify-end shrink-0 whitespace-nowrap">
                           {filteredInternalEntries.length > 0 ? (
-                            filteredInternalEntries.map(([key, val]) => (
-                              <span
-                                key={key}
-                                className="inline-flex items-center gap-1 font-mono font-bold text-emerald-950 dark:text-emerald-200 text-xs"
-                              >
-                                <span className="text-[10px] text-emerald-600/80 dark:text-emerald-400 font-medium">{key}:</span>
-                                <span>{val}</span>
-                              </span>
-                            ))
+                            filteredInternalEntries.map(([key, val]) => {
+                              const hasOutOf = String(val).includes("/");
+                              return (
+                                <span
+                                  key={key}
+                                  className="inline-flex items-center gap-1 font-mono font-bold text-emerald-950 dark:text-emerald-200 text-xs whitespace-nowrap"
+                                >
+                                  <span className="text-[10px] text-emerald-600/80 dark:text-emerald-400 font-medium whitespace-nowrap shrink-0">{key}:</span>
+                                  <span className="whitespace-nowrap">{val}</span>
+                                  {!hasOutOf && (
+                                    <span className="text-[10px] text-emerald-600/70 dark:text-emerald-400/70 font-normal whitespace-nowrap">/ 15</span>
+                                  )}
+                                </span>
+                              );
+                            })
                           ) : (
                             <span className="font-mono text-emerald-400">—</span>
                           )}
