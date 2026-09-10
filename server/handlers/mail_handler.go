@@ -297,15 +297,15 @@ func replaceTemplateVariables(db *sql.DB, templateStr string, r EmailRecipient) 
 		registerNo = strings.TrimSpace(r.RollNo)
 	}
 
-	if db != nil && (fullName == "" || registerNo == "" || userID == "" || dept == "" || batch == "" || strings.EqualFold(fullName, "Student") || strings.EqualFold(fullName, "User")) {
+	if db != nil {
 		var tName, tUserID, tID, tDept, tBatch string
 		_ = db.QueryRow(
 			`SELECT COALESCE(name, ''), COALESCE(user_id, ''), COALESCE(id, ''), COALESCE(department, ''), COALESCE(batch, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
 			r.Email,
 		).Scan(&tName, &tUserID, &tID, &tDept, &tBatch)
 
-		if fullName == "" || strings.EqualFold(fullName, "Student") || strings.EqualFold(fullName, "User") {
-			fullName = tName
+		if strings.TrimSpace(tName) != "" {
+			fullName = strings.TrimSpace(tName)
 		}
 		if registerNo == "" {
 			registerNo = tUserID

@@ -82,10 +82,15 @@ function formatISTDateTime(value) {
   });
 }
 
-function formatStudentDisplayName(displayName, email) {
-  const trimmedName = (displayName || "").trim();
-  if (trimmedName && trimmedName !== "Student" && trimmedName !== "User" && trimmedName !== "-") {
+function formatStudentDisplayName(name, displayName, email) {
+  const trimmedName = (name || "").trim();
+  if (trimmedName && trimmedName !== "Student" && trimmedName !== "User" && trimmedName !== "-" && !trimmedName.includes("@")) {
     return trimmedName;
+  }
+
+  const trimmedDisplay = (displayName || "").trim();
+  if (trimmedDisplay && trimmedDisplay !== "Student" && trimmedDisplay !== "User" && trimmedDisplay !== "-" && !trimmedDisplay.includes("@")) {
+    return trimmedDisplay;
   }
 
   if (!email) return "Student";
@@ -96,7 +101,6 @@ function formatStudentDisplayName(displayName, email) {
     const rawName = parts[0];
     const deptBatchTag = parts[1].toUpperCase();
 
-    // Split trailing single-letter initial if attached: e.g. "balakumarr" -> "Balakumar R"
     let formattedName = rawName;
     const match = rawName.match(/^([a-zA-Z]{3,})([a-zA-Z])$/);
     if (match) {
@@ -213,7 +217,6 @@ export default function AdminMailSender() {
 
   // Selected recipient objects (key: email)
   const [selectedRecipients, setSelectedRecipients] = useState({});
-  const [customEmailInput, setCustomEmailInput] = useState("");
 
   // Email form state
   const [selectedTemplateId, setSelectedTemplateId] = useState("custom");
@@ -347,7 +350,7 @@ export default function AdminMailSender() {
     const email = (user.email || "").toLowerCase().trim();
     if (!email) return;
 
-    const formattedName = formatStudentDisplayName(user.display_name || user.name, user.email);
+    const formattedName = formatStudentDisplayName(user.name, user.display_name || user.displayName, user.email);
 
     setSelectedRecipients((prev) => {
       const next = { ...prev };
@@ -375,7 +378,7 @@ export default function AdminMailSender() {
         if (email) {
           next[email] = {
             email,
-            name: formatStudentDisplayName(u.display_name || u.name, u.email),
+            name: formatStudentDisplayName(u.name, u.display_name || u.displayName, u.email),
             user_id: u.user_id || u.id || "",
             register_no: u.register_no || u.roll_no || "",
             department: u.department || "",
@@ -400,29 +403,6 @@ export default function AdminMailSender() {
 
   const handleClearAllRecipients = () => {
     setSelectedRecipients({});
-  };
-
-  const handleAddCustomEmail = (e) => {
-    e?.preventDefault();
-    const clean = customEmailInput.toLowerCase().trim();
-    if (!clean || !clean.includes("@")) {
-      setBanner({ type: "error", message: "Please enter a valid email address (e.g. user@domain.com)" });
-      return;
-    }
-
-    setSelectedRecipients((prev) => ({
-      ...prev,
-      [clean]: {
-        email: clean,
-        name: clean.split("@")[0],
-        user_id: "",
-        register_no: "",
-        department: "",
-        batch: "",
-      },
-    }));
-    setCustomEmailInput("");
-    setBanner({ type: "success", message: `Added custom recipient ${clean}` });
   };
 
   const handleRemoveRecipient = (email) => {
@@ -469,7 +449,7 @@ export default function AdminMailSender() {
     if (list.length > 0) return list[0];
     if (users.length > 0) {
       const u = users[0];
-      const displayName = formatStudentDisplayName(u.display_name || u.name, u.email);
+      const displayName = formatStudentDisplayName(u.name, u.display_name || u.displayName, u.email);
       return {
         name: displayName || "null",
         first_name: (displayName || "").split(" ")[0] || "null",
@@ -847,25 +827,6 @@ export default function AdminMailSender() {
                 )}
               </div>
 
-              {/* Custom One-Off Email Adder */}
-              <form onSubmit={handleAddCustomEmail} className="flex gap-1.5 pt-1">
-                <input
-                  type="email"
-                  value={customEmailInput}
-                  onChange={(e) => setCustomEmailInput(e.target.value)}
-                  placeholder="Or enter custom email (e.g. staff@bitsathy.ac.in)"
-                  className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-1.5 text-xs text-slate-900 outline-none transition focus:border-teal-500 focus:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                />
-                <button
-                  type="submit"
-                  disabled={!customEmailInput.trim()}
-                  className="inline-flex items-center gap-1 rounded-xl bg-slate-800 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-900 disabled:opacity-40 dark:bg-slate-700 dark:hover:bg-slate-600 cursor-pointer shrink-0"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  <span>Add</span>
-                </button>
-              </form>
-
               {/* Scrollable User Directory List */}
               <div className="max-h-72 overflow-y-auto rounded-xl border border-slate-200/80 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
                 {loadingUsers ? (
@@ -880,7 +841,7 @@ export default function AdminMailSender() {
                   users.map((u) => {
                     const email = (u.email || "").toLowerCase().trim();
                     const isSelected = Boolean(selectedRecipients[email]);
-                    const displayNameFormatted = formatStudentDisplayName(u.display_name || u.name, u.email);
+                    const displayNameFormatted = formatStudentDisplayName(u.name, u.display_name || u.displayName, u.email);
 
                     return (
                       <div
