@@ -5764,7 +5764,7 @@ function AnalyticsSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [hoverPoint, setHoverPoint] = useState(null);
-  const [historyRange, setHistoryRange] = useState(14); // 7 | 14 | 30 | 0 (all)
+  const [historyRange, setHistoryRange] = useState(14);
 
   const fetchAnalytics = useCallback(async () => {
     try {
@@ -6566,4 +6566,4 @@ export {
   AdminFeedbackPageRoute as AdminFeedbackPage,
   AdminAIKeyPage,
 };
-export default AdminDashboard;
+export default AdminDashboard;

@@ -90,34 +90,142 @@ func (h *TrackerUserHandler) GetProfileV2(c *gin.Context) {
 		return
 	}
 
-	emailID := strings.TrimSpace(c.Query("emailid"))
-	if emailID == "" {
-		emailID = strings.TrimSpace(c.Query("email"))
-	}
-	if emailID == "" {
-		emailID = strings.TrimSpace(c.Query("mailid"))
-	}
-
-	if emailID == "" {
-		authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-		token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
-		if token != "" {
-			resolvedEmail, err := emailFromToken(token)
-			if err == nil && resolvedEmail != "" {
-				emailID = resolvedEmail
-			}
-		}
-	}
-
-	if emailID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
+	// 1. Authenticate Requester Token
+	token := ExtractAuthToken(c)
+	if token == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
-			"error":   "Query param 'email' or valid Authorization Bearer token is required",
+			"message": "Authentication required: please sign in to access profile",
 		})
 		return
 	}
 
-	// 1. Fetch from tracker_users table
+	claims, err := config.VerifyGoogleToken(token)
+	if err != nil || claims == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"message": "Invalid authentication token",
+		})
+		return
+	}
+
+	authenticatedUID := strings.TrimSpace(claims.UID)
+	authenticatedEmail := strings.ToLower(strings.TrimSpace(claims.Email))
+	if authenticatedEmail == "" && authenticatedUID == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"message": "Invalid user claims",
+		})
+		return
+	}
+
+	// 2. Check if requester is Admin / SuperAdmin
+	isAdmin := false
+	if h.DB != nil {
+		var role string
+		err := h.DB.QueryRow(`SELECT role FROM users WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, authenticatedUID, authenticatedUID, authenticatedEmail).Scan(&role)
+		if err == nil {
+			r := strings.ToLower(strings.TrimSpace(role))
+			if r == "admin" || r == "superadmin" || r == "super_admin" {
+				isAdmin = true
+			}
+		}
+
+		if !isAdmin && authenticatedUID != "" {
+			var count int
+			_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins WHERE uid = ?`, authenticatedUID).Scan(&count)
+			if count > 0 {
+				isAdmin = true
+			}
+		}
+		if !isAdmin && authenticatedEmail != "" {
+			var count int
+			_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins a JOIN users u ON a.uid = u.uid WHERE LOWER(TRIM(u.email)) = ?`, authenticatedEmail).Scan(&count)
+			if count > 0 {
+				isAdmin = true
+			}
+		}
+	}
+
+	// 3. Determine requested identifier
+	requestedTarget := strings.TrimSpace(c.Query("emailid"))
+	if requestedTarget == "" {
+		requestedTarget = strings.TrimSpace(c.Query("email"))
+	}
+	if requestedTarget == "" {
+		requestedTarget = strings.TrimSpace(c.Query("mailid"))
+	}
+	if requestedTarget == "" {
+		requestedTarget = strings.TrimSpace(c.Query("id"))
+	}
+	if requestedTarget == "" {
+		requestedTarget = strings.TrimSpace(c.Query("user_id"))
+	}
+	if requestedTarget == "" {
+		requestedTarget = strings.TrimSpace(c.Query("roll_no"))
+	}
+
+	targetIdentifier := authenticatedEmail
+	if requestedTarget != "" {
+		if isAdmin {
+			targetIdentifier = requestedTarget
+		} else {
+			// Non-admin user: verify they are only requesting their own profile
+			isOwnProfile := false
+
+			var authenticatedTrackerUserID, authenticatedTrackerID string
+			if h.DB != nil && authenticatedEmail != "" {
+				_ = h.DB.QueryRow(`SELECT COALESCE(user_id, ''), COALESCE(id, '') FROM tracker_users WHERE LOWER(TRIM(email)) = ? LIMIT 1`, authenticatedEmail).Scan(&authenticatedTrackerUserID, &authenticatedTrackerID)
+			}
+
+			emailPrefix := ""
+			if parts := strings.Split(authenticatedEmail, "@"); len(parts) > 0 {
+				emailPrefix = parts[0]
+			}
+
+			if strings.EqualFold(requestedTarget, authenticatedEmail) ||
+				(authenticatedUID != "" && strings.EqualFold(requestedTarget, authenticatedUID)) ||
+				(authenticatedTrackerUserID != "" && strings.EqualFold(requestedTarget, authenticatedTrackerUserID)) ||
+				(authenticatedTrackerID != "" && strings.EqualFold(requestedTarget, authenticatedTrackerID)) ||
+				(emailPrefix != "" && strings.EqualFold(requestedTarget, emailPrefix)) {
+				isOwnProfile = true
+			}
+
+			if !isOwnProfile && h.DB != nil {
+				var tEmail string
+				_ = h.DB.QueryRow(
+					`SELECT COALESCE(email, '') FROM tracker_users WHERE LOWER(TRIM(user_id)) = LOWER(TRIM(?)) OR LOWER(TRIM(id)) = LOWER(TRIM(?)) OR LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
+					requestedTarget, requestedTarget, requestedTarget,
+				).Scan(&tEmail)
+				if tEmail != "" && strings.EqualFold(tEmail, authenticatedEmail) {
+					isOwnProfile = true
+				}
+			}
+
+			if !isOwnProfile && h.DB != nil {
+				var uEmail string
+				_ = h.DB.QueryRow(
+					`SELECT COALESCE(email, '') FROM users WHERE LOWER(TRIM(uid)) = LOWER(TRIM(?)) OR LOWER(TRIM(google_id)) = LOWER(TRIM(?)) OR LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
+					requestedTarget, requestedTarget, requestedTarget,
+				).Scan(&uEmail)
+				if uEmail != "" && strings.EqualFold(uEmail, authenticatedEmail) {
+					isOwnProfile = true
+				}
+			}
+
+			if !isOwnProfile {
+				c.JSON(http.StatusForbidden, gin.H{
+					"success": false,
+					"message": "Forbidden: You are not authorized to view another student's profile",
+				})
+				return
+			}
+
+			targetIdentifier = requestedTarget
+		}
+	}
+
+	// 4. Fetch from tracker_users table
 	trackerQuery := `
 		SELECT 
 			COALESCE(id, ''), 
@@ -135,12 +243,12 @@ func (h *TrackerUserHandler) GetProfileV2(c *gin.Context) {
 	`
 
 	var tID, tUserID, tName, tEmail, tBatch, tPhone, tDept string
-	trackerErr := h.DB.QueryRow(trackerQuery, emailID, emailID, emailID).Scan(
+	trackerErr := h.DB.QueryRow(trackerQuery, targetIdentifier, targetIdentifier, targetIdentifier).Scan(
 		&tID, &tUserID, &tName, &tEmail, &tBatch, &tPhone, &tDept,
 	)
 
-	// 2. Fetch from users table using email
-	searchEmail := emailID
+	// 5. Fetch from users table using email, uid, or google_id
+	searchEmail := targetIdentifier
 	if tEmail != "" {
 		searchEmail = tEmail
 	}
@@ -156,13 +264,15 @@ func (h *TrackerUserHandler) GetProfileV2(c *gin.Context) {
 			COALESCE(last_sign_in_time, '')
 		FROM users
 		WHERE LOWER(TRIM(email)) = LOWER(TRIM(?))
+		   OR LOWER(TRIM(uid)) = LOWER(TRIM(?))
+		   OR LOWER(TRIM(google_id)) = LOWER(TRIM(?))
 		LIMIT 1
 	`
-	_ = h.DB.QueryRow(userQuery, searchEmail).Scan(
+	_ = h.DB.QueryRow(userQuery, searchEmail, targetIdentifier, targetIdentifier).Scan(
 		&userUID, &uEmail, &displayName, &photoURL, &creationTime, &lastSignInTime,
 	)
 
-	// 3. Fetch rollno (user_id) from tracker_users table
+	// 6. Fetch rollno (user_id) from tracker_users table
 	var rollNo string
 	if tUserID != "" {
 		rollNo = tUserID
@@ -182,13 +292,13 @@ func (h *TrackerUserHandler) GetProfileV2(c *gin.Context) {
 		return
 	}
 
-	// 4. Consolidate profile details
+	// 7. Consolidate profile details
 	finalEmail := tEmail
 	if finalEmail == "" {
 		finalEmail = uEmail
 	}
 	if finalEmail == "" {
-		finalEmail = emailID
+		finalEmail = targetIdentifier
 	}
 
 	finalName := tName
