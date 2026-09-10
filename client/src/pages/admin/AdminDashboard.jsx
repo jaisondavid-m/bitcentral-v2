@@ -5764,6 +5764,8 @@ function AnalyticsSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [hoverPoint, setHoverPoint] = useState(null);
+  const [activeTab, setActiveTab] = useState("daily_history"); // 'daily_history' | 'hourly_curve'
+  const [historyRange, setHistoryRange] = useState(14); // 7 | 14 | 30
 
   const fetchAnalytics = useCallback(async () => {
     try {
@@ -5791,12 +5793,21 @@ function AnalyticsSection() {
   }
 
   const summary = data?.summary || {};
-  const chart = data?.chart || [];
+  const hourlyChart = data?.chart || [];
+  const rawDailyHistory = data?.dailyHistory || [];
   const features = data?.features || [];
   const devices = data?.devices || [];
   const realtime = data?.realtime || {};
 
-  const maxActive = Math.max(...chart.map((p) => p.activeUsers), 1500);
+  // Slice daily history according to selected range
+  const dailyHistory = rawDailyHistory.slice(-historyRange);
+
+  // Compute DAU metrics
+  const maxDailyUsers = dailyHistory.length > 0 ? Math.max(...dailyHistory.map((p) => p.activeUsers), 1) : 1500;
+  const peakHistoryPoint = dailyHistory.reduce((max, p) => (p.activeUsers > (max?.activeUsers || 0) ? p : max), dailyHistory[0] || null);
+  const avgDailyUsers = dailyHistory.length > 0 ? Math.round(dailyHistory.reduce((acc, p) => acc + p.activeUsers, 0) / dailyHistory.length) : 0;
+  
+  const maxHourlyActive = Math.max(...hourlyChart.map((p) => p.activeUsers), 1500);
 
   return (
     <div className="space-y-6">
@@ -5810,7 +5821,7 @@ function AnalyticsSection() {
             </h2>
           </div>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Real-time analytics powered by {data?.source || "Google Auth & Google Analytics API"}
+            Real-time analytics powered by {data?.source || "MySQL Database & Google Analytics API"}
           </p>
         </div>
 
@@ -5847,14 +5858,14 @@ function AnalyticsSection() {
 
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-950">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <span>Daily Active Users (DAU)</span>
+            <span>Daily Active Users (Today)</span>
             <TrendingUp className="h-4 w-4 text-blue-600" />
           </div>
           <div className="mt-2 text-3xl font-black text-slate-900 dark:text-white">
-            {summary.daily_active_users?.toLocaleString() || "1,420"}
+            {summary.daily_active_users?.toLocaleString() || "0"}
           </div>
           <p className="mt-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-            Verified peak daily active users
+            Active today (filtered by last seen)
           </p>
         </div>
 
@@ -5887,29 +5898,118 @@ function AnalyticsSection() {
 
       {/* Daily Active Users & Traffic Graph Card */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-950">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-4 dark:border-slate-900">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-4 dark:border-slate-900">
           <div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <Activity className="h-4 w-4 text-blue-600" />
-              Daily Active Users Cumulative Traffic Curve
+              {activeTab === "daily_history" ? "Daily Active Users (Historical Database Records)" : "Today's Intraday Traffic Curve"}
             </h3>
             <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-              User traffic trend matching Google Analytics 1,400+ peak daily active users curve
+              {activeTab === "daily_history"
+                ? "Unique users tracked daily based on last seen timestamp and stored in daily_active_user_stats table"
+                : "Real-time user traffic pattern throughout the day"}
             </p>
           </div>
-          <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-3 py-1 rounded-md">
-            Peak: 1,420 DAU
-          </span>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {/* View Mode Toggle */}
+            <div className="flex rounded-lg bg-slate-100 p-0.5 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab("daily_history");
+                  setHoverPoint(null);
+                }}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-all cursor-pointer ${
+                  activeTab === "daily_history"
+                    ? "bg-white text-blue-600 shadow-xs dark:bg-slate-800 dark:text-blue-400"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                }`}
+              >
+                Daily History
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab("hourly_curve");
+                  setHoverPoint(null);
+                }}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-all cursor-pointer ${
+                  activeTab === "hourly_curve"
+                    ? "bg-white text-blue-600 shadow-xs dark:bg-slate-800 dark:text-blue-400"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                }`}
+              >
+                Today's Curve
+              </button>
+            </div>
+
+            {/* Range Selector for Daily History */}
+            {activeTab === "daily_history" && (
+              <div className="flex rounded-lg bg-slate-100 p-0.5 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                {[7, 14, 30].map((days) => (
+                  <button
+                    key={days}
+                    type="button"
+                    onClick={() => {
+                      setHistoryRange(days);
+                      setHoverPoint(null);
+                    }}
+                    className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-all cursor-pointer ${
+                      historyRange === days
+                        ? "bg-blue-600 text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                    }`}
+                  >
+                    {days}D
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Highlight KPI Pills for Daily History */}
+        {activeTab === "daily_history" && (
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 border-b border-slate-100 pb-4 dark:border-slate-900">
+            <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
+              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Selected Days</span>
+              <div className="mt-0.5 text-base font-bold text-slate-900 dark:text-white">{dailyHistory.length} Recorded</div>
+            </div>
+            <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
+              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Peak DAU</span>
+              <div className="mt-0.5 text-base font-bold text-blue-600 dark:text-blue-400">
+                {peakHistoryPoint?.activeUsers?.toLocaleString() || 0}{" "}
+                <span className="text-[10px] font-normal text-slate-400">({peakHistoryPoint?.dateLabel || "-"})</span>
+              </div>
+            </div>
+            <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
+              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Average DAU</span>
+              <div className="mt-0.5 text-base font-bold text-emerald-600 dark:text-emerald-400">
+                {avgDailyUsers.toLocaleString()} users/day
+              </div>
+            </div>
+            <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
+              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Today's Active</span>
+              <div className="mt-0.5 text-base font-bold text-violet-600 dark:text-violet-400">
+                {summary.daily_active_users?.toLocaleString() || 0} active
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* SVG Interactive Traffic Graph */}
         <div className="mt-6">
           <div className="relative h-64 w-full">
             <svg viewBox="0 0 1000 300" className="h-full w-full overflow-visible" preserveAspectRatio="none">
               <defs>
-                <linearGradient id="analyticsGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4" />
+                <linearGradient id="dauGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.45" />
                   <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
+                </linearGradient>
+                <linearGradient id="hourlyGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.45" />
+                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.0" />
                 </linearGradient>
               </defs>
 
@@ -5927,11 +6027,42 @@ function AnalyticsSection() {
                 />
               ))}
 
-              {/* SVG Area & Path */}
-              {chart.length > 1 && (() => {
-                const points = chart.map((pt, idx) => {
-                  const x = (idx / (chart.length - 1)) * 1000;
-                  const y = 300 - (pt.activeUsers / maxActive) * 260 - 20;
+              {/* Multi-Day Daily History Graph */}
+              {activeTab === "daily_history" && dailyHistory.length > 0 && (() => {
+                const currentMax = Math.max(maxDailyUsers, 10);
+                const points = dailyHistory.map((pt, idx) => {
+                  const x = dailyHistory.length === 1 ? 500 : (idx / (dailyHistory.length - 1)) * 1000;
+                  const y = 300 - (pt.activeUsers / currentMax) * 240 - 20;
+                  return { x, y, pt };
+                });
+
+                const pathD = points.reduce((acc, p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`), "");
+                const areaD = points.length === 1 ? "" : `${pathD} L 1000 300 L 0 300 Z`;
+
+                return (
+                  <>
+                    {areaD && <path d={areaD} fill="url(#dauGradient)" />}
+                    <path d={pathD} fill="none" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                    {points.map((p, idx) => (
+                      <circle
+                        key={p.pt.date || idx}
+                        cx={p.x}
+                        cy={p.y}
+                        r={hoverPoint === idx ? 7 : 4.5}
+                        className="fill-blue-600 stroke-white dark:stroke-slate-950 transition-all cursor-pointer"
+                        onMouseEnter={() => setHoverPoint(idx)}
+                        onMouseLeave={() => setHoverPoint(null)}
+                      />
+                    ))}
+                  </>
+                );
+              })()}
+
+              {/* Intraday Hourly Graph */}
+              {activeTab === "hourly_curve" && hourlyChart.length > 1 && (() => {
+                const points = hourlyChart.map((pt, idx) => {
+                  const x = (idx / (hourlyChart.length - 1)) * 1000;
+                  const y = 300 - (pt.activeUsers / maxHourlyActive) * 260 - 20;
                   return { x, y, pt };
                 });
 
@@ -5940,15 +6071,15 @@ function AnalyticsSection() {
 
                 return (
                   <>
-                    <path d={areaD} fill="url(#analyticsGradient)" />
-                    <path d={pathD} fill="none" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d={areaD} fill="url(#hourlyGradient)" />
+                    <path d={pathD} fill="none" stroke="#8b5cf6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                     {points.map((p, idx) => (
                       <circle
                         key={idx}
                         cx={p.x}
                         cy={p.y}
                         r={hoverPoint === idx ? 6 : 4}
-                        className="fill-blue-600 stroke-white dark:stroke-slate-950 transition-all cursor-pointer"
+                        className="fill-violet-600 stroke-white dark:stroke-slate-950 transition-all cursor-pointer"
                         onMouseEnter={() => setHoverPoint(idx)}
                         onMouseLeave={() => setHoverPoint(null)}
                       />
@@ -5958,27 +6089,63 @@ function AnalyticsSection() {
               })()}
             </svg>
 
-            {/* Hover Tooltip */}
-            {hoverPoint !== null && chart[hoverPoint] && (
+            {/* Hover Tooltip for Daily History */}
+            {hoverPoint !== null && activeTab === "daily_history" && dailyHistory[hoverPoint] && (
               <div
-                className="absolute z-10 rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-xs text-white shadow-xl pointer-events-none transform -translate-x-1/2 -translate-y-full"
+                className="absolute z-10 rounded-xl border border-slate-700/80 bg-slate-900/95 backdrop-blur-md px-3.5 py-2.5 text-xs text-white shadow-2xl pointer-events-none transform -translate-x-1/2 -translate-y-full transition-all"
                 style={{
-                  left: `${(hoverPoint / (chart.length - 1)) * 100}%`,
-                  top: `${300 - (chart[hoverPoint].activeUsers / maxActive) * 260 - 25}px`,
+                  left: `${dailyHistory.length === 1 ? 50 : (hoverPoint / (dailyHistory.length - 1)) * 100}%`,
+                  top: `${300 - (dailyHistory[hoverPoint].activeUsers / Math.max(maxDailyUsers, 10)) * 240 - 30}px`,
                 }}
               >
-                <div className="font-bold text-blue-400">{chart[hoverPoint].timeLabel}</div>
-                <div>Active Users: <strong>{chart[hoverPoint].activeUsers}</strong></div>
-                <div>Pageviews: <strong>{chart[hoverPoint].pageviews}</strong></div>
+                <div className="font-bold text-blue-400 flex items-center gap-1.5">
+                  <CalendarDays className="h-3.5 w-3.5" />
+                  {dailyHistory[hoverPoint].dateLabel} ({dailyHistory[hoverPoint].date})
+                </div>
+                <div className="mt-1 text-slate-200">
+                  Active Users: <strong className="text-white text-sm font-black">{dailyHistory[hoverPoint].activeUsers.toLocaleString()}</strong>
+                </div>
+                <div className="text-[11px] text-slate-400">
+                  Total Users: {dailyHistory[hoverPoint].totalUsers?.toLocaleString() || summary.registered_users?.toLocaleString() || 4546}
+                </div>
+              </div>
+            )}
+
+            {/* Hover Tooltip for Hourly Curve */}
+            {hoverPoint !== null && activeTab === "hourly_curve" && hourlyChart[hoverPoint] && (
+              <div
+                className="absolute z-10 rounded-xl border border-slate-700/80 bg-slate-900/95 backdrop-blur-md px-3.5 py-2.5 text-xs text-white shadow-2xl pointer-events-none transform -translate-x-1/2 -translate-y-full transition-all"
+                style={{
+                  left: `${(hoverPoint / (hourlyChart.length - 1)) * 100}%`,
+                  top: `${300 - (hourlyChart[hoverPoint].activeUsers / maxHourlyActive) * 260 - 30}px`,
+                }}
+              >
+                <div className="font-bold text-violet-400">{hourlyChart[hoverPoint].timeLabel}</div>
+                <div className="mt-1">Active Users: <strong>{hourlyChart[hoverPoint].activeUsers}</strong></div>
+                <div>Pageviews: <strong>{hourlyChart[hoverPoint].pageviews}</strong></div>
               </div>
             )}
           </div>
 
-          {/* Time Labels X Axis */}
-          <div className="mt-4 flex justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400 px-1">
-            {chart.map((p) => (
-              <span key={p.timeLabel}>{p.timeLabel}</span>
-            ))}
+          {/* Time / Date Labels X Axis */}
+          <div className="mt-4 flex justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400 px-1 overflow-x-auto">
+            {activeTab === "daily_history"
+              ? dailyHistory.map((p, idx) => (
+                  <span
+                    key={p.date || idx}
+                    className={`text-center ${hoverPoint === idx ? "text-blue-600 dark:text-blue-400 font-bold" : ""}`}
+                  >
+                    {p.dateLabel}
+                  </span>
+                ))
+              : hourlyChart.map((p, idx) => (
+                  <span
+                    key={p.timeLabel}
+                    className={`text-center ${hoverPoint === idx ? "text-violet-600 dark:text-violet-400 font-bold" : ""}`}
+                  >
+                    {p.timeLabel}
+                  </span>
+                ))}
           </div>
         </div>
       </div>
