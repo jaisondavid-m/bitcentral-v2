@@ -202,9 +202,30 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 	search := strings.TrimSpace(c.Query("search"))
 	method := strings.TrimSpace(strings.ToUpper(c.Query("method")))
 	statusStr := strings.TrimSpace(c.Query("status"))
+	userUID := strings.TrimSpace(c.Query("user_uid"))
+	rollNo := strings.TrimSpace(c.Query("roll_no"))
+	userName := strings.TrimSpace(c.Query("user_name"))
+	userKey := strings.TrimSpace(c.Query("user"))
 
 	whereClauses := []string{"1=1"}
 	args := []interface{}{}
+
+	if userUID != "" {
+		whereClauses = append(whereClauses, "user_uid = ?")
+		args = append(args, userUID)
+	}
+	if rollNo != "" {
+		whereClauses = append(whereClauses, "roll_no = ?")
+		args = append(args, rollNo)
+	}
+	if userName != "" {
+		whereClauses = append(whereClauses, "user_name = ?")
+		args = append(args, userName)
+	}
+	if userKey != "" {
+		whereClauses = append(whereClauses, "(user_uid = ? OR roll_no = ? OR user_name = ?)")
+		args = append(args, userKey, userKey, userKey)
+	}
 
 	if search != "" {
 		whereClauses = append(whereClauses, "(endpoint LIKE ? OR query LIKE ? OR payload LIKE ? OR ip_address LIKE ? OR user_name LIKE ? OR roll_no LIKE ? OR user_uid LIKE ?)")
@@ -289,6 +310,390 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 		"limit":      limit,
 		"totalPages": totalPages,
 	})
+}
+
+// UserAuditSummaryItem represents aggregated user audit data for the user audit cards view
+type UserAuditSummaryItem struct {
+	UserUID        string `json:"user_uid"`
+	UserName       string `json:"user_name"`
+	DisplayName    string `json:"display_name"`
+	Email          string `json:"email"`
+	RollNo         string `json:"roll_no"`
+	Role           string `json:"role"`
+	PhotoURL       string `json:"photo_url"`
+	Department     string `json:"department"`
+	Batch          string `json:"batch"`
+	TotalRequests  int    `json:"total_requests"`
+	ErrorCount     int    `json:"error_count"`
+	SuccessCount   int    `json:"success_count"`
+	LastActiveAt   string `json:"last_active_at"`
+	LastIP         string `json:"last_ip"`
+	LastMethod     string `json:"last_method"`
+	LastEndpoint   string `json:"last_endpoint"`
+}
+
+// GetUserAuditLogsSummary aggregates audit logs per user and returns a summary list with user details
+func (h *AdminHandler) GetUserAuditLogsSummary(c *gin.Context) {
+	if h.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Database unavailable"})
+		return
+	}
+
+	search := strings.ToLower(strings.TrimSpace(c.Query("search")))
+	roleFilter := strings.ToLower(strings.TrimSpace(c.Query("role")))
+	activityFilter := strings.ToLower(strings.TrimSpace(c.Query("activity")))
+	sortBy := strings.ToLower(strings.TrimSpace(c.DefaultQuery("sort", "recent")))
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if page < 1 {
+		page = 1
+	}
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "30"))
+	if limit < 1 || limit > 200 {
+		limit = 30
+	}
+
+	userMap := make(map[string]*UserAuditSummaryItem)
+
+	// 1. Fetch tracker_users mapping for department and batch
+	type trackerInfo struct {
+		name       string
+		department string
+		batch      string
+		rollNo     string
+	}
+	trackerByEmail := make(map[string]trackerInfo)
+	trackerByRoll := make(map[string]trackerInfo)
+
+	tRows, tErr := h.DB.Query(`SELECT COALESCE(user_id, ''), COALESCE(email, ''), COALESCE(name, ''), COALESCE(department, ''), COALESCE(batch, '') FROM tracker_users`)
+	if tErr == nil {
+		defer tRows.Close()
+		for tRows.Next() {
+			var rNo, em, nm, dept, bt string
+			if err := tRows.Scan(&rNo, &em, &nm, &dept, &bt); err == nil {
+				info := trackerInfo{name: nm, department: dept, batch: bt, rollNo: rNo}
+				if em != "" {
+					trackerByEmail[strings.ToLower(strings.TrimSpace(em))] = info
+				}
+				if rNo != "" {
+					trackerByRoll[strings.ToUpper(strings.TrimSpace(rNo))] = info
+				}
+			}
+		}
+	}
+
+	// 2. Fetch all registered users from users table
+	uRows, uErr := h.DB.Query(`SELECT COALESCE(google_id, COALESCE(uid, '')), COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(role, 'user'), COALESCE(creation_time, ''), COALESCE(last_seen_at, '') FROM users`)
+	if uErr == nil {
+		defer uRows.Close()
+		for uRows.Next() {
+			var uid, email, dName, photo, role, creationTime, lastSeen string
+			if err := uRows.Scan(&uid, &email, &dName, &photo, &role, &creationTime, &lastSeen); err == nil {
+				cleanEmail := strings.ToLower(strings.TrimSpace(email))
+				key := uid
+				if key == "" {
+					key = cleanEmail
+				}
+				if key == "" {
+					continue
+				}
+
+				dept := ""
+				batch := ""
+				rollNo := ""
+
+				if info, ok := trackerByEmail[cleanEmail]; ok {
+					dept = info.department
+					batch = info.batch
+					rollNo = info.rollNo
+					if dName == "" {
+						dName = info.name
+					}
+				}
+
+				if dept == "" && cleanEmail != "" {
+					decodedDept, decodedBatch := decodeDepartmentAndBatch(cleanEmail)
+					dept = decodedDept
+					if batch == "" {
+						batch = decodedBatch
+					}
+				}
+
+				userMap[key] = &UserAuditSummaryItem{
+					UserUID:      uid,
+					UserName:     dName,
+					DisplayName:  dName,
+					Email:        email,
+					RollNo:       rollNo,
+					Role:         role,
+					PhotoURL:     photo,
+					Department:   dept,
+					Batch:        batch,
+					LastActiveAt: lastSeen,
+				}
+			}
+		}
+	}
+
+	// 3. Fetch aggregated audit log data
+	auditQuery := `
+		SELECT 
+			COALESCE(user_uid, '') AS uid,
+			COALESCE(user_name, '') AS uname,
+			COALESCE(roll_no, '') AS rno,
+			COALESCE(role, 'user') AS rrole,
+			COUNT(*) AS total_reqs,
+			SUM(CASE WHEN status_code >= 400 THEN 1 ELSE 0 END) AS err_count,
+			SUM(CASE WHEN status_code < 400 THEN 1 ELSE 0 END) AS succ_count,
+			DATE_FORMAT(MAX(created_at), '%Y-%m-%dT%H:%i:%sZ') AS last_time,
+			SUBSTRING_INDEX(GROUP_CONCAT(ip_address ORDER BY id DESC SEPARATOR '|||'), '|||', 1) AS last_ip,
+			SUBSTRING_INDEX(GROUP_CONCAT(method ORDER BY id DESC SEPARATOR '|||'), '|||', 1) AS last_method,
+			SUBSTRING_INDEX(GROUP_CONCAT(endpoint ORDER BY id DESC SEPARATOR '|||'), '|||', 1) AS last_endpoint
+		FROM audit_logs
+		WHERE (user_uid != '' OR roll_no != '' OR user_name != '')
+		GROUP BY user_uid, user_name, roll_no, role
+	`
+
+	aRows, aErr := h.DB.Query(auditQuery)
+	var totalAuditRequests int
+	var totalAuditErrors int
+
+	if aErr == nil {
+		defer aRows.Close()
+		for aRows.Next() {
+			var uid, uname, rno, rrole, lastTime, lastIP, lastMethod, lastEndpoint string
+			var totalReqs, errCount, succCount int
+
+			if err := aRows.Scan(&uid, &uname, &rno, &rrole, &totalReqs, &errCount, &succCount, &lastTime, &lastIP, &lastMethod, &lastEndpoint); err == nil {
+				totalAuditRequests += totalReqs
+				totalAuditErrors += errCount
+
+				// Try matching existing user
+				matched := false
+				var targetItem *UserAuditSummaryItem
+
+				if uid != "" {
+					if item, ok := userMap[uid]; ok {
+						targetItem = item
+						matched = true
+					}
+				}
+
+				if !matched && uname != "" {
+					cleanUname := strings.ToLower(strings.TrimSpace(uname))
+					for _, item := range userMap {
+						if strings.ToLower(strings.TrimSpace(item.Email)) == cleanUname || strings.ToLower(strings.TrimSpace(item.DisplayName)) == cleanUname || strings.ToLower(strings.TrimSpace(item.UserUID)) == cleanUname {
+							targetItem = item
+							matched = true
+							break
+						}
+					}
+				}
+
+				if !matched && rno != "" {
+					cleanRno := strings.ToUpper(strings.TrimSpace(rno))
+					for _, item := range userMap {
+						if strings.ToUpper(strings.TrimSpace(item.RollNo)) == cleanRno {
+							targetItem = item
+							matched = true
+							break
+						}
+					}
+				}
+
+				if !matched {
+					// Create new entry from audit log data
+					key := uid
+					if key == "" {
+						key = rno
+					}
+					if key == "" {
+						key = uname
+					}
+
+					dept := ""
+					batch := ""
+					dName := uname
+					email := ""
+
+					if strings.Contains(uname, "@") {
+						email = uname
+						decodedDept, decodedBatch := decodeDepartmentAndBatch(email)
+						dept = decodedDept
+						batch = decodedBatch
+					}
+
+					if info, ok := trackerByRoll[strings.ToUpper(strings.TrimSpace(rno))]; ok {
+						if dept == "" {
+							dept = info.department
+						}
+						if batch == "" {
+							batch = info.batch
+						}
+						if dName == "" || dName == uname {
+							dName = info.name
+						}
+					}
+
+					targetItem = &UserAuditSummaryItem{
+						UserUID:     uid,
+						UserName:    uname,
+						DisplayName: dName,
+						Email:       email,
+						RollNo:      rno,
+						Role:        rrole,
+						Department:  dept,
+						Batch:       batch,
+					}
+					userMap[key] = targetItem
+				}
+
+				// Accumulate activity
+				targetItem.TotalRequests += totalReqs
+				targetItem.ErrorCount += errCount
+				targetItem.SuccessCount += succCount
+
+				if targetItem.LastActiveAt == "" || lastTime > targetItem.LastActiveAt {
+					targetItem.LastActiveAt = lastTime
+				}
+				if targetItem.LastIP == "" {
+					targetItem.LastIP = lastIP
+				}
+				if targetItem.LastMethod == "" {
+					targetItem.LastMethod = lastMethod
+				}
+				if targetItem.LastEndpoint == "" {
+					targetItem.LastEndpoint = lastEndpoint
+				}
+				if targetItem.RollNo == "" && rno != "" {
+					targetItem.RollNo = rno
+				}
+				if targetItem.Role == "" || targetItem.Role == "user" {
+					if rrole != "" && rrole != "user" {
+						targetItem.Role = rrole
+					}
+				}
+			}
+		}
+	}
+
+	// 4. Filter list
+	filtered := make([]*UserAuditSummaryItem, 0, len(userMap))
+	activeCount := 0
+
+	for _, item := range userMap {
+		if item.TotalRequests > 0 {
+			activeCount++
+		}
+
+		// Role filter
+		if roleFilter != "" && roleFilter != "all" {
+			if strings.ToLower(item.Role) != roleFilter {
+				continue
+			}
+		}
+
+		// Activity filter
+		if activityFilter == "active" && item.TotalRequests == 0 {
+			continue
+		}
+		if activityFilter == "errors" && item.ErrorCount == 0 {
+			continue
+		}
+		if activityFilter == "inactive" && item.TotalRequests > 0 {
+			continue
+		}
+
+		// Search filter
+		if search != "" {
+			combined := strings.ToLower(fmt.Sprintf("%s %s %s %s %s %s %s %s",
+				item.DisplayName, item.UserName, item.Email, item.RollNo,
+				item.UserUID, item.Department, item.Role, item.LastIP,
+			))
+			if !strings.Contains(combined, search) {
+				continue
+			}
+		}
+
+		filtered = append(filtered, item)
+	}
+
+	// 5. Sort list
+	switch sortBy {
+	case "requests":
+		sortSliceUsers(filtered, func(a, b *UserAuditSummaryItem) bool {
+			if a.TotalRequests != b.TotalRequests {
+				return a.TotalRequests > b.TotalRequests
+			}
+			return a.LastActiveAt > b.LastActiveAt
+		})
+	case "errors":
+		sortSliceUsers(filtered, func(a, b *UserAuditSummaryItem) bool {
+			if a.ErrorCount != b.ErrorCount {
+				return a.ErrorCount > b.ErrorCount
+			}
+			return a.TotalRequests > b.TotalRequests
+		})
+	case "name":
+		sortSliceUsers(filtered, func(a, b *UserAuditSummaryItem) bool {
+			nameA := a.DisplayName
+			if nameA == "" {
+				nameA = a.UserName
+			}
+			nameB := b.DisplayName
+			if nameB == "" {
+				nameB = b.UserName
+			}
+			return strings.ToLower(nameA) < strings.ToLower(nameB)
+		})
+	default: // "recent"
+		sortSliceUsers(filtered, func(a, b *UserAuditSummaryItem) bool {
+			if a.LastActiveAt != b.LastActiveAt {
+				return a.LastActiveAt > b.LastActiveAt
+			}
+			return a.TotalRequests > b.TotalRequests
+		})
+	}
+
+	// 6. Paginate
+	total := len(filtered)
+	totalPages := (total + limit - 1) / limit
+	if totalPages < 1 {
+		totalPages = 1
+	}
+
+	start := (page - 1) * limit
+	if start > total {
+		start = total
+	}
+	end := start + limit
+	if end > total {
+		end = total
+	}
+
+	paginated := filtered[start:end]
+
+	c.JSON(http.StatusOK, gin.H{
+		"success":            true,
+		"users":              paginated,
+		"total":              total,
+		"totalUsers":         len(userMap),
+		"activeUsersCount":   activeCount,
+		"totalAuditRequests": totalAuditRequests,
+		"totalAuditErrors":   totalAuditErrors,
+		"page":               page,
+		"limit":              limit,
+		"totalPages":         totalPages,
+	})
+}
+
+func sortSliceUsers(items []*UserAuditSummaryItem, less func(a, b *UserAuditSummaryItem) bool) {
+	for i := 0; i < len(items); i++ {
+		for j := i + 1; j < len(items); j++ {
+			if less(items[j], items[i]) {
+				items[i], items[j] = items[j], items[i]
+			}
+		}
+	}
 }
 
 // ClearAuditLogs clears all audit logs from database

@@ -244,6 +244,7 @@ func SetupRouter(
 
 		// Audit Logs Admin API
 		admin.GET("/audit-logs", adminHandler.GetAuditLogs)
+		admin.GET("/audit-logs/users", adminHandler.GetUserAuditLogsSummary)
 		admin.DELETE("/audit-logs", adminHandler.ClearAuditLogs)
 	}
 
