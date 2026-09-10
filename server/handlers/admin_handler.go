@@ -165,7 +165,8 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 
 		cleanEmail := strings.ToLower(strings.TrimSpace(u.Email))
 		if tp, ok := trackerMap[cleanEmail]; ok {
-			if tp.Name != "" && (u.DisplayName == "" || strings.EqualFold(u.DisplayName, "Student") || strings.EqualFold(u.DisplayName, "User")) {
+			if tp.Name != "" {
+				u.Name = tp.Name
 				u.DisplayName = tp.Name
 			}
 			u.RegisterNo = tp.RegisterNo
