@@ -253,6 +253,22 @@ func createUsersTable() {
 		log.Printf("ℹ️ blocked_at column status: %v", err)
 	}
 
+	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN flagged TINYINT(1) NOT NULL DEFAULT 0`); err != nil {
+		log.Printf("ℹ️ flagged column status: %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN flagged_at DATETIME NULL`); err != nil {
+		log.Printf("ℹ️ flagged_at column status: %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN flag_reason VARCHAR(255) NULL`); err != nil {
+		log.Printf("ℹ️ flag_reason column status: %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN flagged_by VARCHAR(255) NULL`); err != nil {
+		log.Printf("ℹ️ flagged_by column status: %v", err)
+	}
+
 	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN phone VARCHAR(64) NULL`); err != nil {
 		log.Printf("ℹ️ phone column status: %v", err)
 	}

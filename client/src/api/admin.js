@@ -621,6 +621,18 @@ export async function getUserAuditSummaries({
   return response.data;
 }
 
+export async function updateUserFlagStatus(uid, { flagged, reason = "" } = {}) {
+  const headers = await getAdminHeaders();
+  const response = await api.put(`/admin/users/${encodeURIComponent(uid)}/flag`, { flagged, reason }, { headers });
+  return response.data;
+}
+
+export async function updateUserBlockStatus(uid, blocked) {
+  const headers = await getAdminHeaders();
+  const response = await api.put(`/admin/users/${encodeURIComponent(uid)}/block`, { blocked }, { headers });
+  return response.data;
+}
+
 export async function clearAuditLogs() {
   const headers = await getAdminHeaders();
   const response = await api.delete("/admin/audit-logs", { headers });

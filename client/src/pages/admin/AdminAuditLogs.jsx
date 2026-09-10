@@ -27,8 +27,21 @@ import {
   Eye,
   TrendingUp,
   Hash,
+  Flag,
+  FlagOff,
+  Ban,
+  ShieldAlert,
+  AlertTriangle,
+  CheckCircle2,
+  Info,
 } from "lucide-react";
-import { getAuditLogs, getUserAuditSummaries, clearAuditLogs } from "@/api/admin.js";
+import {
+  getAuditLogs,
+  getUserAuditSummaries,
+  updateUserFlagStatus,
+  updateUserBlockStatus,
+  clearAuditLogs,
+} from "@/api/admin.js";
 
 function parseISTDate(value) {
   if (!value) return null;
@@ -115,9 +128,9 @@ function getRoleBadgeStyle(role) {
 }
 
 export default function AdminAuditLogs() {
-  const [activeTab, setActiveTab] = useState("user-logs"); // "stream" | "user-logs"
-  
-  // Stream tab state
+  const [activeTab, setActiveTab] = useState("user-logs"); // "user-logs" | "stream"
+
+  // Stream Tab State
   const [logs, setLogs] = useState([]);
   const [loadingLogs, setLoadingLogs] = useState(true);
   const [logError, setLogError] = useState("");
@@ -125,13 +138,12 @@ export default function AdminAuditLogs() {
   const [logLimit, setLogLimit] = useState(50);
   const [logTotal, setLogTotal] = useState(0);
   const [logTotalPages, setLogTotalPages] = useState(1);
-  
   const [logSearch, setLogSearch] = useState("");
   const [logSearchInput, setLogSearchInput] = useState("");
   const [selectedMethod, setSelectedMethod] = useState("ALL");
   const [selectedStatus, setSelectedStatus] = useState("ALL");
 
-  // User tab state
+  // User Tab State
   const [userSummaries, setUserSummaries] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [userError, setUserError] = useState("");
@@ -142,6 +154,8 @@ export default function AdminAuditLogs() {
   const [userStats, setUserStats] = useState({
     totalUsers: 0,
     activeUsersCount: 0,
+    flaggedUsersCount: 0,
+    blockedUsersCount: 0,
     totalAuditRequests: 0,
     totalAuditErrors: 0,
   });
@@ -152,7 +166,7 @@ export default function AdminAuditLogs() {
   const [userActivityFilter, setUserActivityFilter] = useState("all");
   const [userSortBy, setUserSortBy] = useState("recent");
 
-  // Selected User Drill-down State
+  // Selected User Drilldown State
   const [selectedUser, setSelectedUser] = useState(null);
   const [userSpecificLogs, setUserSpecificLogs] = useState([]);
   const [loadingUserLogs, setLoadingUserLogs] = useState(false);
@@ -164,7 +178,7 @@ export default function AdminAuditLogs() {
   const [userLogSearch, setUserLogSearch] = useState("");
   const [userLogSearchInput, setUserLogSearchInput] = useState("");
 
-  // Payload Inspection Modal
+  // Payload Modal
   const [activePayload, setActivePayload] = useState(null);
   const [copied, setCopied] = useState(false);
 
@@ -172,7 +186,24 @@ export default function AdminAuditLogs() {
   const [clearModalOpen, setClearModalOpen] = useState(false);
   const [clearing, setClearing] = useState(false);
 
-  // 1. Fetch Global Logs Stream
+  // Flag User Modal
+  const [flagModalUser, setFlagModalUser] = useState(null);
+  const [flagReasonInput, setFlagReasonInput] = useState("");
+  const [submittingFlag, setSubmittingFlag] = useState(false);
+
+  // Block User Modal
+  const [blockModalUser, setBlockModalUser] = useState(null);
+  const [submittingBlock, setSubmittingBlock] = useState(false);
+
+  // Notification Toast
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const showToast = (msg, type = "success") => {
+    setToastMessage({ msg, type });
+    setTimeout(() => setToastMessage(null), 4000);
+  };
+
+  // 1. Fetch Global Request Stream
   const fetchLogs = useCallback(async () => {
     setLoadingLogs(true);
     setLogError("");
@@ -218,11 +249,13 @@ export default function AdminAuditLogs() {
         setUserStats({
           totalUsers: data.totalUsers || 0,
           activeUsersCount: data.activeUsersCount || 0,
+          flaggedUsersCount: data.flaggedUsersCount || 0,
+          blockedUsersCount: data.blockedUsersCount || 0,
           totalAuditRequests: data.totalAuditRequests || 0,
           totalAuditErrors: data.totalAuditErrors || 0,
         });
       } else {
-        setUserError(data.error || "Failed to load user audit summaries");
+        setUserError(data.error || "Failed to load user summaries");
       }
     } catch (err) {
       setUserError(err?.response?.data?.error || err?.message || "Error fetching user summaries");
@@ -244,7 +277,7 @@ export default function AdminAuditLogs() {
         status: userLogStatus === "ALL" ? "" : userLogStatus,
         user_uid: userObj.user_uid || "",
         roll_no: userObj.roll_no || "",
-        user_name: (!userObj.user_uid && !userObj.roll_no) ? (userObj.user_name || userObj.email) : "",
+        user_name: !userObj.user_uid && !userObj.roll_no ? userObj.user_name || userObj.email : "",
       });
       if (data.success) {
         setUserSpecificLogs(data.logs || []);
@@ -252,7 +285,7 @@ export default function AdminAuditLogs() {
         setUserLogTotalPages(data.totalPages || 1);
       }
     } catch (err) {
-      console.error("Error fetching user audit logs:", err);
+      console.error("Error fetching user logs:", err);
     } finally {
       setLoadingUserLogs(false);
     }
@@ -288,6 +321,118 @@ export default function AdminAuditLogs() {
     setUserLogPage(1);
   };
 
+  // Flag/Unflag User Action
+  const handleToggleFlag = (user, e) => {
+    if (e) e.stopPropagation();
+    if (user.is_flagged) {
+      // If already flagged, confirm removal
+      executeFlagUpdate(user, false, "");
+    } else {
+      setFlagModalUser(user);
+      setFlagReasonInput("Suspicious request patterns / Under monitoring");
+    }
+  };
+
+  const executeFlagUpdate = async (user, flagged, reason) => {
+    const targetUid = user.user_uid || user.email || user.roll_no;
+    if (!targetUid) return;
+    setSubmittingFlag(true);
+    try {
+      const res = await updateUserFlagStatus(targetUid, { flagged, reason });
+      if (res.success) {
+        showToast(
+          flagged
+            ? `🚩 ${user.displayName || user.userName || "User"} is now flagged for monitoring (requests allowed).`
+            : `User unflagged successfully.`
+        );
+
+        // Update local state
+        setUserSummaries((prev) =>
+          prev.map((u) => {
+            if ((u.user_uid && u.user_uid === user.user_uid) || (u.email && u.email === user.email)) {
+              return { ...u, is_flagged: flagged, flag_reason: reason, flagged_at: flagged ? new Date().toISOString() : "" };
+            }
+            return u;
+          })
+        );
+
+        if (selectedUser && ((selectedUser.user_uid && selectedUser.user_uid === user.user_uid) || selectedUser.email === user.email)) {
+          setSelectedUser((prev) => ({
+            ...prev,
+            is_flagged: flagged,
+            flag_reason: reason,
+            flagged_at: flagged ? new Date().toISOString() : "",
+          }));
+        }
+
+        setUserStats((prev) => ({
+          ...prev,
+          flaggedUsersCount: flagged ? prev.flaggedUsersCount + 1 : Math.max(0, prev.flaggedUsersCount - 1),
+        }));
+
+        setFlagModalUser(null);
+      } else {
+        showToast(res.error || "Failed to update flag status", "error");
+      }
+    } catch (err) {
+      showToast(err?.response?.data?.error || err?.message || "Error updating flag status", "error");
+    } finally {
+      setSubmittingFlag(false);
+    }
+  };
+
+  // Block/Unblock User Action
+  const handleToggleBlock = (user, e) => {
+    if (e) e.stopPropagation();
+    setBlockModalUser(user);
+  };
+
+  const executeBlockUpdate = async () => {
+    if (!blockModalUser) return;
+    const targetUid = blockModalUser.user_uid || blockModalUser.email || blockModalUser.roll_no;
+    const newBlockedState = !blockModalUser.is_blocked;
+    setSubmittingBlock(true);
+    try {
+      const res = await updateUserBlockStatus(targetUid, newBlockedState);
+      if (res.success) {
+        showToast(newBlockedState ? `🚫 User has been blocked from accessing the system.` : `User has been unblocked.`);
+
+        setUserSummaries((prev) =>
+          prev.map((u) => {
+            if ((u.user_uid && u.user_uid === blockModalUser.user_uid) || (u.email && u.email === blockModalUser.email)) {
+              return { ...u, is_blocked: newBlockedState, blocked_at: newBlockedState ? new Date().toISOString() : "" };
+            }
+            return u;
+          })
+        );
+
+        if (
+          selectedUser &&
+          ((selectedUser.user_uid && selectedUser.user_uid === blockModalUser.user_uid) || selectedUser.email === blockModalUser.email)
+        ) {
+          setSelectedUser((prev) => ({
+            ...prev,
+            is_blocked: newBlockedState,
+            blocked_at: newBlockedState ? new Date().toISOString() : "",
+          }));
+        }
+
+        setUserStats((prev) => ({
+          ...prev,
+          blockedUsersCount: newBlockedState ? prev.blockedUsersCount + 1 : Math.max(0, prev.blockedUsersCount - 1),
+        }));
+
+        setBlockModalUser(null);
+      } else {
+        showToast(res.error || "Failed to update block status", "error");
+      }
+    } catch (err) {
+      showToast(err?.response?.data?.error || err?.message || "Error updating block status", "error");
+    } finally {
+      setSubmittingBlock(false);
+    }
+  };
+
   const handleClearLogs = async () => {
     setClearing(true);
     try {
@@ -298,6 +443,7 @@ export default function AdminAuditLogs() {
         setLogTotalPages(1);
         setClearModalOpen(false);
         fetchUserSummaries();
+        showToast("All audit logs truncated successfully.");
       } else {
         setLogError(res.error || "Failed to clear audit logs");
       }
@@ -343,6 +489,18 @@ export default function AdminAuditLogs() {
 
   return (
     <div className="space-y-6">
+      {/* Toast notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl dark:border-slate-800 dark:bg-slate-900 animate-slideUp">
+          {toastMessage.type === "error" ? (
+            <AlertCircle className="h-5 w-5 text-rose-500" />
+          ) : (
+            <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+          )}
+          <span className="text-sm font-semibold text-slate-900 dark:text-white">{toastMessage.msg}</span>
+        </div>
+      )}
+
       {/* Top Banner & Tab Navigation */}
       <div className="rounded-2xl border border-purple-200/60 bg-gradient-to-r from-purple-900/10 via-indigo-900/5 to-slate-900/5 p-6 shadow-sm dark:border-purple-900/30 dark:from-purple-950/40 dark:via-indigo-950/20 dark:to-slate-950">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -352,13 +510,13 @@ export default function AdminAuditLogs() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                Audit Logs & Request Tracking
+                Audit Logs & Monitoring Surveillance
                 <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-semibold text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">
                   Live System
                 </span>
               </h2>
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                Track real-time HTTP requests, inspect individual student/admin audit cards, and review security activities.
+                Flag suspicious users for monitoring without blocking requests, inspect their request stream, and block if illegal.
               </p>
             </div>
           </div>
@@ -402,10 +560,10 @@ export default function AdminAuditLogs() {
             }`}
           >
             <Users className="h-4 w-4" />
-            <span>User Audit Logs</span>
-            {userStats.activeUsersCount > 0 && (
-              <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${activeTab === "user-logs" ? "bg-white/20 text-white" : "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300"}`}>
-                {userStats.activeUsersCount} Active
+            <span>User Audit Logs & Monitoring</span>
+            {userStats.flaggedUsersCount > 0 && (
+              <span className="flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white shadow-sm">
+                <Flag className="h-3 w-3 fill-current" /> {userStats.flaggedUsersCount} Flagged
               </span>
             )}
           </button>
@@ -439,7 +597,7 @@ export default function AdminAuditLogs() {
           {selectedUser ? (
             /* USER DRILLDOWN VIEW */
             <div className="space-y-6 animate-fadeIn">
-              {/* Breadcrumb & Return Bar */}
+              {/* Breadcrumb & Navigation */}
               <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                 <button
                   type="button"
@@ -450,27 +608,71 @@ export default function AdminAuditLogs() {
                   Back to All User Cards
                 </button>
 
-                <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
-                  <span>User Audit Inspector</span>
-                  <span>•</span>
-                  <span className="font-semibold text-purple-600 dark:text-purple-400">
-                    {selectedUser.displayName || selectedUser.userName || selectedUser.email}
-                  </span>
+                <div className="flex items-center gap-3">
+                  {/* Flag / Unflag Quick Toggle in Header */}
+                  <button
+                    type="button"
+                    onClick={(e) => handleToggleFlag(selectedUser, e)}
+                    className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition ${
+                      selectedUser.is_flagged
+                        ? "bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 dark:bg-amber-950/60 dark:text-amber-200 dark:border-amber-700"
+                        : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-200"
+                    }`}
+                  >
+                    {selectedUser.is_flagged ? <FlagOff className="h-4 w-4" /> : <Flag className="h-4 w-4 text-amber-500" />}
+                    {selectedUser.is_flagged ? "Remove Flag" : "Flag for Monitoring"}
+                  </button>
+
+                  {/* Block / Unblock Quick Toggle */}
+                  <button
+                    type="button"
+                    onClick={(e) => handleToggleBlock(selectedUser, e)}
+                    className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition ${
+                      selectedUser.is_blocked
+                        ? "bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-200 dark:border-emerald-700"
+                        : "bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-900"
+                    }`}
+                  >
+                    <Ban className="h-4 w-4" />
+                    {selectedUser.is_blocked ? "Unblock User" : "Block User"}
+                  </button>
                 </div>
               </div>
 
               {/* Selected User Profile Summary Banner */}
-              <div className="rounded-2xl border border-purple-200/80 bg-white p-6 shadow-sm dark:border-purple-900/40 dark:bg-slate-900">
+              <div
+                className={`rounded-2xl border p-6 shadow-sm dark:bg-slate-900 ${
+                  selectedUser.is_flagged
+                    ? "border-amber-300 bg-amber-50/40 dark:border-amber-700/60 dark:bg-amber-950/20"
+                    : selectedUser.is_blocked
+                    ? "border-rose-300 bg-rose-50/40 dark:border-rose-800/60 dark:bg-rose-950/20"
+                    : "border-purple-200/80 bg-white dark:border-purple-900/40"
+                }`}
+              >
                 <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                   <div className="flex items-start gap-4">
                     {selectedUser.photoURL ? (
                       <img
                         src={selectedUser.photoURL}
                         alt=""
-                        className="h-16 w-16 rounded-2xl border-2 border-purple-300 object-cover shadow-md dark:border-purple-700"
+                        className={`h-16 w-16 rounded-2xl border-2 object-cover shadow-md ${
+                          selectedUser.is_flagged
+                            ? "border-amber-400"
+                            : selectedUser.is_blocked
+                            ? "border-rose-400"
+                            : "border-purple-300 dark:border-purple-700"
+                        }`}
                       />
                     ) : (
-                      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 text-xl font-bold text-white shadow-md">
+                      <div
+                        className={`flex h-16 w-16 items-center justify-center rounded-2xl text-xl font-bold text-white shadow-md ${
+                          selectedUser.is_flagged
+                            ? "bg-gradient-to-br from-amber-500 to-orange-600"
+                            : selectedUser.is_blocked
+                            ? "bg-gradient-to-br from-rose-600 to-red-700"
+                            : "bg-gradient-to-br from-purple-600 to-indigo-700"
+                        }`}
+                      >
                         {(selectedUser.displayName || selectedUser.userName || selectedUser.email || "U").slice(0, 2).toUpperCase()}
                       </div>
                     )}
@@ -482,7 +684,18 @@ export default function AdminAuditLogs() {
                         <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider ${getRoleBadgeStyle(selectedUser.role)}`}>
                           {selectedUser.role || "user"}
                         </span>
+                        {selectedUser.is_flagged && (
+                          <span className="flex items-center gap-1 rounded-full border border-amber-300 bg-amber-500 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
+                            <Flag className="h-3 w-3 fill-current" /> Flagged for Monitoring
+                          </span>
+                        )}
+                        {selectedUser.is_blocked && (
+                          <span className="flex items-center gap-1 rounded-full border border-rose-300 bg-rose-600 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
+                            <Ban className="h-3 w-3" /> Account Blocked
+                          </span>
+                        )}
                       </div>
+
                       <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
                         {selectedUser.email && <span>{selectedUser.email}</span>}
                         {selectedUser.rollNo && (
@@ -494,6 +707,20 @@ export default function AdminAuditLogs() {
                           <span className="text-xs text-slate-400 font-mono">UID: {selectedUser.userUID}</span>
                         )}
                       </p>
+
+                      {/* Monitoring Notice Banner */}
+                      {selectedUser.is_flagged && (
+                        <div className="mt-2.5 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-100/70 p-2.5 text-xs text-amber-900 dark:border-amber-800/60 dark:bg-amber-950/50 dark:text-amber-200">
+                          <Info className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+                          <div>
+                            <span className="font-bold">Active Monitoring Note:</span> {selectedUser.flag_reason || "Flagged for monitoring suspicious actions."}{" "}
+                            <span className="text-amber-700 dark:text-amber-300 italic">
+                              (User requests are NOT blocked so you can observe their activities).
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
                       {(selectedUser.department || selectedUser.batch) && (
                         <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
                           {selectedUser.department && (
@@ -515,23 +742,27 @@ export default function AdminAuditLogs() {
 
                   {/* Quick User Stats */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 dark:border-slate-800 dark:bg-slate-950">
+                    <div className="rounded-xl border border-slate-100 bg-white/80 p-3 dark:border-slate-800 dark:bg-slate-950">
                       <span className="text-xs font-medium text-slate-500">Total Requests</span>
                       <p className="mt-1 text-lg font-bold text-slate-900 dark:text-white">{userLogTotal}</p>
                     </div>
-                    <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 dark:border-slate-800 dark:bg-slate-950">
+                    <div className="rounded-xl border border-slate-100 bg-white/80 p-3 dark:border-slate-800 dark:bg-slate-950">
                       <span className="text-xs font-medium text-slate-500">Errors Logged</span>
-                      <p className={`mt-1 text-lg font-bold ${selectedUser.errorCount > 0 ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400"}`}>
+                      <p
+                        className={`mt-1 text-lg font-bold ${
+                          selectedUser.errorCount > 0 ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400"
+                        }`}
+                      >
                         {selectedUser.errorCount || 0}
                       </p>
                     </div>
-                    <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 dark:border-slate-800 dark:bg-slate-950">
+                    <div className="rounded-xl border border-slate-100 bg-white/80 p-3 dark:border-slate-800 dark:bg-slate-950">
                       <span className="text-xs font-medium text-slate-500">Last Active</span>
                       <p className="mt-1 text-xs font-semibold text-slate-800 dark:text-slate-200">
                         {formatShortTime(selectedUser.lastActiveAt)}
                       </p>
                     </div>
-                    <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 dark:border-slate-800 dark:bg-slate-950">
+                    <div className="rounded-xl border border-slate-100 bg-white/80 p-3 dark:border-slate-800 dark:bg-slate-950">
                       <span className="text-xs font-medium text-slate-500">Last IP</span>
                       <p className="mt-1 text-xs font-mono font-medium text-slate-700 dark:text-slate-300 truncate max-w-[100px]">
                         {selectedUser.lastIP || "-"}
@@ -588,9 +819,7 @@ export default function AdminAuditLogs() {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-semibold text-slate-500 flex items-center gap-1 mr-1">
-                      Status:
-                    </span>
+                    <span className="text-xs font-semibold text-slate-500 flex items-center gap-1 mr-1">Status:</span>
                     {[
                       { label: "All Status", val: "ALL" },
                       { label: "2xx Success", val: "success" },
@@ -654,14 +883,16 @@ export default function AdminAuditLogs() {
                       ) : (
                         userSpecificLogs.map((log) => (
                           <tr key={log.id} className="transition hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
-                            <td className="px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">
-                              #{log.id}
-                            </td>
+                            <td className="px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">#{log.id}</td>
                             <td className="px-4 py-3 whitespace-nowrap text-xs text-slate-600 dark:text-slate-300">
                               {formatLogTime(log.created_at)}
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap">
-                              <span className={`inline-flex items-center rounded-md border px-2 py-0.5 font-mono text-xs font-bold ${getMethodBadgeStyle(log.method)}`}>
+                              <span
+                                className={`inline-flex items-center rounded-md border px-2 py-0.5 font-mono text-xs font-bold ${getMethodBadgeStyle(
+                                  log.method
+                                )}`}
+                              >
                                 {log.method}
                               </span>
                             </td>
@@ -678,7 +909,11 @@ export default function AdminAuditLogs() {
                               </div>
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap">
-                              <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold ${getStatusBadgeStyle(log.status_code)}`}>
+                              <span
+                                className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold ${getStatusBadgeStyle(
+                                  log.status_code
+                                )}`}
+                              >
                                 {log.status_code}
                               </span>
                             </td>
@@ -751,9 +986,32 @@ export default function AdminAuditLogs() {
                   <p className="text-[11px] text-slate-500 mt-1">Users registered in BitCentral</p>
                 </div>
 
+                <div
+                  onClick={() => {
+                    setUserActivityFilter(userActivityFilter === "flagged" ? "all" : "flagged");
+                    setUserPage(1);
+                  }}
+                  className={`rounded-2xl border p-4 shadow-sm transition cursor-pointer ${
+                    userActivityFilter === "flagged"
+                      ? "border-amber-400 bg-amber-50 dark:border-amber-600 dark:bg-amber-950/40"
+                      : "border-slate-200 bg-white hover:border-amber-300 dark:border-slate-800 dark:bg-slate-900"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-amber-700 dark:text-amber-300 flex items-center gap-1">
+                      <Flag className="h-3.5 w-3.5 text-amber-500 fill-current" /> Flagged for Monitoring
+                    </span>
+                    <div className="rounded-lg bg-amber-100 p-2 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300">
+                      <ShieldAlert className="h-4 w-4" />
+                    </div>
+                  </div>
+                  <p className="mt-2 text-2xl font-bold text-amber-700 dark:text-amber-300">{userStats.flaggedUsersCount.toLocaleString()}</p>
+                  <p className="text-[11px] text-amber-600/80 dark:text-amber-400/80 mt-1">Under watch (requests allowed)</p>
+                </div>
+
                 <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Active Audit Users</span>
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Active Request Users</span>
                     <div className="rounded-lg bg-emerald-50 p-2 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
                       <Activity className="h-4 w-4" />
                     </div>
@@ -764,24 +1022,13 @@ export default function AdminAuditLogs() {
 
                 <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Total User Requests</span>
-                    <div className="rounded-lg bg-blue-50 p-2 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">
-                      <TrendingUp className="h-4 w-4" />
-                    </div>
-                  </div>
-                  <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">{userStats.totalAuditRequests.toLocaleString()}</p>
-                  <p className="text-[11px] text-slate-500 mt-1">Cumulative HTTP requests</p>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">User Error Actions</span>
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Blocked Users</span>
                     <div className="rounded-lg bg-rose-50 p-2 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400">
-                      <AlertCircle className="h-4 w-4" />
+                      <Ban className="h-4 w-4" />
                     </div>
                   </div>
-                  <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">{userStats.totalAuditErrors.toLocaleString()}</p>
-                  <p className="text-[11px] text-rose-500 mt-1">4xx & 5xx HTTP responses</p>
+                  <p className="mt-2 text-2xl font-bold text-rose-600 dark:text-rose-400">{userStats.blockedUsersCount.toLocaleString()}</p>
+                  <p className="text-[11px] text-rose-500 mt-1">Access restricted by admin</p>
                 </div>
               </div>
 
@@ -792,7 +1039,7 @@ export default function AdminAuditLogs() {
                     <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                     <input
                       type="text"
-                      placeholder="Search users by name, email, roll number, department, UID, or IP..."
+                      placeholder="Search users by name, email, roll number, department, UID, flag reason, or IP..."
                       value={userSearchInput}
                       onChange={(e) => setUserSearchInput(e.target.value)}
                       className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-10 pr-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-purple-500 focus:bg-white focus:ring-2 focus:ring-purple-500/20 dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-purple-400"
@@ -809,6 +1056,26 @@ export default function AdminAuditLogs() {
 
                 <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
                   <div className="flex flex-wrap items-center gap-3">
+                    {/* Activity / Flag Filter */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-semibold text-slate-500">Filter:</span>
+                      <select
+                        value={userActivityFilter}
+                        onChange={(e) => {
+                          setUserActivityFilter(e.target.value);
+                          setUserPage(1);
+                        }}
+                        className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300"
+                      >
+                        <option value="all">All Users</option>
+                        <option value="flagged">🚩 Flagged for Monitoring</option>
+                        <option value="blocked">🚫 Blocked Users</option>
+                        <option value="active">Active with Logs</option>
+                        <option value="errors">With Error Logs</option>
+                        <option value="inactive">No Logs Yet</option>
+                      </select>
+                    </div>
+
                     {/* Role Filter */}
                     <div className="flex items-center gap-1.5">
                       <span className="text-xs font-semibold text-slate-500">Role:</span>
@@ -826,24 +1093,6 @@ export default function AdminAuditLogs() {
                         <option value="superadmin">Super Admins</option>
                       </select>
                     </div>
-
-                    {/* Activity Filter */}
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-semibold text-slate-500">Activity:</span>
-                      <select
-                        value={userActivityFilter}
-                        onChange={(e) => {
-                          setUserActivityFilter(e.target.value);
-                          setUserPage(1);
-                        }}
-                        className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300"
-                      >
-                        <option value="all">All Users</option>
-                        <option value="active">Active with Logs</option>
-                        <option value="errors">With Error Logs</option>
-                        <option value="inactive">No Logs Yet</option>
-                      </select>
-                    </div>
                   </div>
 
                   {/* Sort By */}
@@ -858,6 +1107,7 @@ export default function AdminAuditLogs() {
                       className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300"
                     >
                       <option value="recent">Most Recent Active</option>
+                      <option value="flagged">🚩 Flagged Users First</option>
                       <option value="requests">Highest Total Requests</option>
                       <option value="errors">Highest Error Count</option>
                       <option value="name">Alphabetical (Name)</option>
@@ -877,7 +1127,7 @@ export default function AdminAuditLogs() {
                   <Users className="h-10 w-10 text-slate-400 mb-3" />
                   <h3 className="text-base font-bold text-slate-900 dark:text-white">No users found</h3>
                   <p className="text-xs text-slate-500 mt-1 max-w-sm">
-                    No users matching "{userSearch || userRoleFilter}" were found. Try adjusting your search query or filters.
+                    No users matching "{userSearch || userActivityFilter}" were found. Try adjusting your search query or filters.
                   </p>
                 </div>
               ) : (
@@ -888,20 +1138,36 @@ export default function AdminAuditLogs() {
                       <div
                         key={user.user_uid || user.email || user.roll_no || user.user_name}
                         onClick={() => handleSelectUser(user)}
-                        className="group relative flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-purple-600 cursor-pointer"
+                        className={`group relative flex flex-col justify-between rounded-2xl border p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg cursor-pointer ${
+                          user.is_flagged
+                            ? "border-amber-300 bg-amber-50/30 hover:border-amber-500 hover:shadow-amber-500/10 dark:border-amber-700/60 dark:bg-amber-950/20"
+                            : user.is_blocked
+                            ? "border-rose-300 bg-rose-50/30 hover:border-rose-500 hover:shadow-rose-500/10 dark:border-rose-800/60 dark:bg-rose-950/20"
+                            : "border-slate-200 bg-white hover:border-purple-400 hover:shadow-purple-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-purple-600"
+                        }`}
                       >
                         <div>
-                          {/* Top Card Header */}
+                          {/* Card Header & Status Badges */}
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex items-center gap-3">
                               {user.photo_url ? (
                                 <img
                                   src={user.photo_url}
                                   alt=""
-                                  className="h-12 w-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shadow-sm"
+                                  className={`h-12 w-12 rounded-xl object-cover border shadow-sm ${
+                                    user.is_flagged ? "border-amber-400" : user.is_blocked ? "border-rose-400" : "border-slate-200 dark:border-slate-700"
+                                  }`}
                                 />
                               ) : (
-                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 text-sm font-bold text-white shadow-sm">
+                                <div
+                                  className={`flex h-12 w-12 items-center justify-center rounded-xl text-sm font-bold text-white shadow-sm ${
+                                    user.is_flagged
+                                      ? "bg-gradient-to-br from-amber-500 to-orange-600"
+                                      : user.is_blocked
+                                      ? "bg-gradient-to-br from-rose-600 to-red-700"
+                                      : "bg-gradient-to-br from-purple-500 to-indigo-600"
+                                  }`}
+                                >
                                   {(user.display_name || user.user_name || user.email || "U").slice(0, 2).toUpperCase()}
                                 </div>
                               )}
@@ -909,15 +1175,29 @@ export default function AdminAuditLogs() {
                                 <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate group-hover:text-purple-600 dark:group-hover:text-purple-400 transition">
                                   {user.display_name || user.user_name || "Unnamed User"}
                                 </h4>
-                                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                                  {user.email || user.user_uid || "No email"}
-                                </p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email || user.user_uid || "No email"}</p>
                               </div>
                             </div>
 
-                            <span className={`shrink-0 rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${getRoleBadgeStyle(user.role)}`}>
-                              {user.role || "user"}
-                            </span>
+                            <div className="flex flex-col items-end gap-1">
+                              <span
+                                className={`shrink-0 rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${getRoleBadgeStyle(
+                                  user.role
+                                )}`}
+                              >
+                                {user.role || "user"}
+                              </span>
+                              {user.is_flagged && (
+                                <span className="flex items-center gap-0.5 rounded-md bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                                  <Flag className="h-2.5 w-2.5 fill-current" /> Flagged
+                                </span>
+                              )}
+                              {user.is_blocked && (
+                                <span className="flex items-center gap-0.5 rounded-md bg-rose-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                                  <Ban className="h-2.5 w-2.5" /> Blocked
+                                </span>
+                              )}
+                            </div>
                           </div>
 
                           {/* Roll No & Department Pills */}
@@ -928,7 +1208,10 @@ export default function AdminAuditLogs() {
                               </span>
                             )}
                             {user.department && (
-                              <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300 truncate max-w-[180px]" title={user.department}>
+                              <span
+                                className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300 truncate max-w-[180px]"
+                                title={user.department}
+                              >
                                 <Building2 className="h-3 w-3 text-slate-400 shrink-0" /> {user.department}
                               </span>
                             )}
@@ -938,6 +1221,13 @@ export default function AdminAuditLogs() {
                               </span>
                             )}
                           </div>
+
+                          {/* Flag Reason Snippet if Flagged */}
+                          {user.is_flagged && user.flag_reason && (
+                            <div className="mt-2.5 rounded-lg border border-amber-200 bg-amber-50 p-2 text-[11px] text-amber-900 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-200">
+                              <span className="font-semibold">🚩 Note:</span> {user.flag_reason}
+                            </div>
+                          )}
 
                           {/* Stats Row */}
                           <div className="mt-4 grid grid-cols-2 gap-2 border-t border-slate-100 pt-3 dark:border-slate-800">
@@ -955,7 +1245,11 @@ export default function AdminAuditLogs() {
                               <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">Error Rate</span>
                               <div className="flex items-center gap-1.5 mt-0.5">
                                 <AlertCircle className={`h-3.5 w-3.5 ${user.error_count > 0 ? "text-rose-500" : "text-emerald-500"}`} />
-                                <span className={`text-sm font-bold ${user.error_count > 0 ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400"}`}>
+                                <span
+                                  className={`text-sm font-bold ${
+                                    user.error_count > 0 ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400"
+                                  }`}
+                                >
                                   {user.error_count} {user.error_count === 1 ? "Error" : "Errors"}
                                 </span>
                               </div>
@@ -975,7 +1269,7 @@ export default function AdminAuditLogs() {
                               </div>
                               {user.last_endpoint && (
                                 <div className="flex items-center justify-between font-mono text-[10px]">
-                                  <span className="text-slate-400">Last Endpoint:</span>
+                                  <span className="text-slate-400">Endpoint:</span>
                                   <span className="truncate max-w-[150px] font-semibold text-slate-700 dark:text-slate-300">
                                     {user.last_method} {user.last_endpoint}
                                   </span>
@@ -985,8 +1279,8 @@ export default function AdminAuditLogs() {
                           )}
                         </div>
 
-                        {/* Card Footer Button */}
-                        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                        {/* Card Actions Footer */}
+                        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
                           <button
                             type="button"
                             className="w-full flex items-center justify-center gap-1.5 rounded-xl bg-purple-50 py-2 text-xs font-bold text-purple-700 transition group-hover:bg-purple-600 group-hover:text-white dark:bg-purple-950/40 dark:text-purple-300 dark:group-hover:bg-purple-600 dark:group-hover:text-white shadow-sm"
@@ -994,6 +1288,34 @@ export default function AdminAuditLogs() {
                             <Eye className="h-3.5 w-3.5" />
                             View Audit Logs ({user.total_requests})
                           </button>
+
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={(e) => handleToggleFlag(user, e)}
+                              className={`flex-1 flex items-center justify-center gap-1 rounded-lg py-1.5 text-[11px] font-semibold transition ${
+                                user.is_flagged
+                                  ? "bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-950/60 dark:text-amber-200"
+                                  : "border border-slate-200 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300"
+                              }`}
+                            >
+                              <Flag className={`h-3 w-3 ${user.is_flagged ? "text-amber-700 fill-current" : "text-amber-500"}`} />
+                              {user.is_flagged ? "Unflag" : "Flag"}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={(e) => handleToggleBlock(user, e)}
+                              className={`flex-1 flex items-center justify-center gap-1 rounded-lg py-1.5 text-[11px] font-semibold transition ${
+                                user.is_blocked
+                                  ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-200"
+                                  : "border border-rose-200 text-rose-600 hover:bg-rose-50 dark:border-rose-900/60 dark:text-rose-400"
+                              }`}
+                            >
+                              <Ban className="h-3 w-3" />
+                              {user.is_blocked ? "Unblock" : "Block"}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );
@@ -1193,14 +1515,16 @@ export default function AdminAuditLogs() {
                   ) : (
                     logs.map((log) => (
                       <tr key={log.id} className="transition hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
-                        <td className="px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">
-                          #{log.id}
-                        </td>
+                        <td className="px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">#{log.id}</td>
                         <td className="px-4 py-3 whitespace-nowrap text-xs text-slate-600 dark:text-slate-300">
                           {formatLogTime(log.created_at)}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
-                          <span className={`inline-flex items-center rounded-md border px-2 py-0.5 font-mono text-xs font-bold ${getMethodBadgeStyle(log.method)}`}>
+                          <span
+                            className={`inline-flex items-center rounded-md border px-2 py-0.5 font-mono text-xs font-bold ${getMethodBadgeStyle(
+                              log.method
+                            )}`}
+                          >
                             {log.method}
                           </span>
                         </td>
@@ -1226,11 +1550,7 @@ export default function AdminAuditLogs() {
                                 </span>
                                 <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                                   {log.roll_no && <span className="text-purple-600 dark:text-purple-400 font-bold">{log.roll_no}</span>}
-                                  {log.role && (
-                                    <span className="rounded bg-slate-100 px-1 dark:bg-slate-800">
-                                      {log.role}
-                                    </span>
-                                  )}
+                                  {log.role && <span className="rounded bg-slate-100 px-1 dark:bg-slate-800">{log.role}</span>}
                                 </div>
                               </div>
                             </div>
@@ -1239,7 +1559,11 @@ export default function AdminAuditLogs() {
                           )}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
-                          <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold ${getStatusBadgeStyle(log.status_code)}`}>
+                          <span
+                            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold ${getStatusBadgeStyle(
+                              log.status_code
+                            )}`}
+                          >
                             {log.status_code}
                           </span>
                         </td>
@@ -1298,6 +1622,131 @@ export default function AdminAuditLogs() {
         </div>
       )}
 
+      {/* Flag User Modal */}
+      {flagModalUser && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 px-4 py-6 backdrop-blur-sm"
+          onClick={() => setFlagModalUser(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-950"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 text-amber-600">
+              <div className="rounded-xl bg-amber-100 p-2.5 dark:bg-amber-950/60">
+                <Flag className="h-6 w-6 fill-current" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  Flag User for Monitoring
+                </h3>
+                <p className="text-xs text-slate-500">
+                  {flagModalUser.displayName || flagModalUser.userName || flagModalUser.email}
+                </p>
+              </div>
+            </div>
+
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+              Flagging this user will mark them for <strong>active surveillance</strong> in the admin audit dashboard.{" "}
+              <span className="font-semibold text-purple-600 dark:text-purple-400">
+                Their requests will NOT be blocked
+              </span>
+              , allowing you to monitor their attempted actions and payloads.
+            </p>
+
+            <div className="mt-4">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Reason / Monitoring Note:
+              </label>
+              <textarea
+                value={flagReasonInput}
+                onChange={(e) => setFlagReasonInput(e.target.value)}
+                placeholder="e.g. Trying to query other users' profiles, high error rate, under review..."
+                rows={3}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 outline-none transition focus:border-amber-500 focus:bg-white dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:focus:border-amber-400"
+              />
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setFlagModalUser(null)}
+                disabled={submittingFlag}
+                className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-900"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => executeFlagUpdate(flagModalUser, true, flagReasonInput)}
+                disabled={submittingFlag}
+                className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-2 text-sm font-semibold text-white shadow-md shadow-amber-600/20 transition hover:bg-amber-700 disabled:opacity-50"
+              >
+                {submittingFlag ? <Loader className="h-4 w-4 animate-spin" /> : <Flag className="h-4 w-4 fill-current" />}
+                Confirm Flag
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Block User Modal */}
+      {blockModalUser && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 px-4 py-6 backdrop-blur-sm"
+          onClick={() => setBlockModalUser(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-950"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 text-rose-600">
+              <div className="rounded-xl bg-rose-100 p-2.5 dark:bg-rose-950/60">
+                <Ban className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  {blockModalUser.is_blocked ? "Unblock User Access?" : "Block User Account?"}
+                </h3>
+                <p className="text-xs text-slate-500">
+                  {blockModalUser.displayName || blockModalUser.userName || blockModalUser.email}
+                </p>
+              </div>
+            </div>
+
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+              {blockModalUser.is_blocked
+                ? "This user is currently blocked from accessing BitCentral API. Unblocking will restore their account access."
+                : "Blocking this user will immediately reject their access and prevent them from using BitCentral services. Use this if you have identified illegal or abusive activity."}
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setBlockModalUser(null)}
+                disabled={submittingBlock}
+                className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-900"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={executeBlockUpdate}
+                disabled={submittingBlock}
+                className={`inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white shadow-md transition disabled:opacity-50 ${
+                  blockModalUser.is_blocked
+                    ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20"
+                    : "bg-rose-600 hover:bg-rose-700 shadow-rose-600/20"
+                }`}
+              >
+                {submittingBlock ? <Loader className="h-4 w-4 animate-spin" /> : <Ban className="h-4 w-4" />}
+                {blockModalUser.is_blocked ? "Yes, Unblock User" : "Yes, Block User"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Payload Inspection Modal */}
       {activePayload !== null && (
         <div
@@ -1311,9 +1760,7 @@ export default function AdminAuditLogs() {
             <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <Code2 className="h-5 w-5 text-purple-600" />
-                <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                  Request Payload Inspection
-                </h3>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">Request Payload Inspection</h3>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -1335,9 +1782,7 @@ export default function AdminAuditLogs() {
             </div>
 
             <div className="p-5 max-h-[60vh] overflow-y-auto bg-slate-950 font-mono text-xs text-emerald-400">
-              <pre className="whitespace-pre-wrap break-all leading-relaxed">
-                {formattedPayload}
-              </pre>
+              <pre className="whitespace-pre-wrap break-all leading-relaxed">{formattedPayload}</pre>
             </div>
 
             <div className="flex justify-end border-t border-slate-200 px-5 py-3 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">

@@ -323,6 +323,11 @@ type UserAuditSummaryItem struct {
 	PhotoURL       string `json:"photo_url"`
 	Department     string `json:"department"`
 	Batch          string `json:"batch"`
+	IsBlocked      bool   `json:"is_blocked"`
+	BlockedAt      string `json:"blocked_at"`
+	IsFlagged      bool   `json:"is_flagged"`
+	FlaggedAt      string `json:"flagged_at"`
+	FlagReason     string `json:"flag_reason"`
 	TotalRequests  int    `json:"total_requests"`
 	ErrorCount     int    `json:"error_count"`
 	SuccessCount   int    `json:"success_count"`
@@ -382,12 +387,28 @@ func (h *AdminHandler) GetUserAuditLogsSummary(c *gin.Context) {
 	}
 
 	// 2. Fetch all registered users from users table
-	uRows, uErr := h.DB.Query(`SELECT COALESCE(google_id, COALESCE(uid, '')), COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(role, 'user'), COALESCE(creation_time, ''), COALESCE(last_seen_at, '') FROM users`)
+	uRows, uErr := h.DB.Query(`
+		SELECT 
+			COALESCE(google_id, COALESCE(uid, '')), 
+			COALESCE(email, ''), 
+			COALESCE(display_name, ''), 
+			COALESCE(photo_url, ''), 
+			COALESCE(role, 'user'), 
+			COALESCE(creation_time, ''), 
+			COALESCE(last_seen_at, ''),
+			COALESCE(blocked, 0),
+			COALESCE(DATE_FORMAT(blocked_at, '%Y-%m-%dT%H:%i:%sZ'), ''),
+			COALESCE(flagged, 0),
+			COALESCE(DATE_FORMAT(flagged_at, '%Y-%m-%dT%H:%i:%sZ'), ''),
+			COALESCE(flag_reason, '')
+		FROM users
+	`)
 	if uErr == nil {
 		defer uRows.Close()
 		for uRows.Next() {
-			var uid, email, dName, photo, role, creationTime, lastSeen string
-			if err := uRows.Scan(&uid, &email, &dName, &photo, &role, &creationTime, &lastSeen); err == nil {
+			var uid, email, dName, photo, role, creationTime, lastSeen, bAt, fAt, fReason string
+			var blocked, flagged int
+			if err := uRows.Scan(&uid, &email, &dName, &photo, &role, &creationTime, &lastSeen, &blocked, &bAt, &flagged, &fAt, &fReason); err == nil {
 				cleanEmail := strings.ToLower(strings.TrimSpace(email))
 				key := uid
 				if key == "" {
@@ -428,6 +449,11 @@ func (h *AdminHandler) GetUserAuditLogsSummary(c *gin.Context) {
 					PhotoURL:     photo,
 					Department:   dept,
 					Batch:        batch,
+					IsBlocked:    blocked == 1,
+					BlockedAt:    bAt,
+					IsFlagged:    flagged == 1,
+					FlaggedAt:    fAt,
+					FlagReason:   fReason,
 					LastActiveAt: lastSeen,
 				}
 			}
@@ -579,10 +605,18 @@ func (h *AdminHandler) GetUserAuditLogsSummary(c *gin.Context) {
 	// 4. Filter list
 	filtered := make([]*UserAuditSummaryItem, 0, len(userMap))
 	activeCount := 0
+	flaggedCount := 0
+	blockedCount := 0
 
 	for _, item := range userMap {
 		if item.TotalRequests > 0 {
 			activeCount++
+		}
+		if item.IsFlagged {
+			flaggedCount++
+		}
+		if item.IsBlocked {
+			blockedCount++
 		}
 
 		// Role filter
@@ -592,7 +626,13 @@ func (h *AdminHandler) GetUserAuditLogsSummary(c *gin.Context) {
 			}
 		}
 
-		// Activity filter
+		// Activity & Security filter
+		if activityFilter == "flagged" && !item.IsFlagged {
+			continue
+		}
+		if activityFilter == "blocked" && !item.IsBlocked {
+			continue
+		}
 		if activityFilter == "active" && item.TotalRequests == 0 {
 			continue
 		}
@@ -605,9 +645,9 @@ func (h *AdminHandler) GetUserAuditLogsSummary(c *gin.Context) {
 
 		// Search filter
 		if search != "" {
-			combined := strings.ToLower(fmt.Sprintf("%s %s %s %s %s %s %s %s",
+			combined := strings.ToLower(fmt.Sprintf("%s %s %s %s %s %s %s %s %s",
 				item.DisplayName, item.UserName, item.Email, item.RollNo,
-				item.UserUID, item.Department, item.Role, item.LastIP,
+				item.UserUID, item.Department, item.Role, item.LastIP, item.FlagReason,
 			))
 			if !strings.Contains(combined, search) {
 				continue
@@ -619,6 +659,13 @@ func (h *AdminHandler) GetUserAuditLogsSummary(c *gin.Context) {
 
 	// 5. Sort list
 	switch sortBy {
+	case "flagged":
+		sortSliceUsers(filtered, func(a, b *UserAuditSummaryItem) bool {
+			if a.IsFlagged != b.IsFlagged {
+				return a.IsFlagged && !b.IsFlagged
+			}
+			return a.LastActiveAt > b.LastActiveAt
+		})
 	case "requests":
 		sortSliceUsers(filtered, func(a, b *UserAuditSummaryItem) bool {
 			if a.TotalRequests != b.TotalRequests {
@@ -678,6 +725,8 @@ func (h *AdminHandler) GetUserAuditLogsSummary(c *gin.Context) {
 		"total":              total,
 		"totalUsers":         len(userMap),
 		"activeUsersCount":   activeCount,
+		"flaggedUsersCount":  flaggedCount,
+		"blockedUsersCount":  blockedCount,
 		"totalAuditRequests": totalAuditRequests,
 		"totalAuditErrors":   totalAuditErrors,
 		"page":               page,
