@@ -53,6 +53,7 @@ func main() {
 	chatHandler := handlers.NewChatHandler()
 	aiHandler := handlers.NewAIHandler()
 	mailHandler := handlers.NewMailHandler()
+	internalMarksHandler := handlers.NewInternalMarksHandler()
 
 	r := routes.SetupRouter(
 		sheetHandler,
@@ -74,6 +75,7 @@ func main() {
 		chatHandler,
 		aiHandler,
 		mailHandler,
+		internalMarksHandler,
 	)
 	r.Static("/pdfs", "./pdfs")
 
