@@ -235,7 +235,7 @@ function Dashboard() {
 
   // ── Sub-render: Mess Menu Card ──
   const renderMessCard = () => (
-    <div className="w-full rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/90 space-y-3">
+    <div className="w-full h-full rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/90 space-y-2.5 flex flex-col justify-between">
       {/* Header Row */}
       <div className="flex items-center justify-between gap-1.5 sm:gap-2">
         <div className="flex items-center gap-2 min-w-0">
@@ -324,7 +324,7 @@ function Dashboard() {
 
   // ── Sub-render: Upcoming Leaves Card ──
   const renderLeavesCard = () => (
-    <div className="w-full rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/90 space-y-2.5">
+    <div className="w-full h-full rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/90 space-y-2.5 flex flex-col justify-between">
       <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800/80 gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <div className="flex h-8 w-8 sm:h-8.5 sm:w-8.5 shrink-0 items-center justify-center rounded-xl bg-blue-50/90 text-blue-600 border border-blue-100/80 dark:bg-blue-950/40 dark:border-blue-900/40 dark:text-blue-400">
@@ -521,7 +521,7 @@ function Dashboard() {
 
             {/* ── MOBILE ONLY: AUTO-SLIDING BANNER TRACK ── */}
             <motion.section variants={fadeUp} className="space-y-2 lg:hidden">
-              <div className="relative overflow-hidden min-h-[195px]">
+              <div className="relative overflow-hidden h-[196px] sm:h-[200px]">
                 <AnimatePresence initial={false} custom={direction} mode="popLayout">
                   <motion.div
                     key={page}
@@ -541,7 +541,7 @@ function Dashboard() {
                         paginate(-1);
                       }
                     }}
-                    className="cursor-grab active:cursor-grabbing w-full"
+                    className="cursor-grab active:cursor-grabbing w-full h-full"
                   >
                     {activeCard === 0 ? renderMessCard() : renderLeavesCard()}
                   </motion.div>
