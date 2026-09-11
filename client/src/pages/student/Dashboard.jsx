@@ -426,7 +426,7 @@ function Dashboard() {
         >
           
           {/* ════════ LEFT COLUMN (Reward Points, Quick Actions with balanced spacing, Explore) ════════ */}
-          <div className="lg:col-span-7 flex flex-col space-y-4 sm:space-y-4.5">
+          <div className="lg:col-span-7 flex flex-col space-y-4 sm:space-y-4.5 lg:space-y-6.5">
             
             {/* ── 1. REWARD POINTS SECTION ────────────────────────────────── */}
             <motion.section variants={fadeUp} className="space-y-2">
@@ -575,8 +575,8 @@ function Dashboard() {
               </div>
             </motion.section>
 
-            {/* ── 2. QUICK ACTIONS SECTION (Enhanced spacing above & below for desktop) ── */}
-            <motion.section variants={fadeUp} className="space-y-2 lg:my-1.5">
+            {/* ── 2. QUICK ACTIONS SECTION ── */}
+            <motion.section variants={fadeUp} className="space-y-2">
               <div className="flex items-center gap-1.5">
                 <Zap className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
                 <h2 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
