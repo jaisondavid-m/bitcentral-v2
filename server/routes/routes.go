@@ -252,10 +252,15 @@ func SetupRouter(
 		admin.GET("/audit-logs/users", adminHandler.GetUserAuditLogsSummary)
 		admin.DELETE("/audit-logs", adminHandler.ClearAuditLogs)
 
-		// Mail Sender Admin API (Gomail)
+		// Mail Sender Admin API (Gomail & Job Queue)
 		admin.GET("/mail/config", mailHandler.GetMailConfig)
 		admin.POST("/mail/test", mailHandler.TestMailConnection)
 		admin.POST("/mail/send", mailHandler.SendAdminEmail)
+		admin.GET("/mail/queues", mailHandler.GetMailQueues)
+		admin.GET("/mail/queues/:batch_id", mailHandler.GetMailQueueDetails)
+		admin.POST("/mail/queues/:batch_id/resend-failed", mailHandler.ResendFailedQueue)
+		admin.POST("/mail/queues/item/:id/retry", mailHandler.RetryQueueItem)
+		admin.DELETE("/mail/queues/:batch_id", mailHandler.DeleteMailQueue)
 		admin.GET("/mail/history", mailHandler.GetMailHistory)
 		admin.DELETE("/mail/history/:id", mailHandler.DeleteMailLog)
 	}

@@ -657,6 +657,42 @@ export async function sendAdminMail(payload) {
   return response.data;
 }
 
+export async function getAdminMailQueues({ page = 1, limit = 20, status = "", search = "" } = {}) {
+  const headers = await getAdminHeaders();
+  const params = new URLSearchParams();
+  if (page) params.set("page", page);
+  if (limit) params.set("limit", limit);
+  if (status) params.set("status", status);
+  if (search) params.set("search", search);
+
+  const response = await api.get(`/admin/mail/queues?${params.toString()}`, { headers });
+  return response.data;
+}
+
+export async function getAdminMailQueueDetails(batchId) {
+  const headers = await getAdminHeaders();
+  const response = await api.get(`/admin/mail/queues/${encodeURIComponent(batchId)}`, { headers });
+  return response.data;
+}
+
+export async function resendFailedAdminMailQueue(batchId) {
+  const headers = await getAdminHeaders();
+  const response = await api.post(`/admin/mail/queues/${encodeURIComponent(batchId)}/resend-failed`, {}, { headers });
+  return response.data;
+}
+
+export async function retryAdminMailQueueItem(itemId) {
+  const headers = await getAdminHeaders();
+  const response = await api.post(`/admin/mail/queues/item/${encodeURIComponent(itemId)}/retry`, {}, { headers });
+  return response.data;
+}
+
+export async function deleteAdminMailQueue(batchId) {
+  const headers = await getAdminHeaders();
+  const response = await api.delete(`/admin/mail/queues/${encodeURIComponent(batchId)}`, { headers });
+  return response.data;
+}
+
 export async function getAdminMailHistory({ page = 1, limit = 20 } = {}) {
   const headers = await getAdminHeaders();
   const params = new URLSearchParams();
@@ -672,5 +708,6 @@ export async function deleteAdminMailLog(id) {
   const response = await api.delete(`/admin/mail/history/${encodeURIComponent(id)}`, { headers });
   return response.data;
 }
+
 
 

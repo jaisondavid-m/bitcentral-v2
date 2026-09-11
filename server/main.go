@@ -53,6 +53,7 @@ func main() {
 	chatHandler := handlers.NewChatHandler()
 	aiHandler := handlers.NewAIHandler()
 	mailHandler := handlers.NewMailHandler()
+	mailHandler.StartQueueWorker()
 	internalMarksHandler := handlers.NewInternalMarksHandler()
 
 	r := routes.SetupRouter(
