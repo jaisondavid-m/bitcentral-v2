@@ -264,11 +264,10 @@ function Dashboard() {
               e.stopPropagation();
               handleHostelChange("boys");
             }}
-            className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${
-              hostel === "boys"
+            className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${hostel === "boys"
                 ? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white"
                 : "text-slate-500 hover:text-slate-800 dark:text-slate-400"
-            }`}
+              }`}
           >
             Boys
           </button>
@@ -277,11 +276,10 @@ function Dashboard() {
               e.stopPropagation();
               handleHostelChange("girls");
             }}
-            className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${
-              hostel === "girls"
+            className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${hostel === "girls"
                 ? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white"
                 : "text-slate-500 hover:text-slate-800 dark:text-slate-400"
-            }`}
+              }`}
           >
             Girls
           </button>
@@ -392,36 +390,41 @@ function Dashboard() {
   );
 
   return (
-    <main className="min-h-screen bg-slate-50/50 pb-20 text-slate-900 dark:bg-[#060912] dark:text-slate-100 flex flex-col items-center">
-      <div className="w-full max-w-md md:max-w-2xl lg:max-w-5xl xl:max-w-6xl px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-12 space-y-6 sm:space-y-8">
+    <main className="min-h-screen lg:min-h-[calc(100vh-4.25rem)] bg-slate-50/50 pb-20 lg:pb-3 text-slate-900 dark:bg-[#060912] dark:text-slate-100 flex flex-col items-center justify-start lg:justify-center">
+      <div className="w-full max-w-md md:max-w-2xl lg:max-w-5xl xl:max-w-6xl px-4 sm:px-6 lg:px-8 pt-5 sm:pt-6 lg:pt-3 pb-6 lg:pb-2 space-y-4 sm:space-y-5 lg:space-y-3.5 flex flex-col justify-between flex-1">
         
         {/* ── 1. Top Greeting Header ──────────────────────────────────── */}
-        <section className="flex items-start sm:items-center justify-between gap-3 pb-1 border-b border-slate-200/60 dark:border-slate-800/60 sm:pb-4">
-          <div className="space-y-1">
+        <section className="flex items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/60 dark:border-slate-800/60 sm:pb-3">
+          <div className="space-y-0.5">
             <span className="inline-block rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-blue-600 border border-blue-200/50 dark:bg-blue-950/60 dark:text-blue-400 dark:border-blue-900/40">
               WELCOME BACK!!
             </span>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-slate-900 dark:text-white uppercase">
+            <h1 className="text-xl sm:text-2xl lg:text-2xl font-black tracking-tight text-slate-900 dark:text-white uppercase">
               {displayName}
             </h1>
           </div>
 
           <Link
             to="/tools"
-            className="mt-1 sm:mt-0 inline-flex items-center gap-1.5 sm:gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold text-white shadow-xs hover:from-blue-700 hover:to-indigo-800 active:scale-95 transition-all shrink-0 hover:shadow-sm"
+            className="mt-1 sm:mt-0 inline-flex items-center gap-1.5 sm:gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-bold text-white shadow-xs hover:from-blue-700 hover:to-indigo-800 active:scale-95 transition-all shrink-0 hover:shadow-sm"
           >
             <Boxes className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span>Campus Utilities</span>
           </Link>
         </section>
 
-        {/* ── Main Content Grid (Mobile: 1 Column, Desktop: 12 Columns) ── */}
-        <motion.div variants={stagger} initial="hidden" animate="show" className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* ── Main Content Grid (Mobile: 1 Column, Desktop: 12 Columns with pixel-perfect stretch) ── */}
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 lg:grid-cols-12 gap-4 xl:gap-5 items-stretch flex-1"
+        >
           
-          {/* ════════ LEFT COLUMN (Main Sections) ════════ */}
-          <div className="lg:col-span-7 space-y-6">
+          {/* ════════ LEFT COLUMN (3 Distinct Spaced Sections) ════════ */}
+          <div className="lg:col-span-7 flex flex-col justify-between space-y-4 sm:space-y-5 lg:space-y-0 h-full">
             
-            {/* ── 2. REWARD POINTS SECTION ────────────────────────────────── */}
+            {/* ── 1. REWARD POINTS SECTION ────────────────────────────────── */}
             <motion.section variants={fadeUp} className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
@@ -441,24 +444,24 @@ function Dashboard() {
 
               {rewardsLoading ? (
                 /* Skeleton Loader for Reward Points */
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5">
-                    <div className="h-20 sm:h-24 rounded-2xl border border-slate-200/70 bg-white p-3 sm:p-4 shadow-2xs dark:border-slate-800 dark:bg-slate-900/90 animate-pulse flex flex-col justify-between">
+                    <div className="h-20 sm:h-22 rounded-2xl sm:rounded-3xl border border-slate-200/70 bg-white p-3.5 sm:p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/90 animate-pulse flex flex-col justify-between">
                       <div className="h-3.5 w-14 rounded bg-slate-200 dark:bg-slate-800" />
                       <div className="h-6 w-20 rounded bg-emerald-100 dark:bg-emerald-950/60" />
                     </div>
-                    <div className="h-20 sm:h-24 rounded-2xl border border-slate-200/70 bg-white p-3 sm:p-4 shadow-2xs dark:border-slate-800 dark:bg-slate-900/90 animate-pulse flex flex-col justify-between">
+                    <div className="h-20 sm:h-22 rounded-2xl sm:rounded-3xl border border-slate-200/70 bg-white p-3.5 sm:p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/90 animate-pulse flex flex-col justify-between">
                       <div className="h-3.5 w-16 rounded bg-slate-200 dark:bg-slate-800" />
                       <div className="h-6 w-16 rounded bg-slate-200 dark:bg-slate-800" />
                     </div>
                   </div>
-                  <div className="h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800/70 animate-pulse" />
+                  <div className="h-9 rounded-2xl bg-slate-200/70 dark:bg-slate-800/70 animate-pulse" />
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5">
                     {/* Balance */}
-                    <div className="rounded-2xl border border-emerald-300 bg-white p-3 sm:p-4 shadow-sm dark:border-emerald-700/60 dark:bg-slate-900/90 flex flex-col justify-between">
+                    <div className="rounded-2xl sm:rounded-3xl border border-emerald-300 bg-white p-3.5 sm:p-4 shadow-sm dark:border-emerald-700/60 dark:bg-slate-900/90 flex flex-col justify-between">
                       <div className="flex items-center justify-between">
                         <span className="text-xs sm:text-sm font-semibold text-emerald-700 dark:text-emerald-400">
                           Balance
@@ -467,7 +470,7 @@ function Dashboard() {
                           <CreditCard className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         </div>
                       </div>
-                      <div className="mt-2 flex items-baseline gap-1">
+                      <div className="mt-1 sm:mt-1.5 flex items-baseline gap-1">
                         <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
                           {rewards.balance || "0"}
                         </span>
@@ -476,7 +479,7 @@ function Dashboard() {
                     </div>
 
                     {/* Redeemed */}
-                    <div className="rounded-2xl border border-slate-200/80 bg-white p-3 sm:p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/90 flex flex-col justify-between">
+                    <div className="rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/90 flex flex-col justify-between">
                       <div className="flex items-center justify-between">
                         <span className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400">
                           Redeemed
@@ -485,7 +488,7 @@ function Dashboard() {
                           <Gift className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         </div>
                       </div>
-                      <div className="mt-2 flex items-baseline gap-1">
+                      <div className="mt-1 sm:mt-1.5 flex items-baseline gap-1">
                         <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
                           {rewards.redeemed || "0"}
                         </span>
@@ -497,7 +500,7 @@ function Dashboard() {
                   {/* Catchy Action Link to /rpsite */}
                   <Link
                     to="/rpsite"
-                    className="group flex items-center justify-between rounded-xl border border-blue-100/90 bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-slate-50/70 px-3 py-2 sm:px-3.5 sm:py-2.5 text-xs sm:text-sm font-bold text-slate-800 transition-all hover:border-blue-300 hover:shadow-2xs active:scale-[0.99] dark:border-blue-900/40 dark:from-blue-950/30 dark:via-slate-900/60 dark:to-indigo-950/20 dark:text-slate-200"
+                    className="group flex items-center justify-between rounded-2xl border border-blue-100/90 bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-slate-50/70 px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold text-slate-800 transition-all hover:border-blue-300 hover:shadow-2xs active:scale-[0.99] dark:border-blue-900/40 dark:from-blue-950/30 dark:via-slate-900/60 dark:to-indigo-950/20 dark:text-slate-200"
                   >
                     <div className="flex items-center gap-2">
                       <span className="flex h-1.5 w-1.5 rounded-full bg-blue-600 dark:bg-blue-400 animate-pulse" />
@@ -512,7 +515,7 @@ function Dashboard() {
               )}
             </motion.section>
 
-            {/* ── 3. MOBILE ONLY: AUTO-SLIDING BANNER TRACK (MESS MENU & LEAVES) ── */}
+            {/* ── MOBILE ONLY: AUTO-SLIDING BANNER TRACK (MESS MENU & LEAVES) ── */}
             <motion.section variants={fadeUp} className="space-y-2 lg:hidden">
               <div className="relative overflow-hidden min-h-[195px]">
                 <AnimatePresence initial={false} custom={direction} mode="popLayout">
@@ -547,29 +550,27 @@ function Dashboard() {
                   onClick={() => {
                     if (activeCard !== 0) paginate(-1);
                   }}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    activeCard === 0
+                  className={`h-1.5 rounded-full transition-all duration-300 ${activeCard === 0
                       ? "w-5 bg-blue-600 dark:bg-blue-400"
                       : "w-1.5 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400"
-                  }`}
+                    }`}
                   aria-label="Mess Menu"
                 />
                 <button
                   onClick={() => {
                     if (activeCard !== 1) paginate(1);
                   }}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    activeCard === 1
+                  className={`h-1.5 rounded-full transition-all duration-300 ${activeCard === 1
                       ? "w-5 bg-blue-600 dark:bg-blue-400"
                       : "w-1.5 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400"
-                  }`}
+                    }`}
                   aria-label="Upcoming Leaves"
                 />
               </div>
             </motion.section>
 
-            {/* ── 4. QUICK ACTIONS SECTION ─────────────────────────────────── */}
-            <motion.section variants={fadeUp} className="space-y-3">
+            {/* ── 2. QUICK ACTIONS SECTION ─────────────────────────────────── */}
+            <motion.section variants={fadeUp} className="space-y-2">
               <div className="flex items-center gap-1.5">
                 <Zap className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
                 <h2 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
@@ -577,14 +578,14 @@ function Dashboard() {
                 </h2>
               </div>
 
-              <div className="grid grid-cols-4 gap-2 sm:gap-3">
+              <div className="grid grid-cols-4 gap-2.5 sm:gap-3.5">
                 {quickActions.map(({ to, icon: Icon, label, color }) => (
                   <Link
                     key={to}
                     to={to}
-                    className="group flex flex-col items-center justify-center gap-1.5 rounded-2xl border border-slate-200/80 bg-white p-2.5 sm:p-3.5 text-center shadow-2xs transition-all hover:scale-105 active:scale-95 hover:shadow-sm dark:border-slate-800 dark:bg-slate-900/90"
+                    className="group flex flex-col items-center justify-center gap-1.5 rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-2.5 sm:p-3.5 text-center shadow-sm transition-all hover:scale-105 active:scale-95 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/90"
                   >
-                    <div className={`flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-xl border ${color} shadow-2xs transition-transform group-hover:scale-110`}>
+                    <div className={`flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl border ${color} shadow-2xs transition-transform group-hover:scale-110`}>
                       <Icon className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
                     </div>
                     <span className="text-[10px] sm:text-xs font-bold text-slate-700 dark:text-slate-300 leading-tight text-center line-clamp-2 w-full">
@@ -593,14 +594,16 @@ function Dashboard() {
                   </Link>
                 ))}
               </div>
+            </motion.section>
 
-              {/* Explore Campus Utilities banner */}
+            {/* ── 3. EXPLORE CAMPUS UTILITIES SECTION (Anchors to bottom on desktop) ── */}
+            <motion.section variants={fadeUp} className="space-y-2 lg:mt-auto">
               <Link
                 to="/tools"
-                className="group relative flex items-center justify-between overflow-hidden rounded-2xl border border-blue-200/80 bg-gradient-to-r from-blue-50/80 via-indigo-50/60 to-purple-50/70 p-3 sm:p-4 shadow-2xs transition-all hover:border-blue-400 hover:shadow-sm active:scale-[0.99] dark:border-blue-900/50 dark:from-blue-950/30 dark:via-indigo-950/30 dark:to-purple-950/20 mt-2"
+                className="group relative flex items-center justify-between overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-gradient-to-r from-blue-50/80 via-indigo-50/60 to-purple-50/70 p-3.5 sm:p-4 shadow-sm transition-all hover:border-blue-400 hover:shadow-md active:scale-[0.99] dark:border-slate-800 dark:from-blue-950/30 dark:via-indigo-950/30 dark:to-purple-950/20"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-2xs transition-transform group-hover:scale-110">
+                  <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-sm transition-transform group-hover:scale-110">
                     <LayoutGrid className="h-5 w-5" />
                   </div>
                   <div>
@@ -608,7 +611,7 @@ function Dashboard() {
                       <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
                         Explore Campus Utilities
                       </h3>
-                      <span className="rounded-full bg-blue-100 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-extrabold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                      <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[9px] sm:text-[10px] font-extrabold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
                         All Tools
                       </span>
                     </div>
@@ -618,15 +621,15 @@ function Dashboard() {
                   </div>
                 </div>
 
-                <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-white text-slate-700 shadow-2xs transition-all group-hover:translate-x-1 group-hover:bg-blue-600 group-hover:text-white dark:bg-slate-800 dark:text-slate-300 dark:group-hover:bg-blue-500">
-                  <ChevronRight className="h-4 w-4" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-slate-700 shadow-sm transition-all group-hover:translate-x-1 group-hover:bg-blue-600 group-hover:text-white dark:bg-slate-800 dark:text-slate-300 dark:group-hover:bg-blue-500">
+                  <ChevronRight className="h-4.5 w-4.5" />
                 </div>
               </Link>
             </motion.section>
           </div>
 
           {/* ════════ RIGHT COLUMN (Desktop Only: Mess Menu & Leaves Side-by-Side) ════════ */}
-          <div className="hidden lg:flex lg:flex-col lg:col-span-5 space-y-6">
+          <div className="hidden lg:flex lg:flex-col lg:col-span-5 justify-between h-full space-y-4">
             <motion.section variants={fadeUp} className="space-y-2">
               <div className="flex items-center gap-1.5">
                 <Utensils className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
@@ -637,7 +640,7 @@ function Dashboard() {
               {renderMessCard()}
             </motion.section>
 
-            <motion.section variants={fadeUp} className="space-y-2">
+            <motion.section variants={fadeUp} className="space-y-2 mt-auto">
               <div className="flex items-center gap-1.5">
                 <Calendar className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
                 <h2 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
