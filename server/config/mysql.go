@@ -111,6 +111,7 @@ func InitMySQL() {
 	createAuditLogsTable()
 	createDailyActiveUserStatsTable()
 	createAdminSentEmailsTable()
+	createEmailJobQueuesTables()
 }
 
 func createAdminsTable() {
@@ -685,6 +686,64 @@ func createAdminSentEmailsTable() {
 		log.Printf("ℹ️ admin_sent_emails table notice: %v", err)
 	} else {
 		log.Println("✅ admin_sent_emails table ready")
+	}
+}
+
+func createEmailJobQueuesTables() {
+	queryBatches := `
+	CREATE TABLE IF NOT EXISTS email_job_batches (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		batch_id VARCHAR(64) NOT NULL UNIQUE,
+		admin_uid VARCHAR(128) NULL,
+		admin_email VARCHAR(255) NULL,
+		subject VARCHAR(500) NOT NULL,
+		body LONGTEXT NOT NULL,
+		is_html TINYINT(1) DEFAULT 1,
+		custom_from_name VARCHAR(255) NULL,
+		reply_to VARCHAR(255) NULL,
+		status VARCHAR(32) NOT NULL DEFAULT 'pending',
+		total_count INT NOT NULL DEFAULT 0,
+		sent_count INT NOT NULL DEFAULT 0,
+		failed_count INT NOT NULL DEFAULT 0,
+		pending_count INT NOT NULL DEFAULT 0,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		INDEX idx_batch_status (status),
+		INDEX idx_batch_created (created_at),
+		INDEX idx_batch_admin (admin_uid)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(queryBatches); err != nil {
+		log.Printf("ℹ️ email_job_batches table notice: %v", err)
+	} else {
+		log.Println("✅ email_job_batches table ready")
+	}
+
+	queryItems := `
+	CREATE TABLE IF NOT EXISTS email_queue_items (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		batch_id VARCHAR(64) NOT NULL,
+		recipient_email VARCHAR(255) NOT NULL,
+		recipient_name VARCHAR(255) NULL,
+		recipient_user_id VARCHAR(128) NULL,
+		recipient_register_no VARCHAR(128) NULL,
+		recipient_dept VARCHAR(128) NULL,
+		recipient_batch VARCHAR(128) NULL,
+		status VARCHAR(32) NOT NULL DEFAULT 'pending',
+		attempts INT NOT NULL DEFAULT 0,
+		error_message TEXT NULL,
+		sent_at DATETIME NULL,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		INDEX idx_eq_batch_id (batch_id),
+		INDEX idx_eq_status (status),
+		INDEX idx_eq_recipient (recipient_email)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(queryItems); err != nil {
+		log.Printf("ℹ️ email_queue_items table notice: %v", err)
+	} else {
+		log.Println("✅ email_queue_items table ready")
 	}
 }
 

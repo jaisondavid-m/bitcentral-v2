@@ -30,12 +30,22 @@ import {
   History,
   Tag,
   ArrowRight,
+  RotateCcw,
+  AlertCircle,
+  ListOrdered,
+  Layers,
+  CheckCircle2,
 } from "lucide-react";
 import {
   listAdminUsers,
   getAdminMailConfig,
   testAdminMailConnection,
   sendAdminMail,
+  getAdminMailQueues,
+  getAdminMailQueueDetails,
+  resendFailedAdminMailQueue,
+  retryAdminMailQueueItem,
+  deleteAdminMailQueue,
   getAdminMailHistory,
   deleteAdminMailLog,
 } from "@/api/admin.js";
@@ -198,7 +208,7 @@ const VARIABLE_TAGS = [
 ];
 
 export default function AdminMailSender() {
-  // Navigation tabs: 'composer' | 'history'
+  // Navigation tabs: 'composer' | 'queue' | 'history'
   const [activeSubTab, setActiveSubTab] = useState("composer");
 
   // Users query and pagination state (searches all records in users table)
@@ -241,6 +251,20 @@ export default function AdminMailSender() {
   const [sendResult, setSendResult] = useState(null);
   const [banner, setBanner] = useState({ type: "", message: "" });
 
+  // Job Queue state
+  const [queues, setQueues] = useState([]);
+  const [queueStats, setQueueStats] = useState({ total_jobs: 0, active_jobs: 0, total_sent: 0, total_failed: 0, total_pending: 0 });
+  const [queueTotal, setQueueTotal] = useState(0);
+  const [queuePage, setQueuePage] = useState(1);
+  const [queueStatusFilter, setQueueStatusFilter] = useState("all");
+  const [queueSearch, setQueueSearch] = useState("");
+  const [debouncedQueueSearch, setDebouncedQueueSearch] = useState("");
+  const [loadingQueues, setLoadingQueues] = useState(false);
+  const [expandedBatchId, setExpandedBatchId] = useState(null);
+  const [batchDetails, setBatchDetails] = useState({});
+  const [loadingBatchDetails, setLoadingBatchDetails] = useState({});
+  const [actionInProgress, setActionInProgress] = useState({});
+
   // History state
   const [historyLogs, setHistoryLogs] = useState([]);
   const [historyTotal, setHistoryTotal] = useState(0);
@@ -250,7 +274,7 @@ export default function AdminMailSender() {
 
   const textareaRef = useRef(null);
 
-  // Debounce search input
+  // Debounce user search input
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(userSearch.trim());
@@ -258,6 +282,15 @@ export default function AdminMailSender() {
     }, 250);
     return () => clearTimeout(handler);
   }, [userSearch]);
+
+  // Debounce queue search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQueueSearch(queueSearch.trim());
+      setQueuePage(1);
+    }, 250);
+    return () => clearTimeout(handler);
+  }, [queueSearch]);
 
   // 1. Fetch Users with Server Query & Pagination from `users` table
   const fetchUsers = useCallback(async () => {
@@ -308,7 +341,63 @@ export default function AdminMailSender() {
     }
   }, []);
 
-  // 3. Fetch History
+  // 3. Fetch Job Queues
+  const fetchQueues = useCallback(async (page = 1, showLoading = true) => {
+    try {
+      if (showLoading) setLoadingQueues(true);
+      const res = await getAdminMailQueues({
+        page,
+        limit: 15,
+        status: queueStatusFilter !== "all" ? queueStatusFilter : "",
+        search: debouncedQueueSearch,
+      });
+      if (res?.success) {
+        setQueues(res.data || []);
+        setQueueTotal(res.total || 0);
+        setQueuePage(res.page || 1);
+        if (res.stats) {
+          setQueueStats(res.stats);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load email queues", err);
+    } finally {
+      if (showLoading) setLoadingQueues(false);
+    }
+  }, [queueStatusFilter, debouncedQueueSearch]);
+
+  // 4. Fetch Details for Expanded Batch
+  const fetchBatchItems = useCallback(async (batchId) => {
+    try {
+      setLoadingBatchDetails((prev) => ({ ...prev, [batchId]: true }));
+      const res = await getAdminMailQueueDetails(batchId);
+      if (res?.success && res.items) {
+        setBatchDetails((prev) => ({ ...prev, [batchId]: res.items }));
+      }
+    } catch (err) {
+      console.error(`Failed to load items for batch ${batchId}`, err);
+    } finally {
+      setLoadingBatchDetails((prev) => ({ ...prev, [batchId]: false }));
+    }
+  }, []);
+
+  // Auto-refresh queues when on queue tab and active jobs exist
+  useEffect(() => {
+    if (activeSubTab !== "queue") return;
+
+    fetchQueues(queuePage, true);
+
+    const interval = setInterval(() => {
+      fetchQueues(queuePage, false);
+      if (expandedBatchId) {
+        fetchBatchItems(expandedBatchId);
+      }
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [activeSubTab, queuePage, expandedBatchId, fetchQueues, fetchBatchItems]);
+
+  // 5. Fetch History
   const fetchHistory = useCallback(async (page = 1) => {
     try {
       setLoadingHistory(true);
@@ -443,7 +532,7 @@ export default function AdminMailSender() {
     }, 10);
   };
 
-  // Preview sample interpolation from real tracker user records (no dummy data)
+  // Preview sample interpolation from real tracker user records
   const sampleRecipient = useMemo(() => {
     const list = Object.values(selectedRecipients);
     if (list.length > 0) return list[0];
@@ -524,7 +613,7 @@ export default function AdminMailSender() {
     }
   };
 
-  // Trigger Send
+  // Trigger Send (Enqueues Job)
   const handleOpenSendConfirmation = (e) => {
     e.preventDefault();
     const recipientCount = Object.keys(selectedRecipients).length;
@@ -562,30 +651,91 @@ export default function AdminMailSender() {
       if (res?.success) {
         setSendResult({
           success: true,
-          message: res.message || `Successfully dispatched email to ${res.sent} recipient(s)!`,
+          batch_id: res.batch_id,
+          message: res.message || `Successfully queued ${res.total} emails for sequential delivery!`,
           details: res,
         });
         setBanner({
           type: "success",
-          message: `Emails dispatched! (${res.sent} sent, ${res.failed} failed)`,
+          message: `Emails queued for delivery! (Batch ID: ${res.batch_id})`,
         });
       } else {
         setSendResult({
           success: false,
-          message: res?.message || "Encountered issues during email dispatch.",
+          message: res?.message || "Encountered issues creating email queue.",
           details: res,
         });
         setBanner({
           type: "error",
-          message: res?.message || "Failed to dispatch some or all emails.",
+          message: res?.message || "Failed to queue emails.",
         });
       }
     } catch (err) {
-      const errMsg = normalizeError(err, "Failed to dispatch emails via Gomail SMTP.");
+      const errMsg = normalizeError(err, "Failed to dispatch email job.");
       setSendResult({ success: false, message: errMsg });
       setBanner({ type: "error", message: errMsg });
     } finally {
       setSending(false);
+    }
+  };
+
+  // Queue actions
+  const handleToggleExpandBatch = (batchId) => {
+    if (expandedBatchId === batchId) {
+      setExpandedBatchId(null);
+    } else {
+      setExpandedBatchId(batchId);
+      if (!batchDetails[batchId]) {
+        fetchBatchItems(batchId);
+      }
+    }
+  };
+
+  const handleResendFailedBatch = async (batchId) => {
+    setActionInProgress((prev) => ({ ...prev, [batchId]: true }));
+    try {
+      const res = await resendFailedAdminMailQueue(batchId);
+      if (res?.success) {
+        setBanner({ type: "success", message: res.message || "Failed emails re-queued successfully!" });
+        fetchQueues(queuePage, false);
+        fetchBatchItems(batchId);
+      } else {
+        setBanner({ type: "error", message: res?.message || "Failed to re-queue failed emails." });
+      }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to re-queue emails.") });
+    } finally {
+      setActionInProgress((prev) => ({ ...prev, [batchId]: false }));
+    }
+  };
+
+  const handleRetryItem = async (itemId, batchId) => {
+    setActionInProgress((prev) => ({ ...prev, [`item_${itemId}`]: true }));
+    try {
+      const res = await retryAdminMailQueueItem(itemId);
+      if (res?.success) {
+        setBanner({ type: "success", message: "Email re-queued for delivery!" });
+        fetchQueues(queuePage, false);
+        fetchBatchItems(batchId);
+      } else {
+        setBanner({ type: "error", message: res?.message || "Failed to retry email." });
+      }
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to retry email.") });
+    } finally {
+      setActionInProgress((prev) => ({ ...prev, [`item_${itemId}`]: false }));
+    }
+  };
+
+  const handleDeleteQueue = async (batchId) => {
+    if (!window.confirm("Are you sure you want to delete this email job queue?")) return;
+    try {
+      await deleteAdminMailQueue(batchId);
+      setQueues((prev) => prev.filter((q) => q.batch_id !== batchId));
+      setQueueTotal((prev) => Math.max(0, prev - 1));
+      setBanner({ type: "success", message: "Email queue deleted." });
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to delete queue.") });
     }
   };
 
@@ -640,10 +790,10 @@ export default function AdminMailSender() {
             </div>
             <div>
               <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-                Admin Mail Sender
+                Admin Mail Sender & Job Queues
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Search all registered users in the database and dispatch personalized emails via Gomail SMTP.
+                Dispatch personalized emails sequentially via Gomail SMTP with real-time queue tracking & auto-retry.
               </p>
             </div>
           </div>
@@ -693,6 +843,24 @@ export default function AdminMailSender() {
 
             <button
               type="button"
+              onClick={() => setActiveSubTab("queue")}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
+                activeSubTab === "queue"
+                  ? "bg-white text-slate-900 shadow-xs dark:bg-slate-900 dark:text-white"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+              }`}
+            >
+              <ListOrdered className="h-3.5 w-3.5 text-amber-500" />
+              <span>Job Queues</span>
+              {queueStats.active_jobs > 0 && (
+                <span className="ml-0.5 rounded-full bg-amber-500 text-white px-1.5 py-0.2 text-[10px] font-mono animate-pulse">
+                  {queueStats.active_jobs}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
               onClick={() => setActiveSubTab("history")}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
                 activeSubTab === "history"
@@ -701,12 +869,7 @@ export default function AdminMailSender() {
               }`}
             >
               <History className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-              <span>Sent Logs</span>
-              {historyTotal > 0 && (
-                <span className="ml-0.5 rounded-full bg-slate-200 dark:bg-slate-700 px-1.5 py-0.2 text-[10px] font-mono">
-                  {historyTotal}
-                </span>
-              )}
+              <span>Logs</span>
             </button>
           </div>
         </div>
@@ -1153,7 +1316,7 @@ export default function AdminMailSender() {
               {/* Action Bar */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
                 <div className="text-xs text-slate-500 dark:text-slate-400">
-                  Ready to send to{" "}
+                  Ready to queue for{" "}
                   <strong className="text-teal-600 dark:text-teal-400">
                     {recipientCount} recipient{recipientCount === 1 ? "" : "s"}
                   </strong>
@@ -1165,10 +1328,381 @@ export default function AdminMailSender() {
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-teal-500/20 transition hover:from-teal-700 hover:to-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <Send className="h-4 w-4" />
-                  <span>Review & Dispatch Emails</span>
+                  <span>Queue & Send Emails</span>
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      ) : activeSubTab === "queue" ? (
+        /* JOB QUEUES TAB */
+        <div className="space-y-5">
+          {/* Quick Metrics Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs dark:border-slate-800 dark:bg-slate-900">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Batches</span>
+                <Layers className="h-4 w-4 text-slate-400" />
+              </div>
+              <p className="mt-2 text-2xl font-black text-slate-900 dark:text-white">
+                {queueStats.total_jobs}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-4 shadow-2xs dark:border-amber-900/50 dark:bg-amber-950/20">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">Active In Queue</span>
+                <Clock className="h-4 w-4 text-amber-500" />
+              </div>
+              <p className="mt-2 text-2xl font-black text-amber-600 dark:text-amber-400">
+                {queueStats.total_pending}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-4 shadow-2xs dark:border-emerald-900/50 dark:bg-emerald-950/20">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">Delivered (Sent)</span>
+                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              </div>
+              <p className="mt-2 text-2xl font-black text-emerald-600 dark:text-emerald-400">
+                {queueStats.total_sent}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-rose-200 bg-rose-50/50 p-4 shadow-2xs dark:border-rose-900/50 dark:bg-rose-950/20">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-rose-700 dark:text-rose-300">Failed Mails</span>
+                <AlertCircle className="h-4 w-4 text-rose-500" />
+              </div>
+              <p className="mt-2 text-2xl font-black text-rose-600 dark:text-rose-400">
+                {queueStats.total_failed}
+              </p>
+            </div>
+          </div>
+
+          {/* Queue Filter & Action Bar */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Search Bar */}
+                <div className="relative min-w-[240px]">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                  <input
+                    type="text"
+                    value={queueSearch}
+                    onChange={(e) => setQueueSearch(e.target.value)}
+                    placeholder="Search by subject or batch ID..."
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 py-1.5 text-xs text-slate-900 outline-none transition focus:border-teal-500 focus:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                  />
+                  {queueSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setQueueSearch("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Status Filter */}
+                <select
+                  value={queueStatusFilter}
+                  onChange={(e) => {
+                    setQueueStatusFilter(e.target.value);
+                    setQueuePage(1);
+                  }}
+                  className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 cursor-pointer"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="processing">Processing</option>
+                  <option value="pending">Pending</option>
+                  <option value="completed">Completed</option>
+                  <option value="failed">Failed</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Auto-sync active (every 3.5s)
+                </span>
+                <button
+                  type="button"
+                  onClick={() => fetchQueues(queuePage, true)}
+                  disabled={loadingQueues}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 cursor-pointer shadow-2xs"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${loadingQueues ? "animate-spin" : ""}`} />
+                  <span>Refresh</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Queue Batches List */}
+            {loadingQueues && queues.length === 0 ? (
+              <div className="flex h-48 items-center justify-center">
+                <Loader className="h-6 w-6 animate-spin text-teal-600" />
+              </div>
+            ) : queues.length === 0 ? (
+              <div className="p-12 text-center text-xs text-slate-400 space-y-2">
+                <Mail className="h-8 w-8 mx-auto text-slate-300 dark:text-slate-600" />
+                <p>No email queues found matching the filter criteria.</p>
+              </div>
+            ) : (
+              <div className="space-y-3.5">
+                {queues.map((batch) => {
+                  const isExpanded = expandedBatchId === batch.batch_id;
+                  const percentSent = batch.total_count > 0 ? Math.round((batch.sent_count / batch.total_count) * 100) : 0;
+                  const percentFailed = batch.total_count > 0 ? Math.round((batch.failed_count / batch.total_count) * 100) : 0;
+                  const percentPending = batch.total_count > 0 ? Math.max(0, 100 - percentSent - percentFailed) : 0;
+                  const isBatchActionLoading = actionInProgress[batch.batch_id];
+                  const items = batchDetails[batch.batch_id] || [];
+                  const isLoadingItems = loadingBatchDetails[batch.batch_id];
+
+                  return (
+                    <div
+                      key={batch.batch_id}
+                      className="rounded-2xl border border-slate-200/90 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-950/60 space-y-3.5 transition hover:border-slate-300 dark:hover:border-slate-700"
+                    >
+                      {/* Batch Header */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                        <div className="space-y-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate max-w-md">
+                              {batch.subject}
+                            </h4>
+
+                            {/* Status Badge */}
+                            <span
+                              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                batch.status === "completed"
+                                  ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                                  : batch.status === "processing"
+                                  ? "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 animate-pulse"
+                                  : batch.status === "failed"
+                                  ? "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
+                                  : "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                              }`}
+                            >
+                              {batch.status === "processing" && <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-ping" />}
+                              {batch.status}
+                            </span>
+
+                            <span className="font-mono text-[10px] text-slate-400 bg-slate-200/60 dark:bg-slate-800 px-1.5 py-0.5 rounded">
+                              {batch.batch_id}
+                            </span>
+                          </div>
+
+                          <p className="text-[11px] text-slate-400">
+                            Queued on {formatISTDateTime(batch.created_at)} · Sender:{" "}
+                            <span className="text-slate-600 dark:text-slate-300 font-medium">
+                              {batch.custom_from_name || "BIT Central"}
+                            </span>{" "}
+                            ({batch.admin_email || batch.admin_uid || "Admin"})
+                          </p>
+                        </div>
+
+                        {/* Batch Action Buttons */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {/* Resend Failed Button */}
+                          {batch.failed_count > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => handleResendFailedBatch(batch.batch_id)}
+                              disabled={isBatchActionLoading}
+                              className="inline-flex items-center gap-1 rounded-xl bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 text-xs font-bold shadow-xs transition cursor-pointer disabled:opacity-50"
+                              title="Re-queue all failed recipients in this batch"
+                            >
+                              <RotateCcw className={`h-3 w-3 ${isBatchActionLoading ? "animate-spin" : ""}`} />
+                              <span>Resend Failed ({batch.failed_count})</span>
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => handleToggleExpandBatch(batch.batch_id)}
+                            className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 cursor-pointer shadow-2xs"
+                          >
+                            <span>{isExpanded ? "Hide Details" : "View Recipients"}</span>
+                            {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteQueue(batch.batch_id)}
+                            className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950 cursor-pointer transition"
+                            title="Delete queue batch"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Visual Multi-Segment Progress Bar */}
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between items-center text-[11px] font-medium">
+                          <span className="text-slate-500 dark:text-slate-400">
+                            Delivery Progress:{" "}
+                            <strong className="text-slate-900 dark:text-white">
+                              {batch.sent_count} / {batch.total_count} Sent
+                            </strong>{" "}
+                            ({percentSent}%)
+                          </span>
+
+                          <div className="flex items-center gap-3 text-[10px] font-semibold font-mono">
+                            <span className="text-emerald-600 dark:text-emerald-400">
+                              ✓ {batch.sent_count} Sent
+                            </span>
+                            {batch.pending_count > 0 && (
+                              <span className="text-amber-600 dark:text-amber-400">
+                                ⏳ {batch.pending_count} Pending
+                              </span>
+                            )}
+                            {batch.failed_count > 0 && (
+                              <span className="text-rose-600 dark:text-rose-400">
+                                ✕ {batch.failed_count} Failed
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Progress Bar Track */}
+                        <div className="h-2.5 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden flex shadow-inner">
+                          {percentSent > 0 && (
+                            <div
+                              style={{ width: `${percentSent}%` }}
+                              className="bg-emerald-500 transition-all duration-500"
+                              title={`${batch.sent_count} Delivered`}
+                            />
+                          )}
+                          {percentFailed > 0 && (
+                            <div
+                              style={{ width: `${percentFailed}%` }}
+                              className="bg-rose-500 transition-all duration-500"
+                              title={`${batch.failed_count} Failed`}
+                            />
+                          )}
+                          {percentPending > 0 && (
+                            <div
+                              style={{ width: `${percentPending}%` }}
+                              className="bg-amber-400/80 animate-pulse transition-all duration-500"
+                              title={`${batch.pending_count} Pending`}
+                            />
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Expanded Recipient Items List */}
+                      {isExpanded && (
+                        <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-800 space-y-3">
+                          <div className="flex items-center justify-between text-xs">
+                            <h5 className="font-bold text-slate-800 dark:text-slate-200">
+                              Recipient Queue Items ({items.length || batch.total_count})
+                            </h5>
+                            <button
+                              type="button"
+                              onClick={() => fetchBatchItems(batch.batch_id)}
+                              disabled={isLoadingItems}
+                              className="text-slate-400 hover:text-teal-600 text-[11px] font-medium inline-flex items-center gap-1 cursor-pointer"
+                            >
+                              <RefreshCw className={`h-3 w-3 ${isLoadingItems ? "animate-spin" : ""}`} />
+                              <span>Refresh Items</span>
+                            </button>
+                          </div>
+
+                          {isLoadingItems && items.length === 0 ? (
+                            <div className="flex h-24 items-center justify-center">
+                              <Loader className="h-4 w-4 animate-spin text-teal-600" />
+                            </div>
+                          ) : items.length === 0 ? (
+                            <div className="p-4 text-center text-xs text-slate-400">
+                              No recipient records loaded. Click refresh items.
+                            </div>
+                          ) : (
+                            <div className="max-h-80 overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800/80 bg-white dark:bg-slate-900">
+                              {items.map((item) => {
+                                const isItemLoading = actionInProgress[`item_${item.id}`];
+
+                                return (
+                                  <div
+                                    key={item.id}
+                                    className="p-3 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
+                                  >
+                                    <div className="space-y-0.5 min-w-0">
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-bold text-slate-900 dark:text-white truncate">
+                                          {item.recipient_name || item.recipient_email}
+                                        </span>
+                                        <span className="font-mono text-[11px] text-slate-400 truncate">
+                                          &lt;{item.recipient_email}&gt;
+                                        </span>
+                                      </div>
+
+                                      <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-400">
+                                        {item.recipient_register_no && (
+                                          <span>Reg: {item.recipient_register_no}</span>
+                                        )}
+                                        {item.recipient_dept && (
+                                          <span>Dept: {item.recipient_dept}</span>
+                                        )}
+                                        {item.recipient_batch && (
+                                          <span>Batch: {item.recipient_batch}</span>
+                                        )}
+                                        <span>Attempts: {item.attempts}</span>
+                                        {item.sent_at && (
+                                          <span>Sent: {formatISTDateTime(item.sent_at)}</span>
+                                        )}
+                                      </div>
+
+                                      {/* Failure reason if any */}
+                                      {item.status === "failed" && item.error_message && (
+                                        <p className="text-[10px] text-rose-600 dark:text-rose-400 font-mono bg-rose-50 dark:bg-rose-950/60 p-1.5 rounded-lg border border-rose-200 dark:border-rose-900 mt-1">
+                                          ⚠️ Error: {item.error_message}
+                                        </p>
+                                      )}
+                                    </div>
+
+                                    {/* Item Status & Retry Action */}
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      <span
+                                        className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                                          item.status === "sent"
+                                            ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                                            : item.status === "processing"
+                                            ? "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 animate-pulse"
+                                            : item.status === "failed"
+                                            ? "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
+                                            : "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                                        }`}
+                                      >
+                                        {item.status}
+                                      </span>
+
+                                      {item.status === "failed" && (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleRetryItem(item.id, batch.batch_id)}
+                                          disabled={isItemLoading}
+                                          className="inline-flex items-center gap-1 rounded-lg bg-rose-50 border border-rose-200 px-2 py-1 text-[11px] font-bold text-rose-700 hover:bg-rose-100 dark:bg-rose-950/80 dark:border-rose-900 dark:text-rose-300 cursor-pointer shadow-2xs transition disabled:opacity-50"
+                                        >
+                                          <RotateCcw className={`h-3 w-3 ${isItemLoading ? "animate-spin" : ""}`} />
+                                          <span>Retry</span>
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       ) : (
@@ -1401,7 +1935,7 @@ export default function AdminMailSender() {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
               <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <Send className="h-4 w-4 text-teal-600" />
-                Confirm Email Broadcast
+                Confirm Email Queue Broadcast
               </h3>
               {!sending && (
                 <button
@@ -1439,7 +1973,7 @@ export default function AdminMailSender() {
 
               {sendResult ? (
                 <div
-                  className={`p-4 rounded-xl border text-xs font-medium space-y-1 ${
+                  className={`p-4 rounded-xl border text-xs font-medium space-y-2 ${
                     sendResult.success
                       ? "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/80 dark:text-emerald-200"
                       : "bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/80 dark:text-rose-200"
@@ -1453,11 +1987,28 @@ export default function AdminMailSender() {
                     )}
                     <span>{sendResult.message}</span>
                   </div>
+
+                  {sendResult.success && sendResult.batch_id && (
+                    <div className="pt-2 border-t border-emerald-200 dark:border-emerald-900 flex items-center justify-between">
+                      <span className="font-mono text-[11px]">Batch ID: {sendResult.batch_id}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsConfirmModalOpen(false);
+                          setActiveSubTab("queue");
+                          setExpandedBatchId(sendResult.batch_id);
+                        }}
+                        className="inline-flex items-center gap-1 font-bold text-teal-700 dark:text-teal-300 hover:underline cursor-pointer"
+                      >
+                        <span>View in Live Queue</span>
+                        <ArrowRight className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                  Emails will be dispatched concurrently using Gomail with rate-limiting safety.
-                  Placeholders will be uniquely replaced for each student recipient.
+                  Emails will be added to the background Job Queue and dispatched sequentially one-by-one to prevent SMTP provider rate limits.
                 </p>
               )}
             </div>
@@ -1480,7 +2031,7 @@ export default function AdminMailSender() {
                   className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 px-5 py-2 text-xs font-bold text-white shadow-md shadow-teal-500/20 hover:from-teal-700 hover:to-emerald-700 disabled:opacity-50 cursor-pointer"
                 >
                   {sending ? <Loader className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                  <span>{sending ? `Sending ${recipientCount} emails...` : "Confirm & Send"}</span>
+                  <span>{sending ? `Queueing ${recipientCount} emails...` : "Confirm & Queue"}</span>
                 </button>
               )}
             </div>
@@ -1490,3 +2041,4 @@ export default function AdminMailSender() {
     </div>
   );
 }
+
