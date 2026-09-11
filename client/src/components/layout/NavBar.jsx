@@ -25,7 +25,8 @@ function Navbar() {
   }, [user, profile]);
 
   const navItems = [
-    { to: "/home", label: "Home" },
+    { to: "/dashboard", label: "Dashboard" },
+    { to: "/tools", label: "Tools" },
     ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
     { to: "/profile", label: "My Profile" },
     { to: "/about", label: "About" }
@@ -33,6 +34,7 @@ function Navbar() {
 
   const isActiveNavItem = (item) => {
     if (item.to === "/admin") return location.pathname.startsWith("/admin");
+    if (item.to === "/dashboard") return location.pathname.startsWith("/dashboard");
     return location.pathname === item.to;
   };
 
@@ -58,7 +60,7 @@ function Navbar() {
 
           <div className="relative max-w-7xl mx-auto">
             <div className="flex items-center justify-between px-4 py-3 md:px-6 lg:px-8">
-              <Link to="/home" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity" aria-label="Go to home">
+              <Link to="/dashboard" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity" aria-label="Go to Dashboard">
                 <Star className="h-8 w-8 md:h-10 md:w-10 text-white drop-shadow-lg" fill="currentColor" />
                 <span className="text-xl md:text-2xl font-bold text-white drop-shadow-lg">BIT-CENTRAL</span>
               </Link>

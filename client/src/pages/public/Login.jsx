@@ -30,7 +30,7 @@ function Login() {
 
   useEffect(() => {
     if (user && isAllowedEmail(user.email)) {
-      navigate("/home", { replace: true });
+      navigate("/dashboard", { replace: true });
     }
   }, [user, navigate]);
 
@@ -50,7 +50,7 @@ function Login() {
   const handleGuestLogin = () => {
     setError("");
     activateGuestSession();
-    navigate("/home", { replace: true });
+    navigate("/dashboard", { replace: true });
   };
 
   const isLoading = loading || isSigningIn;

@@ -14,8 +14,8 @@ function NotFound() {
         </p>
 
         <div className="mt-6">
-          <Link to="/home" className="inline-block px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 transition-colors duration-300">
-            Go to Home
+          <Link to="/dashboard" className="inline-block px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 transition-colors duration-300">
+            Go to Dashboard
           </Link>
         </div>
         <p className="mt-6 text-sm text-blue-500 dark:text-blue-400">Error code: 404</p>

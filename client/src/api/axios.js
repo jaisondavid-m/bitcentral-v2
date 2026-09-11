@@ -187,4 +187,60 @@ export async function getFacultyDirectory({ query = "", department = "" } = {}) 
   }
 }
 
+/**
+ * Fetches the authenticated student's profile & reward points.
+ */
+export async function getDashboardRewards() {
+  try {
+    const headers = await getAuthenticatedHeaders();
+    const response = await api.get("/dashboard/rewards", { headers });
+    return response.data?.data || null;
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
+ * Fetches the current/upcoming mess menu for the selected hostel.
+ * @param {string} hostel - "boys" | "girls"
+ */
+export async function getDashboardMess(hostel = "boys") {
+  try {
+    const headers = await getAuthenticatedHeaders();
+    const response = await api.get(`/dashboard/mess?hostel=${encodeURIComponent(hostel)}`, { headers });
+    return response.data?.data || null;
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
+ * Fetches the upcoming leaves for the student dashboard.
+ */
+export async function getDashboardLeaves() {
+  try {
+    const headers = await getAuthenticatedHeaders();
+    const response = await api.get("/dashboard/leaves", { headers });
+    return response.data?.data || [];
+  } catch (error) {
+    return [];
+  }
+}
+
+/**
+ * Fetches the aggregated dashboard summary for the authenticated user.
+ * Automatically verified from user session token.
+ * @param {string} hostel - "boys" | "girls"
+ */
+export async function getDashboardSummary(hostel = "boys") {
+  try {
+    const headers = await getAuthenticatedHeaders();
+    const response = await api.get(`/dashboard/summary?hostel=${encodeURIComponent(hostel)}`, { headers });
+    return response.data?.data || null;
+  } catch (error) {
+    return null;
+  }
+}
+
+
 

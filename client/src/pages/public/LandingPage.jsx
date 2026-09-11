@@ -23,7 +23,7 @@ export default function LandingPage() {
     const isLoggedInUser = Boolean(user && isAllowedEmail(user.email));
 
     if (isLoggedInUser || validCookieToken) {
-      navigate("/home", { replace: true });
+      navigate("/dashboard", { replace: true });
     }
   }, [user, loading, navigate]);
 

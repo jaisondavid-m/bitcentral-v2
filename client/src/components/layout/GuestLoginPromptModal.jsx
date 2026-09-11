@@ -63,7 +63,7 @@ export default function GuestLoginPromptModal() {
       const res = await signInWithGoogle();
       handleDismiss();
       if (res?.user) {
-        navigate("/home", { replace: true });
+        navigate("/dashboard", { replace: true });
       } else {
         navigate("/login");
       }

@@ -119,7 +119,7 @@ export default function FloatingMenu() {
 
   const handleGoHome = () => {
     setIsMenuOpen(false);
-    navigate("/home");
+    navigate("/dashboard");
   };
 
   const handleFacultyDirectory = () => {
@@ -253,13 +253,13 @@ export default function FloatingMenu() {
                 onClick={handleGoHome}
               >
                 <span className="rounded-full bg-white/95 text-slate-800 border border-slate-200/90 shadow-xl backdrop-blur-md dark:bg-slate-900/95 dark:text-slate-100 dark:border-slate-700/70 px-3.5 py-1.5 text-xs font-bold whitespace-nowrap group-hover:bg-slate-100 dark:group-hover:bg-slate-800 transition-colors">
-                  Home Page 🏠
+                  Dashboard 🏠
                 </span>
 
                 <div className="w-14 flex items-center justify-center shrink-0">
                   <button
                     className="flex items-center justify-center h-12 w-12 rounded-full bg-white/95 border border-slate-200/90 shadow-lg backdrop-blur-md group-hover:border-indigo-500/80 group-hover:bg-indigo-50 dark:bg-slate-900/95 dark:border-slate-700/80 dark:group-hover:bg-slate-800 group-hover:scale-110 active:scale-95 transition-all cursor-pointer"
-                    aria-label="Go to Home"
+                    aria-label="Go to Dashboard"
                   >
                     <Home className="h-5 w-5 text-indigo-600 dark:text-indigo-400 group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors" />
                   </button>

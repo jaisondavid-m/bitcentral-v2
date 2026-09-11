@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import FullScreenLoader from "@/components/common/FullScreenLoader.jsx";
 import SEO from "@/components/common/SEO.jsx";
@@ -164,7 +164,8 @@ function App() {
                 </AuthScope>
               }
             >
-              <Route path="/home" element={<Home />} />
+              <Route path="/home" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/tools" element={<Home />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/findmyway" element={<FindMyWay />} />
               <Route

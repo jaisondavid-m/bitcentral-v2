@@ -33,6 +33,7 @@ func SetupRouter(
 	aiHandler *handlers.AIHandler,
 	mailHandler *handlers.MailHandler,
 	internalMarksHandler *handlers.InternalMarksHandler,
+	dashboardHandler *handlers.DashboardHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -167,6 +168,12 @@ func SetupRouter(
 		// Feedback Chat User API
 		api.POST("/feedback/messages", feedbackHandler.SendMessage)
 		api.GET("/feedback/messages", feedbackHandler.GetUserMessages)
+
+		// Dashboard APIs (modular, independent split endpoints)
+		api.GET("/dashboard/rewards", dashboardHandler.GetDashboardRewards)
+		api.GET("/dashboard/mess", dashboardHandler.GetDashboardMess)
+		api.GET("/dashboard/leaves", dashboardHandler.GetDashboardLeaves)
+		api.GET("/dashboard/summary", dashboardHandler.GetDashboardSummary)
 	}
 
 	// Serve uploaded files

@@ -10,13 +10,13 @@ export default function FloatingHomeButton() {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
 
-  // Do not display if user is not logged in or is already on home page
-  if (!user || location.pathname === "/home" || location.pathname === "/") {
+  // Do not display if user is not logged in or is already on dashboard
+  if (!user || location.pathname === "/dashboard" || location.pathname === "/") {
     return null;
   }
 
   const handleClick = () => {
-    navigate("/home");
+    navigate("/dashboard");
   };
 
   return (

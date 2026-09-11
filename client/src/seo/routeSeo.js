@@ -60,17 +60,10 @@ export const ROUTE_SEO = {
     noIndex: true,
   },
 
-  "/home": {
-    title: "Student Home",
-    description: "Protected BIT Central home page for academic tools, exam support, reward points, and student services.",
-    keywords: ["BIT Central home", "student dashboard", "campus tools"],
-    noIndex: true,
-  },
-
   "/dashboard": {
-    title: "Student Profile Dashboard",
-    description: "Protected BIT Central dashboard for student profile, department details, and account activity.",
-    keywords: ["student profile", "BIT dashboard", "account details"],
+    title: "Student Dashboard",
+    description: "Protected BIT Central student dashboard for academic tools, reward points, mess menu, and campus services.",
+    keywords: ["BIT Central dashboard", "student dashboard", "campus tools"],
     noIndex: true,
   },
 

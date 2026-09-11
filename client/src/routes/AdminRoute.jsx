@@ -21,7 +21,7 @@ function AdminRoute({ children }) {
     user?.isAdmin === true;
 
   if (!isAdmin) {
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
