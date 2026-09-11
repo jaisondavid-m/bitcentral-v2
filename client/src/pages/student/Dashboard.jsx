@@ -235,11 +235,11 @@ function Dashboard() {
 
   // ── Sub-render: Mess Menu Card ──
   const renderMessCard = () => (
-    <div className="w-full h-full rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/90 space-y-2.5 flex flex-col justify-between">
+    <div className="w-full h-full rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-3 sm:p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/90 space-y-2 flex flex-col justify-between">
       {/* Header Row */}
-      <div className="flex items-center justify-between gap-1.5 sm:gap-2">
+      <div className="flex items-center justify-between gap-1.5 sm:gap-2 pb-1.5 border-b border-slate-100 dark:border-slate-800/80">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="flex h-8 w-8 sm:h-8.5 sm:w-8.5 shrink-0 items-center justify-center rounded-xl bg-blue-50/90 text-blue-600 border border-blue-100/80 dark:bg-blue-950/40 dark:border-blue-900/40 dark:text-blue-400">
+          <div className="flex h-7.5 w-7.5 sm:h-8.5 sm:w-8.5 shrink-0 items-center justify-center rounded-xl bg-blue-50/90 text-blue-600 border border-blue-100/80 dark:bg-blue-950/40 dark:border-blue-900/40 dark:text-blue-400">
             <MealIcon className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
           </div>
           <h2 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
@@ -324,10 +324,10 @@ function Dashboard() {
 
   // ── Sub-render: Upcoming Leaves Card ──
   const renderLeavesCard = () => (
-    <div className="w-full h-full rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/90 space-y-2.5 flex flex-col justify-between">
+    <div className="w-full h-full rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white p-3 sm:p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/90 space-y-2 flex flex-col justify-between">
       <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800/80 gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="flex h-8 w-8 sm:h-8.5 sm:w-8.5 shrink-0 items-center justify-center rounded-xl bg-blue-50/90 text-blue-600 border border-blue-100/80 dark:bg-blue-950/40 dark:border-blue-900/40 dark:text-blue-400">
+          <div className="flex h-7.5 w-7.5 sm:h-8.5 sm:w-8.5 shrink-0 items-center justify-center rounded-xl bg-blue-50/90 text-blue-600 border border-blue-100/80 dark:bg-blue-950/40 dark:border-blue-900/40 dark:text-blue-400">
             <Calendar className="h-4 w-4" />
           </div>
           <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
@@ -346,27 +346,27 @@ function Dashboard() {
 
       {leavesLoading ? (
         <div className="space-y-2">
-          <div className="h-13 rounded-2xl bg-slate-100 dark:bg-slate-800/60 animate-pulse" />
-          <div className="h-13 rounded-2xl bg-slate-100 dark:bg-slate-800/60 animate-pulse" />
+          <div className="h-12 rounded-xl bg-slate-100 dark:bg-slate-800/60 animate-pulse" />
+          <div className="h-12 rounded-xl bg-slate-100 dark:bg-slate-800/60 animate-pulse" />
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-1.5 sm:space-y-2">
           {leaves && leaves.length > 0 ? (
             leaves.slice(0, 2).map((leave, idx) => (
               <div
                 key={idx}
-                className="rounded-2xl border border-slate-100 bg-slate-50/70 p-2.5 sm:p-3 shadow-2xs dark:border-slate-800 dark:bg-slate-800/50 space-y-1"
+                className="rounded-xl sm:rounded-2xl border border-slate-100 bg-slate-50/70 p-2 sm:p-2.5 shadow-2xs dark:border-slate-800 dark:bg-slate-800/50 space-y-1"
               >
                 <div className="flex items-center justify-between gap-2">
                   <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
                     {leave.name}
                   </h4>
-                  <span className="flex-shrink-0 rounded-lg bg-blue-50 px-2 py-0.5 text-[10px] sm:text-[11px] font-bold text-blue-700 border border-blue-200/60 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800">
+                  <span className="flex-shrink-0 rounded-md sm:rounded-lg bg-blue-50 px-1.5 sm:px-2 py-0.5 text-[9.5px] sm:text-[10.5px] font-bold text-blue-700 border border-blue-200/60 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800">
                     {leave.days_count} {leave.days_count === 1 ? "Day" : "Days"}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">
+                <div className="flex items-center justify-between text-[10.5px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">
                   <div className="flex items-center gap-1.5 truncate">
                     <Calendar className="h-3 w-3 flex-shrink-0 text-blue-500" />
                     <span className="truncate">
@@ -521,7 +521,7 @@ function Dashboard() {
 
             {/* ── MOBILE ONLY: AUTO-SLIDING BANNER TRACK ── */}
             <motion.section variants={fadeUp} className="space-y-2 lg:hidden">
-              <div className="relative overflow-hidden h-[196px] sm:h-[200px]">
+              <div className="relative overflow-hidden h-[210px] sm:h-[216px]">
                 <AnimatePresence initial={false} custom={direction} mode="popLayout">
                   <motion.div
                     key={page}
