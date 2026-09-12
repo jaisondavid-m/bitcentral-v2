@@ -57,7 +57,7 @@ const getMealIcon = (mealType) => {
 
 const quickActions = [
   {
-    to: "/ps-points",
+    to: "/rpsite",
     icon: Sparkles,
     label: "Reward Points",
     color: "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/40",
