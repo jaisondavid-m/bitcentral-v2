@@ -2,13 +2,6 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import { useLocation } from "react-router-dom";
 import { auth, logout, getStoredToken, getCurrentUser } from "@/config/auth.js";
 import { getMeProfile } from "@/api/axios.js";
-import {
-  clearGuestSession,
-  createGuestStudent,
-  createGuestUser,
-  readGuestSession,
-  subscribeToGuestSessionChanges,
-} from "@/services/guestSession.js";
 
 const AuthContext = createContext();
 
@@ -98,87 +91,21 @@ function getPresenceRouteLabel(pathname = "") {
 
 export const StudentContext = ({ children }) => {
   const location = useLocation();
-  const initialGuestSession = readGuestSession();
   const initialToken = getStoredToken();
-  const initialUser = initialGuestSession
-    ? createGuestUser(initialGuestSession)
-    : initialToken
-    ? getCurrentUser()
-    : null;
+  const initialUser = initialToken ? getCurrentUser() : null;
 
   const [user, setUser] = useState(initialUser);
-  const [student, setStudent] = useState(initialGuestSession ? createGuestStudent() : null);
+  const [student, setStudent] = useState(null);
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(Boolean(initialGuestSession || initialToken));
+  const [loading, setLoading] = useState(Boolean(initialToken));
   const [accessDeniedMessage, setAccessDeniedMessage] = useState("");
   const currentRouteLabel = useMemo(() => getPresenceRouteLabel(location.pathname), [location.pathname]);
   const hydratedEmailRef = useRef("");
-
-  const hydrateAuthenticatedUser = async (currentUser) => {
-    if (!currentUser?.email) {
-      setStudent(null);
-      setProfile(null);
-      hydratedEmailRef.current = "";
-      return;
-    }
-
-    if (hydratedEmailRef.current === currentUser.email) {
-      return;
-    }
-
-    hydratedEmailRef.current = currentUser.email;
-  setAccessDeniedMessage("");
-
-    clearGuestSession();
-    const decoded = decodeCollegeEmail(currentUser.email);
-    setStudent(decoded);
-
-    try {
-      const backendProfile = await getMeProfile();
-      if (backendProfile?.email) {
-        setProfile(backendProfile);
-        setStudent((prev) => toProfileStudent(backendProfile, decoded || prev));
-        const userRole = (backendProfile.role || "").toLowerCase().trim();
-        setUser((prev) => ({
-          ...prev,
-          role: userRole || "user",
-          isAdmin: userRole === "admin" || userRole === "superadmin" || userRole === "super_admin",
-        }));
-      } else {
-        setProfile(null);
-      }
-    } catch (error) {
-      const status = error?.response?.status;
-      const message = error?.response?.data?.message || error?.message || "Failed to load profile from /me";
-      if (status === 403 || error?.response?.data?.status === "blocked") {
-        setAccessDeniedMessage(message);
-        setUser(null);
-        setStudent(null);
-        setProfile(null);
-        hydratedEmailRef.current = "";
-        logout().catch(() => {});
-        return;
-      }
-      setProfile(null);
-      console.error("Failed to load profile from /me", error);
-    }
-  };
 
   useEffect(() => {
     let cancelled = false;
 
     const checkAuthState = async () => {
-      const guestSession = readGuestSession();
-
-      if (guestSession) {
-        setUser(createGuestUser(guestSession));
-        setStudent(createGuestStudent());
-        setProfile(null);
-        hydratedEmailRef.current = "";
-        setLoading(false);
-        return;
-      }
-
       const currentUser = auth.currentUser;
       setUser(currentUser);
 
@@ -241,28 +168,12 @@ export const StudentContext = ({ children }) => {
     window.addEventListener("auth_state_changed", handleAuthChange);
     window.addEventListener("storage", handleAuthChange);
 
-    const unsubscribeGuest = subscribeToGuestSessionChanges(() => {
-      checkAuthState();
-    });
-
-    const checkGuestExpiration = () => {
-      readGuestSession();
-    };
-
-    const intervalId = setInterval(checkGuestExpiration, 60000);
-    window.addEventListener("focus", checkGuestExpiration);
-
     return () => {
       cancelled = true;
       window.removeEventListener("auth_state_changed", handleAuthChange);
       window.removeEventListener("storage", handleAuthChange);
-      unsubscribeGuest();
-      clearInterval(intervalId);
-      window.removeEventListener("focus", checkGuestExpiration);
     };
   }, []);
-
-
 
   return (
     <AuthContext.Provider value={{ user, student, profile, loading, accessDeniedMessage, setAccessDeniedMessage }}>

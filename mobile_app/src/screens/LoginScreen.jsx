@@ -12,7 +12,6 @@ import {
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { useAuth } from '../context/StudentContext';
 import { postGoogleAuth } from '../api/axios';
-import { isGuestLoginEnabled } from '../services/guestSession';
 import ENV from '../config/env';
 
 GoogleSignin.configure({
@@ -21,7 +20,7 @@ GoogleSignin.configure({
 });
 
 export default function LoginScreen() {
-  const { loginWithGoogleUser, loginAsGuest, accessDeniedMessage } = useAuth();
+  const { loginWithGoogleUser, accessDeniedMessage } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -92,19 +91,6 @@ export default function LoginScreen() {
     }
   };
 
-
-  const handleGuestLogin = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      await loginAsGuest();
-    } catch (err) {
-      setError('Guest login failed');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -145,20 +131,7 @@ export default function LoginScreen() {
             )}
           </TouchableOpacity>
 
-          {isGuestLoginEnabled && (
-            <TouchableOpacity
-              style={styles.guestButton}
-              disabled={loading}
-              onPress={handleGuestLogin}
-            >
-              <Text style={styles.guestButtonText}>Continue as Guest</Text>
-            </TouchableOpacity>
-          )}
-
           <Text style={styles.footerNote}>Secure authentication powered by Google</Text>
-          {isGuestLoginEnabled && (
-            <Text style={styles.guestNote}>Guest login mode allows instant preview of student tools.</Text>
-          )}
         </View>
       </View>
     </SafeAreaView>
@@ -245,30 +218,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
   },
-  guestButton: {
-    backgroundColor: '#EFF6FF',
-    borderColor: '#BFDBFE',
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  guestButtonText: {
-    color: '#1D4ED8',
-    fontSize: 15,
-    fontWeight: '600',
-  },
   footerNote: {
     fontSize: 12,
     color: '#94A3B8',
     textAlign: 'center',
     marginTop: 8,
-  },
-  guestNote: {
-    fontSize: 11,
-    color: '#3B82F6',
-    textAlign: 'center',
-    marginTop: 6,
   },
 });

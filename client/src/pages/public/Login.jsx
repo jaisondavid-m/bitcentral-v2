@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { signInWithGoogle } from "@/config/auth.js";
 import { isAllowedEmail } from "@/services/authRules.js";
-import { AlertCircle, LogIn, Moon, Sun } from "lucide-react";
+import { AlertCircle, Moon, Sun } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext.jsx";
-import { activateGuestSession, isGuestLoginEnabled } from "@/services/guestSession.js";
 import { useAuth } from "@/context/StudentContext.jsx";
 
 function Login() {
@@ -45,12 +44,6 @@ function Login() {
     } finally {
       setIsSigningIn(false);
     }
-  };
-
-  const handleGuestLogin = () => {
-    setError("");
-    activateGuestSession();
-    navigate("/dashboard", { replace: true });
   };
 
   const isLoading = loading || isSigningIn;
@@ -105,20 +98,6 @@ function Login() {
             <span>{isLoading ? "Checking authentication..." : "Sign in with Google"}</span>
           </button>
 
-          {isGuestLoginEnabled && (
-            <button
-              type="button"
-              disabled={isLoading}
-              onClick={handleGuestLogin}
-              className={`mt-3 flex w-full items-center justify-center gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700 transition-all hover:border-blue-300 hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-200 dark:hover:bg-blue-950 ${
-                isLoading ? "cursor-not-allowed opacity-50" : ""
-              }`}
-            >
-              <LogIn className="h-5 w-5" />
-              Continue as Guest
-            </button>
-          )}
-
           <p className="mt-6 text-center text-xs text-gray-400 dark:text-slate-400">Secure authentication powered by Google</p>
 
           {accessDeniedMessage && (
@@ -126,13 +105,6 @@ function Login() {
               Contact support@bitsathy.in for more details.
             </p>
           )}
-
-          {isGuestLoginEnabled && (
-            <p className="mt-3 text-center text-[11px] text-blue-500 dark:text-blue-300">
-              Guest login mode allows instant preview of student tools.
-            </p>
-          )}
-
         </div>
       </div>
     </main>

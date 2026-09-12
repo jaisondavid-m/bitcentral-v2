@@ -110,16 +110,10 @@ export default function ProfileScreen() {
           <Text style={styles.email}>{email}</Text>
 
           <View style={styles.badgeRow}>
-            {user?.isGuest ? (
-              <View style={[styles.badge, styles.guestBadge]}>
-                <Text style={styles.guestBadgeText}>Guest Session</Text>
-              </View>
-            ) : (
-              <View style={[styles.badge, styles.studentBadge]}>
-                <Ionicons name="school-outline" size={14} color="#1D4ED8" style={styles.badgeIcon} />
-                <Text style={styles.studentBadgeText}>BIT Sathy Student</Text>
-              </View>
-            )}
+            <View style={[styles.badge, styles.studentBadge]}>
+              <Ionicons name="school-outline" size={14} color="#1D4ED8" style={styles.badgeIcon} />
+              <Text style={styles.studentBadgeText}>BIT Sathy Student</Text>
+            </View>
           </View>
         </View>
 
@@ -338,14 +332,6 @@ const styles = StyleSheet.create({
   studentBadgeText: {
     fontSize: 12,
     color: '#1D4ED8',
-    fontWeight: '600',
-  },
-  guestBadge: {
-    backgroundColor: '#FEF3C7',
-  },
-  guestBadgeText: {
-    fontSize: 12,
-    color: '#D97706',
     fontWeight: '600',
   },
   loadingBox: {

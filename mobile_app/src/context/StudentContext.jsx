@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { GUEST_USER, setGuestSession, clearGuestSession } from '../services/guestSession';
 import { isAllowedEmail } from '../services/authRules';
 
 const StudentContext = createContext({});
@@ -63,7 +62,6 @@ export function StudentProvider({ children }) {
       roll_no: googleUser.roll_no || googleUser.rollNo,
       user_id: googleUser.user_id || googleUser.userId,
       photoURL: googleUser.photo || googleUser.photoURL,
-      isGuest: false,
     };
 
     setUser(userData);
@@ -74,16 +72,11 @@ export function StudentProvider({ children }) {
     return true;
   };
 
-  const loginAsGuest = async () => {
-    setAccessDeniedMessage('');
-    setUser(GUEST_USER);
-    await setGuestSession();
-  };
-
   const logout = async () => {
     setUser(null);
-    await clearGuestSession();
+    await AsyncStorage.removeItem('user_session');
     await AsyncStorage.removeItem('auth_token');
+    await AsyncStorage.removeItem('me_profile');
   };
 
   return (
@@ -93,7 +86,6 @@ export function StudentProvider({ children }) {
         loading,
         accessDeniedMessage,
         loginWithGoogleUser,
-        loginAsGuest,
         logout,
       }}
     >
