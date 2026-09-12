@@ -142,6 +142,7 @@ export default function AdminAuditLogs() {
   const [logSearchInput, setLogSearchInput] = useState("");
   const [selectedMethod, setSelectedMethod] = useState("ALL");
   const [selectedStatus, setSelectedStatus] = useState("ALL");
+  const [selectedUserType, setSelectedUserType] = useState("ALL");
 
   // User Tab State
   const [userSummaries, setUserSummaries] = useState([]);
@@ -214,6 +215,7 @@ export default function AdminAuditLogs() {
         search: logSearch,
         method: selectedMethod === "ALL" ? "" : selectedMethod,
         status: selectedStatus === "ALL" ? "" : selectedStatus,
+        user_type: selectedUserType === "ALL" ? "" : selectedUserType,
       });
       if (data.success) {
         setLogs(data.logs || []);
@@ -227,7 +229,7 @@ export default function AdminAuditLogs() {
     } finally {
       setLoadingLogs(false);
     }
-  }, [logPage, logLimit, logSearch, selectedMethod, selectedStatus]);
+  }, [logPage, logLimit, logSearch, selectedMethod, selectedStatus, selectedUserType]);
 
   // 2. Fetch User Audit Summaries
   const fetchUserSummaries = useCallback(async () => {
@@ -1473,6 +1475,35 @@ export default function AdminAuditLogs() {
                   </button>
                 ))}
               </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-xs font-semibold text-slate-500 flex items-center gap-1">
+                  <Users className="h-3.5 w-3.5" /> User Scope:
+                </span>
+                {[
+                  { label: "All Logs", value: "ALL" },
+                  { label: "Students / Users", value: "registered" },
+                  { label: "Guest Preview Logs", value: "guest" },
+                ].map((u) => (
+                  <button
+                    key={u.value}
+                    type="button"
+                    onClick={() => {
+                      setSelectedUserType(u.value);
+                      setLogPage(1);
+                    }}
+                    className={`rounded-lg px-3 py-1 text-xs font-semibold transition ${
+                      selectedUserType === u.value
+                        ? u.value === "guest"
+                          ? "bg-amber-600 text-white shadow-sm ring-2 ring-amber-400/30"
+                          : "bg-purple-600 text-white shadow-sm"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                    }`}
+                  >
+                    {u.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -1541,7 +1572,7 @@ export default function AdminAuditLogs() {
                           </div>
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
-                          {log.user_name || log.roll_no || log.user_uid ? (
+                          {log.user_name || log.roll_no || (log.user_uid && log.user_uid !== "guest" && log.user_uid !== "guest-user") ? (
                             <div className="flex items-center gap-2">
                               <div className="flex flex-col">
                                 <span className="text-xs font-semibold text-slate-900 dark:text-white flex items-center gap-1">
@@ -1555,7 +1586,10 @@ export default function AdminAuditLogs() {
                               </div>
                             </div>
                           ) : (
-                            <span className="text-xs text-slate-400 italic">Guest / System</span>
+                            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 shadow-sm dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-300">
+                              <Eye className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                              Guest Preview
+                            </span>
                           )}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">

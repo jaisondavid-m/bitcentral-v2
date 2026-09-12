@@ -249,6 +249,13 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 		}
 	}
 
+	userType := strings.TrimSpace(strings.ToLower(c.Query("user_type")))
+	if userType == "guest" || userType == "guest_preview" || userType == "guest-preview" {
+		whereClauses = append(whereClauses, "(COALESCE(user_uid, '') = '' OR user_uid = 'guest' OR user_uid = 'guest-user' OR LOWER(TRIM(user_name)) = 'guest' OR LOWER(TRIM(user_name)) = 'guest student')")
+	} else if userType == "registered" || userType == "students" || userType == "users" {
+		whereClauses = append(whereClauses, "(COALESCE(user_uid, '') != '' AND user_uid != 'guest' AND user_uid != 'guest-user' AND LOWER(TRIM(user_name)) != 'guest' AND LOWER(TRIM(user_name)) != 'guest student')")
+	}
+
 	whereStmt := strings.Join(whereClauses, " AND ")
 
 	var total int

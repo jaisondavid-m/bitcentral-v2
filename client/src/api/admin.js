@@ -583,6 +583,7 @@ export async function getAuditLogs({
   roll_no = "",
   user_name = "",
   user = "",
+  user_type = "",
 } = {}) {
   const headers = await getAdminHeaders();
   const params = new URLSearchParams();
@@ -595,6 +596,7 @@ export async function getAuditLogs({
   if (roll_no) params.set("roll_no", roll_no);
   if (user_name) params.set("user_name", user_name);
   if (user) params.set("user", user);
+  if (user_type) params.set("user_type", user_type);
 
   const response = await api.get(`/admin/audit-logs?${params.toString()}`, { headers });
   return response.data;
