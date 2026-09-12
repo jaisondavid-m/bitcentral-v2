@@ -137,9 +137,9 @@ func SetupRouter(
 	r.POST("/api/chat", chatHandler.HandleChat)
 	r.POST("/chat", chatHandler.HandleChat)
 
-	// Protected routes
+	// Protected routes (strictly requires @bitsathy.ac.in authentication)
 	api := r.Group("/")
-	api.Use(handler.RequireAuth())
+	api.Use(middleware.RequireBitsathyAuth())
 	{
 		api.GET("/internal-marks/conversion", internalMarksHandler.GetInternalMarksConversion)
 		api.GET("/api/internal-marks/conversion", internalMarksHandler.GetInternalMarksConversion)

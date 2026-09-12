@@ -456,21 +456,19 @@ func (h *StudentLookupHandler) MobileGoogleLogin(c *gin.Context) {
 		return
 	}
 
-	// Enforce email domain if configured
-	if strings.ToLower(strings.TrimSpace(os.Getenv("ENFORCE_EMAIL_DOMAIN"))) == "true" {
-		if !(strings.HasSuffix(email, "@bitsathy.ac.in") || strings.HasSuffix(email, "@bitsathy.in")) {
-			domain := ""
-			if at := strings.LastIndex(email, "@"); at >= 0 {
-				domain = email[at+1:]
-			}
-			var count int
-			if h.DB != nil {
-				_ = h.DB.QueryRow(`SELECT COUNT(*) FROM allowed_emails WHERE (type='email' AND LOWER(value)=?) OR (type='domain' AND LOWER(value)=?)`, email, domain).Scan(&count)
-				if count == 0 {
-					c.JSON(http.StatusForbidden, gin.H{"success": false, "error": "Access restricted to allowed email domain."})
-					return
-				}
-			}
+	// Enforce @bitsathy.ac.in or @bitsathy.in email domain
+	if !(strings.HasSuffix(email, "@bitsathy.ac.in") || strings.HasSuffix(email, "@bitsathy.in")) {
+		domain := ""
+		if at := strings.LastIndex(email, "@"); at >= 0 {
+			domain = email[at+1:]
+		}
+		var count int
+		if h.DB != nil {
+			_ = h.DB.QueryRow(`SELECT COUNT(*) FROM allowed_emails WHERE (type='email' AND LOWER(value)=?) OR (type='domain' AND LOWER(value)=?)`, email, domain).Scan(&count)
+		}
+		if count == 0 {
+			c.JSON(http.StatusForbidden, gin.H{"success": false, "error": "Only @bitsathy.ac.in or @bitsathy.in email accounts are allowed."})
+			return
 		}
 	}
 
@@ -568,21 +566,19 @@ func (h *StudentLookupHandler) GoogleLogin(c *gin.Context) {
 	displayName := claims.Name
 	photoURL := claims.Picture
 
-	// Enforce email domain if configured
-	if strings.ToLower(strings.TrimSpace(os.Getenv("ENFORCE_EMAIL_DOMAIN"))) == "true" {
-		if !(strings.HasSuffix(email, "@bitsathy.ac.in") || strings.HasSuffix(email, "@bitsathy.in")) {
-			domain := ""
-			if at := strings.LastIndex(email, "@"); at >= 0 {
-				domain = email[at+1:]
-			}
-			var count int
-			if h.DB != nil {
-				_ = h.DB.QueryRow(`SELECT COUNT(*) FROM allowed_emails WHERE (type='email' AND LOWER(value)=?) OR (type='domain' AND LOWER(value)=?)`, email, domain).Scan(&count)
-				if count == 0 {
-					c.JSON(http.StatusForbidden, gin.H{"success": false, "error": "Access restricted to allowed email domain."})
-					return
-				}
-			}
+	// Enforce @bitsathy.ac.in or @bitsathy.in email domain
+	if !(strings.HasSuffix(email, "@bitsathy.ac.in") || strings.HasSuffix(email, "@bitsathy.in")) {
+		domain := ""
+		if at := strings.LastIndex(email, "@"); at >= 0 {
+			domain = email[at+1:]
+		}
+		var count int
+		if h.DB != nil {
+			_ = h.DB.QueryRow(`SELECT COUNT(*) FROM allowed_emails WHERE (type='email' AND LOWER(value)=?) OR (type='domain' AND LOWER(value)=?)`, email, domain).Scan(&count)
+		}
+		if count == 0 {
+			c.JSON(http.StatusForbidden, gin.H{"success": false, "error": "Only @bitsathy.ac.in or @bitsathy.in email accounts are allowed."})
+			return
 		}
 	}
 
