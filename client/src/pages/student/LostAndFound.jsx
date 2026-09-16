@@ -1311,7 +1311,7 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
                 type="text"
                 value={matchedRollNumber}
                 onChange={(e) => setMatchedRollNumber(e.target.value)}
-                placeholder="e.g. 7376222AD101 (if written on ID card, lab record, etc.)"
+                placeholder="e.g. 7376222AD101"
                 className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-bold uppercase tracking-wider outline-none focus:border-blue-500 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800"
               />
               <p className="text-[11px] text-slate-400 mt-1">
