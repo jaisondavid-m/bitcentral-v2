@@ -104,6 +104,21 @@ function formatRelative(dateStr) {
   return d.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
 }
 
+// Resolve full image URL (handles Cloudinary HTTPS URLs and local paths)
+function getMediaUrl(url) {
+  if (!url) return "";
+  if (
+    url.startsWith("http://") ||
+    url.startsWith("https://") ||
+    url.startsWith("blob:") ||
+    url.startsWith("data:")
+  ) {
+    return url;
+  }
+  const apiBase = import.meta.env.VITE_API_BASE_URL || "";
+  return `${apiBase}${url.startsWith("/") ? "" : "/"}${url}`;
+}
+
 export default function LostAndFound() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -729,7 +744,7 @@ export default function LostAndFound() {
               onClick={(e) => e.stopPropagation()}
             >
               <img
-                src={lightboxImage}
+                src={getMediaUrl(lightboxImage)}
                 alt="preview"
                 className="max-h-[80vh] w-auto object-contain rounded-xl"
               />
@@ -786,7 +801,7 @@ function CleanItemCard({
         {item.images && item.images.length > 0 ? (
           <div className="relative aspect-video w-full overflow-hidden rounded-t-2xl bg-gray-100 dark:bg-zinc-800">
             <img
-              src={item.images[0]}
+              src={getMediaUrl(item.images[0])}
               alt={item.title}
               onClick={() => onImageClick(item.images[0])}
               className="h-full w-full object-cover cursor-pointer hover:scale-102 transition-transform duration-300"
@@ -1423,7 +1438,7 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
                   key={idx}
                   className="relative h-16 w-16 rounded-xl overflow-hidden border border-gray-200 dark:border-zinc-700"
                 >
-                  <img src={img} alt="preview" className="h-full w-full object-cover" />
+                  <img src={getMediaUrl(img)} alt="preview" className="h-full w-full object-cover" />
                   <button
                     type="button"
                     onClick={() => handleRemoveImage(idx)}
