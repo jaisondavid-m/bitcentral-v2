@@ -72,18 +72,21 @@ function LeaveDetailsContent() {
     return new Date(dateStr).toLocaleDateString("en-GB", { weekday: "long" });
   };
 
-  const getDurationDays = (from, to, fromHalfDay) => {
+  const getDurationDays = (from, to, fromHalfDay, toHalfDay) => {
     const diffTime = Math.abs(new Date(to) - new Date(from));
     let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
     if (fromHalfDay === "AN") {
       days -= 0.5;
     }
-    return days;
+    if (toHalfDay === "FN") {
+      days -= 0.5;
+    }
+    return Math.max(0.5, days);
   };
 
   const LeaveCard = ({ leave, category }) => {
     const isExpanded = expandedId === leave.from_date;
-    const duration = getDurationDays(leave.from_date, leave.to_date, leave.from_half_day);
+    const duration = getDurationDays(leave.from_date, leave.to_date, leave.from_half_day, leave.to_half_day);
     const isCurrent = category === "current";
     const isUpcoming = category === "upcoming";
 
@@ -133,7 +136,7 @@ function LeaveDetailsContent() {
               <div className="mt-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                 <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
                 <span>
-                  {formatDate(leave.from_date)}{leave.from_half_day ? ` (${leave.from_half_day})` : ""} {(duration > 1 || duration === 0.5) && `• ${duration} ${duration === 1 ? "day" : "days"}`}
+                  {formatDate(leave.from_date)}{leave.from_half_day ? ` (${leave.from_half_day})` : ""}{leave.to_half_day ? ` → ${formatDate(leave.to_date)} (${leave.to_half_day})` : ""} {(duration > 1 || duration === 0.5) && `• ${duration} ${duration === 1 ? "day" : "days"}`}
                 </span>
               </div>
             </div>
@@ -173,6 +176,15 @@ function LeaveDetailsContent() {
                 <Clock className="w-4 h-4 text-amber-500 flex-shrink-0" />
                 <p className="text-xs text-amber-700 dark:text-amber-300 font-medium">
                   Leave starts Afternoon (AN) — First half day is College (CLG)
+                </p>
+              </div>
+            )}
+
+            {leave.to_half_day === "FN" && (
+              <div className="bg-teal-50/50 dark:bg-teal-950/20 border border-teal-200/50 dark:border-teal-900/30 rounded px-3 py-2 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-teal-500 flex-shrink-0" />
+                <p className="text-xs text-teal-700 dark:text-teal-300 font-medium">
+                  Leave ends Forenoon (FN) — Second half day is College (CLG)
                 </p>
               </div>
             )}

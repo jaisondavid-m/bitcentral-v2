@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
+	"server/data"
 )
 
 var DB *sql.DB
@@ -112,6 +114,7 @@ func InitMySQL() {
 	createDailyActiveUserStatsTable()
 	createAdminSentEmailsTable()
 	createEmailJobQueuesTables()
+	createCollegeLeavesTable()
 }
 
 func createAdminsTable() {
@@ -747,5 +750,74 @@ func createEmailJobQueuesTables() {
 	}
 }
 
+func createCollegeLeavesTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS college_leaves (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		name VARCHAR(255) NOT NULL,
+		from_date DATE NOT NULL,
+		to_date DATE NOT NULL,
+		day VARCHAR(50) NULL,
+		from_half_day VARCHAR(10) NOT NULL DEFAULT '',
+		to_half_day VARCHAR(10) NOT NULL DEFAULT '',
+		leave_type VARCHAR(50) NOT NULL DEFAULT 'GP',
+		remarks TEXT NULL,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		INDEX idx_leaves_dates (from_date, to_date),
+		INDEX idx_leaves_from (from_date)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
+	if _, err := DB.Exec(query); err != nil {
+		log.Printf("ℹ️ college_leaves table notice: %v", err)
+	} else {
+		log.Println("✅ college_leaves table ready")
+	}
 
+	// Safe column additions for existing tables
+	_, _ = DB.Exec(`ALTER TABLE college_leaves ADD COLUMN from_half_day VARCHAR(10) NOT NULL DEFAULT '' AFTER day`)
+	_, _ = DB.Exec(`ALTER TABLE college_leaves ADD COLUMN to_half_day VARCHAR(10) NOT NULL DEFAULT '' AFTER from_half_day`)
+	_, _ = DB.Exec(`ALTER TABLE college_leaves ADD COLUMN leave_type VARCHAR(50) NOT NULL DEFAULT 'GP' AFTER to_half_day`)
+	_, _ = DB.Exec(`ALTER TABLE college_leaves ADD COLUMN remarks TEXT NULL AFTER leave_type`)
+
+	// Seed initial holidays if table is empty
+	var count int
+	err := DB.QueryRow("SELECT COUNT(*) FROM college_leaves").Scan(&count)
+	if err == nil && count == 0 {
+		stmt, err := DB.Prepare(`
+			INSERT INTO college_leaves (name, from_date, to_date, day, from_half_day, to_half_day, leave_type, remarks)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+		`)
+		if err == nil {
+			defer stmt.Close()
+			for _, hol := range data.Holidays {
+				fromDate := hol.FromDate
+				fromHalfDay := hol.FromHalfDay
+				if strings.HasSuffix(fromDate, "(AN)") {
+					fromDate = strings.TrimSuffix(fromDate, "(AN)")
+					fromHalfDay = "AN"
+				} else if strings.HasSuffix(fromDate, "(FN)") {
+					fromDate = strings.TrimSuffix(fromDate, "(FN)")
+					fromHalfDay = "FN"
+				}
+
+				dayName := hol.Day
+				if dayName == "" {
+					if t, parseErr := time.Parse("2006-01-02", fromDate); parseErr == nil {
+						dayName = t.Weekday().String()
+					}
+				}
+
+				leaveType := "GP"
+				if strings.Contains(hol.Name, "GP") {
+					leaveType = "GP"
+				} else {
+					leaveType = "Holiday"
+				}
+
+				_, _ = stmt.Exec(hol.Name, fromDate, hol.ToDate, dayName, fromHalfDay, hol.ToHalfDay, leaveType, hol.Remarks)
+			}
+			log.Println("✅ Seeded default college leaves from initial holidays data")
+		}
+	}
+}
