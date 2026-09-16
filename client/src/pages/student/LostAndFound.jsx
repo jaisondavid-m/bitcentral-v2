@@ -989,7 +989,7 @@ function CleanItemCard({
 }
 
 /* =========================================================================
-   CLEAN REPORT MODAL
+   CLEAN REPORT MODAL (Streamlined Form)
    ========================================================================= */
 function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
   const { user } = useAuth();
@@ -997,45 +997,23 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
 
   const [itemType, setItemType] = useState(itemToEdit?.item_type || "lost");
   const [title, setTitle] = useState(itemToEdit?.title || "");
-  const [category, setCategory] = useState(itemToEdit?.category || "id_card");
-  const [description, setDescription] = useState(itemToEdit?.description || "");
   const [locationCampus, setLocationCampus] = useState(
     itemToEdit?.location_campus || ""
   );
-  const [locationDetails, setLocationDetails] = useState(
-    itemToEdit?.location_details || ""
+  const [description, setDescription] = useState(itemToEdit?.description || "");
+  const [matchedRollNumber, setMatchedRollNumber] = useState(
+    itemToEdit?.matched_roll_number || ""
   );
+  const [contactPhone, setContactPhone] = useState(
+    itemToEdit?.contact_phone || user?.phone || ""
+  );
+
   const [latitude, setLatitude] = useState(itemToEdit?.latitude || null);
   const [longitude, setLongitude] = useState(itemToEdit?.longitude || null);
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsError, setGpsError] = useState("");
 
-  const [dateOccurred, setDateOccurred] = useState(
-    itemToEdit?.date_occurred || new Date().toISOString().split("T")[0]
-  );
-  const [timeOccurred, setTimeOccurred] = useState(
-    itemToEdit?.time_occurred || ""
-  );
   const [images, setImages] = useState(itemToEdit?.images || []);
-  const [matchedRollNumber, setMatchedRollNumber] = useState(
-    itemToEdit?.matched_roll_number || ""
-  );
-  const [currentCustody, setCurrentCustody] = useState(
-    itemToEdit?.current_custody || "with_finder"
-  );
-  const [custodyDetails, setCustodyDetails] = useState(
-    itemToEdit?.custody_details || ""
-  );
-  const [secretQuestion, setSecretQuestion] = useState(
-    itemToEdit?.secret_question || ""
-  );
-  const [contactPhone, setContactPhone] = useState(
-    itemToEdit?.contact_phone || user?.phone || ""
-  );
-  const [showPhone, setShowPhone] = useState(
-    itemToEdit?.show_phone !== undefined ? itemToEdit.show_phone : true
-  );
-
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -1059,7 +1037,7 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
         if (err.code === 1) {
           setGpsError("Permission denied. Please allow location access in your browser.");
         } else if (err.code === 2) {
-          setGpsError("Location unavailable. Make sure your device location / GPS is turned on.");
+          setGpsError("Location unavailable. Make sure your device GPS is on.");
         } else {
           setGpsError("Failed to fetch GPS coordinates. Please try again.");
         }
@@ -1107,15 +1085,15 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim()) {
-      setErrorMsg("Please enter an item title");
+      setErrorMsg("Please enter the item name");
       return;
     }
     if (!locationCampus.trim()) {
-      setErrorMsg("Please enter the place/location where item was found or lost");
-      return;
-    }
-    if (!description.trim()) {
-      setErrorMsg("Please provide a description");
+      setErrorMsg(
+        itemType === "lost"
+          ? "Please enter the location where you lost the item"
+          : "Please enter the location where you found the item"
+      );
       return;
     }
 
@@ -1125,21 +1103,21 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
     const payload = {
       item_type: itemType,
       title: title.trim(),
-      category,
+      category: matchedRollNumber.trim() ? "id_card" : "others",
       description: description.trim(),
       location_campus: locationCampus.trim(),
-      location_details: locationDetails.trim(),
-      latitude: latitude != null ? Number(latitude) : null,
-      longitude: longitude != null ? Number(longitude) : null,
-      date_occurred: dateOccurred,
-      time_occurred: timeOccurred.trim(),
-      images,
-      matched_roll_number: matchedRollNumber.trim().toUpperCase(),
-      current_custody: itemType === "found" ? currentCustody : "with_finder",
-      custody_details: custodyDetails.trim(),
-      secret_question: secretQuestion.trim(),
+      location_details: "",
+      latitude: itemType === "found" && latitude != null ? Number(latitude) : null,
+      longitude: itemType === "found" && longitude != null ? Number(longitude) : null,
+      date_occurred: itemToEdit?.date_occurred || new Date().toISOString().split("T")[0],
+      time_occurred: "",
+      images: images || [],
+      matched_roll_number: itemType === "found" ? matchedRollNumber.trim().toUpperCase() : "",
+      current_custody: "with_finder",
+      custody_details: "",
+      secret_question: "",
       contact_phone: contactPhone.trim(),
-      show_phone: showPhone,
+      show_phone: Boolean(contactPhone.trim()),
       allow_inapp_claim: true,
     };
 
@@ -1169,20 +1147,23 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
         initial={{ scale: 0.96, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.96, opacity: 0 }}
-        className="relative my-6 w-full max-w-xl rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
+        className="relative my-6 w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
       >
-        <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-zinc-800">
+        {/* Modal Header */}
+        <div className="flex items-center justify-between pb-3.5 border-b border-gray-100 dark:border-zinc-800">
           <div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              {isEditing ? "Edit Item" : "Report an Item"}
+              {isEditing ? "Edit Listing" : itemType === "lost" ? "Report Lost Item" : "Report Found Item"}
             </h3>
-            <p className="text-xs text-slate-400">
-              Provide clear details so the item can be identified quickly.
+            <p className="text-xs text-slate-400 mt-0.5">
+              {itemType === "lost"
+                ? "Enter quick details so finder can return it to you."
+                : "Help return this found item to its rightful owner."}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-gray-100 dark:hover:bg-zinc-800"
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
@@ -1195,149 +1176,81 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4 max-h-[70vh] overflow-y-auto pr-1">
-          {/* Item Type Segmented */}
-          <div className="grid grid-cols-2 gap-2 bg-gray-100 p-1 rounded-xl dark:bg-zinc-800">
-            <button
-              type="button"
-              onClick={() => setItemType("lost")}
-              className={`rounded-lg py-2 text-xs font-bold transition ${
-                itemType === "lost"
-                  ? "bg-white text-rose-600 shadow-xs dark:bg-zinc-900 dark:text-rose-400"
-                  : "text-slate-600 dark:text-slate-400"
-              }`}
-            >
-              🔍 I Lost Something
-            </button>
-            <button
-              type="button"
-              onClick={() => setItemType("found")}
-              className={`rounded-lg py-2 text-xs font-bold transition ${
-                itemType === "found"
-                  ? "bg-white text-emerald-600 shadow-xs dark:bg-zinc-900 dark:text-emerald-400"
-                  : "text-slate-600 dark:text-slate-400"
-              }`}
-            >
-              🎁 I Found Something
-            </button>
-          </div>
-
-          {/* Title & Category */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Item Name *
-              </label>
-              <input
-                type="text"
-                required
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Blue Titan Bottle, Casio FX-991"
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Category *
-              </label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
+        <form onSubmit={handleSubmit} className="mt-4 space-y-3.5 max-h-[72vh] overflow-y-auto pr-1">
+          {/* Item Type Segmented Switch */}
+          {!isEditing && (
+            <div className="grid grid-cols-2 gap-1.5 bg-gray-100 p-1 rounded-xl dark:bg-zinc-800">
+              <button
+                type="button"
+                onClick={() => setItemType("lost")}
+                className={`rounded-lg py-2 text-xs font-bold transition cursor-pointer ${
+                  itemType === "lost"
+                    ? "bg-white text-rose-600 shadow-xs dark:bg-zinc-900 dark:text-rose-400"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                }`}
               >
-                {ITEM_CATEGORIES.filter((c) => c.id !== "all").map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Smart Roll Matcher if ID Card */}
-          {category === "id_card" && (
-            <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-3 dark:border-blue-900 dark:bg-blue-950/20">
-              <label className="block text-xs font-bold text-blue-900 dark:text-blue-300">
-                Student Roll Number (Auto-Notification)
-              </label>
-              <p className="text-[11px] text-blue-600 dark:text-blue-400 mt-0.5">
-                Entering roll number will automatically dispatch a notification to that student.
-              </p>
-              <input
-                type="text"
-                value={matchedRollNumber}
-                onChange={(e) => setMatchedRollNumber(e.target.value)}
-                placeholder="e.g. 7376222AD101"
-                className="mt-1.5 w-full rounded-lg border border-blue-300 bg-white px-3 py-1.5 text-xs font-bold uppercase tracking-wider dark:border-blue-800 dark:bg-zinc-900"
-              />
+                🔍 I Lost Something
+              </button>
+              <button
+                type="button"
+                onClick={() => setItemType("found")}
+                className={`rounded-lg py-2 text-xs font-bold transition cursor-pointer ${
+                  itemType === "found"
+                    ? "bg-white text-emerald-600 shadow-xs dark:bg-zinc-900 dark:text-emerald-400"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                }`}
+              >
+                🎁 I Found Something
+              </button>
             </div>
           )}
 
-          {/* Description */}
+          {/* 1. Item Name */}
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Description *
+              Item Name *
             </label>
-            <textarea
+            <input
+              type="text"
               required
-              rows={2}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Color, brand, identifying marks, condition..."
-              className="w-full rounded-xl border border-gray-200 bg-gray-50 p-2.5 text-xs font-medium outline-none focus:border-blue-500 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={itemType === "lost" ? "e.g. Blue Titan Bottle, Casio FX-991, Keys..." : "e.g. Casio Calculator, ID Card, Watch..."}
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800"
             />
           </div>
 
-          {/* Location & GPS Pin */}
-          <div className="space-y-2.5">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Place / Campus Location *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={locationCampus}
-                  onChange={(e) => setLocationCampus(e.target.value)}
-                  placeholder="e.g. AS Block 2nd Floor, Central Library, Food Court..."
-                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800"
-                />
-              </div>
+          {/* 2. Location */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              {itemType === "lost" ? "Where was it lost? *" : "Where was it found? *"}
+            </label>
+            <input
+              type="text"
+              required
+              value={locationCampus}
+              onChange={(e) => setLocationCampus(e.target.value)}
+              placeholder="e.g. AS Block 2nd Floor, Central Library, Food Court, SF-204..."
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800"
+            />
+          </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Room / Specific Spot (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={locationDetails}
-                  onChange={(e) => setLocationDetails(e.target.value)}
-                  placeholder="e.g. SF-204 2nd bench, near water cooler"
-                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
-                />
-              </div>
-            </div>
-
-            {/* GPS Pin Capture Box */}
-            <div className="rounded-xl border border-gray-200/90 bg-gray-50/80 p-3 dark:border-zinc-800 dark:bg-zinc-800/40">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+          {/* Found Only: GPS Location Pin (Optional) */}
+          {itemType === "found" && (
+            <div className="rounded-xl border border-gray-200/90 bg-gray-50/80 p-2.5 dark:border-zinc-800 dark:bg-zinc-800/40">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div>
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
+                  <div className="flex items-center gap-1 text-xs font-bold text-slate-800 dark:text-slate-200">
                     <MapPin className="h-3.5 w-3.5 text-rose-500" />
-                    <span>Attach Current GPS Location Pin</span>
+                    <span>GPS Location Pin (Optional)</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                    {itemType === "found"
-                      ? "Pin exact GPS coordinates if you found the item at your current location."
-                      : "Pin exact GPS coordinates if you are currently at the lost location."}
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Pin exact coordinates if you found it at your current spot.
                   </p>
                 </div>
 
                 {latitude && longitude ? (
-                  <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-100/90 px-3 py-1.5 text-xs font-bold text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 self-start sm:self-auto">
+                  <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-100/90 px-2.5 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 self-start sm:self-auto">
                     <span className="flex items-center gap-1">
                       <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                       <span>{Number(latitude).toFixed(5)}, {Number(longitude).toFixed(5)}</span>
@@ -1367,84 +1280,68 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
                     type="button"
                     onClick={handleGetGPSLocation}
                     disabled={gpsLoading}
-                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-blue-700 disabled:opacity-50 transition cursor-pointer self-start sm:self-auto"
+                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-blue-700 disabled:opacity-50 transition cursor-pointer self-start sm:self-auto"
                   >
                     {gpsLoading ? (
                       <RefreshCw className="h-3.5 w-3.5 animate-spin" />
                     ) : (
                       <Crosshair className="h-3.5 w-3.5" />
                     )}
-                    <span>{gpsLoading ? "Acquiring GPS Pin..." : "📍 Pin Current Location (GPS)"}</span>
+                    <span>{gpsLoading ? "Acquiring GPS..." : "📍 Pin Current Location"}</span>
                   </button>
                 )}
               </div>
 
               {gpsError && (
-                <p className="mt-2 text-[11px] font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                <p className="mt-1.5 text-[11px] font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-1">
                   <AlertCircle className="h-3 w-3 shrink-0" />
                   <span>{gpsError}</span>
                 </p>
               )}
             </div>
-          </div>
+          )}
 
-          {/* Date */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Date {itemType === "lost" ? "Lost" : "Found"} *
-              </label>
-              <input
-                type="date"
-                required
-                value={dateOccurred}
-                onChange={(e) => setDateOccurred(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Approx Time
-              </label>
-              <input
-                type="text"
-                value={timeOccurred}
-                onChange={(e) => setTimeOccurred(e.target.value)}
-                placeholder="e.g. Morning, 2:30 PM"
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
-              />
-            </div>
-          </div>
-
-          {/* Custody (Found only) */}
+          {/* Found Only: Student Register / Roll Number on Item (Optional) */}
           {itemType === "found" && (
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Where is this item kept?
+                Student Register / Roll No on Item (Optional)
               </label>
-              <select
-                value={currentCustody}
-                onChange={(e) => setCurrentCustody(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
-              >
-                {CUSTODY_OPTIONS.map((opt) => (
-                  <option key={opt.id} value={opt.id}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+              <input
+                type="text"
+                value={matchedRollNumber}
+                onChange={(e) => setMatchedRollNumber(e.target.value)}
+                placeholder="e.g. 7376222AD101 (if written on ID card, lab record, etc.)"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-bold uppercase tracking-wider outline-none focus:border-blue-500 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800"
+              />
+              <p className="text-[11px] text-slate-400 mt-1">
+                If provided, an automated notification will be dispatched to that student. Admin will also manage it.
+              </p>
             </div>
           )}
 
-          {/* Photos */}
+          {/* 3. Description (Optional) */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Description (Optional)
+            </label>
+            <textarea
+              rows={2}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Color, brand, identifying marks, condition..."
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 p-2.5 text-xs font-medium outline-none focus:border-blue-500 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800"
+            />
+          </div>
+
+          {/* 4. Photos (Optional - Max 4) */}
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                Photos (Max 4)
+                Photos (Optional - Max 4)
               </label>
               <span className="text-[11px] font-medium text-slate-400">
-                {images.length}/4 uploaded
+                {images.length}/4
               </span>
             </div>
 
@@ -1453,13 +1350,13 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
               {images.map((img, idx) => (
                 <div
                   key={idx}
-                  className="relative h-18 w-18 rounded-2xl overflow-hidden border border-gray-200 dark:border-zinc-700 shadow-xs group"
+                  className="relative h-16 w-16 rounded-xl overflow-hidden border border-gray-200 dark:border-zinc-700 shadow-xs group"
                 >
                   <img src={getMediaUrl(img)} alt="preview" className="h-full w-full object-cover" />
                   <button
                     type="button"
                     onClick={() => handleRemoveImage(idx)}
-                    className="absolute top-1 right-1 rounded-full bg-black/70 p-1 text-white hover:bg-rose-600 transition cursor-pointer"
+                    className="absolute top-0.5 right-0.5 rounded-full bg-black/70 p-1 text-white hover:bg-rose-600 transition cursor-pointer"
                     title="Remove Photo"
                   >
                     <X className="h-3 w-3" />
@@ -1475,19 +1372,19 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
                     type="button"
                     onClick={() => setShowCameraModal(true)}
                     disabled={uploadingImage}
-                    className="flex h-18 min-w-[76px] px-2.5 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-blue-300 bg-blue-50/50 hover:bg-blue-100/60 dark:border-blue-800/80 dark:bg-blue-950/20 dark:hover:bg-blue-950/40 text-blue-600 dark:text-blue-400 transition"
-                    title="Take photo using camera"
+                    className="flex h-16 min-w-[70px] px-2 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-blue-300 bg-blue-50/50 hover:bg-blue-100/60 dark:border-blue-800/80 dark:bg-blue-950/20 dark:hover:bg-blue-950/40 text-blue-600 dark:text-blue-400 transition"
+                    title="Take photo using live camera"
                   >
-                    <Camera className="h-4 w-4 mb-1" />
+                    <Camera className="h-4 w-4 mb-0.5" />
                     <span className="text-[10px] font-bold">Camera</span>
                   </button>
 
                   {/* Button 2: File Upload / Gallery */}
-                  <label className="flex h-18 min-w-[76px] px-2.5 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100/80 dark:border-zinc-700 dark:bg-zinc-800/60 dark:hover:bg-zinc-800 text-slate-500 dark:text-slate-300 transition">
+                  <label className="flex h-16 min-w-[70px] px-2 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100/80 dark:border-zinc-700 dark:bg-zinc-800/60 dark:hover:bg-zinc-800 text-slate-500 dark:text-slate-300 transition">
                     {uploadingImage ? (
-                      <RefreshCw className="h-4 w-4 animate-spin text-blue-500 mb-1" />
+                      <RefreshCw className="h-4 w-4 animate-spin text-blue-500 mb-0.5" />
                     ) : (
-                      <Upload className="h-4 w-4 mb-1" />
+                      <Upload className="h-4 w-4 mb-0.5" />
                     )}
                     <span className="text-[10px] font-bold">
                       {uploadingImage ? "Saving..." : "Gallery"}
@@ -1512,67 +1409,57 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
             )}
           </div>
 
-          {/* Live Camera Modal */}
-          <AnimatePresence>
-            {showCameraModal && (
-              <LiveCameraCaptureModal
-                onClose={() => setShowCameraModal(false)}
-                onCapture={async (file) => {
-                  setShowCameraModal(false);
-                  await handleUploadFile(file);
-                }}
-                uploading={uploadingImage}
-              />
-            )}
-          </AnimatePresence>
-
-          {/* Contact Details */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 pt-2 border-t border-gray-100 dark:border-zinc-800">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                WhatsApp Phone
-              </label>
-              <input
-                type="tel"
-                value={contactPhone}
-                onChange={(e) => setContactPhone(e.target.value)}
-                placeholder="e.g. 9843777817"
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
-              />
-            </div>
-
-            <div className="flex items-center gap-2 pt-5">
-              <input
-                type="checkbox"
-                id="showPhoneClean"
-                checked={showPhone}
-                onChange={(e) => setShowPhone(e.target.checked)}
-                className="h-4 w-4 rounded text-blue-600"
-              />
-              <label htmlFor="showPhoneClean" className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                Show WhatsApp button to students
-              </label>
-            </div>
+          {/* 5. Phone / WhatsApp Number (Optional) */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              {itemType === "lost" ? "Contact / Phone Number (Optional)" : "WhatsApp / Phone Number (Optional)"}
+            </label>
+            <input
+              type="tel"
+              value={contactPhone}
+              onChange={(e) => setContactPhone(e.target.value)}
+              placeholder="e.g. 9843777817"
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
+            />
+            <p className="text-[11px] text-slate-400 mt-1">
+              {itemType === "lost"
+                ? "Finder can reach out to you via call or WhatsApp."
+                : "Owner can contact you to recover their item."}
+            </p>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-2 pt-4 border-t border-gray-100 dark:border-zinc-800">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-zinc-800">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl px-4 py-2 text-xs font-bold text-slate-600 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-zinc-800"
+              className="rounded-xl px-4 py-2 text-xs font-bold text-slate-600 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-zinc-800 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white hover:bg-blue-700 transition disabled:opacity-50"
+              className="rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer shadow-sm"
             >
-              {submitting ? "Saving..." : isEditing ? "Save Changes" : "Publish Listing"}
+              {submitting ? "Publishing..." : isEditing ? "Save Changes" : itemType === "lost" ? "Post Lost Item" : "Post Found Item"}
             </button>
           </div>
         </form>
+
+        {/* Live Camera Modal */}
+        <AnimatePresence>
+          {showCameraModal && (
+            <LiveCameraCaptureModal
+              onClose={() => setShowCameraModal(false)}
+              onCapture={async (file) => {
+                setShowCameraModal(false);
+                await handleUploadFile(file);
+              }}
+              uploading={uploadingImage}
+            />
+          )}
+        </AnimatePresence>
       </motion.div>
     </div>
   );
