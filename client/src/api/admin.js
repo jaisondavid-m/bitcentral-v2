@@ -746,6 +746,32 @@ export async function resetDefaultAdminLeaves() {
   return response.data;
 }
 
+// In-site Notifications Admin API
+export async function listAdminNotifications() {
+  const headers = await getAdminHeaders();
+  const response = await api.get("/admin/notifications", { headers });
+  return response.data;
+}
+
+export async function createAdminNotification(payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.post("/admin/notifications", payload, { headers });
+  return response.data;
+}
+
+export async function updateAdminNotification(id, payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.put(`/admin/notifications/${id}`, payload, { headers });
+  return response.data;
+}
+
+export async function deleteAdminNotification(id) {
+  const headers = await getAdminHeaders();
+  const response = await api.delete(`/admin/notifications/${id}`, { headers });
+  return response.data;
+}
+
+
 
 
 

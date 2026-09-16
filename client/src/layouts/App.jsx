@@ -256,6 +256,14 @@ function App() {
                 }
               />
               <Route
+                path="/admin/notifications"
+                element={
+                  <AdminRoute>
+                    <AdminDashboard />
+                  </AdminRoute>
+                }
+              />
+              <Route
                 path="/admin/feedback"
                 element={
                   <AdminRoute>

@@ -50,6 +50,7 @@ import {
   ArrowLeft,
   ArrowRight,
   BarChart3,
+  BellRing,
   BookOpen,
   CalendarDays,
   Check,
@@ -98,6 +99,7 @@ import AdminFeedbackPage from "./AdminFeedbackPage.jsx";
 import AdminAuditLogs from "./AdminAuditLogs.jsx";
 import AdminMailSender from "./AdminMailSender.jsx";
 import AdminLeavesSection from "./AdminLeavesSection.jsx";
+import AdminNotificationsSection from "./AdminNotificationsSection.jsx";
 
 function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
@@ -330,6 +332,15 @@ const ADMIN_TABS = [
     description: "Configure college holidays, General Permission (GP), half-day sessions (FN/AN), and date schedules.",
   },
   {
+    key: "notifications",
+    label: "In-Site Notifications",
+    href: "/admin/notifications",
+    icon: BellRing,
+    gradient: "from-pink-500 to-rose-600",
+    badge: "Live Alerts",
+    description: "Dispatch broadcast announcements and targeted direct alerts to students with real-time modal delivery.",
+  },
+  {
     key: "feedback",
     label: "Feedback & Support",
     href: "/admin/feedback",
@@ -396,6 +407,7 @@ function getAdminTabFromPath(pathname) {
   if (pathname.startsWith("/admin/cards")) return "cards";
   if (pathname.startsWith("/admin/mess")) return "mess";
   if (pathname.startsWith("/admin/leaves")) return "leaves";
+  if (pathname.startsWith("/admin/notifications")) return "notifications";
   if (pathname.startsWith("/admin/feedback")) return "feedback";
   if (pathname.startsWith("/admin/mail-sender") || pathname.startsWith("/admin/mail")) return "mail";
   if (pathname.startsWith("/admin/ai-key")) return "ai-key";
@@ -6519,6 +6531,8 @@ function AdminDashboard({ initialTab } = {}) {
         <MessSection />
       ) : activeTab === "leaves" ? (
         <AdminLeavesSection />
+      ) : activeTab === "notifications" ? (
+        <AdminNotificationsSection />
       ) : activeTab === "feedback" ? (
         <AdminFeedbackPage />
       ) : activeTab === "mail" || activeTab === "mail-sender" ? (
@@ -6576,6 +6590,10 @@ function AdminLeavesPage() {
   return <AdminDashboard initialTab="leaves" />;
 }
 
+function AdminNotificationsPage() {
+  return <AdminDashboard initialTab="notifications" />;
+}
+
 function AdminFeedbackPageRoute() {
   return <AdminDashboard initialTab="feedback" />;
 }
@@ -6599,6 +6617,7 @@ export {
   AdminCardsPage,
   AdminMessPage,
   AdminLeavesPage,
+  AdminNotificationsPage,
   AdminFeedbackPageRoute as AdminFeedbackPage,
   AdminAIKeyPage,
   AdminMailSenderPage,

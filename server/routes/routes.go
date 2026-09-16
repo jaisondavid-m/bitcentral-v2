@@ -33,6 +33,7 @@ func SetupRouter(
 	aiHandler *handlers.AIHandler,
 	mailHandler *handlers.MailHandler,
 	internalMarksHandler *handlers.InternalMarksHandler,
+	notificationHandler *handlers.NotificationHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -136,6 +137,9 @@ func SetupRouter(
 	r.POST("/api/chat", chatHandler.HandleChat)
 	r.POST("/chat", chatHandler.HandleChat)
 
+	// In-site Notifications (Public / User with auth)
+	r.GET("/notifications", notificationHandler.GetUserNotifications)
+
 	// Protected routes
 	api := r.Group("/")
 	api.Use(handler.RequireAuth())
@@ -167,6 +171,11 @@ func SetupRouter(
 		// Feedback Chat User API
 		api.POST("/feedback/messages", feedbackHandler.SendMessage)
 		api.GET("/feedback/messages", feedbackHandler.GetUserMessages)
+
+		// Notifications User Actions API
+		api.POST("/notifications/:id/read", notificationHandler.MarkNotificationAsRead)
+		api.POST("/notifications/read-all", notificationHandler.MarkAllNotificationsAsRead)
+		api.DELETE("/notifications/:id/dismiss", notificationHandler.DismissNotification)
 	}
 
 	// Serve uploaded files
@@ -271,6 +280,12 @@ func SetupRouter(
 		admin.DELETE("/mail/queues/:batch_id", mailHandler.DeleteMailQueue)
 		admin.GET("/mail/history", mailHandler.GetMailHistory)
 		admin.DELETE("/mail/history/:id", mailHandler.DeleteMailLog)
+
+		// Notifications Admin CRUD
+		admin.GET("/notifications", notificationHandler.GetAdminNotifications)
+		admin.POST("/notifications", notificationHandler.CreateNotification)
+		admin.PUT("/notifications/:id", notificationHandler.UpdateNotification)
+		admin.DELETE("/notifications/:id", notificationHandler.DeleteNotification)
 	}
 
 	// Super-admin routes: manage admins and allowed external emails/domains
