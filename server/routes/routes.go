@@ -34,6 +34,7 @@ func SetupRouter(
 	mailHandler *handlers.MailHandler,
 	internalMarksHandler *handlers.InternalMarksHandler,
 	notificationHandler *handlers.NotificationHandler,
+	lostFoundHandler *handlers.LostFoundHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -140,6 +141,10 @@ func SetupRouter(
 	// In-site Notifications (Public / User with auth)
 	r.GET("/notifications", notificationHandler.GetUserNotifications)
 
+	// Lost & Found (Public / User with auth)
+	r.GET("/lost-found", lostFoundHandler.GetItems)
+	r.GET("/lost-found/:id", lostFoundHandler.GetItemByID)
+
 	// Protected routes
 	api := r.Group("/")
 	api.Use(handler.RequireAuth())
@@ -176,6 +181,16 @@ func SetupRouter(
 		api.POST("/notifications/:id/read", notificationHandler.MarkNotificationAsRead)
 		api.POST("/notifications/read-all", notificationHandler.MarkAllNotificationsAsRead)
 		api.DELETE("/notifications/:id/dismiss", notificationHandler.DismissNotification)
+
+		// Lost & Found User Actions API
+		api.POST("/lost-found", lostFoundHandler.CreateItem)
+		api.PUT("/lost-found/:id", lostFoundHandler.UpdateItem)
+		api.POST("/lost-found/:id/status", lostFoundHandler.UpdateItemStatus)
+		api.DELETE("/lost-found/:id", lostFoundHandler.DeleteItem)
+		api.POST("/lost-found/upload", lostFoundHandler.UploadImage)
+		api.POST("/lost-found/:id/claim", lostFoundHandler.SubmitClaim)
+		api.POST("/lost-found/claims/:claimId/status", lostFoundHandler.UpdateClaimStatus)
+		api.GET("/lost-found/my", lostFoundHandler.GetMyItemsAndClaims)
 	}
 
 	// Serve uploaded files
@@ -286,6 +301,11 @@ func SetupRouter(
 		admin.POST("/notifications", notificationHandler.CreateNotification)
 		admin.PUT("/notifications/:id", notificationHandler.UpdateNotification)
 		admin.DELETE("/notifications/:id", notificationHandler.DeleteNotification)
+
+		// Lost & Found Admin Moderation
+		admin.GET("/lost-found", lostFoundHandler.AdminGetItems)
+		admin.POST("/lost-found/:id/pin", lostFoundHandler.AdminTogglePin)
+		admin.DELETE("/lost-found/:id", lostFoundHandler.DeleteItem)
 	}
 
 	// Super-admin routes: manage admins and allowed external emails/domains

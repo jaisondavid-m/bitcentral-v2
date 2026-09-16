@@ -43,6 +43,7 @@ const PaymentSuccessful = lazyWithRetry(() => import("@/pages/student/PaymentSuc
 const WifiDetails = lazyWithRetry(() => import("@/pages/student/WifiDetails.jsx"));
 const FacultyDirectory = lazyWithRetry(() => import("@/pages/student/FacultyDirectory.jsx"));
 const BitBot = lazyWithRetry(() => import("@/pages/student/BitBot.jsx"));
+const LostAndFound = lazyWithRetry(() => import("@/pages/student/LostAndFound.jsx"));
 
 const AK22PH202 = lazyWithRetry(() => import("@/pages/answers/AK__22PH202.jsx"));
 const AnswerKey22HS006 = lazyWithRetry(() => import("@/pages/answers/AnswerKey22HS006.jsx"));
@@ -264,6 +265,14 @@ function App() {
                 }
               />
               <Route
+                path="/admin/lost-found"
+                element={
+                  <AdminRoute>
+                    <AdminDashboard />
+                  </AdminRoute>
+                }
+              />
+              <Route
                 path="/admin/feedback"
                 element={
                   <AdminRoute>
@@ -316,6 +325,8 @@ function App() {
               <Route path="/leavedetails" element={<LeaveDetails />} />
               <Route path="/semester" element={<Semester />} />
               <Route path="/mess" element={<MessMenu />} />
+              <Route path="/lost-found" element={<LostAndFound />} />
+              <Route path="/lostfound" element={<LostAndFound />} />
               <Route path="/student-report/:id" element={<StudentReportDetails />} />
               <Route path="/student-report" element={<StudentReportDetails />} />
               <Route path="/ps-assessment-history" element={<PSAssessmentHistory />} />

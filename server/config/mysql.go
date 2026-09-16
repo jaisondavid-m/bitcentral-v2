@@ -116,6 +116,7 @@ func InitMySQL() {
 	createEmailJobQueuesTables()
 	createCollegeLeavesTable()
 	createNotificationsTables()
+	createLostFoundTables()
 }
 
 func createAdminsTable() {
@@ -899,3 +900,72 @@ func createNotificationsTables() {
 	}
 }
 
+func createLostFoundTables() {
+	queryItems := `
+	CREATE TABLE IF NOT EXISTS lost_found_items (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		item_type ENUM('lost', 'found') NOT NULL,
+		title VARCHAR(255) NOT NULL,
+		category VARCHAR(64) NOT NULL,
+		description TEXT NOT NULL,
+		location_campus VARCHAR(128) NOT NULL,
+		location_details VARCHAR(255) NULL,
+		date_occurred VARCHAR(64) NOT NULL,
+		time_occurred VARCHAR(64) NULL,
+		images JSON NOT NULL,
+		matched_roll_number VARCHAR(64) NULL,
+		current_custody VARCHAR(128) NOT NULL DEFAULT 'with_finder',
+		custody_details VARCHAR(255) NULL,
+		secret_question VARCHAR(255) NULL,
+		contact_phone VARCHAR(64) NULL,
+		show_phone TINYINT(1) NOT NULL DEFAULT 1,
+		allow_inapp_claim TINYINT(1) NOT NULL DEFAULT 1,
+		user_uid VARCHAR(128) NOT NULL,
+		user_name VARCHAR(255) NOT NULL,
+		user_email VARCHAR(255) NOT NULL,
+		user_roll_no VARCHAR(64) NULL,
+		user_department VARCHAR(128) NULL,
+		user_batch VARCHAR(64) NULL,
+		status ENUM('active', 'claimed', 'handed_over', 'closed') NOT NULL DEFAULT 'active',
+		is_pinned TINYINT(1) NOT NULL DEFAULT 0,
+		is_flagged TINYINT(1) NOT NULL DEFAULT 0,
+		resolved_at DATETIME NULL,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		INDEX idx_type_status (item_type, status),
+		INDEX idx_category (category),
+		INDEX idx_campus_location (location_campus),
+		INDEX idx_roll (matched_roll_number),
+		INDEX idx_user (user_uid),
+		INDEX idx_created (created_at DESC)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(queryItems); err != nil {
+		log.Printf("ℹ️ lost_found_items table notice: %v", err)
+	} else {
+		log.Println("✅ lost_found_items table ready")
+	}
+
+	queryClaims := `
+	CREATE TABLE IF NOT EXISTS lost_found_claims (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		item_id INT NOT NULL,
+		claimant_uid VARCHAR(128) NOT NULL,
+		claimant_name VARCHAR(255) NOT NULL,
+		claimant_email VARCHAR(255) NOT NULL,
+		claimant_roll_no VARCHAR(64) NULL,
+		claimant_phone VARCHAR(64) NULL,
+		proof_description TEXT NOT NULL,
+		proof_image VARCHAR(1024) NULL,
+		status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		INDEX idx_item_claims (item_id),
+		INDEX idx_claimant (claimant_uid)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(queryClaims); err != nil {
+		log.Printf("ℹ️ lost_found_claims table notice: %v", err)
+	} else {
+		log.Println("✅ lost_found_claims table ready")
+	}
+}
