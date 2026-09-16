@@ -131,7 +131,6 @@ export default function LostAndFound() {
   const [activeTab, setActiveTab] = useState(activeTabParam);
 
   // Filters
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const [statusFilter, setStatusFilter] = useState("active");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -182,7 +181,7 @@ export default function LostAndFound() {
     try {
       const res = await getLostFoundItems({
         type: computedType,
-        category: selectedCategory,
+        category: "all",
         status: statusFilter,
         q: searchQuery,
       });
@@ -195,7 +194,7 @@ export default function LostAndFound() {
     } finally {
       setLoading(false);
     }
-  }, [computedType, selectedCategory, statusFilter, searchQuery, activeTab]);
+  }, [computedType, statusFilter, searchQuery, activeTab]);
 
   useEffect(() => {
     fetchFeed();
@@ -273,12 +272,10 @@ export default function LostAndFound() {
   };
 
   const hasActiveFilters =
-    selectedCategory !== "all" ||
     statusFilter !== "active" ||
     searchQuery.trim() !== "";
 
   const resetFilters = () => {
-    setSelectedCategory("all");
     setStatusFilter("active");
     setSearchQuery("");
   };
@@ -396,19 +393,6 @@ export default function LostAndFound() {
 
               {/* Filters Group */}
               <div className="flex flex-wrap items-center gap-2">
-                {/* Category Dropdown */}
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-slate-700 outline-none transition focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-slate-200 cursor-pointer"
-                >
-                  {ITEM_CATEGORIES.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-
                 {/* Status Dropdown */}
                 <select
                   value={statusFilter}
@@ -418,7 +402,6 @@ export default function LostAndFound() {
                   <option value="active">Active</option>
                   <option value="all">All Statuses</option>
                   <option value="claimed">Claimed</option>
-                  <option value="handed_over">At Security Gate</option>
                 </select>
 
                 {hasActiveFilters && (
