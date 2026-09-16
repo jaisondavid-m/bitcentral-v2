@@ -14,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"server/config"
 	"server/models"
+	"server/services"
 )
 
 type LostFoundHandler struct {
@@ -813,7 +814,7 @@ func (h *LostFoundHandler) DeleteItem(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Item deleted successfully"})
 }
 
-// POST /api/lost-found/upload - Upload item image (authenticated)
+// POST /api/lost-found/upload - Upload item image (Cloudinary with local fallback)
 func (h *LostFoundHandler) UploadImage(c *gin.Context) {
 	userUID, userEmail := h.getAuthUser(c)
 	if userUID == "" && userEmail == "" {
@@ -843,6 +844,23 @@ func (h *LostFoundHandler) UploadImage(c *gin.Context) {
 		return
 	}
 
+	// 1. Primary: Upload directly to Cloudinary
+	cloudinaryURL, cldErr := services.UploadToCloudinary(file)
+	if cldErr == nil && cloudinaryURL != "" {
+		c.JSON(http.StatusOK, gin.H{
+			"success":  true,
+			"url":      cloudinaryURL,
+			"provider": "cloudinary",
+			"message":  "Image uploaded to Cloudinary successfully",
+		})
+		return
+	}
+
+	if cldErr != nil {
+		fmt.Printf("[Cloudinary] Upload attempt notice: %v. Falling back to local storage.\n", cldErr)
+	}
+
+	// 2. Fallback: Save to local server uploads directory
 	if err := os.MkdirAll(h.UploadDir, 0755); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to create upload directory: " + err.Error()})
 		return
@@ -858,9 +876,10 @@ func (h *LostFoundHandler) UploadImage(c *gin.Context) {
 
 	urlPath := "/uploads/lost_found/" + safeName
 	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"url":     urlPath,
-		"message": "Image uploaded successfully",
+		"success":  true,
+		"url":      urlPath,
+		"provider": "local",
+		"message":  "Image uploaded successfully",
 	})
 }
 
