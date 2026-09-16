@@ -916,6 +916,8 @@ func createLostFoundTables() {
 		user_department VARCHAR(128) NULL,
 		user_batch VARCHAR(64) NULL,
 		status ENUM('active', 'claimed', 'handed_over', 'closed') NOT NULL DEFAULT 'active',
+		latitude DOUBLE NULL,
+		longitude DOUBLE NULL,
 		is_pinned TINYINT(1) NOT NULL DEFAULT 0,
 		is_flagged TINYINT(1) NOT NULL DEFAULT 0,
 		resolved_at DATETIME NULL,
@@ -934,6 +936,10 @@ func createLostFoundTables() {
 	} else {
 		log.Println("✅ lost_found_items table ready")
 	}
+
+	// Safe column additions for existing table
+	_, _ = DB.Exec("ALTER TABLE lost_found_items ADD COLUMN latitude DOUBLE NULL AFTER status")
+	_, _ = DB.Exec("ALTER TABLE lost_found_items ADD COLUMN longitude DOUBLE NULL AFTER latitude")
 
 	queryClaims := `
 	CREATE TABLE IF NOT EXISTS lost_found_claims (
