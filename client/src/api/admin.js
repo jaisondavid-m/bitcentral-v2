@@ -709,5 +709,43 @@ export async function deleteAdminMailLog(id) {
   return response.data;
 }
 
+// College Leaves & Holidays Admin API
+export async function listAdminLeaves() {
+  const headers = await getAdminHeaders();
+  const response = await api.get("/admin/leaves", { headers });
+  return response.data;
+}
+
+export async function createAdminLeave(payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.post("/admin/leaves", payload, { headers });
+  return response.data;
+}
+
+export async function updateAdminLeave(id, payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.put(`/admin/leaves/${id}`, payload, { headers });
+  return response.data;
+}
+
+export async function deleteAdminLeave(id) {
+  const headers = await getAdminHeaders();
+  const response = await api.delete(`/admin/leaves/${id}`, { headers });
+  return response.data;
+}
+
+export async function batchCreateAdminLeaves(leaves) {
+  const headers = await getAdminHeaders();
+  const response = await api.post("/admin/leaves/batch", leaves, { headers });
+  return response.data;
+}
+
+export async function resetDefaultAdminLeaves() {
+  const headers = await getAdminHeaders();
+  const response = await api.post("/admin/leaves/reset", {}, { headers });
+  return response.data;
+}
+
+
 
 

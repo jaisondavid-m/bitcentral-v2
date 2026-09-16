@@ -248,6 +248,14 @@ function App() {
                 }
               />
               <Route
+                path="/admin/leaves"
+                element={
+                  <AdminRoute>
+                    <AdminDashboard />
+                  </AdminRoute>
+                }
+              />
+              <Route
                 path="/admin/feedback"
                 element={
                   <AdminRoute>

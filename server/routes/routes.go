@@ -242,6 +242,14 @@ func SetupRouter(
 		admin.PUT("/cards/reorder", handlers.ReorderCards)
 		admin.DELETE("/cards/:id", handlers.DeleteCard)
 
+		// Leaves admin CRUD
+		admin.GET("/leaves", leaveHandler.GetAllLeaves)
+		admin.POST("/leaves", leaveHandler.CreateLeave)
+		admin.PUT("/leaves/:id", leaveHandler.UpdateLeave)
+		admin.DELETE("/leaves/:id", leaveHandler.DeleteLeave)
+		admin.POST("/leaves/batch", leaveHandler.BatchCreateLeaves)
+		admin.POST("/leaves/reset", leaveHandler.ResetToDefaultLeaves)
+
 		// Feedback Chat Admin API
 		admin.GET("/feedback/conversations", feedbackHandler.GetAdminConversations)
 		admin.GET("/feedback/messages/:user_uid", feedbackHandler.GetAdminUserMessages)

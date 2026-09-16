@@ -97,6 +97,7 @@ import AdminPSRewardsPage from "./AdminPSRewards.jsx";
 import AdminFeedbackPage from "./AdminFeedbackPage.jsx";
 import AdminAuditLogs from "./AdminAuditLogs.jsx";
 import AdminMailSender from "./AdminMailSender.jsx";
+import AdminLeavesSection from "./AdminLeavesSection.jsx";
 
 function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
@@ -320,6 +321,15 @@ const ADMIN_TABS = [
     description: "Upload and schedule boys & girls mess menu CSV files for weekly meals.",
   },
   {
+    key: "leaves",
+    label: "Leave & Holidays",
+    href: "/admin/leaves",
+    icon: CalendarDays,
+    gradient: "from-amber-500 to-rose-600",
+    badge: "General Permission (GP)",
+    description: "Configure college holidays, General Permission (GP), half-day sessions (FN/AN), and date schedules.",
+  },
+  {
     key: "feedback",
     label: "Feedback & Support",
     href: "/admin/feedback",
@@ -385,6 +395,7 @@ function getAdminTabFromPath(pathname) {
   if (pathname.startsWith("/admin/ps-rewards")) return "ps";
   if (pathname.startsWith("/admin/cards")) return "cards";
   if (pathname.startsWith("/admin/mess")) return "mess";
+  if (pathname.startsWith("/admin/leaves")) return "leaves";
   if (pathname.startsWith("/admin/feedback")) return "feedback";
   if (pathname.startsWith("/admin/mail-sender") || pathname.startsWith("/admin/mail")) return "mail";
   if (pathname.startsWith("/admin/ai-key")) return "ai-key";
@@ -6506,6 +6517,8 @@ function AdminDashboard({ initialTab } = {}) {
         <CardsSection />
       ) : activeTab === "mess" ? (
         <MessSection />
+      ) : activeTab === "leaves" ? (
+        <AdminLeavesSection />
       ) : activeTab === "feedback" ? (
         <AdminFeedbackPage />
       ) : activeTab === "mail" || activeTab === "mail-sender" ? (
@@ -6559,6 +6572,10 @@ function AdminMessPage() {
   return <AdminDashboard initialTab="mess" />;
 }
 
+function AdminLeavesPage() {
+  return <AdminDashboard initialTab="leaves" />;
+}
+
 function AdminFeedbackPageRoute() {
   return <AdminDashboard initialTab="feedback" />;
 }
@@ -6581,6 +6598,7 @@ export {
   AdminPSRewardsPageRoute as AdminPSRewardsPage,
   AdminCardsPage,
   AdminMessPage,
+  AdminLeavesPage,
   AdminFeedbackPageRoute as AdminFeedbackPage,
   AdminAIKeyPage,
   AdminMailSenderPage,
