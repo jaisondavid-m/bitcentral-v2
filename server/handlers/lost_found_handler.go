@@ -198,6 +198,8 @@ func (h *LostFoundHandler) GetItems(c *gin.Context) {
 			COALESCE(user_department, '') AS user_department,
 			COALESCE(user_batch, '') AS user_batch,
 			status,
+			latitude,
+			longitude,
 			is_pinned,
 			is_flagged,
 			COALESCE(resolved_at, '') AS resolved_at,
@@ -224,6 +226,7 @@ func (h *LostFoundHandler) GetItems(c *gin.Context) {
 		var imagesRaw string
 		var resolvedAt sql.NullString
 		var updatedAt sql.NullString
+		var lat, lng sql.NullFloat64
 
 		err := rows.Scan(
 			&item.ID,
@@ -250,6 +253,8 @@ func (h *LostFoundHandler) GetItems(c *gin.Context) {
 			&item.UserDepartment,
 			&item.UserBatch,
 			&item.Status,
+			&lat,
+			&lng,
 			&item.IsPinned,
 			&item.IsFlagged,
 			&resolvedAt,
@@ -259,6 +264,13 @@ func (h *LostFoundHandler) GetItems(c *gin.Context) {
 		)
 		if err != nil {
 			continue
+		}
+
+		if lat.Valid {
+			item.Latitude = &lat.Float64
+		}
+		if lng.Valid {
+			item.Longitude = &lng.Float64
 		}
 
 		if resolvedAt.Valid {
@@ -335,6 +347,8 @@ func (h *LostFoundHandler) GetItemByID(c *gin.Context) {
 			COALESCE(user_department, '') AS user_department,
 			COALESCE(user_batch, '') AS user_batch,
 			status,
+			latitude,
+			longitude,
 			is_pinned,
 			is_flagged,
 			COALESCE(resolved_at, '') AS resolved_at,
@@ -350,6 +364,7 @@ func (h *LostFoundHandler) GetItemByID(c *gin.Context) {
 	var imagesRaw string
 	var resolvedAt sql.NullString
 	var updatedAt sql.NullString
+	var lat, lng sql.NullFloat64
 
 	err = h.DB.QueryRow(query, id).Scan(
 		&item.ID,
@@ -376,6 +391,8 @@ func (h *LostFoundHandler) GetItemByID(c *gin.Context) {
 		&item.UserDepartment,
 		&item.UserBatch,
 		&item.Status,
+		&lat,
+		&lng,
 		&item.IsPinned,
 		&item.IsFlagged,
 		&resolvedAt,
@@ -386,6 +403,13 @@ func (h *LostFoundHandler) GetItemByID(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "Item not found"})
 		return
+	}
+
+	if lat.Valid {
+		item.Latitude = &lat.Float64
+	}
+	if lng.Valid {
+		item.Longitude = &lng.Float64
 	}
 
 	if resolvedAt.Valid {
@@ -523,8 +547,10 @@ func (h *LostFoundHandler) CreateItem(c *gin.Context) {
 			user_roll_no,
 			user_department,
 			user_batch,
+			latitude,
+			longitude,
 			status
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')
 	`
 
 	res, err := h.DB.Exec(
@@ -551,6 +577,8 @@ func (h *LostFoundHandler) CreateItem(c *gin.Context) {
 		userRollNo,
 		userDept,
 		userBatch,
+		req.Latitude,
+		req.Longitude,
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to create item: " + err.Error()})
@@ -653,7 +681,9 @@ func (h *LostFoundHandler) UpdateItem(c *gin.Context) {
 			secret_question = ?,
 			contact_phone = ?,
 			show_phone = ?,
-			allow_inapp_claim = ?
+			allow_inapp_claim = ?,
+			latitude = ?,
+			longitude = ?
 		WHERE id = ?
 	`
 
@@ -674,6 +704,8 @@ func (h *LostFoundHandler) UpdateItem(c *gin.Context) {
 		req.ContactPhone,
 		req.ShowPhone,
 		req.AllowInAppClaim,
+		req.Latitude,
+		req.Longitude,
 		id,
 	)
 	if err != nil {
@@ -1028,7 +1060,7 @@ func (h *LostFoundHandler) GetMyItemsAndClaims(c *gin.Context) {
 			current_custody, COALESCE(custody_details, ''), COALESCE(secret_question, ''),
 			COALESCE(contact_phone, ''), show_phone, allow_inapp_claim, user_uid, user_name, user_email,
 			COALESCE(user_roll_no, ''), COALESCE(user_department, ''), COALESCE(user_batch, ''),
-			status, is_pinned, is_flagged, COALESCE(resolved_at, ''), created_at, updated_at,
+			status, latitude, longitude, is_pinned, is_flagged, COALESCE(resolved_at, ''), created_at, updated_at,
 			(SELECT COUNT(*) FROM lost_found_claims WHERE item_id = lost_found_items.id) AS claim_count
 		FROM lost_found_items
 		WHERE user_uid = ?
@@ -1041,15 +1073,22 @@ func (h *LostFoundHandler) GetMyItemsAndClaims(c *gin.Context) {
 			item := &models.LostFoundItem{}
 			var imagesRaw string
 			var resolvedAt, updatedAt sql.NullString
+			var lat, lng sql.NullFloat64
 			_ = itemRows.Scan(
 				&item.ID, &item.ItemType, &item.Title, &item.Category, &item.Description,
 				&item.LocationCampus, &item.LocationDetails, &item.DateOccurred, &item.TimeOccurred,
 				&imagesRaw, &item.MatchedRollNumber, &item.CurrentCustody, &item.CustodyDetails,
 				&item.SecretQuestion, &item.ContactPhone, &item.ShowPhone, &item.AllowInAppClaim,
 				&item.UserUID, &item.UserName, &item.UserEmail, &item.UserRollNo, &item.UserDepartment,
-				&item.UserBatch, &item.Status, &item.IsPinned, &item.IsFlagged, &resolvedAt,
+				&item.UserBatch, &item.Status, &lat, &lng, &item.IsPinned, &item.IsFlagged, &resolvedAt,
 				&item.CreatedAt, &updatedAt, &item.ClaimCount,
 			)
+			if lat.Valid {
+				item.Latitude = &lat.Float64
+			}
+			if lng.Valid {
+				item.Longitude = &lng.Float64
+			}
 			if resolvedAt.Valid {
 				item.ResolvedAt = resolvedAt.String
 			}
@@ -1151,7 +1190,7 @@ func (h *LostFoundHandler) AdminGetItems(c *gin.Context) {
 			current_custody, COALESCE(custody_details, ''), COALESCE(secret_question, ''),
 			COALESCE(contact_phone, ''), show_phone, allow_inapp_claim, user_uid, user_name, user_email,
 			COALESCE(user_roll_no, ''), COALESCE(user_department, ''), COALESCE(user_batch, ''),
-			status, is_pinned, is_flagged, COALESCE(resolved_at, ''), created_at, updated_at,
+			status, latitude, longitude, is_pinned, is_flagged, COALESCE(resolved_at, ''), created_at, updated_at,
 			(SELECT COUNT(*) FROM lost_found_claims WHERE item_id = lost_found_items.id) AS claim_count
 		FROM lost_found_items
 		%s
@@ -1171,15 +1210,22 @@ func (h *LostFoundHandler) AdminGetItems(c *gin.Context) {
 		item := &models.LostFoundItem{}
 		var imagesRaw string
 		var resolvedAt, updatedAt sql.NullString
+		var lat, lng sql.NullFloat64
 		_ = rows.Scan(
 			&item.ID, &item.ItemType, &item.Title, &item.Category, &item.Description,
 			&item.LocationCampus, &item.LocationDetails, &item.DateOccurred, &item.TimeOccurred,
 			&imagesRaw, &item.MatchedRollNumber, &item.CurrentCustody, &item.CustodyDetails,
 			&item.SecretQuestion, &item.ContactPhone, &item.ShowPhone, &item.AllowInAppClaim,
 			&item.UserUID, &item.UserName, &item.UserEmail, &item.UserRollNo, &item.UserDepartment,
-			&item.UserBatch, &item.Status, &item.IsPinned, &item.IsFlagged, &resolvedAt,
+			&item.UserBatch, &item.Status, &lat, &lng, &item.IsPinned, &item.IsFlagged, &resolvedAt,
 			&item.CreatedAt, &updatedAt, &item.ClaimCount,
 		)
+		if lat.Valid {
+			item.Latitude = &lat.Float64
+		}
+		if lng.Valid {
+			item.Longitude = &lng.Float64
+		}
 		if resolvedAt.Valid {
 			item.ResolvedAt = resolvedAt.String
 		}

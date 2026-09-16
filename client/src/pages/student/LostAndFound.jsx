@@ -46,6 +46,8 @@ import {
   UserCheck,
   Pin,
   Share2,
+  Crosshair,
+  Navigation,
 } from "lucide-react";
 import { useAuth } from "@/context/StudentContext.jsx";
 import {
@@ -61,7 +63,6 @@ import {
   getMyLostFound,
 } from "@/api/lostFound.js";
 import {
-  CAMPUS_LOCATIONS,
   ITEM_CATEGORIES,
   CUSTODY_OPTIONS,
   STATUS_LABELS,
@@ -113,7 +114,6 @@ export default function LostAndFound() {
 
   // Filters
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedLocation, setSelectedLocation] = useState("all");
   const [statusFilter, setStatusFilter] = useState("active");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -165,7 +165,6 @@ export default function LostAndFound() {
       const res = await getLostFoundItems({
         type: computedType,
         category: selectedCategory,
-        location: selectedLocation,
         status: statusFilter,
         q: searchQuery,
       });
@@ -178,7 +177,7 @@ export default function LostAndFound() {
     } finally {
       setLoading(false);
     }
-  }, [computedType, selectedCategory, selectedLocation, statusFilter, searchQuery, activeTab]);
+  }, [computedType, selectedCategory, statusFilter, searchQuery, activeTab]);
 
   useEffect(() => {
     fetchFeed();
@@ -257,13 +256,11 @@ export default function LostAndFound() {
 
   const hasActiveFilters =
     selectedCategory !== "all" ||
-    selectedLocation !== "all" ||
     statusFilter !== "active" ||
     searchQuery.trim() !== "";
 
   const resetFilters = () => {
     setSelectedCategory("all");
-    setSelectedLocation("all");
     setStatusFilter("active");
     setSearchQuery("");
   };
@@ -366,7 +363,7 @@ export default function LostAndFound() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search item, student name, roll number, or landmark..."
+                  placeholder="Search item, student name, roll number, place, or landmark..."
                   className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-9 pr-8 text-xs sm:text-sm font-medium outline-none transition focus:border-blue-500 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800/80 dark:focus:bg-zinc-800"
                 />
                 {searchQuery && (
@@ -394,19 +391,6 @@ export default function LostAndFound() {
                   ))}
                 </select>
 
-                {/* Location Dropdown */}
-                <select
-                  value={selectedLocation}
-                  onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-slate-700 outline-none transition focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-slate-200 cursor-pointer"
-                >
-                  {CAMPUS_LOCATIONS.map((loc) => (
-                    <option key={loc.id} value={loc.id === "all" ? "all" : loc.name}>
-                      {loc.name}
-                    </option>
-                  ))}
-                </select>
-
                 {/* Status Dropdown */}
                 <select
                   value={statusFilter}
@@ -422,7 +406,7 @@ export default function LostAndFound() {
                 {hasActiveFilters && (
                   <button
                     onClick={resetFilters}
-                    className="rounded-xl border border-dashed border-gray-300 px-2.5 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 dark:border-zinc-700 dark:text-rose-400 dark:hover:bg-rose-950/40 transition"
+                    className="rounded-xl border border-dashed border-gray-300 px-2.5 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 dark:border-zinc-700 dark:text-rose-400 dark:hover:bg-rose-950/40 transition cursor-pointer"
                     title="Reset all filters"
                   >
                     Reset
@@ -862,7 +846,7 @@ function CleanItemCard({
 
           {/* Location & Time */}
           <div className="mt-3.5 space-y-1 text-xs text-slate-500 dark:text-slate-400 border-t border-gray-100 pt-3 dark:border-zinc-800">
-            <div className="flex items-center gap-1.5 font-medium truncate">
+            <div className="flex items-center gap-1.5 font-medium">
               <MapPin className="h-3.5 w-3.5 text-rose-500 shrink-0" />
               <span className="truncate">
                 {item.location_campus}
@@ -870,7 +854,24 @@ function CleanItemCard({
               </span>
             </div>
 
-            <div className="flex items-center justify-between text-[11px] text-slate-400 pt-0.5">
+            {/* GPS Pin Badge & Map Link if available */}
+            {item.latitude && item.longitude ? (
+              <div className="pt-1">
+                <a
+                  href={`https://www.google.com/maps?q=${item.latitude},${item.longitude}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800/80 transition"
+                  title="Open exact location in Google Maps"
+                >
+                  <MapPin className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+                  <span>GPS Pin on Map</span>
+                  <ExternalLink className="h-2.5 w-2.5 opacity-70" />
+                </a>
+              </div>
+            ) : null}
+
+            <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
               <span>{item.date_occurred}</span>
               <span>{formatRelative(item.created_at)}</span>
             </div>
@@ -981,11 +982,16 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
   const [category, setCategory] = useState(itemToEdit?.category || "id_card");
   const [description, setDescription] = useState(itemToEdit?.description || "");
   const [locationCampus, setLocationCampus] = useState(
-    itemToEdit?.location_campus || "Main Block (AS Block)"
+    itemToEdit?.location_campus || ""
   );
   const [locationDetails, setLocationDetails] = useState(
     itemToEdit?.location_details || ""
   );
+  const [latitude, setLatitude] = useState(itemToEdit?.latitude || null);
+  const [longitude, setLongitude] = useState(itemToEdit?.longitude || null);
+  const [gpsLoading, setGpsLoading] = useState(false);
+  const [gpsError, setGpsError] = useState("");
+
   const [dateOccurred, setDateOccurred] = useState(
     itemToEdit?.date_occurred || new Date().toISOString().split("T")[0]
   );
@@ -1015,6 +1021,34 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  const handleGetGPSLocation = () => {
+    if (!navigator.geolocation) {
+      setGpsError("Geolocation is not supported by your browser");
+      return;
+    }
+    setGpsLoading(true);
+    setGpsError("");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLatitude(position.coords.latitude);
+        setLongitude(position.coords.longitude);
+        setGpsLoading(false);
+      },
+      (err) => {
+        console.error("GPS error:", err);
+        if (err.code === 1) {
+          setGpsError("Permission denied. Please allow location access in your browser.");
+        } else if (err.code === 2) {
+          setGpsError("Location unavailable. Make sure your device location / GPS is turned on.");
+        } else {
+          setGpsError("Failed to fetch GPS coordinates. Please try again.");
+        }
+        setGpsLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
 
   const handlePhotoSelect = async (e) => {
     const file = e.target.files?.[0];
@@ -1051,6 +1085,10 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
       setErrorMsg("Please enter an item title");
       return;
     }
+    if (!locationCampus.trim()) {
+      setErrorMsg("Please enter the place/location where item was found or lost");
+      return;
+    }
     if (!description.trim()) {
       setErrorMsg("Please provide a description");
       return;
@@ -1064,8 +1102,10 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
       title: title.trim(),
       category,
       description: description.trim(),
-      location_campus: locationCampus,
+      location_campus: locationCampus.trim(),
       location_details: locationDetails.trim(),
+      latitude: latitude != null ? Number(latitude) : null,
+      longitude: longitude != null ? Number(longitude) : null,
       date_occurred: dateOccurred,
       time_occurred: timeOccurred.trim(),
       images,
@@ -1225,36 +1265,101 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
             />
           </div>
 
-          {/* Location & Room */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Campus Location *
-              </label>
-              <select
-                value={locationCampus}
-                onChange={(e) => setLocationCampus(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
-              >
-                {CAMPUS_LOCATIONS.filter((l) => l.id !== "all").map((loc) => (
-                  <option key={loc.id} value={loc.name}>
-                    {loc.name}
-                  </option>
-                ))}
-              </select>
+          {/* Location & GPS Pin */}
+          <div className="space-y-2.5">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Place / Campus Location *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={locationCampus}
+                  onChange={(e) => setLocationCampus(e.target.value)}
+                  placeholder="e.g. AS Block 2nd Floor, Central Library, Food Court..."
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Room / Specific Spot (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={locationDetails}
+                  onChange={(e) => setLocationDetails(e.target.value)}
+                  placeholder="e.g. SF-204 2nd bench, near water cooler"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Room / Landmark
-              </label>
-              <input
-                type="text"
-                value={locationDetails}
-                onChange={(e) => setLocationDetails(e.target.value)}
-                placeholder="e.g. SF-204 2nd bench, Library 1st floor"
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
-              />
+            {/* GPS Pin Capture Box */}
+            <div className="rounded-xl border border-gray-200/90 bg-gray-50/80 p-3 dark:border-zinc-800 dark:bg-zinc-800/40">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+                <div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
+                    <MapPin className="h-3.5 w-3.5 text-rose-500" />
+                    <span>Attach Current GPS Location Pin</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    {itemType === "found"
+                      ? "Pin exact GPS coordinates if you found the item at your current location."
+                      : "Pin exact GPS coordinates if you are currently at the lost location."}
+                  </p>
+                </div>
+
+                {latitude && longitude ? (
+                  <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-100/90 px-3 py-1.5 text-xs font-bold text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 self-start sm:self-auto">
+                    <span className="flex items-center gap-1">
+                      <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <span>{Number(latitude).toFixed(5)}, {Number(longitude).toFixed(5)}</span>
+                    </span>
+                    <a
+                      href={`https://www.google.com/maps?q=${latitude},${longitude}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] text-blue-600 hover:underline dark:text-blue-400"
+                    >
+                      Map
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLatitude(null);
+                        setLongitude(null);
+                      }}
+                      className="ml-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer"
+                      title="Clear GPS Pin"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleGetGPSLocation}
+                    disabled={gpsLoading}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-blue-700 disabled:opacity-50 transition cursor-pointer self-start sm:self-auto"
+                  >
+                    {gpsLoading ? (
+                      <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Crosshair className="h-3.5 w-3.5" />
+                    )}
+                    <span>{gpsLoading ? "Acquiring GPS Pin..." : "📍 Pin Current Location (GPS)"}</span>
+                  </button>
+                )}
+              </div>
+
+              {gpsError && (
+                <p className="mt-2 text-[11px] font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3 shrink-0" />
+                  <span>{gpsError}</span>
+                </p>
+              )}
             </div>
           </div>
 

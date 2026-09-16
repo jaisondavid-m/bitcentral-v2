@@ -25,6 +25,8 @@ type LostFoundItem struct {
 	UserDepartment    string            `json:"user_department,omitempty"`
 	UserBatch         string            `json:"user_batch,omitempty"`
 	Status            string            `json:"status"` // "active", "claimed", "handed_over", "closed"
+	Latitude          *float64          `json:"latitude,omitempty"`
+	Longitude         *float64          `json:"longitude,omitempty"`
 	IsPinned          bool              `json:"is_pinned"`
 	IsFlagged         bool              `json:"is_flagged"`
 	ResolvedAt        string            `json:"resolved_at,omitempty"`
