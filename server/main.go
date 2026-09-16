@@ -55,6 +55,7 @@ func main() {
 	mailHandler := handlers.NewMailHandler()
 	mailHandler.StartQueueWorker()
 	internalMarksHandler := handlers.NewInternalMarksHandler()
+	notificationHandler := handlers.NewNotificationHandler()
 
 	r := routes.SetupRouter(
 		sheetHandler,
@@ -77,6 +78,7 @@ func main() {
 		aiHandler,
 		mailHandler,
 		internalMarksHandler,
+		notificationHandler,
 	)
 	r.Static("/pdfs", "./pdfs")
 

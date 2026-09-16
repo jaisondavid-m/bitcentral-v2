@@ -115,6 +115,7 @@ func InitMySQL() {
 	createAdminSentEmailsTable()
 	createEmailJobQueuesTables()
 	createCollegeLeavesTable()
+	createNotificationsTables()
 }
 
 func createAdminsTable() {
@@ -821,3 +822,80 @@ func createCollegeLeavesTable() {
 		}
 	}
 }
+
+func createNotificationsTables() {
+	queryNotif := `
+	CREATE TABLE IF NOT EXISTS notifications (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		title VARCHAR(255) NOT NULL,
+		message TEXT NOT NULL,
+		type VARCHAR(50) NOT NULL DEFAULT 'announcement',
+		priority VARCHAR(20) NOT NULL DEFAULT 'normal',
+		target_type ENUM('all', 'user', 'batch', 'dept') NOT NULL DEFAULT 'all',
+		target_user_uid VARCHAR(128) NULL,
+		target_email VARCHAR(255) NULL,
+		target_roll_no VARCHAR(64) NULL,
+		target_batch VARCHAR(64) NULL,
+		target_dept VARCHAR(255) NULL,
+		link_url VARCHAR(1024) NULL,
+		link_text VARCHAR(100) NULL,
+		created_by VARCHAR(128) NULL,
+		is_active TINYINT(1) NOT NULL DEFAULT 1,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		INDEX idx_notif_target (target_type, is_active, created_at),
+		INDEX idx_notif_user_uid (target_user_uid),
+		INDEX idx_notif_email (target_email),
+		INDEX idx_notif_roll (target_roll_no)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(queryNotif); err != nil {
+		log.Printf("ℹ️ notifications table notice: %v", err)
+	} else {
+		log.Println("✅ notifications table ready")
+	}
+
+	queryReads := `
+	CREATE TABLE IF NOT EXISTS user_notification_reads (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		notification_id INT NOT NULL,
+		user_uid VARCHAR(128) NOT NULL,
+		read_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		UNIQUE KEY uk_user_notif (notification_id, user_uid),
+		INDEX idx_user_reads (user_uid)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(queryReads); err != nil {
+		log.Printf("ℹ️ user_notification_reads table notice: %v", err)
+	} else {
+		log.Println("✅ user_notification_reads table ready")
+	}
+
+	queryDismiss := `
+	CREATE TABLE IF NOT EXISTS user_notification_dismissals (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		notification_id INT NOT NULL,
+		user_uid VARCHAR(128) NOT NULL,
+		dismissed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		UNIQUE KEY uk_user_dismissal (notification_id, user_uid),
+		INDEX idx_user_dismiss (user_uid)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(queryDismiss); err != nil {
+		log.Printf("ℹ️ user_notification_dismissals table notice: %v", err)
+	} else {
+		log.Println("✅ user_notification_dismissals table ready")
+	}
+
+	// Seed initial welcome announcement if table is empty
+	var count int
+	err := DB.QueryRow("SELECT COUNT(*) FROM notifications").Scan(&count)
+	if err == nil && count == 0 {
+		_, _ = DB.Exec(`
+			INSERT INTO notifications (title, message, type, priority, target_type, link_url, link_text, created_by)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+		`, "Welcome to BIT-CENTRAL!", "Explore new features including real-time Leave Schedule with General Permission (GP) details, Exam Hall Finder, Question Bank, and Mess Menu.", "announcement", "normal", "all", "/home", "Explore BIT-CENTRAL", "system")
+		log.Println("✅ Seeded initial announcement notification")
+	}
+}
+

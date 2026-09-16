@@ -6,6 +6,7 @@ import { logout } from "@/config/auth.js";
 import { LogOut, Moon, Star, Sun, X } from "lucide-react";
 import { useAuth } from "@/context/StudentContext.jsx";
 import { useTheme } from "@/context/ThemeContext.jsx";
+import NotificationBell from "@/components/notifications/NotificationBell.jsx";
 
 function Navbar() {
   const { user, profile } = useAuth();
@@ -64,7 +65,10 @@ function Navbar() {
               </Link>
 
               <nav className="hidden lg:block">
-                <ul className="flex items-center gap-6">
+                <ul className="flex items-center gap-4 xl:gap-6">
+                  <li>
+                    <NotificationBell />
+                  </li>
                   <li>
                     <button
                       onClick={toggleTheme}
@@ -91,8 +95,11 @@ function Navbar() {
                 </ul>
               </nav>
 
-              <div className="lg:hidden" aria-label="Open navigation menu">
-                <Hamburger toggled={isOpen} toggle={setIsOpen} color="#ffffff" size={20} />
+              <div className="flex items-center gap-2 lg:hidden">
+                <NotificationBell />
+                <div aria-label="Open navigation menu">
+                  <Hamburger toggled={isOpen} toggle={setIsOpen} color="#ffffff" size={20} />
+                </div>
               </div>
             </div>
           </div>
