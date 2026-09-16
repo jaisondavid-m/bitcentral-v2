@@ -100,6 +100,7 @@ import AdminAuditLogs from "./AdminAuditLogs.jsx";
 import AdminMailSender from "./AdminMailSender.jsx";
 import AdminLeavesSection from "./AdminLeavesSection.jsx";
 import AdminNotificationsSection from "./AdminNotificationsSection.jsx";
+import AdminLostFoundSection from "./AdminLostFoundSection.jsx";
 
 function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
@@ -341,6 +342,15 @@ const ADMIN_TABS = [
     description: "Dispatch broadcast announcements and targeted direct alerts to students with real-time modal delivery.",
   },
   {
+    key: "lost-found",
+    label: "Lost & Found",
+    href: "/admin/lost-found",
+    icon: Search,
+    gradient: "from-emerald-500 to-teal-600",
+    badge: "Campus Items",
+    description: "Audit reported lost/found items, pin priority notices, and moderate claims across campus.",
+  },
+  {
     key: "feedback",
     label: "Feedback & Support",
     href: "/admin/feedback",
@@ -378,12 +388,12 @@ const ADMIN_TABS = [
   },
   {
     key: "mail",
-    label: "Mail Sender",
+    label: "Mail Sender (SMTP)",
     href: "/admin/mail",
     icon: Mail,
-    gradient: "from-teal-500 to-emerald-600",
-    badge: "Gomail SMTP",
-    description: "Select students or admins, compose personalized templates, and dispatch broadcast emails via Gomail SMTP.",
+    gradient: "from-rose-500 to-pink-600",
+    badge: "Gomail & Queue",
+    description: "Send direct & batch HTML emails, manage failed job queues, and inspect delivery logs.",
   },
   {
     key: "super",
@@ -408,6 +418,7 @@ function getAdminTabFromPath(pathname) {
   if (pathname.startsWith("/admin/mess")) return "mess";
   if (pathname.startsWith("/admin/leaves")) return "leaves";
   if (pathname.startsWith("/admin/notifications")) return "notifications";
+  if (pathname.startsWith("/admin/lost-found")) return "lost-found";
   if (pathname.startsWith("/admin/feedback")) return "feedback";
   if (pathname.startsWith("/admin/mail-sender") || pathname.startsWith("/admin/mail")) return "mail";
   if (pathname.startsWith("/admin/ai-key")) return "ai-key";
@@ -6533,6 +6544,8 @@ function AdminDashboard({ initialTab } = {}) {
         <AdminLeavesSection />
       ) : activeTab === "notifications" ? (
         <AdminNotificationsSection />
+      ) : activeTab === "lost-found" ? (
+        <AdminLostFoundSection />
       ) : activeTab === "feedback" ? (
         <AdminFeedbackPage />
       ) : activeTab === "mail" || activeTab === "mail-sender" ? (
@@ -6594,6 +6607,10 @@ function AdminNotificationsPage() {
   return <AdminDashboard initialTab="notifications" />;
 }
 
+function AdminLostFoundPage() {
+  return <AdminDashboard initialTab="lost-found" />;
+}
+
 function AdminFeedbackPageRoute() {
   return <AdminDashboard initialTab="feedback" />;
 }
@@ -6618,6 +6635,7 @@ export {
   AdminMessPage,
   AdminLeavesPage,
   AdminNotificationsPage,
+  AdminLostFoundPage,
   AdminFeedbackPageRoute as AdminFeedbackPage,
   AdminAIKeyPage,
   AdminMailSenderPage,
