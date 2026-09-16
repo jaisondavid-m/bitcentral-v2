@@ -119,15 +119,26 @@ export default function NotificationBell({ className = "" }) {
     return () => clearInterval(interval);
   }, [fetchNotifs]);
 
-  // Handle click outside to close
+  // Handle click outside & escape key to close
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleKeyDown = (e) => {
       if (e.key === "Escape") setIsOpen(false);
     };
-    if (isOpen) {
-      document.addEventListener("keydown", handleKeyDown);
-    }
-    return () => document.removeEventListener("keydown", handleKeyDown);
+
+    const handleClickOutside = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, [isOpen]);
 
   // Filtered notifications
@@ -215,19 +226,19 @@ export default function NotificationBell({ className = "" }) {
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop for mobile / outside click */}
+            {/* Backdrop for mobile */}
             <div
-              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs md:bg-transparent"
+              className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-xs md:hidden"
               onClick={() => setIsOpen(false)}
             />
 
             {/* Notification Card Flyout */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+              initial={{ opacity: 0, scale: 0.95, y: -8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              exit={{ opacity: 0, scale: 0.95, y: -8 }}
               transition={{ duration: 0.18, ease: "easeOut" }}
-              className="fixed inset-x-3 top-16 z-50 mx-auto max-w-md rounded-3xl border border-slate-200 bg-white/95 p-4 shadow-2xl backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/95 sm:absolute sm:inset-auto sm:right-0 sm:top-12 sm:w-[420px]"
+              className="fixed inset-x-3 top-16 z-50 mx-auto max-w-md rounded-3xl border border-slate-200/90 bg-white/95 p-4 shadow-2xl backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/95 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[420px] sm:max-w-none text-left"
             >
               {/* Header */}
               <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
