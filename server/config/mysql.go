@@ -887,17 +887,6 @@ func createNotificationsTables() {
 	} else {
 		log.Println("✅ user_notification_dismissals table ready")
 	}
-
-	// Seed initial welcome announcement if table is empty
-	var count int
-	err := DB.QueryRow("SELECT COUNT(*) FROM notifications").Scan(&count)
-	if err == nil && count == 0 {
-		_, _ = DB.Exec(`
-			INSERT INTO notifications (title, message, type, priority, target_type, link_url, link_text, created_by)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-		`, "Welcome to BIT-CENTRAL!", "Explore new features including real-time Leave Schedule with General Permission (GP) details, Exam Hall Finder, Question Bank, and Mess Menu.", "announcement", "normal", "all", "/home", "Explore BIT-CENTRAL", "system")
-		log.Println("✅ Seeded initial announcement notification")
-	}
 }
 
 func createLostFoundTables() {
