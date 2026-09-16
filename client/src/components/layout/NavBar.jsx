@@ -27,7 +27,6 @@ function Navbar() {
 
   const navItems = [
     { to: "/home", label: "Home" },
-    { to: "/lost-found", label: "Lost & Found" },
     ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
     { to: "/profile", label: "My Profile" },
     { to: "/about", label: "About" }
