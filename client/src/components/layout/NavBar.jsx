@@ -50,12 +50,14 @@ function Navbar() {
   return (
     <>
       <header className="sticky top-0 left-0 right-0 z-40">
-        <div className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 opacity-90 dark:from-black dark:via-slate-900 dark:to-blue-950">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,180,255,0.3),transparent)] animate-pulse"></div>
+        <div className="relative">
+          {/* Background visuals with overflow-hidden isolated to avoid clipping popovers/modals */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 opacity-90 dark:from-black dark:via-slate-900 dark:to-blue-950">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,180,255,0.3),transparent)] animate-pulse"></div>
+            </div>
+            <div className="absolute inset-0 backdrop-blur-md bg-white/10 border-b border-white/20 dark:bg-black/35 dark:border-blue-900/50"></div>
           </div>
-
-          <div className="absolute inset-0 backdrop-blur-md bg-white/10 border-b border-white/20 dark:bg-black/35 dark:border-blue-900/50"></div>
 
           <div className="relative max-w-7xl mx-auto">
             <div className="flex items-center justify-between px-4 py-3 md:px-6 lg:px-8">
