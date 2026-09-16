@@ -42,7 +42,7 @@ import {
   Backpack,
   Package,
   Building2,
-  Home,
+  Home as HomeIcon,
   UserCheck,
   Pin,
   Share2,
@@ -89,29 +89,29 @@ function getCategoryIcon(catId) {
   }
 }
 
-// Relative time formatting
+// Relative date formatting
 function formatRelative(dateStr) {
   if (!dateStr) return "";
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return dateStr;
   const now = new Date();
-  const diffDays = Math.floor((now - d) / (1000 * 60 * 60 * 24));
+  now.setHours(0, 0, 0, 0);
+  const diffDays = Math.round((now - d) / (1000 * 60 * 60 * 24));
   if (diffDays === 0) return "Today";
   if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays > 1 && diffDays < 7) return `${diffDays} days ago`;
   return d.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
 }
 
 export default function LostAndFound() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Navigation tabs: 'feed' | 'report' | 'my'
-  const activeTabParam = searchParams.get("tab") || "feed";
+  // Navigation tab: 'all' | 'lost' | 'found' | 'my'
+  const activeTabParam = searchParams.get("tab") || "all";
   const [activeTab, setActiveTab] = useState(activeTabParam);
 
-  // Feed Filter States
-  const [itemTypeFilter, setItemTypeFilter] = useState("all"); // 'all' | 'lost' | 'found'
+  // Filters
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
   const [statusFilter, setStatusFilter] = useState("active");
@@ -147,15 +147,23 @@ export default function LostAndFound() {
 
   const showToast = (msg, type = "success") => {
     setToastMessage({ msg, type });
-    setTimeout(() => setToastMessage(null), 4000);
+    setTimeout(() => setToastMessage(null), 3500);
   };
+
+  // Type filter derived from tab
+  const computedType = useMemo(() => {
+    if (activeTab === "lost") return "lost";
+    if (activeTab === "found") return "found";
+    return "all";
+  }, [activeTab]);
 
   // Fetch Feed Items
   const fetchFeed = useCallback(async () => {
+    if (activeTab === "my") return;
     setLoading(true);
     try {
       const res = await getLostFoundItems({
-        type: itemTypeFilter,
+        type: computedType,
         category: selectedCategory,
         location: selectedLocation,
         status: statusFilter,
@@ -170,7 +178,7 @@ export default function LostAndFound() {
     } finally {
       setLoading(false);
     }
-  }, [itemTypeFilter, selectedCategory, selectedLocation, statusFilter, searchQuery]);
+  }, [computedType, selectedCategory, selectedLocation, statusFilter, searchQuery, activeTab]);
 
   useEffect(() => {
     fetchFeed();
@@ -198,22 +206,7 @@ export default function LostAndFound() {
     }
   }, [activeTab, fetchMyData]);
 
-  // Check URL if single item requested (e.g. from notification link `/lost-found?id=123`)
-  const requestedId = searchParams.get("id");
-  useEffect(() => {
-    if (requestedId && items.length > 0) {
-      const el = document.getElementById(`item-${requestedId}`);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-        el.classList.add("ring-4", "ring-blue-500", "ring-offset-2");
-        setTimeout(() => {
-          el.classList.remove("ring-4", "ring-blue-500", "ring-offset-2");
-        }, 3000);
-      }
-    }
-  }, [requestedId, items]);
-
-  // Handle Mark as Returned / Claimed
+  // Status toggle handler
   const handleToggleStatus = async (item, newStatus) => {
     try {
       const res = await updateLostFoundStatus(item.id, newStatus);
@@ -229,9 +222,9 @@ export default function LostAndFound() {
     }
   };
 
-  // Handle Delete
+  // Delete handler
   const handleDeleteItem = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this listing?")) return;
+    if (!window.confirm("Are you sure you want to remove this listing?")) return;
     try {
       const res = await deleteLostFoundItem(id);
       if (res?.success) {
@@ -246,8 +239,37 @@ export default function LostAndFound() {
     }
   };
 
+  // Claim approve/reject
+  const handleClaimStatusChange = async (claimId, status) => {
+    try {
+      const res = await updateClaimStatus(claimId, status);
+      if (res?.success) {
+        showToast(`Claim marked as ${status}`);
+        fetchMyData();
+        fetchFeed();
+      } else {
+        showToast(res?.message || "Failed to update claim", "error");
+      }
+    } catch (e) {
+      showToast("Error updating claim", "error");
+    }
+  };
+
+  const hasActiveFilters =
+    selectedCategory !== "all" ||
+    selectedLocation !== "all" ||
+    statusFilter !== "active" ||
+    searchQuery.trim() !== "";
+
+  const resetFilters = () => {
+    setSelectedCategory("all");
+    setSelectedLocation("all");
+    setStatusFilter("active");
+    setSearchQuery("");
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50/70 pb-20 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100">
+    <main className="min-h-screen bg-gray-50 py-6 sm:py-10 dark:bg-black font-sans text-slate-800 dark:text-slate-100">
       {/* Toast Alert */}
       <AnimatePresence>
         {toastMessage && (
@@ -257,234 +279,216 @@ export default function LostAndFound() {
             exit={{ opacity: 0, y: -20 }}
             className={`fixed top-18 right-6 z-50 flex items-center gap-2.5 rounded-2xl px-5 py-3 shadow-xl backdrop-blur-xl border ${
               toastMessage.type === "error"
-                ? "bg-rose-500/90 text-white border-rose-400"
-                : "bg-emerald-600/90 text-white border-emerald-400"
+                ? "bg-rose-600 text-white border-rose-500"
+                : "bg-emerald-600 text-white border-emerald-500"
             }`}
           >
             {toastMessage.type === "error" ? (
-              <AlertCircle className="h-5 w-5" />
+              <AlertCircle className="h-4 w-4" />
             ) : (
-              <CheckCircle2 className="h-5 w-5" />
+              <CheckCircle2 className="h-4 w-4" />
             )}
-            <span className="text-sm font-semibold">{toastMessage.msg}</span>
+            <span className="text-xs font-bold">{toastMessage.msg}</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-slate-900 px-4 pt-10 pb-16 text-white shadow-xl md:px-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(120,180,255,0.25),transparent)] pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(99,102,241,0.25),transparent)] pointer-events-none" />
-
-        <div className="relative mx-auto max-w-7xl">
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1 text-xs font-semibold backdrop-blur-md border border-white/20 text-blue-100 mb-3">
-                <Sparkles className="h-3.5 w-3.5 text-amber-300" />
-                <span>BIT-CENTRAL Campus Community</span>
-              </div>
-              <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl text-white">
-                Campus Lost & Found Hub
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm md:text-base text-blue-100/90 leading-relaxed">
-                A unified campus platform to report, search, and recover lost student ID cards, keys, gadgets, and personal belongings across BIT Sathy.
-              </p>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Top Header Row */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-gray-200 dark:border-zinc-800">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
+                <Sparkles className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                <span>BIT Campus Hub</span>
+              </span>
             </div>
-
-            {/* Quick Action Button */}
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                onClick={() => {
-                  setEditingItem(null);
-                  setShowReportModal(true);
-                }}
-                className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-blue-700 shadow-lg hover:bg-blue-50 active:scale-98 transition-all"
-              >
-                <Plus className="h-4 w-4 stroke-[3]" />
-                <span>Report Lost or Found</span>
-              </button>
-            </div>
+            <h1 className="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              Lost & Found
+            </h1>
+            <p className="mt-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-xl">
+              Search, report, and recover student ID cards, keys, devices, and personal items across campus.
+            </p>
           </div>
 
-          {/* Tab Navigation */}
-          <div className="mt-8 flex flex-wrap items-center gap-2 border-b border-white/20 pb-1">
-            <button
-              onClick={() => handleTabChange("feed")}
-              className={`flex items-center gap-2 rounded-t-xl px-4 py-2.5 text-sm font-bold transition-all border-b-2 ${
-                activeTab === "feed"
-                  ? "border-white bg-white/15 text-white backdrop-blur-md"
-                  : "border-transparent text-white/70 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              <Inbox className="h-4 w-4" />
-              <span>Campus Feed ({totalCount})</span>
-            </button>
+          <button
+            onClick={() => {
+              setEditingItem(null);
+              setShowReportModal(true);
+            }}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-sm hover:bg-blue-700 active:scale-98 transition self-start sm:self-auto cursor-pointer"
+          >
+            <Plus className="h-4 w-4 stroke-[2.5]" />
+            <span>Report an Item</span>
+          </button>
+        </div>
 
-            <button
-              onClick={() => handleTabChange("my")}
-              className={`flex items-center gap-2 rounded-t-xl px-4 py-2.5 text-sm font-bold transition-all border-b-2 ${
-                activeTab === "my"
-                  ? "border-white bg-white/15 text-white backdrop-blur-md"
-                  : "border-transparent text-white/70 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              <UserCheck className="h-4 w-4" />
-              <span>My Listings & Claims</span>
-              {myItems.length > 0 && (
-                <span className="rounded-full bg-blue-500/80 px-2 py-0.5 text-xs text-white">
-                  {myItems.length}
-                </span>
-              )}
-            </button>
+        {/* Navigation Tabs (Segmented Control) */}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+          <div className="inline-flex rounded-xl bg-gray-200/80 p-1 dark:bg-zinc-800/80">
+            {[
+              { key: "all", label: "All Items" },
+              { key: "lost", label: "🔍 Lost" },
+              { key: "found", label: "🎁 Found" },
+              { key: "my", label: `My Activity ${myItems.length > 0 ? `(${myItems.length})` : ""}` },
+            ].map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => handleTabChange(tab.key)}
+                className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                  activeTab === tab.key
+                    ? "bg-white text-blue-600 shadow-xs dark:bg-zinc-900 dark:text-white"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="text-xs font-medium text-slate-400">
+            {activeTab !== "my" && (
+              <span>
+                Showing <b>{items.length}</b> {items.length === 1 ? "listing" : "listings"}
+              </span>
+            )}
           </div>
         </div>
-      </div>
 
-      {/* Main Content Area */}
-      <div className="mx-auto max-w-7xl px-4 md:px-8 -mt-6">
-        {activeTab === "feed" ? (
-          <div>
-            {/* Search & Filter Controls Bar */}
-            <div className="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-xl backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/90 mb-8">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                {/* Search input */}
-                <div className="relative flex-1">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search by item name, roll number, or landmark (e.g. 'Casio fx-991', '7376222', 'SF Block')..."
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-xs md:text-sm font-medium outline-none transition focus:border-blue-500 focus:bg-white dark:border-slate-700 dark:bg-slate-800/80 dark:focus:bg-slate-800"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery("")}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-
-                {/* Filter Pills */}
-                <div className="flex flex-wrap items-center gap-2">
-                  {/* Type Filter Buttons */}
-                  <div className="flex rounded-2xl bg-slate-100 p-1 dark:bg-slate-800">
-                    {[
-                      { key: "all", label: "All" },
-                      { key: "lost", label: "🔍 Lost" },
-                      { key: "found", label: "🎁 Found" },
-                    ].map((t) => (
-                      <button
-                        key={t.key}
-                        onClick={() => setItemTypeFilter(t.key)}
-                        className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
-                          itemTypeFilter === t.key
-                            ? "bg-white text-blue-600 shadow-sm dark:bg-slate-700 dark:text-white"
-                            : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-                        }`}
-                      >
-                        {t.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Location Selector */}
-                  <select
-                    value={selectedLocation}
-                    onChange={(e) => setSelectedLocation(e.target.value)}
-                    className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 outline-none transition focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                  >
-                    {CAMPUS_LOCATIONS.map((loc) => (
-                      <option key={loc.id} value={loc.id === "all" ? "all" : loc.name}>
-                        {loc.name}
-                      </option>
-                    ))}
-                  </select>
-
-                  {/* Status Selector */}
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 outline-none transition focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                  >
-                    <option value="active">Active Only</option>
-                    <option value="all">All Statuses</option>
-                    <option value="claimed">Claimed & Returned</option>
-                    <option value="handed_over">At Security / Admin</option>
-                  </select>
-
-                  {/* Refresh */}
+        {/* Filter Controls Bar (Only when not in My Activity) */}
+        {activeTab !== "my" && (
+          <div className="mt-4 rounded-2xl border border-gray-200/90 bg-white p-3.5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900/90">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center">
+              {/* Search Bar */}
+              <div className="relative flex-1">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search item, student name, roll number, or landmark..."
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-9 pr-8 text-xs sm:text-sm font-medium outline-none transition focus:border-blue-500 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800/80 dark:focus:bg-zinc-800"
+                />
+                {searchQuery && (
                   <button
-                    onClick={fetchFeed}
-                    className="rounded-2xl border border-slate-200 bg-slate-50 p-2 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 transition"
-                    title="Refresh feed"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                   >
-                    <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin text-blue-500" : ""}`} />
+                    <X className="h-3.5 w-3.5" />
                   </button>
-                </div>
+                )}
               </div>
 
-              {/* Category Filter Chips Carousel */}
-              <div className="mt-3 flex items-center gap-1.5 overflow-x-auto pt-2 pb-1 scrollbar-none">
-                {ITEM_CATEGORIES.map((cat) => {
-                  const Icon = getCategoryIcon(cat.id);
-                  const isSelected = selectedCategory === cat.id;
-                  return (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(cat.id)}
-                      className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
-                        isSelected
-                          ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
-                          : "bg-slate-100 text-slate-600 hover:bg-slate-200/80 dark:bg-slate-800/60 dark:text-slate-400 dark:hover:bg-slate-800"
-                      }`}
-                    >
-                      <Icon className="h-3.5 w-3.5" />
-                      <span>{cat.name}</span>
-                    </button>
-                  );
-                })}
+              {/* Filters Group */}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Category Dropdown */}
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-slate-700 outline-none transition focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-slate-200 cursor-pointer"
+                >
+                  {ITEM_CATEGORIES.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Location Dropdown */}
+                <select
+                  value={selectedLocation}
+                  onChange={(e) => setSelectedLocation(e.target.value)}
+                  className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-slate-700 outline-none transition focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-slate-200 cursor-pointer"
+                >
+                  {CAMPUS_LOCATIONS.map((loc) => (
+                    <option key={loc.id} value={loc.id === "all" ? "all" : loc.name}>
+                      {loc.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Status Dropdown */}
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-slate-700 outline-none transition focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-slate-200 cursor-pointer"
+                >
+                  <option value="active">Active</option>
+                  <option value="all">All Statuses</option>
+                  <option value="claimed">Claimed</option>
+                  <option value="handed_over">At Security Gate</option>
+                </select>
+
+                {hasActiveFilters && (
+                  <button
+                    onClick={resetFilters}
+                    className="rounded-xl border border-dashed border-gray-300 px-2.5 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 dark:border-zinc-700 dark:text-rose-400 dark:hover:bg-rose-950/40 transition"
+                    title="Reset all filters"
+                  >
+                    Reset
+                  </button>
+                )}
+
+                <button
+                  onClick={fetchFeed}
+                  className="rounded-xl border border-gray-200 bg-gray-50 p-2 text-slate-500 hover:bg-gray-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-slate-400 transition cursor-pointer"
+                  title="Refresh"
+                >
+                  <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin text-blue-500" : ""}`} />
+                </button>
               </div>
             </div>
+          </div>
+        )}
 
-            {/* Item Grid Feed */}
-            {loading && items.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <RefreshCw className="h-8 w-8 animate-spin text-blue-600" />
-                <p className="mt-3 text-sm font-bold text-slate-600 dark:text-slate-400">
-                  Scanning campus listings...
+        {/* Content Section */}
+        <div className="mt-6">
+          {activeTab !== "my" ? (
+            /* Feed List */
+            loading && items.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-24 text-center">
+                <RefreshCw className="h-7 w-7 animate-spin text-blue-600" />
+                <p className="mt-3 text-xs font-bold text-slate-500 dark:text-slate-400">
+                  Loading campus listings...
                 </p>
               </div>
             ) : items.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-white/60 py-20 px-4 text-center dark:border-slate-800 dark:bg-slate-900/40">
-                <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
-                  <Inbox className="h-8 w-8" />
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-white py-20 px-4 text-center dark:border-zinc-800 dark:bg-zinc-900/60">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100 text-slate-400 dark:bg-zinc-800 dark:text-slate-500">
+                  <Inbox className="h-7 w-7" />
                 </div>
-                <h3 className="mt-4 text-base font-bold text-slate-800 dark:text-slate-200">
+                <h3 className="mt-3.5 text-sm font-bold text-slate-800 dark:text-slate-200">
                   No listings found
                 </h3>
-                <p className="mt-1 max-w-sm text-xs text-slate-500 dark:text-slate-400">
-                  {searchQuery || selectedCategory !== "all" || selectedLocation !== "all"
-                    ? "Try adjusting your search filters or check back later."
-                    : "Be the first to report a lost or found item to help your campus peers."}
+                <p className="mt-1 max-w-sm text-xs text-slate-400">
+                  {hasActiveFilters
+                    ? "Try clearing or changing your search filters."
+                    : "No items have been reported in this category yet."}
                 </p>
-                <button
-                  onClick={() => {
-                    setEditingItem(null);
-                    setShowReportModal(true);
-                  }}
-                  className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-blue-700 transition"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span>Report an Item</span>
-                </button>
+                {hasActiveFilters ? (
+                  <button
+                    onClick={resetFilters}
+                    className="mt-4 rounded-xl bg-gray-100 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-gray-200 dark:bg-zinc-800 dark:text-slate-300 transition"
+                  >
+                    Clear Filters
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setEditingItem(null);
+                      setShowReportModal(true);
+                    }}
+                    className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Report Item</span>
+                  </button>
+                )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {items.map((item) => (
-                  <ItemCard
+                  <CleanItemCard
                     key={item.id}
                     item={item}
                     user={user}
@@ -502,115 +506,176 @@ export default function LostAndFound() {
                   />
                 ))}
               </div>
-            )}
-          </div>
-        ) : (
-          /* My Listings & Claims Tab */
-          <div className="space-y-8">
-            {/* My Items Section */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">
-                    Items You Reported ({myItems.length})
-                  </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Manage your lost/found listings and review claims submitted by classmates.
-                  </p>
+            )
+          ) : (
+            /* My Activity Tab */
+            <div className="space-y-8">
+              {/* My Reported Items */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                      Items You Reported ({myItems.length})
+                    </h2>
+                    <p className="text-xs text-slate-400">
+                      Manage your listings, change status, and review claims received.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setEditingItem(null);
+                      setShowReportModal(true);
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-blue-700 transition"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Report New</span>
+                  </button>
                 </div>
-                <button
-                  onClick={() => {
-                    setEditingItem(null);
-                    setShowReportModal(true);
-                  }}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  <span>Report New</span>
-                </button>
+
+                {loadingMy ? (
+                  <div className="py-12 text-center">
+                    <RefreshCw className="h-6 w-6 animate-spin mx-auto text-blue-500" />
+                  </div>
+                ) : myItems.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
+                    <p className="text-xs font-semibold text-slate-400">
+                      You haven't posted any lost or found items yet.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {myItems.map((item) => (
+                      <CleanItemCard
+                        key={item.id}
+                        item={item}
+                        user={user}
+                        isMyView={true}
+                        onImageClick={(imgUrl) => setLightboxImage(imgUrl)}
+                        onToggleStatus={handleToggleStatus}
+                        onEdit={(itm) => {
+                          setEditingItem(itm);
+                          setShowReportModal(true);
+                        }}
+                        onDelete={handleDeleteItem}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {loadingMy ? (
-                <div className="py-10 text-center">
-                  <RefreshCw className="h-6 w-6 animate-spin mx-auto text-blue-500" />
-                </div>
-              ) : myItems.length === 0 ? (
-                <div className="rounded-3xl border border-dashed border-slate-200 bg-white p-8 text-center dark:border-slate-800 dark:bg-slate-900">
-                  <p className="text-sm font-semibold text-slate-500">
-                    You have not posted any lost or found items yet.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                  {myItems.map((item) => (
-                    <ItemCard
-                      key={item.id}
-                      item={item}
-                      user={user}
-                      isMyView={true}
-                      onImageClick={(imgUrl) => setLightboxImage(imgUrl)}
-                      onToggleStatus={handleToggleStatus}
-                      onEdit={(itm) => {
-                        setEditingItem(itm);
-                        setShowReportModal(true);
-                      }}
-                      onDelete={handleDeleteItem}
-                    />
-                  ))}
+              {/* Claims Received on My Items */}
+              {myItems.some((it) => it.claims && it.claims.length > 0) && (
+                <div className="border-t border-gray-200 pt-6 dark:border-zinc-800">
+                  <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mb-3">
+                    Claims Received from Classmates
+                  </h2>
+                  <div className="space-y-3">
+                    {myItems
+                      .flatMap((it) => (it.claims || []).map((c) => ({ ...c, itemTitle: it.title })))
+                      .map((claim) => (
+                        <div
+                          key={claim.id}
+                          className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-gray-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900 shadow-xs"
+                        >
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-xs text-slate-900 dark:text-white">
+                                {claim.claimant_name} ({claim.claimant_roll_no || claim.claimant_email})
+                              </span>
+                              <span className="text-[11px] text-slate-400">on item: <b>{claim.itemTitle}</b></span>
+                            </div>
+                            <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
+                              Proof: {claim.proof_description}
+                            </p>
+                            {claim.claimant_phone && (
+                              <a
+                                href={`https://wa.me/91${claim.claimant_phone.replace(/\D/g, "").slice(-10)}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400"
+                              >
+                                <MessageCircle className="h-3 w-3" />
+                                <span>WhatsApp {claim.claimant_phone}</span>
+                              </a>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {claim.status === "pending" ? (
+                              <>
+                                <button
+                                  onClick={() => handleClaimStatusChange(claim.id, "approved")}
+                                  className="rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700"
+                                >
+                                  Approve & Return
+                                </button>
+                                <button
+                                  onClick={() => handleClaimStatusChange(claim.id, "rejected")}
+                                  className="rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-gray-100 dark:border-zinc-700 dark:text-slate-300"
+                                >
+                                  Reject
+                                </button>
+                              </>
+                            ) : (
+                              <span
+                                className={`rounded-xl px-2.5 py-1 text-xs font-bold uppercase ${
+                                  claim.status === "approved"
+                                    ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                                    : "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
+                                }`}
+                              >
+                                {claim.status}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
                 </div>
               )}
-            </div>
 
-            {/* My Claims Section */}
-            <div className="border-t border-slate-200 pt-8 dark:border-slate-800">
-              <div className="mb-4">
-                <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">
+              {/* Claims Submitted by User */}
+              <div className="border-t border-gray-200 pt-6 dark:border-zinc-800">
+                <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mb-3">
                   Claims You Submitted ({myClaims.length})
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Track the status of your recovery claims on found items.
-                </p>
-              </div>
 
-              {myClaims.length === 0 ? (
-                <div className="rounded-3xl border border-dashed border-slate-200 bg-white p-8 text-center dark:border-slate-800 dark:bg-slate-900">
-                  <p className="text-sm font-semibold text-slate-500">
-                    You have not submitted any claims yet.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {myClaims.map((claim) => (
-                    <div
-                      key={claim.id}
-                      className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase ${
-                              claim.item_type === "found"
-                                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
-                                : "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
-                            }`}
-                          >
-                            {claim.item_type}
-                          </span>
-                          <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
-                            {claim.item_title}
-                          </h4>
+                {myClaims.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
+                    <p className="text-xs font-semibold text-slate-400">
+                      You haven't submitted any recovery claims yet.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {myClaims.map((claim) => (
+                      <div
+                        key={claim.id}
+                        className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-gray-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900 shadow-xs"
+                      >
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`rounded-md px-2 py-0.5 text-[10px] font-black uppercase ${
+                                claim.item_type === "found"
+                                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                                  : "bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300"
+                              }`}
+                            >
+                              {claim.item_type}
+                            </span>
+                            <span className="text-xs font-bold text-slate-900 dark:text-white">
+                              {claim.item_title}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
+                            Your proof: {claim.proof_description}
+                          </p>
                         </div>
-                        <p className="mt-1 text-xs text-slate-600 dark:text-slate-400 line-clamp-1">
-                          Proof provided: {claim.proof_description}
-                        </p>
-                        <span className="mt-1 block text-[10px] text-slate-400">
-                          Submitted on {new Date(claim.created_at).toLocaleDateString("en-IN")}
-                        </span>
-                      </div>
 
-                      <div className="flex items-center gap-2">
                         <span
-                          className={`rounded-xl px-3 py-1 text-xs font-bold ${
+                          className={`self-start sm:self-auto rounded-xl px-2.5 py-1 text-[11px] font-bold uppercase ${
                             claim.status === "approved"
                               ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
                               : claim.status === "rejected"
@@ -618,27 +683,27 @@ export default function LostAndFound() {
                               : "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
                           }`}
                         >
-                          Status: {claim.status.toUpperCase()}
+                          Status: {claim.status}
                         </span>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Report Modal */}
       <AnimatePresence>
         {showReportModal && (
-          <ReportItemModal
+          <CleanReportModal
             itemToEdit={editingItem}
             onClose={() => setShowReportModal(false)}
             onSuccess={(msg) => {
               setShowReportModal(false);
-              showToast(msg || "Item saved successfully! 🎉");
+              showToast(msg || "Item published successfully!");
               fetchFeed();
               if (activeTab === "my") fetchMyData();
             }}
@@ -649,7 +714,7 @@ export default function LostAndFound() {
       {/* Claim Modal */}
       <AnimatePresence>
         {showClaimModal && activeItemForClaim && (
-          <ClaimItemModal
+          <CleanClaimModal
             item={activeItemForClaim}
             onClose={() => {
               setShowClaimModal(false);
@@ -658,50 +723,50 @@ export default function LostAndFound() {
             onSuccess={(msg) => {
               setShowClaimModal(false);
               setActiveItemForClaim(null);
-              showToast(msg || "Claim submitted! The finder has been notified.", "success");
+              showToast(msg || "Claim submitted to finder!");
               fetchFeed();
             }}
           />
         )}
       </AnimatePresence>
 
-      {/* Image Lightbox Modal */}
+      {/* Image Lightbox */}
       <AnimatePresence>
         {lightboxImage && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
             onClick={() => setLightboxImage(null)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-3xl bg-slate-900 shadow-2xl border border-white/20"
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative max-h-[85vh] max-w-[90vw] overflow-hidden rounded-2xl bg-black"
               onClick={(e) => e.stopPropagation()}
             >
               <img
                 src={lightboxImage}
-                alt="Enlarged item preview"
-                className="max-h-[85vh] w-auto object-contain rounded-2xl"
+                alt="preview"
+                className="max-h-[80vh] w-auto object-contain rounded-xl"
               />
               <button
                 onClick={() => setLightboxImage(null)}
-                className="absolute top-3 right-3 rounded-full bg-black/60 p-2 text-white hover:bg-black/80 transition"
+                className="absolute top-2 right-2 rounded-full bg-black/60 p-1.5 text-white hover:bg-black"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
-    </div>
+    </main>
   );
 }
 
 /* =========================================================================
-   ITEM CARD COMPONENT
+   CLEAN ITEM CARD COMPONENT
    ========================================================================= */
-function ItemCard({
+function CleanItemCard({
   item,
   user,
   isMyView = false,
@@ -716,7 +781,7 @@ function ItemCard({
   const statusInfo = STATUS_LABELS[item.status] || STATUS_LABELS.active;
   const CategoryIcon = getCategoryIcon(item.category);
 
-  // WhatsApp helper link
+  // WhatsApp link
   const cleanPhone = (item.contact_phone || "").replace(/\D/g, "");
   const whatsappUrl = cleanPhone
     ? `https://wa.me/91${cleanPhone.slice(-10)}?text=${encodeURIComponent(
@@ -725,90 +790,61 @@ function ItemCard({
     : null;
 
   return (
-    <motion.div
-      id={`item-${item.id}`}
-      layout
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`group relative flex flex-col justify-between rounded-3xl border transition-all duration-300 ${
+    <div
+      className={`group flex flex-col justify-between rounded-2xl border transition-all duration-200 ${
         item.is_pinned
-          ? "border-amber-300/80 bg-amber-50/30 dark:border-amber-900/60 dark:bg-amber-950/10 shadow-lg shadow-amber-500/5"
-          : "border-slate-200/90 bg-white shadow-sm hover:shadow-xl dark:border-slate-800 dark:bg-slate-900"
+          ? "border-amber-300 bg-amber-50/20 dark:border-amber-800/80 dark:bg-amber-950/10 shadow-sm"
+          : "border-gray-200/90 bg-white hover:border-gray-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900/90 dark:hover:border-zinc-700"
       }`}
     >
       <div>
-        {/* Card Header & Media Container */}
-        <div className="relative aspect-video w-full overflow-hidden rounded-t-3xl bg-slate-100 dark:bg-slate-800/80">
-          {item.images && item.images.length > 0 ? (
+        {/* Photo or Clean Icon Box */}
+        {item.images && item.images.length > 0 ? (
+          <div className="relative aspect-video w-full overflow-hidden rounded-t-2xl bg-gray-100 dark:bg-zinc-800">
             <img
               src={item.images[0]}
               alt={item.title}
               onClick={() => onImageClick(item.images[0])}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 cursor-pointer"
+              className="h-full w-full object-cover cursor-pointer hover:scale-102 transition-transform duration-300"
             />
-          ) : (
-            <div className="flex h-full w-full flex-col items-center justify-center text-slate-400 dark:text-slate-600 p-4">
-              <CategoryIcon className="h-12 w-12 stroke-[1.5]" />
-              <span className="mt-1 text-[11px] font-semibold text-slate-400">
-                No photo attached
-              </span>
-            </div>
-          )}
-
-          {/* Badges Overlay */}
-          <div className="absolute top-3 left-3 flex flex-wrap items-center gap-1.5">
-            <span
-              className={`inline-flex items-center gap-1 rounded-xl px-2.5 py-1 text-xs font-black uppercase tracking-wider shadow-md backdrop-blur-md ${
-                isLost
-                  ? "bg-rose-500 text-white"
-                  : "bg-emerald-600 text-white"
-              }`}
-            >
-              {isLost ? "🔍 LOST" : "🎁 FOUND"}
-            </span>
-
-            {item.is_pinned && (
-              <span className="inline-flex items-center gap-1 rounded-xl bg-amber-400 px-2 py-1 text-[10px] font-black text-amber-950 shadow-md">
-                <Pin className="h-3 w-3 fill-current" />
-                PINNED
+            {item.images.length > 1 && (
+              <span className="absolute bottom-2 right-2 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                +{item.images.length - 1}
               </span>
             )}
           </div>
+        ) : null}
 
-          <div className="absolute top-3 right-3">
+        {/* Content Body */}
+        <div className="p-4 sm:p-5">
+          {/* Top Pill Row */}
+          <div className="flex items-center justify-between gap-2 mb-2.5">
+            <div className="flex items-center gap-1.5">
+              <span
+                className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${
+                  isLost
+                    ? "bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300"
+                    : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300"
+                }`}
+              >
+                {isLost ? "LOST" : "FOUND"}
+              </span>
+
+              <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 dark:bg-zinc-800 dark:text-slate-300">
+                <CategoryIcon className="h-3 w-3" />
+                {item.category.replace("_", " ")}
+              </span>
+            </div>
+
             <span
-              className={`inline-flex items-center gap-1 rounded-xl px-2.5 py-1 text-[11px] font-bold border shadow-md backdrop-blur-md ${statusInfo.bg}`}
+              className={`rounded-md px-2 py-0.5 text-[10px] font-bold border ${statusInfo.bg}`}
             >
               {statusInfo.label}
             </span>
           </div>
 
-          {/* Photos count indicator */}
-          {item.images && item.images.length > 1 && (
-            <div className="absolute bottom-2 right-2 rounded-lg bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-xs">
-              +{item.images.length - 1} more
-            </div>
-          )}
-        </div>
-
-        {/* Card Body */}
-        <div className="p-4 sm:p-5">
-          {/* Category & ID Fast Match */}
-          <div className="flex flex-wrap items-center gap-1.5 mb-2">
-            <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-              <CategoryIcon className="h-3 w-3" />
-              {item.category.replace("_", " ").toUpperCase()}
-            </span>
-
-            {item.matched_roll_number && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-blue-100 px-2 py-0.5 text-[11px] font-bold text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
-                <CreditCard className="h-3 w-3" />
-                Roll: {item.matched_roll_number}
-              </span>
-            )}
-          </div>
-
-          <h3 className="text-base font-extrabold text-slate-900 dark:text-white line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          {/* Title & Description */}
+          <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white line-clamp-1">
             {item.title}
           </h3>
 
@@ -816,118 +852,102 @@ function ItemCard({
             {item.description}
           </p>
 
-          {/* Location & Time Chips */}
-          <div className="mt-3 space-y-1.5 border-t border-slate-100 pt-3 text-xs dark:border-slate-800/80">
-            <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
+          {/* ID Card Roll Number Fast Match */}
+          {item.matched_roll_number && (
+            <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50">
+              <CreditCard className="h-3.5 w-3.5" />
+              <span>Roll No: {item.matched_roll_number}</span>
+            </div>
+          )}
+
+          {/* Location & Time */}
+          <div className="mt-3.5 space-y-1 text-xs text-slate-500 dark:text-slate-400 border-t border-gray-100 pt-3 dark:border-zinc-800">
+            <div className="flex items-center gap-1.5 font-medium truncate">
               <MapPin className="h-3.5 w-3.5 text-rose-500 shrink-0" />
-              <span className="font-semibold truncate">
+              <span className="truncate">
                 {item.location_campus}
                 {item.location_details ? ` (${item.location_details})` : ""}
               </span>
             </div>
 
-            <div className="flex items-center justify-between text-[11px] text-slate-400">
-              <span className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
-                {item.date_occurred} {item.time_occurred ? `• ${item.time_occurred}` : ""}
-              </span>
+            <div className="flex items-center justify-between text-[11px] text-slate-400 pt-0.5">
+              <span>{item.date_occurred}</span>
               <span>{formatRelative(item.created_at)}</span>
             </div>
           </div>
 
-          {/* Current Custody / Where it is kept */}
+          {/* Custody (for found items) */}
           {!isLost && (
-            <div className="mt-3 rounded-2xl bg-blue-50/70 p-2.5 text-xs text-blue-900 dark:bg-blue-950/30 dark:text-blue-300 border border-blue-100 dark:border-blue-900/40">
-              <div className="flex items-center gap-1.5 font-bold">
-                <ShieldCheck className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                <span>
-                  {item.current_custody === "main_security_gate"
-                    ? "Safe at Main Security Gate"
-                    : item.current_custody === "dept_office"
-                    ? "At Department Office"
-                    : item.current_custody === "hostel_warden"
-                    ? "With Hostel Warden"
-                    : "Safe with Finder"}
-                </span>
-              </div>
-              {item.custody_details && (
-                <p className="mt-0.5 text-[11px] text-blue-700/80 dark:text-blue-400/80">
-                  {item.custody_details}
-                </p>
-              )}
+            <div className="mt-2.5 rounded-xl bg-gray-50 px-2.5 py-1.5 text-[11px] font-medium text-slate-600 dark:bg-zinc-800/80 dark:text-slate-300 flex items-center gap-1.5">
+              <ShieldCheck className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+              <span className="truncate">
+                {item.current_custody === "main_security_gate"
+                  ? "At Main Security Gate"
+                  : item.current_custody === "dept_office"
+                  ? "At Department Office"
+                  : item.current_custody === "hostel_warden"
+                  ? "With Hostel Warden"
+                  : "Safe with Finder"}
+              </span>
             </div>
           )}
-
-          {/* Posted By Details */}
-          <div className="mt-3 flex items-center justify-between pt-2 text-[11px] text-slate-400 border-t border-slate-100 dark:border-slate-800/80">
-            <span className="truncate">
-              Posted by <b className="text-slate-700 dark:text-slate-300">{item.user_name}</b>
-              {item.user_roll_no ? ` (${item.user_roll_no})` : ""}
-            </span>
-          </div>
         </div>
       </div>
 
-      {/* Card Footer Actions */}
+      {/* Card Actions */}
       <div className="p-4 sm:p-5 pt-0">
         {item.is_my_item ? (
-          /* Owner Controls */
-          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-2 border-t border-gray-100 pt-3 dark:border-zinc-800">
             {item.status === "active" ? (
               <button
                 onClick={() => onToggleStatus(item, "claimed")}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 py-2 px-3 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition active:scale-98"
+                className="flex-1 rounded-xl bg-emerald-600 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition"
               >
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                <span>Mark Recovered</span>
+                Mark Resolved
               </button>
             ) : (
               <button
                 onClick={() => onToggleStatus(item, "active")}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-slate-200 py-2 px-3 text-xs font-bold text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-300 transition"
+                className="flex-1 rounded-xl bg-gray-100 py-2 text-xs font-bold text-slate-700 hover:bg-gray-200 dark:bg-zinc-800 dark:text-slate-300 transition"
               >
-                <span>Reactivate</span>
+                Reactivate
               </button>
             )}
 
             <button
               onClick={() => onEdit(item)}
-              className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 transition"
-              title="Edit listing"
+              className="rounded-xl border border-gray-200 p-2 text-slate-500 hover:bg-gray-100 dark:border-zinc-700 dark:text-slate-300"
+              title="Edit"
             >
               <Edit3 className="h-3.5 w-3.5" />
             </button>
 
             <button
               onClick={() => onDelete(item.id)}
-              className="rounded-xl border border-rose-200 p-2 text-rose-600 hover:bg-rose-50 dark:border-rose-900/50 dark:hover:bg-rose-950/40 transition"
-              title="Delete listing"
+              className="rounded-xl border border-rose-200 p-2 text-rose-600 hover:bg-rose-50 dark:border-rose-900/40"
+              title="Delete"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>
           </div>
         ) : (
-          /* Student Peer Actions */
-          <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-            {/* Claim button if active & allowed */}
+          <div className="flex items-center gap-2 border-t border-gray-100 pt-3 dark:border-zinc-800">
             {!isResolved && item.allow_inapp_claim && (
               <button
                 onClick={() => onOpenClaim(item)}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 py-2.5 px-3 text-xs font-bold text-white shadow-md hover:bg-blue-700 transition active:scale-98"
+                className="flex-1 rounded-xl bg-blue-600 py-2 px-3 text-xs font-bold text-white hover:bg-blue-700 transition"
               >
-                <ShieldCheck className="h-3.5 w-3.5" />
-                <span>Claim This Item</span>
+                Claim Item
               </button>
             )}
 
-            {/* Direct WhatsApp / Phone Contact */}
             {whatsappUrl && (
               <a
                 href={whatsappUrl}
                 target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-1 rounded-xl bg-emerald-500 py-2.5 px-3 text-xs font-bold text-white shadow-sm hover:bg-emerald-600 transition"
-                title="Message on WhatsApp"
+                rel="noreferrer"
+                className="rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition flex items-center gap-1"
+                title="WhatsApp Finder"
               >
                 <MessageCircle className="h-3.5 w-3.5" />
                 <span>WhatsApp</span>
@@ -937,24 +957,22 @@ function ItemCard({
             {item.contact_phone && !whatsappUrl && (
               <a
                 href={`tel:${item.contact_phone}`}
-                className="inline-flex items-center justify-center gap-1 rounded-xl bg-slate-100 py-2.5 px-3 text-xs font-bold text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 transition"
-                title="Call finder"
+                className="rounded-xl bg-gray-100 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-gray-200 dark:bg-zinc-800 dark:text-slate-300 transition"
               >
-                <Phone className="h-3.5 w-3.5" />
-                <span>Call</span>
+                Call
               </a>
             )}
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
 /* =========================================================================
-   REPORT ITEM MODAL (NEW & EDIT)
+   CLEAN REPORT MODAL
    ========================================================================= */
-function ReportItemModal({ itemToEdit, onClose, onSuccess }) {
+function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
   const { user } = useAuth();
   const isEditing = Boolean(itemToEdit?.id);
 
@@ -998,13 +1016,12 @@ function ReportItemModal({ itemToEdit, onClose, onSuccess }) {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Handle Photo Upload
   const handlePhotoSelect = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (images.length >= 4) {
-      setErrorMsg("Maximum 4 images allowed per item.");
+      setErrorMsg("Max 4 images allowed");
       return;
     }
 
@@ -1028,15 +1045,14 @@ function ReportItemModal({ itemToEdit, onClose, onSuccess }) {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Submit Handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim()) {
-      setErrorMsg("Please enter a title for the item");
+      setErrorMsg("Please enter an item title");
       return;
     }
     if (!description.trim()) {
-      setErrorMsg("Please provide a brief description");
+      setErrorMsg("Please provide a description");
       return;
     }
 
@@ -1071,13 +1087,7 @@ function ReportItemModal({ itemToEdit, onClose, onSuccess }) {
       }
 
       if (res?.success) {
-        onSuccess(
-          isEditing
-            ? "Listing updated successfully!"
-            : itemType === "found" && matchedRollNumber
-            ? `Found report created! Automated alert dispatched for Roll No ${matchedRollNumber}.`
-            : "Report created successfully!"
-        );
+        onSuccess(isEditing ? "Updated listing!" : "Published listing!");
       } else {
         setErrorMsg(res?.message || "Failed to save item");
       }
@@ -1091,81 +1101,75 @@ function ReportItemModal({ itemToEdit, onClose, onSuccess }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs overflow-y-auto">
       <motion.div
-        initial={{ scale: 0.95, opacity: 0, y: 10 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.95, opacity: 0, y: 10 }}
-        className="relative my-8 w-full max-w-2xl rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900"
+        initial={{ scale: 0.96, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.96, opacity: 0 }}
+        className="relative my-6 w-full max-w-xl rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
       >
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-zinc-800">
           <div>
-            <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">
-              {isEditing ? "Edit Listing" : "Report Lost or Found Item"}
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">
+              {isEditing ? "Edit Item" : "Report an Item"}
             </h3>
-            <p className="text-xs text-slate-500">
-              Provide accurate details to help classmates find or claim items quickly.
+            <p className="text-xs text-slate-400">
+              Provide clear details so the item can be identified quickly.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-gray-100 dark:hover:bg-zinc-800"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
         {errorMsg && (
-          <div className="mt-4 flex items-center gap-2 rounded-2xl bg-rose-50 p-3 text-xs font-semibold text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200">
+          <div className="mt-3.5 flex items-center gap-2 rounded-xl bg-rose-50 p-2.5 text-xs font-semibold text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-5 space-y-4 max-h-[70vh] overflow-y-auto pr-1">
-          {/* Type Toggle */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-              What are you reporting?
-            </label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setItemType("lost")}
-                className={`flex items-center justify-center gap-2 rounded-2xl p-3 text-xs font-bold transition border ${
-                  itemType === "lost"
-                    ? "border-rose-500 bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 ring-2 ring-rose-500/30"
-                    : "border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-800/60"
-                }`}
-              >
-                <span>🔍 I Lost an Item</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setItemType("found")}
-                className={`flex items-center justify-center gap-2 rounded-2xl p-3 text-xs font-bold transition border ${
-                  itemType === "found"
-                    ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 ring-2 ring-emerald-500/30"
-                    : "border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-800/60"
-                }`}
-              >
-                <span>🎁 I Found an Item</span>
-              </button>
-            </div>
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+          {/* Item Type Segmented */}
+          <div className="grid grid-cols-2 gap-2 bg-gray-100 p-1 rounded-xl dark:bg-zinc-800">
+            <button
+              type="button"
+              onClick={() => setItemType("lost")}
+              className={`rounded-lg py-2 text-xs font-bold transition ${
+                itemType === "lost"
+                  ? "bg-white text-rose-600 shadow-xs dark:bg-zinc-900 dark:text-rose-400"
+                  : "text-slate-600 dark:text-slate-400"
+              }`}
+            >
+              🔍 I Lost Something
+            </button>
+            <button
+              type="button"
+              onClick={() => setItemType("found")}
+              className={`rounded-lg py-2 text-xs font-bold transition ${
+                itemType === "found"
+                  ? "bg-white text-emerald-600 shadow-xs dark:bg-zinc-900 dark:text-emerald-400"
+                  : "text-slate-600 dark:text-slate-400"
+              }`}
+            >
+              🎁 I Found Something
+            </button>
           </div>
 
           {/* Title & Category */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Item Title *
+                Item Name *
               </label>
               <input
                 type="text"
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g., Casio Scientific Calculator / Student ID"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-medium outline-none focus:border-blue-500 focus:bg-white dark:border-slate-700 dark:bg-slate-800"
+                placeholder="e.g. Blue Titan Bottle, Casio FX-991"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800"
               />
             </div>
 
@@ -1176,7 +1180,7 @@ function ReportItemModal({ itemToEdit, onClose, onSuccess }) {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-medium outline-none focus:border-blue-500 focus:bg-white dark:border-slate-700 dark:bg-slate-800"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
               >
                 {ITEM_CATEGORIES.filter((c) => c.id !== "all").map((cat) => (
                   <option key={cat.id} value={cat.id}>
@@ -1187,22 +1191,21 @@ function ReportItemModal({ itemToEdit, onClose, onSuccess }) {
             </div>
           </div>
 
-          {/* Special Roll Number Fast-Match if ID Card */}
+          {/* Smart Roll Matcher if ID Card */}
           {category === "id_card" && (
-            <div className="rounded-2xl border border-blue-200 bg-blue-50/60 p-3.5 dark:border-blue-900/60 dark:bg-blue-950/30">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-blue-900 dark:text-blue-300">
-                <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <span>Smart ID-Card Matcher</span>
-              </div>
-              <p className="mt-0.5 text-[11px] text-blue-700 dark:text-blue-400">
-                If the student roll number is visible, enter it below to automatically dispatch a notification to that student!
+            <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-3 dark:border-blue-900 dark:bg-blue-950/20">
+              <label className="block text-xs font-bold text-blue-900 dark:text-blue-300">
+                Student Roll Number (Auto-Notification)
+              </label>
+              <p className="text-[11px] text-blue-600 dark:text-blue-400 mt-0.5">
+                Entering roll number will automatically dispatch a notification to that student.
               </p>
               <input
                 type="text"
                 value={matchedRollNumber}
                 onChange={(e) => setMatchedRollNumber(e.target.value)}
                 placeholder="e.g. 7376222AD101"
-                className="mt-2 w-full rounded-xl border border-blue-300 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wider outline-none focus:ring-2 focus:ring-blue-500 dark:border-blue-800 dark:bg-slate-900"
+                className="mt-1.5 w-full rounded-lg border border-blue-300 bg-white px-3 py-1.5 text-xs font-bold uppercase tracking-wider dark:border-blue-800 dark:bg-zinc-900"
               />
             </div>
           )}
@@ -1210,19 +1213,19 @@ function ReportItemModal({ itemToEdit, onClose, onSuccess }) {
           {/* Description */}
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Detailed Description *
+              Description *
             </label>
             <textarea
               required
-              rows={3}
+              rows={2}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe color, brand, distinct marks, or situation..."
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs font-medium outline-none focus:border-blue-500 focus:bg-white dark:border-slate-700 dark:bg-slate-800"
+              placeholder="Color, brand, identifying marks, condition..."
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 p-2.5 text-xs font-medium outline-none focus:border-blue-500 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800"
             />
           </div>
 
-          {/* Campus Location & Specific Room */}
+          {/* Location & Room */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
@@ -1231,7 +1234,7 @@ function ReportItemModal({ itemToEdit, onClose, onSuccess }) {
               <select
                 value={locationCampus}
                 onChange={(e) => setLocationCampus(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-medium outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
               >
                 {CAMPUS_LOCATIONS.filter((l) => l.id !== "all").map((loc) => (
                   <option key={loc.id} value={loc.name}>
@@ -1243,19 +1246,19 @@ function ReportItemModal({ itemToEdit, onClose, onSuccess }) {
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Specific Room / Landmark
+                Room / Landmark
               </label>
               <input
                 type="text"
                 value={locationDetails}
                 onChange={(e) => setLocationDetails(e.target.value)}
-                placeholder="e.g., Room SF-204, 2nd row bench"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-medium outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800"
+                placeholder="e.g. SF-204 2nd bench, Library 1st floor"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
               />
             </div>
           </div>
 
-          {/* Date & Time */}
+          {/* Date */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
@@ -1266,34 +1269,34 @@ function ReportItemModal({ itemToEdit, onClose, onSuccess }) {
                 required
                 value={dateOccurred}
                 onChange={(e) => setDateOccurred(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Approximate Time
+                Approx Time
               </label>
               <input
                 type="text"
                 value={timeOccurred}
                 onChange={(e) => setTimeOccurred(e.target.value)}
-                placeholder="e.g., 2:30 PM (after PT exam)"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800"
+                placeholder="e.g. Morning, 2:30 PM"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
               />
             </div>
           </div>
 
-          {/* Current Custody (For Found Items) */}
+          {/* Custody (Found only) */}
           {itemType === "found" && (
-            <div className="space-y-2">
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                Where is this item currently kept? *
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Where is this item kept?
               </label>
               <select
                 value={currentCustody}
                 onChange={(e) => setCurrentCustody(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-medium outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
               >
                 {CUSTODY_OPTIONS.map((opt) => (
                   <option key={opt.id} value={opt.id}>
@@ -1301,33 +1304,25 @@ function ReportItemModal({ itemToEdit, onClose, onSuccess }) {
                   </option>
                 ))}
               </select>
-
-              <input
-                type="text"
-                value={custodyDetails}
-                onChange={(e) => setCustodyDetails(e.target.value)}
-                placeholder="Optional custody notes (e.g., 'Handed over to Officer Raman at Main Gate')"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800"
-              />
             </div>
           )}
 
-          {/* Photo Uploader */}
+          {/* Photos */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
               Photos (Max 4)
             </label>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2">
               {images.map((img, idx) => (
                 <div
                   key={idx}
-                  className="relative h-20 w-20 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700"
+                  className="relative h-16 w-16 rounded-xl overflow-hidden border border-gray-200 dark:border-zinc-700"
                 >
-                  <img src={img} alt="Upload preview" className="h-full w-full object-cover" />
+                  <img src={img} alt="preview" className="h-full w-full object-cover" />
                   <button
                     type="button"
                     onClick={() => handleRemoveImage(idx)}
-                    className="absolute top-1 right-1 rounded-full bg-black/70 p-1 text-white hover:bg-black"
+                    className="absolute top-0.5 right-0.5 rounded-full bg-black/60 p-0.5 text-white"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -1335,13 +1330,13 @@ function ReportItemModal({ itemToEdit, onClose, onSuccess }) {
               ))}
 
               {images.length < 4 && (
-                <label className="flex h-20 w-20 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/60 dark:hover:bg-slate-800 transition">
+                <label className="flex h-16 w-16 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-zinc-700 dark:bg-zinc-800">
                   {uploadingImage ? (
-                    <RefreshCw className="h-5 w-5 animate-spin text-blue-500" />
+                    <RefreshCw className="h-4 w-4 animate-spin text-blue-500" />
                   ) : (
                     <>
-                      <Camera className="h-5 w-5 text-slate-400" />
-                      <span className="text-[10px] font-bold text-slate-400 mt-1">Add Photo</span>
+                      <Camera className="h-4 w-4 text-slate-400" />
+                      <span className="text-[9px] font-bold text-slate-400 mt-0.5">Upload</span>
                     </>
                   )}
                   <input
@@ -1356,67 +1351,50 @@ function ReportItemModal({ itemToEdit, onClose, onSuccess }) {
             </div>
           </div>
 
-          {/* Verification Secret Question (Optional) */}
-          {itemType === "found" && (
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Ownership Verification Hint (Optional)
-              </label>
-              <input
-                type="text"
-                value={secretQuestion}
-                onChange={(e) => setSecretQuestion(e.target.value)}
-                placeholder="e.g. 'What is the sticker on the back?' or 'Name the brand of keychain'"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-medium outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800"
-              />
-            </div>
-          )}
-
           {/* Contact Details */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 pt-2 border-t border-gray-100 dark:border-zinc-800">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Contact Phone / WhatsApp
+                WhatsApp Phone
               </label>
               <input
                 type="tel"
                 value={contactPhone}
                 onChange={(e) => setContactPhone(e.target.value)}
                 placeholder="e.g. 9843777817"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-medium outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
               />
             </div>
 
-            <div className="flex items-center gap-2 pt-6">
+            <div className="flex items-center gap-2 pt-5">
               <input
                 type="checkbox"
-                id="showPhoneCheck"
+                id="showPhoneClean"
                 checked={showPhone}
                 onChange={(e) => setShowPhone(e.target.checked)}
-                className="h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
+                className="h-4 w-4 rounded text-blue-600"
               />
-              <label htmlFor="showPhoneCheck" className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                Allow students to message on WhatsApp
+              <label htmlFor="showPhoneClean" className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                Show WhatsApp button to students
               </label>
             </div>
           </div>
 
-          {/* Action buttons */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-2 pt-4 border-t border-gray-100 dark:border-zinc-800">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl px-4 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="rounded-xl px-4 py-2 text-xs font-bold text-slate-600 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-zinc-800"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-xs font-bold text-white shadow-md hover:bg-blue-700 active:scale-98 transition disabled:opacity-50"
+              className="rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white hover:bg-blue-700 transition disabled:opacity-50"
             >
-              {submitting && <RefreshCw className="h-3.5 w-3.5 animate-spin" />}
-              <span>{isEditing ? "Save Changes" : "Publish Report"}</span>
+              {submitting ? "Saving..." : isEditing ? "Save Changes" : "Publish Listing"}
             </button>
           </div>
         </form>
@@ -1426,9 +1404,9 @@ function ReportItemModal({ itemToEdit, onClose, onSuccess }) {
 }
 
 /* =========================================================================
-   CLAIM ITEM MODAL
+   CLEAN CLAIM MODAL
    ========================================================================= */
-function ClaimItemModal({ item, onClose, onSuccess }) {
+function CleanClaimModal({ item, onClose, onSuccess }) {
   const { user } = useAuth();
   const [proofDescription, setProofDescription] = useState("");
   const [claimantPhone, setClaimantPhone] = useState(user?.phone || "");
@@ -1438,7 +1416,7 @@ function ClaimItemModal({ item, onClose, onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!proofDescription.trim()) {
-      setErrorMsg("Please provide proof details or answer the verification question.");
+      setErrorMsg("Please describe your proof or identifying marks");
       return;
     }
 
@@ -1457,7 +1435,7 @@ function ClaimItemModal({ item, onClose, onSuccess }) {
         setErrorMsg(res?.message || "Failed to submit claim");
       }
     } catch (err) {
-      setErrorMsg("An error occurred while submitting your claim.");
+      setErrorMsg("Error submitting claim");
     } finally {
       setSubmitting(false);
     }
@@ -1466,43 +1444,39 @@ function ClaimItemModal({ item, onClose, onSuccess }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
       <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
+        initial={{ scale: 0.96, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        className="relative w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900"
+        exit={{ scale: 0.96, opacity: 0 }}
+        className="relative w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
       >
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-zinc-800">
           <div>
-            <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">
-              Claim Item: {item.title}
+            <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+              Claim: {item.title}
             </h3>
-            <p className="text-xs text-slate-500">
-              Provide unique identifying details so the finder can verify your ownership.
+            <p className="text-xs text-slate-400">
+              Provide unique details to verify you are the owner.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="rounded-lg p-1 text-slate-400 hover:bg-gray-100 dark:hover:bg-zinc-800"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
         {errorMsg && (
-          <div className="mt-4 flex items-center gap-2 rounded-2xl bg-rose-50 p-3 text-xs font-semibold text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200">
+          <div className="mt-3 flex items-center gap-2 rounded-xl bg-rose-50 p-2.5 text-xs font-semibold text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-4 space-y-3">
           {item.secret_question && (
-            <div className="rounded-2xl bg-amber-50 p-3 text-xs font-semibold text-amber-900 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-900">
-              <div className="flex items-center gap-1.5 font-bold mb-0.5">
-                <HelpCircle className="h-4 w-4 text-amber-600" />
-                <span>Finder's Verification Question:</span>
-              </div>
-              <p className="text-amber-800 dark:text-amber-200">{item.secret_question}</p>
+            <div className="rounded-xl bg-amber-50 p-2.5 text-xs text-amber-900 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200">
+              <b>Finder's Question:</b> {item.secret_question}
             </div>
           )}
 
@@ -1512,42 +1486,41 @@ function ClaimItemModal({ item, onClose, onSuccess }) {
             </label>
             <textarea
               required
-              rows={4}
+              rows={3}
               value={proofDescription}
               onChange={(e) => setProofDescription(e.target.value)}
-              placeholder="Describe unique characteristics, contents inside, lock code, wallpapers, or where you lost it..."
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs font-medium outline-none focus:border-blue-500 focus:bg-white dark:border-slate-700 dark:bg-slate-800"
+              placeholder="Describe unique characteristics, color, contents inside, lock codes, or where you lost it..."
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 p-2.5 text-xs font-medium outline-none focus:border-blue-500 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800"
             />
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Your Phone Number for Finder to Contact You
+              Your Contact Phone Number
             </label>
             <input
               type="tel"
               value={claimantPhone}
               onChange={(e) => setClaimantPhone(e.target.value)}
               placeholder="e.g. 9843777817"
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-medium outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800"
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-zinc-800">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl px-4 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="rounded-xl px-4 py-2 text-xs font-bold text-slate-600 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-zinc-800"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-xs font-bold text-white shadow-md hover:bg-blue-700 active:scale-98 transition disabled:opacity-50"
+              className="rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white hover:bg-blue-700 transition disabled:opacity-50"
             >
-              {submitting && <RefreshCw className="h-3.5 w-3.5 animate-spin" />}
-              <span>Submit Claim</span>
+              {submitting ? "Submitting..." : "Send Claim"}
             </button>
           </div>
         </form>
