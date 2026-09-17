@@ -920,6 +920,9 @@ func createLostFoundTables() {
 		longitude DOUBLE NULL,
 		is_pinned TINYINT(1) NOT NULL DEFAULT 0,
 		is_flagged TINYINT(1) NOT NULL DEFAULT 0,
+		is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+		deleted_at DATETIME NULL,
+		deleted_by VARCHAR(255) NULL,
 		resolved_at DATETIME NULL,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -928,6 +931,7 @@ func createLostFoundTables() {
 		INDEX idx_campus_location (location_campus),
 		INDEX idx_roll (matched_roll_number),
 		INDEX idx_user (user_uid),
+		INDEX idx_deleted (is_deleted),
 		INDEX idx_created (created_at DESC)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
@@ -940,6 +944,9 @@ func createLostFoundTables() {
 	// Safe column additions for existing table
 	_, _ = DB.Exec("ALTER TABLE lost_found_items ADD COLUMN latitude DOUBLE NULL AFTER status")
 	_, _ = DB.Exec("ALTER TABLE lost_found_items ADD COLUMN longitude DOUBLE NULL AFTER latitude")
+	_, _ = DB.Exec("ALTER TABLE lost_found_items ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0 AFTER is_flagged")
+	_, _ = DB.Exec("ALTER TABLE lost_found_items ADD COLUMN deleted_at DATETIME NULL AFTER is_deleted")
+	_, _ = DB.Exec("ALTER TABLE lost_found_items ADD COLUMN deleted_by VARCHAR(255) NULL AFTER deleted_at")
 
 	queryClaims := `
 	CREATE TABLE IF NOT EXISTS lost_found_claims (

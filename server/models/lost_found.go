@@ -29,6 +29,9 @@ type LostFoundItem struct {
 	Longitude         *float64          `json:"longitude,omitempty"`
 	IsPinned          bool              `json:"is_pinned"`
 	IsFlagged         bool              `json:"is_flagged"`
+	IsDeleted         bool              `json:"is_deleted"`
+	DeletedAt         string            `json:"deleted_at,omitempty"`
+	DeletedBy         string            `json:"deleted_by,omitempty"`
 	ResolvedAt        string            `json:"resolved_at,omitempty"`
 	CreatedAt         string            `json:"created_at"`
 	UpdatedAt         string            `json:"updated_at,omitempty"`

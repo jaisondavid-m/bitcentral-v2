@@ -133,7 +133,7 @@ func (h *LostFoundHandler) GetItems(c *gin.Context) {
 	}
 	offset := (page - 1) * limit
 
-	var conditions []string
+	conditions := []string{"COALESCE(is_deleted, 0) = 0"}
 	var args []interface{}
 
 	if itemType != "" && itemType != "all" {
@@ -357,7 +357,7 @@ func (h *LostFoundHandler) GetItemByID(c *gin.Context) {
 			updated_at,
 			(SELECT COUNT(*) FROM lost_found_claims WHERE item_id = lost_found_items.id) AS claim_count
 		FROM lost_found_items
-		WHERE id = ?
+		WHERE id = ? AND COALESCE(is_deleted, 0) = 0
 		LIMIT 1
 	`
 
@@ -667,7 +667,7 @@ func (h *LostFoundHandler) UpdateItem(c *gin.Context) {
 	isAdmin := h.isAdmin(userUID, userEmail)
 
 	var ownerUID string
-	err = h.DB.QueryRow("SELECT user_uid FROM lost_found_items WHERE id = ?", id).Scan(&ownerUID)
+	err = h.DB.QueryRow("SELECT user_uid FROM lost_found_items WHERE id = ? AND COALESCE(is_deleted, 0) = 0", id).Scan(&ownerUID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "Item not found"})
 		return
@@ -758,7 +758,7 @@ func (h *LostFoundHandler) UpdateItemStatus(c *gin.Context) {
 	isAdmin := h.isAdmin(userUID, userEmail)
 
 	var ownerUID string
-	err = h.DB.QueryRow("SELECT user_uid FROM lost_found_items WHERE id = ?", id).Scan(&ownerUID)
+	err = h.DB.QueryRow("SELECT user_uid FROM lost_found_items WHERE id = ? AND COALESCE(is_deleted, 0) = 0", id).Scan(&ownerUID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "Item not found"})
 		return
@@ -798,7 +798,7 @@ func (h *LostFoundHandler) UpdateItemStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Status updated successfully", "status": req.Status})
 }
 
-// DELETE /api/lost-found/:id - Delete item
+// DELETE /api/lost-found/:id - Soft delete item
 func (h *LostFoundHandler) DeleteItem(c *gin.Context) {
 	if h.DB == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Database not available"})
@@ -816,7 +816,7 @@ func (h *LostFoundHandler) DeleteItem(c *gin.Context) {
 	isAdmin := h.isAdmin(userUID, userEmail)
 
 	var ownerUID string
-	err = h.DB.QueryRow("SELECT user_uid FROM lost_found_items WHERE id = ?", id).Scan(&ownerUID)
+	err = h.DB.QueryRow("SELECT user_uid FROM lost_found_items WHERE id = ? AND COALESCE(is_deleted, 0) = 0", id).Scan(&ownerUID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "Item not found"})
 		return
@@ -827,8 +827,15 @@ func (h *LostFoundHandler) DeleteItem(c *gin.Context) {
 		return
 	}
 
-	_, _ = h.DB.Exec("DELETE FROM lost_found_claims WHERE item_id = ?", id)
-	_, err = h.DB.Exec("DELETE FROM lost_found_items WHERE id = ?", id)
+	deletedBy := userEmail
+	if deletedBy == "" {
+		deletedBy = userUID
+	}
+	if isAdmin {
+		deletedBy = "admin:" + deletedBy
+	}
+
+	_, err = h.DB.Exec("UPDATE lost_found_items SET is_deleted = 1, deleted_at = NOW(), deleted_by = ? WHERE id = ?", deletedBy, id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to delete item: " + err.Error()})
 		return
@@ -930,7 +937,7 @@ func (h *LostFoundHandler) SubmitClaim(c *gin.Context) {
 	err = h.DB.QueryRow(`
 		SELECT id, title, item_type, user_uid, user_name, user_email, allow_inapp_claim, status
 		FROM lost_found_items
-		WHERE id = ?
+		WHERE id = ? AND COALESCE(is_deleted, 0) = 0
 	`, id).Scan(
 		&item.ID,
 		&item.Title,
@@ -1105,7 +1112,7 @@ func (h *LostFoundHandler) GetMyItemsAndClaims(c *gin.Context) {
 			status, latitude, longitude, is_pinned, is_flagged, COALESCE(resolved_at, ''), created_at, updated_at,
 			(SELECT COUNT(*) FROM lost_found_claims WHERE item_id = lost_found_items.id) AS claim_count
 		FROM lost_found_items
-		WHERE user_uid = ?
+		WHERE user_uid = ? AND COALESCE(is_deleted, 0) = 0
 		ORDER BY created_at DESC
 	`, userUID)
 
@@ -1190,18 +1197,18 @@ func (h *LostFoundHandler) AdminGetItems(c *gin.Context) {
 
 	// Compute stats
 	var stats models.LostFoundStats
-	_ = h.DB.QueryRow("SELECT COUNT(*) FROM lost_found_items").Scan(&stats.TotalItems)
-	_ = h.DB.QueryRow("SELECT COUNT(*) FROM lost_found_items WHERE item_type = 'lost' AND status = 'active'").Scan(&stats.ActiveLost)
-	_ = h.DB.QueryRow("SELECT COUNT(*) FROM lost_found_items WHERE item_type = 'found' AND status = 'active'").Scan(&stats.ActiveFound)
-	_ = h.DB.QueryRow("SELECT COUNT(*) FROM lost_found_items WHERE status IN ('claimed', 'handed_over', 'closed')").Scan(&stats.ResolvedCount)
-	_ = h.DB.QueryRow("SELECT COUNT(*) FROM lost_found_claims").Scan(&stats.TotalClaims)
+	_ = h.DB.QueryRow("SELECT COUNT(*) FROM lost_found_items WHERE COALESCE(is_deleted, 0) = 0").Scan(&stats.TotalItems)
+	_ = h.DB.QueryRow("SELECT COUNT(*) FROM lost_found_items WHERE item_type = 'lost' AND status = 'active' AND COALESCE(is_deleted, 0) = 0").Scan(&stats.ActiveLost)
+	_ = h.DB.QueryRow("SELECT COUNT(*) FROM lost_found_items WHERE item_type = 'found' AND status = 'active' AND COALESCE(is_deleted, 0) = 0").Scan(&stats.ActiveFound)
+	_ = h.DB.QueryRow("SELECT COUNT(*) FROM lost_found_items WHERE status IN ('claimed', 'handed_over', 'closed') AND COALESCE(is_deleted, 0) = 0").Scan(&stats.ResolvedCount)
+	_ = h.DB.QueryRow("SELECT COUNT(*) FROM lost_found_claims c JOIN lost_found_items i ON c.item_id = i.id WHERE COALESCE(i.is_deleted, 0) = 0").Scan(&stats.TotalClaims)
 
 	// Delegate to standard GetItems for listing
 	search := strings.TrimSpace(c.Query("q"))
 	itemType := strings.ToLower(strings.TrimSpace(c.Query("type")))
 	status := strings.ToLower(strings.TrimSpace(c.Query("status")))
 
-	var conditions []string
+	conditions := []string{"COALESCE(is_deleted, 0) = 0"}
 	var args []interface{}
 
 	if itemType != "" && itemType != "all" {
@@ -1302,14 +1309,14 @@ func (h *LostFoundHandler) AdminTogglePin(c *gin.Context) {
 		return
 	}
 
-	_, err = h.DB.Exec("UPDATE lost_found_items SET is_pinned = NOT is_pinned WHERE id = ?", id)
+	_, err = h.DB.Exec("UPDATE lost_found_items SET is_pinned = NOT is_pinned WHERE id = ? AND COALESCE(is_deleted, 0) = 0", id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to toggle pin: " + err.Error()})
 		return
 	}
 
 	var isPinned bool
-	_ = h.DB.QueryRow("SELECT is_pinned FROM lost_found_items WHERE id = ?", id).Scan(&isPinned)
+	_ = h.DB.QueryRow("SELECT is_pinned FROM lost_found_items WHERE id = ? AND COALESCE(is_deleted, 0) = 0", id).Scan(&isPinned)
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Pin status updated", "is_pinned": isPinned})
 }
