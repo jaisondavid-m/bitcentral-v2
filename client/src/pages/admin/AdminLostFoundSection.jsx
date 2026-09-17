@@ -285,10 +285,11 @@ export default function AdminLostFoundSection() {
                                 <Pin className="h-3 w-3 text-amber-500 fill-current shrink-0" />
                               )}
                             </div>
-                            <span className="text-[11px] text-slate-400 capitalize">
-                              {item.category.replace("_", " ")}
-                              {item.matched_roll_number ? ` • Roll: ${item.matched_roll_number}` : ""}
-                            </span>
+                            {item.matched_roll_number ? (
+                              <span className="text-[11px] text-slate-400 font-mono">
+                                Roll: {item.matched_roll_number}
+                              </span>
+                            ) : null}
                           </div>
                         </div>
                       </td>
