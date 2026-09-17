@@ -764,7 +764,6 @@ function CleanItemCard({
   const isLost = item.item_type === "lost";
   const isResolved = item.status === "claimed" || item.status === "closed";
   const statusInfo = STATUS_LABELS[item.status] || STATUS_LABELS.active;
-  const CategoryIcon = getCategoryIcon(item.category);
 
   // WhatsApp link
   const cleanPhone = (item.contact_phone || "").replace(/\D/g, "");
@@ -813,11 +812,6 @@ function CleanItemCard({
                 }`}
               >
                 {isLost ? "LOST" : "FOUND"}
-              </span>
-
-              <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 dark:bg-zinc-800 dark:text-slate-300">
-                <CategoryIcon className="h-3 w-3" />
-                {item.category.replace("_", " ")}
               </span>
             </div>
 
