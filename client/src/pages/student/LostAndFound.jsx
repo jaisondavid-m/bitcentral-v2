@@ -1080,7 +1080,7 @@ function CleanReportModal({ itemToEdit, onClose, onSuccess }) {
     const payload = {
       item_type: itemType,
       title: title.trim(),
-      category: matchedRollNumber.trim() ? "id_card" : "others",
+      category: itemToEdit?.category || "others",
       description: description.trim(),
       location_campus: locationCampus.trim(),
       location_details: "",

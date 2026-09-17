@@ -481,17 +481,19 @@ func (h *LostFoundHandler) CreateItem(c *gin.Context) {
 		return
 	}
 
-	// Validation
+	// Field defaults
 	req.Title = strings.TrimSpace(req.Title)
 	if req.Title == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Title is required"})
-		return
+		if req.ItemType == "lost" {
+			req.Title = "Lost Item"
+		} else {
+			req.Title = "Found Item"
+		}
 	}
 
 	req.ItemType = strings.ToLower(strings.TrimSpace(req.ItemType))
 	if req.ItemType != "lost" && req.ItemType != "found" {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Item type must be 'lost' or 'found'"})
-		return
+		req.ItemType = "found"
 	}
 
 	req.Category = strings.ToLower(strings.TrimSpace(req.Category))
@@ -588,10 +590,10 @@ func (h *LostFoundHandler) CreateItem(c *gin.Context) {
 
 	newID, _ := res.LastInsertId()
 
-	// AUTOMATION: If this is a found ID card with a Roll Number, trigger automated notification to that student
+	// AUTOMATION: If this is a found item with a Roll Number, trigger automated notification to that student
 	if req.ItemType == "found" && req.MatchedRollNumber != "" {
 		matchedRoll := strings.TrimSpace(strings.ToUpper(req.MatchedRollNumber))
-		go h.triggerIDCardAutoNotification(int(newID), matchedRoll, req.Title, req.LocationCampus)
+		go h.triggerFoundItemNotification(int(newID), matchedRoll, req.Title, req.LocationCampus)
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
@@ -601,8 +603,8 @@ func (h *LostFoundHandler) CreateItem(c *gin.Context) {
 	})
 }
 
-// Background auto-notifier when a student ID card is found
-func (h *LostFoundHandler) triggerIDCardAutoNotification(itemID int, rollNo, title, location string) {
+// Background auto-notifier when a student item is found matching a roll number
+func (h *LostFoundHandler) triggerFoundItemNotification(itemID int, rollNo, title, location string) {
 	if h.DB == nil || rollNo == "" {
 		return
 	}
@@ -615,8 +617,29 @@ func (h *LostFoundHandler) triggerIDCardAutoNotification(itemID int, rollNo, tit
 		LIMIT 1
 	`, rollNo, "%"+rollNo+"%").Scan(&targetUID, &targetEmail)
 
-	notifTitle := fmt.Sprintf("ID Card Found (%s)", rollNo)
-	notifMsg := fmt.Sprintf("A student ID card matching Roll No %s was found at %s. Click to view and recover your item.", rollNo, location)
+	itemTitle := strings.TrimSpace(title)
+	if itemTitle == "" {
+		itemTitle = "Personal Item"
+	}
+
+	isIDCard := strings.Contains(strings.ToLower(itemTitle), "id card") ||
+		strings.Contains(strings.ToLower(itemTitle), "idcard") ||
+		strings.Contains(strings.ToLower(itemTitle), "smart card")
+
+	var notifTitle, notifMsg string
+	locText := location
+	if locText == "" {
+		locText = "Campus"
+	}
+
+	if isIDCard {
+		notifTitle = fmt.Sprintf("ID Card Found (%s)", rollNo)
+		notifMsg = fmt.Sprintf("A student ID card matching Roll No %s was found at %s. Click to view and recover your item.", rollNo, locText)
+	} else {
+		notifTitle = fmt.Sprintf("Found Item: %s (%s)", itemTitle, rollNo)
+		notifMsg = fmt.Sprintf("A found item \"%s\" matching Roll No %s was found at %s. Click to view and recover your item.", itemTitle, rollNo, locText)
+	}
+
 	linkURL := fmt.Sprintf("/lost-found?id=%d", itemID)
 
 	_, _ = h.DB.Exec(`
