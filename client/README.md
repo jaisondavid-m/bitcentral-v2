@@ -193,7 +193,6 @@ VITE_API_BASE_URL=http://localhost:8080
 VITE_ADMIN_FIREBASE_UID=your_admin_firebase_uid
 
 # Optional Features
-VITE_ENABLE_GUEST_LOGIN=false
 PING_ON=true
 ```
 
