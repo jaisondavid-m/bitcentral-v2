@@ -46,16 +46,9 @@ const loadRazorpayScript = () => {
 export default function SupportDev() {
   const navigate = useNavigate();
   const { user, profile, student } = useAuth();
-  const isRealUser = Boolean(user && !user?.isGuest);
+  const isRealUser = Boolean(user);
 
   const handleLoginToDonate = async () => {
-    if (user?.isGuest) {
-      try {
-        await logout();
-      } catch (e) {
-        // ignore
-      }
-    }
     navigate("/login", { state: { from: "/support-dev" } });
   };
 

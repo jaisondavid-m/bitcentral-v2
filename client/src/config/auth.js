@@ -1,5 +1,4 @@
 import { isAllowedEmail } from "@/services/authRules.js";
-import { clearGuestSession } from "@/services/guestSession.js";
 import { getCookie, setCookie, deleteCookie, isJwtValid } from "@/utils/cookieAuth.js";
 import { postGoogleAuth, postGoogleLogout } from "@/api/axios.js";
 
@@ -138,7 +137,6 @@ export const signInWithGoogle = async () => {
         const finalToken = backendAuth?.token || token;
         setStoredToken(finalToken);
 
-        clearGuestSession();
         window.dispatchEvent(new Event("auth_state_changed"));
 
         resolved = true;
@@ -182,7 +180,6 @@ export const signInWithGoogle = async () => {
             const finalToken = backendAuth?.token || token;
             setStoredToken(finalToken);
 
-            clearGuestSession();
             window.dispatchEvent(new Event("auth_state_changed"));
             resolved = true;
             const finalClaims = parseJwt(finalToken);
@@ -212,7 +209,6 @@ export const signInWithGoogle = async () => {
 };
 
 export const logout = async () => {
-  clearGuestSession();
   try {
     await postGoogleLogout();
   } catch (e) {}
