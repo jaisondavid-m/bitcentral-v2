@@ -394,6 +394,158 @@ func createCardsTable() {
 		log.Printf("ℹ️ app_route column not created (may already exist): %v", err)
 	}
 
+	// Seed default cards if empty
+	var count int
+	if err := DB.QueryRow("SELECT COUNT(*) FROM cards").Scan(&count); err == nil && count == 0 {
+		type seedCard struct {
+			ID         int
+			Order      int
+			ClickCount int
+			Img        string
+			Name       string
+			Keywords   string
+			Link       string
+			AppRoute   string
+			BtnText    string
+			CreatedAt  string
+			UpdatedAt  string
+		}
+
+		seedCards := []seedCard{
+			{
+				ID:         4,
+				Order:      13,
+				ClickCount: 0,
+				Img:        "",
+				Name:       "Exam hall finder",
+				Keywords:   "[]",
+				Link:       "",
+				AppRoute:   "/exam-hall",
+				BtnText:    "Find Now",
+				CreatedAt:  "2026-05-21 11:51:02",
+				UpdatedAt:  "2026-08-30 15:16:28",
+			},
+			{
+				ID:         5,
+				Order:      18,
+				ClickCount: 0,
+				Img:        "",
+				Name:       "PBL Portal",
+				Keywords:   "[]",
+				Link:       "https://pcdp.bitsathy.ac.in/stf/pbl",
+				AppRoute:   "",
+				BtnText:    "Open Now",
+				CreatedAt:  "2026-05-21 11:51:46",
+				UpdatedAt:  "2026-08-30 15:16:29",
+			},
+			{
+				ID:         6,
+				Order:      21,
+				ClickCount: 0,
+				Img:        "",
+				Name:       "Upcoming Leave Details",
+				Keywords:   "[]",
+				Link:       "",
+				AppRoute:   "/leavedetails",
+				BtnText:    "View Now",
+				CreatedAt:  "2026-05-21 11:52:44",
+				UpdatedAt:  "2026-08-30 15:16:29",
+			},
+			{
+				ID:         7,
+				Order:      19,
+				ClickCount: 0,
+				Img:        "",
+				Name:       "PCDP App installation",
+				Keywords:   "[]",
+				Link:       "",
+				AppRoute:   "/pcdp",
+				BtnText:    "Install App",
+				CreatedAt:  "2026-05-21 11:53:17",
+				UpdatedAt:  "2026-08-30 15:16:29",
+			},
+			{
+				ID:         8,
+				Order:      20,
+				ClickCount: 0,
+				Img:        "",
+				Name:       "Wiki Page",
+				Keywords:   "[]",
+				Link:       "https://wiki.bitsathy.ac.in",
+				AppRoute:   "",
+				BtnText:    "Open Material",
+				CreatedAt:  "2026-05-21 11:54:06",
+				UpdatedAt:  "2026-08-30 15:16:29",
+			},
+			{
+				ID:         30001,
+				Order:      1,
+				ClickCount: 20478,
+				Img:        "/CardImgs/rewardpoint.png",
+				Name:       "RP Checker",
+				Keywords:   `["rp", "reward", "points", "rp", "ap", "internal", "marks", "rewards"]`,
+				Link:       "",
+				AppRoute:   "/rpsite",
+				BtnText:    "Check RP",
+				CreatedAt:  "2026-05-22 02:33:28",
+				UpdatedAt:  "2026-09-25 17:14:13",
+			},
+			{
+				ID:         30003,
+				Order:      10,
+				ClickCount: 14841,
+				Img:        "/CardImgs/hallfinder.png",
+				Name:       "Exam Hall Finder",
+				Keywords:   `["hall", "venue", "finder", "exam", "sem"]`,
+				Link:       "",
+				AppRoute:   "/exam-hall",
+				BtnText:    "Find Now",
+				CreatedAt:  "2026-05-22 02:34:03",
+				UpdatedAt:  "2026-09-25 17:12:52",
+			},
+			{
+				ID:         30004,
+				Order:      2,
+				ClickCount: 29991,
+				Img:        "/CardImgs/bitmenu.png",
+				Name:       "Mess Menu",
+				Keywords:   `["food", "mess", "menu", "lunch", "dinner", "breakfast", "snacks"]`,
+				Link:       "",
+				AppRoute:   "/mess",
+				BtnText:    "MessMenu",
+				CreatedAt:  "2026-05-22 02:34:59",
+				UpdatedAt:  "2026-09-25 17:38:41",
+			},
+			{
+				ID:         30005,
+				Order:      8,
+				ClickCount: 1031,
+				Img:        "",
+				Name:       "PBL Portal",
+				Keywords:   `["pbl", "venue", "portal", "assigment"]`,
+				Link:       "https://pcdp.bitsathy.ac.in/stf/pbl",
+				AppRoute:   "",
+				BtnText:    "Open Now",
+				CreatedAt:  "2026-05-22 02:35:17",
+				UpdatedAt:  "2026-09-25 15:41:41",
+			},
+		}
+
+		stmt, err := DB.Prepare(`
+			INSERT INTO cards (id, card_order, click_count, img, name, keywords, link, app_route, btntext, created_at, updated_at)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		`)
+		if err == nil {
+			defer stmt.Close()
+			for _, card := range seedCards {
+				_, _ = stmt.Exec(card.ID, card.Order, card.ClickCount, card.Img, card.Name, card.Keywords, card.Link, card.AppRoute, card.BtnText, card.CreatedAt, card.UpdatedAt)
+			}
+			log.Println("✅ Seeded default cards")
+		} else {
+			log.Printf("⚠️ Failed to prepare card seeding statement: %v", err)
+		}
+	}
+
 	log.Println("✅ cards table ready")
 }
 
