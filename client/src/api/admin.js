@@ -212,6 +212,15 @@ export async function createCard(payload) {
   return response.data;
 }
 
+export async function bulkUploadCards(payload, isFormData = false) {
+  const headers = await getAdminHeaders();
+  if (isFormData) {
+    headers["Content-Type"] = "multipart/form-data";
+  }
+  const response = await api.post(`/admin/cards/bulk`, payload, { headers });
+  return response.data;
+}
+
 export async function updateCard(id, payload) {
   const headers = await getAdminHeaders();
   const response = await api.put(`/admin/cards/${id}`, payload, { headers });

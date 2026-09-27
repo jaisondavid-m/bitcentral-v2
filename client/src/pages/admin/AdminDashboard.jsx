@@ -19,6 +19,7 @@ import {
   uploadAdminFile,
   listAdminCards,
   createCard,
+  bulkUploadCards,
   updateCard,
   reorderAdminCards,
   deleteCard,
@@ -2415,11 +2416,636 @@ function CardForm({ initial, onSubmit, onCancel, isLoading }) {
   );
 }
 
+/* -- Card CSV/JSON Bulk Upload Helpers & Modal ------------------------------ */
+const CARD_CSV_TEMPLATE = `name,card_order,link,app_route,btntext,keywords,img,click_count
+"Exam Hall Finder",1,"","/exam-hall","Find Now","hall, venue, finder, exam, sem","/CardImgs/hallfinder.png",0
+"Mess Menu",2,"","/mess","MessMenu","food, mess, menu, lunch, dinner, breakfast, snacks","/CardImgs/bitmenu.png",0
+"PBL Portal",3,"https://pcdp.bitsathy.ac.in/stf/pbl","","Open Now","pbl, venue, portal","",0
+"Upcoming Leave Details",4,"","/leavedetails","View Now","leave, holidays, details","",0`;
+
+const CARD_JSON_TEMPLATE = JSON.stringify(
+  [
+    {
+      name: "Exam Hall Finder",
+      card_order: 1,
+      link: "",
+      app_route: "/exam-hall",
+      btntext: "Find Now",
+      keywords: ["hall", "venue", "finder", "exam", "sem"],
+      img: "/CardImgs/hallfinder.png",
+      click_count: 0
+    },
+    {
+      name: "Mess Menu",
+      card_order: 2,
+      link: "",
+      app_route: "/mess",
+      btntext: "MessMenu",
+      keywords: ["food", "mess", "menu", "lunch", "dinner", "breakfast", "snacks"],
+      img: "/CardImgs/bitmenu.png",
+      click_count: 0
+    },
+    {
+      name: "PBL Portal",
+      card_order: 3,
+      link: "https://pcdp.bitsathy.ac.in/stf/pbl",
+      app_route: "",
+      btntext: "Open Now",
+      keywords: ["pbl", "venue", "portal"],
+      img: "",
+      click_count: 0
+    }
+  ],
+  null,
+  2
+);
+
+function downloadCardTemplateFile(format = "csv") {
+  const isCsv = format === "csv";
+  const content = isCsv ? CARD_CSV_TEMPLATE : CARD_JSON_TEMPLATE;
+  const mime = isCsv ? "text/csv;charset=utf-8;" : "application/json;charset=utf-8;";
+  const filename = isCsv ? "cards_template.csv" : "cards_template.json";
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function parseCardCSVText(text) {
+  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  if (lines.length < 2) return [];
+
+  const parseRow = (rowStr) => {
+    const result = [];
+    let cur = "";
+    let inQuotes = false;
+    for (let i = 0; i < rowStr.length; i++) {
+      const char = rowStr[i];
+      if (char === '"' || char === "'") {
+        if (inQuotes && rowStr[i + 1] === char) {
+          cur += char;
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char === "," && !inQuotes) {
+        result.push(cur.trim());
+        cur = "";
+      } else {
+        cur += char;
+      }
+    }
+    result.push(cur.trim());
+    return result.map((v) => v.replace(/^["']|["']$/g, "").trim());
+  };
+
+  const headers = parseRow(lines[0]).map((h) => h.toLowerCase().replace(/[\s_-]+/g, ""));
+  const records = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const values = parseRow(lines[i]);
+    if (!values || values.length === 0 || (values.length === 1 && !values[0])) continue;
+    const row = {};
+    headers.forEach((h, idx) => {
+      row[h] = values[idx] !== undefined ? values[idx] : "";
+    });
+    records.push(row);
+  }
+
+  return records.map((r, idx) => {
+    const name = r.name || r.cardname || r.title || "";
+    let keywords = [];
+    const kwRaw = r.keywords || r.keyword || r.tags || r.tag || "";
+    if (Array.isArray(kwRaw)) {
+      keywords = kwRaw;
+    } else if (typeof kwRaw === "string" && kwRaw.trim()) {
+      if (kwRaw.startsWith("[") && kwRaw.endsWith("]")) {
+        try {
+          keywords = JSON.parse(kwRaw);
+        } catch (e) {
+          keywords = kwRaw.replace(/^\[|\]$/g, "").split(",").map((s) => s.replace(/^["']|["']$/g, "").trim()).filter(Boolean);
+        }
+      } else {
+        keywords = kwRaw.split(",").map((s) => s.trim()).filter(Boolean);
+      }
+    }
+
+    const order = parseInt(r.card_order || r.cardorder || r.order || r.position || "0", 10) || (idx + 1);
+    const clickCount = parseInt(r.click_count || r.clickcount || r.clicks || r.count || "0", 10) || 0;
+    const img = r.img || r.image || r.icon || r.icon_url || "";
+    const link = r.link || r.url || r.website || "";
+    const appRoute = r.app_route || r.approute || r.route || r.app_redirection_route || "";
+    const btntext = r.btntext || r.btn_text || r.buttontext || r.button_text || r.button || "";
+    const id = r.id ? parseInt(r.id, 10) : undefined;
+
+    return {
+      ...(id ? { id } : {}),
+      name: name.trim(),
+      card_order: order,
+      click_count: clickCount,
+      img: img.trim(),
+      keywords,
+      link: link.trim(),
+      app_route: appRoute.trim(),
+      btntext: btntext.trim(),
+    };
+  }).filter((c) => c.name);
+}
+
+function parseCardJSONText(text) {
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch (err) {
+    throw new Error("Invalid JSON syntax: " + err.message);
+  }
+  const list = Array.isArray(parsed) ? parsed : (parsed?.cards || parsed?.data || []);
+  if (!Array.isArray(list)) {
+    throw new Error("JSON must contain an array of cards or a { cards: [...] } object");
+  }
+
+  return list.map((c, idx) => {
+    let kw = c.keywords || c.tags || [];
+    if (typeof kw === "string") {
+      kw = kw.split(",").map((s) => s.trim()).filter(Boolean);
+    }
+    return {
+      ...(c.id ? { id: Number(c.id) } : {}),
+      name: (c.name || c.title || "").trim(),
+      card_order: Number(c.card_order ?? c.order ?? (idx + 1)),
+      click_count: Number(c.click_count ?? c.clicks ?? 0),
+      img: (c.img || c.image || "").trim(),
+      keywords: Array.isArray(kw) ? kw : [],
+      link: (c.link || c.url || "").trim(),
+      app_route: (c.app_route || c.route || "").trim(),
+      btntext: (c.btntext || c.btn_text || c.button_text || "").trim(),
+    };
+  }).filter((c) => c.name);
+}
+
+function BulkCardUploadModal({ onClose, onSuccess }) {
+  const [activeTab, setActiveTab] = useState("file");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [pasteFormat, setPasteFormat] = useState("csv");
+  const [pasteText, setPasteText] = useState("");
+  const [importMode, setImportMode] = useState("append");
+  const [parsedCards, setParsedCards] = useState([]);
+  const [parseError, setParseError] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const processFile = useCallback((file) => {
+    if (!file) return;
+    setSelectedFile(file);
+    setParseError("");
+    const ext = file.name.split(".").pop().toLowerCase();
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target.result;
+      try {
+        if (ext === "json") {
+          const cards = parseCardJSONText(text);
+          if (cards.length === 0) {
+            setParseError("No valid cards found in JSON file (each card must have a 'name')");
+          }
+          setParsedCards(cards);
+        } else if (ext === "csv") {
+          const cards = parseCardCSVText(text);
+          if (cards.length === 0) {
+            setParseError("No valid cards found in CSV file (make sure headers include 'name')");
+          }
+          setParsedCards(cards);
+        } else {
+          setParseError("Unsupported file type. Please upload a .csv or .json file.");
+          setParsedCards([]);
+        }
+      } catch (err) {
+        setParseError(err.message || "Failed to parse file");
+        setParsedCards([]);
+      }
+    };
+    reader.readAsText(file);
+  }, []);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) processFile(file);
+  };
+
+  const handlePasteChange = (text, format = pasteFormat) => {
+    setPasteText(text);
+    setParseError("");
+    if (!text.trim()) {
+      setParsedCards([]);
+      return;
+    }
+    try {
+      if (format === "json") {
+        const cards = parseCardJSONText(text);
+        if (cards.length === 0) {
+          setParseError("No valid cards found (ensure each card object has a 'name' field)");
+        }
+        setParsedCards(cards);
+      } else {
+        const cards = parseCardCSVText(text);
+        if (cards.length === 0) {
+          setParseError("No valid cards found in CSV text (ensure header row contains 'name')");
+        }
+        setParsedCards(cards);
+      }
+    } catch (err) {
+      setParseError(err.message || "Parsing error");
+      setParsedCards([]);
+    }
+  };
+
+  const handleDropFile = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) processFile(file);
+  };
+
+  const handleUpload = async () => {
+    if (parsedCards.length === 0) return;
+    setIsUploading(true);
+    setParseError("");
+
+    try {
+      let res;
+      if (activeTab === "file" && selectedFile) {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        formData.append("mode", importMode);
+        res = await bulkUploadCards(formData, true);
+      } else {
+        res = await bulkUploadCards({
+          cards: parsedCards,
+          mode: importMode,
+        });
+      }
+
+      if (res?.success) {
+        onSuccess(res.message || `${parsedCards.length} cards uploaded successfully`);
+      } else {
+        setParseError(res?.error || "Upload failed");
+      }
+    } catch (err) {
+      setParseError(normalizeError(err, "Failed to upload cards"));
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-950/60 p-4 backdrop-blur-sm sm:p-6">
+      <div className="absolute inset-0" onClick={onClose} />
+      <div className="relative z-50 w-full max-w-4xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
+        {/* Header */}
+        <div className="flex flex-col gap-2 border-b border-slate-200 px-6 py-5 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-300">
+                Bulk Import
+              </span>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Upload Cards (CSV / JSON)</h3>
+            </div>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Add multiple homepage cards at once using a CSV spreadsheet or JSON payload.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => downloadCardTemplateFile("csv")}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+            >
+              <Download className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+              CSV Template
+            </button>
+            <button
+              type="button"
+              onClick={() => downloadCardTemplateFile("json")}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+            >
+              <Download className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+              JSON Template
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400 dark:hover:bg-slate-900"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-6 p-6">
+          {/* Controls row: Tab + Mode */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            {/* Tab switch */}
+            <div className="inline-flex rounded-2xl border border-slate-200 bg-slate-100 p-1 dark:border-slate-800 dark:bg-slate-900">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab("file");
+                  setParseError("");
+                  if (selectedFile) processFile(selectedFile);
+                }}
+                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition ${
+                  activeTab === "file"
+                    ? "bg-white text-slate-900 shadow-sm dark:bg-slate-800 dark:text-slate-100"
+                    : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+                }`}
+              >
+                <Upload className="h-3.5 w-3.5" />
+                Upload File
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab("paste");
+                  setParseError("");
+                  handlePasteChange(pasteText, pasteFormat);
+                }}
+                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition ${
+                  activeTab === "paste"
+                    ? "bg-white text-slate-900 shadow-sm dark:bg-slate-800 dark:text-slate-100"
+                    : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+                }`}
+              >
+                <Edit2 className="h-3.5 w-3.5" />
+                Paste Raw Data
+              </button>
+            </div>
+
+            {/* Import Mode Selector */}
+            <div className="flex items-center gap-2 text-xs">
+              <span className="font-semibold text-slate-500 dark:text-slate-400">Import Mode:</span>
+              <label className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 font-medium text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+                <input
+                  type="radio"
+                  name="cardImportMode"
+                  value="append"
+                  checked={importMode === "append"}
+                  onChange={() => setImportMode("append")}
+                  className="text-blue-600"
+                />
+                Append
+              </label>
+              <label className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50/50 px-3 py-1.5 font-medium text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300">
+                <input
+                  type="radio"
+                  name="cardImportMode"
+                  value="replace"
+                  checked={importMode === "replace"}
+                  onChange={() => setImportMode("replace")}
+                  className="text-rose-600"
+                />
+                Replace All
+              </label>
+            </div>
+          </div>
+
+          {/* Tab 1: File Dropzone */}
+          {activeTab === "file" && (
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={handleDropFile}
+              onClick={() => fileInputRef.current?.click()}
+              className={`flex cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed p-8 text-center transition ${
+                isDragging
+                  ? "border-blue-500 bg-blue-50/50 dark:border-blue-500 dark:bg-blue-950/20"
+                  : selectedFile
+                  ? "border-emerald-300 bg-emerald-50/30 dark:border-emerald-900 dark:bg-emerald-950/10"
+                  : "border-slate-200 bg-slate-50/50 hover:bg-slate-100/70 dark:border-slate-800 dark:bg-slate-900/40 dark:hover:bg-slate-900/80"
+              }`}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv,.json,text/csv,application/json"
+                onChange={handleFileChange}
+                className="sr-only"
+              />
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm dark:bg-slate-800">
+                <Upload className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <h4 className="mt-3 text-sm font-semibold text-slate-800 dark:text-slate-200">
+                {selectedFile ? selectedFile.name : "Click to select or drag and drop your file"}
+              </h4>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                Supports <strong className="text-slate-700 dark:text-slate-300">.CSV</strong> (spreadsheets) or{" "}
+                <strong className="text-slate-700 dark:text-slate-300">.JSON</strong> format
+              </p>
+              {selectedFile && (
+                <span className="mt-3 rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                  {(selectedFile.size / 1024).toFixed(1)} KB · {parsedCards.length} cards detected
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Tab 2: Paste Raw Text */}
+          {activeTab === "paste" && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Format:</span>
+                  <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-0.5 dark:border-slate-800 dark:bg-slate-900">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPasteFormat("csv");
+                        handlePasteChange(pasteText, "csv");
+                      }}
+                      className={`rounded-lg px-2.5 py-1 text-xs font-medium transition ${
+                        pasteFormat === "csv"
+                          ? "bg-white text-slate-900 shadow-xs dark:bg-slate-800 dark:text-slate-100"
+                          : "text-slate-500 dark:text-slate-400"
+                      }`}
+                    >
+                      CSV
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPasteFormat("json");
+                        handlePasteChange(pasteText, "json");
+                      }}
+                      className={`rounded-lg px-2.5 py-1 text-xs font-medium transition ${
+                        pasteFormat === "json"
+                          ? "bg-white text-slate-900 shadow-xs dark:bg-slate-800 dark:text-slate-100"
+                          : "text-slate-500 dark:text-slate-400"
+                      }`}
+                    >
+                      JSON
+                    </button>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handlePasteChange(pasteFormat === "csv" ? CARD_CSV_TEMPLATE : CARD_JSON_TEMPLATE, pasteFormat)}
+                  className="text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400"
+                >
+                  Load Sample Data
+                </button>
+              </div>
+
+              <textarea
+                rows={6}
+                value={pasteText}
+                onChange={(e) => handlePasteChange(e.target.value, pasteFormat)}
+                placeholder={
+                  pasteFormat === "csv"
+                    ? 'name,card_order,link,app_route,btntext,keywords\n"Exam Hall Finder",1,"","/exam-hall","Find Now","hall, exam"'
+                    : '[\n  {\n    "name": "Exam Hall Finder",\n    "app_route": "/exam-hall",\n    "btntext": "Find Now"\n  }\n]'
+                }
+                className="w-full font-mono rounded-2xl border border-slate-200 bg-white p-3.5 text-xs outline-none ring-blue-500 focus:ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+              />
+            </div>
+          )}
+
+          {/* Error Banner */}
+          {parseError && (
+            <div className="flex items-center gap-2 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-semibold text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              <span>{parseError}</span>
+            </div>
+          )}
+
+          {/* Preview Section */}
+          {parsedCards.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    Preview ({parsedCards.length} cards ready to import)
+                  </h4>
+                </div>
+                <span className="text-[11px] text-slate-400">
+                  {importMode === "replace" ? "⚠️ Will replace all current cards" : "Will append to current list"}
+                </span>
+              </div>
+
+              <div className="max-h-64 overflow-y-auto rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900">
+                <table className="w-full text-left text-xs">
+                  <thead className="sticky top-0 border-b border-slate-200 bg-slate-100/90 text-slate-600 backdrop-blur-xs dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+                    <tr>
+                      <th className="px-3 py-2 font-semibold">#</th>
+                      <th className="px-3 py-2 font-semibold">Name</th>
+                      <th className="px-3 py-2 font-semibold">Button</th>
+                      <th className="px-3 py-2 font-semibold">Link / Route</th>
+                      <th className="px-3 py-2 font-semibold">Keywords</th>
+                      <th className="px-3 py-2 font-semibold">Image</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                    {parsedCards.map((card, idx) => (
+                      <tr key={idx} className="hover:bg-white/60 dark:hover:bg-slate-800/50">
+                        <td className="px-3 py-2 text-slate-400 font-mono">{card.card_order || idx + 1}</td>
+                        <td className="px-3 py-2 font-semibold text-slate-900 dark:text-slate-100">
+                          {card.name}
+                        </td>
+                        <td className="px-3 py-2 text-slate-600 dark:text-slate-300">
+                          {card.btntext || <span className="text-slate-400 italic">None</span>}
+                        </td>
+                        <td className="px-3 py-2 text-slate-500 dark:text-slate-400">
+                          {card.app_route ? (
+                            <span className="rounded bg-blue-50 px-1.5 py-0.5 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                              Route: {card.app_route}
+                            </span>
+                          ) : card.link ? (
+                            <span className="truncate max-w-[150px] inline-block">{card.link}</span>
+                          ) : (
+                            <span className="text-slate-400 italic">None</span>
+                          )}
+                        </td>
+                        <td className="px-3 py-2">
+                          <div className="flex flex-wrap gap-1 max-w-[180px]">
+                            {card.keywords && card.keywords.length > 0 ? (
+                              card.keywords.slice(0, 3).map((kw, ki) => (
+                                <span key={ki} className="rounded bg-slate-200 px-1.5 py-0.2 text-[10px] text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                                  {kw}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-slate-400 italic text-[11px]">None</span>
+                            )}
+                            {card.keywords && card.keywords.length > 3 && (
+                              <span className="text-[10px] text-slate-400">+{card.keywords.length - 3}</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-3 py-2">
+                          {card.img ? (
+                            <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400">
+                              <Check className="h-3 w-3" /> Img attached
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 italic text-[11px]">No img</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Footer Actions */}
+          <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleUpload}
+              disabled={isUploading || parsedCards.length === 0}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 py-2.5 text-xs font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isUploading ? (
+                <>
+                  <Loader className="h-4 w-4 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4" />
+                  Import {parsedCards.length > 0 ? `${parsedCards.length} Cards` : "Cards"}
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* -- Cards Section --------------------------------------------------------- */
 function CardsSection() {
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [viewCard, setViewCard] = useState(null);
   const [isReordering, setIsReordering] = useState(false);
@@ -2592,7 +3218,15 @@ function CardsSection() {
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search cards..." className="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500" />
           {searchQuery && <button type="button" onClick={() => setSearchQuery("")} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><X className="h-4 w-4" /></button>}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setShowBulkModal(true)}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900 sm:flex-none"
+          >
+            <Upload className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            Bulk Upload
+          </button>
           <button onClick={() => { setEditItem(null); setShowForm(true); }} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 sm:flex-none"><Plus className="h-4 w-4" />Add Card</button>
           <button onClick={load} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900 sm:flex-none"><RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />Refresh</button>
         </div>
@@ -2735,6 +3369,17 @@ function CardsSection() {
               <div className="p-4 sm:p-6"><CardForm initial={editItem} onSubmit={editItem ? onUpdate : onCreate} onCancel={() => { setShowForm(false); setEditItem(null); }} isLoading={false} /></div>
             </div>
           </div>
+        )}
+
+        {showBulkModal && (
+          <BulkCardUploadModal
+            onClose={() => setShowBulkModal(false)}
+            onSuccess={async (msg) => {
+              setShowBulkModal(false);
+              setBanner({ type: "success", message: msg });
+              await load();
+            }}
+          />
         )}
       </div>
     </section>
