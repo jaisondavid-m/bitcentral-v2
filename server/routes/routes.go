@@ -262,6 +262,7 @@ func SetupRouter(
 		// Cards admin CRUD
 		admin.GET("/cards", handlers.GetCards)
 		admin.POST("/cards", handlers.CreateCard)
+		admin.POST("/cards/bulk", handlers.BulkUploadCards)
 		admin.PUT("/cards/:id", handlers.UpdateCard)
 		admin.PUT("/cards/reorder", handlers.ReorderCards)
 		admin.DELETE("/cards/:id", handlers.DeleteCard)
