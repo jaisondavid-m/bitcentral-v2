@@ -25,12 +25,12 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Auth
 export async function postGoogleAuth(payload) {
   try {
     const requestData = typeof payload === 'string' ? { credential: payload } : payload;
     requestData.client_id = ENV.GOOGLE_WEB_CLIENT_ID;
 
-    // Call mobile app dedicated google auth endpoint first
     try {
       const res = await api.post('/auth/mobile/google', requestData);
       if (res?.data && res.data.success) {
@@ -49,6 +49,7 @@ export async function postGoogleAuth(payload) {
   }
 }
 
+// Home Cards
 export async function fetchHomeCards() {
   try {
     const res = await api.get('/cards');
@@ -59,6 +60,7 @@ export async function fetchHomeCards() {
   }
 }
 
+// Faculty Directory
 export async function fetchFacultyDirectory(query = '', department = '') {
   try {
     const params = new URLSearchParams();
@@ -72,6 +74,7 @@ export async function fetchFacultyDirectory(query = '', department = '') {
   }
 }
 
+// Mess Menu
 export async function fetchMessMenu(hostel = 'boys', date = '') {
   try {
     const params = {};
@@ -85,6 +88,7 @@ export async function fetchMessMenu(hostel = 'boys', date = '') {
   }
 }
 
+// BitBot AI Chat
 export async function sendChatMessage({ message, history = [], rollNo = '' }) {
   try {
     const res = await api.post('/api/chat', {
@@ -102,6 +106,7 @@ export async function sendChatMessage({ message, history = [], rollNo = '' }) {
   }
 }
 
+// Profile
 export async function fetchMeProfile() {
   try {
     const res = await api.get('/me');
@@ -122,16 +127,6 @@ export async function fetchMeProfile() {
   }
 }
 
-export async function getCachedMeProfile() {
-  try {
-    const cached = await AsyncStorage.getItem('me_profile');
-    if (cached) return JSON.parse(cached);
-  } catch (e) {
-    console.warn('Failed to read me_profile from AsyncStorage:', e);
-  }
-  return null;
-}
-
 export async function fetchV2Profile() {
   try {
     const res = await api.get('/v2/profile');
@@ -142,6 +137,7 @@ export async function fetchV2Profile() {
   }
 }
 
+// RP (Reward Points)
 export async function searchRpStudents(query = '') {
   try {
     const res = await api.get('/search', { params: { q: query } });
@@ -187,6 +183,162 @@ export async function fetchRpAverages() {
   }
 }
 
+// Exam Hall Seating Finder
+export async function fetchExamHall(rollNo = '', date = '', session = '') {
+  try {
+    const params = {};
+    if (rollNo) params.roll_no = rollNo;
+    if (date) params.date = date;
+    if (session) params.session = session;
+    const res = await api.get('/exam-hall', { params });
+    return res?.data || null;
+  } catch (err) {
+    console.error('Failed to fetch exam hall:', err?.message || err);
+    return { error: err?.response?.data?.error || err?.message || 'Failed to fetch exam hall' };
+  }
+}
+
+export async function fetchAllExamHallsByRegNo(regNo = '') {
+  try {
+    const res = await api.get('/exam-hall/all', { params: { reg_no: regNo } });
+    return res?.data || [];
+  } catch (err) {
+    console.error('Failed to fetch all exam halls:', err?.message || err);
+    return [];
+  }
+}
+
+// Semester & Courses
+export async function fetchSemesterCourses(year = '1') {
+  try {
+    const res = await api.get(`/semesters/${year}`);
+    return res?.data || null;
+  } catch (err) {
+    console.error('Failed to fetch semester courses:', err?.message || err);
+    return null;
+  }
+}
+
+// Student Leaves & Outings
+export async function fetchStudentLeaves() {
+  try {
+    const res = await api.get('/leaves');
+    return res?.data?.data || res?.data || [];
+  } catch (err) {
+    console.error('Failed to fetch leaves:', err?.message || err);
+    return [];
+  }
+}
+
+// Placement & Training (PS)
+export async function fetchPSAssessmentHistory() {
+  try {
+    const res = await api.get('/ps/assessments');
+    return res?.data?.data || res?.data || [];
+  } catch (err) {
+    console.error('Failed to fetch PS assessment history:', err?.message || err);
+    return [];
+  }
+}
+
+export async function fetchPSPointDetails() {
+  try {
+    const res = await api.get('/ps/points');
+    return res?.data?.data || res?.data || [];
+  } catch (err) {
+    console.error('Failed to fetch PS points:', err?.message || err);
+    return [];
+  }
+}
+
+export async function fetchPSBiometricDetails() {
+  try {
+    const res = await api.get('/ps/biometrics');
+    return res?.data?.data || res?.data || [];
+  } catch (err) {
+    console.error('Failed to fetch PS biometrics:', err?.message || err);
+    return [];
+  }
+}
+
+export async function fetchStudentReportDetails() {
+  try {
+    const res = await api.get('/ps/student-report/details');
+    return res?.data?.data || res?.data || null;
+  } catch (err) {
+    console.error('Failed to fetch student report details:', err?.message || err);
+    return null;
+  }
+}
+
+// Lost & Found
+export async function fetchLostFoundItems(params = {}) {
+  try {
+    const res = await api.get('/lost-found', { params });
+    return res?.data || { items: [], total: 0 };
+  } catch (err) {
+    console.error('Failed to fetch lost & found items:', err?.message || err);
+    return { items: [], total: 0 };
+  }
+}
+
+export async function createLostFoundItem(data) {
+  try {
+    const res = await api.post('/lost-found', data);
+    return res?.data || null;
+  } catch (err) {
+    console.error('Failed to create lost & found item:', err?.message || err);
+    return { error: err?.response?.data?.error || err?.message };
+  }
+}
+
+export async function fetchMyLostFoundItems() {
+  try {
+    const res = await api.get('/lost-found/my');
+    return res?.data || { items: [], claims: [] };
+  } catch (err) {
+    console.error('Failed to fetch my lost & found items:', err?.message || err);
+    return { items: [], claims: [] };
+  }
+}
+
+export async function submitLostFoundClaim(itemId, data) {
+  try {
+    const res = await api.post(`/lost-found/${itemId}/claim`, data);
+    return res?.data || null;
+  } catch (err) {
+    console.error('Failed to submit claim:', err?.message || err);
+    return { error: err?.response?.data?.error || err?.message };
+  }
+}
+
+// Sponsors / Support Developer
+export async function fetchSponsorsLeaderboard() {
+  try {
+    const res = await api.get('/sponsors/leaderboard');
+    return res?.data || { success: false, data: [] };
+  } catch (err) {
+    console.error('Failed to fetch sponsors leaderboard:', err?.message || err);
+    return { success: false, data: [] };
+  }
+}
+
+export async function createSponsorOrder(amount, rollNo, name, email) {
+  try {
+    const res = await api.post('/sponsors/create-order', {
+      amount,
+      roll_no: rollNo,
+      name,
+      email,
+    });
+    return res?.data || null;
+  } catch (err) {
+    console.error('Failed to create sponsor order:', err?.message || err);
+    return { error: err?.response?.data?.error || err?.message };
+  }
+}
+
+// Feedback Messages
 export async function getFeedbackMessages(markRead = false) {
   try {
     const url = markRead ? '/feedback/messages?mark_read=true' : '/feedback/messages';
@@ -212,5 +364,3 @@ export async function sendFeedbackMessage(message, senderName) {
 }
 
 export default api;
-
-
