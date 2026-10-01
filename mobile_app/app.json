@@ -1,4 +1,27 @@
 {
-  "name": "BitCentral",
-  "displayName": "BitCentral"
+  "expo": {
+    "name": "BitCentral",
+    "slug": "bitcentral",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "bitcentral",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": false,
+    "splash": {
+      "backgroundColor": "#2563EB"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bitcentral.app"
+    },
+    "android": {
+      "package": "com.bitcentral",
+      "adaptiveIcon": {
+        "backgroundColor": "#2563EB"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
 }

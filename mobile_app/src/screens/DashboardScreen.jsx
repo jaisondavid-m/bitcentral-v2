@@ -8,7 +8,7 @@ import {
   Image,
   RefreshControl,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '../context/StudentContext';
 import { fetchMeProfile, fetchV2Profile } from '../api/axios';
 import ScreenHeader from '../components/ScreenHeader';
