@@ -10,57 +10,61 @@ import {
   StatusBar,
 } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
-import * as AuthSession from 'expo-auth-session';
+import * as Google from 'expo-auth-session/providers/google';
 import { useAuth } from '../context/StudentContext';
 import { postGoogleAuth } from '../api/axios';
 import ENV from '../config/env';
 
-// Complete WebBrowser session for Expo Auth Session
+// Complete any active WebBrowser authentication session
 WebBrowser.maybeCompleteAuthSession();
-
-const discovery = {
-  authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
-  tokenEndpoint: 'https://oauth2.googleapis.com/token',
-  revocationEndpoint: 'https://oauth2.googleapis.com/revoke',
-};
-
-// Simple base64url JWT decoder for Google ID token claims
-function parseJwt(token) {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch (e) {
-    return null;
-  }
-}
 
 export default function LoginScreen() {
   const { loginWithGoogleUser, accessDeniedMessage } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const processAuthIdToken = useCallback(
-    async (idToken) => {
+  // Official Expo Google Auth Provider with PKCE (Works across iOS, Android & Expo Go)
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    clientId: ENV.GOOGLE_WEB_CLIENT_ID,
+    webClientId: ENV.GOOGLE_WEB_CLIENT_ID,
+    androidClientId: ENV.GOOGLE_WEB_CLIENT_ID,
+    iosClientId: ENV.GOOGLE_WEB_CLIENT_ID,
+    selectAccount: true,
+  });
+
+  const processGoogleAuthResponse = useCallback(
+    async (authResponse) => {
       try {
         setLoading(true);
         setError('');
 
-        const claims = parseJwt(idToken) || {};
-        const userEmail = (claims.email || '').toLowerCase().trim();
+        const accessToken = authResponse?.authentication?.accessToken || authResponse?.params?.access_token;
+        const idToken = authResponse?.authentication?.idToken || authResponse?.params?.id_token;
+
+        let googleUser = null;
+        if (accessToken) {
+          try {
+            const userInfoRes = await fetch('https://www.googleapis.com/userinfo/v2/me', {
+              headers: { Authorization: `Bearer ${accessToken}` },
+            });
+            googleUser = await userInfoRes.json();
+          } catch (fetchErr) {
+            console.warn('Could not fetch userinfo from Google endpoint:', fetchErr);
+          }
+        }
+
+        const userEmail = (googleUser?.email || '').toLowerCase().trim();
+        if (!userEmail && !idToken && !accessToken) {
+          throw new Error('Google Sign-In completed but no user account details were returned.');
+        }
 
         const backendRes = await postGoogleAuth({
-          id_token: idToken,
-          credential: idToken,
+          id_token: idToken || accessToken,
+          credential: idToken || accessToken,
+          token: accessToken || idToken,
           email: userEmail,
-          name: claims.name || claims.given_name || 'BIT Student',
-          photo_url: claims.picture || null,
+          name: googleUser?.name || googleUser?.given_name || 'BIT Student',
+          photo_url: googleUser?.picture || null,
         });
 
         if (backendRes?.error && !backendRes?.success) {
@@ -70,15 +74,15 @@ export default function LoginScreen() {
         }
 
         const userObj = backendRes?.user || {
-          id: claims.sub || userEmail,
+          id: googleUser?.id || userEmail,
           email: userEmail,
-          name: claims.name || claims.given_name || 'BIT Student',
-          photo: claims.picture || null,
+          name: googleUser?.name || googleUser?.given_name || 'BIT Student',
+          photo: googleUser?.picture || null,
         };
 
         const success = await loginWithGoogleUser(
           userObj,
-          backendRes?.token || backendRes?.jwt || idToken
+          backendRes?.token || backendRes?.jwt || accessToken || idToken
         );
         if (!success && !accessDeniedMessage) {
           setError('Sign in failed. Only @bitsathy.ac.in accounts allowed.');
@@ -93,37 +97,16 @@ export default function LoginScreen() {
     [loginWithGoogleUser, accessDeniedMessage]
   );
 
-  // Request ID Token so Google returns a valid JWT id_token expected by backend
-  const [request, response, promptAsync] = AuthSession.useAuthRequest(
-    {
-      clientId: ENV.GOOGLE_WEB_CLIENT_ID,
-      scopes: ['openid', 'profile', 'email'],
-      responseType: AuthSession.ResponseType.IdToken,
-      redirectUri: 'https://auth.expo.io/@anonymous/bitcentral',
-      prompt: AuthSession.Prompt.SelectAccount,
-      extraParams: {
-        nonce: 'bitcentral_oauth_login_nonce',
-      },
-    },
-    discovery
-  );
-
   useEffect(() => {
     if (response?.type === 'success') {
-      const idToken = response.params?.id_token || response.params?.access_token;
-      if (idToken) {
-        processAuthIdToken(idToken);
-      } else {
-        setError('No ID token returned by Google');
-        setLoading(false);
-      }
+      processGoogleAuthResponse(response);
     } else if (response?.type === 'error') {
       setError(response.error?.message || 'Google Sign-In failed');
       setLoading(false);
     } else if (response?.type === 'cancel' || response?.type === 'dismiss') {
       setLoading(false);
     }
-  }, [response, processAuthIdToken]);
+  }, [response, processGoogleAuthResponse]);
 
   const handleSignIn = async () => {
     try {
