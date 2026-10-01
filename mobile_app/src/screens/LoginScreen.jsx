@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,115 +8,114 @@ import {
   Image,
   SafeAreaView,
   StatusBar,
+  Modal,
 } from 'react-native';
-import * as WebBrowser from 'expo-web-browser';
-import * as Google from 'expo-auth-session/providers/google';
+import { WebView } from 'react-native-webview';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '../context/StudentContext';
 import { postGoogleAuth } from '../api/axios';
 import ENV from '../config/env';
 
-// Complete any active WebBrowser authentication session
-WebBrowser.maybeCompleteAuthSession();
+const GOOGLE_AUTH_URL =
+  'https://accounts.google.com/o/oauth2/v2/auth?' +
+  new URLSearchParams({
+    client_id: ENV.GOOGLE_WEB_CLIENT_ID,
+    redirect_uri: 'https://auth.expo.io/@anonymous/bitcentral',
+    response_type: 'token',
+    scope: 'openid profile email',
+    prompt: 'select_account',
+  }).toString();
+
+// Standard Mobile Safari User-Agent so Google allows web authentication
+const CUSTOM_USER_AGENT =
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 
 export default function LoginScreen() {
   const { loginWithGoogleUser, accessDeniedMessage } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showWebModal, setShowWebModal] = useState(false);
 
-  // Official Expo Google Auth Provider with PKCE (Works across iOS, Android & Expo Go)
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: ENV.GOOGLE_WEB_CLIENT_ID,
-    webClientId: ENV.GOOGLE_WEB_CLIENT_ID,
-    androidClientId: ENV.GOOGLE_WEB_CLIENT_ID,
-    iosClientId: ENV.GOOGLE_WEB_CLIENT_ID,
-    selectAccount: true,
-  });
-
-  const processGoogleAuthResponse = useCallback(
-    async (authResponse) => {
-      try {
-        setLoading(true);
-        setError('');
-
-        const accessToken = authResponse?.authentication?.accessToken || authResponse?.params?.access_token;
-        const idToken = authResponse?.authentication?.idToken || authResponse?.params?.id_token;
-
-        let googleUser = null;
-        if (accessToken) {
-          try {
-            const userInfoRes = await fetch('https://www.googleapis.com/userinfo/v2/me', {
-              headers: { Authorization: `Bearer ${accessToken}` },
-            });
-            googleUser = await userInfoRes.json();
-          } catch (fetchErr) {
-            console.warn('Could not fetch userinfo from Google endpoint:', fetchErr);
-          }
-        }
-
-        const userEmail = (googleUser?.email || '').toLowerCase().trim();
-        if (!userEmail && !idToken && !accessToken) {
-          throw new Error('Google Sign-In completed but no user account details were returned.');
-        }
-
-        const backendRes = await postGoogleAuth({
-          id_token: idToken || accessToken,
-          credential: idToken || accessToken,
-          token: accessToken || idToken,
-          email: userEmail,
-          name: googleUser?.name || googleUser?.given_name || 'BIT Student',
-          photo_url: googleUser?.picture || null,
-        });
-
-        if (backendRes?.error && !backendRes?.success) {
-          console.warn('Backend Auth error:', backendRes.error);
-          setError(backendRes.error);
-          return;
-        }
-
-        const userObj = backendRes?.user || {
-          id: googleUser?.id || userEmail,
-          email: userEmail,
-          name: googleUser?.name || googleUser?.given_name || 'BIT Student',
-          photo: googleUser?.picture || null,
-        };
-
-        const success = await loginWithGoogleUser(
-          userObj,
-          backendRes?.token || backendRes?.jwt || accessToken || idToken
-        );
-        if (!success && !accessDeniedMessage) {
-          setError('Sign in failed. Only @bitsathy.ac.in accounts allowed.');
-        }
-      } catch (err) {
-        console.error('Authentication processing error:', err);
-        setError(err?.message || 'Authentication failed. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [loginWithGoogleUser, accessDeniedMessage]
-  );
-
-  useEffect(() => {
-    if (response?.type === 'success') {
-      processGoogleAuthResponse(response);
-    } else if (response?.type === 'error') {
-      setError(response.error?.message || 'Google Sign-In failed');
-      setLoading(false);
-    } else if (response?.type === 'cancel' || response?.type === 'dismiss') {
-      setLoading(false);
-    }
-  }, [response, processGoogleAuthResponse]);
-
-  const handleSignIn = async () => {
+  const processAccessToken = async (accessToken) => {
     try {
       setLoading(true);
+      setShowWebModal(false);
       setError('');
-      await promptAsync();
+
+      let googleUser = null;
+      if (accessToken) {
+        try {
+          const userInfoRes = await fetch('https://www.googleapis.com/userinfo/v2/me', {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          googleUser = await userInfoRes.json();
+        } catch (fetchErr) {
+          console.warn('Could not fetch userinfo from Google endpoint:', fetchErr);
+        }
+      }
+
+      const userEmail = (googleUser?.email || '').toLowerCase().trim();
+      if (!userEmail) {
+        throw new Error('Google Sign-In completed but no email was found.');
+      }
+
+      const backendRes = await postGoogleAuth({
+        credential: accessToken,
+        id_token: accessToken,
+        token: accessToken,
+        email: userEmail,
+        name: googleUser?.name || googleUser?.given_name || 'BIT Student',
+        photo_url: googleUser?.picture || null,
+      });
+
+      if (backendRes?.error && !backendRes?.success) {
+        console.warn('Backend Auth error:', backendRes.error);
+        setError(backendRes.error);
+        return;
+      }
+
+      const userObj = backendRes?.user || {
+        id: googleUser?.id || userEmail,
+        email: userEmail,
+        name: googleUser?.name || googleUser?.given_name || 'BIT Student',
+        photo: googleUser?.picture || null,
+      };
+
+      const success = await loginWithGoogleUser(
+        userObj,
+        backendRes?.token || backendRes?.jwt || accessToken
+      );
+      if (!success && !accessDeniedMessage) {
+        setError('Sign in failed. Only @bitsathy.ac.in accounts allowed.');
+      }
     } catch (err) {
-      console.error('Sign-in initiation error:', err);
-      setError(err?.message || 'Could not start sign-in process');
+      console.error('Authentication error:', err);
+      setError(err?.message || 'Authentication failed. Please try again.');
+    } finally {
       setLoading(false);
+    }
+  };
+
+  const handleNavigationStateChange = (navState) => {
+    const { url } = navState;
+    if (!url) return;
+
+    if (url.includes('access_token=')) {
+      const hashIndex = url.indexOf('#');
+      const queryIndex = url.indexOf('?');
+      const paramString =
+        hashIndex !== -1 ? url.substring(hashIndex + 1) : queryIndex !== -1 ? url.substring(queryIndex + 1) : '';
+
+      const params = new URLSearchParams(paramString);
+      const token = params.get('access_token');
+      if (token) {
+        processAccessToken(token);
+      }
+    } else if (url.includes('error=')) {
+      const params = new URLSearchParams(url.split('?')[1] || url.split('#')[1] || '');
+      const errReason = params.get('error') || 'Sign in was cancelled or failed';
+      setShowWebModal(false);
+      setError(errReason);
     }
   };
 
@@ -144,8 +143,11 @@ export default function LoginScreen() {
 
           <TouchableOpacity
             style={styles.googleButton}
-            disabled={loading || !request}
-            onPress={handleSignIn}
+            disabled={loading}
+            onPress={() => {
+              setError('');
+              setShowWebModal(true);
+            }}
           >
             {loading ? (
               <ActivityIndicator color="#FFFFFF" />
@@ -163,6 +165,40 @@ export default function LoginScreen() {
           <Text style={styles.footerNote}>Secure authentication powered by Google</Text>
         </View>
       </View>
+
+      {/* In-App Google OAuth Modal */}
+      <Modal
+        visible={showWebModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowWebModal(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Google Sign In</Text>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setShowWebModal(false)}
+            >
+              <Ionicons name="close" size={24} color="#0F172A" />
+            </TouchableOpacity>
+          </View>
+          <WebView
+            source={{ uri: GOOGLE_AUTH_URL }}
+            userAgent={CUSTOM_USER_AGENT}
+            onNavigationStateChange={handleNavigationStateChange}
+            startInLoadingState={true}
+            renderLoading={() => (
+              <View style={styles.webLoading}>
+                <ActivityIndicator size="large" color="#2563EB" />
+              </View>
+            )}
+            javaScriptEnabled={true}
+            domStorageEnabled={true}
+            incognito={false}
+          />
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -252,5 +288,32 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     textAlign: 'center',
     marginTop: 8,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#0F172A',
+  },
+  closeButton: {
+    padding: 4,
+  },
+  webLoading: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
