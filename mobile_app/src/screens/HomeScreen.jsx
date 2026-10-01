@@ -18,141 +18,10 @@ import { fetchHomeCards } from '../api/axios';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0;
 
-const FALLBACK_CARDS = [
-  {
-    id: 'dashboard',
-    name: 'Student Dashboard',
-    description: 'Quick student overview, batch details, and academic health stats.',
-    btntext: 'Open Dashboard',
-    icon: 'speedometer-outline',
-    route: 'Dashboard',
-  },
-  {
-    id: 'semester',
-    name: 'Semester & Courses',
-    description: 'Check enrolled courses, credits, and live subject attendance percentages.',
-    btntext: 'View Courses',
-    icon: 'school-outline',
-    route: 'Semester',
-  },
-  {
-    id: 'exam-hall',
-    name: 'Exam Hall Finder',
-    description: 'Find your exam hall, seat number, and floor layout by roll number.',
-    btntext: 'Find Hall',
-    icon: 'location-outline',
-    route: 'ExamHall',
-  },
-  {
-    id: 'student-report',
-    name: 'Student 360 Report',
-    description: 'Comprehensive academic history, CGPA analytics, and arrear tracker.',
-    btntext: 'View Report',
-    icon: 'analytics-outline',
-    route: 'StudentReport',
-  },
-  {
-    id: 'lost-found',
-    name: 'Campus Lost & Found',
-    description: 'Report lost items or claim belongings found across campus.',
-    btntext: 'Browse Items',
-    icon: 'search-outline',
-    route: 'LostAndFound',
-  },
-  {
-    id: 'mess-menu',
-    name: 'Mess Menu',
-    description: 'Check daily food menus for boys and girls hostel mess with timings.',
-    btntext: 'View Menu',
-    icon: 'restaurant-outline',
-    route: 'MessMenu',
-  },
-  {
-    id: 'leave-details',
-    name: 'Leave & Outpasses',
-    description: 'Check status of applied hostel leaves, outpasses, and gate logs.',
-    btntext: 'View Leaves',
-    icon: 'calendar-outline',
-    route: 'LeaveDetails',
-  },
-  {
-    id: 'find-my-way',
-    name: 'Find My Way',
-    description: 'Locate campus blocks, labs, auditoriums, and facilities on the map.',
-    btntext: 'Explore Campus',
-    icon: 'map-outline',
-    route: 'FindMyWay',
-  },
-  {
-    id: 'faculty-directory',
-    name: 'Faculty Directory',
-    description: 'Find contact info, cabins, and emails for BIT faculty.',
-    btntext: 'Search Faculty',
-    icon: 'people-outline',
-    route: 'FacultyDirectory',
-  },
-  {
-    id: 'reward-points',
-    name: 'Reward Points (RP Site)',
-    description: 'Search student RP, leaderboard rankings, and year-wise averages.',
-    btntext: 'View RP Site',
-    icon: 'ribbon-outline',
-    route: 'RpSite',
-  },
-  {
-    id: 'activity-points',
-    name: 'Activity Points (AP Site)',
-    description: 'Track your AICTE activity points and certificate submissions.',
-    btntext: 'View AP Site',
-    icon: 'trophy-outline',
-    route: 'ApSite',
-  },
-  {
-    id: 'pcdp',
-    name: 'PCDP Placement Portal',
-    description: 'Access placement training modules and upcoming campus drives.',
-    btntext: 'Open PCDP',
-    icon: 'briefcase-outline',
-    route: 'PCDP',
-  },
-  {
-    id: 'ps-assessments',
-    name: 'PS Assessment History',
-    description: 'Review placement mock tests, test results, and attendance records.',
-    btntext: 'View Tests',
-    icon: 'document-text-outline',
-    route: 'PSAssessmentHistory',
-  },
-  {
-    id: 'wifi-details',
-    name: 'Wi-Fi Portal & Setup',
-    description: 'Quick credentials, setup guide, and connection instructions for campus Wi-Fi.',
-    btntext: 'Connect Wi-Fi',
-    icon: 'wifi-outline',
-    route: 'WifiDetails',
-  },
-  {
-    id: 'bitbot-ai',
-    name: 'BitBot AI Assistant',
-    description: 'Ask questions about academics, campus rules, mess, and exam schedules.',
-    btntext: 'Chat with AI',
-    icon: 'sparkles-outline',
-    route: 'BitBot',
-  },
-  {
-    id: 'bitcentral-support',
-    name: 'Support Developer',
-    description: 'Support BIT-CENTRAL server maintenance via UPI contributions.',
-    btntext: 'Buy a Coffee',
-    icon: 'heart-outline',
-    route: 'Support',
-  },
-];
-
 export default function HomeScreen({ navigation }) {
   const [search, setSearch] = useState('');
-  const [cards, setCards] = useState(FALLBACK_CARDS);
-  const [loading, setLoading] = useState(false);
+  const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -161,21 +30,20 @@ export default function HomeScreen({ navigation }) {
 
   const loadCards = async () => {
     setLoading(true);
-    const apiCards = await fetchHomeCards();
-    if (apiCards && apiCards.length > 0) {
-      // Merge fallback cards with API cards to ensure all native screens are accessible
-      const merged = [...FALLBACK_CARDS];
-      apiCards.forEach((ac) => {
-        if (!merged.find((m) => m.name.toLowerCase() === ac.name.toLowerCase())) {
-          merged.push(ac);
-        }
-      });
-      setCards(merged);
-    } else {
-      setCards(FALLBACK_CARDS);
+    try {
+      const apiCards = await fetchHomeCards();
+      if (Array.isArray(apiCards) && apiCards.length > 0) {
+        setCards(apiCards);
+      } else {
+        setCards([]);
+      }
+    } catch (err) {
+      console.error('Failed to load cards from backend API:', err);
+      setCards([]);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-    setLoading(false);
-    setRefreshing(false);
   };
 
   const onRefresh = () => {
