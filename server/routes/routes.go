@@ -63,8 +63,6 @@ func SetupRouter(
 		MaxAge:           12 * time.Hour,
 	}))
 
-	r.Use(middleware.AuditLoggerMiddleware())
-
 	// Health check
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
