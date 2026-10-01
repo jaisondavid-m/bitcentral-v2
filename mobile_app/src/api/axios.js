@@ -127,6 +127,16 @@ export async function fetchMeProfile() {
   }
 }
 
+export async function getCachedMeProfile() {
+  try {
+    const cached = await AsyncStorage.getItem('me_profile');
+    if (cached) return JSON.parse(cached);
+  } catch (e) {
+    // ignore
+  }
+  return null;
+}
+
 export async function fetchV2Profile() {
   try {
     const res = await api.get('/v2/profile');

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,84 +9,130 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import * as WebBrowser from 'expo-web-browser';
+import * as AuthSession from 'expo-auth-session';
 import { useAuth } from '../context/StudentContext';
 import { postGoogleAuth } from '../api/axios';
 import ENV from '../config/env';
 
-GoogleSignin.configure({
-  webClientId: ENV.GOOGLE_WEB_CLIENT_ID,
-  offlineAccess: true,
-});
+// Complete WebBrowser session for Expo Auth Session
+WebBrowser.maybeCompleteAuthSession();
+
+const discovery = {
+  authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
+  tokenEndpoint: 'https://oauth2.googleapis.com/token',
+  revocationEndpoint: 'https://oauth2.googleapis.com/revoke',
+};
+
+// Simple base64url JWT decoder for Google ID token claims
+function parseJwt(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+}
 
 export default function LoginScreen() {
   const { loginWithGoogleUser, accessDeniedMessage } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleGoogleSignIn = async () => {
+  const processAuthIdToken = useCallback(
+    async (idToken) => {
+      try {
+        setLoading(true);
+        setError('');
+
+        const claims = parseJwt(idToken) || {};
+        const userEmail = (claims.email || '').toLowerCase().trim();
+
+        const backendRes = await postGoogleAuth({
+          id_token: idToken,
+          credential: idToken,
+          email: userEmail,
+          name: claims.name || claims.given_name || 'BIT Student',
+          photo_url: claims.picture || null,
+        });
+
+        if (backendRes?.error && !backendRes?.success) {
+          console.warn('Backend Auth error:', backendRes.error);
+          setError(backendRes.error);
+          return;
+        }
+
+        const userObj = backendRes?.user || {
+          id: claims.sub || userEmail,
+          email: userEmail,
+          name: claims.name || claims.given_name || 'BIT Student',
+          photo: claims.picture || null,
+        };
+
+        const success = await loginWithGoogleUser(
+          userObj,
+          backendRes?.token || backendRes?.jwt || idToken
+        );
+        if (!success && !accessDeniedMessage) {
+          setError('Sign in failed. Only @bitsathy.ac.in accounts allowed.');
+        }
+      } catch (err) {
+        console.error('Authentication processing error:', err);
+        setError(err?.message || 'Authentication failed. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loginWithGoogleUser, accessDeniedMessage]
+  );
+
+  // Request ID Token so Google returns a valid JWT id_token expected by backend
+  const [request, response, promptAsync] = AuthSession.useAuthRequest(
+    {
+      clientId: ENV.GOOGLE_WEB_CLIENT_ID,
+      scopes: ['openid', 'profile', 'email'],
+      responseType: AuthSession.ResponseType.IdToken,
+      redirectUri: 'https://auth.expo.io/@anonymous/bitcentral',
+      prompt: AuthSession.Prompt.SelectAccount,
+      extraParams: {
+        nonce: 'bitcentral_oauth_login_nonce',
+      },
+    },
+    discovery
+  );
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const idToken = response.params?.id_token || response.params?.access_token;
+      if (idToken) {
+        processAuthIdToken(idToken);
+      } else {
+        setError('No ID token returned by Google');
+        setLoading(false);
+      }
+    } else if (response?.type === 'error') {
+      setError(response.error?.message || 'Google Sign-In failed');
+      setLoading(false);
+    } else if (response?.type === 'cancel' || response?.type === 'dismiss') {
+      setLoading(false);
+    }
+  }, [response, processAuthIdToken]);
+
+  const handleSignIn = async () => {
     try {
       setLoading(true);
       setError('');
-
-      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-      const response = await GoogleSignin.signIn();
-
-      const idToken = response?.data?.idToken || response?.idToken;
-      const googleUser = response?.data?.user || response?.user;
-
-      if (!googleUser || !googleUser.email) {
-        throw new Error('Google Sign-In failed to retrieve account info');
-      }
-
-      const userEmail = googleUser.email.toLowerCase().trim();
-
-      const backendRes = await postGoogleAuth({
-        id_token: idToken,
-        credential: idToken,
-        email: userEmail,
-        name: googleUser.name || googleUser.givenName || 'BIT Student',
-        photo_url: googleUser.photo || null,
-      });
-
-      if (backendRes?.error && !backendRes?.success) {
-        console.warn('Backend Auth response:', backendRes.error);
-        setError(backendRes.error);
-        return;
-      }
-
-      const userObj = backendRes?.user || {
-        id: googleUser.id,
-        email: userEmail,
-        name: googleUser.name || googleUser.givenName || 'BIT Student',
-        photo: googleUser.photo || null,
-      };
-
-      const success = await loginWithGoogleUser(userObj, backendRes?.token || backendRes?.jwt || 'session_jwt_token');
-      if (!success && !accessDeniedMessage) {
-        setError('Sign in failed. Only @bitsathy.ac.in accounts allowed.');
-      }
+      await promptAsync();
     } catch (err) {
-      const isDevError = err?.code === statusCodes.DEVELOPER_ERROR || err?.code === '10' || String(err).includes('DEVELOPER_ERROR');
-      const isNetworkError = err?.code === statusCodes.NETWORK_ERROR || err?.code === '7' || String(err).includes('NETWORK_ERROR');
-
-      if (err?.code === statusCodes.SIGN_IN_CANCELLED) {
-        console.log('User cancelled Google Sign-In flow');
-      } else if (err?.code === statusCodes.IN_PROGRESS) {
-        setError('Google Sign-In is already in progress.');
-      } else if (err?.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        setError('Google Play Services unavailable on this device.');
-      } else if (isNetworkError) {
-        console.warn('Google Sign-In NETWORK_ERROR:', err);
-        setError('Network Error: Unable to reach Google servers. Please check your device/emulator internet connection.');
-      } else if (isDevError) {
-        console.warn('Google Sign-In DEVELOPER_ERROR:', err);
-        setError('Google OAuth DEVELOPER_ERROR: Add SHA-1 (5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25) to Google Cloud Console.');
-      } else {
-        console.error('Google Sign-In error:', err);
-        setError(err?.message || 'Google Sign-In failed. Please try again.');
-      }
-    } finally {
+      console.error('Sign-in initiation error:', err);
+      setError(err?.message || 'Could not start sign-in process');
       setLoading(false);
     }
   };
@@ -107,7 +153,7 @@ export default function LoginScreen() {
             Only <Text style={styles.domainHighlight}>@bitsathy.ac.in</Text> email accounts are allowed
           </Text>
 
-          {(error || accessDeniedMessage) ? (
+          {error || accessDeniedMessage ? (
             <View style={styles.errorBox}>
               <Text style={styles.errorText}>{error || accessDeniedMessage}</Text>
             </View>
@@ -115,8 +161,8 @@ export default function LoginScreen() {
 
           <TouchableOpacity
             style={styles.googleButton}
-            disabled={loading}
-            onPress={handleGoogleSignIn}
+            disabled={loading || !request}
+            onPress={handleSignIn}
           >
             {loading ? (
               <ActivityIndicator color="#FFFFFF" />

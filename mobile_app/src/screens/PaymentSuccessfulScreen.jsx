@@ -6,12 +6,12 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import ScreenHeader from '../components/ScreenHeader';
 import Badge from '../components/Badge';
 
 export default function PaymentSuccessfulScreen({ route, navigation }) {
-  const { amount = 50, id = 'TXN_' + Date.now().toString().slice(-6) } = route.params || {};
+  const { amount = 50, id = 'TXN_SUCCESS' } = route.params || {};
 
   return (
     <View style={styles.container}>

@@ -299,7 +299,40 @@ func VerifyGoogleToken(tokenString string) (*GoogleUserClaims, error) {
 		return localClaims, nil
 	}
 
-	// 3. Fallback: Google Tokeninfo endpoint
+	// 3. Check Google UserInfo endpoint if token is an OAuth access token (starts with ya29)
+	if strings.HasPrefix(tokenString, "ya29.") {
+		userInfoURL := "https://www.googleapis.com/oauth2/v3/userinfo"
+		req, err := http.NewRequest("GET", userInfoURL, nil)
+		if err == nil {
+			req.Header.Set("Authorization", "Bearer "+tokenString)
+			resp, err := GoogleOAuthInstance.httpClient.Do(req)
+			if err == nil {
+				defer resp.Body.Close()
+				if resp.StatusCode == http.StatusOK {
+					body, err := io.ReadAll(resp.Body)
+					if err == nil {
+						var claims GoogleUserClaims
+						if err := json.Unmarshal(body, &claims); err == nil && claims.Email != "" {
+							if claims.UID == "" {
+								var raw map[string]interface{}
+								_ = json.Unmarshal(body, &raw)
+								if subVal, ok := raw["sub"].(string); ok {
+									claims.UID = subVal
+								}
+							}
+							tokenCache.Store(tokenString, &cachedTokenClaims{
+								claims:    &claims,
+								expiresAt: time.Now().Add(30 * 24 * time.Hour),
+							})
+							return &claims, nil
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// 4. Fallback: Google Tokeninfo endpoint for ID tokens
 	tokenInfoURL := fmt.Sprintf("https://oauth2.googleapis.com/tokeninfo?id_token=%s", tokenString)
 	req, err := http.NewRequest("GET", tokenInfoURL, nil)
 	if err == nil {
@@ -329,7 +362,7 @@ func VerifyGoogleToken(tokenString string) (*GoogleUserClaims, error) {
 		}
 	}
 
-	// 4. Fallback: Google UserInfo endpoint
+	// 5. Fallback: Google UserInfo endpoint for general Bearer tokens
 	userInfoURL := "https://www.googleapis.com/oauth2/v3/userinfo"
 	req, err = http.NewRequest("GET", userInfoURL, nil)
 	if err == nil {
