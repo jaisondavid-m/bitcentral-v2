@@ -75,69 +75,92 @@ function FacultyAvatar({ photoUrl, name, size = 52 }) {
 
 export default function FacultyDirectoryScreen({ navigation }) {
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [faculty, setFaculty] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [selectedDept, setSelectedDept] = useState('ALL');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [copiedId, setCopiedId] = useState(null);
   const [activeCallModal, setActiveCallModal] = useState(null);
 
-  const loadDirectory = useCallback(async () => {
-    // 1. Instantly check AsyncStorage cache for 0ms load
-    try {
-      const cached = await AsyncStorage.getItem('faculty_directory_cache');
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setFaculty(parsed);
-          setLoading(false);
-        }
-      }
-    } catch (e) {
-      // ignore
-    }
+  // Debounce search query input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query.trim());
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query]);
 
-    // 2. Fetch full directory from API in background
-    const res = await fetchFacultyDirectory('', '');
-    if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
-      setFaculty(res.data);
-      AsyncStorage.setItem('faculty_directory_cache', JSON.stringify(res.data)).catch(() => {});
-    } else if (faculty.length === 0) {
-      // Fallback data if server returns empty and cache was empty
-      setFaculty([
-        {
-          id: 1,
-          name: 'Dr. S. Kumar',
-          department: 'Computer Science & Engineering',
-          job_title: 'Professor & Head',
-          email: 'skumar@bitsathy.ac.in',
-          phone: '9843123456',
-        },
-        {
-          id: 2,
-          name: 'Prof. R. Priya',
-          department: 'Information Technology',
-          job_title: 'Associate Professor',
-          email: 'rpriya@bitsathy.ac.in',
-          phone: '9843654321',
-        },
-        {
-          id: 3,
-          name: 'Dr. M. Rajesh',
-          department: 'Electronics & Communication',
-          job_title: 'Assistant Professor',
-          email: 'mrajesh@bitsathy.ac.in',
-          phone: '9843987654',
-        },
-      ]);
-    }
-    setLoading(false);
-  }, [faculty.length]);
+  // Load paginated data from API
+  const loadDirectoryData = useCallback(
+    async (pageNum, isRefresh = false) => {
+      if (pageNum === 1 && !isRefresh && faculty.length === 0) {
+        setLoading(true);
+      } else if (pageNum > 1) {
+        setLoadingMore(true);
+      }
+
+      try {
+        const res = await fetchFacultyDirectory(debouncedQuery, selectedDept, pageNum, 20);
+        if (res && res.success) {
+          const newData = Array.isArray(res.data) ? res.data : [];
+          if (pageNum === 1) {
+            setFaculty(newData);
+          } else {
+            setFaculty((prev) => [...prev, ...newData]);
+          }
+          setTotalRecords(typeof res.total === 'number' ? res.total : newData.length);
+          setTotalPages(typeof res.total_pages === 'number' ? res.total_pages : 1);
+          if (Array.isArray(res.departments) && res.departments.length > 0) {
+            setDepartments(res.departments);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to fetch faculty directory', e);
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
+        setRefreshing(false);
+      }
+    },
+    [debouncedQuery, selectedDept, faculty.length]
+  );
 
   useEffect(() => {
-    loadDirectory();
-  }, [loadDirectory]);
+    loadDirectoryData(page);
+  }, [debouncedQuery, selectedDept, page]);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    if (page === 1) {
+      loadDirectoryData(1, true);
+    } else {
+      setPage(1);
+    }
+  };
+
+  const handleLoadMore = () => {
+    if (!loading && !loadingMore && page < totalPages) {
+      setPage((prev) => prev + 1);
+    }
+  };
+
+  const handleSelectDept = (dept) => {
+    setSelectedDept(dept);
+    setPage(1);
+  };
 
   const departmentList = useMemo(() => {
+    if (departments.length > 0) {
+      const list = departments.map((d) => d.name);
+      return ['ALL', ...list];
+    }
     const counts = {};
     faculty.forEach((member) => {
       const dept = (member.department || 'Faculty & Staff').trim();
@@ -145,26 +168,7 @@ export default function FacultyDirectoryScreen({ navigation }) {
     });
     const list = Object.keys(counts).sort();
     return ['ALL', ...list];
-  }, [faculty]);
-
-  const filteredFaculty = useMemo(() => {
-    const q = query.toLowerCase().trim();
-    return faculty.filter((member) => {
-      if (selectedDept && selectedDept !== 'ALL') {
-        const memberDept = (member.department || '').trim().toLowerCase();
-        if (!memberDept.includes(selectedDept.toLowerCase())) {
-          return false;
-        }
-      }
-      if (!q) return true;
-      const nameMatch = member.name?.toLowerCase().includes(q);
-      const emailMatch = member.email?.toLowerCase().includes(q);
-      const phoneMatch = member.phone?.includes(q);
-      const deptMatch = member.department?.toLowerCase().includes(q);
-      const jobMatch = member.job_title?.toLowerCase().includes(q);
-      return nameMatch || emailMatch || phoneMatch || deptMatch || jobMatch;
-    });
-  }, [faculty, query, selectedDept]);
+  }, [departments, faculty]);
 
   const handleEmailPress = (email) => {
     if (!email) return;
@@ -231,7 +235,7 @@ export default function FacultyDirectoryScreen({ navigation }) {
                 <TouchableOpacity
                   key={dept}
                   style={[styles.deptChip, isActive && styles.activeDeptChip]}
-                  onPress={() => setSelectedDept(dept)}
+                  onPress={() => handleSelectDept(dept)}
                   activeOpacity={0.7}
                 >
                   <Text style={[styles.deptChipText, isActive && styles.activeDeptChipText]}>
@@ -247,7 +251,9 @@ export default function FacultyDirectoryScreen({ navigation }) {
       {/* Faculty Member Count Status Bar */}
       <View style={styles.countBar}>
         <Text style={styles.countText}>
-          {filteredFaculty.length} Faculty Member{filteredFaculty.length !== 1 ? 's' : ''} Found
+          {totalRecords > 0
+            ? `Showing ${faculty.length} of ${totalRecords} Faculty Members`
+            : '0 Faculty Members Found'}
         </Text>
       </View>
 
@@ -257,12 +263,23 @@ export default function FacultyDirectoryScreen({ navigation }) {
           <ActivityIndicator size="large" color="#2563EB" />
           <Text style={styles.loadingText}>Fetching Faculty Contacts...</Text>
         </View>
-      ) : filteredFaculty.length > 0 ? (
+      ) : faculty.length > 0 ? (
         <FlatList
-          data={filteredFaculty}
+          data={faculty}
           keyExtractor={(item, index) => item.id?.toString() || item.email || index.toString()}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.4}
+          ListFooterComponent={() =>
+            loadingMore ? (
+              <View style={{ paddingVertical: 16 }}>
+                <ActivityIndicator size="small" color="#2563EB" />
+              </View>
+            ) : null
+          }
           renderItem={({ item }) => (
             <View style={styles.card}>
               <View style={styles.cardHeaderRow}>

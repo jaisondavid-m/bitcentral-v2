@@ -394,6 +394,14 @@ func createCardsTable() {
 		log.Printf("ℹ️ app_route column not created (may already exist): %v", err)
 	}
 
+	if _, err := DB.Exec(`ALTER TABLE cards ADD COLUMN show_on_site TINYINT(1) NOT NULL DEFAULT 1 AFTER btntext`); err != nil {
+		log.Printf("ℹ️ show_on_site column not created (may already exist): %v", err)
+	}
+
+	if _, err := DB.Exec(`ALTER TABLE cards ADD COLUMN show_on_app TINYINT(1) NOT NULL DEFAULT 1 AFTER show_on_site`); err != nil {
+		log.Printf("ℹ️ show_on_app column not created (may already exist): %v", err)
+	}
+
 	// Seed default cards if empty
 	var count int
 	if err := DB.QueryRow("SELECT COUNT(*) FROM cards").Scan(&count); err == nil && count == 0 {

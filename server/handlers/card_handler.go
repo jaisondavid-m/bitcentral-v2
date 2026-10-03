@@ -24,7 +24,20 @@ func NewCardHandler() *CardHandler {
 }
 
 func GetCards(c *gin.Context) {
-	rows, err := config.DB.Query(`SELECT id, card_order, img, name, keywords, link, COALESCE(app_route, ''), btntext, click_count FROM cards ORDER BY card_order ASC, id ASC`)
+	platform := strings.ToLower(strings.TrimSpace(c.Query("platform")))
+	isAdminReq := strings.Contains(c.Request.URL.Path, "/admin/") || c.Query("all") == "true"
+
+	query := `SELECT id, card_order, img, name, keywords, link, COALESCE(app_route, ''), btntext, click_count, COALESCE(show_on_site, 1), COALESCE(show_on_app, 1) FROM cards`
+	if !isAdminReq {
+		if platform == "app" || platform == "mobile" {
+			query += ` WHERE COALESCE(show_on_app, 1) = 1`
+		} else {
+			query += ` WHERE COALESCE(show_on_site, 1) = 1`
+		}
+	}
+	query += ` ORDER BY card_order ASC, id ASC`
+
+	rows, err := config.DB.Query(query)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -37,13 +50,16 @@ func GetCards(c *gin.Context) {
 		var clickCount int
 		var img, name, link, appRoute, btntext string
 		var keywords sql.NullString
-		if err := rows.Scan(&id, &order, &img, &name, &keywords, &link, &appRoute, &btntext, &clickCount); err != nil {
+		var showOnSite, showOnApp int
+		if err := rows.Scan(&id, &order, &img, &name, &keywords, &link, &appRoute, &btntext, &clickCount, &showOnSite, &showOnApp); err != nil {
 			continue
 		}
 		var kw []string
 		if keywords.Valid && keywords.String != "" {
 			_ = json.Unmarshal([]byte(keywords.String), &kw)
 		}
+		siteBool := showOnSite == 1
+		appBool := showOnApp == 1
 		cards = append(cards, models.Card{
 			ID:         id,
 			Order:      order,
@@ -54,6 +70,8 @@ func GetCards(c *gin.Context) {
 			AppRoute:   appRoute,
 			BtnText:    btntext,
 			ClickCount: clickCount,
+			ShowOnSite: &siteBool,
+			ShowOnApp:  &appBool,
 		})
 	}
 
@@ -73,14 +91,26 @@ func CreateCard(c *gin.Context) {
 			return
 		}
 	}
+	showOnSite := 1
+	if payload.ShowOnSite != nil && !*payload.ShowOnSite {
+		showOnSite = 0
+	}
+	showOnApp := 1
+	if payload.ShowOnApp != nil && !*payload.ShowOnApp {
+		showOnApp = 0
+	}
 	kwBytes, _ := json.Marshal(payload.Keywords)
-	res, err := config.DB.Exec(`INSERT INTO cards (card_order, img, name, keywords, link, app_route, btntext) VALUES (?, ?, ?, ?, ?, ?, ?)`, payload.Order, payload.Image, payload.Name, string(kwBytes), payload.Link, payload.AppRoute, payload.BtnText)
+	res, err := config.DB.Exec(`INSERT INTO cards (card_order, img, name, keywords, link, app_route, btntext, show_on_site, show_on_app) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, payload.Order, payload.Image, payload.Name, string(kwBytes), payload.Link, payload.AppRoute, payload.BtnText, showOnSite, showOnApp)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 	id, _ := res.LastInsertId()
 	payload.ID = int(id)
+	siteBool := showOnSite == 1
+	appBool := showOnApp == 1
+	payload.ShowOnSite = &siteBool
+	payload.ShowOnApp = &appBool
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": payload})
 }
 
@@ -107,13 +137,25 @@ func UpdateCard(c *gin.Context) {
 			return
 		}
 	}
+	showOnSite := 1
+	if payload.ShowOnSite != nil && !*payload.ShowOnSite {
+		showOnSite = 0
+	}
+	showOnApp := 1
+	if payload.ShowOnApp != nil && !*payload.ShowOnApp {
+		showOnApp = 0
+	}
 	kwBytes, _ := json.Marshal(payload.Keywords)
-	_, err = config.DB.Exec(`UPDATE cards SET card_order=?, img=?, name=?, keywords=?, link=?, app_route=?, btntext=? WHERE id=?`, payload.Order, payload.Image, payload.Name, string(kwBytes), payload.Link, payload.AppRoute, payload.BtnText, id)
+	_, err = config.DB.Exec(`UPDATE cards SET card_order=?, img=?, name=?, keywords=?, link=?, app_route=?, btntext=?, show_on_site=?, show_on_app=? WHERE id=?`, payload.Order, payload.Image, payload.Name, string(kwBytes), payload.Link, payload.AppRoute, payload.BtnText, showOnSite, showOnApp, id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 	payload.ID = id
+	siteBool := showOnSite == 1
+	appBool := showOnApp == 1
+	payload.ShowOnSite = &siteBool
+	payload.ShowOnApp = &appBool
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": payload})
 }
 

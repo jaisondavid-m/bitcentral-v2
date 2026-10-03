@@ -5,6 +5,8 @@ import {
   Building2,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Copy,
   Mail,
   Phone,
@@ -184,21 +186,47 @@ function SearchableDeptDropdown({
 
 export default function FacultyDirectory() {
   const [faculty, setFaculty] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("ALL");
+  const [page, setPage] = useState(1);
+  const [limit] = useState(24);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [copiedId, setCopiedId] = useState(null);
   const [activeCallModal, setActiveCallModal] = useState(null);
 
+  // Debounce search input to avoid hitting backend on every key stroke
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Load paginated data from backend whenever search, dept, or page changes
   useEffect(() => {
     let cancelled = false;
 
     async function loadDirectory() {
       setLoading(true);
       try {
-        const res = await getFacultyDirectory();
-        if (res?.success && Array.isArray(res.data) && !cancelled) {
-          setFaculty(res.data);
+        const res = await getFacultyDirectory({
+          query: debouncedSearch,
+          department: selectedDepartment,
+          page: page,
+          limit: limit,
+        });
+        if (res?.success && !cancelled) {
+          setFaculty(Array.isArray(res.data) ? res.data : []);
+          setTotalRecords(typeof res.total === "number" ? res.total : 0);
+          setTotalPages(typeof res.total_pages === "number" ? res.total_pages : 1);
+          if (Array.isArray(res.departments) && res.departments.length > 0) {
+            setDepartments(res.departments);
+          }
         }
       } catch (err) {
         console.error("Failed to load faculty directory", err);
@@ -213,7 +241,7 @@ export default function FacultyDirectory() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [debouncedSearch, selectedDepartment, page, limit]);
 
   // Handle escape key to close call modal
   useEffect(() => {
@@ -233,7 +261,25 @@ export default function FacultyDirectory() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleSelectDepartment = (dept) => {
+    setSelectedDepartment(dept);
+    setPage(1);
+  };
+
   const departmentOptions = useMemo(() => {
+    if (departments.length > 0) {
+      const totalAll = departments.reduce((sum, d) => sum + (d.count || 0), 0);
+      const list = departments.map((d) => ({
+        id: d.name,
+        name: d.name,
+        count: d.count,
+      }));
+      return [
+        { id: "ALL", name: "All Departments", count: totalAll || totalRecords },
+        ...list,
+      ];
+    }
+
     const counts = {};
     faculty.forEach((member) => {
       const dept = (member.department || "Other").trim();
@@ -251,32 +297,23 @@ export default function FacultyDirectory() {
       .sort((a, b) => a.name.localeCompare(b.name));
 
     return [
-      { id: "ALL", name: "All Departments", count: faculty.length },
+      { id: "ALL", name: "All Departments", count: totalRecords || faculty.length },
       ...list,
     ];
-  }, [faculty]);
+  }, [departments, faculty, totalRecords]);
 
-  const filteredFaculty = useMemo(() => {
-    const q = search.toLowerCase().trim();
-    return faculty.filter((member) => {
-      // Department filter
-      if (selectedDepartment && selectedDepartment !== "ALL") {
-        const memberDept = (member.department || "Other").trim().toLowerCase();
-        if (memberDept !== selectedDepartment.toLowerCase()) {
-          return false;
-        }
-      }
-
-      // Search filter
-      if (!q) return true;
-      const nameMatch = member.name?.toLowerCase().includes(q);
-      const emailMatch = member.email?.toLowerCase().includes(q);
-      const phoneMatch = member.phone?.includes(q);
-      const deptMatch = member.department?.toLowerCase().includes(q);
-      const jobMatch = member.job_title?.toLowerCase().includes(q);
-      return nameMatch || emailMatch || phoneMatch || deptMatch || jobMatch;
-    });
-  }, [faculty, search, selectedDepartment]);
+  const getPageNumbers = (current, total) => {
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+    if (current <= 4) {
+      return [1, 2, 3, 4, 5, "...", total];
+    }
+    if (current >= total - 3) {
+      return [1, "...", total - 4, total - 3, total - 2, total - 1, total];
+    }
+    return [1, "...", current - 1, current, current + 1, "...", total];
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 px-3 py-4 dark:bg-slate-950 sm:px-6 sm:py-8 lg:px-8">
@@ -287,9 +324,12 @@ export default function FacultyDirectory() {
             Faculty Directory
           </h1>
           <span className="rounded-full bg-slate-200/80 px-2.5 py-0.5 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300 sm:bg-transparent sm:p-0 sm:text-sm sm:text-slate-500 dark:sm:text-slate-400">
-            {selectedDepartment !== "ALL" || search
-              ? `${filteredFaculty.length} / ${faculty.length}`
-              : `${filteredFaculty.length} Members`}
+            {totalRecords > 0
+              ? `Showing ${Math.min((page - 1) * limit + 1, totalRecords)}-${Math.min(
+                  page * limit,
+                  totalRecords
+                )} of ${totalRecords} Members`
+              : "0 Members"}
           </span>
         </div>
 
@@ -318,7 +358,7 @@ export default function FacultyDirectory() {
           <SearchableDeptDropdown
             departments={departmentOptions}
             selected={selectedDepartment}
-            onSelect={setSelectedDepartment}
+            onSelect={handleSelectDepartment}
             placeholder="Search departments..."
           />
         </div>
@@ -345,7 +385,7 @@ export default function FacultyDirectory() {
               </div>
             ))}
           </div>
-        ) : filteredFaculty.length === 0 ? (
+        ) : faculty.length === 0 ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center dark:border-slate-800 dark:bg-slate-900 sm:rounded-3xl sm:p-12">
             <Users className="mx-auto h-10 w-10 text-slate-400 dark:text-slate-600 sm:h-12 sm:w-12" />
             <h3 className="mt-3 text-sm font-semibold text-slate-900 dark:text-white sm:mt-4 sm:text-base">
@@ -356,8 +396,9 @@ export default function FacultyDirectory() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredFaculty.map((member) => {
+          <>
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+              {faculty.map((member) => {
               const avatarColor = getAvatarColor(member.name);
               const initials = getInitials(member.name);
               const isCopied = copiedId === member.id;
@@ -444,7 +485,74 @@ export default function FacultyDirectory() {
               );
             })}
           </div>
-        )}
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-2xs dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:px-6 sm:py-4">
+              <div className="text-xs font-medium text-slate-600 dark:text-slate-400 sm:text-sm">
+                Page <span className="font-semibold text-slate-900 dark:text-white">{page}</span> of{" "}
+                <span className="font-semibold text-slate-900 dark:text-white">{totalPages}</span>
+              </div>
+
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <button
+                  type="button"
+                  disabled={page <= 1 || loading}
+                  onClick={() => {
+                    setPage((p) => Math.max(1, p - 1));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+                  title="Previous Page"
+                >
+                  <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                </button>
+
+                {getPageNumbers(page, totalPages).map((pNum, idx) =>
+                  pNum === "..." ? (
+                    <span
+                      key={`ellipsis-${idx}`}
+                      className="px-2 text-xs font-medium text-slate-400 dark:text-slate-600 sm:text-sm"
+                    >
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      key={`page-${pNum}`}
+                      type="button"
+                      disabled={loading}
+                      onClick={() => {
+                        setPage(pNum);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className={`h-8 min-w-[32px] rounded-xl text-xs font-semibold sm:h-10 sm:min-w-[40px] sm:text-sm transition-colors cursor-pointer ${
+                        page === pNum
+                          ? "bg-blue-600 text-white shadow-xs dark:bg-blue-500"
+                          : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                      }`}
+                    >
+                      {pNum}
+                    </button>
+                  )
+                )}
+
+                <button
+                  type="button"
+                  disabled={page >= totalPages || loading}
+                  onClick={() => {
+                    setPage((p) => Math.min(totalPages, p + 1));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+                  title="Next Page"
+                >
+                  <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
 
         {/* Big Confirmation Call Modal */}
         {activeCallModal && (

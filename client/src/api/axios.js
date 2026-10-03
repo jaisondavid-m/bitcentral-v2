@@ -175,15 +175,17 @@ export async function getVerifiedCertificate(id) {
   }
 }
 
-export async function getFacultyDirectory({ query = "", department = "" } = {}) {
+export async function getFacultyDirectory({ query = "", department = "", page = 1, limit = 24 } = {}) {
   try {
     const params = new URLSearchParams();
     if (query) params.set("q", query);
-    if (department) params.set("dept", department);
+    if (department && department !== "ALL") params.set("dept", department);
+    if (page) params.set("page", page.toString());
+    if (limit) params.set("limit", limit.toString());
     const response = await api.get(`/faculty-directory?${params.toString()}`);
     return response.data;
   } catch (error) {
-    return { success: false, total: 0, data: [], error: error.message };
+    return { success: false, total: 0, page: 1, limit: 24, total_pages: 0, data: [], departments: [], error: error.message };
   }
 }
 
