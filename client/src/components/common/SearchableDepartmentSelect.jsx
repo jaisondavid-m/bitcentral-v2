@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { GraduationCap, Search, Check, ChevronDown, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { haptics } from "@/utils/haptics.js";
 
 export default function SearchableDepartmentSelect({
   departments = [],
@@ -61,6 +62,7 @@ export default function SearchableDepartmentSelect({
   }, [departments, searchQuery]);
 
   const handleSelect = (deptId) => {
+    haptics.selection();
     onChange(String(deptId));
     setIsOpen(false);
     setSearchQuery("");

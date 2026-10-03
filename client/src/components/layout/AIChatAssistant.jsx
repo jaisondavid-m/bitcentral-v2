@@ -9,6 +9,7 @@ import {
   Cpu
 } from "lucide-react";
 import { sendChatMessage } from "@/api/chat";
+import { haptics } from "@/utils/haptics.js";
 
 
 
@@ -233,6 +234,7 @@ export default function AIChatAssistant({ isOpen, onClose, currentRollNo = "" })
     const queryText = (textToSend || input).trim();
     if (!queryText || isLoading) return;
 
+    haptics.action();
     const userMessage = { role: "user", content: queryText };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
@@ -251,6 +253,7 @@ export default function AIChatAssistant({ isOpen, onClose, currentRollNo = "" })
     setIsLoading(false);
 
     if (res.success) {
+      haptics.success();
       setMessages((prev) => [
         ...prev,
         {
@@ -260,6 +263,7 @@ export default function AIChatAssistant({ isOpen, onClose, currentRollNo = "" })
         },
       ]);
     } else {
+      haptics.error();
       const errorText = res.error || res.message || "⚠️ Unable to connect to BitBot AI service.";
       setMessages((prev) => [
         ...prev,

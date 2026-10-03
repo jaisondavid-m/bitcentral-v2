@@ -7,6 +7,7 @@ import { LogOut, Moon, Star, Sun, X } from "lucide-react";
 import { useAuth } from "@/context/StudentContext.jsx";
 import { useTheme } from "@/context/ThemeContext.jsx";
 import NotificationBell from "@/components/notifications/NotificationBell.jsx";
+import { haptics } from "@/utils/haptics.js";
 
 function Navbar() {
   const { user, profile } = useAuth();
@@ -38,6 +39,7 @@ function Navbar() {
   };
 
   const handleLogout = async () => {
+    haptics.action();
     try {
       await logout();
       setIsOpen(false);
@@ -45,6 +47,11 @@ function Navbar() {
     } catch (error) {
       console.error("Error logging out:", error);
     }
+  };
+
+  const handleToggleTheme = () => {
+    haptics.selection();
+    toggleTheme();
   };
 
   return (
@@ -73,7 +80,7 @@ function Navbar() {
                   </li>
                   <li>
                     <button
-                      onClick={toggleTheme}
+                      onClick={handleToggleTheme}
                       className="flex cursor-pointer items-center gap-2 text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 px-4 py-2 rounded-full border border-white/20 transition-all duration-300"
                       aria-label="Toggle theme"
                     >
