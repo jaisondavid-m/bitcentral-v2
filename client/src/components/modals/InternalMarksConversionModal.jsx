@@ -8,6 +8,7 @@ import {
   AlertCircle,
   BookOpen,
 } from "lucide-react";
+import { haptics } from "@/utils/haptics.js";
 
 function getMaxRewardPoints(rollNo) {
   const clean = String(rollNo || "").trim().toUpperCase().replace(/\s+/g, "");
@@ -74,7 +75,10 @@ export default function InternalMarksConversionModal({
             {onRefresh && (
               <button
                 type="button"
-                onClick={onRefresh}
+                onClick={(e) => {
+                  haptics.action();
+                  onRefresh(e);
+                }}
                 disabled={loading}
                 className="rounded-xl border border-slate-200 dark:border-slate-700 p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50"
                 title="Refresh conversion"
@@ -85,7 +89,10 @@ export default function InternalMarksConversionModal({
 
             <button
               type="button"
-              onClick={onClose}
+              onClick={(e) => {
+                haptics.light();
+                onClose(e);
+              }}
               className="rounded-xl border border-slate-200 dark:border-slate-700 p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer ml-1"
               aria-label="Close"
             >

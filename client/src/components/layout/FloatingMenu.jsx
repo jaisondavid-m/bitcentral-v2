@@ -18,6 +18,7 @@ import {
 import { BiSupport, BiDonateHeart } from "react-icons/bi";
 import { sendFeedbackMessage, getFeedbackMessages } from "@/api/feedback.js";
 import { useNavigate, useLocation } from "react-router-dom";
+import { haptics } from "@/utils/haptics.js";
 
 
 export default function FloatingMenu() {
@@ -29,10 +30,10 @@ export default function FloatingMenu() {
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   const handleOpenAIAssistant = () => {
+    haptics.light();
     setIsMenuOpen(false);
     navigate("/bitbot");
   };
-
 
   // Feedback Chat state
   const [messages, setMessages] = useState([]);
@@ -80,6 +81,7 @@ export default function FloatingMenu() {
     e.preventDefault();
     if (!newMessage.trim() || sending) return;
 
+    haptics.action();
     const msgText = newMessage.trim();
     setNewMessage("");
     setSending(true);
@@ -88,12 +90,14 @@ export default function FloatingMenu() {
       const displayName =
         user?.display_name || user?.displayName || user?.name || user?.roll_no || "Student";
       const sent = await sendFeedbackMessage(msgText, displayName);
+      haptics.success();
       if (sent) {
         setMessages((prev) => [...prev, sent]);
       } else {
         await fetchMessages(isChatOpen);
       }
     } catch (err) {
+      haptics.error();
       setNewMessage(msgText);
     } finally {
       setSending(false);
@@ -106,11 +110,13 @@ export default function FloatingMenu() {
   }
 
   const toggleMenu = () => {
+    haptics.light();
     setIsMenuOpen((prev) => !prev);
     if (isChatOpen) setIsChatOpen(false);
   };
 
   const handleOpenChat = () => {
+    haptics.light();
     setIsMenuOpen(false);
     setIsChatOpen(true);
     setHasUnreadAdminMsg(false);
@@ -118,16 +124,19 @@ export default function FloatingMenu() {
   };
 
   const handleGoHome = () => {
+    haptics.light();
     setIsMenuOpen(false);
     navigate("/home");
   };
 
   const handleFacultyDirectory = () => {
+    haptics.light();
     setIsMenuOpen(false);
     navigate("/faculty-directory");
   };
 
   const handleSupportDev = () => {
+    haptics.light();
     setIsMenuOpen(false);
     navigate("/support-dev");
   };

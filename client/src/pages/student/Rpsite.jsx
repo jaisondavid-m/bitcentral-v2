@@ -7,6 +7,7 @@ import SearchBar from "@/components/common/SearchBar.jsx";
 import RpCard from "@/components/cards/RpCard.jsx";
 import Leaderboard from "@/components/features/Leaderboard.jsx";
 import { useAuth } from "@/context/StudentContext.jsx";
+import { haptics } from "@/utils/haptics.js";
 
 function countSearchableCharacters(value) {
   return Array.from(value).filter((character) => /[a-z0-9]/i.test(character)).length;
@@ -175,7 +176,10 @@ function RpsiteContent() {
               </div>
               <button
                 type="button"
-                onClick={() => setShowLeaderboard(true)}
+                onClick={() => {
+                  haptics.light();
+                  setShowLeaderboard(true);
+                }}
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm font-semibold text-indigo-700 shadow-sm transition-all hover:-translate-y-px hover:border-indigo-300 hover:bg-indigo-100 dark:border-slate-700 dark:bg-slate-900 dark:text-indigo-300 dark:hover:border-slate-600 dark:hover:bg-slate-800"
               >
                 <Medal className="h-4 w-4" />
@@ -183,7 +187,10 @@ function RpsiteContent() {
               </button>
               <button
                 type="button"
-                onClick={() => setShowAverages(true)}
+                onClick={() => {
+                  haptics.light();
+                  setShowAverages(true);
+                }}
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:-translate-y-px hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800"
               >
                 <BarChart3 className="h-4 w-4" />
