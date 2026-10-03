@@ -61,11 +61,13 @@ export async function fetchHomeCards() {
 }
 
 // Faculty Directory
-export async function fetchFacultyDirectory(query = '', department = '') {
+export async function fetchFacultyDirectory(query = '', department = '', page = 1, limit = 20) {
   try {
     const params = new URLSearchParams();
     if (query) params.set('q', query);
-    if (department) params.set('dept', department);
+    if (department && department !== 'ALL') params.set('dept', department);
+    if (page) params.set('page', page.toString());
+    if (limit) params.set('limit', limit.toString());
     const res = await api.get(`/faculty-directory?${params.toString()}`);
     return res?.data || { success: false, data: [] };
   } catch (err) {

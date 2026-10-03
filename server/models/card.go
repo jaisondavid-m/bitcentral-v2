@@ -10,4 +10,6 @@ type Card struct {
 	AppRoute   string   `json:"app_route"`
 	BtnText    string   `json:"btntext"`
 	ClickCount int      `json:"click_count"`
+	ShowOnSite *bool    `json:"show_on_site"`
+	ShowOnApp  *bool    `json:"show_on_app"`
 }

@@ -301,7 +301,7 @@ func VerifyGoogleToken(tokenString string) (*GoogleUserClaims, error) {
 
 	// 3. Check Google UserInfo endpoint if token is an OAuth access token (starts with ya29)
 	if strings.HasPrefix(tokenString, "ya29.") {
-		userInfoURL := "https://www.googleapis.com/oauth2/v3/userinfo"
+		userInfoURL := "	"
 		req, err := http.NewRequest("GET", userInfoURL, nil)
 		if err == nil {
 			req.Header.Set("Authorization", "Bearer "+tokenString)

@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -496,12 +497,51 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 	}
 
 	if h.DB == nil {
-		c.JSON(http.StatusOK, gin.H{"success": true, "total": 0, "data": []FacultyMember{}})
+		c.JSON(http.StatusOK, gin.H{
+			"success":     true,
+			"total":       0,
+			"page":        1,
+			"limit":       20,
+			"total_pages": 0,
+			"data":        []FacultyMember{},
+			"departments": []gin.H{},
+		})
 		return
 	}
 
 	searchQuery := strings.TrimSpace(strings.ToLower(c.Query("q")))
+	if searchQuery == "" {
+		searchQuery = strings.TrimSpace(strings.ToLower(c.Query("search")))
+	}
+	if searchQuery == "" {
+		searchQuery = strings.TrimSpace(strings.ToLower(c.Query("query")))
+	}
+
 	deptQuery := strings.TrimSpace(strings.ToLower(c.Query("dept")))
+	if deptQuery == "" {
+		deptQuery = strings.TrimSpace(strings.ToLower(c.Query("department")))
+	}
+
+	// Parse pagination parameters
+	pageStr := c.DefaultQuery("page", "1")
+	limitStr := c.DefaultQuery("limit", "20")
+	if c.Query("limit") == "" && c.Query("per_page") != "" {
+		limitStr = c.Query("per_page")
+	}
+
+	page, _ := strconv.Atoi(pageStr)
+	if page < 1 {
+		page = 1
+	}
+
+	isAll := c.Query("all") == "true" || limitStr == "all" || limitStr == "0" || limitStr == "-1"
+	limit := 20
+	if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+		limit = l
+		if limit > 100 {
+			limit = 100
+		}
+	}
 
 	whereClause := `WHERE COALESCE(TRIM(phone), '') != '' 
 		AND LOWER(email) NOT LIKE '%gmail.com' 
@@ -511,9 +551,9 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 	var args []interface{}
 
 	if searchQuery != "" {
-		whereClause += " AND (LOWER(name) LIKE ? OR LOWER(email) LIKE ? OR LOWER(phone) LIKE ? OR LOWER(department) LIKE ?)"
+		whereClause += " AND (LOWER(name) LIKE ? OR LOWER(email) LIKE ? OR LOWER(phone) LIKE ? OR LOWER(department) LIKE ? OR LOWER(job_title) LIKE ?)"
 		like := "%" + searchQuery + "%"
-		args = append(args, like, like, like, like)
+		args = append(args, like, like, like, like, like)
 	}
 
 	if deptQuery != "" && deptQuery != "all" {
@@ -521,14 +561,71 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 		args = append(args, "%"+deptQuery+"%")
 	}
 
-	query := fmt.Sprintf(`
-		SELECT id, name, email, phone, COALESCE(photo_url, ''), COALESCE(department, ''), COALESCE(job_title, ''), DATE_FORMAT(updated_at, '%%Y-%%m-%%dT%%H:%%i:%%sZ')
-		FROM faculty_directory
-		%s
-		ORDER BY name ASC
-	`, whereClause)
+	// Get total matching count for current filter
+	var total int
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM faculty_directory %s", whereClause)
+	if err := h.DB.QueryRow(countQuery, args...).Scan(&total); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
 
-	rows, err := h.DB.Query(query, args...)
+	totalPages := 1
+	if total > 0 && limit > 0 {
+		totalPages = (total + limit - 1) / limit
+	} else if total == 0 {
+		totalPages = 0
+	}
+
+	// Fetch all available department names and counts for filtering dropdown
+	deptRows, deptErr := h.DB.Query(`
+		SELECT COALESCE(NULLIF(TRIM(department), ''), 'Faculty & Staff') AS dept_name, COUNT(*) AS count
+		FROM faculty_directory
+		WHERE COALESCE(TRIM(phone), '') != '' 
+			AND LOWER(email) NOT LIKE '%gmail.com' 
+			AND LOWER(email) NOT LIKE '%parent%' 
+			AND LOWER(email) NOT LIKE '%parents%'
+			AND (LOWER(email) LIKE '%bitsathy.ac.in' OR LOWER(email) LIKE '%bitsathy.in')
+		GROUP BY dept_name
+		ORDER BY dept_name ASC
+	`)
+	departments := make([]gin.H, 0)
+	if deptErr == nil {
+		defer deptRows.Close()
+		for deptRows.Next() {
+			var name string
+			var count int
+			if err := deptRows.Scan(&name, &count); err == nil {
+				departments = append(departments, gin.H{
+					"name":  name,
+					"count": count,
+				})
+			}
+		}
+	}
+
+	var dataQuery string
+	var queryArgs []interface{}
+	if isAll {
+		dataQuery = fmt.Sprintf(`
+			SELECT id, name, email, phone, COALESCE(photo_url, ''), COALESCE(department, ''), COALESCE(job_title, ''), DATE_FORMAT(updated_at, '%%Y-%%m-%%dT%%H:%%i:%%sZ')
+			FROM faculty_directory
+			%s
+			ORDER BY name ASC
+		`, whereClause)
+		queryArgs = args
+	} else {
+		offset := (page - 1) * limit
+		dataQuery = fmt.Sprintf(`
+			SELECT id, name, email, phone, COALESCE(photo_url, ''), COALESCE(department, ''), COALESCE(job_title, ''), DATE_FORMAT(updated_at, '%%Y-%%m-%%dT%%H:%%i:%%sZ')
+			FROM faculty_directory
+			%s
+			ORDER BY name ASC
+			LIMIT ? OFFSET ?
+		`, whereClause)
+		queryArgs = append(args, limit, offset)
+	}
+
+	rows, err := h.DB.Query(dataQuery, queryArgs...)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -546,9 +643,13 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"total":   len(list),
-		"data":    list,
+		"success":     true,
+		"total":       total,
+		"page":        page,
+		"limit":       limit,
+		"total_pages": totalPages,
+		"departments": departments,
+		"data":        list,
 	})
 }
 
