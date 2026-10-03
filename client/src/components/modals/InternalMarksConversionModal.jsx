@@ -30,6 +30,12 @@ export default function InternalMarksConversionModal({
   error,
   onRefresh,
 }) {
+  React.useEffect(() => {
+    if (open && error) {
+      haptics.error();
+    }
+  }, [open, error]);
+
   if (!open) return null;
 
   const rollNo = String(student?.roll_no || student?.user_id || student?.reg_no || data?.roll_no || "").trim();

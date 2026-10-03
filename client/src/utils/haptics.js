@@ -76,19 +76,27 @@ export const haptics = {
   },
 
   /**
-   * Success confirmation (~10ms) for copy success, form save success, payment complete.
+   * Success confirmation pattern ([8ms, 30ms pause, 12ms]) matching native success feedback.
    */
   success() {
     if (!shouldTrigger('success', 100)) return;
-    vibrateSafe(10);
+    vibrateSafe([8, 30, 12]);
   },
 
   /**
-   * Error / Warning pulse (~12ms) for form validation failure or action error.
+   * Warning confirmation pattern ([10ms, 35ms pause, 10ms]) for resets & destructive alerts.
+   */
+  warning() {
+    if (!shouldTrigger('warning', 100)) return;
+    vibrateSafe([10, 35, 10]);
+  },
+
+  /**
+   * Distinct Error pattern ([12ms, 40ms pause, 12ms]) for validation errors & operation failures.
    */
   error() {
     if (!shouldTrigger('error', 100)) return;
-    vibrateSafe(12);
+    vibrateSafe([12, 40, 12]);
   },
 };
 
