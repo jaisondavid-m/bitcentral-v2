@@ -18,6 +18,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { fetchFacultyDirectory } from '../api/axios';
+import { haptics } from '../utils/haptics';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0;
 
@@ -152,6 +153,7 @@ export default function FacultyDirectoryScreen({ navigation }) {
   };
 
   const handleSelectDept = (dept) => {
+    haptics.selection();
     setSelectedDept(dept);
     setPage(1);
   };
@@ -193,9 +195,6 @@ export default function FacultyDirectoryScreen({ navigation }) {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
         <View style={styles.headerLeft}>
           <Ionicons name="star" size={20} color="#FFFFFF" style={styles.starIcon} />
           <Text style={styles.headerTitle}>BIT-CENTRAL</Text>

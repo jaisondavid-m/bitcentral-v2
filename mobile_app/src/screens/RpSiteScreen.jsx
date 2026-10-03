@@ -23,6 +23,7 @@ import {
   fetchMeProfile,
   getCachedMeProfile,
 } from '../api/axios';
+import { haptics } from '../utils/haptics';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0;
 
@@ -249,8 +250,8 @@ export default function RpSiteScreen({ navigation }) {
             {isAbove
               ? `${absDiff} pts above Year ${studentYear} Avg (${yearAvg} pts)`
               : isBelow
-              ? `${absDiff} pts below Year ${studentYear} Avg (${yearAvg} pts)`
-              : `Exact match with Year ${studentYear} Avg (${yearAvg} pts)`}
+                ? `${absDiff} pts below Year ${studentYear} Avg (${yearAvg} pts)`
+                : `Exact match with Year ${studentYear} Avg (${yearAvg} pts)`}
           </Text>
         </View>
       </View>
@@ -311,9 +312,6 @@ export default function RpSiteScreen({ navigation }) {
 
       {/* Top Navbar */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
         <View style={styles.headerTitleRow}>
           <Ionicons name="star" size={20} color="#FFFFFF" style={styles.starIcon} />
           <Text style={styles.headerTitle}>BIT-CENTRAL</Text>
@@ -325,7 +323,10 @@ export default function RpSiteScreen({ navigation }) {
         <View style={styles.segmentContainer}>
           <TouchableOpacity
             style={[styles.segmentBtn, activeTab === 'search' && styles.activeSegmentBtn]}
-            onPress={() => setActiveTab('search')}
+            onPress={() => {
+              haptics.selection();
+              setActiveTab('search');
+            }}
             activeOpacity={0.8}
           >
             <Ionicons
@@ -341,7 +342,10 @@ export default function RpSiteScreen({ navigation }) {
 
           <TouchableOpacity
             style={[styles.segmentBtn, activeTab === 'leaderboard' && styles.activeSegmentBtn]}
-            onPress={() => setActiveTab('leaderboard')}
+            onPress={() => {
+              haptics.selection();
+              setActiveTab('leaderboard');
+            }}
             activeOpacity={0.8}
           >
             <Ionicons
@@ -357,7 +361,10 @@ export default function RpSiteScreen({ navigation }) {
 
           <TouchableOpacity
             style={[styles.segmentBtn, activeTab === 'averages' && styles.activeSegmentBtn]}
-            onPress={() => setActiveTab('averages')}
+            onPress={() => {
+              haptics.selection();
+              setActiveTab('averages');
+            }}
             activeOpacity={0.8}
           >
             <Ionicons
@@ -604,7 +611,7 @@ export default function RpSiteScreen({ navigation }) {
             </View>
           ) : (
             <View style={styles.averagesGrid}>
-              <View style={[styles.avgCard, styles.avgCardYear1]}>
+              <View style={styles.avgCard}>
                 <View style={styles.avgBadgeRow}>
                   <Ionicons name="school" size={14} color="#2563EB" />
                   <Text style={[styles.avgYearLabel, styles.avgYearLabel1]}>YEAR I</Text>
@@ -613,7 +620,7 @@ export default function RpSiteScreen({ navigation }) {
                 <Text style={styles.avgUnit}>Avg Reward Points</Text>
               </View>
 
-              <View style={[styles.avgCard, styles.avgCardYear2]}>
+              <View style={styles.avgCard}>
                 <View style={styles.avgBadgeRow}>
                   <Ionicons name="school" size={14} color="#7C3AED" />
                   <Text style={[styles.avgYearLabel, styles.avgYearLabel2]}>YEAR II</Text>
@@ -622,7 +629,7 @@ export default function RpSiteScreen({ navigation }) {
                 <Text style={styles.avgUnit}>Avg Reward Points</Text>
               </View>
 
-              <View style={[styles.avgCard, styles.avgCardYear3]}>
+              <View style={styles.avgCard}>
                 <View style={styles.avgBadgeRow}>
                   <Ionicons name="school" size={14} color="#059669" />
                   <Text style={[styles.avgYearLabel, styles.avgYearLabel3]}>YEAR III</Text>
@@ -631,7 +638,7 @@ export default function RpSiteScreen({ navigation }) {
                 <Text style={styles.avgUnit}>Avg Reward Points</Text>
               </View>
 
-              <View style={[styles.avgCard, styles.avgCardYear4]}>
+              <View style={styles.avgCard}>
                 <View style={styles.avgBadgeRow}>
                   <Ionicons name="school" size={14} color="#D97706" />
                   <Text style={[styles.avgYearLabel, styles.avgYearLabel4]}>YEAR IV</Text>
@@ -1188,22 +1195,6 @@ const styles = StyleSheet.create({
   },
   averagesHeaderIcon: {
     marginRight: 10,
-  },
-  avgCardYear1: {
-    borderTopColor: '#2563EB',
-    borderTopWidth: 4,
-  },
-  avgCardYear2: {
-    borderTopColor: '#7C3AED',
-    borderTopWidth: 4,
-  },
-  avgCardYear3: {
-    borderTopColor: '#059669',
-    borderTopWidth: 4,
-  },
-  avgCardYear4: {
-    borderTopColor: '#D97706',
-    borderTopWidth: 4,
   },
   avgYearLabel1: {
     color: '#2563EB',

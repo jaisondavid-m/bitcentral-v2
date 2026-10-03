@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { fetchMessMenu } from '../api/axios';
+import { haptics } from '../utils/haptics';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0;
 
@@ -157,14 +158,17 @@ export default function MessMenuScreen({ navigation }) {
   const activeMeta = MEAL_META[activeTab] || { label: activeTab, icon: '🍽️', time: '' };
 
   const handlePrevDay = () => {
+    haptics.selection();
     setSelectedDate((curr) => getShiftedDate(curr, -1));
   };
 
   const handleNextDay = () => {
+    haptics.selection();
     setSelectedDate((curr) => getShiftedDate(curr, 1));
   };
 
   const handleResetToday = () => {
+    haptics.selection();
     setSelectedDate(todayIST());
     const [y, m] = todayIST().split('-');
     setPickerYear(parseInt(y, 10));
@@ -172,6 +176,7 @@ export default function MessMenuScreen({ navigation }) {
   };
 
   const handleOpenPicker = () => {
+    haptics.tap();
     const [y, m] = selectedDate.split('-');
     setPickerYear(parseInt(y, 10));
     setPickerMonth(parseInt(m, 10) - 1);
@@ -179,6 +184,7 @@ export default function MessMenuScreen({ navigation }) {
   };
 
   const handlePickerPrevMonth = () => {
+    haptics.selection();
     if (pickerMonth === 0) {
       setPickerMonth(11);
       setPickerYear((y) => y - 1);
@@ -188,6 +194,7 @@ export default function MessMenuScreen({ navigation }) {
   };
 
   const handlePickerNextMonth = () => {
+    haptics.selection();
     if (pickerMonth === 11) {
       setPickerMonth(0);
       setPickerYear((y) => y + 1);
@@ -197,6 +204,7 @@ export default function MessMenuScreen({ navigation }) {
   };
 
   const handleSelectDay = (day) => {
+    haptics.selection();
     const yyyy = pickerYear;
     const mm = String(pickerMonth + 1).padStart(2, '0');
     const dd = String(day).padStart(2, '0');
@@ -225,10 +233,8 @@ export default function MessMenuScreen({ navigation }) {
       
       {/* Top Navbar */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
+          <Ionicons name="star" size={20} color="#FFFFFF" style={{ marginRight: 6 }} />
           <Text style={styles.headerTitle}>Mess Menu</Text>
         </View>
         <TouchableOpacity onPress={() => loadMenu(true)} style={styles.refreshButton}>

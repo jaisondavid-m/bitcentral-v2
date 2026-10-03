@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { fetchHomeCards } from '../api/axios';
+import { haptics } from '../utils/haptics';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0;
 
@@ -47,6 +48,7 @@ export default function HomeScreen({ navigation }) {
   };
 
   const onRefresh = () => {
+    haptics.lightTap();
     setRefreshing(true);
     loadCards();
   };
@@ -62,6 +64,7 @@ export default function HomeScreen({ navigation }) {
   });
 
   const handleCardPress = (card) => {
+    haptics.tap();
     const targetRoute = (card.app_route || card.route || '').trim();
 
     if (targetRoute) {

@@ -123,12 +123,6 @@ func isParentEmail(email string) bool {
 
 func isValidFacultyRecord(email, phone string) bool {
 	cleanEmail := strings.ToLower(strings.TrimSpace(email))
-	cleanPhone := strings.TrimSpace(phone)
-
-	// Must have a non-empty mobile / phone number
-	if cleanPhone == "" {
-		return false
-	}
 
 	if cleanEmail == "" {
 		return false
@@ -188,6 +182,7 @@ func (h *FacultyDirectoryHandler) GetOAuthConfig() *oauth2.Config {
 		RedirectURL:  redirectURL,
 		Scopes: []string{
 			"https://www.googleapis.com/auth/contacts.readonly",
+			"https://www.googleapis.com/auth/contacts.other.readonly",
 			"https://www.googleapis.com/auth/directory.readonly",
 			"https://www.googleapis.com/auth/userinfo.profile",
 			"https://www.googleapis.com/auth/userinfo.email",
@@ -212,8 +207,7 @@ func (h *FacultyDirectoryHandler) SyncGoogleDirectory() {
 	if h.DB != nil {
 		res, err := h.DB.Exec(`
 			DELETE FROM faculty_directory 
-			WHERE COALESCE(TRIM(phone), '') = '' 
-			   OR LOWER(email) LIKE '%gmail.com' 
+			WHERE LOWER(email) LIKE '%gmail.com' 
 			   OR LOWER(email) LIKE '%parent%' 
 			   OR LOWER(email) LIKE '%parents%'
 			   OR (LOWER(email) NOT LIKE '%bitsathy.ac.in' AND LOWER(email) NOT LIKE '%bitsathy.in');
@@ -226,23 +220,21 @@ func (h *FacultyDirectoryHandler) SyncGoogleDirectory() {
 	}
 
 	var httpClient *http.Client
-
-	// Try using SheetHandler's OAuth Token if available
-	if h.sheetsHandler != nil && h.sheetsHandler.oauthConfig != nil && h.sheetsHandler.oauthToken != nil {
-		httpClient = h.sheetsHandler.oauthConfig.Client(context.Background(), h.sheetsHandler.oauthToken)
-	}
+	cfg := h.GetOAuthConfig()
 
 	// Fallback to loading token.json with Bearer authorization header
-	if httpClient == nil {
-		if f, err := os.Open("token.json"); err == nil {
-			defer f.Close()
-			var tok oauth2.Token
-			if err := json.NewDecoder(f).Decode(&tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
-				ctx := context.Background()
-				cfg := h.GetOAuthConfig()
-				httpClient = cfg.Client(ctx, &tok)
-			}
+	if f, err := os.Open("token.json"); err == nil {
+		defer f.Close()
+		var tok oauth2.Token
+		if err := json.NewDecoder(f).Decode(&tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
+			ctx := context.Background()
+			httpClient = cfg.Client(ctx, &tok)
 		}
+	}
+
+	// Try using SheetHandler's OAuth Token if token.json is not present
+	if httpClient == nil && h.sheetsHandler != nil && h.sheetsHandler.oauthToken != nil {
+		httpClient = cfg.Client(context.Background(), h.sheetsHandler.oauthToken)
 	}
 
 	if httpClient == nil {
@@ -543,8 +535,7 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 		}
 	}
 
-	whereClause := `WHERE COALESCE(TRIM(phone), '') != '' 
-		AND LOWER(email) NOT LIKE '%gmail.com' 
+	whereClause := `WHERE LOWER(email) NOT LIKE '%gmail.com' 
 		AND LOWER(email) NOT LIKE '%parent%' 
 		AND LOWER(email) NOT LIKE '%parents%'
 		AND (LOWER(email) LIKE '%bitsathy.ac.in' OR LOWER(email) LIKE '%bitsathy.in')`
@@ -580,8 +571,7 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 	deptRows, deptErr := h.DB.Query(`
 		SELECT COALESCE(NULLIF(TRIM(department), ''), 'Faculty & Staff') AS dept_name, COUNT(*) AS count
 		FROM faculty_directory
-		WHERE COALESCE(TRIM(phone), '') != '' 
-			AND LOWER(email) NOT LIKE '%gmail.com' 
+		WHERE LOWER(email) NOT LIKE '%gmail.com' 
 			AND LOWER(email) NOT LIKE '%parent%' 
 			AND LOWER(email) NOT LIKE '%parents%'
 			AND (LOWER(email) LIKE '%bitsathy.ac.in' OR LOWER(email) LIKE '%bitsathy.in')
