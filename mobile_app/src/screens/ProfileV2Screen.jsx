@@ -7,133 +7,239 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ScreenHeader from '../components/ScreenHeader';
-import Badge from '../components/Badge';
 import { useAuth } from '../context/StudentContext';
 import { fetchV2Profile, fetchMeProfile } from '../api/axios';
+import { haptics } from '../utils/haptics';
 
 export default function ProfileV2Screen({ navigation }) {
   const { user, logout } = useAuth();
   const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadProfile();
   }, []);
 
   const loadProfile = async () => {
-    const v2 = await fetchV2Profile();
-    const me = await fetchMeProfile();
-    setProfile({ ...(me || {}), ...(v2 || {}) });
+    try {
+      setLoading(true);
+      const v2 = await fetchV2Profile();
+      const me = await fetchMeProfile();
+      setProfile({ ...(me || {}), ...(v2 || {}) });
+    } catch (err) {
+      console.warn('Failed to load profile data:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLogout = () => {
+    haptics.warning();
     Alert.alert('Sign Out', 'Are you sure you want to sign out of BIT-CENTRAL?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign Out', style: 'destructive', onPress: () => logout() },
+      { text: 'Cancel', style: 'cancel', onPress: () => haptics.tap() },
+      {
+        text: 'Sign Out',
+        style: 'destructive',
+        onPress: () => {
+          haptics.confirm();
+          logout();
+        },
+      },
     ]);
   };
 
-  const displayName = profile?.display_name || user?.display_name || user?.displayName || 'Student';
-  const rollNo = profile?.roll_no || user?.roll_no || user?.user_id || '7376...';
-  const email = user?.email || profile?.email || '';
+  const formatAuthDate = (value) => {
+    if (!value) return '-';
+    const numericValue = Number(value);
+    const timestamp = Number.isFinite(numericValue) ? numericValue : Date.parse(value);
+    if (!Number.isFinite(timestamp)) return String(value);
+
+    return new Date(timestamp).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
+  const name =
+    profile?.name ||
+    profile?.display_name ||
+    user?.display_name ||
+    user?.displayName ||
+    'Student';
+
+  const email = (profile?.email || user?.email || '').toLowerCase().trim();
+  const isBitsathyEmail = email.endsWith('@bitsathy.ac.in');
+
   const photoURL = profile?.photo_url || user?.photoURL || null;
+
+  const registerNo =
+    profile?.register_no ||
+    profile?.roll_no ||
+    profile?.user_id ||
+    user?.roll_no ||
+    '-';
+
+  const userId =
+    profile?.user_id ||
+    profile?.uid ||
+    user?.uid ||
+    '-';
+
+  const department = profile?.department || 'Department Student';
+  const batch = profile?.batch || '2024 - 2028';
+  const phone = profile?.phone || profile?.phone_no || '-';
+
+  const creationTime =
+    profile?.creation_time ||
+    user?.metadata?.createdAt ||
+    user?.metadata?.creationTime ||
+    '';
+
+  const lastSignInTime =
+    profile?.last_sign_in_time ||
+    user?.metadata?.lastLoginAt ||
+    user?.metadata?.lastSignInTime ||
+    '';
 
   return (
     <View style={styles.container}>
-      <ScreenHeader
-        title="Student Profile"
-        subtitle="Account & Academic Identity"
-        navigation={navigation}
-        showBack={true}
-      />
+      <ScreenHeader title="My Profile" subtitle="Student Account & Identity" navigation={navigation} />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Profile Card */}
+        {/* Profile Banner */}
         <View style={styles.profileHeaderCard}>
-          {photoURL ? (
-            <Image source={{ uri: photoURL }} style={styles.avatar} />
-          ) : (
-            <View style={styles.avatarPlaceholder}>
-              <Ionicons name="person" size={36} color="#FFFFFF" />
+          <View style={styles.avatarContainer}>
+            {photoURL ? (
+              <Image source={{ uri: photoURL }} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <Ionicons name="person" size={40} color="#FFFFFF" />
+              </View>
+            )}
+            <View style={styles.verifiedBadge}>
+              <Ionicons name="checkmark-circle" size={20} color="#10B981" />
             </View>
-          )}
-          <Text style={styles.nameText}>{displayName}</Text>
+          </View>
+
+          <Text style={styles.nameText}>{name}</Text>
           <Text style={styles.emailText}>{email}</Text>
-          <View style={styles.tagRow}>
-            <Badge label={rollNo} variant="info" />
-            <Badge label={profile?.department || 'CSE'} variant="neutral" />
-            <Badge label="Active Student" variant="success" />
+
+          <View style={styles.tagContainer}>
+            <View style={styles.tagChip}>
+              <Ionicons name="school-outline" size={14} color="#2563EB" style={styles.tagIcon} />
+              <Text style={styles.tagText}>{registerNo}</Text>
+            </View>
+            <View style={[styles.tagChip, styles.deptTagChip]}>
+              <Text style={styles.deptTagText}>{department}</Text>
+            </View>
           </View>
         </View>
 
-        {/* Academic Details Section */}
-        <Text style={styles.sectionTitle}>Academic Information</Text>
-        <View style={styles.infoCard}>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Roll Number</Text>
-            <Text style={styles.infoValue}>{rollNo}</Text>
+        {/* Domain Warning Banner if non-bitsathy */}
+        {!isBitsathyEmail && email.length > 0 && (
+          <View style={styles.warningBanner}>
+            <Ionicons name="warning-outline" size={20} color="#D97706" style={styles.warningIcon} />
+            <Text style={styles.warningText}>
+              Please use your @bitsathy.ac.in college email for full access.
+            </Text>
           </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Degree Program</Text>
-            <Text style={styles.infoValue}>{profile?.degree || 'B.E. Computer Science'}</Text>
+        )}
+
+        {/* Loading Indicator */}
+        {loading && (
+          <View style={styles.loadingBox}>
+            <ActivityIndicator size="small" color="#2563EB" />
+            <Text style={styles.loadingText}>Loading profile details...</Text>
           </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Current Year & Sem</Text>
-            <Text style={styles.infoValue}>{profile?.year_sem || '2nd Year / Sem 4'}</Text>
+        )}
+
+        {/* Details Grid Cards */}
+        <Text style={styles.sectionTitle}>Account Details</Text>
+        <View style={styles.detailsGrid}>
+          {/* Register No */}
+          <View style={styles.detailCard}>
+            <View style={styles.detailCardHeader}>
+              <Text style={styles.detailLabel}>REGISTER NO</Text>
+              <View style={styles.iconCircle}>
+                <Ionicons name="school-outline" size={18} color="#2563EB" />
+              </View>
+            </View>
+            <Text style={styles.detailValue}>{registerNo}</Text>
           </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Academic Batch</Text>
-            <Text style={styles.infoValue}>{profile?.batch || '2024 - 2028'}</Text>
+
+          {/* User ID */}
+          <View style={styles.detailCard}>
+            <View style={styles.detailCardHeader}>
+              <Text style={styles.detailLabel}>USER ID</Text>
+              <View style={styles.iconCircle}>
+                <Ionicons name="finger-print-outline" size={18} color="#2563EB" />
+              </View>
+            </View>
+            <Text style={styles.detailValue}>{userId}</Text>
           </View>
-          <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
-            <Text style={styles.infoLabel}>Faculty Mentor</Text>
-            <Text style={styles.infoValue}>{profile?.mentor || 'Dr. S. Ramesh, ASP/CSE'}</Text>
+
+          {/* Department */}
+          <View style={styles.detailCard}>
+            <View style={styles.detailCardHeader}>
+              <Text style={styles.detailLabel}>DEPARTMENT</Text>
+              <View style={styles.iconCircle}>
+                <Ionicons name="business-outline" size={18} color="#2563EB" />
+              </View>
+            </View>
+            <Text style={styles.detailValue}>{department}</Text>
+          </View>
+
+          {/* Batch */}
+          <View style={styles.detailCard}>
+            <View style={styles.detailCardHeader}>
+              <Text style={styles.detailLabel}>BATCH</Text>
+              <View style={styles.iconCircle}>
+                <Ionicons name="calendar-outline" size={18} color="#2563EB" />
+              </View>
+            </View>
+            <Text style={styles.detailValue}>{batch}</Text>
+          </View>
+
+          {/* Phone */}
+          <View style={styles.detailCard}>
+            <View style={styles.detailCardHeader}>
+              <Text style={styles.detailLabel}>PHONE</Text>
+              <View style={styles.iconCircle}>
+                <Ionicons name="call-outline" size={18} color="#2563EB" />
+              </View>
+            </View>
+            <Text style={styles.detailValue}>{phone}</Text>
+          </View>
+
+          {/* First Login */}
+          <View style={styles.detailCard}>
+            <View style={styles.detailCardHeader}>
+              <Text style={styles.detailLabel}>FIRST LOGIN</Text>
+              <View style={styles.iconCircle}>
+                <Ionicons name="time-outline" size={18} color="#2563EB" />
+              </View>
+            </View>
+            <Text style={styles.detailValue}>{formatAuthDate(creationTime)}</Text>
+          </View>
+
+          {/* Last Login */}
+          <View style={styles.detailCard}>
+            <View style={styles.detailCardHeader}>
+              <Text style={styles.detailLabel}>LAST LOGIN</Text>
+              <View style={styles.iconCircle}>
+                <Ionicons name="time-outline" size={18} color="#2563EB" />
+              </View>
+            </View>
+            <Text style={styles.detailValue}>{formatAuthDate(lastSignInTime)}</Text>
           </View>
         </View>
 
-        {/* Quick App Actions */}
-        <Text style={styles.sectionTitle}>App & Community</Text>
-        <View style={styles.menuCard}>
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navigation.navigate('Support')}
-          >
-            <Ionicons name="heart-outline" size={20} color="#EA580C" style={styles.menuIcon} />
-            <Text style={styles.menuText}>Support Developer (Buy Me a Coffee)</Text>
-            <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navigation.navigate('GuidesIndex')}
-          >
-            <Ionicons name="book-outline" size={20} color="#2563EB" style={styles.menuIcon} />
-            <Text style={styles.menuText}>Campus Knowledge Guides</Text>
-            <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navigation.navigate('About')}
-          >
-            <Ionicons name="information-circle-outline" size={20} color="#7C3AED" style={styles.menuIcon} />
-            <Text style={styles.menuText}>About BIT Central</Text>
-            <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.menuItem, { borderBottomWidth: 0 }]}
-            onPress={() => navigation.navigate('FAQ')}
-          >
-            <Ionicons name="help-circle-outline" size={20} color="#059669" style={styles.menuIcon} />
-            <Text style={styles.menuText}>Frequently Asked Questions</Text>
-            <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Logout Button */}
+        {/* Sign Out Button */}
         <TouchableOpacity style={styles.logoutBtn} activeOpacity={0.85} onPress={handleLogout}>
           <Ionicons name="log-out-outline" size={20} color="#DC2626" style={{ marginRight: 8 }} />
           <Text style={styles.logoutText}>Sign Out of BIT-CENTRAL</Text>
@@ -150,113 +256,183 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 36,
+    paddingBottom: 40,
   },
   profileHeaderCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    backgroundColor: '#2563EB',
+    borderRadius: 20,
     padding: 20,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    marginBottom: 20,
-    elevation: 2,
+    marginBottom: 16,
+    elevation: 4,
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+  },
+  avatarContainer: {
+    position: 'relative',
+    marginBottom: 12,
   },
   avatar: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
+    width: 84,
+    height: 84,
+    borderRadius: 42,
     borderWidth: 3,
-    borderColor: '#2563EB',
-    marginBottom: 12,
+    borderColor: '#FFFFFF',
   },
   avatarPlaceholder: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    backgroundColor: '#2563EB',
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+    backgroundColor: '#3B82F6',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
+  },
+  verifiedBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
   },
   nameText: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '800',
-    color: '#0F172A',
-    marginBottom: 4,
+    color: '#FFFFFF',
+    textAlign: 'center',
   },
   emailText: {
     fontSize: 13,
-    color: '#64748B',
-    marginBottom: 12,
+    color: '#E0E7FF',
+    marginTop: 2,
+    textAlign: 'center',
   },
-  tagRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#1E293B',
-    marginBottom: 10,
-  },
-  infoCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    marginBottom: 20,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-  },
-  infoLabel: {
-    fontSize: 13,
-    color: '#64748B',
-  },
-  infoValue: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  menuCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    marginBottom: 24,
-  },
-  menuItem: {
+  tagContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
+    marginTop: 12,
   },
-  menuIcon: {
-    marginRight: 12,
-  },
-  menuText: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1E293B',
-  },
-  logoutBtn: {
-    backgroundColor: '#FEF2F2',
-    borderWidth: 1,
-    borderColor: '#FECACA',
+  tagChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 12,
-    height: 48,
+    marginRight: 8,
+  },
+  tagIcon: {
+    marginRight: 4,
+  },
+  tagText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#2563EB',
+  },
+  deptTagChip: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  deptTagText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  warningBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+  },
+  warningIcon: {
+    marginRight: 10,
+  },
+  warningText: {
+    flex: 1,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#B45309',
+  },
+  loadingBox: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 10,
+  },
+  loadingText: {
+    fontSize: 12,
+    color: '#64748B',
+    marginLeft: 8,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#64748B',
+    marginBottom: 10,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  detailsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  detailCard: {
+    backgroundColor: '#FFFFFF',
+    width: '48%',
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    elevation: 1,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 2,
+  },
+  detailCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  detailLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#64748B',
+    letterSpacing: 0.5,
+  },
+  iconCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#EFF6FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  detailValue: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#0F172A',
+  },
+  logoutBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
+    elevation: 1,
   },
   logoutText: {
     fontSize: 14,

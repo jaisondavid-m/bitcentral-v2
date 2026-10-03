@@ -8,14 +8,13 @@ import {
   Platform,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { haptics } from '../utils/haptics';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0;
 
 export default function ScreenHeader({
-  title,
+  title = 'BIT-CENTRAL',
   subtitle,
-  navigation,
-  showBack = true,
   rightAction,
   rightIcon,
   onRightPress,
@@ -26,15 +25,7 @@ export default function ScreenHeader({
       <StatusBar backgroundColor={backgroundColor} barStyle="light-content" translucent={true} />
       <View style={styles.headerRow}>
         <View style={styles.leftContainer}>
-          {showBack && navigation && (
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => navigation.goBack()}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
-          )}
+          <Ionicons name="star" size={20} color="#FFFFFF" style={styles.starIcon} />
           <View style={styles.titleContainer}>
             <Text style={styles.title} numberOfLines={1}>
               {title}
@@ -52,7 +43,10 @@ export default function ScreenHeader({
         ) : rightIcon && onRightPress ? (
           <TouchableOpacity
             style={styles.rightButton}
-            onPress={onRightPress}
+            onPress={() => {
+              haptics.tap();
+              onRightPress();
+            }}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Ionicons name={rightIcon} size={22} color="#FFFFFF" />
@@ -65,14 +59,14 @@ export default function ScreenHeader({
 
 const styles = StyleSheet.create({
   header: {
-    paddingTop: STATUS_BAR_HEIGHT + 10,
+    paddingTop: STATUS_BAR_HEIGHT + 12,
     paddingBottom: 14,
     paddingHorizontal: 16,
     elevation: 4,
-    shadowColor: '#000',
+    shadowColor: '#2563EB',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
-    shadowRadius: 3,
+    shadowRadius: 4,
   },
   headerRow: {
     flexDirection: 'row',
@@ -84,23 +78,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  backButton: {
-    marginRight: 12,
-    padding: 2,
+  starIcon: {
+    marginRight: 8,
   },
   titleContainer: {
     flex: 1,
   },
   title: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#FFFFFF',
-    letterSpacing: 0.3,
+    letterSpacing: 0.4,
   },
   subtitle: {
     fontSize: 12,
     color: '#E0E7FF',
-    marginTop: 2,
+    marginTop: 1,
   },
   rightButton: {
     padding: 4,

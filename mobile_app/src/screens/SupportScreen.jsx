@@ -16,6 +16,7 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '../context/StudentContext';
 import { getFeedbackMessages, sendFeedbackMessage, getCachedMeProfile, fetchMeProfile } from '../api/axios';
+import { haptics } from '../utils/haptics';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0;
 
@@ -85,6 +86,7 @@ export default function SupportScreen({ navigation }) {
 
     const msgText = inputText.trim();
     setInputText('');
+    haptics.mediumTap();
     setSending(true);
 
     const displayName =
@@ -109,6 +111,7 @@ export default function SupportScreen({ navigation }) {
 
     try {
       const result = await sendFeedbackMessage(msgText, displayName);
+      haptics.success();
       if (result && result.id) {
         setMessages((prev) => prev.map((m) => (m.id === tempId ? result : m)));
       } else {
@@ -116,12 +119,11 @@ export default function SupportScreen({ navigation }) {
       }
     } catch (err) {
       console.error('Failed to send message:', err);
+      haptics.error();
     } finally {
       setSending(false);
     }
   };
-
-  const canGoBack = navigation?.canGoBack?.();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -129,16 +131,6 @@ export default function SupportScreen({ navigation }) {
 
       {/* Header */}
       <View style={styles.header}>
-        {canGoBack ? (
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backBtn}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-        ) : null}
-
         <View style={styles.headerLeftContainer}>
           <View style={styles.headsetIconWrapper}>
             <View style={styles.headsetCircle}>

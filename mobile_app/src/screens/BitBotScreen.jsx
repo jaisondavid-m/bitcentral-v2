@@ -15,6 +15,7 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { sendChatMessage } from '../api/axios';
 import { useAuth } from '../context/StudentContext';
+import { haptics } from '../utils/haptics';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0;
 
@@ -28,6 +29,7 @@ export default function BitBotScreen() {
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;
+    haptics.mediumTap();
 
     const userText = input.trim();
     const userMsg = { id: Date.now().toString(), sender: 'user', text: userText };

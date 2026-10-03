@@ -23,9 +23,6 @@ export default function WifiDetailsScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="#2563EB" barStyle="light-content" translucent={true} />
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
         <View style={styles.headerLeft}>
           <Ionicons name="star" size={20} color="#FFFFFF" style={styles.starIcon} />
           <Text style={styles.headerTitle}>BIT-CENTRAL</Text>

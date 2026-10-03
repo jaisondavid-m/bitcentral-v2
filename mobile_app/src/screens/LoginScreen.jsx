@@ -15,6 +15,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '../context/StudentContext';
 import { postGoogleAuth } from '../api/axios';
 import ENV from '../config/env';
+import { haptics } from '../utils/haptics';
 
 const GOOGLE_AUTH_URL =
   'https://accounts.google.com/o/oauth2/v2/auth?' +
@@ -70,6 +71,7 @@ export default function LoginScreen() {
 
       if (backendRes?.error && !backendRes?.success) {
         console.warn('Backend Auth error:', backendRes.error);
+        haptics.error();
         setError(backendRes.error);
         return;
       }
@@ -85,11 +87,15 @@ export default function LoginScreen() {
         userObj,
         backendRes?.token || backendRes?.jwt || accessToken
       );
-      if (!success && !accessDeniedMessage) {
+      if (success) {
+        haptics.success();
+      } else if (!accessDeniedMessage) {
+        haptics.error();
         setError('Sign in failed. Only @bitsathy.ac.in accounts allowed.');
       }
     } catch (err) {
       console.error('Authentication error:', err);
+      haptics.error();
       setError(err?.message || 'Authentication failed. Please try again.');
     } finally {
       setLoading(false);
@@ -115,6 +121,7 @@ export default function LoginScreen() {
       const params = new URLSearchParams(url.split('?')[1] || url.split('#')[1] || '');
       const errReason = params.get('error') || 'Sign in was cancelled or failed';
       setShowWebModal(false);
+      haptics.error();
       setError(errReason);
     }
   };
@@ -145,6 +152,7 @@ export default function LoginScreen() {
             style={styles.googleButton}
             disabled={loading}
             onPress={() => {
+              haptics.mediumTap();
               setError('');
               setShowWebModal(true);
             }}

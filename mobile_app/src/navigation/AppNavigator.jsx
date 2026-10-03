@@ -6,6 +6,7 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { useAuth } from '../context/StudentContext';
+import { haptics } from '../utils/haptics';
 
 // Core Screens
 import LoginScreen from '../screens/LoginScreen';
@@ -50,8 +51,6 @@ import LegalScreen from '../screens/LegalScreen';
 const Tab = createBottomTabNavigator();
 const RootStack = createNativeStackNavigator();
 const HomeStack = createNativeStackNavigator();
-const AcademicsStack = createNativeStackNavigator();
-const CampusLifeStack = createNativeStackNavigator();
 const ProfileStack = createNativeStackNavigator();
 
 // Tab Icon Helper
@@ -59,12 +58,6 @@ const renderTabBarIcon = (route, focused, color, size) => {
   let iconName;
   if (route.name === 'HomeTab') {
     iconName = focused ? 'home' : 'home-outline';
-  } else if (route.name === 'AcademicsTab') {
-    iconName = focused ? 'school' : 'school-outline';
-  } else if (route.name === 'CampusTab') {
-    iconName = focused ? 'compass' : 'compass-outline';
-  } else if (route.name === 'BitBotTab') {
-    iconName = focused ? 'sparkles' : 'sparkles-outline';
   } else if (route.name === 'ProfileTab') {
     iconName = focused ? 'person' : 'person-outline';
   }
@@ -107,36 +100,6 @@ function HomeStackNav() {
   );
 }
 
-function AcademicsStackNav() {
-  return (
-    <AcademicsStack.Navigator screenOptions={{ headerShown: false }}>
-      <AcademicsStack.Screen name="AcademicsHome" component={SemesterScreen} />
-      <AcademicsStack.Screen name="StudentReport" component={StudentReportDetailsScreen} />
-      <AcademicsStack.Screen name="ExamHall" component={ExamHallScreen} />
-      <AcademicsStack.Screen name="PCDP" component={PCDPScreen} />
-      <AcademicsStack.Screen name="PSAssessmentHistory" component={PSAssessmentHistoryScreen} />
-      <AcademicsStack.Screen name="PSPointDetails" component={PSPointDetailsScreen} />
-      <AcademicsStack.Screen name="PSBiometricDetails" component={PSBiometricDetailsScreen} />
-      <AcademicsStack.Screen name="ApSite" component={ApSiteScreen} />
-      <AcademicsStack.Screen name="RpSite" component={RpSiteScreen} />
-      <AcademicsStack.Screen name="AnswerKey" component={AnswerKeyScreen} />
-    </AcademicsStack.Navigator>
-  );
-}
-
-function CampusLifeStackNav() {
-  return (
-    <CampusLifeStack.Navigator screenOptions={{ headerShown: false }}>
-      <CampusLifeStack.Screen name="MessMenuHome" component={MessMenuScreen} />
-      <CampusLifeStack.Screen name="LostAndFound" component={LostAndFoundScreen} />
-      <CampusLifeStack.Screen name="LeaveDetails" component={LeaveDetailsScreen} />
-      <CampusLifeStack.Screen name="FindMyWay" component={FindMyWayScreen} />
-      <CampusLifeStack.Screen name="FacultyDirectory" component={FacultyDirectoryScreen} />
-      <CampusLifeStack.Screen name="WifiDetails" component={WifiDetailsScreen} />
-    </CampusLifeStack.Navigator>
-  );
-}
-
 function ProfileStackNav() {
   return (
     <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
@@ -158,6 +121,11 @@ function ProfileStackNav() {
 function MainTabs() {
   return (
     <Tab.Navigator
+      screenListeners={{
+        tabPress: () => {
+          haptics.tabChange();
+        },
+      }}
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: '#2563EB',
@@ -173,9 +141,6 @@ function MainTabs() {
       })}
     >
       <Tab.Screen name="HomeTab" component={HomeStackNav} options={{ tabBarLabel: 'Home' }} />
-      <Tab.Screen name="AcademicsTab" component={AcademicsStackNav} options={{ tabBarLabel: 'Academics' }} />
-      <Tab.Screen name="CampusTab" component={CampusLifeStackNav} options={{ tabBarLabel: 'Campus' }} />
-      <Tab.Screen name="BitBotTab" component={BitBotScreen} options={{ tabBarLabel: 'BitBot AI' }} />
       <Tab.Screen name="ProfileTab" component={ProfileStackNav} options={{ tabBarLabel: 'Profile' }} />
     </Tab.Navigator>
   );
