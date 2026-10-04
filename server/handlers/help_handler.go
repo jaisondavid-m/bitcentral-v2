@@ -723,6 +723,79 @@ func (h *HelpHandler) DeleteOwnMessage(c *gin.Context) {
 	})
 }
 
+// POST /api/help/block-message
+func (h *HelpHandler) AdminBlockUserFromMessage(c *gin.Context) {
+	token := ExtractAuthToken(c)
+	uid, email, err := userFromToken(token)
+	if err != nil || uid == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	isAdmin := false
+	var role string
+	_ = h.DB.QueryRow(`SELECT role FROM users WHERE (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, uid, strings.ToLower(strings.TrimSpace(email))).Scan(&role)
+	r := strings.ToLower(strings.TrimSpace(role))
+	if r == "admin" || r == "superadmin" || r == "super_admin" {
+		isAdmin = true
+	}
+
+	if !isAdmin {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Only administrators can block users from messages"})
+		return
+	}
+
+	var req struct {
+		MessageID string `json:"message_id" binding:"required"`
+		Reason    string `json:"reason"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "message_id is required"})
+		return
+	}
+
+	msgID := strings.TrimSpace(req.MessageID)
+	reason := strings.TrimSpace(req.Reason)
+	if reason == "" {
+		reason = "Blocked by Admin from chat message"
+	}
+
+	var targetUID string
+	err = h.DB.QueryRow(`SELECT sender_uid FROM help_messages WHERE id = ?`, msgID).Scan(&targetUID)
+	if err == sql.ErrNoRows || targetUID == "" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Message not found"})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		return
+	}
+
+	// 1. Delete this specific message
+	_, err = h.DB.Exec(`UPDATE help_messages SET is_removed = 1 WHERE id = ?`, msgID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete message"})
+		return
+	}
+
+	// 2. Ban target user from sending future messages (past messages remain safe)
+	now := time.Now()
+	_, err = h.DB.Exec(`
+		INSERT INTO help_user_restrictions (user_uid, status, reason, created_by, created_at)
+		VALUES (?, 'BLOCKED', ?, ?, ?)
+		ON DUPLICATE KEY UPDATE status = 'BLOCKED', reason = VALUES(reason), created_by = VALUES(created_by), created_at = VALUES(created_at)
+	`, targetUID, reason, uid, now)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to block user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "User blocked from sending future messages and message deleted",
+	})
+}
+
 // POST /api/help/rooms/:id/resolve
 func (h *HelpHandler) ResolveRoom(c *gin.Context) {
 	token := ExtractAuthToken(c)

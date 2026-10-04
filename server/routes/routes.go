@@ -203,6 +203,7 @@ func SetupRouter(
 		api.POST("/api/help/rooms/:id/resolve", helpHandler.ResolveRoom)
 		api.POST("/api/help/reports", helpHandler.SubmitReport)
 		api.POST("/api/help/block", helpHandler.BlockAnonUser)
+		api.POST("/api/help/block-message", helpHandler.AdminBlockUserFromMessage)
 		api.GET("/api/help/my", helpHandler.GetMyHelpData)
 	}
 
