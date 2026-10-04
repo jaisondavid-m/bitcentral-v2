@@ -73,9 +73,13 @@ export default function Help() {
 
     const handleViewportChange = () => {
       const vv = window.visualViewport;
-      const heightDiff = window.innerHeight - vv.height;
-      if (heightDiff > 80) {
-        setKeyboardHeight(heightDiff);
+      const kHeight = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+
+      if (kHeight > 60) {
+        setKeyboardHeight(kHeight);
+        if (window.scrollY !== 0) {
+          window.scrollTo(0, 0);
+        }
       } else {
         setKeyboardHeight(0);
       }
@@ -83,11 +87,23 @@ export default function Help() {
 
     window.visualViewport.addEventListener("resize", handleViewportChange);
     window.visualViewport.addEventListener("scroll", handleViewportChange);
+    window.addEventListener("scroll", handleViewportChange);
+
     return () => {
       window.visualViewport.removeEventListener("resize", handleViewportChange);
       window.visualViewport.removeEventListener("scroll", handleViewportChange);
+      window.removeEventListener("scroll", handleViewportChange);
     };
   }, []);
+
+  const handleInputFocus = () => {
+    setTimeout(() => {
+      if (window.scrollY !== 0) {
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
+      scrollToBottom("smooth");
+    }, 100);
+  };
 
   // Live PII Detection
   const piiRegex = /(?:\+?91[\-\s]?)?[6-9]\d{9}|\b(7376|2[0-9])[A-Z0-9]{4,10}\b|[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|\b(dm me|contact me|whatsapp me|call me|text me|ping me|mail me)\b/i;
@@ -418,7 +434,10 @@ export default function Help() {
       {/* 2. SCROLLABLE CENTER MESSAGE FEED */}
       <div
         ref={feedContainerRef}
-        className="flex-1 p-3 sm:p-4 space-y-3 max-w-4xl w-full mx-auto"
+        className="flex-1 p-3 sm:p-4 space-y-3 max-w-4xl w-full mx-auto transition-all duration-200"
+        style={{
+          paddingBottom: keyboardHeight > 0 ? `${keyboardHeight + 96}px` : undefined,
+        }}
       >
         {loadingFeed ? (
           <div className="space-y-3 py-4">
@@ -520,7 +539,9 @@ export default function Help() {
       {/* 3. FLOATING BOTTOM INPUT CARD (Keyboard & Mobile Friendly) */}
       <div
         className="fixed bottom-3 sm:bottom-6 left-0 right-0 z-30 px-3 sm:px-4 max-w-4xl mx-auto w-full transition-all duration-200 pointer-events-none"
-        style={keyboardHeight > 0 ? { bottom: `${keyboardHeight + 8}px` } : {}}
+        style={{
+          bottom: keyboardHeight > 0 ? `${keyboardHeight + 8}px` : "calc(0.75rem + env(safe-area-inset-bottom, 0px))",
+        }}
       >
         <div className="pointer-events-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 p-2 sm:p-2.5 rounded-3xl shadow-2xl shadow-blue-900/15 dark:shadow-black/60 space-y-2">
           {msgError && (
@@ -542,7 +563,7 @@ export default function Help() {
               placeholder="Ask a doubt or send a message anonymously..."
               value={newMsg}
               onChange={(e) => setNewMsg(e.target.value)}
-              onFocus={() => setTimeout(() => scrollToBottom("smooth"), 150)}
+              onFocus={handleInputFocus}
               maxLength={1500}
               className="flex-1 px-4 py-2.5 sm:py-3 rounded-full bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
             />
@@ -567,7 +588,10 @@ export default function Help() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 250 }}
-              className="bg-white dark:bg-slate-900 w-full max-w-xl h-full shadow-2xl border-l border-slate-200 dark:border-slate-800 flex flex-col"
+              className="bg-white dark:bg-slate-900 w-full max-w-xl h-full shadow-2xl border-l border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-200"
+              style={{
+                paddingBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : undefined,
+              }}
             >
               {/* Thread Top Bar */}
               <div className="p-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0 bg-slate-50 dark:bg-slate-900">
@@ -665,6 +689,12 @@ export default function Help() {
                     placeholder="Reply to thread anonymously..."
                     value={threadInput}
                     onChange={(e) => setThreadInput(e.target.value)}
+                    onFocus={() => {
+                      setTimeout(() => {
+                        if (window.scrollY !== 0) window.scrollTo({ top: 0, behavior: "instant" });
+                        scrollThreadToBottom("smooth");
+                      }, 100);
+                    }}
                     maxLength={1500}
                     className="flex-1 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                   />
