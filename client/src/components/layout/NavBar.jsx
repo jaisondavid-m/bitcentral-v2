@@ -28,7 +28,6 @@ function Navbar() {
 
   const navItems = [
     { to: "/home", label: "Home" },
-    { to: "/help", label: "BIT Help" },
     ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
     { to: "/profile", label: "My Profile" },
     { to: "/about", label: "About" }
