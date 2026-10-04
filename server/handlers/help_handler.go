@@ -672,6 +672,57 @@ func (h *HelpHandler) SendMessage(c *gin.Context) {
 	})
 }
 
+// DELETE /api/help/messages/:id
+func (h *HelpHandler) DeleteOwnMessage(c *gin.Context) {
+	token := ExtractAuthToken(c)
+	uid, email, err := userFromToken(token)
+	if err != nil || uid == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	msgID := c.Param("id")
+	if msgID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Message ID is required"})
+		return
+	}
+
+	var senderUID string
+	err = h.DB.QueryRow(`SELECT sender_uid FROM help_messages WHERE id = ? AND is_removed = 0`, msgID).Scan(&senderUID)
+	if err == sql.ErrNoRows {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Message not found"})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		return
+	}
+
+	isAdmin := false
+	var role string
+	_ = h.DB.QueryRow(`SELECT role FROM users WHERE (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, uid, strings.ToLower(strings.TrimSpace(email))).Scan(&role)
+	r := strings.ToLower(strings.TrimSpace(role))
+	if r == "admin" || r == "superadmin" || r == "super_admin" {
+		isAdmin = true
+	}
+
+	if senderUID != uid && !isAdmin {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You can only delete your own messages unless you are an admin"})
+		return
+	}
+
+	_, err = h.DB.Exec(`UPDATE help_messages SET is_removed = 1 WHERE id = ?`, msgID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete message"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Message deleted successfully",
+	})
+}
+
 // POST /api/help/rooms/:id/resolve
 func (h *HelpHandler) ResolveRoom(c *gin.Context) {
 	token := ExtractAuthToken(c)
