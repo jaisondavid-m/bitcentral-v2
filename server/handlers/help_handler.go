@@ -1015,7 +1015,7 @@ func (h *HelpHandler) AdminGetMessages(c *gin.Context) {
 		(SELECT COUNT(*) FROM help_messages r WHERE r.parent_id = m.id AND r.is_removed = 0) as reply_count
 		FROM help_messages m
 		ORDER BY m.created_at DESC
-		LIMIT 200
+		LIMIT 500
 	`)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch admin messages"})
