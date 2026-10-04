@@ -141,6 +141,8 @@ export default function FloatingMenu() {
     navigate("/support-dev");
   };
 
+  const isHelpPage = location.pathname === "/help";
+
   return (
     <>
       {/* Motivational Toast Pill when Admin replies */}
@@ -151,7 +153,7 @@ export default function FloatingMenu() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.9 }}
             onClick={handleOpenChat}
-            className="fixed bottom-[5.75rem] right-6 z-40 flex items-center gap-2 rounded-full bg-gradient-to-r from-red-600 to-rose-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-lg shadow-red-500/40 hover:from-red-700 hover:to-rose-700 transition-all cursor-pointer border border-red-400/50 group"
+            className={`fixed ${isHelpPage ? "bottom-[11.5rem] sm:bottom-[12.5rem]" : "bottom-[5.75rem]"} right-6 z-40 flex items-center gap-2 rounded-full bg-gradient-to-r from-red-600 to-rose-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-lg shadow-red-500/40 hover:from-red-700 hover:to-rose-700 transition-all cursor-pointer border border-red-400/50 group`}
           >
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
@@ -177,7 +179,7 @@ export default function FloatingMenu() {
             />
 
             {/* Menu options container stacked neatly above main FAB */}
-            <div className="fixed bottom-[5.75rem] right-6 z-40 flex flex-col items-end gap-3.5 pointer-events-auto">
+            <div className={`fixed ${isHelpPage ? "bottom-[11.5rem] sm:bottom-[12.5rem]" : "bottom-[5.75rem]"} right-6 z-40 flex flex-col items-end gap-3.5 pointer-events-auto`}>
               {/* BitBot AI Assistant */}
               <motion.div
                 initial={{ opacity: 0, y: 15, scale: 0.8 }}
@@ -251,7 +253,6 @@ export default function FloatingMenu() {
                 </div>
               </motion.div>
 
-
               {/* 1. Home Button (Bottom-most above main fab) */}
               <motion.div
                 initial={{ opacity: 0, y: 15, scale: 0.8 }}
@@ -286,7 +287,7 @@ export default function FloatingMenu() {
         animate={{ scale: 1 }}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-6 z-40 flex items-center justify-center h-14 w-14 rounded-full text-white bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 shadow-xl shadow-blue-600/35 border border-blue-400/30 hover:from-blue-700 hover:to-indigo-800 transition-all cursor-pointer group"
+        className={`fixed ${isHelpPage ? "bottom-28 sm:bottom-32" : "bottom-6"} right-6 z-40 flex items-center justify-center h-14 w-14 rounded-full text-white bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 shadow-xl shadow-blue-600/35 border border-blue-400/30 hover:from-blue-700 hover:to-indigo-800 transition-all cursor-pointer group`}
         aria-label="Toggle Quick Navigation Menu"
       >
         {/* Subtle Ping Ring */}

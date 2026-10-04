@@ -64,6 +64,30 @@ export default function Help() {
   const [blockTargetLabel, setBlockTargetLabel] = useState("");
   const [submittingBlock, setSubmittingBlock] = useState(false);
 
+  // Mobile Visual Viewport & Keyboard Height Handling
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.visualViewport) return;
+
+    const handleViewportChange = () => {
+      const vv = window.visualViewport;
+      const heightDiff = window.innerHeight - vv.height;
+      if (heightDiff > 80) {
+        setKeyboardHeight(heightDiff);
+      } else {
+        setKeyboardHeight(0);
+      }
+    };
+
+    window.visualViewport.addEventListener("resize", handleViewportChange);
+    window.visualViewport.addEventListener("scroll", handleViewportChange);
+    return () => {
+      window.visualViewport.removeEventListener("resize", handleViewportChange);
+      window.visualViewport.removeEventListener("scroll", handleViewportChange);
+    };
+  }, []);
+
   // Live PII Detection
   const piiRegex = /(?:\+?91[\-\s]?)?[6-9]\d{9}|\b(7376|2[0-9])[A-Z0-9]{4,10}\b|[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|\b(dm me|contact me|whatsapp me|call me|text me|ping me|mail me)\b/i;
   const hasPiiInMain = useMemo(() => piiRegex.test(newMsg), [newMsg]);
@@ -283,10 +307,10 @@ export default function Help() {
   };
 
   return (
-    <div className="h-[calc(100dvh-4rem)] flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-hidden transition-colors">
+    <div className="min-h-[calc(100dvh-4rem)] flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors relative pb-28 sm:pb-32">
       
-      {/* 1. FIXED TOP HEADER BAR (WhatsApp / Telegram style) */}
-      <div className="shrink-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 shadow-sm z-10 space-y-2">
+      {/* 1. FIXED TOP HEADER BAR */}
+      <div className="sticky top-0 shrink-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-2.5 shadow-sm z-20 space-y-2">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center gap-2">
@@ -353,10 +377,10 @@ export default function Help() {
         </AnimatePresence>
       </div>
 
-      {/* 2. SCROLLABLE CENTER MESSAGE FEED (Oldest at top -> Newest at bottom) */}
+      {/* 2. SCROLLABLE CENTER MESSAGE FEED */}
       <div
         ref={feedContainerRef}
-        className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 max-w-4xl w-full mx-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700"
+        className="flex-1 p-3 sm:p-4 space-y-3 max-w-4xl w-full mx-auto"
       >
         {loadingFeed ? (
           <div className="space-y-3 py-4">
@@ -374,7 +398,7 @@ export default function Help() {
             <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold">
               {searchQuery ? "No messages found matching your search." : "No posts in the help chat feed yet."}
             </p>
-            <p className="text-slate-400 text-[11px]">Type a doubt in the input bar below to start the conversation!</p>
+            <p className="text-slate-400 text-[11px]">Type a doubt in the floating input bar below to start the conversation!</p>
           </div>
         ) : (
           filteredMessages.map((m) => (
@@ -458,17 +482,20 @@ export default function Help() {
         )}
       </div>
 
-      {/* 3. FIXED BOTTOM INPUT BAR (WhatsApp / Mobile Virtual Keyboard Friendly) */}
-      <div className="shrink-0 sticky bottom-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 p-2.5 sm:p-3 pb-safe shadow-lg">
-        <div className="max-w-4xl mx-auto space-y-2">
+      {/* 3. FLOATING BOTTOM INPUT CARD (Keyboard & Mobile Friendly) */}
+      <div
+        className="fixed bottom-3 sm:bottom-6 left-0 right-0 z-30 px-3 sm:px-4 max-w-4xl mx-auto w-full transition-all duration-200 pointer-events-none"
+        style={keyboardHeight > 0 ? { bottom: `${keyboardHeight + 8}px` } : {}}
+      >
+        <div className="pointer-events-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 p-2 sm:p-2.5 rounded-3xl shadow-2xl shadow-blue-900/15 dark:shadow-black/60 space-y-2">
           {msgError && (
-            <div className="p-2 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 text-red-600 text-xs">
+            <div className="p-2 rounded-2xl bg-red-50 dark:bg-red-950/50 border border-red-200 text-red-600 text-xs">
               {msgError}
             </div>
           )}
 
           {hasPiiInMain && (
-            <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 text-amber-700 dark:text-amber-400 text-xs flex items-center gap-1.5">
+            <div className="p-2 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 text-amber-700 dark:text-amber-400 text-xs flex items-center gap-1.5">
               <AlertCircle className="w-3.5 h-3.5 shrink-0" />
               <span>Please remove contact numbers, emails, or roll numbers before sending.</span>
             </div>
@@ -480,13 +507,14 @@ export default function Help() {
               placeholder="Ask a doubt or send a message anonymously..."
               value={newMsg}
               onChange={(e) => setNewMsg(e.target.value)}
+              onFocus={() => setTimeout(() => scrollToBottom("smooth"), 150)}
               maxLength={1500}
-              className="flex-1 px-4 py-2.5 sm:py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+              className="flex-1 px-4 py-2.5 sm:py-3 rounded-full bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
             />
             <button
               type="submit"
               disabled={sendingMsg || !newMsg.trim() || hasPiiInMain}
-              className="p-2.5 sm:px-5 sm:py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer shrink-0"
+              className="p-3 sm:px-6 sm:py-3 rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition-all cursor-pointer shrink-0"
             >
               <Send className="w-4 h-4" />
               <span className="hidden sm:inline">Send</span>
