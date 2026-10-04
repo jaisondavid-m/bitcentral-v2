@@ -25,6 +25,7 @@ import {
   deleteHelpMessage,
   submitHelpReport,
   blockHelpUser,
+  adminBlockHelpUserMessage,
 } from "@/api/help.js";
 
 export default function Help() {
@@ -287,6 +288,43 @@ export default function Help() {
     }
   };
 
+  // Admin Block & Ban User (Deletes clicked message & bans user from future messaging, leaving past messages intact)
+  const handleAdminBlockUser = async (msgId, isThreadReply = false) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to block this user from BIT Help? They will be permanently banned from sending future messages. This message will be deleted, but their previous past messages will remain safe."
+      )
+    ) {
+      return;
+    }
+    haptics.action();
+    try {
+      await adminBlockHelpUserMessage(msgId, "Blocked by Admin from chat message");
+      haptics.success();
+      alert("User has been permanently blocked from BIT Help and message deleted.");
+      if (isThreadReply) {
+        setThreadReplies((prev) => prev.filter((m) => m.id !== msgId));
+        if (activeThreadParent) {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === activeThreadParent.id
+                ? { ...m, reply_count: Math.max(0, (m.reply_count || 1) - 1) }
+                : m
+            )
+          );
+        }
+      } else {
+        setMessages((prev) => prev.filter((m) => m.id !== msgId));
+        if (activeThreadParent && activeThreadParent.id === msgId) {
+          setActiveThreadParent(null);
+        }
+      }
+    } catch (err) {
+      haptics.error();
+      alert(err.message || "Failed to block user");
+    }
+  };
+
   // Block User
   const handleBlockUserSubmit = async () => {
     if (!blockTargetLabel) return;
@@ -452,28 +490,25 @@ export default function Help() {
                     </button>
                   ) : null}
                   {!m.is_mine && (
-                    <>
-                      <button
-                        onClick={() => {
-                          setReportTarget({ type: "MESSAGE", id: m.id });
-                          setShowReportModal(true);
-                        }}
-                        className="hover:text-amber-500 p-1 cursor-pointer"
-                        title="Report Message"
-                      >
-                        <Flag className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setBlockTargetLabel(m.anon_label);
-                          setShowBlockModal(true);
-                        }}
-                        className="hover:text-red-500 p-1 cursor-pointer"
-                        title="Block User"
-                      >
-                        <UserX className="w-3.5 h-3.5" />
-                      </button>
-                    </>
+                    <button
+                      onClick={() => {
+                        setReportTarget({ type: "MESSAGE", id: m.id });
+                        setShowReportModal(true);
+                      }}
+                      className="hover:text-amber-500 p-1 cursor-pointer text-slate-400"
+                      title="Report Message"
+                    >
+                      <Flag className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                  {isAdmin && !m.is_mine && (
+                    <button
+                      onClick={() => handleAdminBlockUser(m.id, false)}
+                      className="hover:text-red-600 p-1 cursor-pointer text-red-500"
+                      title="Block & Ban User (Admin Only)"
+                    >
+                      <UserX className="w-3.5 h-3.5" />
+                    </button>
                   )}
                 </div>
               </div>
@@ -593,6 +628,15 @@ export default function Help() {
                             title={isAdmin && !r.is_mine ? "Delete Reply (Admin)" : "Delete My Reply"}
                           >
                             <Trash2 className="w-3 h-3" />
+                          </button>
+                        )}
+                        {isAdmin && !r.is_mine && (
+                          <button
+                            onClick={() => handleAdminBlockUser(r.id, true)}
+                            className="hover:text-red-600 text-red-500 ml-1 transition-colors cursor-pointer"
+                            title="Block & Ban User (Admin Only)"
+                          >
+                            <UserX className="w-3 h-3" />
                           </button>
                         )}
                       </div>

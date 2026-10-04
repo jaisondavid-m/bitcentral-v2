@@ -72,6 +72,12 @@ export const blockHelpUser = async (roomId, targetAnonLabel) => {
   return res.data;
 };
 
+export const adminBlockHelpUserMessage = async (messageId, reason = "Blocked by Admin from chat") => {
+  const headers = await getAuthenticatedHeaders();
+  const res = await api.post("/api/help/block-message", { message_id: messageId, reason }, { headers });
+  return res.data;
+};
+
 export const getMyHelpData = async () => {
   const headers = await getAuthenticatedHeaders();
   const res = await api.get("/api/help/my", { headers });
