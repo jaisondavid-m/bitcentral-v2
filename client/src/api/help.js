@@ -92,6 +92,12 @@ export const getAdminHelpStats = async () => {
   return res.data;
 };
 
+export const getAdminHelpMessages = async () => {
+  const headers = await getAuthenticatedHeaders();
+  const res = await api.get("/admin/help/messages", { headers });
+  return res.data;
+};
+
 export const getAdminHelpRooms = async () => {
   const headers = await getAuthenticatedHeaders();
   const res = await api.get("/admin/help/rooms", { headers });
