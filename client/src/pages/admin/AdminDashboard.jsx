@@ -431,6 +431,7 @@ function getAdminTabFromPath(pathname) {
   if (pathname.startsWith("/admin/leaves")) return "leaves";
   if (pathname.startsWith("/admin/notifications")) return "notifications";
   if (pathname.startsWith("/admin/lost-found")) return "lost-found";
+  if (pathname.startsWith("/admin/help")) return "help";
   if (pathname.startsWith("/admin/feedback")) return "feedback";
   if (pathname.startsWith("/admin/mail-sender") || pathname.startsWith("/admin/mail")) return "mail";
   if (pathname.startsWith("/admin/ai-key")) return "ai-key";
@@ -7269,6 +7270,10 @@ function AdminLostFoundPage() {
   return <AdminDashboard initialTab="lost-found" />;
 }
 
+function AdminHelpPageRoute() {
+  return <AdminDashboard initialTab="help" />;
+}
+
 function AdminFeedbackPageRoute() {
   return <AdminDashboard initialTab="feedback" />;
 }
@@ -7294,6 +7299,7 @@ export {
   AdminLeavesPage,
   AdminNotificationsPage,
   AdminLostFoundPage,
+  AdminHelpPageRoute as AdminHelpPage,
   AdminFeedbackPageRoute as AdminFeedbackPage,
   AdminAIKeyPage,
   AdminMailSenderPage,
