@@ -36,6 +36,12 @@ export const postHelpMessage = async (content, parentId = "") => {
   return res.data;
 };
 
+export const deleteHelpMessage = async (messageId) => {
+  const headers = await getAuthenticatedHeaders();
+  const res = await api.delete(`/api/help/messages/${messageId}`, { headers });
+  return res.data;
+};
+
 export const getHelpMessages = async (roomId) => {
   const headers = await getAuthenticatedHeaders();
   const res = await api.get(`/api/help/rooms/${roomId}/messages`, { headers });

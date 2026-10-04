@@ -15,18 +15,22 @@ import {
   Search,
   CornerDownRight,
   Info,
+  Trash2,
 } from "lucide-react";
 import { useAuth } from "@/context/StudentContext.jsx";
 import { haptics } from "@/utils/haptics.js";
 import {
   getHelpFeed,
   postHelpMessage,
+  deleteHelpMessage,
   submitHelpReport,
   blockHelpUser,
 } from "@/api/help.js";
 
 export default function Help() {
   const { user } = useAuth();
+  const userRole = (user?.role || "").toLowerCase().trim();
+  const isAdmin = userRole === "admin" || userRole === "superadmin" || userRole === "super_admin";
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState("");
@@ -229,6 +233,36 @@ export default function Help() {
     }
   };
 
+  // Delete My Message
+  const handleDeleteMyMessage = async (msgId, isThreadReply = false) => {
+    if (!window.confirm("Are you sure you want to delete this message?")) return;
+    haptics.action();
+    try {
+      await deleteHelpMessage(msgId);
+      haptics.success();
+      if (isThreadReply) {
+        setThreadReplies((prev) => prev.filter((m) => m.id !== msgId));
+        if (activeThreadParent) {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === activeThreadParent.id
+                ? { ...m, reply_count: Math.max(0, (m.reply_count || 1) - 1) }
+                : m
+            )
+          );
+        }
+      } else {
+        setMessages((prev) => prev.filter((m) => m.id !== msgId));
+        if (activeThreadParent && activeThreadParent.id === msgId) {
+          setActiveThreadParent(null);
+        }
+      }
+    } catch (err) {
+      haptics.error();
+      alert(err.message || "Failed to delete message");
+    }
+  };
+
   // Block User
   const handleBlockUserSubmit = async () => {
     if (!blockTargetLabel) return;
@@ -384,6 +418,15 @@ export default function Help() {
                 </button>
 
                 <div className="flex items-center gap-2 text-slate-400">
+                  {m.is_mine || isAdmin ? (
+                    <button
+                      onClick={() => handleDeleteMyMessage(m.id, false)}
+                      className="hover:text-red-500 p-1 transition-colors cursor-pointer text-slate-400"
+                      title={isAdmin && !m.is_mine ? "Delete Message (Admin)" : "Delete My Message"}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  ) : null}
                   {!m.is_mine && (
                     <>
                       <button
@@ -391,7 +434,7 @@ export default function Help() {
                           setReportTarget({ type: "MESSAGE", id: m.id });
                           setShowReportModal(true);
                         }}
-                        className="hover:text-amber-500 p-1"
+                        className="hover:text-amber-500 p-1 cursor-pointer"
                         title="Report Message"
                       >
                         <Flag className="w-3.5 h-3.5" />
@@ -401,7 +444,7 @@ export default function Help() {
                           setBlockTargetLabel(m.anon_label);
                           setShowBlockModal(true);
                         }}
-                        className="hover:text-red-500 p-1"
+                        className="hover:text-red-500 p-1 cursor-pointer"
                         title="Block User"
                       >
                         <UserX className="w-3.5 h-3.5" />
@@ -515,6 +558,15 @@ export default function Help() {
                         <span className="font-semibold text-slate-700 dark:text-slate-300">{r.anon_label}</span>
                         <span>•</span>
                         <span>{new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                        {(r.is_mine || isAdmin) && (
+                          <button
+                            onClick={() => handleDeleteMyMessage(r.id, true)}
+                            className="hover:text-red-500 text-slate-400 ml-1 transition-colors cursor-pointer"
+                            title={isAdmin && !r.is_mine ? "Delete Reply (Admin)" : "Delete My Reply"}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        )}
                       </div>
                       <div
                         className={`p-3 rounded-2xl max-w-[90%] text-sm leading-relaxed whitespace-pre-wrap ${

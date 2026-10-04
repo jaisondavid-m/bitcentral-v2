@@ -194,6 +194,7 @@ func SetupRouter(
 		// BIT Help Student API (Single Feed & Threads)
 		api.GET("/api/help/messages", helpHandler.GetMessages)
 		api.POST("/api/help/messages", helpHandler.SendMessage)
+		api.DELETE("/api/help/messages/:id", helpHandler.DeleteOwnMessage)
 		api.GET("/api/help/rooms", helpHandler.GetRooms)
 		api.POST("/api/help/rooms", helpHandler.CreateRoom)
 		api.GET("/api/help/rooms/:id", helpHandler.GetRoomByID)
