@@ -187,33 +187,27 @@ export default function AdminHelpPage() {
 
   return (
     <div className="space-y-6 p-4 sm:p-6 max-w-7xl mx-auto">
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-slate-900 text-white p-6 sm:p-8 shadow-2xl border border-slate-800">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-indigo-600/10 to-transparent pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-400/30">
-              <Shield className="w-3 h-3 text-blue-400" /> Moderation Control Panel
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight mt-2">
-              BIT Help Administration
-            </h2>
-            <p className="text-slate-400 text-xs sm:text-sm mt-1 max-w-2xl">
-              Inspect live chat feed & threads, unmask real student identities for moderation, audit user flag reports, and enforce BIT Help bans.
-            </p>
-          </div>
-          <button
-            onClick={() => {
-              fetchStats();
-              if (activeTab === "messages") fetchMessages();
-              else if (activeTab === "reports") fetchReports();
-              else if (activeTab === "restrictions") fetchRestrictions();
-            }}
-            className="px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/10 flex items-center gap-2 cursor-pointer shrink-0"
-          >
-            <RefreshCw className="w-4 h-4" /> Refresh Data
-          </button>
+      {/* Clean Page Title Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" /> BIT Help Moderation
+          </h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Inspect all messages, view unmasked student identities, audit reports, and manage bans.
+          </p>
         </div>
+        <button
+          onClick={() => {
+            fetchStats();
+            if (activeTab === "messages") fetchMessages();
+            else if (activeTab === "reports") fetchReports();
+            else if (activeTab === "restrictions") fetchRestrictions();
+          }}
+          className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all border border-slate-200 dark:border-slate-800 flex items-center gap-2 cursor-pointer shadow-sm shrink-0"
+        >
+          <RefreshCw className="w-3.5 h-3.5" /> Refresh Data
+        </button>
       </div>
 
       {/* KPI Stats Grid */}
