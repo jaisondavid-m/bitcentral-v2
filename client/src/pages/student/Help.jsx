@@ -292,7 +292,7 @@ export default function Help() {
   const handleAdminBlockUser = async (msgId, isThreadReply = false) => {
     if (
       !window.confirm(
-        "Are you sure you want to block this user from BIT Help? They will be permanently banned from sending future messages. This message will be deleted, but their previous past messages will remain safe."
+        "Are you sure you want to block this user from BIT Connect? They will be permanently banned from sending future messages. This message will be deleted, but their previous past messages will remain safe."
       )
     ) {
       return;
@@ -301,7 +301,7 @@ export default function Help() {
     try {
       await adminBlockHelpUserMessage(msgId, "Blocked by Admin from chat message");
       haptics.success();
-      alert("User has been permanently blocked from BIT Help and message deleted.");
+      alert("User has been permanently blocked from BIT Connect and message deleted.");
       if (isThreadReply) {
         setThreadReplies((prev) => prev.filter((m) => m.id !== msgId));
         if (activeThreadParent) {
@@ -352,7 +352,7 @@ export default function Help() {
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center gap-2">
-              BIT Help
+              BIT Connect
             </h1>
             <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900">
               <Lock className="w-3 h-3" /> Anonymous

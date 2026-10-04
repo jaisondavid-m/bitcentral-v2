@@ -296,7 +296,7 @@ export default function AdminHelpPage() {
     try {
       await adminBlockHelpUserMessage(blockModal.msgId, "Blocked by Admin from Help Moderation Page");
       setMessages((prev) => prev.map((m) => (m.id === blockModal.msgId ? { ...m, is_removed: true } : m)));
-      showToast(`User ${blockModal.studentName} banned from BIT Help`);
+      showToast(`User ${blockModal.studentName} banned from BIT Connect`);
       fetchStats();
     } catch (err) {
       showToast(err.message || "Failed to block user");
@@ -356,7 +356,7 @@ export default function AdminHelpPage() {
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center gap-2">
-              <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" /> BIT Help Admin
+              <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" /> BIT Connect Admin
             </h1>
             <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900">
               Moderator Panel
@@ -780,8 +780,8 @@ export default function AdminHelpPage() {
         <div className="space-y-4 max-w-4xl mx-auto w-full p-4">
           <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">BIT Help Restrictions</h3>
-              <p className="text-xs text-slate-400">Manage students restricted from posting or replying in BIT Help.</p>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">BIT Connect Restrictions</h3>
+              <p className="text-xs text-slate-400">Manage students restricted from posting or replying in BIT Connect.</p>
             </div>
             <button
               onClick={() => setShowBanModal(true)}
@@ -902,7 +902,7 @@ export default function AdminHelpPage() {
                   <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Block & Ban Student</h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     Ban <strong className="text-slate-900 dark:text-slate-100">{blockModal.studentName}</strong>{" "}
-                    {blockModal.studentReg ? `(${blockModal.studentReg})` : blockModal.studentEmail} from BIT Help?
+                    {blockModal.studentReg ? `(${blockModal.studentReg})` : blockModal.studentEmail} from BIT Connect?
                   </p>
                   <p className="text-[11px] text-red-600 dark:text-red-400 mt-2 bg-red-50 dark:bg-red-950/40 p-2.5 rounded-xl border border-red-200 dark:border-red-900/40 leading-relaxed">
                     This student will be permanently banned from sending future messages. This message will be deleted, but past previous messages remain safe.
@@ -933,7 +933,7 @@ export default function AdminHelpPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
           <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 max-w-md w-full space-y-4 shadow-2xl">
             <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <ShieldAlert className="w-5 h-5 text-red-500" /> Restrict Student from BIT Help
+              <ShieldAlert className="w-5 h-5 text-red-500" /> Restrict Student from BIT Connect
             </h3>
 
             <form onSubmit={handleSaveRestriction} className="space-y-3 text-xs">

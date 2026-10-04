@@ -355,12 +355,12 @@ const ADMIN_TABS = [
   },
   {
     key: "help",
-    label: "BIT Help",
+    label: "BIT Connect",
     href: "/admin/help",
     icon: HelpCircle,
     gradient: "from-indigo-600 to-blue-600",
     badge: "Anonymous Doubts",
-    description: "Inspect student doubt requests, chat transcripts, reports, user real identities, and manage help bans.",
+    description: "Inspect student doubt requests, chat feed, thread replies, reports, user real identities, and manage bans.",
   },
   {
     key: "feedback",
