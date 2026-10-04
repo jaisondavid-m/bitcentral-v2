@@ -117,6 +117,7 @@ func InitMySQL() {
 	createCollegeLeavesTable()
 	createNotificationsTables()
 	createLostFoundTables()
+	createHelpTables()
 }
 
 func createAdminsTable() {
@@ -1131,3 +1132,127 @@ func createLostFoundTables() {
 		log.Println("✅ lost_found_claims table ready")
 	}
 }
+
+func createHelpTables() {
+	queryRooms := `
+	CREATE TABLE IF NOT EXISTS help_rooms (
+		id VARCHAR(64) PRIMARY KEY,
+		creator_uid VARCHAR(128) NOT NULL,
+		creator_anon_label VARCHAR(64) NOT NULL,
+		title VARCHAR(255) NOT NULL,
+		content TEXT NOT NULL,
+		category VARCHAR(64) NOT NULL,
+		status VARCHAR(32) NOT NULL DEFAULT 'OPEN',
+		views_count INT NOT NULL DEFAULT 0,
+		responses_count INT NOT NULL DEFAULT 0,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		INDEX idx_category (category),
+		INDEX idx_status_created (status, created_at),
+		INDEX idx_creator_uid (creator_uid)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(queryRooms); err != nil {
+		log.Printf("ℹ️ help_rooms table notice: %v", err)
+	} else {
+		log.Println("✅ help_rooms table ready")
+	}
+
+	queryParticipants := `
+	CREATE TABLE IF NOT EXISTS help_participants (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		room_id VARCHAR(64) NOT NULL,
+		user_uid VARCHAR(128) NOT NULL,
+		anon_label VARCHAR(64) NOT NULL,
+		joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		UNIQUE KEY uk_room_user (room_id, user_uid),
+		INDEX idx_room_id (room_id)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(queryParticipants); err != nil {
+		log.Printf("ℹ️ help_participants table notice: %v", err)
+	} else {
+		log.Println("✅ help_participants table ready")
+	}
+
+	queryMessages := `
+	CREATE TABLE IF NOT EXISTS help_messages (
+		id VARCHAR(64) PRIMARY KEY,
+		parent_id VARCHAR(64) NULL,
+		room_id VARCHAR(64) NOT NULL DEFAULT 'main',
+		sender_uid VARCHAR(128) NOT NULL,
+		anon_label VARCHAR(64) NOT NULL,
+		content TEXT NOT NULL,
+		is_system TINYINT(1) DEFAULT 0,
+		is_removed TINYINT(1) DEFAULT 0,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		INDEX idx_room_created (room_id, created_at),
+		INDEX idx_parent_created (parent_id, created_at),
+		INDEX idx_sender_uid (sender_uid)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(queryMessages); err != nil {
+		log.Printf("ℹ️ help_messages table notice: %v", err)
+	} else {
+		log.Println("✅ help_messages table ready")
+	}
+	_, _ = DB.Exec("ALTER TABLE help_messages ADD COLUMN parent_id VARCHAR(64) NULL AFTER id")
+	_, _ = DB.Exec("ALTER TABLE help_messages ADD INDEX idx_parent_created (parent_id, created_at)")
+
+	queryReports := `
+	CREATE TABLE IF NOT EXISTS help_reports (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		reporter_uid VARCHAR(128) NOT NULL,
+		target_type VARCHAR(32) NOT NULL,
+		target_id VARCHAR(64) NOT NULL,
+		reason VARCHAR(64) NOT NULL,
+		details TEXT NULL,
+		status VARCHAR(32) NOT NULL DEFAULT 'PENDING',
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		INDEX idx_status (status),
+		INDEX idx_target (target_type, target_id)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(queryReports); err != nil {
+		log.Printf("ℹ️ help_reports table notice: %v", err)
+	} else {
+		log.Println("✅ help_reports table ready")
+	}
+
+	queryBlocks := `
+	CREATE TABLE IF NOT EXISTS help_blocks (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		blocker_uid VARCHAR(128) NOT NULL,
+		blocked_uid VARCHAR(128) NOT NULL,
+		room_id VARCHAR(64) NULL,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		UNIQUE KEY uk_blocker_blocked (blocker_uid, blocked_uid),
+		INDEX idx_blocker (blocker_uid),
+		INDEX idx_blocked (blocked_uid)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(queryBlocks); err != nil {
+		log.Printf("ℹ️ help_blocks table notice: %v", err)
+	} else {
+		log.Println("✅ help_blocks table ready")
+	}
+
+	queryRestrictions := `
+	CREATE TABLE IF NOT EXISTS help_user_restrictions (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		user_uid VARCHAR(128) NOT NULL,
+		status VARCHAR(32) NOT NULL DEFAULT 'BLOCKED',
+		reason TEXT NULL,
+		created_by VARCHAR(128) NOT NULL,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		expires_at DATETIME NULL,
+		INDEX idx_user_status (user_uid, status)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+
+	if _, err := DB.Exec(queryRestrictions); err != nil {
+		log.Printf("ℹ️ help_user_restrictions table notice: %v", err)
+	} else {
+		log.Println("✅ help_user_restrictions table ready")
+	}
+}
+

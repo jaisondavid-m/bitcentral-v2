@@ -57,6 +57,7 @@ func main() {
 	internalMarksHandler := handlers.NewInternalMarksHandler()
 	notificationHandler := handlers.NewNotificationHandler()
 	lostFoundHandler := handlers.NewLostFoundHandler()
+	helpHandler := handlers.NewHelpHandler()
 
 	r := routes.SetupRouter(
 		sheetHandler,
@@ -81,6 +82,7 @@ func main() {
 		internalMarksHandler,
 		notificationHandler,
 		lostFoundHandler,
+		helpHandler,
 	)
 	r.Static("/pdfs", "./pdfs")
 
