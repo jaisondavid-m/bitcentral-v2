@@ -996,9 +996,9 @@ func (h *HelpHandler) GetMyHelpData(c *gin.Context) {
 // GET /api/admin/help/stats
 func (h *HelpHandler) AdminGetStats(c *gin.Context) {
 	stats := models.HelpStatsDTO{}
-	_ = h.DB.QueryRow(`SELECT COUNT(*) FROM help_rooms`).Scan(&stats.TotalRequests)
-	_ = h.DB.QueryRow(`SELECT COUNT(*) FROM help_rooms WHERE status = 'OPEN'`).Scan(&stats.ActiveRequests)
-	_ = h.DB.QueryRow(`SELECT COUNT(*) FROM help_messages`).Scan(&stats.TotalMessages)
+	_ = h.DB.QueryRow(`SELECT COUNT(*) FROM help_messages WHERE is_removed = 0`).Scan(&stats.TotalMessages)
+	_ = h.DB.QueryRow(`SELECT COUNT(*) FROM help_messages WHERE (parent_id = '' OR parent_id IS NULL) AND is_removed = 0`).Scan(&stats.TotalRequests) // Main feed posts
+	_ = h.DB.QueryRow(`SELECT COUNT(*) FROM help_messages WHERE parent_id != '' AND is_removed = 0`).Scan(&stats.ActiveRequests)                     // Thread replies
 	_ = h.DB.QueryRow(`SELECT COUNT(*) FROM help_reports WHERE status = 'PENDING'`).Scan(&stats.PendingReports)
 	_ = h.DB.QueryRow(`SELECT COUNT(*) FROM help_user_restrictions WHERE status IN ('BLOCKED', 'TEMPORARY_BLOCK')`).Scan(&stats.RestrictedUsers)
 
@@ -1008,40 +1008,47 @@ func (h *HelpHandler) AdminGetStats(c *gin.Context) {
 	})
 }
 
-// GET /api/admin/help/rooms
-func (h *HelpHandler) AdminGetRooms(c *gin.Context) {
-	rows, err := h.DB.Query(`SELECT id, creator_uid, creator_anon_label, title, content, category, status, views_count, responses_count, created_at FROM help_rooms ORDER BY created_at DESC LIMIT 50`)
+// GET /api/admin/help/messages
+func (h *HelpHandler) AdminGetMessages(c *gin.Context) {
+	rows, err := h.DB.Query(`
+		SELECT m.id, COALESCE(m.parent_id, ''), COALESCE(m.room_id, ''), m.sender_uid, m.anon_label, m.content, m.is_system, m.is_removed, m.created_at,
+		(SELECT COUNT(*) FROM help_messages r WHERE r.parent_id = m.id AND r.is_removed = 0) as reply_count
+		FROM help_messages m
+		ORDER BY m.created_at DESC
+		LIMIT 200
+	`)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch admin rooms"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch admin messages"})
 		return
 	}
 	defer rows.Close()
 
-	rooms := []models.AdminHelpRoomDTO{}
+	messages := []models.AdminHelpMessageDTO{}
 	for rows.Next() {
-		var r models.HelpRoom
-		if err := rows.Scan(&r.ID, &r.CreatorUID, &r.CreatorAnonLabel, &r.Title, &r.Content, &r.Category, &r.Status, &r.ViewsCount, &r.ResponsesCount, &r.CreatedAt); err != nil {
+		var m models.HelpMessage
+		var replyCount int
+		if err := rows.Scan(&m.ID, &m.ParentID, &m.RoomID, &m.SenderUID, &m.AnonLabel, &m.Content, &m.IsSystem, &m.IsRemoved, &m.CreatedAt, &replyCount); err != nil {
 			continue
 		}
-		creator := h.loadUserIdentity(r.CreatorUID)
-		dto := models.AdminHelpRoomDTO{
-			ID:             r.ID,
-			Title:          r.Title,
-			Content:        r.Content,
-			Category:       r.Category,
-			Status:         r.Status,
-			ViewsCount:     r.ViewsCount,
-			ResponsesCount: r.ResponsesCount,
-			AnonLabel:      r.CreatorAnonLabel,
-			CreatedAt:      r.CreatedAt,
-			Creator:        creator,
+		sender := h.loadUserIdentity(m.SenderUID)
+		dto := models.AdminHelpMessageDTO{
+			ID:         m.ID,
+			ParentID:   m.ParentID,
+			RoomID:     m.RoomID,
+			AnonLabel:  m.AnonLabel,
+			Content:    m.Content,
+			IsSystem:   m.IsSystem,
+			IsRemoved:  m.IsRemoved,
+			ReplyCount: replyCount,
+			CreatedAt:  m.CreatedAt,
+			Sender:     sender,
 		}
-		rooms = append(rooms, dto)
+		messages = append(messages, dto)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"data":    rooms,
+		"data":    messages,
 	})
 }
 
@@ -1164,23 +1171,25 @@ func (h *HelpHandler) AdminGetReports(c *gin.Context) {
 		if err := rows.Scan(&rep.ID, &rep.ReporterUID, &rep.TargetType, &rep.TargetID, &rep.Reason, &rep.Details, &rep.Status, &rep.CreatedAt); err == nil {
 			reporter := h.loadUserIdentity(rep.ReporterUID)
 
-			snippet := ""
-			if rep.TargetType == "MESSAGE" {
-				_ = h.DB.QueryRow(`SELECT content FROM help_messages WHERE id = ?`, rep.TargetID).Scan(&snippet)
-			} else if rep.TargetType == "ROOM" {
-				_ = h.DB.QueryRow(`SELECT title FROM help_rooms WHERE id = ?`, rep.TargetID).Scan(&snippet)
+			var targetMessageContent, targetSenderUID, targetAnonLabel string
+			if rep.TargetID != "" {
+				_ = h.DB.QueryRow(`SELECT content, sender_uid, anon_label FROM help_messages WHERE id = ?`, rep.TargetID).Scan(&targetMessageContent, &targetSenderUID, &targetAnonLabel)
 			}
+			targetUser := h.loadUserIdentity(targetSenderUID)
 
 			reports = append(reports, models.AdminHelpReportDTO{
-				ID:         rep.ID,
-				Reporter:   reporter,
-				TargetType: rep.TargetType,
-				TargetID:   rep.TargetID,
-				Reason:     rep.Reason,
-				Details:    rep.Details,
-				Status:     rep.Status,
-				CreatedAt:  rep.CreatedAt,
-				Snippet:    snippet,
+				ID:            rep.ID,
+				Reporter:      reporter,
+				TargetType:    rep.TargetType,
+				TargetID:      rep.TargetID,
+				TargetContent: targetMessageContent,
+				TargetUser:    targetUser,
+				TargetLabel:   targetAnonLabel,
+				Reason:        rep.Reason,
+				Details:       rep.Details,
+				Status:        rep.Status,
+				CreatedAt:     rep.CreatedAt,
+				Snippet:       targetMessageContent,
 			})
 		}
 	}
@@ -1226,13 +1235,13 @@ func (h *HelpHandler) AdminGetRestrictions(c *gin.Context) {
 	}
 	defer rows.Close()
 
-	list := []models.AdminHelpRestrictionDTO{}
+	list := []models.AdminHelpUserRestrictionDTO{}
 	for rows.Next() {
 		var r models.HelpUserRestriction
 		var expiresAt sql.NullTime
 		if err := rows.Scan(&r.ID, &r.UserUID, &r.Status, &r.Reason, &r.CreatedBy, &r.CreatedAt, &expiresAt); err == nil {
 			user := h.loadUserIdentity(r.UserUID)
-			dto := models.AdminHelpRestrictionDTO{
+			dto := models.AdminHelpUserRestrictionDTO{
 				ID:        r.ID,
 				User:      user,
 				Status:    r.Status,

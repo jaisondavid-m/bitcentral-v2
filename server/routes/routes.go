@@ -327,10 +327,8 @@ func SetupRouter(
 
 		// BIT Help Admin Moderation API
 		admin.GET("/help/stats", helpHandler.AdminGetStats)
-		admin.GET("/help/rooms", helpHandler.AdminGetRooms)
-		admin.GET("/help/rooms/:id", helpHandler.AdminGetRoomByID)
+		admin.GET("/help/messages", helpHandler.AdminGetMessages)
 		admin.DELETE("/help/messages/:id", helpHandler.AdminDeleteMessage)
-		admin.POST("/help/rooms/:id/close", helpHandler.AdminCloseRoom)
 		admin.GET("/help/reports", helpHandler.AdminGetReports)
 		admin.POST("/help/reports/:id/action", helpHandler.AdminActionReport)
 		admin.GET("/help/restrictions", helpHandler.AdminGetRestrictions)

@@ -128,18 +128,21 @@ type AdminHelpRoomDTO struct {
 }
 
 type AdminHelpReportDTO struct {
-	ID          int               `json:"id"`
-	Reporter    AdminUserIdentity `json:"reporter"`
-	TargetType  string            `json:"target_type"`
-	TargetID    string            `json:"target_id"`
-	Reason      string            `json:"reason"`
-	Details     string            `json:"details"`
-	Status      string            `json:"status"`
-	CreatedAt   time.Time         `json:"created_at"`
-	Snippet     string            `json:"snippet,omitempty"`
+	ID            int               `json:"id"`
+	Reporter      AdminUserIdentity `json:"reporter"`
+	TargetType    string            `json:"target_type"`
+	TargetID      string            `json:"target_id"`
+	TargetContent string            `json:"target_content,omitempty"`
+	TargetUser    AdminUserIdentity `json:"target_user,omitempty"`
+	TargetLabel   string            `json:"target_label,omitempty"`
+	Reason        string            `json:"reason"`
+	Details       string            `json:"details"`
+	Status        string            `json:"status"`
+	CreatedAt     time.Time         `json:"created_at"`
+	Snippet       string            `json:"snippet,omitempty"`
 }
 
-type AdminHelpRestrictionDTO struct {
+type AdminHelpUserRestrictionDTO struct {
 	ID        int               `json:"id"`
 	User      AdminUserIdentity `json:"user"`
 	Status    string            `json:"status"`
