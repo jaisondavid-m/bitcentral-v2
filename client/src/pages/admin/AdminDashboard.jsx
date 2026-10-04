@@ -72,6 +72,7 @@ import {
   GraduationCap,
   GripVertical,
   Heart,
+  HelpCircle,
   LayoutGrid,
   Loader,
   Mail,
@@ -102,6 +103,7 @@ import AdminMailSender from "./AdminMailSender.jsx";
 import AdminLeavesSection from "./AdminLeavesSection.jsx";
 import AdminNotificationsSection from "./AdminNotificationsSection.jsx";
 import AdminLostFoundSection from "./AdminLostFoundSection.jsx";
+import AdminHelpPage from "./AdminHelpPage.jsx";
 
 function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
@@ -350,6 +352,15 @@ const ADMIN_TABS = [
     gradient: "from-emerald-500 to-teal-600",
     badge: "Campus Items",
     description: "Audit reported lost/found items, pin priority notices, and moderate claims across campus.",
+  },
+  {
+    key: "help",
+    label: "BIT Help",
+    href: "/admin/help",
+    icon: HelpCircle,
+    gradient: "from-indigo-600 to-blue-600",
+    badge: "Anonymous Doubts",
+    description: "Inspect student doubt requests, chat transcripts, reports, user real identities, and manage help bans.",
   },
   {
     key: "feedback",
@@ -7191,6 +7202,8 @@ function AdminDashboard({ initialTab } = {}) {
         <AdminNotificationsSection />
       ) : activeTab === "lost-found" ? (
         <AdminLostFoundSection />
+      ) : activeTab === "help" ? (
+        <AdminHelpPage />
       ) : activeTab === "feedback" ? (
         <AdminFeedbackPage />
       ) : activeTab === "mail" || activeTab === "mail-sender" ? (

@@ -35,6 +35,7 @@ func SetupRouter(
 	internalMarksHandler *handlers.InternalMarksHandler,
 	notificationHandler *handlers.NotificationHandler,
 	lostFoundHandler *handlers.LostFoundHandler,
+	helpHandler *handlers.HelpHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -189,7 +190,23 @@ func SetupRouter(
 		api.POST("/lost-found/:id/claim", lostFoundHandler.SubmitClaim)
 		api.POST("/lost-found/claims/:claimId/status", lostFoundHandler.UpdateClaimStatus)
 		api.GET("/lost-found/my", lostFoundHandler.GetMyItemsAndClaims)
+
+		// BIT Help Student API (Single Feed & Threads)
+		api.GET("/api/help/messages", helpHandler.GetMessages)
+		api.POST("/api/help/messages", helpHandler.SendMessage)
+		api.GET("/api/help/rooms", helpHandler.GetRooms)
+		api.POST("/api/help/rooms", helpHandler.CreateRoom)
+		api.GET("/api/help/rooms/:id", helpHandler.GetRoomByID)
+		api.GET("/api/help/rooms/:id/messages", helpHandler.GetMessages)
+		api.POST("/api/help/rooms/:id/messages", helpHandler.SendMessage)
+		api.POST("/api/help/rooms/:id/resolve", helpHandler.ResolveRoom)
+		api.POST("/api/help/reports", helpHandler.SubmitReport)
+		api.POST("/api/help/block", helpHandler.BlockAnonUser)
+		api.GET("/api/help/my", helpHandler.GetMyHelpData)
 	}
+
+	// Public GET for help rooms (so unauthenticated preview works or protected inside handler)
+	r.GET("/help/public/rooms", helpHandler.GetRooms)
 
 	// Serve uploaded files
 	r.Static("/uploads", "./uploads")
@@ -305,6 +322,17 @@ func SetupRouter(
 		admin.GET("/lost-found", lostFoundHandler.AdminGetItems)
 		admin.POST("/lost-found/:id/pin", lostFoundHandler.AdminTogglePin)
 		admin.DELETE("/lost-found/:id", lostFoundHandler.DeleteItem)
+
+		// BIT Help Admin Moderation API
+		admin.GET("/help/stats", helpHandler.AdminGetStats)
+		admin.GET("/help/rooms", helpHandler.AdminGetRooms)
+		admin.GET("/help/rooms/:id", helpHandler.AdminGetRoomByID)
+		admin.DELETE("/help/messages/:id", helpHandler.AdminDeleteMessage)
+		admin.POST("/help/rooms/:id/close", helpHandler.AdminCloseRoom)
+		admin.GET("/help/reports", helpHandler.AdminGetReports)
+		admin.POST("/help/reports/:id/action", helpHandler.AdminActionReport)
+		admin.GET("/help/restrictions", helpHandler.AdminGetRestrictions)
+		admin.POST("/help/restrictions", helpHandler.AdminManageRestriction)
 	}
 
 	// Super-admin routes: manage admins and allowed external emails/domains
