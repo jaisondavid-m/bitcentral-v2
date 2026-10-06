@@ -396,8 +396,20 @@ func (h *TrackerUserHandler) GetTrackerUsersAdmin(c *gin.Context) {
 		if strings.EqualFold(batchFilter, "others") {
 			whereClauses = append(whereClauses, "(batch IS NULL OR batch = '' OR batch = '-')")
 		} else {
-			whereClauses = append(whereClauses, "LOWER(COALESCE(batch, '')) = LOWER(?)")
-			args = append(args, batchFilter)
+			cleanB := strings.ReplaceAll(strings.ToLower(batchFilter), " ", "")
+			var year string
+			if strings.HasPrefix(cleanB, "202") && len(cleanB) >= 4 {
+				year = cleanB[2:4]
+			} else if len(cleanB) == 2 {
+				year = cleanB
+			}
+			if year != "" {
+				whereClauses = append(whereClauses, "(REPLACE(LOWER(COALESCE(batch, '')), ' ', '') = ? OR batch = ? OR batch = ?)")
+				args = append(args, cleanB, "20"+year, year)
+			} else {
+				whereClauses = append(whereClauses, "REPLACE(LOWER(COALESCE(batch, '')), ' ', '') = ?")
+				args = append(args, cleanB)
+			}
 		}
 	}
 

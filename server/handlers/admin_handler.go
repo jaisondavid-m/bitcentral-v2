@@ -26,25 +26,66 @@ func NewAdminHandler() *AdminHandler {
 		DB: config.DB,
 	}
 }
-func getBatchLabelFromEmail(email string) string {
-	email = strings.ToLower(strings.TrimSpace(email))
-	if email == "" {
-		return "others"
+func normalizeBatchLabel(batchStr string, email string) string {
+	allowedRanges := map[string]string{
+		"2026-2030": "2026-2030",
+		"2025-2029": "2025-2029",
+		"2024-2028": "2024-2028",
+		"2023-2027": "2023-2027",
+		"2022-2026": "2022-2026",
 	}
-	re := regexp.MustCompile(`(?:^|[^0-9])([0-9]{2})(?:[^0-9]|$)`)
-	matches := re.FindStringSubmatch(email)
-	if len(matches) < 2 {
-		return "others"
+
+	yearToRange := map[string]string{
+		"2026": "2026-2030", "26": "2026-2030",
+		"2025": "2025-2029", "25": "2025-2029",
+		"2024": "2024-2028", "24": "2024-2028",
+		"2023": "2023-2027", "23": "2023-2027",
+		"2022": "2022-2026", "22": "2022-2026",
 	}
-	two := matches[1]
-	allowed := map[string]bool{"22": true, "23": true, "24": true, "25": true, "26": true}
-	if !allowed[two] {
-		return "others"
+
+	cleanBatch := strings.TrimSpace(batchStr)
+	if cleanBatch != "" {
+		compact := strings.ReplaceAll(cleanBatch, " ", "")
+		if r, ok := allowedRanges[compact]; ok {
+			return r
+		}
+		if r, ok := yearToRange[compact]; ok {
+			return r
+		}
+		reDigits := regexp.MustCompile(`(202[2-6]|2[2-6])`)
+		if m := reDigits.FindString(compact); m != "" {
+			if r, ok := yearToRange[m]; ok {
+				return r
+			}
+		}
 	}
-	year, _ := strconv.Atoi(two)
-	start := 2000 + year
-	end := start + 4
-	return fmt.Sprintf("%d-%d", start, end)
+
+	cleanEmail := strings.ToLower(strings.TrimSpace(email))
+	if cleanEmail != "" {
+		re7376 := regexp.MustCompile(`7376(2[2-6])`)
+		if m := re7376.FindStringSubmatch(cleanEmail); len(m) > 1 {
+			if r, ok := yearToRange[m[1]]; ok {
+				return r
+			}
+		}
+
+		username := strings.Split(cleanEmail, "@")[0]
+		reYear := regexp.MustCompile(`(?:^|[^0-9])(2[2-6])(?:[^0-9]|$)`)
+		if m := reYear.FindStringSubmatch(username); len(m) > 1 {
+			if r, ok := yearToRange[m[1]]; ok {
+				return r
+			}
+		}
+
+		reFallback := regexp.MustCompile(`(2[2-6])`)
+		if m := reFallback.FindString(username); m != "" {
+			if r, ok := yearToRange[m]; ok {
+				return r
+			}
+		}
+	}
+
+	return "others"
 }
 
 func (h *AdminHandler) syncUsersToDB() error {
@@ -90,7 +131,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		orderQuery = "id DESC"
 	}
 
-	queryStr := fmt.Sprintf(`SELECT %s, COALESCE(google_id, COALESCE(uid, '')), COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(creation_time, ''), COALESCE(last_sign_in_time, ''), COALESCE(last_seen_at, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%%Y-%%m-%%dT%%H:%%i:%%sZ'), ''), COALESCE(role, 'user') FROM users WHERE email LIKE '%%@bitsathy.ac.in' ORDER BY %s`, idQuery, orderQuery)
+	queryStr := fmt.Sprintf(`SELECT %s, COALESCE(google_id, COALESCE(uid, '')), COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(creation_time, ''), COALESCE(last_sign_in_time, ''), COALESCE(last_seen_at, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%%Y-%%m-%%dT%%H:%%i:%%sZ'), ''), COALESCE(role, 'user') FROM users ORDER BY %s`, idQuery, orderQuery)
 
 	rows, err := h.DB.Query(queryStr)
 	if err != nil {
@@ -141,9 +182,15 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 	}
 
 	var allUsers []models.User
-	batchCounts := make(map[string]int)
+	batchCounts := map[string]int{
+		"2026-2030": 0,
+		"2025-2029": 0,
+		"2024-2028": 0,
+		"2023-2027": 0,
+		"2022-2026": 0,
+		"others":    0,
+	}
 
-	// Time in IST (UTC+5:30) and local server time for active today matching
 	todayIST := time.Now().UTC().Add(5*time.Hour + 30*time.Minute).Format("2006-01-02")
 	todayLocal := time.Now().Format("2006-01-02")
 
@@ -177,10 +224,8 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 			u.Phone = tp.Phone
 		}
 
-		batchLabel := u.Batch
-		if batchLabel == "" {
-			batchLabel = getBatchLabelFromEmail(u.Email)
-		}
+		batchLabel := normalizeBatchLabel(u.Batch, u.Email)
+		u.Batch = batchLabel
 		batchCounts[batchLabel]++
 
 		if u.LastSeenAt != "" && (strings.HasPrefix(u.LastSeenAt, todayIST) || strings.HasPrefix(u.LastSeenAt, todayLocal)) {
@@ -199,10 +244,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 	var filtered []models.User
 	for _, u := range allUsers {
 		if batch != "" {
-			batchLabel := u.Batch
-			if batchLabel == "" {
-				batchLabel = getBatchLabelFromEmail(u.Email)
-			}
+			batchLabel := normalizeBatchLabel(u.Batch, u.Email)
 			if batchLabel != batch {
 				continue
 			}
@@ -233,17 +275,19 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 			regLower := strings.ToLower(u.RegisterNo)
 			userIDLower := strings.ToLower(u.UserID)
 			deptLower := strings.ToLower(u.Department)
-			batchLower := strings.ToLower(u.Batch)
+			batchLower := strings.ToLower(normalizeBatchLabel(u.Batch, u.Email))
 			roleLower := strings.ToLower(u.Role)
-			if !strings.Contains(emailLower, search) &&
-				!strings.Contains(nameLower, search) &&
-				!strings.Contains(uidLower, search) &&
-				!strings.Contains(rollLower, search) &&
-				!strings.Contains(regLower, search) &&
-				!strings.Contains(userIDLower, search) &&
-				!strings.Contains(deptLower, search) &&
-				!strings.Contains(batchLower, search) &&
-				!strings.Contains(roleLower, search) {
+			searchLower := strings.ToLower(strings.TrimSpace(search))
+
+			if !strings.Contains(emailLower, searchLower) &&
+				!strings.Contains(nameLower, searchLower) &&
+				!strings.Contains(uidLower, searchLower) &&
+				!strings.Contains(rollLower, searchLower) &&
+				!strings.Contains(regLower, searchLower) &&
+				!strings.Contains(userIDLower, searchLower) &&
+				!strings.Contains(deptLower, searchLower) &&
+				!strings.Contains(batchLower, searchLower) &&
+				!strings.Contains(roleLower, searchLower) {
 				continue
 			}
 		}

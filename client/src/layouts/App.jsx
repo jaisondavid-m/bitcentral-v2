@@ -142,7 +142,7 @@ function App() {
             <Route path="/guides/:slug" element={<GuideDetail />} />
             <Route path="/wifi-details" element={<WifiDetails />} />
             <Route
-              path="/"
+              path="/"  
               element={
                 <AuthScope>
                   <LandingPage />
