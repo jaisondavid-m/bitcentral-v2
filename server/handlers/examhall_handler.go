@@ -67,6 +67,8 @@ func hallBlock(hallNo string) *string {
 		label = "SunFlower(SF) Block"
 	case strings.HasPrefix(upper, "AIML"):
 		label = "SunFlower(SF) Block"
+	case strings.HasPrefix(upper, "IT"):
+		label = "SunFlower(SF) Block"
 	case strings.HasPrefix(upper, "AI BASED"):
 		label = "AS Block"
 	case strings.HasPrefix(upper, "LATHE"):
