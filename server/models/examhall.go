@@ -4,6 +4,7 @@ type SeatingRecord struct {
 	HallNo      string
 	CourseCode  string
 	RegisterNos []string
+	Time        string
 }
 
 type ExamSession struct {
