@@ -536,6 +536,7 @@ export default function ExamHallDownload() {
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [error, setError] = useState("");
+  const [noExams, setNoExams] = useState(false);
   const [registerNo, setRegisterNo] = useState("");
   const hasFetched = useRef(false);
 
@@ -546,14 +547,32 @@ export default function ExamHallDownload() {
     hasFetched.current = true;
     setRegisterNo(roll);
     setLoading(true);
+    setNoExams(false);
     api.get("/exam-hall/all", { params: { registerNo: roll } })
       .then(res => {
         const data = res.data;
-        if (!data.success || !data.sessions?.length) { setError("No exam schedule found."); return; }
+        if (!data.success || !data.sessions?.length) {
+          setNoExams(true);
+          return;
+        }
         const up = data.sessions;
-        up.length === 0 ? setError("All exams done — nothing upcoming.") : setSessions(up);
+        if (up.length === 0) {
+          setNoExams(true);
+        } else {
+          setSessions(up);
+        }
       })
-      .catch(() => setError("Could not reach the server. Try again."))
+      .catch((err) => {
+        if (
+          err.response?.status === 404 ||
+          err.response?.data?.message?.includes("no exam sessions found") ||
+          (err.response?.data && !err.response.data.success)
+        ) {
+          setNoExams(true);
+        } else {
+          setError("Could not reach the server. Try again.");
+        }
+      })
       .finally(() => setLoading(false));
   }, [profile, student]);
 
@@ -624,7 +643,7 @@ export default function ExamHallDownload() {
           )}
 
           {/* ── Register No Not Found / Not signed in ── */}
-          {!loading && !sessions && !error && (
+          {!loading && !sessions && !error && !noExams && (
             <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border
               border-dashed border-blue-200 bg-white px-4 py-14 text-center
               dark:border-blue-900/40 dark:bg-[#0F1C33]">
@@ -634,7 +653,7 @@ export default function ExamHallDownload() {
                   Register Number Not Found
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  No registered profile detected. You can search your exam hall manually using your register number and course code.
+                  No registered profile detected. You can search your exam hall manually using your register number.
                 </p>
               </div>
               <button
@@ -643,6 +662,30 @@ export default function ExamHallDownload() {
               >
                 <Search className="h-3.5 w-3.5" />
                 Go to Manual Search
+              </button>
+            </div>
+          )}
+
+          {/* ── No Exams Scheduled ── */}
+          {!loading && !sessions && !error && noExams && (
+            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border
+              border-dashed border-blue-200 bg-white px-4 py-14 text-center
+              dark:border-blue-900/40 dark:bg-[#0F1C33]">
+              <CalendarDays className="h-10 w-10 text-blue-300 dark:text-blue-600" />
+              <div className="max-w-xs space-y-1">
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                  No exams are scheduled for you
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  There are currently no examinations scheduled for your register number {registerNo ? `(${registerNo})` : ""}.
+                </p>
+              </div>
+              <button
+                onClick={() => navigate("/exam-hall-manual")}
+                className="mt-2 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.98] dark:bg-blue-500 dark:hover:bg-blue-600 cursor-pointer"
+              >
+                <Search className="h-3.5 w-3.5" />
+                Search Another Register No
               </button>
             </div>
           )}

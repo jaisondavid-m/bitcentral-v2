@@ -475,6 +475,7 @@ const ExamHall = () => {
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [error, setError] = useState("");
+  const [noExams, setNoExams] = useState(false);
   const [searchedRegNo, setSearchedRegNo] = useState("");
 
   const hasAppliedDefaultRegisterNo = useRef(false);
@@ -501,6 +502,7 @@ const ExamHall = () => {
 
     setLoading(true);
     setError("");
+    setNoExams(false);
     setSessions(null);
     setSearchedRegNo(query);
 
@@ -508,12 +510,22 @@ const ExamHall = () => {
       .then((res) => {
         const data = res.data;
         if (!data.success || !data.sessions?.length) {
-          setError(`No exam schedule found for register number "${query}".`);
+          setNoExams(true);
           return;
         }
         setSessions(data.sessions);
       })
-      .catch(() => setError("Could not reach the server. Please try again."))
+      .catch((err) => {
+        if (
+          err.response?.status === 404 ||
+          err.response?.data?.message?.includes("no exam sessions found") ||
+          (err.response?.data && !err.response.data.success)
+        ) {
+          setNoExams(true);
+        } else {
+          setError("Could not reach the server. Please try again.");
+        }
+      })
       .finally(() => setLoading(false));
   };
 
@@ -638,6 +650,21 @@ const ExamHall = () => {
             </div>
           )}
 
+          {/* ── No Exams Scheduled ── */}
+          {!loading && noExams && (
+            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-blue-200 bg-white px-4 py-12 text-center dark:border-blue-900/40 dark:bg-[#0F1C33]">
+              <CalendarDays className="h-10 w-10 text-blue-300 dark:text-blue-500" />
+              <div className="max-w-xs space-y-1">
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                  No exams are scheduled for you
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  No exam sessions found for {searchedRegNo}.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* ── Error ── */}
           {error && (
             <div className="flex items-start gap-3 rounded-2xl border border-red-100
@@ -648,7 +675,7 @@ const ExamHall = () => {
           )}
 
           {/* ── Idle hint ── */}
-          {!sessions && !loading && !error && (
+          {!sessions && !loading && !error && !noExams && (
             <p className="py-2 text-center text-xs text-slate-400 dark:text-slate-600">
               Enter your details above and search
             </p>
