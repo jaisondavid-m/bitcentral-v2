@@ -3,7 +3,7 @@ import { useAuth } from "@/context/StudentContext.jsx";
 import { useTheme } from "@/context/ThemeContext.jsx";
 import {
   Loader2, AlertCircle, MapPin, BookOpen,
-  Clock, CalendarDays, FileDown, GraduationCap, Building2, Search, ArrowLeft
+  Clock, CalendarDays, FileDown, GraduationCap, Building2, Search, ArrowLeft, Mail
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "@/api/axios.js";
@@ -694,6 +694,21 @@ const ExamHall = () => {
             </div>
           )}
 
+          {/* ── Missing Schedule Notice ── */}
+          <div className="rounded-xl border border-blue-100 bg-white p-3.5 shadow-sm dark:border-blue-900/30 dark:bg-[#0F1C33]">
+            <div className="flex items-start gap-2.5">
+              <Mail className="mt-0.5 h-4 w-4 shrink-0 text-blue-500 dark:text-blue-400" />
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                If your data or department student lab schedule is not found, please email your department Laboratory Schedule PDF to{" "}
+                <a
+                  href="mailto:jaisondavidm.cs25@bitsathy.ac.in?subject=Laboratory%20Schedule%20PDF%20Submission"
+                  className="font-semibold text-blue-600 underline underline-offset-2 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  jaisondavidm.cs25@bitsathy.ac.in
+                </a>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
