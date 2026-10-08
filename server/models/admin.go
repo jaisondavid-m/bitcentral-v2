@@ -30,12 +30,6 @@ type UserWithRollNo struct {
 	RollNo string `json:"roll_no"`
 }
 
-type PSToken struct {
-	Token     string `json:"token"`
-	UpdatedAt string `json:"updated_at,omitempty"`
-	UpdatedBy string `json:"updated_by,omitempty"`
-	TokenKey  string `json:"token_key,omitempty"`
-}
 
 type QBAnswerKey struct {
 	ID           int     `json:"id"`

@@ -123,26 +123,6 @@ export async function deleteQBAnswerKey(id) {
   return response.data;
 }
 
-export async function getPSToken() {
-  const headers = await getAdminHeaders();
-  const response = await api.get("/admin/ps-token", { headers });
-  return response.data;
-}
-
-export async function savePSToken(token) {
-  const headers = await getAdminHeaders();
-  const response = await api.put("/admin/ps-token", { token }, { headers });
-  return response.data;
-}
-
-export async function fetchPSRewardsBreakdown(userId) {
-  const headers = await getAuthenticatedHeaders();
-  const response = await api.get("/ps/rewards/breakdown", {
-    headers,
-    params: { user_id: userId },
-  });
-  return response.data;
-}
 
 export async function uploadMessMenuCsv(formData) {
   const headers = await getAdminHeaders();
@@ -582,53 +562,6 @@ export async function testAIKeyConfig(payload) {
   return response.data;
 }
 
-export async function getAuditLogs({
-  page = 1,
-  limit = 50,
-  search = "",
-  method = "",
-  status = "",
-  user_uid = "",
-  roll_no = "",
-  user_name = "",
-  user = "",
-} = {}) {
-  const headers = await getAdminHeaders();
-  const params = new URLSearchParams();
-  if (page) params.set("page", page);
-  if (limit) params.set("limit", limit);
-  if (search) params.set("search", search);
-  if (method) params.set("method", method);
-  if (status) params.set("status", status);
-  if (user_uid) params.set("user_uid", user_uid);
-  if (roll_no) params.set("roll_no", roll_no);
-  if (user_name) params.set("user_name", user_name);
-  if (user) params.set("user", user);
-
-  const response = await api.get(`/admin/audit-logs?${params.toString()}`, { headers });
-  return response.data;
-}
-
-export async function getUserAuditSummaries({
-  page = 1,
-  limit = 30,
-  search = "",
-  role = "",
-  activity = "",
-  sort = "recent",
-} = {}) {
-  const headers = await getAdminHeaders();
-  const params = new URLSearchParams();
-  if (page) params.set("page", page);
-  if (limit) params.set("limit", limit);
-  if (search) params.set("search", search);
-  if (role) params.set("role", role);
-  if (activity) params.set("activity", activity);
-  if (sort) params.set("sort", sort);
-
-  const response = await api.get(`/admin/audit-logs/users?${params.toString()}`, { headers });
-  return response.data;
-}
 
 export async function updateUserFlagStatus(uid, { flagged, reason = "" } = {}) {
   const headers = await getAdminHeaders();
@@ -642,11 +575,6 @@ export async function updateUserBlockStatus(uid, blocked) {
   return response.data;
 }
 
-export async function clearAuditLogs() {
-  const headers = await getAdminHeaders();
-  const response = await api.delete("/admin/audit-logs", { headers });
-  return response.data;
-}
 
 export async function getAdminMailConfig() {
   const headers = await getAdminHeaders();

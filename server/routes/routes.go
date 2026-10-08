@@ -34,7 +34,6 @@ func SetupRouter(
 	mailHandler *handlers.MailHandler,
 	internalMarksHandler *handlers.InternalMarksHandler,
 	notificationHandler *handlers.NotificationHandler,
-	lostFoundHandler *handlers.LostFoundHandler,
 	helpHandler *handlers.HelpHandler,
 ) *gin.Engine {
 
@@ -140,10 +139,6 @@ func SetupRouter(
 	// In-site Notifications (Public / User with auth)
 	r.GET("/notifications", notificationHandler.GetUserNotifications)
 
-	// Lost & Found (Public / User with auth)
-	r.GET("/lost-found", lostFoundHandler.GetItems)
-	r.GET("/lost-found/:id", lostFoundHandler.GetItemByID)
-
 	// Protected routes
 	api := r.Group("/")
 	api.Use(handler.RequireAuth())
@@ -162,11 +157,6 @@ func SetupRouter(
 		api.GET("/qb", qbHandler.List)
 		api.GET("/mess", messHandler.GetMess)
 		api.GET("/mess/timings", messHandler.GetMealTimings)
-		api.GET("/ps/rewards/breakdown", adminHandler.FetchPSRewardsBreakdown)
-		api.GET("/ps/student-report/details", adminHandler.FetchStudentReportDetails)
-		api.GET("/ps/assessments", adminHandler.FetchAssessmentDetails)
-		api.GET("/ps/points", adminHandler.FetchPointsDetails)
-		api.GET("/ps/biometrics", adminHandler.FetchBiometricDetails)
 		api.GET("/v2/profile", trackerUserHandler.GetProfileV2)
 		api.GET("/profile/v2", trackerUserHandler.GetProfileV2)
 
@@ -180,16 +170,6 @@ func SetupRouter(
 		api.POST("/notifications/:id/read", notificationHandler.MarkNotificationAsRead)
 		api.POST("/notifications/read-all", notificationHandler.MarkAllNotificationsAsRead)
 		api.DELETE("/notifications/:id/dismiss", notificationHandler.DismissNotification)
-
-		// Lost & Found User Actions API
-		api.POST("/lost-found", lostFoundHandler.CreateItem)
-		api.PUT("/lost-found/:id", lostFoundHandler.UpdateItem)
-		api.POST("/lost-found/:id/status", lostFoundHandler.UpdateItemStatus)
-		api.DELETE("/lost-found/:id", lostFoundHandler.DeleteItem)
-		api.POST("/lost-found/upload", lostFoundHandler.UploadImage)
-		api.POST("/lost-found/:id/claim", lostFoundHandler.SubmitClaim)
-		api.POST("/lost-found/claims/:claimId/status", lostFoundHandler.UpdateClaimStatus)
-		api.GET("/lost-found/my", lostFoundHandler.GetMyItemsAndClaims)
 
 		// BIT Help Student API (Single Feed & Threads)
 		api.GET("/api/help/messages", helpHandler.GetMessages)
@@ -225,7 +205,6 @@ func SetupRouter(
 	r.GET("/pdf/:id", uploadHandler.ProxyPDF)
 
 	// Admin routes
-
 	r.GET("/admin/super/check", adminHandler.CheckSuper)
 
 	admin := r.Group("/admin")
@@ -253,17 +232,12 @@ func SetupRouter(
 		admin.PUT("/users/:uid/role", adminHandler.UpdateUserRole)
 		admin.DELETE("/users/:uid", adminHandler.DeleteUser)
 		admin.POST("/users/delete-batch", adminHandler.DeleteUsersBatch)
-		// admin.GET("/qb", qbHandler.List)
 		admin.GET("/qb", qbHandler.List)
 		admin.POST("/qb", qbHandler.Create)
 		admin.POST("/qb/batch", qbHandler.BatchCreate)
 		admin.PUT("/qb/reorder", qbHandler.Reorder)
 		admin.PUT("/qb/:id", qbHandler.Update)
 		admin.DELETE("/qb/:id", qbHandler.Delete)
-		admin.GET("/ps-token", adminHandler.GetPSToken)
-		admin.PUT("/ps-token", adminHandler.UpdatePSToken)
-		admin.GET("/ps/rewards/breakdown", adminHandler.FetchPSRewardsBreakdown)
-		admin.GET("/ps/student-report/details", adminHandler.FetchStudentReportDetails)
 		admin.GET("/mess", messHandler.ListAdmin)
 		admin.POST("/mess/upload", messHandler.UploadCSV)
 		admin.PUT("/mess/:id", messHandler.UpdateAdmin)
@@ -297,11 +271,6 @@ func SetupRouter(
 		admin.GET("/feedback/messages/:user_uid", feedbackHandler.GetAdminUserMessages)
 		admin.POST("/feedback/reply", feedbackHandler.AdminReply)
 
-		// Audit Logs Admin API
-		admin.GET("/audit-logs", adminHandler.GetAuditLogs)
-		admin.GET("/audit-logs/users", adminHandler.GetUserAuditLogsSummary)
-		admin.DELETE("/audit-logs", adminHandler.ClearAuditLogs)
-
 		// Mail Sender Admin API (Gomail & Job Queue)
 		admin.GET("/mail/config", mailHandler.GetMailConfig)
 		admin.POST("/mail/test", mailHandler.TestMailConnection)
@@ -319,11 +288,6 @@ func SetupRouter(
 		admin.POST("/notifications", notificationHandler.CreateNotification)
 		admin.PUT("/notifications/:id", notificationHandler.UpdateNotification)
 		admin.DELETE("/notifications/:id", notificationHandler.DeleteNotification)
-
-		// Lost & Found Admin Moderation
-		admin.GET("/lost-found", lostFoundHandler.AdminGetItems)
-		admin.POST("/lost-found/:id/pin", lostFoundHandler.AdminTogglePin)
-		admin.DELETE("/lost-found/:id", lostFoundHandler.DeleteItem)
 
 		// BIT Help Admin Moderation API
 		admin.GET("/help/stats", helpHandler.AdminGetStats)

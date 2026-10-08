@@ -96,13 +96,10 @@ import {
   Zap,
 } from "lucide-react";
 import SuperAdminPanel from "./SuperAdminPanel.jsx";
-import AdminPSRewardsPage from "./AdminPSRewards.jsx";
 import AdminFeedbackPage from "./AdminFeedbackPage.jsx";
-import AdminAuditLogs from "./AdminAuditLogs.jsx";
 import AdminMailSender from "./AdminMailSender.jsx";
 import AdminLeavesSection from "./AdminLeavesSection.jsx";
 import AdminNotificationsSection from "./AdminNotificationsSection.jsx";
-import AdminLostFoundSection from "./AdminLostFoundSection.jsx";
 import AdminHelpPage from "./AdminHelpPage.jsx";
 
 function normalizeError(error, fallback) {
@@ -300,15 +297,6 @@ const ADMIN_TABS = [
     description: "Create, edit, search, and organize general question bank entries and answer keys.",
   },
   {
-    key: "ps",
-    label: "PS Rewards",
-    href: "/admin/ps-rewards",
-    icon: Clock,
-    gradient: "from-amber-500 to-orange-600",
-    badge: "PS Integration",
-    description: "Store PS cookie credentials and inspect live rewards breakdown responses.",
-  },
-  {
     key: "cards",
     label: "Cards",
     href: "/admin/cards",
@@ -343,15 +331,6 @@ const ADMIN_TABS = [
     gradient: "from-pink-500 to-rose-600",
     badge: "Live Alerts",
     description: "Dispatch broadcast announcements and targeted direct alerts to students with real-time modal delivery.",
-  },
-  {
-    key: "lost-found",
-    label: "Lost & Found",
-    href: "/admin/lost-found",
-    icon: Search,
-    gradient: "from-emerald-500 to-teal-600",
-    badge: "Campus Items",
-    description: "Audit reported lost/found items, pin priority notices, and moderate claims across campus.",
   },
   {
     key: "help",
@@ -390,15 +369,6 @@ const ADMIN_TABS = [
     description: "Manage Google Gemini API key, model selection, status, and live AI assistant settings stored in DB.",
   },
   {
-    key: "audit-logs",
-    label: "Audit Logs",
-    href: "/admin/audit-logs",
-    icon: ShieldCheck,
-    gradient: "from-purple-600 to-indigo-600",
-    badge: "API History",
-    description: "View real-time HTTP request audit logs including IP, payload, query params, timestamp, and user details.",
-  },
-  {
     key: "mail",
     label: "Mail Sender (SMTP)",
     href: "/admin/mail",
@@ -421,16 +391,13 @@ const ADMIN_TABS = [
 function getAdminTabFromPath(pathname) {
   if (pathname === "/admin" || pathname === "/admin/") return "overview";
   if (pathname.startsWith("/admin/analytics")) return "analytics";
-  if (pathname.startsWith("/admin/audit-logs")) return "audit-logs";
   if (pathname.startsWith("/admin/user-directory")) return "user-directory";
   if (pathname.startsWith("/admin/sponsors")) return "sponsors";
   if (pathname.startsWith("/admin/qb")) return "qb";
-  if (pathname.startsWith("/admin/ps-rewards")) return "ps";
   if (pathname.startsWith("/admin/cards")) return "cards";
   if (pathname.startsWith("/admin/mess")) return "mess";
   if (pathname.startsWith("/admin/leaves")) return "leaves";
   if (pathname.startsWith("/admin/notifications")) return "notifications";
-  if (pathname.startsWith("/admin/lost-found")) return "lost-found";
   if (pathname.startsWith("/admin/help")) return "help";
   if (pathname.startsWith("/admin/feedback")) return "feedback";
   if (pathname.startsWith("/admin/mail-sender") || pathname.startsWith("/admin/mail")) return "mail";
@@ -7185,14 +7152,10 @@ function AdminDashboard({ initialTab } = {}) {
         <AdminOverviewGrid isSuper={isSuper} />
       ) : activeTab === "analytics" ? (
         <AnalyticsSection />
-      ) : activeTab === "audit-logs" ? (
-        <AdminAuditLogs />
       ) : activeTab === "sponsors" ? (
         <SponsorsSection />
       ) : activeTab === "qb" ? (
         <QBSection />
-      ) : activeTab === "ps" ? (
-        <AdminPSRewardsPage />
       ) : activeTab === "cards" ? (
         <CardsSection />
       ) : activeTab === "mess" ? (
@@ -7201,8 +7164,6 @@ function AdminDashboard({ initialTab } = {}) {
         <AdminLeavesSection />
       ) : activeTab === "notifications" ? (
         <AdminNotificationsSection />
-      ) : activeTab === "lost-found" ? (
-        <AdminLostFoundSection />
       ) : activeTab === "help" ? (
         <AdminHelpPage />
       ) : activeTab === "feedback" ? (
@@ -7246,10 +7207,6 @@ function AdminQBPage() {
   return <AdminDashboard initialTab="qb" />;
 }
 
-function AdminPSRewardsPageRoute() {
-  return <AdminDashboard initialTab="ps" />;
-}
-
 function AdminCardsPage() {
   return <AdminDashboard initialTab="cards" />;
 }
@@ -7264,10 +7221,6 @@ function AdminLeavesPage() {
 
 function AdminNotificationsPage() {
   return <AdminDashboard initialTab="notifications" />;
-}
-
-function AdminLostFoundPage() {
-  return <AdminDashboard initialTab="lost-found" />;
 }
 
 function AdminHelpPageRoute() {
@@ -7288,17 +7241,14 @@ function AdminMailSenderPage() {
 
 export {
   AdminAnalyticsPage,
-  AdminAuditLogsPage,
   AdminUsersPage,
   AdminUserDirectoryPage,
   AdminSponsorsPage,
   AdminQBPage,
-  AdminPSRewardsPageRoute as AdminPSRewardsPage,
   AdminCardsPage,
   AdminMessPage,
   AdminLeavesPage,
   AdminNotificationsPage,
-  AdminLostFoundPage,
   AdminHelpPageRoute as AdminHelpPage,
   AdminFeedbackPageRoute as AdminFeedbackPage,
   AdminAIKeyPage,

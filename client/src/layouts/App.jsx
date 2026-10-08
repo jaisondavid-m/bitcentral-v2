@@ -29,25 +29,16 @@ const Semester = lazyWithRetry(() => import("@/pages/student/Semester.jsx"));
 const MessMenu = lazyWithRetry(() => import("@/pages/student/MessMenu.jsx"));
 const PCDP = lazyWithRetry(() => import("@/pages/student/PCDP.jsx"));
 const FindMyWay = lazyWithRetry(() => import("@/pages/student/FindMyWay.jsx"));
-const Apsite = lazyWithRetry(() => import("@/pages/student/Apsite.jsx"));
 const NotFound = lazyWithRetry(() => import("@/pages/NotFound.jsx"));
 const LeaveDetails = lazyWithRetry(() => import("@/pages/student/LeaveDetails.jsx"));
 const ExamHall = lazyWithRetry(() => import("@/pages/student/ExamHall.jsx"));
 const ExamHallDownload = lazyWithRetry(() => import("@/pages/student/ExamHallDownload.jsx"));
-const StudentReportDetails = lazyWithRetry(() => import("@/pages/student/StudentReportDetails.jsx"));
-const PSAssessmentHistory = lazyWithRetry(() => import("@/pages/student/PSAssessmentHistory.jsx"));
-const PSPointDetails = lazyWithRetry(() => import("@/pages/student/PSPointDetails.jsx"));
-const PSBiometricDetails = lazyWithRetry(() => import("@/pages/student/PSBiometricDetails.jsx"));
 const SupportDev = lazyWithRetry(() => import("@/pages/student/SupportDev.jsx"));
 const PaymentSuccessful = lazyWithRetry(() => import("@/pages/student/PaymentSuccessful.jsx"));
 const WifiDetails = lazyWithRetry(() => import("@/pages/student/WifiDetails.jsx"));
 const FacultyDirectory = lazyWithRetry(() => import("@/pages/student/FacultyDirectory.jsx"));
 const BitBot = lazyWithRetry(() => import("@/pages/student/BitBot.jsx"));
-const LostAndFound = lazyWithRetry(() => import("@/pages/student/LostAndFound.jsx"));
-const Help = lazyWithRetry(() => import("@/pages/student/Help.jsx"));
 
-const AK22PH202 = lazyWithRetry(() => import("@/pages/answers/AK__22PH202.jsx"));
-const AnswerKey22HS006 = lazyWithRetry(() => import("@/pages/answers/AnswerKey22HS006.jsx"));
 // const DocsPage = lazyWithRetry(() => import("@/pages/public/AboutDocs.jsx"));
 const AuthScope = lazyWithRetry(() => import("../routes/AuthScope.jsx"));
 const ProtectedRoute = lazyWithRetry(() => import("../routes/ProtectedRoute.jsx"));
@@ -330,21 +321,9 @@ function App() {
               <Route path="/pcdp" element={<PCDP />} />
               <Route path="/exam-hall" element={<ExamHallDownload />} />
               <Route path="/exam-hall-manual" element={<ExamHall />} />
-              <Route path="/apsite" element={<Apsite />} />
               <Route path="/leavedetails" element={<LeaveDetails />} />
               <Route path="/semester" element={<Semester />} />
               <Route path="/mess" element={<MessMenu />} />
-              <Route path="/lost-found" element={<LostAndFound />} />
-              <Route path="/lostfound" element={<LostAndFound />} />
-              <Route path="/help" element={<Help />} />
-              <Route path="/student-report/:id" element={<StudentReportDetails />} />
-              <Route path="/student-report" element={<StudentReportDetails />} />
-              <Route path="/ps-assessment-history" element={<PSAssessmentHistory />} />
-              <Route path="/ps-assessment" element={<PSAssessmentHistory />} />
-              <Route path="/ps-points" element={<PSPointDetails />} />
-              <Route path="/ps-point-details" element={<PSPointDetails />} />
-              <Route path="/ps-biometrics" element={<PSBiometricDetails />} />
-              <Route path="/ps-biometric-details" element={<PSBiometricDetails />} />
               <Route path="/support-dev" element={<SupportDev />} />
               <Route path="/payment-successful" element={<PaymentSuccessful />} />
               <Route path="/payment-successful/:id" element={<PaymentSuccessful />} />
@@ -353,8 +332,6 @@ function App() {
               <Route path="/bitbot" element={<BitBot />} />
 
               <Route path="*" element={<NotFound />} />
-              <Route path="/ak_22ph202" element={<AK22PH202 />} />
-              <Route path="/tamil_ak" element={<AnswerKey22HS006 />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
