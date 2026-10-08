@@ -3,12 +3,10 @@ import { useAuth } from "@/context/StudentContext.jsx";
 import { useTheme } from "@/context/ThemeContext.jsx";
 import {
   Loader2, AlertCircle, MapPin, BookOpen,
-  Clock, CalendarDays, FileDown, GraduationCap, Building2, Search,
+  Clock, CalendarDays, FileDown, GraduationCap, Building2, Search, Mail,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "@/api/axios.js";
-
-const CREATOR_LINKEDIN = "https://www.linkedin.com/in/jaison-david-m-a14072360/";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -524,33 +522,6 @@ function ExamCard({ session: s }) {
   );
 }
 
-function CreatorCredit() {
-  return (
-    <a href={CREATOR_LINKEDIN} target="_blank" rel="noopener noreferrer"
-      className="group inline-flex items-center gap-2 rounded-full border
-        border-blue-100 bg-white px-4 py-2 text-xs shadow-sm transition-all
-        hover:border-blue-300 hover:bg-blue-50 hover:shadow-md
-        dark:border-blue-900/40 dark:bg-[#0F1C33]
-        dark:hover:border-blue-700 dark:hover:bg-blue-950">
-      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-[#0A66C2]" aria-hidden>
-        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853
-          0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9
-          1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337
-          7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782
-          13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0
-          23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774
-          23.2 0 22.222 0h.003z"/>
-      </svg>
-      <span className="text-blue-400 dark:text-blue-500">
-        Created by{" "}
-        <strong className="font-semibold text-blue-700 group-hover:text-blue-800
-          dark:text-blue-300 dark:group-hover:text-blue-200">
-          Jaison David M
-        </strong>
-      </span>
-    </a>
-  );
-}
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
@@ -737,14 +708,26 @@ export default function ExamHallDownload() {
                 </div>
               )}
 
-              {/* Creator credit */}
-              <div className="flex justify-center pt-2 pb-4">
-                <CreatorCredit />
+              </div>
+            )}
+
+            {/* ── Notice Banner ── */}
+            <div className="rounded-xl border border-blue-100 bg-white p-3.5 shadow-sm dark:border-blue-900/30 dark:bg-[#0F1C33]">
+              <div className="flex items-start gap-2.5">
+                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-blue-500 dark:text-blue-400" />
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                  If your data or department student lab schedule is not found, please email your department Laboratory Schedule PDF to{" "}
+                  <a
+                    href="mailto:jaisondavidm.cs25@bitsathy.ac.in?subject=Laboratory%20Schedule%20PDF%20Submission"
+                    className="font-semibold text-blue-600 underline underline-offset-2 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                  >
+                    jaisondavidm.cs25@bitsathy.ac.in
+                  </a>
+                </p>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
-    </div>
   );
 }
