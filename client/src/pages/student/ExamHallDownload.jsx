@@ -716,7 +716,7 @@ export default function ExamHallDownload() {
               <div className="flex items-start gap-2.5">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-blue-500 dark:text-blue-400" />
                 <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  If your data or department student lab schedule is not found, please email your department Laboratory Schedule PDF to{" "}
+                  If your data or department student lab schedule is not found or is showing any incorrect data, please email your department Laboratory Schedule PDF to{" "}
                   <a
                     href="mailto:jaisondavidm.cs25@bitsathy.ac.in?subject=Laboratory%20Schedule%20PDF%20Submission"
                     className="font-semibold text-blue-600 underline underline-offset-2 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
