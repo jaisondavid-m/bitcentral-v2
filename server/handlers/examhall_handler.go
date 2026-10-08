@@ -61,6 +61,18 @@ func hallBlock(hallNo string) *string {
 		label = "Mechanical Block"
 	case strings.HasPrefix(upper, "SF"):
 		label = "SunFlower(SF) Block"
+	case strings.HasPrefix(upper, "CC"):
+		label = "Central Computing Centre (CC Block)"
+	case strings.HasPrefix(upper, "CSE"):
+		label = "CSE Block / Computer Lab"
+	case strings.HasPrefix(upper, "AIML"):
+		label = "AIML Block / Computer Lab"
+	case strings.HasPrefix(upper, "AI BASED"):
+		label = "Industrial Automation Lab"
+	case strings.HasPrefix(upper, "LATHE"):
+		label = "Mechanical Workshop / Lathe Shop"
+	case strings.HasPrefix(upper, "THERMAL"):
+		label = "Thermal Engineering Lab"
 	default:
 		return nil
 	}
