@@ -71,30 +71,7 @@ func SetupRouter(
 		})
 	})
 
-	r.GET("/docs/about", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"developer": gin.H{
-				"name": "Jaison David M",
-				"bio":  "1st-year CSE student at Bannari Amman Institute of Technology. Builds web apps and freelance services.",
-				"links": gin.H{
-					"github":    "https://github.com/jaisondavid-m",
-					"linkedin":  "https://www.linkedin.com/in/jaison-david-m-a14072360/",
-					"freelance": "https://herostack.netlify.app/",
-				},
-			},
-
-			"contact": gin.H{
-				"email":         "developer@bitsathy.in",
-				"phone":         "+919843777817",
-				"feedback_form": "https://forms.gle/LSMMFVBHSPUvPKKK9",
-			},
-		})
-	})
-
-	// Public / Internal AI Key route for mcp-server
-	r.GET("/internal/ai-key", aiHandler.GetInternalAIKey)
-
-	// Public routes
+	// Login & Auth Callback routes (Public)
 	r.GET("/auth/login", handler.HandleLogin)
 	r.GET("/auth/callback", func(c *gin.Context) {
 		code := c.Query("code")
@@ -126,23 +103,55 @@ func SetupRouter(
 	r.POST("/auth/google", studentLookupHandler.GoogleLogin)
 	r.POST("/auth/mobile/google", studentLookupHandler.MobileGoogleLogin)
 	r.POST("/api/auth/mobile/google", studentLookupHandler.MobileGoogleLogin)
-	r.POST("/auth/logout", studentLookupHandler.GoogleLogout)
-	r.GET("/auth/logout", studentLookupHandler.GoogleLogout)
-	r.GET("/exam-hall", examHallHandler.GetHall)
-	r.GET("/exam-hall/all", examHallHandler.GetAllHallsByRegNo)
-	r.GET("/faculty-directory", facultyDirectoryHandler.GetFacultyDirectory)
 	r.GET("/faculty-directory/auth/login", facultyDirectoryHandler.HandleDirectoryLogin)
-	r.GET("/faculty", facultyDirectoryHandler.GetFacultyDirectory)
-	r.POST("/api/chat", chatHandler.HandleChat)
-	r.POST("/chat", chatHandler.HandleChat)
 
-	// In-site Notifications (Public / User with auth)
-	r.GET("/notifications", notificationHandler.GetUserNotifications)
-
-	// Protected routes
+	// Protected routes (Requires logged-in user)
 	api := r.Group("/")
 	api.Use(handler.RequireAuth())
 	{
+		api.GET("/docs/about", func(c *gin.Context) {
+			c.JSON(200, gin.H{
+				"developer": gin.H{
+					"name": "Jaison David M",
+					"bio":  "1st-year CSE student at Bannari Amman Institute of Technology. Builds web apps and freelance services.",
+					"links": gin.H{
+						"github":    "https://github.com/jaisondavid-m",
+						"linkedin":  "https://www.linkedin.com/in/jaison-david-m-a14072360/",
+						"freelance": "https://herostack.netlify.app/",
+					},
+				},
+
+				"contact": gin.H{
+					"email":         "developer@bitsathy.in",
+					"phone":         "+919843777817",
+					"feedback_form": "https://forms.gle/LSMMFVBHSPUvPKKK9",
+				},
+			})
+		})
+
+		// Internal AI Key route
+		api.GET("/internal/ai-key", aiHandler.GetInternalAIKey)
+
+		// Logout
+		api.POST("/auth/logout", studentLookupHandler.GoogleLogout)
+		api.GET("/auth/logout", studentLookupHandler.GoogleLogout)
+
+		// Exam Hall
+		api.GET("/exam-hall", examHallHandler.GetHall)
+		api.GET("/exam-hall/all", examHallHandler.GetAllHallsByRegNo)
+
+		// Faculty Directory
+		api.GET("/faculty-directory", facultyDirectoryHandler.GetFacultyDirectory)
+		api.GET("/faculty", facultyDirectoryHandler.GetFacultyDirectory)
+
+		// Chat
+		api.POST("/api/chat", chatHandler.HandleChat)
+		api.POST("/chat", chatHandler.HandleChat)
+
+		// Notifications
+		api.GET("/notifications", notificationHandler.GetUserNotifications)
+
+		// Internal Marks & Cards
 		api.GET("/internal-marks/conversion", internalMarksHandler.GetInternalMarksConversion)
 		api.GET("/api/internal-marks/conversion", internalMarksHandler.GetInternalMarksConversion)
 		api.POST("/cards/:id/click", handlers.TrackCardClick)
@@ -185,24 +194,22 @@ func SetupRouter(
 		api.POST("/api/help/block", helpHandler.BlockAnonUser)
 		api.POST("/api/help/block-message", helpHandler.AdminBlockUserFromMessage)
 		api.GET("/api/help/my", helpHandler.GetMyHelpData)
+		api.GET("/help/public/rooms", helpHandler.GetRooms)
+
+		// Serve uploaded files
+		api.Static("/uploads", "./uploads")
+
+		// Leaderboard & Sponsors API
+		api.GET("/sponsors/leaderboard", sponsorsHandler.GetSponsorsLeaderboard)
+		api.GET("/sponsors/department-leaderboard", sponsorsHandler.GetDepartmentLeaderboard)
+		api.POST("/sponsors/check-contribution", sponsorsHandler.CheckContribution)
+		api.POST("/sponsors/create-order", sponsorsHandler.CreateOrder)
+		api.POST("/sponsors/capture-payment", sponsorsHandler.CapturePayment)
+		api.GET("/sponsors/certificate/:id", sponsorsHandler.GetCertificate)
+
+		// Proxy PDF by Google Drive ID
+		api.GET("/pdf/:id", uploadHandler.ProxyPDF)
 	}
-
-	// Public GET for help rooms (so unauthenticated preview works or protected inside handler)
-	r.GET("/help/public/rooms", helpHandler.GetRooms)
-
-	// Serve uploaded files
-	r.Static("/uploads", "./uploads")
-
-	// Public/Protected Leaderboard & Sponsors API
-	r.GET("/sponsors/leaderboard", sponsorsHandler.GetSponsorsLeaderboard)
-	r.GET("/sponsors/department-leaderboard", sponsorsHandler.GetDepartmentLeaderboard)
-	r.POST("/sponsors/check-contribution", sponsorsHandler.CheckContribution)
-	r.POST("/sponsors/create-order", sponsorsHandler.CreateOrder)
-	r.POST("/sponsors/capture-payment", sponsorsHandler.CapturePayment)
-	r.GET("/sponsors/certificate/:id", sponsorsHandler.GetCertificate)
-
-	// Proxy PDF by Google Drive ID (keeps original links hidden)
-	r.GET("/pdf/:id", uploadHandler.ProxyPDF)
 
 	// Admin routes
 	r.GET("/admin/super/check", adminHandler.CheckSuper)
