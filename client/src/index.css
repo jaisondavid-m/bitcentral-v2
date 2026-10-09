@@ -1,11 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* ============================================================
    DESIGN SYSTEM TOKENS (CSS Variables)
    ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 
 :root {
+  color-scheme: light;
+
   /* Surface & Background Colors (Light, Soft Pastel) */
   --bg:        #f5f4fa;  /* Base application canvas background */
   --bg-raised: #faf9ff;  /* Elevated sections & sidebars */
@@ -59,6 +63,28 @@
   --shadow-sm: 0 1px 4px rgba(110, 86, 207, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 16px rgba(110, 86, 207, 0.10), 0 2px 4px rgba(0, 0, 0, 0.04);
   --shadow-lg: 0 12px 40px rgba(110, 86, 207, 0.14), 0 4px 8px rgba(0, 0, 0, 0.04);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --bg:        #090d16;
+  --bg-raised: #0f172a;
+  --bg-card:   #1e293b;
+  --bg-input:  #1e293b;
+  --bg-hover:  #334155;
+
+  --border:        rgba(255, 255, 255, 0.10);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --border-accent: rgba(110, 86, 207, 0.60);
+
+  --text-primary:   #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted:     #64748b;
+  --text-accent:    #a78bfa;
+
+  --accent-dim:   rgba(110, 86, 207, 0.20);
+  --accent-glow:  rgba(110, 86, 207, 0.35);
 }
 
 @layer base {
