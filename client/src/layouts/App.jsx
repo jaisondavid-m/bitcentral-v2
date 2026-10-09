@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import FullScreenLoader from "@/components/common/FullScreenLoader.jsx";
 import SEO from "@/components/common/SEO.jsx";
 import DailySupportModal from "@/components/modals/DailySupportModal.jsx";
+import PWAInstallModal from "@/components/modals/PWAInstallModal.jsx";
 import FloatingMenu from "@/components/layout/FloatingMenu.jsx";
 import ErrorBoundary from "@/components/common/ErrorBoundary.jsx";
 import { lazyWithRetry } from "@/utils/lazyWithRetry.js";
@@ -339,6 +340,7 @@ function App() {
       </ErrorBoundary>
       <Analytics />
       <DailySupportModal />
+      <PWAInstallModal />
       <FloatingMenu />
     </>
   );
