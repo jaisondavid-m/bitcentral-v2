@@ -1,0 +1,70 @@
+package adminmodels
+
+type User struct {
+	ID             int    `json:"id"`
+	GoogleID       string `json:"google_id"`
+	UID            string `json:"uid"`
+	Email          string `json:"email"`
+	DisplayName    string `json:"displayName"`
+	Name           string `json:"name,omitempty"`
+	PhotoURL       string `json:"photoURL"`
+	CreationTime   string `json:"creationTime"`
+	LastSignInTime string `json:"lastSignInTime"`
+	LastSeenAt     string `json:"lastSeenAt"`
+	LastUsedRoute  string `json:"lastUsedRoute"`
+	IsOnline       bool   `json:"isOnline"`
+	IsAdmin        bool   `json:"isAdmin"`
+	IsBlocked      bool   `json:"isBlocked"`
+	BlockedAt      string `json:"blockedAt"`
+	Role           string `json:"role"`
+	RollNo         string `json:"roll_no,omitempty"`
+	RegisterNo     string `json:"register_no,omitempty"`
+	UserID         string `json:"user_id,omitempty"`
+	Department     string `json:"department,omitempty"`
+	Batch          string `json:"batch,omitempty"`
+	Phone          string `json:"phone,omitempty"`
+}
+
+type UserWithRollNo struct {
+	User
+	RollNo string `json:"roll_no"`
+}
+
+
+type QBAnswerKey struct {
+	ID           int     `json:"id"`
+	Year         int     `json:"year"`
+	Department   string  `json:"department"`
+	SubjectCode  string  `json:"subject_code"`
+	SubjectName  string  `json:"subject_name"`
+	QB1          *string `json:"qb1"`
+	QB2          *string `json:"qb2"`
+	AK1          *string `json:"ak1"`
+	AK2          *string `json:"ak2"`
+	SemQBWithAns *string `json:"semqbwithans"`
+	CreatedAt    string  `json:"created_at"`
+	UpdatedAt    string  `json:"updated_at"`
+}
+
+type QBAnswerKeyInput struct {
+	Year         int     `json:"year" binding:"required"`
+	Department   string  `json:"department"`
+	SubjectCode  string  `json:"subject_code" binding:"required"`
+	SubjectName  string  `json:"subject_name" binding:"required"`
+	QB1          *string `json:"qb1"`
+	QB2          *string `json:"qb2"`
+	AK1          *string `json:"ak1"`
+	AK2          *string `json:"ak2"`
+	SemQBWithAns *string `json:"semqbwithans"`
+}
+
+type QBAnswerKeyBatchInput struct {
+	Year     int                `json:"year" binding:"required"`
+	Subjects []QBAnswerKeyInput `json:"subjects" binding:"required"`
+}
+
+type QBAnswerKeyReorderInput struct {
+	Year       int    `json:"year" binding:"required"`
+	Department string `json:"department"`
+	SubjectIDs []int  `json:"subject_ids" binding:"required"`
+}

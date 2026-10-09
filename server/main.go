@@ -8,7 +8,9 @@ import (
 	"github.com/joho/godotenv"
 
 	"server/config"
-	"server/handlers"
+	"server/handlers/admin"
+	"server/handlers/common"
+	"server/handlers/student"
 	"server/routes"
 )
 
@@ -26,7 +28,7 @@ func main() {
 		config.InitGoogleOAuth()
 	}
 
-	sheetHandler := handlers.NewSheetHandler()
+	sheetHandler := student.NewSheetHandler()
 	sheetHandler.InitOAuth()
 
 	if sheetHandler.LoadSavedToken() {
@@ -35,28 +37,28 @@ func main() {
 		fmt.Println("Not authenticated. Visit: http://localhost:8080/auth/login")
 	}
 
-	cardHandler := handlers.NewCardHandler()
-	semesterHandler := handlers.NewSemesterHandler()
-	adminHandler := handlers.NewAdminHandler()
-	examHallHandler := handlers.NewExamHallHandler()
-	messHandler := handlers.NewMessHandler()
-	leaderboardHandler := handlers.NewLeaderboardHandler(sheetHandler)
-	leaveHandler := handlers.NewLeaveHandler()
-	qbHandler := handlers.NewQBHandler()
-	studentLookupHandler := handlers.NewStudentLookupHandler()
-	uploadHandler := handlers.NewUploadHandler()
-	trackerUserHandler := handlers.NewTrackerUserHandler()
-	sponsorsHandler := handlers.NewSponsorsHandler()
-	feedbackHandler := handlers.NewFeedbackHandler()
-	analyticsHandler := handlers.NewAnalyticsHandler()
-	facultyDirectoryHandler := handlers.NewFacultyDirectoryHandler(sheetHandler)
-	chatHandler := handlers.NewChatHandler()
-	aiHandler := handlers.NewAIHandler()
-	mailHandler := handlers.NewMailHandler()
+	cardHandler := student.NewCardHandler()
+	semesterHandler := student.NewSemesterHandler()
+	adminHandler := admin.NewAdminHandler()
+	examHallHandler := student.NewExamHallHandler()
+	messHandler := student.NewMessHandler()
+	leaderboardHandler := student.NewLeaderboardHandler(sheetHandler)
+	leaveHandler := student.NewLeaveHandler()
+	qbHandler := student.NewQBHandler()
+	studentLookupHandler := admin.NewStudentLookupHandler()
+	uploadHandler := common.NewUploadHandler()
+	trackerUserHandler := admin.NewTrackerUserHandler()
+	sponsorsHandler := admin.NewSponsorsHandler()
+	feedbackHandler := common.NewFeedbackHandler()
+	analyticsHandler := admin.NewAnalyticsHandler()
+	facultyDirectoryHandler := admin.NewFacultyDirectoryHandler(sheetHandler)
+	chatHandler := common.NewChatHandler()
+	aiHandler := common.NewAIHandler()
+	mailHandler := common.NewMailHandler()
 	mailHandler.StartQueueWorker()
-	internalMarksHandler := handlers.NewInternalMarksHandler()
-	notificationHandler := handlers.NewNotificationHandler()
-	helpHandler := handlers.NewHelpHandler()
+	internalMarksHandler := student.NewInternalMarksHandler()
+	notificationHandler := common.NewNotificationHandler()
+	helpHandler := common.NewHelpHandler()
 
 	r := routes.SetupRouter(
 		sheetHandler,
