@@ -1,2 +1,263 @@
 @import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================
+   DESIGN SYSTEM TOKENS (CSS Variables)
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+:root {
+  /* Surface & Background Colors (Light, Soft Pastel) */
+  --bg:        #f5f4fa;  /* Base application canvas background */
+  --bg-raised: #faf9ff;  /* Elevated sections & sidebars */
+  --bg-card:   #ffffff;  /* Primary card container */
+  --bg-input:  #f0eef8;  /* Form field fills & tab backgrounds */
+  --bg-hover:  #ebe8f5;  /* Subtle hover interactive states */
+
+  /* Borders & Dividers */
+  --border:        rgba(110, 86, 207, 0.10); /* Soft subtle divider */
+  --border-strong: rgba(110, 86, 207, 0.20); /* Card / Input boundary */
+  --border-accent: rgba(110, 86, 207, 0.40); /* Focused highlight / active tab */
+
+  /* Typography Colors */
+  --text-primary:   #1e1a30; /* High contrast navy-charcoal */
+  --text-secondary: #6b6589; /* Subtitle / label text */
+  --text-muted:     #a89fc4; /* Captions / placeholders */
+  --text-accent:    #6e56cf; /* Accent highlight text */
+
+  /* Primary Accent & Brand (Purple Violet #6E56CF) */
+  --accent:       #6e56cf;
+  --accent-dim:   rgba(110, 86, 207, 0.08);
+  --accent-glow:  rgba(110, 86, 207, 0.16);
+
+  /* Semantic Destructive & State Colors */
+  --green:        #30a46c;                  /* Success Green */
+  --green-bg:     rgba(48, 164, 108, 0.08);
+  --green-border: rgba(48, 164, 108, 0.25);
+
+  --amber:        #d97706;                  /* Warning Amber */
+  --amber-bg:     rgba(217, 119, 6, 0.08);
+  --amber-border: rgba(217, 119, 6, 0.25);
+
+  --red:          #e5484d;                  /* Destructive Red */
+  --red-bg:       rgba(229, 72, 77, 0.08);
+  --red-border:   rgba(229, 72, 77, 0.20);
+
+  /* Typography Stack */
+  --font-ui:   'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Border Radii Hierarchy */
+  --radius-sm: 6px;   /* Small elements (buttons, inputs, pills) */
+  --radius-md: 10px;  /* Medium components (cards, list items, dropdowns) */
+  --radius-lg: 14px;  /* Modals / Large cards / Workspace panes */
+  --radius-xl: 20px;  /* Auth containers / Hero elements */
+
+  /* Motion & Transitions */
+  --transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Multi-layered Soft Shadows (Violet-tinted) */
+  --shadow-sm: 0 1px 4px rgba(110, 86, 207, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 16px rgba(110, 86, 207, 0.10), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 40px rgba(110, 86, 207, 0.14), 0 4px 8px rgba(0, 0, 0, 0.04);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+}
+
+/* Typography Utilities */
+.font-ui { font-family: var(--font-ui); }
+.font-mono { font-family: var(--font-mono); }
+
+/* Buttons */
+.btn {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all var(--transition);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(110, 86, 207, 0.30);
+}
+.btn-primary:hover {
+  opacity: 0.94;
+  box-shadow: 0 6px 20px rgba(110, 86, 207, 0.38);
+}
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-secondary {
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.btn-danger {
+  background: var(--red);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(229, 72, 77, 0.30);
+}
+.btn-danger:hover {
+  opacity: 0.94;
+  box-shadow: 0 6px 20px rgba(229, 72, 77, 0.38);
+}
+
+/* Status Pills & Badges */
+.status-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.2;
+}
+
+.status-active, .status-accent {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid var(--border-strong);
+}
+
+.status-pending, .status-neutral {
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.status-error, .status-red {
+  background: var(--red-bg);
+  color: var(--red);
+  border: 1px solid var(--red-border);
+}
+
+.badge-kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.badge-kicker::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+/* Data Cards & Panels */
+.panel-card, .data-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+
+.data-card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-strong);
+}
+
+/* Form Controls */
+.custom-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition), background-color var(--transition);
+  width: 100%;
+}
+.custom-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+  background: var(--bg-card);
+}
+.custom-input::placeholder { color: var(--text-muted); }
+
+/* Custom Scrollbars */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 150ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-scaleUp {
+  animation: scaleUp 180ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}

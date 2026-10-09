@@ -59,6 +59,16 @@ func buildSeatingData09Oct2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "IT LAB 1", CourseCode: "22IT502", RegisterNos: expandRange("7376242IT135", "7376242IT168"), Time: "10:30 AM – 12:00 Noon"},
 		{HallNo: "IT LAB 5", CourseCode: "22IT504", RegisterNos: expandRange("7376242IT235", "7376242IT268"), Time: "08:45 AM – 10:15 AM"},
 		{HallNo: "IT LAB 5", CourseCode: "22IT504", RegisterNos: expandRange("7376242IT269", "7376242IT301"), Time: "10:30 AM – 12:00 Noon"},
+
+		// ECE
+		{HallNo: "Cyber Physical Lab 1", CourseCode: "22EC501", RegisterNos: append(append(expandRange("7376241EC103", "7376241EC110"), expandRange("7376241EC112", "7376241EC113")...), expandRange("7376241EC115", "7376241EC137")...), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "Cyber Physical Lab 1", CourseCode: "22EC501", RegisterNos: expandRange("7376241EC138", "7376241EC170"), Time: "10:30 AM – 12:00 Noon"},
+		{HallNo: "Cyber Physical Lab 3", CourseCode: "22EC503", RegisterNos: expandRange("7376241EC241", "7376241EC274"), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "Cyber Physical Lab 3", CourseCode: "22EC503", RegisterNos: expandRange("7376241EC275", "7376241EC307"), Time: "10:30 AM – 12:00 Noon"},
+		{HallNo: "ECE Department CC Lab", CourseCode: "22EC502", RegisterNos: append(expandRange("7376241EC171", "7376241EC174"), expandRange("7376241EC176", "7376241EC205")...), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "ECE Department CC Lab", CourseCode: "22EC502", RegisterNos: append(append(expandRange("7376241EC206", "7376241EC207"), expandRange("7376241EC209", "7376241EC230")...), expandRange("7376241EC232", "7376241EC240")...), Time: "10:30 AM – 12:00 Noon"},
+		{HallNo: "VLSI Lab", CourseCode: "22EC504", RegisterNos: expandRange("7376241EC308", "7376241EC340"), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "VLSI Lab", CourseCode: "22EC504", RegisterNos: append(expandRange("7376241EC341", "7376241EC352"), expandRange("7376251EC501", "7376251EC521")...), Time: "10:30 AM – 12:00 Noon"},
 	}
 }
 
@@ -105,6 +115,16 @@ func buildSeatingData10Oct2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "IT LAB 1", CourseCode: "22IT502", RegisterNos: expandRange("7376242IT269", "7376242IT301"), Time: "10:30 AM – 12:00 Noon"},
 		{HallNo: "IT LAB 5", CourseCode: "22IT504", RegisterNos: expandRange("7376242IT101", "7376242IT134"), Time: "08:45 AM – 10:15 AM"},
 		{HallNo: "IT LAB 5", CourseCode: "22IT504", RegisterNos: expandRange("7376242IT135", "7376242IT168"), Time: "10:30 AM – 12:00 Noon"},
+
+		// ECE
+		{HallNo: "Cyber Physical Lab 1", CourseCode: "22EC501", RegisterNos: append(expandRange("7376241EC171", "7376241EC174"), expandRange("7376241EC176", "7376241EC205")...), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "Cyber Physical Lab 1", CourseCode: "22EC501", RegisterNos: append(append(expandRange("7376241EC206", "7376241EC207"), expandRange("7376241EC209", "7376241EC230")...), expandRange("7376241EC232", "7376241EC240")...), Time: "10:30 AM – 12:00 Noon"},
+		{HallNo: "Cyber Physical Lab 3", CourseCode: "22EC503", RegisterNos: expandRange("7376241EC308", "7376241EC340"), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "Cyber Physical Lab 3", CourseCode: "22EC503", RegisterNos: append(expandRange("7376241EC341", "7376241EC352"), expandRange("7376251EC501", "7376251EC521")...), Time: "10:30 AM – 12:00 Noon"},
+		{HallNo: "ECE Department CC Lab", CourseCode: "22EC502", RegisterNos: expandRange("7376241EC241", "7376241EC274"), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "ECE Department CC Lab", CourseCode: "22EC502", RegisterNos: expandRange("7376241EC275", "7376241EC307"), Time: "10:30 AM – 12:00 Noon"},
+		{HallNo: "VLSI Lab", CourseCode: "22EC504", RegisterNos: append(append(expandRange("7376241EC103", "7376241EC110"), expandRange("7376241EC112", "7376241EC113")...), expandRange("7376241EC115", "7376241EC137")...), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "VLSI Lab", CourseCode: "22EC504", RegisterNos: expandRange("7376241EC138", "7376241EC170"), Time: "10:30 AM – 12:00 Noon"},
 	}
 }
 
@@ -200,6 +220,16 @@ func buildSeatingData12Oct2026FN() []studentmodels.SeatingRecord {
 			"7376242IT207", "7376242IT208", "7376242IT209", "7376242IT210",
 			"7376242IT211", "7376242IT213", "7376242IT215",
 		}, Time: "10:30 AM – 12:00 Noon"},
+
+		// ECE
+		{HallNo: "Cyber Physical Lab 1", CourseCode: "22EC501", RegisterNos: expandRange("7376241EC241", "7376241EC274"), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "Cyber Physical Lab 1", CourseCode: "22EC501", RegisterNos: expandRange("7376241EC275", "7376241EC307"), Time: "10:30 AM – 12:00 Noon"},
+		{HallNo: "Cyber Physical Lab 3", CourseCode: "22EC503", RegisterNos: append(append(expandRange("7376241EC103", "7376241EC110"), expandRange("7376241EC112", "7376241EC113")...), expandRange("7376241EC115", "7376241EC137")...), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "Cyber Physical Lab 3", CourseCode: "22EC503", RegisterNos: expandRange("7376241EC138", "7376241EC170"), Time: "10:30 AM – 12:00 Noon"},
+		{HallNo: "ECE Department CC Lab", CourseCode: "22EC502", RegisterNos: expandRange("7376241EC308", "7376241EC340"), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "ECE Department CC Lab", CourseCode: "22EC502", RegisterNos: append(expandRange("7376241EC341", "7376241EC352"), expandRange("7376251EC501", "7376251EC521")...), Time: "10:30 AM – 12:00 Noon"},
+		{HallNo: "VLSI Lab", CourseCode: "22EC504", RegisterNos: append(expandRange("7376241EC171", "7376241EC174"), expandRange("7376241EC176", "7376241EC205")...), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "VLSI Lab", CourseCode: "22EC504", RegisterNos: append(append(expandRange("7376241EC206", "7376241EC207"), expandRange("7376241EC209", "7376241EC230")...), expandRange("7376241EC232", "7376241EC240")...), Time: "10:30 AM – 12:00 Noon"},
 	}
 }
 
@@ -356,6 +386,16 @@ func buildSeatingData13Oct2026FN() []studentmodels.SeatingRecord {
 			"7376252IT508", "7376252IT509", "7376252IT511", "7376252IT512",
 			"7376252IT513", "7376252IT514", "7376252IT515", "7376252IT516",
 		}, Time: "10:30 AM – 12:00 Noon"},
+
+		// ECE
+		{HallNo: "Cyber Physical Lab 1", CourseCode: "22EC501", RegisterNos: expandRange("7376241EC308", "7376241EC340"), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "Cyber Physical Lab 1", CourseCode: "22EC501", RegisterNos: append(expandRange("7376241EC341", "7376241EC352"), expandRange("7376251EC501", "7376251EC521")...), Time: "10:30 AM – 12:00 Noon"},
+		{HallNo: "Cyber Physical Lab 3", CourseCode: "22EC503", RegisterNos: append(expandRange("7376241EC171", "7376241EC174"), expandRange("7376241EC176", "7376241EC205")...), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "Cyber Physical Lab 3", CourseCode: "22EC503", RegisterNos: append(append(expandRange("7376241EC206", "7376241EC207"), expandRange("7376241EC209", "7376241EC230")...), expandRange("7376241EC232", "7376241EC240")...), Time: "10:30 AM – 12:00 Noon"},
+		{HallNo: "ECE Department CC Lab", CourseCode: "22EC502", RegisterNos: append(append(expandRange("7376241EC103", "7376241EC110"), expandRange("7376241EC112", "7376241EC113")...), expandRange("7376241EC115", "7376241EC137")...), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "ECE Department CC Lab", CourseCode: "22EC502", RegisterNos: expandRange("7376241EC138", "7376241EC170"), Time: "10:30 AM – 12:00 Noon"},
+		{HallNo: "VLSI Lab", CourseCode: "22EC504", RegisterNos: expandRange("7376241EC241", "7376241EC274"), Time: "08:45 AM – 10:15 AM"},
+		{HallNo: "VLSI Lab", CourseCode: "22EC504", RegisterNos: expandRange("7376241EC275", "7376241EC307"), Time: "10:30 AM – 12:00 Noon"},
 	}
 }
 
