@@ -45,9 +45,11 @@ export default function FloatingMenu() {
 
   // Hover states for sub-buttons
   const [hoveredBtn, setHoveredBtn] = useState(null);
+  const isFetchingRef = useRef(false);
 
   const fetchMessages = async (markRead = false) => {
-    if (!user) return;
+    if (!user || isFetchingRef.current) return;
+    isFetchingRef.current = true;
     try {
       const data = await getFeedbackMessages(markRead);
       if (Array.isArray(data)) {
@@ -58,16 +60,20 @@ export default function FloatingMenu() {
         setHasUnreadAdminMsg(unread);
       }
     } catch (err) {
-      // Ignore errors silently
+      console.error("Failed to fetch feedback messages", err);
+    } finally {
+      isFetchingRef.current = false;
     }
   };
 
+  const userIdentifier = user?.email || user?.uid || user?.roll_no || "";
+
   useEffect(() => {
-    if (user && isChatOpen) {
+    if (userIdentifier && isChatOpen) {
       setLoading(true);
       fetchMessages(true).finally(() => setLoading(false));
     }
-  }, [user, isChatOpen]);
+  }, [userIdentifier, isChatOpen]);
 
   const messagesContainerRef = useRef(null);
 
@@ -120,7 +126,6 @@ export default function FloatingMenu() {
     setIsMenuOpen(false);
     setIsChatOpen(true);
     setHasUnreadAdminMsg(false);
-    fetchMessages(true);
   };
 
   const handleGoHome = () => {
