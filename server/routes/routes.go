@@ -8,33 +8,35 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
-	"server/handlers"
+	"server/handlers/admin"
+	"server/handlers/common"
+	"server/handlers/student"
 	"server/middleware"
 )
 
 func SetupRouter(
-	handler *handlers.SheetHandler,
-	cardHandler *handlers.CardHandler,
-	semesterHandler *handlers.SemesterHandler,
-	adminHandler *handlers.AdminHandler,
-	messHandler *handlers.MessHandler,
-	leaderboardHandler *handlers.LeaderboardHandler,
-	leaveHandler *handlers.LeaveHandler,
-	examHallHandler *handlers.ExamHallHandler,
-	qbHandler *handlers.QBHandler,
-	studentLookupHandler *handlers.StudentLookupHandler,
-	uploadHandler *handlers.UploadHandler,
-	trackerUserHandler *handlers.TrackerUserHandler,
-	sponsorsHandler *handlers.SponsorsHandler,
-	feedbackHandler *handlers.FeedbackHandler,
-	analyticsHandler *handlers.AnalyticsHandler,
-	facultyDirectoryHandler *handlers.FacultyDirectoryHandler,
-	chatHandler *handlers.ChatHandler,
-	aiHandler *handlers.AIHandler,
-	mailHandler *handlers.MailHandler,
-	internalMarksHandler *handlers.InternalMarksHandler,
-	notificationHandler *handlers.NotificationHandler,
-	helpHandler *handlers.HelpHandler,
+	handler *student.SheetHandler,
+	cardHandler *student.CardHandler,
+	semesterHandler *student.SemesterHandler,
+	adminHandler *admin.AdminHandler,
+	messHandler *student.MessHandler,
+	leaderboardHandler *student.LeaderboardHandler,
+	leaveHandler *student.LeaveHandler,
+	examHallHandler *student.ExamHallHandler,
+	qbHandler *student.QBHandler,
+	studentLookupHandler *admin.StudentLookupHandler,
+	uploadHandler *common.UploadHandler,
+	trackerUserHandler *admin.TrackerUserHandler,
+	sponsorsHandler *admin.SponsorsHandler,
+	feedbackHandler *common.FeedbackHandler,
+	analyticsHandler *admin.AnalyticsHandler,
+	facultyDirectoryHandler *admin.FacultyDirectoryHandler,
+	chatHandler *common.ChatHandler,
+	aiHandler *common.AIHandler,
+	mailHandler *common.MailHandler,
+	internalMarksHandler *student.InternalMarksHandler,
+	notificationHandler *common.NotificationHandler,
+	helpHandler *common.HelpHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -154,8 +156,8 @@ func SetupRouter(
 		// Internal Marks & Cards
 		api.GET("/internal-marks/conversion", internalMarksHandler.GetInternalMarksConversion)
 		api.GET("/api/internal-marks/conversion", internalMarksHandler.GetInternalMarksConversion)
-		api.POST("/cards/:id/click", handlers.TrackCardClick)
-		api.GET("/cards", handlers.GetCards)
+		api.POST("/cards/:id/click", student.TrackCardClick)
+		api.GET("/cards", student.GetCards)
 		api.GET("/leaves", leaveHandler.GetAllLeaves)
 		api.GET("/search", handler.UniversalSearch)
 		api.GET("/rewards", handler.GetRewardsByRollNo)
@@ -258,12 +260,12 @@ func SetupRouter(
 		admin.POST("/ai-key/test", aiHandler.TestAIKey)
 
 		// Cards admin CRUD
-		admin.GET("/cards", handlers.GetCards)
-		admin.POST("/cards", handlers.CreateCard)
-		admin.POST("/cards/bulk", handlers.BulkUploadCards)
-		admin.PUT("/cards/:id", handlers.UpdateCard)
-		admin.PUT("/cards/reorder", handlers.ReorderCards)
-		admin.DELETE("/cards/:id", handlers.DeleteCard)
+		admin.GET("/cards", student.GetCards)
+		admin.POST("/cards", student.CreateCard)
+		admin.POST("/cards/bulk", student.BulkUploadCards)
+		admin.PUT("/cards/:id", student.UpdateCard)
+		admin.PUT("/cards/reorder", student.ReorderCards)
+		admin.DELETE("/cards/:id", student.DeleteCard)
 
 		// Leaves admin CRUD
 		admin.GET("/leaves", leaveHandler.GetAllLeaves)

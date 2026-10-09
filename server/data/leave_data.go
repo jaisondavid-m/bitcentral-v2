@@ -1,8 +1,8 @@
 package data
 
-import "server/models"
+import "server/models/student"
 
-var Holidays = []models.Holiday{
+var Holidays = []studentmodels.Holiday{
 	// June 2026
 	{
 		FromDate: "2026-06-26(AN)",

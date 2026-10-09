@@ -1,12 +1,12 @@
 package data
 
-import "server/models"
+import "server/models/student"
 
 func strPtr(s string) *string {
 	return &s
 }
 
-var SemestersData = map[int][]models.SemesterSubject{
+var SemestersData = map[int][]studentmodels.SemesterSubject{
 	25: {
 		{
 			Code:         nil, // or strPtr("22MA101")
