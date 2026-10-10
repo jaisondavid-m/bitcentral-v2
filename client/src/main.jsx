@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HelmetProvider } from "react-helmet-async";
 import "@/utils/lottiePreloader.js";
 import "./index.css";
+import * as serviceWorkerRegistration from "./serviceWorkerRegistration.js";
 
 const queryClient = new QueryClient();
 
@@ -33,3 +34,7 @@ createRoot(document.getElementById("root")).render(
     </HelmetProvider>
   </StrictMode>
 );
+
+// Register service worker for production-ready PWA functionality
+serviceWorkerRegistration.register();
+
