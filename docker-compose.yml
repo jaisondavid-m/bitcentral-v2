@@ -1,0 +1,62 @@
+services:
+  # Go Backend Server Service (Connects to TiDB Cloud MySQL)
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: bitcentral-server
+    restart: always
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./server/.env
+    environment:
+      - PORT=8080
+      - GIN_MODE=release
+    volumes:
+      - server_pdfs:/app/pdfs
+    networks:
+      - bitcentral-net
+
+  # Vite / React Web Client Service (Nginx)
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
+    container_name: bitcentral-client
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      - bitcentral-net
+    depends_on:
+      - server
+
+  # BitCentral MCP Server Service
+  mcp-server:
+    build:
+      context: ./mcp-server
+      dockerfile: Dockerfile
+    container_name: bitcentral-mcp-server
+    restart: always
+    ports:
+      - "8081:8081"
+    env_file:
+      - ./mcp-server/.env
+    environment:
+      - PORT=8081
+      - BACKEND_URL=http://server:8080
+    networks:
+      - bitcentral-net
+    depends_on:
+      - server
+
+networks:
+  bitcentral-net:
+    driver: bridge
+
+volumes:
+  server_pdfs:
+    driver: local
