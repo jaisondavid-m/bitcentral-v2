@@ -7,6 +7,7 @@ import (
 	"math"
 	"net/http"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -113,6 +114,10 @@ var deptNameMap = map[string]string{
 	"electrical & electronics engineering":         "ee",
 	"eee":                                          "ee",
 	"ee":                                           "ee",
+	"electronics and instrumentation engineering":  "ei",
+	"electronics & instrumentation engineering":    "ei",
+	"eie":                                          "ei",
+	"ei":                                           "ei",
 	"computer technology":                          "ct",
 	"ct":                                           "ct",
 	"biotechnology":                                "bt",
@@ -188,6 +193,41 @@ func (h *AdminHandler) syncUsersToDB() error {
 	return nil
 }
 
+func parseTimestampToUnix(val string) int64 {
+	val = strings.TrimSpace(val)
+	if val == "" || val == "-" {
+		return 0
+	}
+	if num, err := strconv.ParseInt(val, 10, 64); err == nil {
+		if num > 1e11 {
+			return num / 1000
+		}
+		return num
+	}
+	layouts := []string{
+		"2006-01-02 15:04:05",
+		time.RFC3339,
+		time.RFC3339Nano,
+		"2006-01-02T15:04:05",
+		time.RFC1123,
+		time.RFC1123Z,
+		"2006-01-02 15:04:05 -0700 MST",
+		"2006-01-02 15:04:05.000",
+		"2006-01-02",
+	}
+	for _, layout := range layouts {
+		if t, err := time.Parse(layout, val); err == nil {
+			return t.Unix()
+		}
+	}
+	clean := strings.TrimSuffix(val, "Z")
+	clean = strings.Replace(clean, "T", " ", 1)
+	if t, err := time.Parse("2006-01-02 15:04:05", clean); err == nil {
+		return t.Unix()
+	}
+	return 0
+}
+
 func (h *AdminHandler) GetUsers(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if page < 1 {
@@ -224,11 +264,19 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 	}
 
 	idQuery := "0 AS id"
-	orderQuery := "creation_time DESC"
+	idOrder := "creation_time DESC"
 	if hasIDCol {
 		idQuery = "COALESCE(id, 0)"
-		orderQuery = "id DESC"
+		idOrder = "id DESC"
 	}
+
+	orderQuery := fmt.Sprintf(`
+		CASE WHEN last_seen_at IS NOT NULL AND last_seen_at != '' AND last_seen_at != '-' THEN 0 ELSE 1 END ASC,
+		last_seen_at DESC,
+		CASE WHEN last_sign_in_time IS NOT NULL AND last_sign_in_time != '' AND last_sign_in_time != '-' THEN 0 ELSE 1 END ASC,
+		last_sign_in_time DESC,
+		creation_time DESC,
+		%s`, idOrder)
 
 	queryStr := fmt.Sprintf(`SELECT %s, COALESCE(google_id, COALESCE(uid, '')), COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(creation_time, ''), COALESCE(last_sign_in_time, ''), COALESCE(last_seen_at, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%%Y-%%m-%%dT%%H:%%i:%%sZ'), ''), COALESCE(role, 'user') FROM users ORDER BY %s`, idQuery, orderQuery)
 
@@ -296,6 +344,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		"it":     0,
 		"ad":     0,
 		"ee":     0,
+		"ei":     0,
 		"al":     0,
 		"cb":     0,
 		"bt":     0,
@@ -429,6 +478,51 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 
 		filtered = append(filtered, u)
 	}
+
+	// Sort so that the lastly online person is first, then the next, in descending order
+	sort.SliceStable(filtered, func(i, j int) bool {
+		u1 := filtered[i]
+		u2 := filtered[j]
+
+		t1Seen := parseTimestampToUnix(u1.LastSeenAt)
+		t2Seen := parseTimestampToUnix(u2.LastSeenAt)
+
+		if t1Seen > 0 && t2Seen > 0 {
+			if t1Seen != t2Seen {
+				return t1Seen > t2Seen // latest online first
+			}
+		} else if t1Seen > 0 {
+			return true
+		} else if t2Seen > 0 {
+			return false
+		}
+
+		t1Sign := parseTimestampToUnix(u1.LastSignInTime)
+		t2Sign := parseTimestampToUnix(u2.LastSignInTime)
+		if t1Sign > 0 && t2Sign > 0 {
+			if t1Sign != t2Sign {
+				return t1Sign > t2Sign
+			}
+		} else if t1Sign > 0 {
+			return true
+		} else if t2Sign > 0 {
+			return false
+		}
+
+		t1Create := parseTimestampToUnix(u1.CreationTime)
+		t2Create := parseTimestampToUnix(u2.CreationTime)
+		if t1Create > 0 && t2Create > 0 {
+			if t1Create != t2Create {
+				return t1Create > t2Create
+			}
+		} else if t1Create > 0 {
+			return true
+		} else if t2Create > 0 {
+			return false
+		}
+
+		return u1.ID > u2.ID
+	})
 
 	totalFiltered := len(filtered)
 	totalPages := int(math.Ceil(float64(totalFiltered) / float64(limit)))

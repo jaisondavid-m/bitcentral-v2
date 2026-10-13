@@ -11,11 +11,19 @@ const departmentMap = {
   al: "Artificial Intelligence & Machine Learning",
   ec: "Electronics and Communication Engineering",
   ee: "Electrical and Electronics Engineering",
+  ei: "Electronics and Instrumentation Engineering",
   ct: "Computer Technology",
   bt: "Biotechnology",
   cb: "Computer Science and Business Systems",
   mz: "Mechatronics",
   it: "Information Technology",
+  me: "Mechanical Engineering",
+  ce: "Civil Engineering",
+  bm: "Biomedical Engineering",
+  ae: "Aeronautical Engineering",
+  ag: "Agricultural Engineering",
+  ft: "Fashion Technology",
+  se: "Information Science and Engineering",
 };
 
 const decodeCollegeEmail = (email) => {

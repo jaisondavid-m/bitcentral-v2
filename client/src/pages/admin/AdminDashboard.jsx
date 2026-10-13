@@ -985,7 +985,12 @@ function UserTable({
             </th>
             <th className="px-4 py-3.5 text-left font-bold">#</th>
             <th className="px-4 py-3.5 text-left font-bold">User</th>
-            <th className="px-4 py-3.5 text-left font-bold">Last Seen</th>
+            <th className="px-4 py-3.5 text-left font-bold">
+              <span className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 font-bold" title="Sorted: lastly online person first">
+                Last Seen
+                <ChevronDown className="h-3.5 w-3.5" />
+              </span>
+            </th>
             <th className="px-4 py-3.5 text-left font-bold">Last Sign In</th>
             <th className="px-4 py-3.5 text-left font-bold">Created At</th>
             <th className="px-4 py-3.5 text-left font-bold">Role</th>
@@ -1415,7 +1420,7 @@ function UsersSection({ isSuper }) {
   const allowedBatches = ["2026-2030", "2025-2029", "2024-2028", "2023-2027", "2022-2026", "others"];
 
   const availableDepts = useMemo(() => {
-    const priorityCodes = ["cs", "ec", "it", "ad", "ee", "al", "cb", "bt", "ct", "me", "mz", "ce", "bm", "ae", "ag", "ft", "others"];
+    const priorityCodes = ["cs", "ec", "it", "ad", "ee", "ei", "al", "cb", "bt", "ct", "me", "mz", "ce", "bm", "ae", "ag", "ft", "others"];
     const list = [];
     const seen = new Set();
 
