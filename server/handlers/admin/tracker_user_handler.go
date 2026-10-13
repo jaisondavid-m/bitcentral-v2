@@ -44,6 +44,9 @@ var departmentMap = map[string]string{
 	"bm": "Biomedical Engineering",
 	"ce": "Civil Engineering",
 	"ft": "Fashion Technology",
+	"tx": "Textile Technology",
+	"fd": "Food Technology",
+	"cd": "Computer Design",
 	"me": "Mechanical Engineering",
 	"se": "Information Science and Engineering",
 }
