@@ -23,6 +23,9 @@ const departmentMap = {
   ae: "Aeronautical Engineering",
   ag: "Agricultural Engineering",
   ft: "Fashion Technology",
+  tx: "Textile Technology",
+  fd: "Food Technology",
+  cd: "Computer Design",
   se: "Information Science and Engineering",
 };
 

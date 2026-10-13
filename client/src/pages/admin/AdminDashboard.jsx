@@ -1420,7 +1420,7 @@ function UsersSection({ isSuper }) {
   const allowedBatches = ["2026-2030", "2025-2029", "2024-2028", "2023-2027", "2022-2026", "others"];
 
   const availableDepts = useMemo(() => {
-    const priorityCodes = ["cs", "ec", "it", "ad", "ee", "ei", "al", "cb", "bt", "ct", "me", "mz", "ce", "bm", "ae", "ag", "ft", "others"];
+    const priorityCodes = ["cs", "ec", "it", "ad", "ee", "ei", "cd", "al", "cb", "bt", "ct", "me", "mz", "ce", "bm", "ae", "ag", "ft", "tx", "fd", "se", "others"];
     const list = [];
     const seen = new Set();
 
@@ -3478,12 +3478,13 @@ const DEPARTMENT_MASTER = {
   ce: { code: "CE", alt: "CIVIL", name: "Civil Engineering (CE / CIVIL)" },
   ag: { code: "AG", alt: "AGRI", name: "Agricultural Engineering (AG / AGRI)" },
   bt: { code: "BT", alt: "BT", name: "Biotechnology (BT)" },
-  ft: { code: "FT", alt: "FT", name: "Food Technology (FT)" },
-  fd: { code: "FD", alt: "FD", name: "Fashion Technology (FD)" },
+  ft: { code: "FT", alt: "FT", name: "Fashion Technology (FT)" },
+  fd: { code: "FD", alt: "FD", name: "Food Department / Food Technology (FD)" },
+  tx: { code: "TX", alt: "TXT", name: "Textile Technology / Department (TX)" },
   bm: { code: "BM", alt: "BME", name: "Biomedical Engineering (BM / BME)" },
   mb: { code: "MB", alt: "MBA", name: "Management Studies (MB / MBA)" },
   cb: { code: "CB", alt: "CSBS", name: "Computer Science & Business Systems (CB / CSBS)" },
-  cd: { code: "CD", alt: "CSD", name: "Computer Science & Design (CD / CSD)" },
+  cd: { code: "CD", alt: "CSD", name: "Computer Design (CD / CSD)" },
   ct: { code: "CT", alt: "CT", name: "Computer Technology (CT)" },
   mz: { code: "MZ", alt: "MCTR", name: "Mechatronics Engineering (MZ)" },
 };
@@ -3538,12 +3539,13 @@ const DEFAULT_DEPARTMENTS_LIST = [
   { code: "CE", name: "Civil Engineering (CE / CIVIL)" },
   { code: "AG", name: "Agricultural Engineering (AG / AGRI)" },
   { code: "BT", name: "Biotechnology (BT)" },
-  { code: "FT", name: "Food Technology (FT)" },
-  { code: "FD", name: "Fashion Technology (FD)" },
+  { code: "FT", name: "Fashion Technology (FT)" },
+  { code: "FD", name: "Food Department / Food Technology (FD)" },
+  { code: "TX", name: "Textile Technology / Department (TX)" },
   { code: "BM", name: "Biomedical Engineering (BM / BME)" },
   { code: "MB", name: "Management Studies (MB / MBA)" },
   { code: "CB", name: "Computer Science & Business Systems (CB / CSBS)" },
-  { code: "CD", name: "Computer Science & Design (CD / CSD)" },
+  { code: "CD", name: "Computer Design (CD / CSD)" },
   { code: "CT", name: "Computer Technology (CT)" },
   { code: "MZ", name: "Mechatronics Engineering (MZ)" },
 ];
