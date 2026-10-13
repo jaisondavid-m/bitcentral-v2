@@ -88,6 +88,101 @@ func normalizeBatchLabel(batchStr string, email string) string {
 	return "others"
 }
 
+var deptNameMap = map[string]string{
+	"computer science and engineering":             "cs",
+	"computer science & engineering":               "cs",
+	"cse":                                          "cs",
+	"cs":                                           "cs",
+	"information technology":                       "it",
+	"it":                                           "it",
+	"electronics and communication engineering":    "ec",
+	"electronics & communication engineering":      "ec",
+	"ece":                                          "ec",
+	"ec":                                           "ec",
+	"artificial intelligence & data science":       "ad",
+	"artificial intelligence and data science":     "ad",
+	"ai & ds":                                      "ad",
+	"aids":                                         "ad",
+	"ad":                                           "ad",
+	"artificial intelligence & machine learning":   "al",
+	"artificial intelligence and machine learning": "al",
+	"ai & ml":                                      "al",
+	"aiml":                                         "al",
+	"al":                                           "al",
+	"electrical and electronics engineering":       "ee",
+	"electrical & electronics engineering":         "ee",
+	"eee":                                          "ee",
+	"ee":                                           "ee",
+	"computer technology":                          "ct",
+	"ct":                                           "ct",
+	"biotechnology":                                "bt",
+	"bt":                                           "bt",
+	"computer science and business systems":        "cb",
+	"computer science & business systems":          "cb",
+	"csbs":                                         "cb",
+	"cb":                                           "cb",
+	"mechatronics":                                 "mz",
+	"mechatronics engineering":                     "mz",
+	"mte":                                          "mz",
+	"mz":                                           "mz",
+	"mechanical engineering":                       "me",
+	"mech":                                         "me",
+	"me":                                           "me",
+	"civil engineering":                            "ce",
+	"civil":                                        "ce",
+	"ce":                                           "ce",
+	"biomedical engineering":                       "bm",
+	"bme":                                          "bm",
+	"bm":                                           "bm",
+	"aeronautical engineering":                     "ae",
+	"aero":                                         "ae",
+	"ae":                                           "ae",
+	"agricultural engineering":                     "ag",
+	"agri":                                         "ag",
+	"ag":                                           "ag",
+	"fashion technology":                           "ft",
+	"ft":                                           "ft",
+	"information science and engineering":          "se",
+	"ise":                                          "se",
+	"se":                                           "se",
+}
+
+func normalizeDeptCode(deptStr string, email string) string {
+	cleanDept := strings.ToLower(strings.TrimSpace(deptStr))
+	if code, ok := deptNameMap[cleanDept]; ok {
+		return code
+	}
+
+	cleanEmail := strings.ToLower(strings.TrimSpace(email))
+	if cleanEmail != "" {
+		if strings.HasSuffix(cleanEmail, "@bitsathy.ac.in") || strings.HasSuffix(cleanEmail, "@bitsathy.in") {
+			username := strings.Split(cleanEmail, "@")[0]
+			parts := strings.Split(username, ".")
+			if len(parts) >= 2 {
+				deptYear := parts[len(parts)-1]
+				if len(deptYear) >= 2 {
+					code := deptYear[:2]
+					if _, ok := deptNameMap[code]; ok {
+						return code
+					}
+				}
+			}
+			reRoll := regexp.MustCompile(`7376\d{3}([a-z]{2})\d+`)
+			if m := reRoll.FindStringSubmatch(username); len(m) > 1 {
+				if _, ok := deptNameMap[m[1]]; ok {
+					return m[1]
+				}
+			}
+		}
+	}
+
+	if len(cleanDept) == 2 && cleanDept >= "aa" && cleanDept <= "zz" {
+		return cleanDept
+	}
+
+	return "others"
+}
+
 func (h *AdminHandler) syncUsersToDB() error {
 	log.Println("✅ Users synced from local MySQL database")
 	return nil
@@ -109,6 +204,10 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 
 	search := strings.ToLower(strings.TrimSpace(c.Query("search")))
 	batch := strings.TrimSpace(c.Query("batch"))
+	dept := strings.ToLower(strings.TrimSpace(c.Query("department")))
+	if dept == "" {
+		dept = strings.ToLower(strings.TrimSpace(c.Query("dept")))
+	}
 	status := strings.ToLower(strings.TrimSpace(c.Query("status")))
 
 	var totalInDB int
@@ -191,6 +290,26 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		"others":    0,
 	}
 
+	deptCounts := map[string]int{
+		"cs":     0,
+		"ec":     0,
+		"it":     0,
+		"ad":     0,
+		"ee":     0,
+		"al":     0,
+		"cb":     0,
+		"bt":     0,
+		"ct":     0,
+		"me":     0,
+		"mz":     0,
+		"ce":     0,
+		"bm":     0,
+		"ae":     0,
+		"ag":     0,
+		"ft":     0,
+		"others": 0,
+	}
+
 	todayIST := time.Now().UTC().Add(5*time.Hour + 30*time.Minute).Format("2006-01-02")
 	todayLocal := time.Now().Format("2006-01-02")
 
@@ -228,6 +347,13 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		u.Batch = batchLabel
 		batchCounts[batchLabel]++
 
+		deptCode := normalizeDeptCode(u.Department, u.Email)
+		u.DeptCode = strings.ToUpper(deptCode)
+		if u.Department == "" || u.Department == "-" {
+			u.Department = strings.ToUpper(deptCode)
+		}
+		deptCounts[deptCode]++
+
 		if u.LastSeenAt != "" && (strings.HasPrefix(u.LastSeenAt, todayIST) || strings.HasPrefix(u.LastSeenAt, todayLocal)) {
 			activeTodayCount++
 		}
@@ -246,6 +372,13 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		if batch != "" {
 			batchLabel := normalizeBatchLabel(u.Batch, u.Email)
 			if batchLabel != batch {
+				continue
+			}
+		}
+
+		if dept != "" && dept != "all" {
+			userDept := normalizeDeptCode(u.Department, u.Email)
+			if userDept != dept {
 				continue
 			}
 		}
@@ -275,6 +408,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 			regLower := strings.ToLower(u.RegisterNo)
 			userIDLower := strings.ToLower(u.UserID)
 			deptLower := strings.ToLower(u.Department)
+			deptCodeLower := strings.ToLower(u.DeptCode)
 			batchLower := strings.ToLower(normalizeBatchLabel(u.Batch, u.Email))
 			roleLower := strings.ToLower(u.Role)
 			searchLower := strings.ToLower(strings.TrimSpace(search))
@@ -286,6 +420,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 				!strings.Contains(regLower, searchLower) &&
 				!strings.Contains(userIDLower, searchLower) &&
 				!strings.Contains(deptLower, searchLower) &&
+				!strings.Contains(deptCodeLower, searchLower) &&
 				!strings.Contains(batchLower, searchLower) &&
 				!strings.Contains(roleLower, searchLower) {
 				continue
@@ -325,6 +460,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		"pageSize":      limit,
 		"totalPages":    totalPages,
 		"batchCounts":   batchCounts,
+		"deptCounts":    deptCounts,
 	})
 }
 func (h *AdminHandler) UpdateUsers(c *gin.Context) {

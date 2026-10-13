@@ -21,6 +21,7 @@ type User struct {
 	RegisterNo     string `json:"register_no,omitempty"`
 	UserID         string `json:"user_id,omitempty"`
 	Department     string `json:"department,omitempty"`
+	DeptCode       string `json:"dept_code,omitempty"`
 	Batch          string `json:"batch,omitempty"`
 	Phone          string `json:"phone,omitempty"`
 }
