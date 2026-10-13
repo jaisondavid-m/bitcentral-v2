@@ -845,6 +845,11 @@ function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showS
               <p className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">
                 {userItem.displayName || userItem.email || userItem.uid}
               </p>
+              {userItem.dept_code && (
+                <span className="rounded bg-blue-50 px-1.5 py-0.2 text-[9px] font-extrabold uppercase text-blue-700 dark:bg-blue-950 dark:text-blue-300 border border-blue-200/60 dark:border-blue-900">
+                  {userItem.dept_code}
+                </span>
+              )}
               {activeToday && (
                 <span className="relative flex h-2 w-2 shrink-0">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
@@ -1036,6 +1041,11 @@ function UserTable({
                         <p className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">
                           {userItem.displayName || "No Name"}
                         </p>
+                        {userItem.dept_code && (
+                          <span className="rounded bg-blue-50 px-1.5 py-0.2 text-[10px] font-extrabold uppercase text-blue-700 dark:bg-blue-950 dark:text-blue-300 border border-blue-200/60 dark:border-blue-900">
+                            {userItem.dept_code}
+                          </span>
+                        )}
                         {activeToday && (
                           <span className="relative flex h-2 w-2 shrink-0" title="Active today">
                             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
@@ -1178,9 +1188,11 @@ function UsersSection({ isSuper }) {
   const [pageSize, setPageSize] = useState(25);
   const [totalPages, setTotalPages] = useState(1);
   const [batchCounts, setBatchCounts] = useState({});
+  const [deptCounts, setDeptCounts] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [batchFilter, setBatchFilter] = useState("");
+  const [deptFilter, setDeptFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [deletingUid, setDeletingUid] = useState("");
@@ -1246,6 +1258,7 @@ function UsersSection({ isSuper }) {
         limit: pageSize,
         search: debouncedSearch,
         batch: batchFilter,
+        department: deptFilter,
         status: statusFilter,
       });
       setUsers(result.users || []);
@@ -1256,13 +1269,14 @@ function UsersSection({ isSuper }) {
       setFilteredTotal(result.filteredTotal || 0);
       setTotalPages(result.totalPages || 1);
       setBatchCounts(result.batchCounts || {});
+      setDeptCounts(result.deptCounts || {});
     } catch (error) {
       setUsers([]);
       setBanner({ type: "error", message: normalizeError(error, "Failed to load users") });
     } finally {
       setIsLoadingUsers(false);
     }
-  }, [page, pageSize, debouncedSearch, batchFilter, statusFilter]);
+  }, [page, pageSize, debouncedSearch, batchFilter, deptFilter, statusFilter]);
 
   useEffect(() => {
     loadUsers();
@@ -1399,6 +1413,37 @@ function UsersSection({ isSuper }) {
   };
 
   const allowedBatches = ["2026-2030", "2025-2029", "2024-2028", "2023-2027", "2022-2026", "others"];
+
+  const availableDepts = useMemo(() => {
+    const priorityCodes = ["cs", "ec", "it", "ad", "ee", "al", "cb", "bt", "ct", "me", "mz", "ce", "bm", "ae", "ag", "ft", "others"];
+    const list = [];
+    const seen = new Set();
+
+    priorityCodes.forEach((code) => {
+      const cnt = deptCounts[code] || 0;
+      if (cnt > 0 || code === "cs" || code === "ec" || code === "it") {
+        list.push({
+          code,
+          label: code === "others" ? "others" : code.toUpperCase(),
+          count: cnt,
+        });
+        seen.add(code);
+      }
+    });
+
+    Object.keys(deptCounts).forEach((code) => {
+      if (!seen.has(code) && deptCounts[code] > 0) {
+        list.push({
+          code,
+          label: code === "others" ? "others" : code.toUpperCase(),
+          count: deptCounts[code],
+        });
+        seen.add(code);
+      }
+    });
+
+    return list;
+  }, [deptCounts]);
 
   return (
     <div className="space-y-6">
@@ -1608,11 +1653,12 @@ function UsersSection({ isSuper }) {
               ))}
             </div>
 
-            {(batchFilter || statusFilter !== "all" || debouncedSearch) && (
+            {(batchFilter || deptFilter || statusFilter !== "all" || debouncedSearch) && (
               <button
                 type="button"
                 onClick={() => {
                   setBatchFilter("");
+                  setDeptFilter("");
                   setStatusFilter("all");
                   setSearchQuery("");
                   setPage(1);
@@ -1624,75 +1670,124 @@ function UsersSection({ isSuper }) {
             )}
           </div>
 
-          {/* Batch Badges & Search Row */}
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            {/* Batch Filter Pills */}
+          {/* Batch, Dept Badges & Search Row */}
+          <div className="space-y-3">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              {/* Batch Filter Pills */}
+              <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-0.5">
+                <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 mr-1 shrink-0">Batch:</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBatchFilter("");
+                    setPage(1);
+                  }}
+                  className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
+                    batchFilter === ""
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  <span>All</span>
+                </button>
+                {allowedBatches.map((label) => {
+                  const count = batchCounts[label] || 0;
+                  return (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => {
+                        setBatchFilter(batchFilter === label ? "" : label);
+                        setPage(1);
+                      }}
+                      className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
+                        batchFilter === label
+                          ? "bg-blue-600 text-white shadow-xs"
+                          : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
+                      }`}
+                    >
+                      <span>{label}</span>
+                      <span
+                        className={`rounded-sm px-1 py-0.2 text-[10px] font-bold ${
+                          batchFilter === label
+                            ? "bg-blue-700 text-white"
+                            : "bg-slate-200/80 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+                        }`}
+                      >
+                        {count.toLocaleString()}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Search Bar */}
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 dark:border-slate-800 dark:bg-slate-900 dark:focus-within:bg-slate-950 lg:w-80 shrink-0">
+                <Search className="h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by name, email, UID..."
+                  className="w-full bg-transparent text-xs text-slate-800 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Dept Filter Pills */}
             <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1">
-              <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 mr-1">Batch:</span>
+              <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 mr-1 shrink-0">Dept:</span>
               <button
                 type="button"
                 onClick={() => {
-                  setBatchFilter("");
+                  setDeptFilter("");
                   setPage(1);
                 }}
                 className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
-                  batchFilter === ""
+                  deptFilter === ""
                     ? "bg-blue-600 text-white shadow-xs"
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
                 }`}
               >
                 <span>All</span>
               </button>
-              {allowedBatches.map((label) => {
-                const count = batchCounts[label] || 0;
-                return (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={() => {
-                      setBatchFilter(batchFilter === label ? "" : label);
-                      setPage(1);
-                    }}
-                    className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
-                      batchFilter === label
-                        ? "bg-blue-600 text-white shadow-xs"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
-                    }`}
-                  >
-                    <span>{label}</span>
+              {availableDepts.map((d) => (
+                <button
+                  key={d.code}
+                  type="button"
+                  onClick={() => {
+                    setDeptFilter(deptFilter === d.code ? "" : d.code);
+                    setPage(1);
+                  }}
+                  className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
+                    deptFilter === d.code
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  <span>{d.label}</span>
+                  {d.count > 0 && (
                     <span
                       className={`rounded-sm px-1 py-0.2 text-[10px] font-bold ${
-                        batchFilter === label
+                        deptFilter === d.code
                           ? "bg-blue-700 text-white"
                           : "bg-slate-200/80 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
                       }`}
                     >
-                      {count.toLocaleString()}
+                      {d.count.toLocaleString()}
                     </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Search Bar */}
-            <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 dark:border-slate-800 dark:bg-slate-900 dark:focus-within:bg-slate-950 lg:w-80">
-              <Search className="h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by name, email, UID..."
-                className="w-full bg-transparent text-xs text-slate-800 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery("")}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                >
-                  <X className="h-3.5 w-3.5" />
+                  )}
                 </button>
-              )}
+              ))}
             </div>
           </div>
 
@@ -1808,7 +1903,7 @@ function UsersSection({ isSuper }) {
                     <span className="font-bold text-slate-800 dark:text-slate-200">
                       {filteredTotal.toLocaleString()}
                     </span>{" "}
-                    users {batchFilter || statusFilter !== "all" || debouncedSearch ? `(filtered from ${total.toLocaleString()})` : ""}
+                    users {batchFilter || deptFilter || statusFilter !== "all" || debouncedSearch ? `(filtered from ${total.toLocaleString()})` : ""}
                   </span>
 
                   <div className="flex items-center gap-1.5">
