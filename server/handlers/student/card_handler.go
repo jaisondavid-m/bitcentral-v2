@@ -10,9 +10,11 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"server/config"
 	studentmodels "server/models/student"
+	"server/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,7 +25,52 @@ func NewCardHandler() *CardHandler {
 	return &CardHandler{}
 }
 
+func updateLastSeenIfAuthenticated(c *gin.Context) {
+	if config.DB == nil {
+		return
+	}
+
+	token := utils.ExtractAuthToken(c)
+	if token == "" {
+		return
+	}
+
+	claims, err := config.VerifyGoogleToken(token)
+	if err != nil || claims == nil {
+		return
+	}
+
+	userEmail := strings.ToLower(strings.TrimSpace(claims.Email))
+	userUID := strings.TrimSpace(claims.UID)
+
+	if userEmail == "" && userUID == "" {
+		return
+	}
+
+	nowSeen := time.Now().Format("2006-01-02 15:04:05")
+	go func(targetEmail, targetUID, seenTime string) {
+		if targetEmail != "" && targetUID != "" {
+			_, _ = config.DB.Exec(
+				`UPDATE users SET last_seen_at = ? WHERE (email != '' AND (email = ? OR LOWER(TRIM(email)) = ?)) OR (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?)`,
+				seenTime, targetEmail, targetEmail, targetUID, targetUID,
+			)
+		} else if targetEmail != "" {
+			_, _ = config.DB.Exec(
+				`UPDATE users SET last_seen_at = ? WHERE email = ? OR LOWER(TRIM(email)) = ?`,
+				seenTime, targetEmail, targetEmail,
+			)
+		} else if targetUID != "" {
+			_, _ = config.DB.Exec(
+				`UPDATE users SET last_seen_at = ? WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?)`,
+				seenTime, targetUID, targetUID,
+			)
+		}
+	}(userEmail, userUID, nowSeen)
+}
+
 func GetCards(c *gin.Context) {
+	updateLastSeenIfAuthenticated(c)
+
 	platform := strings.ToLower(strings.TrimSpace(c.Query("platform")))
 	isAdminReq := strings.Contains(c.Request.URL.Path, "/admin/") || c.Query("all") == "true"
 
@@ -161,6 +208,8 @@ func UpdateCard(c *gin.Context) {
 
 // Public: Track card click
 func TrackCardClick(c *gin.Context) {
+	updateLastSeenIfAuthenticated(c)
+
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
