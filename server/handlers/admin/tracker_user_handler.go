@@ -33,6 +33,7 @@ var departmentMap = map[string]string{
 	"al": "Artificial Intelligence & Machine Learning",
 	"ec": "Electronics and Communication Engineering",
 	"ee": "Electrical and Electronics Engineering",
+	"ei": "Electronics and Instrumentation Engineering",
 	"ct": "Computer Technology",
 	"bt": "Biotechnology",
 	"cb": "Computer Science and Business Systems",
