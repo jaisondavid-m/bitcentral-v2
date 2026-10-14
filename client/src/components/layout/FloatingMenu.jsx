@@ -104,7 +104,7 @@ export default function FloatingMenu() {
   };
 
   // Do not render floating menu if user is not logged in
-  if (!user || location.pathname === "/bitbot" || location.pathname.startsWith("/bitbot")) {
+  if (!user) {
     return null;
   }
 

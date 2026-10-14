@@ -52,7 +52,6 @@ func main() {
 	feedbackHandler := common.NewFeedbackHandler()
 	analyticsHandler := admin.NewAnalyticsHandler()
 	facultyDirectoryHandler := admin.NewFacultyDirectoryHandler(sheetHandler)
-	chatHandler := common.NewChatHandler()
 	aiHandler := common.NewAIHandler()
 	mailHandler := common.NewMailHandler()
 	mailHandler.StartQueueWorker()
@@ -77,7 +76,6 @@ func main() {
 		feedbackHandler,
 		analyticsHandler,
 		facultyDirectoryHandler,
-		chatHandler,
 		aiHandler,
 		mailHandler,
 		internalMarksHandler,

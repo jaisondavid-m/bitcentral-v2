@@ -2417,7 +2417,7 @@ function CardForm({ initial, onSubmit, onCancel, isLoading }) {
           <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">App Redirection Route (Mobile)</label>
           <div className="flex gap-2">
             <select
-              value={["MessMenu", "FacultyDirectory", "WifiDetails", "BitBot", "Profile", "Tools"].includes(form.app_route) ? form.app_route : "custom"}
+              value={["MessMenu", "FacultyDirectory", "WifiDetails", "Profile", "Tools"].includes(form.app_route) ? form.app_route : "custom"}
               onChange={(e) => {
                 if (e.target.value !== "custom") {
                   setForm({ ...form, app_route: e.target.value });
@@ -2429,7 +2429,6 @@ function CardForm({ initial, onSubmit, onCancel, isLoading }) {
               <option value="MessMenu">MessMenu</option>
               <option value="FacultyDirectory">FacultyDirectory</option>
               <option value="WifiDetails">WifiDetails</option>
-              <option value="BitBot">BitBot</option>
               <option value="Profile">Profile</option>
               <option value="Tools">Tools</option>
             </select>
@@ -6989,7 +6988,7 @@ function AIKeySection() {
             AI API Key & Provider Management
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Store and manage Google Gemini, Groq, or OpenAI API keys in MySQL database. BitBot MCP server uses live settings dynamically.
+            Store and manage Google Gemini, Groq, or OpenAI API keys in MySQL database.
           </p>
         </div>
         <div className="flex items-center gap-2">

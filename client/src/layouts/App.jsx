@@ -37,7 +37,6 @@ const SupportDev = lazyWithRetry(() => import("@/pages/student/SupportDev.jsx"))
 const PaymentSuccessful = lazyWithRetry(() => import("@/pages/student/PaymentSuccessful.jsx"));
 const WifiDetails = lazyWithRetry(() => import("@/pages/student/WifiDetails.jsx"));
 const FacultyDirectory = lazyWithRetry(() => import("@/pages/student/FacultyDirectory.jsx"));
-const BitBot = lazyWithRetry(() => import("@/pages/student/BitBot.jsx"));
 
 // const DocsPage = lazyWithRetry(() => import("@/pages/public/AboutDocs.jsx"));
 const AuthScope = lazyWithRetry(() => import("../routes/AuthScope.jsx"));
@@ -329,7 +328,6 @@ function App() {
               <Route path="/payment-successful/:id" element={<PaymentSuccessful />} />
               <Route path="/payment-successfull" element={<PaymentSuccessful />} />
               <Route path="/payment-successfull/:id" element={<PaymentSuccessful />} />
-              <Route path="/bitbot" element={<BitBot />} />
 
               <Route path="*" element={<NotFound />} />
             </Route>
