@@ -24,7 +24,6 @@ Disallow: /ps-
 Disallow: /apsite
 Disallow: /support-dev
 Disallow: /payment-success
-Disallow: /bitbot
 Disallow: /*?
 
 User-agent: OAI-SearchBot
@@ -50,7 +49,6 @@ Disallow: /ps-
 Disallow: /apsite
 Disallow: /support-dev
 Disallow: /payment-success
-Disallow: /bitbot
 Disallow: /*?
 
 User-agent: GPTBot
@@ -76,7 +74,6 @@ Disallow: /ps-
 Disallow: /apsite
 Disallow: /support-dev
 Disallow: /payment-success
-Disallow: /bitbot
 Disallow: /*?
 
 User-agent: ChatGPT-User
@@ -102,7 +99,6 @@ Disallow: /ps-
 Disallow: /apsite
 Disallow: /support-dev
 Disallow: /payment-success
-Disallow: /bitbot
 Disallow: /*?
 
 User-agent: PerplexityBot
@@ -128,7 +124,6 @@ Disallow: /ps-
 Disallow: /apsite
 Disallow: /support-dev
 Disallow: /payment-success
-Disallow: /bitbot
 Disallow: /*?
 
 Sitemap: https://bitcentral.bitsathy.in/sitemap.xml

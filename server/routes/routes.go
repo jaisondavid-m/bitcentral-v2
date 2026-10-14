@@ -31,7 +31,6 @@ func SetupRouter(
 	feedbackHandler *common.FeedbackHandler,
 	analyticsHandler *admin.AnalyticsHandler,
 	facultyDirectoryHandler *admin.FacultyDirectoryHandler,
-	chatHandler *common.ChatHandler,
 	aiHandler *common.AIHandler,
 	mailHandler *common.MailHandler,
 	internalMarksHandler *student.InternalMarksHandler,
@@ -145,10 +144,6 @@ func SetupRouter(
 		// Faculty Directory
 		api.GET("/faculty-directory", facultyDirectoryHandler.GetFacultyDirectory)
 		api.GET("/faculty", facultyDirectoryHandler.GetFacultyDirectory)
-
-		// Chat
-		api.POST("/api/chat", chatHandler.HandleChat)
-		api.POST("/chat", chatHandler.HandleChat)
 
 		// Notifications
 		api.GET("/notifications", notificationHandler.GetUserNotifications)
