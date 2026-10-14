@@ -13,7 +13,6 @@ import {
   LogIn,
   MessageSquare,
   Users,
-  Bot,
 } from "lucide-react";
 import { BiSupport, BiDonateHeart } from "react-icons/bi";
 import { sendFeedbackMessage, getFeedbackMessages } from "@/api/feedback.js";
@@ -28,12 +27,6 @@ export default function FloatingMenu() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
-
-  const handleOpenAIAssistant = () => {
-    haptics.light();
-    setIsMenuOpen(false);
-    navigate("/bitbot");
-  };
 
   // Feedback Chat state
   const [messages, setMessages] = useState([]);
@@ -185,28 +178,6 @@ export default function FloatingMenu() {
 
             {/* Menu options container stacked neatly above main FAB */}
             <div className={`fixed ${isHelpPage ? "bottom-[11.5rem] sm:bottom-[12.5rem]" : "bottom-[5.75rem]"} right-6 z-40 flex flex-col items-end gap-3.5 pointer-events-auto`}>
-              {/* BitBot AI Assistant */}
-              <motion.div
-                initial={{ opacity: 0, y: 15, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 15, scale: 0.8 }}
-                transition={{ duration: 0.18, delay: 0.15 }}
-                className="flex items-center gap-3 cursor-pointer group"
-                onClick={handleOpenAIAssistant}
-              >
-                <span className="rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl backdrop-blur-md px-3.5 py-1.5 text-xs font-bold whitespace-nowrap hover:from-indigo-500 hover:to-purple-500 transition-all flex items-center gap-1.5">
-                  BitBot AI (Gemini) 🤖
-                </span>
-
-                <div className="w-14 flex items-center justify-center shrink-0">
-                  <button
-                    className="flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 border border-indigo-400/50 shadow-lg shadow-indigo-500/30 backdrop-blur-md group-hover:scale-110 active:scale-95 transition-all cursor-pointer text-white"
-                    aria-label="BitBot AI Assistant"
-                  >
-                    <Bot className="h-6 w-6 text-white" />
-                  </button>
-                </div>
-              </motion.div>
               {/* 3. Support Developer Button (Top) */}
               <motion.div
                 initial={{ opacity: 0, y: 15, scale: 0.8 }}
