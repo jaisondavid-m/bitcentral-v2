@@ -2,25 +2,20 @@ import React from "react";
 import {
 	ArrowRight,
 	CalendarDays,
-	Download,
 	ExternalLink,
 	GitBranch,
-	Layers3,
-	LocateFixed,
 	MapPinned,
 	MoonStar,
-	Route,
 	Satellite,
-	ShieldCheck,
-	Smartphone,
 	Sparkles,
-	Clock3,
 	User,
 	Users,
 	Waypoints,
 	BellRing,
 } from "lucide-react";
+import { FaApple, FaAndroid } from "react-icons/fa";
 
+const APP_STORE_URL = "https://apps.apple.com/us/app/findmyway/id6800996542";
 const APK_URL = "https://drive.google.com/drive/folders/1mEe86lWRstyHinOfKlyYgR6DeDCXIDbE?usp=share_link";
 
 const highlights = [
@@ -77,14 +72,14 @@ const highlights = [
 const installSteps = [
 	{
 		step: "01",
-		title: "Download the APK",
-		description: "Tap the button below to open the Google Drive download link for the Android app.",
+		title: "Choose your platform",
+		description: "For iOS, install directly from the Apple App Store. For Android, download the APK package via Google Drive.",
 	},
 	{
 		step: "02",
-		title: "Allow app installs",
+		title: "Allow app installs (Android APK only)",
 		description:
-			"If Android blocks the install, enable installs from this source in your device security settings.",
+			"If Android blocks the install, enable installs from this source or allow unknown app installs in your device settings.",
 	},
 	{
 		step: "03",
@@ -121,30 +116,43 @@ function FindMyWay() {
 						<div className="mb-4 inline-flex flex-wrap items-center justify-center gap-2">
 							<div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300">
 								<Sparkles className="h-4 w-4" />
-								Android available now, iOS coming soon
+								Available on iOS (App Store) & Android (APK)
 							</div>
 							<div className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-slate-100/60 px-3 py-1.5 text-xs font-medium text-slate-500 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-400">
 								<User className="h-3.5 w-3.5 opacity-70" />
 								<span>Sudhir Sivakumar</span>
 							</div>
 						</div>
-						<h1 className="mb-4 text-3xl font-bold text-blue-600 sm:text-4xl">FindMyWay installation</h1>
+						<h1 className="mb-4 text-3xl font-bold text-blue-600 sm:text-4xl">FindMyWay App</h1>
 						<p className="mx-auto max-w-2xl text-base text-blue-700 sm:text-lg dark:text-blue-300">
-							Download the Android APK and use FindMyWay to locate buildings, labs, rooms, and campus
-							venues anywhere in the college.
+							Download FindMyWay from the App Store on iOS or install the Android APK to locate
+							buildings, labs, rooms, and campus venues anywhere in the college.
 						</p>
-						<div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+						<div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
+							<a
+								href={APP_STORE_URL}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
+							>
+								<FaApple className="h-4 w-4" />
+								Download on App Store
+								<ExternalLink className="h-3.5 w-3.5 opacity-80" />
+							</a>
 							<a
 								href={APK_URL}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+								className="inline-flex items-center justify-center gap-2 rounded-lg border border-blue-600/30 bg-blue-50 px-5 py-3 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
 							>
-								<Download className="h-4 w-4" />
-								Download APK
-								<ExternalLink className="h-4 w-4" />
+								<FaAndroid className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+								Download Android APK
+								<ExternalLink className="h-3.5 w-3.5 opacity-80" />
 							</a>
-							<a href="#features" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-blue-700 transition-colors hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-950 dark:text-blue-300 dark:hover:bg-slate-900">
+							<a
+								href="#features"
+								className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-blue-700 transition-colors hover:bg-gray-50 dark:border-blue-900 dark:bg-slate-950 dark:text-blue-300 dark:hover:bg-slate-900"
+							>
 								Explore features
 								<ArrowRight className="h-4 w-4" />
 							</a>
@@ -154,47 +162,10 @@ function FindMyWay() {
 			</header>
 
 			<div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-				<section className="mb-12 rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
+				<section id="features" className="mb-12 rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
 					<h2 className="mb-4 text-2xl font-bold text-blue-600">What makes FindMyWay special?</h2>
 					<div className="grid gap-4 sm:grid-cols-2">
-						{[
-							{
-								icon: <MapPinned className="h-6 w-6" />,
-								title: "Multi-term search",
-								description:
-									"Search buildings, labs, rooms, or campus terms like library and placement across nested location data.",
-							},
-							{
-								icon: <CalendarDays className="h-6 w-6" />,
-								title: "Event-linked navigation",
-								description:
-									"Connect events to venues so one tap takes you straight to the right room.",
-							},
-							{
-								icon: <Satellite className="h-6 w-6" />,
-								title: "Blueprint and satellite views",
-								description:
-									"Switch between a campus blueprint and a satellite overlay while keeping coordinates aligned.",
-							},
-							{
-								icon: <Waypoints className="h-6 w-6" />,
-								title: "Smart pathfinding",
-								description:
-									"A graph-based routing engine finds the shortest path to your destination.",
-							},
-							{
-								icon: <BellRing className="h-6 w-6" />,
-								title: "Silent-mode attendance alarms",
-								description:
-									"Get reminders even when your phone is muted so you do not miss attendance OTP time.",
-							},
-							{
-								icon: <Users className="h-6 w-6" />,
-								title: "Privacy-first friends map",
-								description:
-									"Location sharing updates only when you actively view the page to save battery.",
-							},
-						].map((feature) => (
+						{highlights.map((feature) => (
 							<article key={feature.title} className="rounded-lg border border-gray-200 bg-gray-50 p-5 shadow-sm transition-shadow hover:shadow-md dark:border-blue-900 dark:bg-slate-900">
 								<div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300">
 									{feature.icon}
@@ -234,24 +205,37 @@ function FindMyWay() {
 						))}
 					</div>
 					<div className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300">
-						FindMyWay is currently supported on Android. An iOS release is planned for later.
+						FindMyWay is officially available for iOS via the App Store, and for Android devices via direct APK download.
 					</div>
 				</section>
 
 				<section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-blue-900 dark:bg-slate-950">
-					<h2 className="mb-2 text-2xl font-bold text-blue-600">Ready to install?</h2>
+					<h2 className="mb-2 text-2xl font-bold text-blue-600">Ready to get started?</h2>
 					<p className="mb-6 text-blue-700 dark:text-blue-300">
-						Open the APK link, allow installs from your browser if prompted, and start using FindMyWay to move around campus.
+						Install FindMyWay on iOS directly from the App Store or download the Android APK to start navigating around campus.
 					</p>
-					<a
-						href={APK_URL}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
-					>
-						<Download className="h-4 w-4" />
-						Get the APK
-					</a>
+					<div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+						<a
+							href={APP_STORE_URL}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
+						>
+							<FaApple className="h-4 w-4" />
+							Download on App Store
+							<ExternalLink className="h-3.5 w-3.5 opacity-80" />
+						</a>
+						<a
+							href={APK_URL}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center justify-center gap-2 rounded-lg border border-blue-600/30 bg-blue-50 px-5 py-3 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
+						>
+							<FaAndroid className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+							Download Android APK
+							<ExternalLink className="h-3.5 w-3.5 opacity-80" />
+						</a>
+					</div>
 				</section>
 			</div>
 		</main>
@@ -259,3 +243,4 @@ function FindMyWay() {
 }
 
 export default FindMyWay;
+
