@@ -94,6 +94,7 @@ import {
   WifiOff,
   X,
   Zap,
+  Server,
 } from "lucide-react";
 import SuperAdminPanel from "./SuperAdminPanel.jsx";
 import AdminFeedbackPage from "./AdminFeedbackPage.jsx";
@@ -101,6 +102,7 @@ import AdminMailSender from "./AdminMailSender.jsx";
 import AdminLeavesSection from "./AdminLeavesSection.jsx";
 import AdminNotificationsSection from "./AdminNotificationsSection.jsx";
 import AdminHelpPage from "./AdminHelpPage.jsx";
+import AdminDeploymentsSection from "./AdminDeploymentsSection.jsx";
 
 function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
@@ -378,6 +380,15 @@ const ADMIN_TABS = [
     description: "Send direct & batch HTML emails, manage failed job queues, and inspect delivery logs.",
   },
   {
+    key: "deployments",
+    label: "Deployments",
+    href: "/admin/deployments",
+    icon: Server,
+    gradient: "from-blue-600 to-indigo-600",
+    badge: "Origin & Failover",
+    description: "Real-time serving origin inspection (Own Server vs Vercel / Render), failover network health checks, and TiDB Cloud status.",
+  },
+  {
     key: "super",
     label: "Super Admin",
     href: "/admin/super",
@@ -391,6 +402,7 @@ const ADMIN_TABS = [
 function getAdminTabFromPath(pathname) {
   if (pathname === "/admin" || pathname === "/admin/") return "overview";
   if (pathname.startsWith("/admin/analytics")) return "analytics";
+  if (pathname.startsWith("/admin/deployments")) return "deployments";
   if (pathname.startsWith("/admin/user-directory")) return "user-directory";
   if (pathname.startsWith("/admin/sponsors")) return "sponsors";
   if (pathname.startsWith("/admin/qb")) return "qb";
@@ -7275,6 +7287,8 @@ function AdminDashboard({ initialTab } = {}) {
         <UserDirectorySection />
       ) : activeTab === "ai-key" ? (
         <AIKeySection />
+      ) : activeTab === "deployments" ? (
+        <AdminDeploymentsSection />
       ) : activeTab === "super" ? (
         <SuperAdminPanel />
       ) : (
@@ -7282,6 +7296,10 @@ function AdminDashboard({ initialTab } = {}) {
       )}
     </AdminDashboardShell>
   );
+}
+
+export function AdminDeploymentsPage() {
+  return <AdminDashboard initialTab="deployments" />;
 }
 
 function AdminAnalyticsPage() {

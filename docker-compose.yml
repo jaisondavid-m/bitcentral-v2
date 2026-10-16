@@ -7,7 +7,7 @@ services:
     container_name: bitcentral-server
     restart: always
     ports:
-      - "8080:8080"
+      - "${SERVER_PORT:-8080}:8080"
     env_file:
       - ./server/.env
     environment:
@@ -28,7 +28,7 @@ services:
     container_name: bitcentral-client
     restart: always
     ports:
-      - "80:80"
+      - "${CLIENT_PORT:-5173}:80"
     networks:
       - bitcentral-net
     depends_on:
@@ -42,11 +42,11 @@ services:
     container_name: bitcentral-mcp-server
     restart: always
     ports:
-      - "8081:8081"
+      - "${MCP_PORT:-8082}:${MCP_PORT:-8082}"
     env_file:
       - ./mcp-server/.env
     environment:
-      - PORT=8081
+      - PORT=${MCP_PORT:-8082}
       - BACKEND_URL=http://server:8080
     networks:
       - bitcentral-net
