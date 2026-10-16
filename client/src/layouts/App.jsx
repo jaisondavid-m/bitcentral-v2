@@ -176,6 +176,14 @@ function App() {
                 }
               />
               <Route
+                path="/admin/deployments"
+                element={
+                  <AdminRoute>
+                    <AdminDashboard />
+                  </AdminRoute>
+                }
+              />
+              <Route
                 path="/admin/audit-logs"
                 element={
                   <AdminRoute>

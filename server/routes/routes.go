@@ -3,6 +3,7 @@ package routes
 import (
 	"encoding/json"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -46,6 +47,7 @@ func SetupRouter(
 			"http://localhost:5173",
 			"http://127.0.0.1:5173",
 			"https://bitcentral.vercel.app",
+			"https://bitcentral-v2-inky.vercel.app",
 			"https://bitcenteral.netlify.app",
 			"https://bitcentral.bitsathy.in",
 			"http://bitcentral.bitsathy.in",
@@ -53,12 +55,19 @@ func SetupRouter(
 			"http://bitsathy.in",
 			"https://www.bitsathy.in",
 			"http://www.bitsathy.in",
+			"https://bitcentral.jaisondavidm.xyz",
+			"http://bitcentral.jaisondavidm.xyz",
+		},
+		AllowOriginFunc: func(origin string) bool {
+			return strings.HasSuffix(origin, ".bitsathy.in") ||
+				strings.HasSuffix(origin, ".jaisondavidm.xyz") ||
+				strings.HasSuffix(origin, ".vercel.app")
 		},
 		AllowMethods: []string{
 			"GET", "POST", "PUT", "DELETE", "OPTIONS",
 		},
 		AllowHeaders: []string{
-			"Origin", "Content-Type", "Authorization",
+			"Origin", "Content-Type", "Authorization", "X-Requested-With",
 		},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
@@ -67,8 +76,23 @@ func SetupRouter(
 	// Health check
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"status": "ok",
-			"time":   time.Now().UTC().Format(time.RFC3339),
+			"status":      "ok",
+			"server_type": "own_server",
+			"time":        time.Now().UTC().Format(time.RFC3339),
+		})
+	})
+
+	// Live Deployment Info
+	r.GET("/api/deployment/status", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status":      "ok",
+			"server_type": "own_server",
+			"server_name": "BitCentral Primary Engine (Local Docker)",
+			"environment": os.Getenv("GIN_MODE"),
+			"port":        os.Getenv("PORT"),
+			"db_host":     os.Getenv("MYSQL_HOST"),
+			"db_database": os.Getenv("MYSQL_DATABASE"),
+			"time":        time.Now().UTC().Format(time.RFC3339),
 		})
 	})
 

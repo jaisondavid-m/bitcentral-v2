@@ -8,9 +8,9 @@ services:
     container_name: bitcentral-mcp-server
     restart: always
     ports:
-      - "8081:8081"
+      - "${MCP_PORT:-8082}:${MCP_PORT:-8082}"
     env_file:
       - .env
     environment:
-      - PORT=8081
+      - PORT=${MCP_PORT:-8082}
       - MCP_TRANSPORT=sse
