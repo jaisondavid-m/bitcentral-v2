@@ -18,7 +18,9 @@ import (
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 
+	"server/config"
 	studentmodels "server/models/student"
+	"server/utils"
 )
 
 var defaultTabs = []string{
@@ -154,16 +156,14 @@ func (h *SheetHandler) HandleCallback(c *gin.Context) {
 
 func (h *SheetHandler) RequireAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		host := c.Request.Host
-		isLocalhost := strings.HasPrefix(host, "localhost") || strings.HasPrefix(host, "127.0.0.1") || os.Getenv("GIN_MODE") != "release"
-
-		if h.getSheetsService() == nil && !isLocalhost {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error":    "Not authenticated",
-				"login_at": h.getLoginURL(c),
-			})
-			c.Abort()
-			return
+		token := utils.ExtractAuthToken(c)
+		if token != "" {
+			if claims, err := config.VerifyGoogleToken(token); err == nil && claims != nil {
+				c.Set("user", claims)
+				c.Set("email", claims.Email)
+				c.Set("uid", claims.UID)
+				c.Set("role", claims.Role)
+			}
 		}
 		c.Next()
 	}
@@ -171,7 +171,7 @@ func (h *SheetHandler) RequireAuth() gin.HandlerFunc {
 
 func (h *SheetHandler) getLoginURL(c *gin.Context) string {
 	scheme := "http"
-	if c.Request.TLS != nil {
+	if c.Request.TLS != nil || c.GetHeader("X-Forwarded-Proto") == "https" {
 		scheme = "https"
 	}
 	host := c.Request.Host
