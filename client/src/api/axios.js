@@ -4,20 +4,11 @@ import { auth, getStoredToken } from "@/config/auth.js";
 export function getApiBaseUrl() {
   if (typeof window !== "undefined") {
     const host = window.location.hostname;
-    if (host === "bitcentral.bitsathy.in" || host.endsWith(".bitsathy.in")) {
-      return "https://api.bitcentral.bitsathy.in";
-    }
-    if (host.includes("jaisondavidm.xyz")) {
-      return "https://bitcentral-api.jaisondavidm.xyz";
-    }
-    if (host.includes("vercel.app")) {
-      return "https://bitcentral-v2.onrender.com";
-    }
     if (host === "localhost" || host === "127.0.0.1") {
       return "http://localhost:8080";
     }
   }
-  return import.meta.env.VITE_API_BASE_URL || "https://api.bitcentral.bitsathy.in";
+  return import.meta.env.VITE_API_BASE_URL || "https://bitcentral-v2.onrender.com";
 }
 
 const api = axios.create({
