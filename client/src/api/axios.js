@@ -21,7 +21,7 @@ export function getApiBaseUrl() {
 }
 
 const api = axios.create({
-  baseURL: getApiBaseUrl(),
+  baseURL: "https://bitcentral-v2.onrender.com",
   timeout: 15000,
   withCredentials: true,
   headers: {
@@ -209,4 +209,4 @@ export async function getFacultyDirectory({ query = "", department = "", page = 
   }
 }
 
-
+
