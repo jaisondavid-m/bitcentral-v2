@@ -34,6 +34,28 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error?.response?.status === 401) {
+      const url = error.config?.url || "";
+      // Prevent loop if the auth or logout calls themselves trigger 401
+      if (!url.includes("/auth/logout") && !url.includes("/auth/google")) {
+        try {
+          const { logout } = await import("@/config/auth.js");
+          await logout();
+        } catch (e) {
+          localStorage.removeItem("google_auth_token");
+          localStorage.removeItem("jwt");
+          localStorage.removeItem("token");
+          window.dispatchEvent(new Event("auth_state_changed"));
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export async function postGoogleAuth(credential) {
   try {
     const res = await api.post("/auth/google", { credential });
