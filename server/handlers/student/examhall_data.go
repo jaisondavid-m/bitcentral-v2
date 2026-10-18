@@ -494,6 +494,14 @@ func buildSeatingData01Sep2026FNto02Sep2026AN() []studentmodels.SeatingRecord {
 	allRecords = append(allRecords, buildSeatingData12Oct2026AN()...)
 	allRecords = append(allRecords, buildSeatingData13Oct2026FN()...)
 	allRecords = append(allRecords, buildSeatingData13Oct2026AN()...)
+	allRecords = append(allRecords, buildSeatingData22Oct2026FN()...)
+	allRecords = append(allRecords, buildSeatingData22Oct2026AN()...)
+	allRecords = append(allRecords, buildSeatingData23Oct2026FN()...)
+	allRecords = append(allRecords, buildSeatingData23Oct2026AN()...)
+	allRecords = append(allRecords, buildSeatingData24Oct2026FN()...)
+	allRecords = append(allRecords, buildSeatingData24Oct2026AN()...)
+	allRecords = append(allRecords, buildSeatingData26Oct2026FN()...)
+	allRecords = append(allRecords, buildSeatingData26Oct2026AN()...)
 
 	return allRecords
 }
@@ -540,9 +548,29 @@ var sessionMetaList = []struct {
 	{buildSeatingData12Oct2026AN, sessionMeta{"12-10-2026", "AN", "01:30 PM – 04:30 PM"}},
 	{buildSeatingData13Oct2026FN, sessionMeta{"13-10-2026", "FN", "08:45 AM – 12:00 Noon"}},
 	{buildSeatingData13Oct2026AN, sessionMeta{"13-10-2026", "AN", "01:30 PM – 04:30 PM"}},
+	{buildSeatingData22Oct2026FN, sessionMeta{"22-10-2026", "FN", "10:45 AM – 12:15 PM"}},
+	{buildSeatingData22Oct2026AN, sessionMeta{"22-10-2026", "AN", "03:00 PM – 04:30 PM"}},
+	{buildSeatingData23Oct2026FN, sessionMeta{"23-10-2026", "FN", "10:45 AM – 12:15 PM"}},
+	{buildSeatingData23Oct2026AN, sessionMeta{"23-10-2026", "AN", "03:00 PM – 04:30 PM"}},
+	{buildSeatingData24Oct2026FN, sessionMeta{"24-10-2026", "FN", "10:45 AM – 12:15 PM"}},
+	{buildSeatingData24Oct2026AN, sessionMeta{"24-10-2026", "AN", "03:00 PM – 04:30 PM"}},
+	{buildSeatingData26Oct2026FN, sessionMeta{"26-10-2026", "FN", "10:45 AM – 12:15 PM"}},
+	{buildSeatingData26Oct2026AN, sessionMeta{"26-10-2026", "AN", "03:00 PM – 04:30 PM"}},
 }
 
 var courseNameMap = map[string]string{
+	"AD":      "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+	"AG":      "AGRICULTURAL ENGINEERING",
+	"AL":      "ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING",
+	"BT":      "BIOTECHNOLOGY",
+	"CB":      "COMPUTER SCIENCE AND BUSINESS SYSTEMS",
+	"CS":      "COMPUTER SCIENCE AND ENGINEERING",
+	"EC":      "ELECTRONICS AND COMMUNICATION ENGINEERING",
+	"EE":      "ELECTRICAL AND ELECTRONICS ENGINEERING",
+	"EI":      "ELECTRONICS AND INSTRUMENTATION ENGINEERING",
+	"IT":      "INFORMATION TECHNOLOGY",
+	"ME":      "MECHANICAL ENGINEERING",
+	"MZ":      "MECHATRONICS ENGINEERING",
 	"22HS004": "HUMAN VALUES AND ETHICS",
 	"22HS005": "SOFT SKILLS AND EFFECTIVE COMMUNICATION",
 	"22AG301": "NUMERICAL METHODS AND STATISTICS",
