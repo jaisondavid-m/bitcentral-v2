@@ -4,24 +4,15 @@ import { auth, getStoredToken } from "@/config/auth.js";
 export function getApiBaseUrl() {
   if (typeof window !== "undefined") {
     const host = window.location.hostname;
-    if (host === "bitcentral.bitsathy.in" || host.endsWith(".bitsathy.in")) {
-      return "https://api.bitcentral.bitsathy.in";
-    }
-    if (host.includes("jaisondavidm.xyz")) {
-      return "https://bitcentral-api.jaisondavidm.xyz";
-    }
-    if (host.includes("vercel.app")) {
-      return "https://bitcentral-v2.onrender.com";
-    }
     if (host === "localhost" || host === "127.0.0.1") {
       return "http://localhost:8080";
     }
   }
-  return import.meta.env.VITE_API_BASE_URL || "https://api.bitcentral.bitsathy.in";
+  return import.meta.env.VITE_API_BASE_URL || "https://bitcentral-v2.onrender.com";
 }
 
 const api = axios.create({
-  baseURL: getApiBaseUrl(),
+  baseURL: "https://bitcentral-v2.onrender.com",
   timeout: 15000,
   withCredentials: true,
   headers: {
@@ -41,6 +32,28 @@ api.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error?.response?.status === 401) {
+      const url = error.config?.url || "";
+      // Prevent loop if the auth or logout calls themselves trigger 401
+      if (!url.includes("/auth/logout") && !url.includes("/auth/google")) {
+        try {
+          const { logout } = await import("@/config/auth.js");
+          await logout();
+        } catch (e) {
+          localStorage.removeItem("google_auth_token");
+          localStorage.removeItem("jwt");
+          localStorage.removeItem("token");
+          window.dispatchEvent(new Event("auth_state_changed"));
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
 );
 
 export async function postGoogleAuth(credential) {
@@ -209,4 +222,4 @@ export async function getFacultyDirectory({ query = "", department = "", page = 
   }
 }
 
-
+

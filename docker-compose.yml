@@ -17,6 +17,11 @@ services:
       - server_pdfs:/app/pdfs
     networks:
       - bitcentral-net
+    deploy:
+      resources:
+        limits:
+          cpus: '3.0'
+          memory: 1536M
 
   # Vite / React Web Client Service (Nginx)
   client:
@@ -33,6 +38,11 @@ services:
       - bitcentral-net
     depends_on:
       - server
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
 
   # BitCentral MCP Server Service
   mcp-server:
@@ -52,6 +62,11 @@ services:
       - bitcentral-net
     depends_on:
       - server
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
 
 networks:
   bitcentral-net:
