@@ -502,6 +502,10 @@ func buildSeatingData01Sep2026FNto02Sep2026AN() []studentmodels.SeatingRecord {
 	allRecords = append(allRecords, buildSeatingData24Oct2026AN()...)
 	allRecords = append(allRecords, buildSeatingData26Oct2026FN()...)
 	allRecords = append(allRecords, buildSeatingData26Oct2026AN()...)
+	allRecords = append(allRecords, buildSeatingData24to26Oct2026Sem3FN()...)
+	allRecords = append(allRecords, buildSeatingData24to26Oct2026Sem3AN()...)
+	allRecords = append(allRecords, buildSeatingData27to28Oct2026Sem3FN()...)
+	allRecords = append(allRecords, buildSeatingData27to28Oct2026Sem3AN()...)
 
 	return allRecords
 }
@@ -556,6 +560,14 @@ var sessionMetaList = []struct {
 	{buildSeatingData24Oct2026AN, sessionMeta{"24-10-2026", "AN", "03:00 PM – 04:30 PM"}},
 	{buildSeatingData26Oct2026FN, sessionMeta{"26-10-2026", "FN", "10:45 AM – 12:15 PM"}},
 	{buildSeatingData26Oct2026AN, sessionMeta{"26-10-2026", "AN", "03:00 PM – 04:30 PM"}},
+	// Semester III Sessions
+	{buildSeatingData24to26Oct2026Sem3FN, sessionMeta{"24-10-2026", "FN", "10:45 AM – 12:15 PM"}},
+	{buildSeatingData24to26Oct2026Sem3AN, sessionMeta{"24-10-2026", "AN", "03:00 PM – 04:30 PM"}},
+	{buildSeatingData24to26Oct2026Sem3FN, sessionMeta{"26-10-2026", "FN", "10:45 AM – 12:15 PM"}},
+	{buildSeatingData24to26Oct2026Sem3AN, sessionMeta{"26-10-2026", "AN", "03:00 PM – 04:30 PM"}},
+	{buildSeatingData27to28Oct2026Sem3FN, sessionMeta{"27-10-2026", "FN", "10:45 AM – 12:15 PM"}},
+	{buildSeatingData27to28Oct2026Sem3AN, sessionMeta{"27-10-2026", "AN", "03:00 PM – 04:30 PM"}},
+	{buildSeatingData27to28Oct2026Sem3FN, sessionMeta{"28-10-2026", "FN", "10:45 AM – 12:15 PM"}},
 }
 
 var courseNameMap = map[string]string{

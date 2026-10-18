@@ -5729,3 +5729,2641 @@ func buildSeatingData24Oct2026AN() []studentmodels.SeatingRecord {
 		},
 	}
 }
+
+func buildSeatingData24to26Oct2026Sem3FN() []studentmodels.SeatingRecord {
+	return []studentmodels.SeatingRecord{
+		// S.No 1: WW 202 | AG (26 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "AG",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376252AG101", "7376252AG113"), expandRange("7376252AG115", "7376252AG127")...),
+		},
+		// S.No 2: WW 202 | AD (34 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD101", "7376252AD134"),
+		},
+		// S.No 3: WW 207 | AD (60 candidates)
+		{
+			HallNo: "WW 207",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD135", "7376252AD194"),
+		},
+		// S.No 4: WW 212 | AD (60 candidates)
+		{
+			HallNo: "WW 212",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD195", "7376252AD254"),
+		},
+		// S.No 5: WW 008 | AD (30 candidates)
+		{
+			HallNo: "WW 008",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD255", "7376252AD284"),
+		},
+		// S.No 6: WW 011 | AD (30 candidates)
+		{
+			HallNo: "WW 011",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD285", "7376252AD314"),
+		},
+		// S.No 7: WW 113 | AD (30 candidates)
+		{
+			HallNo: "WW 113",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD315", "7376252AD344"),
+		},
+		// S.No 8: WW 114 | AD (30 candidates)
+		{
+			HallNo: "WW 114",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD345", "7376252AD374"),
+		},
+		// S.No 9: WW 115 | AD (7 candidates)
+		{
+			HallNo: "WW 115",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD375", "7376252AD381"),
+		},
+		// S.No 10: WW 115 | AL (23 candidates)
+		{
+			HallNo: "WW 115",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL101", "7376252AL123"),
+		},
+		// S.No 11: WW 118 | AL (30 candidates)
+		{
+			HallNo: "WW 118",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL124", "7376252AL153"),
+		},
+		// S.No 12: WW 213 | AL (30 candidates)
+		{
+			HallNo: "WW 213",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL154", "7376252AL183"),
+		},
+		// S.No 13: WW 214 | AL (30 candidates)
+		{
+			HallNo: "WW 214",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL184", "7376252AL213"),
+		},
+		// S.No 14: WW 215 | AL (30 candidates)
+		{
+			HallNo: "WW 215",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL214", "7376252AL243"),
+		},
+		// S.No 15: WW 219 | AL (3 candidates)
+		{
+			HallNo: "WW 219",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL244", "7376252AL246"),
+		},
+		// S.No 16: WW 219 | BT (27 candidates)
+		{
+			HallNo: "WW 219",
+			CourseCode: "BT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252BT102", "7376252BT128"),
+		},
+		// S.No 17: WW 210 | BT (30 candidates)
+		{
+			HallNo: "WW 210",
+			CourseCode: "BT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376252BT129", "7376252BT153"), expandRange("7376252BT155", "7376252BT159")...),
+		},
+		// S.No 18: WW 211 | BT (30 candidates)
+		{
+			HallNo: "WW 211",
+			CourseCode: "BT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252BT160", "7376252BT189"),
+		},
+		// S.No 19: WW 203 | BT (30 candidates)
+		{
+			HallNo: "WW 203",
+			CourseCode: "BT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376252BT191", "7376252BT197"), expandRange("7376252BT199", "7376252BT221")...),
+		},
+		// S.No 20: WW 204 | BT (3 candidates)
+		{
+			HallNo: "WW 204",
+			CourseCode: "BT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252BT222", "7376252BT224"),
+		},
+		// S.No 21: WW 204 | CS (27 candidates)
+		{
+			HallNo: "WW 204",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS101", "7376251CS127"),
+		},
+		// S.No 22: WW 205 | CS (30 candidates)
+		{
+			HallNo: "WW 205",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append([]string{"7376251CS128"}, expandRange("7376251CS130", "7376251CS158")...),
+		},
+		// S.No 23: WW 206 | CS (30 candidates)
+		{
+			HallNo: "WW 206",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376251CS159", "7376251CS168"), expandRange("7376251CS170", "7376251CS189")...),
+		},
+		// S.No 24: WW 208 | CS (30 candidates)
+		{
+			HallNo: "WW 208",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS190", "7376251CS219"),
+		},
+		// S.No 25: WW 209 | CS (30 candidates)
+		{
+			HallNo: "WW 209",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376251CS220", "7376251CS228"), expandRange("7376251CS230", "7376251CS250")...),
+		},
+		// S.No 26: WW 218 | CS (30 candidates)
+		{
+			HallNo: "WW 218",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS251", "7376251CS280"),
+		},
+		// S.No 27: ME 101 | CS (45 candidates)
+		{
+			HallNo: "ME 101",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS281", "7376251CS325"),
+		},
+		// S.No 28: ME 102 | CS (45 candidates)
+		{
+			HallNo: "ME 102",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS326", "7376251CS370"),
+		},
+		// S.No 29: ME 107 | CS (45 candidates)
+		{
+			HallNo: "ME 107",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append([]string{"7376251CS371"}, expandRange("7376251CS373", "7376251CS416")...),
+		},
+		// S.No 30: ME 201 | CS (45 candidates)
+		{
+			HallNo: "ME 201",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS417", "7376251CS461"),
+		},
+		// S.No 31: ME 202 | CS (18 candidates)
+		{
+			HallNo: "ME 202",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS462", "7376251CS479"),
+		},
+		// S.No 32: ME 202 | EE (27 candidates)
+		{
+			HallNo: "ME 202",
+			CourseCode: "EE",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EE102", "7376251EE128"),
+		},
+		// S.No 33: ME 203 | EE (45 candidates)
+		{
+			HallNo: "ME 203",
+			CourseCode: "EE",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EE129", "7376251EE173"),
+		},
+		// S.No 34: ME 204 | EE (32 candidates)
+		{
+			HallNo: "ME 204",
+			CourseCode: "EE",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EE174", "7376251EE205"),
+		},
+		// S.No 35: ME 204 | EC (13 candidates)
+		{
+			HallNo: "ME 204",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC101", "7376251EC113"),
+		},
+		// S.No 36: ME 301 | EC (45 candidates)
+		{
+			HallNo: "ME 301",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC114", "7376251EC158"),
+		},
+		// S.No 37: ME 302 | EC (45 candidates)
+		{
+			HallNo: "ME 302",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC159", "7376251EC203"),
+		},
+		// S.No 38: ME 303 | EC (45 candidates)
+		{
+			HallNo: "ME 303",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC204", "7376251EC248"),
+		},
+		// S.No 39: ME 304 | EC (45 candidates)
+		{
+			HallNo: "ME 304",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376251EC249", "7376251EC269"), expandRange("7376251EC271", "7376251EC294")...),
+		},
+		// S.No 40: ME 305 | EC (45 candidates)
+		{
+			HallNo: "ME 305",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC295", "7376251EC339"),
+		},
+		// S.No 41: SF B01 | EC (13 candidates)
+		{
+			HallNo: "SF B01",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC340", "7376251EC352"),
+		},
+		// S.No 42: SF B01 | EI (17 candidates)
+		{
+			HallNo: "SF B01",
+			CourseCode: "EI",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EI101", "7376251EI117"),
+		},
+		// S.No 43: SF B02 | EI (30 candidates)
+		{
+			HallNo: "SF B02",
+			CourseCode: "EI",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EI118", "7376251EI147"),
+		},
+		// S.No 44: SF B03 | EI (14 candidates)
+		{
+			HallNo: "SF B03",
+			CourseCode: "EI",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EI148", "7376251EI161"),
+		},
+		// S.No 45: SF B03 | IT (16 candidates)
+		{
+			HallNo: "SF B03",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252IT102", "7376252IT117"),
+		},
+		// S.No 46: SF 001 | IT (30 candidates)
+		{
+			HallNo: "SF 001",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252IT118", "7376252IT147"),
+		},
+		// S.No 47: SF 002 | IT (30 candidates)
+		{
+			HallNo: "SF 002",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252IT148", "7376252IT177"),
+		},
+		// S.No 48: SF 101 | IT (30 candidates)
+		{
+			HallNo: "SF 101",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252IT178", "7376252IT207"),
+		},
+		// S.No 49: SF 102 | IT (30 candidates)
+		{
+			HallNo: "SF 102",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252IT208", "7376252IT237"),
+		},
+		// S.No 50: SF 103 | IT (30 candidates)
+		{
+			HallNo: "SF 103",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252IT238", "7376252IT267"),
+		},
+		// S.No 51: SF 201 | IT (30 candidates)
+		{
+			HallNo: "SF 201",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252IT268", "7376252IT297"),
+		},
+		// S.No 52: SF 202 | IT (30 candidates)
+		{
+			HallNo: "SF 202",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252IT298", "7376252IT327"),
+		},
+		// S.No 53: SF 203 | IT (30 candidates)
+		{
+			HallNo: "SF 203",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376252IT328", "7376252IT336"), expandRange("7376252IT338", "7376252IT358")...),
+		},
+		// S.No 54: WW 222 | IT (30 candidates)
+		{
+			HallNo: "WW 222",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252IT359", "7376252IT388"),
+		},
+		// S.No 55: WW 222 | ME (20 candidates)
+		{
+			HallNo: "WW 222",
+			CourseCode: "ME",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251ME102", "7376251ME121"),
+		},
+		// S.No 56: WW 223 | ME (39 candidates)
+		{
+			HallNo: "WW 223",
+			CourseCode: "ME",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251ME122", "7376251ME160"),
+		},
+		// S.No 57: WW 223 | MZ (11 candidates)
+		{
+			HallNo: "WW 223",
+			CourseCode: "MZ",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251MZ101", "7376251MZ111"),
+		},
+		// S.No 58: WW 224 | MZ (50 candidates)
+		{
+			HallNo: "WW 224",
+			CourseCode: "MZ",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251MZ112", "7376251MZ161"),
+		},
+		// S.No 59: WW 225 | MZ (1 candidates)
+		{
+			HallNo: "WW 225",
+			CourseCode: "MZ",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: []string{"7376251MZ162"},
+		},
+		// S.No 60: WW 225 | CS (24 candidates)
+		{
+			HallNo: "WW 225",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376261CS501", "7376261CS524"),
+		},
+		// S.No 61: WW 225 | EC (19 candidates)
+		{
+			HallNo: "WW 225",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376261EC502", "7376261EC520"),
+		},
+		// S.No 62: WW 225 | EE (6 candidates)
+		{
+			HallNo: "WW 225",
+			CourseCode: "EE",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376261EE502", "7376261EE507"),
+		},
+		// S.No 63: WW 226 | EE (11 candidates)
+		{
+			HallNo: "WW 226",
+			CourseCode: "EE",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376261EE508", "7376261EE518"),
+		},
+		// S.No 64: WW 226 | EI (5 candidates)
+		{
+			HallNo: "WW 226",
+			CourseCode: "EI",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376261EI501", "7376261EI505"),
+		},
+		// S.No 65: WW 226 | ME (7 candidates)
+		{
+			HallNo: "WW 226",
+			CourseCode: "ME",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376261ME501", "7376261ME507"),
+		},
+		// S.No 66: WW 226 | MZ (4 candidates)
+		{
+			HallNo: "WW 226",
+			CourseCode: "MZ",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376261MZ502", "7376261MZ505"),
+		},
+		// S.No 67: WW 226 | AD (22 candidates)
+		{
+			HallNo: "WW 226",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376262AD501", "7376262AD522"),
+		},
+		// S.No 68: WW 226 | AL (1 candidates)
+		{
+			HallNo: "WW 226",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: []string{"7376262AL501"},
+		},
+		// S.No 69: WW 227 | AL (8 candidates)
+		{
+			HallNo: "WW 227",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376262AL502", "7376262AL509"),
+		},
+		// S.No 70: WW 227 | IT (15 candidates)
+		{
+			HallNo: "WW 227",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376262IT502", "7376262IT516"),
+		},
+	}
+}
+
+func buildSeatingData24to26Oct2026Sem3AN() []studentmodels.SeatingRecord {
+	return []studentmodels.SeatingRecord{
+		// S.No 1: WW 202 | AG (26 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "AG",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376252AG101", "7376252AG113"), expandRange("7376252AG115", "7376252AG127")...),
+		},
+		// S.No 2: WW 202 | AD (34 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD101", "7376252AD134"),
+		},
+		// S.No 3: WW 207 | AD (60 candidates)
+		{
+			HallNo: "WW 207",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD135", "7376252AD194"),
+		},
+		// S.No 4: WW 212 | AD (60 candidates)
+		{
+			HallNo: "WW 212",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD195", "7376252AD254"),
+		},
+		// S.No 5: WW 008 | AD (30 candidates)
+		{
+			HallNo: "WW 008",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD255", "7376252AD284"),
+		},
+		// S.No 6: WW 011 | AD (30 candidates)
+		{
+			HallNo: "WW 011",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD285", "7376252AD314"),
+		},
+		// S.No 7: WW 113 | AD (30 candidates)
+		{
+			HallNo: "WW 113",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD315", "7376252AD344"),
+		},
+		// S.No 8: WW 114 | AD (30 candidates)
+		{
+			HallNo: "WW 114",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD345", "7376252AD374"),
+		},
+		// S.No 9: WW 115 | AD (7 candidates)
+		{
+			HallNo: "WW 115",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD375", "7376252AD381"),
+		},
+		// S.No 10: WW 115 | AL (23 candidates)
+		{
+			HallNo: "WW 115",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL101", "7376252AL123"),
+		},
+		// S.No 11: WW 118 | AL (30 candidates)
+		{
+			HallNo: "WW 118",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL124", "7376252AL153"),
+		},
+		// S.No 12: WW 213 | AL (30 candidates)
+		{
+			HallNo: "WW 213",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL154", "7376252AL183"),
+		},
+		// S.No 13: WW 214 | AL (30 candidates)
+		{
+			HallNo: "WW 214",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL184", "7376252AL213"),
+		},
+		// S.No 14: WW 215 | AL (30 candidates)
+		{
+			HallNo: "WW 215",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL214", "7376252AL243"),
+		},
+		// S.No 15: WW 219 | AL (3 candidates)
+		{
+			HallNo: "WW 219",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL244", "7376252AL246"),
+		},
+		// S.No 16: WW 219 | BT (27 candidates)
+		{
+			HallNo: "WW 219",
+			CourseCode: "BT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252BT102", "7376252BT128"),
+		},
+		// S.No 17: WW 210 | BT (30 candidates)
+		{
+			HallNo: "WW 210",
+			CourseCode: "BT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376252BT129", "7376252BT153"), expandRange("7376252BT155", "7376252BT159")...),
+		},
+		// S.No 18: WW 211 | BT (30 candidates)
+		{
+			HallNo: "WW 211",
+			CourseCode: "BT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252BT160", "7376252BT189"),
+		},
+		// S.No 19: WW 203 | BT (30 candidates)
+		{
+			HallNo: "WW 203",
+			CourseCode: "BT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376252BT191", "7376252BT197"), expandRange("7376252BT199", "7376252BT221")...),
+		},
+		// S.No 20: WW 204 | BT (3 candidates)
+		{
+			HallNo: "WW 204",
+			CourseCode: "BT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252BT222", "7376252BT224"),
+		},
+		// S.No 21: WW 204 | CS (27 candidates)
+		{
+			HallNo: "WW 204",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS101", "7376251CS127"),
+		},
+		// S.No 22: WW 205 | CS (30 candidates)
+		{
+			HallNo: "WW 205",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append([]string{"7376251CS128"}, expandRange("7376251CS130", "7376251CS158")...),
+		},
+		// S.No 23: WW 206 | CS (30 candidates)
+		{
+			HallNo: "WW 206",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251CS159", "7376251CS168"), expandRange("7376251CS170", "7376251CS189")...),
+		},
+		// S.No 24: WW 208 | CS (30 candidates)
+		{
+			HallNo: "WW 208",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS190", "7376251CS219"),
+		},
+		// S.No 25: WW 209 | CS (30 candidates)
+		{
+			HallNo: "WW 209",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251CS220", "7376251CS228"), expandRange("7376251CS230", "7376251CS250")...),
+		},
+		// S.No 26: WW 218 | CS (30 candidates)
+		{
+			HallNo: "WW 218",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS251", "7376251CS280"),
+		},
+		// S.No 27: ME 101 | CS (45 candidates)
+		{
+			HallNo: "ME 101",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS281", "7376251CS325"),
+		},
+		// S.No 28: ME 102 | CS (45 candidates)
+		{
+			HallNo: "ME 102",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS326", "7376251CS370"),
+		},
+		// S.No 29: ME 107 | CS (45 candidates)
+		{
+			HallNo: "ME 107",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append([]string{"7376251CS371"}, expandRange("7376251CS373", "7376251CS416")...),
+		},
+		// S.No 30: ME 201 | CS (45 candidates)
+		{
+			HallNo: "ME 201",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS417", "7376251CS461"),
+		},
+		// S.No 31: ME 202 | CS (18 candidates)
+		{
+			HallNo: "ME 202",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS462", "7376251CS479"),
+		},
+		// S.No 32: ME 202 | EE (27 candidates)
+		{
+			HallNo: "ME 202",
+			CourseCode: "EE",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EE102", "7376251EE128"),
+		},
+		// S.No 33: ME 203 | EE (45 candidates)
+		{
+			HallNo: "ME 203",
+			CourseCode: "EE",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EE129", "7376251EE173"),
+		},
+		// S.No 34: ME 204 | EE (32 candidates)
+		{
+			HallNo: "ME 204",
+			CourseCode: "EE",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EE174", "7376251EE205"),
+		},
+		// S.No 35: ME 204 | EC (13 candidates)
+		{
+			HallNo: "ME 204",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC101", "7376251EC113"),
+		},
+		// S.No 36: ME 301 | EC (45 candidates)
+		{
+			HallNo: "ME 301",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC114", "7376251EC158"),
+		},
+		// S.No 37: ME 302 | EC (45 candidates)
+		{
+			HallNo: "ME 302",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC159", "7376251EC203"),
+		},
+		// S.No 38: ME 303 | EC (45 candidates)
+		{
+			HallNo: "ME 303",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC204", "7376251EC248"),
+		},
+		// S.No 39: ME 304 | EC (45 candidates)
+		{
+			HallNo: "ME 304",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251EC249", "7376251EC269"), expandRange("7376251EC271", "7376251EC294")...),
+		},
+		// S.No 40: ME 305 | EC (45 candidates)
+		{
+			HallNo: "ME 305",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC295", "7376251EC339"),
+		},
+		// S.No 41: SF B01 | EC (13 candidates)
+		{
+			HallNo: "SF B01",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC340", "7376251EC352"),
+		},
+		// S.No 42: SF B01 | EI (17 candidates)
+		{
+			HallNo: "SF B01",
+			CourseCode: "EI",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EI101", "7376251EI117"),
+		},
+		// S.No 43: SF B02 | EI (30 candidates)
+		{
+			HallNo: "SF B02",
+			CourseCode: "EI",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EI118", "7376251EI147"),
+		},
+		// S.No 44: SF B03 | EI (14 candidates)
+		{
+			HallNo: "SF B03",
+			CourseCode: "EI",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EI148", "7376251EI161"),
+		},
+		// S.No 45: SF B03 | IT (16 candidates)
+		{
+			HallNo: "SF B03",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT102", "7376252IT117"),
+		},
+		// S.No 46: SF 001 | IT (30 candidates)
+		{
+			HallNo: "SF 001",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT118", "7376252IT147"),
+		},
+		// S.No 47: SF 002 | IT (30 candidates)
+		{
+			HallNo: "SF 002",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT148", "7376252IT177"),
+		},
+		// S.No 48: SF 101 | IT (30 candidates)
+		{
+			HallNo: "SF 101",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT178", "7376252IT207"),
+		},
+		// S.No 49: SF 102 | IT (30 candidates)
+		{
+			HallNo: "SF 102",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT208", "7376252IT237"),
+		},
+		// S.No 50: SF 103 | IT (30 candidates)
+		{
+			HallNo: "SF 103",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT238", "7376252IT267"),
+		},
+		// S.No 51: SF 201 | IT (30 candidates)
+		{
+			HallNo: "SF 201",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT268", "7376252IT297"),
+		},
+		// S.No 52: SF 202 | IT (30 candidates)
+		{
+			HallNo: "SF 202",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT298", "7376252IT327"),
+		},
+		// S.No 53: SF 203 | IT (30 candidates)
+		{
+			HallNo: "SF 203",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376252IT328", "7376252IT336"), expandRange("7376252IT338", "7376252IT358")...),
+		},
+		// S.No 54: WW 222 | IT (30 candidates)
+		{
+			HallNo: "WW 222",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT359", "7376252IT388"),
+		},
+		// S.No 55: WW 222 | ME (20 candidates)
+		{
+			HallNo: "WW 222",
+			CourseCode: "ME",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251ME102", "7376251ME121"),
+		},
+		// S.No 56: WW 223 | ME (39 candidates)
+		{
+			HallNo: "WW 223",
+			CourseCode: "ME",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251ME122", "7376251ME160"),
+		},
+		// S.No 57: WW 223 | MZ (11 candidates)
+		{
+			HallNo: "WW 223",
+			CourseCode: "MZ",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251MZ101", "7376251MZ111"),
+		},
+		// S.No 58: WW 224 | MZ (50 candidates)
+		{
+			HallNo: "WW 224",
+			CourseCode: "MZ",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251MZ112", "7376251MZ161"),
+		},
+		// S.No 59: WW 225 | MZ (1 candidates)
+		{
+			HallNo: "WW 225",
+			CourseCode: "MZ",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: []string{"7376251MZ162"},
+		},
+		// S.No 60: WW 225 | CS (24 candidates)
+		{
+			HallNo: "WW 225",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376261CS501", "7376261CS524"),
+		},
+		// S.No 61: WW 225 | EC (19 candidates)
+		{
+			HallNo: "WW 225",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376261EC502", "7376261EC520"),
+		},
+		// S.No 62: WW 225 | EE (6 candidates)
+		{
+			HallNo: "WW 225",
+			CourseCode: "EE",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376261EE502", "7376261EE507"),
+		},
+		// S.No 63: WW 226 | EE (11 candidates)
+		{
+			HallNo: "WW 226",
+			CourseCode: "EE",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376261EE508", "7376261EE518"),
+		},
+		// S.No 64: WW 226 | EI (5 candidates)
+		{
+			HallNo: "WW 226",
+			CourseCode: "EI",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376261EI501", "7376261EI505"),
+		},
+		// S.No 65: WW 226 | ME (7 candidates)
+		{
+			HallNo: "WW 226",
+			CourseCode: "ME",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376261ME501", "7376261ME507"),
+		},
+		// S.No 66: WW 226 | MZ (4 candidates)
+		{
+			HallNo: "WW 226",
+			CourseCode: "MZ",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376261MZ502", "7376261MZ505"),
+		},
+		// S.No 67: WW 226 | AD (22 candidates)
+		{
+			HallNo: "WW 226",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376262AD501", "7376262AD522"),
+		},
+		// S.No 68: WW 226 | AL (1 candidates)
+		{
+			HallNo: "WW 226",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: []string{"7376262AL501"},
+		},
+		// S.No 69: WW 227 | AL (8 candidates)
+		{
+			HallNo: "WW 227",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376262AL502", "7376262AL509"),
+		},
+		// S.No 70: WW 227 | IT (15 candidates)
+		{
+			HallNo: "WW 227",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376262IT502", "7376262IT516"),
+		},
+	}
+}
+
+func buildSeatingData27to28Oct2026Sem3FN() []studentmodels.SeatingRecord {
+	return []studentmodels.SeatingRecord{
+		// S.No 1: SF 001 | AD (20 candidates)
+		{
+			HallNo: "SF 001",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD101", "7376252AD120"),
+		},
+		// S.No 2: SF 001 | AG (20 candidates)
+		{
+			HallNo: "SF 001",
+			CourseCode: "AG",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376252AG101", "7376252AG113"), expandRange("7376252AG115", "7376252AG121")...),
+		},
+		// S.No 3: SF 001 | AD (20 candidates)
+		{
+			HallNo: "SF 001",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD121", "7376252AD140"),
+		},
+		// S.No 4: SF 001 | AG (6 candidates)
+		{
+			HallNo: "SF 001",
+			CourseCode: "AG",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AG122", "7376252AG127"),
+		},
+		// S.No 5: SF 001 | BT (14 candidates)
+		{
+			HallNo: "SF 001",
+			CourseCode: "BT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252BT102", "7376252BT115"),
+		},
+		// S.No 6: SF 002 | AD (20 candidates)
+		{
+			HallNo: "SF 002",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD141", "7376252AD160"),
+		},
+		// S.No 7: SF 002 | BT (20 candidates)
+		{
+			HallNo: "SF 002",
+			CourseCode: "BT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252BT116", "7376252BT135"),
+		},
+		// S.No 8: SF 002 | AD (20 candidates)
+		{
+			HallNo: "SF 002",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD161", "7376252AD180"),
+		},
+		// S.No 9: SF 002 | BT (20 candidates)
+		{
+			HallNo: "SF 002",
+			CourseCode: "BT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376252BT136", "7376252BT153"), expandRange("7376252BT155", "7376252BT156")...),
+		},
+		// S.No 10: WW 216 | AD (10 candidates)
+		{
+			HallNo: "WW 216",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD181", "7376252AD190"),
+		},
+		// S.No 11: WW 216 | BT (10 candidates)
+		{
+			HallNo: "WW 216",
+			CourseCode: "BT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252BT157", "7376252BT166"),
+		},
+		// S.No 12: WW 216 | AD (10 candidates)
+		{
+			HallNo: "WW 216",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD191", "7376252AD200"),
+		},
+		// S.No 13: WW 216 | BT (10 candidates)
+		{
+			HallNo: "WW 216",
+			CourseCode: "BT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252BT167", "7376252BT176"),
+		},
+		// S.No 14: WW 217 | AD (10 candidates)
+		{
+			HallNo: "WW 217",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD201", "7376252AD210"),
+		},
+		// S.No 15: WW 217 | BT (10 candidates)
+		{
+			HallNo: "WW 217",
+			CourseCode: "BT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252BT177", "7376252BT186"),
+		},
+		// S.No 16: WW 217 | AD (10 candidates)
+		{
+			HallNo: "WW 217",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD211", "7376252AD220"),
+		},
+		// S.No 17: WW 217 | BT (10 candidates)
+		{
+			HallNo: "WW 217",
+			CourseCode: "BT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376252BT187", "7376252BT189"), expandRange("7376252BT191", "7376252BT197")...),
+		},
+		// S.No 18: WW 220 | AD (10 candidates)
+		{
+			HallNo: "WW 220",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD221", "7376252AD230"),
+		},
+		// S.No 19: WW 220 | BT (10 candidates)
+		{
+			HallNo: "WW 220",
+			CourseCode: "BT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252BT199", "7376252BT208"),
+		},
+		// S.No 20: WW 220 | AD (10 candidates)
+		{
+			HallNo: "WW 220",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD231", "7376252AD240"),
+		},
+		// S.No 21: WW 220 | BT (10 candidates)
+		{
+			HallNo: "WW 220",
+			CourseCode: "BT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252BT209", "7376252BT218"),
+		},
+		// S.No 22: WW 008 | AD (15 candidates)
+		{
+			HallNo: "WW 008",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD241", "7376252AD255"),
+		},
+		// S.No 23: WW 008 | BT (6 candidates)
+		{
+			HallNo: "WW 008",
+			CourseCode: "BT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252BT219", "7376252BT224"),
+		},
+		// S.No 24: WW 008 | EC (9 candidates)
+		{
+			HallNo: "WW 008",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC101", "7376251EC109"),
+		},
+		// S.No 25: WW 008 | AD (15 candidates)
+		{
+			HallNo: "WW 008",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD256", "7376252AD270"),
+		},
+		// S.No 26: WW 008 | EC (15 candidates)
+		{
+			HallNo: "WW 008",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC110", "7376251EC124"),
+		},
+		// S.No 27: WW 011 | AD (15 candidates)
+		{
+			HallNo: "WW 011",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD271", "7376252AD285"),
+		},
+		// S.No 28: WW 011 | EC (15 candidates)
+		{
+			HallNo: "WW 011",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC125", "7376251EC139"),
+		},
+		// S.No 29: WW 011 | AD (15 candidates)
+		{
+			HallNo: "WW 011",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD286", "7376252AD300"),
+		},
+		// S.No 30: WW 011 | EC (15 candidates)
+		{
+			HallNo: "WW 011",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC140", "7376251EC154"),
+		},
+		// S.No 31: WW 012 | AD (15 candidates)
+		{
+			HallNo: "WW 012",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD301", "7376252AD315"),
+		},
+		// S.No 32: WW 012 | EC (15 candidates)
+		{
+			HallNo: "WW 012",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC155", "7376251EC169"),
+		},
+		// S.No 33: WW 012 | AD (15 candidates)
+		{
+			HallNo: "WW 012",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD316", "7376252AD330"),
+		},
+		// S.No 34: WW 012 | EC (15 candidates)
+		{
+			HallNo: "WW 012",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC170", "7376251EC184"),
+		},
+		// S.No 35: WW 117 | AD (15 candidates)
+		{
+			HallNo: "WW 117",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD331", "7376252AD345"),
+		},
+		// S.No 36: WW 117 | EC (15 candidates)
+		{
+			HallNo: "WW 117",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC185", "7376251EC199"),
+		},
+		// S.No 37: WW 117 | AD (15 candidates)
+		{
+			HallNo: "WW 117",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD346", "7376252AD360"),
+		},
+		// S.No 38: WW 117 | EC (15 candidates)
+		{
+			HallNo: "WW 117",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC200", "7376251EC214"),
+		},
+		// S.No 39: WW 118 | AD (15 candidates)
+		{
+			HallNo: "WW 118",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AD361", "7376252AD375"),
+		},
+		// S.No 40: WW 118 | EC (15 candidates)
+		{
+			HallNo: "WW 118",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC215", "7376251EC229"),
+		},
+		// S.No 41: WW 118 | AD (15 candidates)
+		{
+			HallNo: "WW 118",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376252AD376", "7376252AD381"), expandRange("7376262AD501", "7376262AD509")...),
+		},
+		// S.No 42: WW 118 | EC (15 candidates)
+		{
+			HallNo: "WW 118",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC230", "7376251EC244"),
+		},
+		// S.No 43: WW 203 | AD (13 candidates)
+		{
+			HallNo: "WW 203",
+			CourseCode: "AD",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376262AD510", "7376262AD522"),
+		},
+		// S.No 44: WW 203 | AL (2 candidates)
+		{
+			HallNo: "WW 203",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL101", "7376252AL102"),
+		},
+		// S.No 45: WW 203 | EC (15 candidates)
+		{
+			HallNo: "WW 203",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC245", "7376251EC259"),
+		},
+		// S.No 46: WW 203 | AL (15 candidates)
+		{
+			HallNo: "WW 203",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL103", "7376252AL117"),
+		},
+		// S.No 47: WW 203 | EC (15 candidates)
+		{
+			HallNo: "WW 203",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376251EC260", "7376251EC269"), expandRange("7376251EC271", "7376251EC275")...),
+		},
+		// S.No 48: WW 204 | AL (15 candidates)
+		{
+			HallNo: "WW 204",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL118", "7376252AL132"),
+		},
+		// S.No 49: WW 204 | EC (15 candidates)
+		{
+			HallNo: "WW 204",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC276", "7376251EC290"),
+		},
+		// S.No 50: WW 204 | AL (15 candidates)
+		{
+			HallNo: "WW 204",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL133", "7376252AL147"),
+		},
+		// S.No 51: WW 204 | EC (15 candidates)
+		{
+			HallNo: "WW 204",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC291", "7376251EC305"),
+		},
+		// S.No 52: WW 205 | AL (15 candidates)
+		{
+			HallNo: "WW 205",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL148", "7376252AL162"),
+		},
+		// S.No 53: WW 205 | EC (15 candidates)
+		{
+			HallNo: "WW 205",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC306", "7376251EC320"),
+		},
+		// S.No 54: WW 205 | AL (15 candidates)
+		{
+			HallNo: "WW 205",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL163", "7376252AL177"),
+		},
+		// S.No 55: WW 205 | EC (15 candidates)
+		{
+			HallNo: "WW 205",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC321", "7376251EC335"),
+		},
+		// S.No 56: WW 206 | AL (15 candidates)
+		{
+			HallNo: "WW 206",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL178", "7376252AL192"),
+		},
+		// S.No 57: WW 206 | EC (15 candidates)
+		{
+			HallNo: "WW 206",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EC336", "7376251EC350"),
+		},
+		// S.No 58: WW 206 | AL (15 candidates)
+		{
+			HallNo: "WW 206",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL193", "7376252AL207"),
+		},
+		// S.No 59: WW 206 | EC (15 candidates)
+		{
+			HallNo: "WW 206",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376251EC351", "7376251EC352"), expandRange("7376261EC502", "7376261EC514")...),
+		},
+		// S.No 60: WW 208 | AL (15 candidates)
+		{
+			HallNo: "WW 208",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL208", "7376252AL222"),
+		},
+		// S.No 61: WW 208 | EC (6 candidates)
+		{
+			HallNo: "WW 208",
+			CourseCode: "EC",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376261EC515", "7376261EC520"),
+		},
+		// S.No 62: WW 208 | EE (9 candidates)
+		{
+			HallNo: "WW 208",
+			CourseCode: "EE",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EE102", "7376251EE110"),
+		},
+		// S.No 63: WW 208 | AL (15 candidates)
+		{
+			HallNo: "WW 208",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252AL223", "7376252AL237"),
+		},
+		// S.No 64: WW 208 | EE (15 candidates)
+		{
+			HallNo: "WW 208",
+			CourseCode: "EE",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EE111", "7376251EE125"),
+		},
+		// S.No 65: WW 209 | AL (15 candidates)
+		{
+			HallNo: "WW 209",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376252AL238", "7376252AL246"), expandRange("7376262AL501", "7376262AL506")...),
+		},
+		// S.No 66: WW 209 | EE (15 candidates)
+		{
+			HallNo: "WW 209",
+			CourseCode: "EE",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EE126", "7376251EE140"),
+		},
+		// S.No 67: WW 209 | AL (3 candidates)
+		{
+			HallNo: "WW 209",
+			CourseCode: "AL",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376262AL507", "7376262AL509"),
+		},
+		// S.No 68: WW 209 | CS (12 candidates)
+		{
+			HallNo: "WW 209",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS101", "7376251CS112"),
+		},
+		// S.No 69: WW 209 | EE (15 candidates)
+		{
+			HallNo: "WW 209",
+			CourseCode: "EE",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EE141", "7376251EE155"),
+		},
+		// S.No 70: WW 210 | CS (15 candidates)
+		{
+			HallNo: "WW 210",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS113", "7376251CS127"),
+		},
+		// S.No 71: WW 210 | EE (15 candidates)
+		{
+			HallNo: "WW 210",
+			CourseCode: "EE",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EE156", "7376251EE170"),
+		},
+		// S.No 72: WW 210 | CS (15 candidates)
+		{
+			HallNo: "WW 210",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append([]string{"7376251CS128"}, expandRange("7376251CS130", "7376251CS143")...),
+		},
+		// S.No 73: WW 210 | EE (15 candidates)
+		{
+			HallNo: "WW 210",
+			CourseCode: "EE",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EE171", "7376251EE185"),
+		},
+		// S.No 74: WW 211 | CS (15 candidates)
+		{
+			HallNo: "WW 211",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS144", "7376251CS158"),
+		},
+		// S.No 75: WW 211 | EE (15 candidates)
+		{
+			HallNo: "WW 211",
+			CourseCode: "EE",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EE186", "7376251EE200"),
+		},
+		// S.No 76: WW 211 | CS (15 candidates)
+		{
+			HallNo: "WW 211",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376251CS159", "7376251CS168"), expandRange("7376251CS170", "7376251CS174")...),
+		},
+		// S.No 77: WW 211 | EE (15 candidates)
+		{
+			HallNo: "WW 211",
+			CourseCode: "EE",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376251EE201", "7376251EE205"), expandRange("7376261EE502", "7376261EE511")...),
+		},
+		// S.No 78: WW 213 | CS (15 candidates)
+		{
+			HallNo: "WW 213",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS175", "7376251CS189"),
+		},
+		// S.No 79: WW 213 | EE (7 candidates)
+		{
+			HallNo: "WW 213",
+			CourseCode: "EE",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376261EE512", "7376261EE518"),
+		},
+		// S.No 80: WW 213 | EI (8 candidates)
+		{
+			HallNo: "WW 213",
+			CourseCode: "EI",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EI101", "7376251EI108"),
+		},
+		// S.No 81: WW 213 | CS (15 candidates)
+		{
+			HallNo: "WW 213",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS190", "7376251CS204"),
+		},
+		// S.No 82: WW 213 | EI (15 candidates)
+		{
+			HallNo: "WW 213",
+			CourseCode: "EI",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EI109", "7376251EI123"),
+		},
+		// S.No 83: WW 214 | CS (15 candidates)
+		{
+			HallNo: "WW 214",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS205", "7376251CS219"),
+		},
+		// S.No 84: WW 214 | EI (15 candidates)
+		{
+			HallNo: "WW 214",
+			CourseCode: "EI",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EI124", "7376251EI138"),
+		},
+		// S.No 85: WW 214 | CS (15 candidates)
+		{
+			HallNo: "WW 214",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376251CS220", "7376251CS228"), expandRange("7376251CS230", "7376251CS235")...),
+		},
+		// S.No 86: WW 214 | EI (15 candidates)
+		{
+			HallNo: "WW 214",
+			CourseCode: "EI",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251EI139", "7376251EI153"),
+		},
+		// S.No 87: WW 215 | CS (15 candidates)
+		{
+			HallNo: "WW 215",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS236", "7376251CS250"),
+		},
+		// S.No 88: WW 215 | EI (13 candidates)
+		{
+			HallNo: "WW 215",
+			CourseCode: "EI",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376251EI154", "7376251EI161"), expandRange("7376261EI501", "7376261EI505")...),
+		},
+		// S.No 89: WW 215 | ME (2 candidates)
+		{
+			HallNo: "WW 215",
+			CourseCode: "ME",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251ME102", "7376251ME103"),
+		},
+		// S.No 90: WW 215 | CS (15 candidates)
+		{
+			HallNo: "WW 215",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS251", "7376251CS265"),
+		},
+		// S.No 91: WW 215 | ME (15 candidates)
+		{
+			HallNo: "WW 215",
+			CourseCode: "ME",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251ME104", "7376251ME118"),
+		},
+		// S.No 92: WW 218 | CS (15 candidates)
+		{
+			HallNo: "WW 218",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS266", "7376251CS280"),
+		},
+		// S.No 93: WW 218 | ME (15 candidates)
+		{
+			HallNo: "WW 218",
+			CourseCode: "ME",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251ME119", "7376251ME133"),
+		},
+		// S.No 94: WW 218 | CS (15 candidates)
+		{
+			HallNo: "WW 218",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS281", "7376251CS295"),
+		},
+		// S.No 95: WW 218 | ME (15 candidates)
+		{
+			HallNo: "WW 218",
+			CourseCode: "ME",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251ME134", "7376251ME148"),
+		},
+		// S.No 96: WW 219 | CS (15 candidates)
+		{
+			HallNo: "WW 219",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS296", "7376251CS310"),
+		},
+		// S.No 97: WW 219 | ME (15 candidates)
+		{
+			HallNo: "WW 219",
+			CourseCode: "ME",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376251ME149", "7376251ME160"), expandRange("7376261ME501", "7376261ME503")...),
+		},
+		// S.No 98: WW 219 | CS (15 candidates)
+		{
+			HallNo: "WW 219",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS311", "7376251CS325"),
+		},
+		// S.No 99: WW 219 | ME (4 candidates)
+		{
+			HallNo: "WW 219",
+			CourseCode: "ME",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376261ME504", "7376261ME507"),
+		},
+		// S.No 100: WW 219 | MZ (11 candidates)
+		{
+			HallNo: "WW 219",
+			CourseCode: "MZ",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251MZ101", "7376251MZ111"),
+		},
+		// S.No 101: WW 202 | CS (15 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS326", "7376251CS340"),
+		},
+		// S.No 102: WW 202 | MZ (15 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "MZ",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251MZ112", "7376251MZ126"),
+		},
+		// S.No 103: WW 202 | CS (15 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS341", "7376251CS355"),
+		},
+		// S.No 104: WW 202 | MZ (15 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "MZ",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251MZ127", "7376251MZ141"),
+		},
+		// S.No 105: WW 202 | CS (15 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS356", "7376251CS370"),
+		},
+		// S.No 106: WW 202 | MZ (15 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "MZ",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251MZ142", "7376251MZ156"),
+		},
+		// S.No 107: WW 202 | CS (15 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append([]string{"7376251CS371"}, expandRange("7376251CS373", "7376251CS386")...),
+		},
+		// S.No 108: WW 202 | MZ (10 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "MZ",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376251MZ157", "7376251MZ162"), expandRange("7376261MZ502", "7376261MZ505")...),
+		},
+		// S.No 109: WW 207 | CS (60 candidates)
+		{
+			HallNo: "WW 207",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376251CS387", "7376251CS446"),
+		},
+		// S.No 110: WW 212 | CS (57 candidates)
+		{
+			HallNo: "WW 212",
+			CourseCode: "CS",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376251CS447", "7376251CS479"), expandRange("7376261CS501", "7376261CS524")...),
+		},
+		// S.No 111: WW 212 | IT (3 candidates)
+		{
+			HallNo: "WW 212",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252IT102", "7376252IT104"),
+		},
+		// S.No 112: WW 222 | IT (50 candidates)
+		{
+			HallNo: "WW 222",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252IT105", "7376252IT154"),
+		},
+		// S.No 113: WW 223 | IT (50 candidates)
+		{
+			HallNo: "WW 223",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252IT155", "7376252IT204"),
+		},
+		// S.No 114: WW 224 | IT (50 candidates)
+		{
+			HallNo: "WW 224",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252IT205", "7376252IT254"),
+		},
+		// S.No 115: WW 225 | IT (50 candidates)
+		{
+			HallNo: "WW 225",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: expandRange("7376252IT255", "7376252IT304"),
+		},
+		// S.No 116: WW 226 | IT (50 candidates)
+		{
+			HallNo: "WW 226",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376252IT305", "7376252IT336"), expandRange("7376252IT338", "7376252IT355")...),
+		},
+		// S.No 117: WW 227 | IT (48 candidates)
+		{
+			HallNo: "WW 227",
+			CourseCode: "IT",
+			Time: "10:45 AM – 12:15 PM",
+			RegisterNos: append(expandRange("7376252IT356", "7376252IT388"), expandRange("7376262IT502", "7376262IT516")...),
+		},
+	}
+}
+
+func buildSeatingData27to28Oct2026Sem3AN() []studentmodels.SeatingRecord {
+	return []studentmodels.SeatingRecord{
+		// S.No 1: SF 001 | AD (20 candidates)
+		{
+			HallNo: "SF 001",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD101", "7376252AD120"),
+		},
+		// S.No 2: SF 001 | AG (20 candidates)
+		{
+			HallNo: "SF 001",
+			CourseCode: "AG",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376252AG101", "7376252AG113"), expandRange("7376252AG115", "7376252AG121")...),
+		},
+		// S.No 3: SF 001 | AD (20 candidates)
+		{
+			HallNo: "SF 001",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD121", "7376252AD140"),
+		},
+		// S.No 4: SF 001 | AG (6 candidates)
+		{
+			HallNo: "SF 001",
+			CourseCode: "AG",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AG122", "7376252AG127"),
+		},
+		// S.No 5: SF 001 | BT (14 candidates)
+		{
+			HallNo: "SF 001",
+			CourseCode: "BT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252BT102", "7376252BT115"),
+		},
+		// S.No 6: SF 002 | AD (20 candidates)
+		{
+			HallNo: "SF 002",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD141", "7376252AD160"),
+		},
+		// S.No 7: SF 002 | BT (20 candidates)
+		{
+			HallNo: "SF 002",
+			CourseCode: "BT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252BT116", "7376252BT135"),
+		},
+		// S.No 8: SF 002 | AD (20 candidates)
+		{
+			HallNo: "SF 002",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD161", "7376252AD180"),
+		},
+		// S.No 9: SF 002 | BT (20 candidates)
+		{
+			HallNo: "SF 002",
+			CourseCode: "BT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376252BT136", "7376252BT153"), expandRange("7376252BT155", "7376252BT156")...),
+		},
+		// S.No 10: WW 216 | AD (10 candidates)
+		{
+			HallNo: "WW 216",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD181", "7376252AD190"),
+		},
+		// S.No 11: WW 216 | BT (10 candidates)
+		{
+			HallNo: "WW 216",
+			CourseCode: "BT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252BT157", "7376252BT166"),
+		},
+		// S.No 12: WW 216 | AD (10 candidates)
+		{
+			HallNo: "WW 216",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD191", "7376252AD200"),
+		},
+		// S.No 13: WW 216 | BT (10 candidates)
+		{
+			HallNo: "WW 216",
+			CourseCode: "BT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252BT167", "7376252BT176"),
+		},
+		// S.No 14: WW 217 | AD (10 candidates)
+		{
+			HallNo: "WW 217",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD201", "7376252AD210"),
+		},
+		// S.No 15: WW 217 | BT (10 candidates)
+		{
+			HallNo: "WW 217",
+			CourseCode: "BT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252BT177", "7376252BT186"),
+		},
+		// S.No 16: WW 217 | AD (10 candidates)
+		{
+			HallNo: "WW 217",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD211", "7376252AD220"),
+		},
+		// S.No 17: WW 217 | BT (10 candidates)
+		{
+			HallNo: "WW 217",
+			CourseCode: "BT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376252BT187", "7376252BT189"), expandRange("7376252BT191", "7376252BT197")...),
+		},
+		// S.No 18: WW 220 | AD (10 candidates)
+		{
+			HallNo: "WW 220",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD221", "7376252AD230"),
+		},
+		// S.No 19: WW 220 | BT (10 candidates)
+		{
+			HallNo: "WW 220",
+			CourseCode: "BT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252BT199", "7376252BT208"),
+		},
+		// S.No 20: WW 220 | AD (10 candidates)
+		{
+			HallNo: "WW 220",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD231", "7376252AD240"),
+		},
+		// S.No 21: WW 220 | BT (10 candidates)
+		{
+			HallNo: "WW 220",
+			CourseCode: "BT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252BT209", "7376252BT218"),
+		},
+		// S.No 22: WW 008 | AD (15 candidates)
+		{
+			HallNo: "WW 008",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD241", "7376252AD255"),
+		},
+		// S.No 23: WW 008 | BT (6 candidates)
+		{
+			HallNo: "WW 008",
+			CourseCode: "BT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252BT219", "7376252BT224"),
+		},
+		// S.No 24: WW 008 | EC (9 candidates)
+		{
+			HallNo: "WW 008",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC101", "7376251EC109"),
+		},
+		// S.No 25: WW 008 | AD (15 candidates)
+		{
+			HallNo: "WW 008",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD256", "7376252AD270"),
+		},
+		// S.No 26: WW 008 | EC (15 candidates)
+		{
+			HallNo: "WW 008",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC110", "7376251EC124"),
+		},
+		// S.No 27: WW 011 | AD (15 candidates)
+		{
+			HallNo: "WW 011",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD271", "7376252AD285"),
+		},
+		// S.No 28: WW 011 | EC (15 candidates)
+		{
+			HallNo: "WW 011",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC125", "7376251EC139"),
+		},
+		// S.No 29: WW 011 | AD (15 candidates)
+		{
+			HallNo: "WW 011",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD286", "7376252AD300"),
+		},
+		// S.No 30: WW 011 | EC (15 candidates)
+		{
+			HallNo: "WW 011",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC140", "7376251EC154"),
+		},
+		// S.No 31: WW 012 | AD (15 candidates)
+		{
+			HallNo: "WW 012",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD301", "7376252AD315"),
+		},
+		// S.No 32: WW 012 | EC (15 candidates)
+		{
+			HallNo: "WW 012",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC155", "7376251EC169"),
+		},
+		// S.No 33: WW 012 | AD (15 candidates)
+		{
+			HallNo: "WW 012",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD316", "7376252AD330"),
+		},
+		// S.No 34: WW 012 | EC (15 candidates)
+		{
+			HallNo: "WW 012",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC170", "7376251EC184"),
+		},
+		// S.No 35: WW 117 | AD (15 candidates)
+		{
+			HallNo: "WW 117",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD331", "7376252AD345"),
+		},
+		// S.No 36: WW 117 | EC (15 candidates)
+		{
+			HallNo: "WW 117",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC185", "7376251EC199"),
+		},
+		// S.No 37: WW 117 | AD (15 candidates)
+		{
+			HallNo: "WW 117",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD346", "7376252AD360"),
+		},
+		// S.No 38: WW 117 | EC (15 candidates)
+		{
+			HallNo: "WW 117",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC200", "7376251EC214"),
+		},
+		// S.No 39: WW 118 | AD (15 candidates)
+		{
+			HallNo: "WW 118",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AD361", "7376252AD375"),
+		},
+		// S.No 40: WW 118 | EC (15 candidates)
+		{
+			HallNo: "WW 118",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC215", "7376251EC229"),
+		},
+		// S.No 41: WW 118 | AD (15 candidates)
+		{
+			HallNo: "WW 118",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376252AD376", "7376252AD381"), expandRange("7376262AD501", "7376262AD509")...),
+		},
+		// S.No 42: WW 118 | EC (15 candidates)
+		{
+			HallNo: "WW 118",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC230", "7376251EC244"),
+		},
+		// S.No 43: WW 203 | AD (13 candidates)
+		{
+			HallNo: "WW 203",
+			CourseCode: "AD",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376262AD510", "7376262AD522"),
+		},
+		// S.No 44: WW 203 | AL (2 candidates)
+		{
+			HallNo: "WW 203",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL101", "7376252AL102"),
+		},
+		// S.No 45: WW 203 | EC (15 candidates)
+		{
+			HallNo: "WW 203",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC245", "7376251EC259"),
+		},
+		// S.No 46: WW 203 | AL (15 candidates)
+		{
+			HallNo: "WW 203",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL103", "7376252AL117"),
+		},
+		// S.No 47: WW 203 | EC (15 candidates)
+		{
+			HallNo: "WW 203",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251EC260", "7376251EC269"), expandRange("7376251EC271", "7376251EC275")...),
+		},
+		// S.No 48: WW 204 | AL (15 candidates)
+		{
+			HallNo: "WW 204",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL118", "7376252AL132"),
+		},
+		// S.No 49: WW 204 | EC (15 candidates)
+		{
+			HallNo: "WW 204",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC276", "7376251EC290"),
+		},
+		// S.No 50: WW 204 | AL (15 candidates)
+		{
+			HallNo: "WW 204",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL133", "7376252AL147"),
+		},
+		// S.No 51: WW 204 | EC (15 candidates)
+		{
+			HallNo: "WW 204",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC291", "7376251EC305"),
+		},
+		// S.No 52: WW 205 | AL (15 candidates)
+		{
+			HallNo: "WW 205",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL148", "7376252AL162"),
+		},
+		// S.No 53: WW 205 | EC (15 candidates)
+		{
+			HallNo: "WW 205",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC306", "7376251EC320"),
+		},
+		// S.No 54: WW 205 | AL (15 candidates)
+		{
+			HallNo: "WW 205",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL163", "7376252AL177"),
+		},
+		// S.No 55: WW 205 | EC (15 candidates)
+		{
+			HallNo: "WW 205",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC321", "7376251EC335"),
+		},
+		// S.No 56: WW 206 | AL (15 candidates)
+		{
+			HallNo: "WW 206",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL178", "7376252AL192"),
+		},
+		// S.No 57: WW 206 | EC (15 candidates)
+		{
+			HallNo: "WW 206",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC336", "7376251EC350"),
+		},
+		// S.No 58: WW 206 | AL (15 candidates)
+		{
+			HallNo: "WW 206",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL193", "7376252AL207"),
+		},
+		// S.No 59: WW 206 | EC (15 candidates)
+		{
+			HallNo: "WW 206",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251EC351", "7376251EC352"), expandRange("7376261EC502", "7376261EC514")...),
+		},
+		// S.No 60: WW 208 | AL (15 candidates)
+		{
+			HallNo: "WW 208",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL208", "7376252AL222"),
+		},
+		// S.No 61: WW 208 | EC (6 candidates)
+		{
+			HallNo: "WW 208",
+			CourseCode: "EC",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376261EC515", "7376261EC520"),
+		},
+		// S.No 62: WW 208 | EE (9 candidates)
+		{
+			HallNo: "WW 208",
+			CourseCode: "EE",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EE102", "7376251EE110"),
+		},
+		// S.No 63: WW 208 | AL (15 candidates)
+		{
+			HallNo: "WW 208",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252AL223", "7376252AL237"),
+		},
+		// S.No 64: WW 208 | EE (15 candidates)
+		{
+			HallNo: "WW 208",
+			CourseCode: "EE",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EE111", "7376251EE125"),
+		},
+		// S.No 65: WW 209 | AL (15 candidates)
+		{
+			HallNo: "WW 209",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376252AL238", "7376252AL246"), expandRange("7376262AL501", "7376262AL506")...),
+		},
+		// S.No 66: WW 209 | EE (15 candidates)
+		{
+			HallNo: "WW 209",
+			CourseCode: "EE",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EE126", "7376251EE140"),
+		},
+		// S.No 67: WW 209 | AL (3 candidates)
+		{
+			HallNo: "WW 209",
+			CourseCode: "AL",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376262AL507", "7376262AL509"),
+		},
+		// S.No 68: WW 209 | CS (12 candidates)
+		{
+			HallNo: "WW 209",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS101", "7376251CS112"),
+		},
+		// S.No 69: WW 209 | EE (15 candidates)
+		{
+			HallNo: "WW 209",
+			CourseCode: "EE",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EE141", "7376251EE155"),
+		},
+		// S.No 70: WW 210 | CS (15 candidates)
+		{
+			HallNo: "WW 210",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS113", "7376251CS127"),
+		},
+		// S.No 71: WW 210 | EE (15 candidates)
+		{
+			HallNo: "WW 210",
+			CourseCode: "EE",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EE156", "7376251EE170"),
+		},
+		// S.No 72: WW 210 | CS (15 candidates)
+		{
+			HallNo: "WW 210",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append([]string{"7376251CS128"}, expandRange("7376251CS130", "7376251CS143")...),
+		},
+		// S.No 73: WW 210 | EE (15 candidates)
+		{
+			HallNo: "WW 210",
+			CourseCode: "EE",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EE171", "7376251EE185"),
+		},
+		// S.No 74: WW 211 | CS (15 candidates)
+		{
+			HallNo: "WW 211",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS144", "7376251CS158"),
+		},
+		// S.No 75: WW 211 | EE (15 candidates)
+		{
+			HallNo: "WW 211",
+			CourseCode: "EE",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EE186", "7376251EE200"),
+		},
+		// S.No 76: WW 211 | CS (15 candidates)
+		{
+			HallNo: "WW 211",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251CS159", "7376251CS168"), expandRange("7376251CS170", "7376251CS174")...),
+		},
+		// S.No 77: WW 211 | EE (15 candidates)
+		{
+			HallNo: "WW 211",
+			CourseCode: "EE",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251EE201", "7376251EE205"), expandRange("7376261EE502", "7376261EE511")...),
+		},
+		// S.No 78: WW 213 | CS (15 candidates)
+		{
+			HallNo: "WW 213",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS175", "7376251CS189"),
+		},
+		// S.No 79: WW 213 | EE (7 candidates)
+		{
+			HallNo: "WW 213",
+			CourseCode: "EE",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376261EE512", "7376261EE518"),
+		},
+		// S.No 80: WW 213 | EI (8 candidates)
+		{
+			HallNo: "WW 213",
+			CourseCode: "EI",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EI101", "7376251EI108"),
+		},
+		// S.No 81: WW 213 | CS (15 candidates)
+		{
+			HallNo: "WW 213",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS190", "7376251CS204"),
+		},
+		// S.No 82: WW 213 | EI (15 candidates)
+		{
+			HallNo: "WW 213",
+			CourseCode: "EI",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EI109", "7376251EI123"),
+		},
+		// S.No 83: WW 214 | CS (15 candidates)
+		{
+			HallNo: "WW 214",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS205", "7376251CS219"),
+		},
+		// S.No 84: WW 214 | EI (15 candidates)
+		{
+			HallNo: "WW 214",
+			CourseCode: "EI",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EI124", "7376251EI138"),
+		},
+		// S.No 85: WW 214 | CS (15 candidates)
+		{
+			HallNo: "WW 214",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251CS220", "7376251CS228"), expandRange("7376251CS230", "7376251CS235")...),
+		},
+		// S.No 86: WW 214 | EI (15 candidates)
+		{
+			HallNo: "WW 214",
+			CourseCode: "EI",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EI139", "7376251EI153"),
+		},
+		// S.No 87: WW 215 | CS (15 candidates)
+		{
+			HallNo: "WW 215",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS236", "7376251CS250"),
+		},
+		// S.No 88: WW 215 | EI (13 candidates)
+		{
+			HallNo: "WW 215",
+			CourseCode: "EI",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251EI154", "7376251EI161"), expandRange("7376261EI501", "7376261EI505")...),
+		},
+		// S.No 89: WW 215 | ME (2 candidates)
+		{
+			HallNo: "WW 215",
+			CourseCode: "ME",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251ME102", "7376251ME103"),
+		},
+		// S.No 90: WW 215 | CS (15 candidates)
+		{
+			HallNo: "WW 215",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS251", "7376251CS265"),
+		},
+		// S.No 91: WW 215 | ME (15 candidates)
+		{
+			HallNo: "WW 215",
+			CourseCode: "ME",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251ME104", "7376251ME118"),
+		},
+		// S.No 92: WW 218 | CS (15 candidates)
+		{
+			HallNo: "WW 218",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS266", "7376251CS280"),
+		},
+		// S.No 93: WW 218 | ME (15 candidates)
+		{
+			HallNo: "WW 218",
+			CourseCode: "ME",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251ME119", "7376251ME133"),
+		},
+		// S.No 94: WW 218 | CS (15 candidates)
+		{
+			HallNo: "WW 218",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS281", "7376251CS295"),
+		},
+		// S.No 95: WW 218 | ME (15 candidates)
+		{
+			HallNo: "WW 218",
+			CourseCode: "ME",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251ME134", "7376251ME148"),
+		},
+		// S.No 96: WW 219 | CS (15 candidates)
+		{
+			HallNo: "WW 219",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS296", "7376251CS310"),
+		},
+		// S.No 97: WW 219 | ME (15 candidates)
+		{
+			HallNo: "WW 219",
+			CourseCode: "ME",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251ME149", "7376251ME160"), expandRange("7376261ME501", "7376261ME503")...),
+		},
+		// S.No 98: WW 219 | CS (15 candidates)
+		{
+			HallNo: "WW 219",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS311", "7376251CS325"),
+		},
+		// S.No 99: WW 219 | ME (4 candidates)
+		{
+			HallNo: "WW 219",
+			CourseCode: "ME",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376261ME504", "7376261ME507"),
+		},
+		// S.No 100: WW 219 | MZ (11 candidates)
+		{
+			HallNo: "WW 219",
+			CourseCode: "MZ",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251MZ101", "7376251MZ111"),
+		},
+		// S.No 101: WW 202 | CS (15 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS326", "7376251CS340"),
+		},
+		// S.No 102: WW 202 | MZ (15 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "MZ",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251MZ112", "7376251MZ126"),
+		},
+		// S.No 103: WW 202 | CS (15 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS341", "7376251CS355"),
+		},
+		// S.No 104: WW 202 | MZ (15 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "MZ",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251MZ127", "7376251MZ141"),
+		},
+		// S.No 105: WW 202 | CS (15 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS356", "7376251CS370"),
+		},
+		// S.No 106: WW 202 | MZ (15 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "MZ",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251MZ142", "7376251MZ156"),
+		},
+		// S.No 107: WW 202 | CS (15 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append([]string{"7376251CS371"}, expandRange("7376251CS373", "7376251CS386")...),
+		},
+		// S.No 108: WW 202 | MZ (10 candidates)
+		{
+			HallNo: "WW 202",
+			CourseCode: "MZ",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251MZ157", "7376251MZ162"), expandRange("7376261MZ502", "7376261MZ505")...),
+		},
+		// S.No 109: WW 207 | CS (60 candidates)
+		{
+			HallNo: "WW 207",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS387", "7376251CS446"),
+		},
+		// S.No 110: WW 212 | CS (57 candidates)
+		{
+			HallNo: "WW 212",
+			CourseCode: "CS",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251CS447", "7376251CS479"), expandRange("7376261CS501", "7376261CS524")...),
+		},
+		// S.No 111: WW 212 | IT (3 candidates)
+		{
+			HallNo: "WW 212",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT102", "7376252IT104"),
+		},
+		// S.No 112: WW 222 | IT (50 candidates)
+		{
+			HallNo: "WW 222",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT105", "7376252IT154"),
+		},
+		// S.No 113: WW 223 | IT (50 candidates)
+		{
+			HallNo: "WW 223",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT155", "7376252IT204"),
+		},
+		// S.No 114: WW 224 | IT (50 candidates)
+		{
+			HallNo: "WW 224",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT205", "7376252IT254"),
+		},
+		// S.No 115: WW 225 | IT (50 candidates)
+		{
+			HallNo: "WW 225",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT255", "7376252IT304"),
+		},
+		// S.No 116: WW 226 | IT (50 candidates)
+		{
+			HallNo: "WW 226",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376252IT305", "7376252IT336"), expandRange("7376252IT338", "7376252IT355")...),
+		},
+		// S.No 117: WW 227 | IT (48 candidates)
+		{
+			HallNo: "WW 227",
+			CourseCode: "IT",
+			Time: "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376252IT356", "7376252IT388"), expandRange("7376262IT502", "7376262IT516")...),
+		},
+	}
+}
