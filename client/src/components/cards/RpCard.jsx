@@ -1,21 +1,25 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { GraduationCap, MapPin, User, Loader2, X, ChevronRight, ChevronLeft, Calculator, Sparkles } from "lucide-react";
+import { GraduationCap, MapPin, User, Loader2, X, ChevronRight, ChevronLeft, Calculator, Sparkles, Trophy } from "lucide-react";
 import api from "@/api/axios.js";
 import { fetchInternalMarkConversion } from "@/api/gradioRewardPoints.js";
 import InternalMarksConversionModal from "@/components/modals/InternalMarksConversionModal.jsx";
+import RankModal from "@/components/modals/RankModal.jsx";
 
-const Meta = ({ icon: Icon, children }) => (
-  <div className="flex items-start gap-2">
-    <Icon
-      className="mt-px h-3.5 w-3.5 shrink-0 text-slate-500 dark:text-slate-500"
-      strokeWidth={1.6}
-    />
-    <span className="text-[12px] leading-snug text-slate-600 dark:text-slate-400">
-      {children}
-    </span>
-  </div>
-);
+const Meta = (props) => {
+  const Icon = props.icon;
+  return (
+    <div className="flex items-start gap-2">
+      <Icon
+        className="mt-px h-3.5 w-3.5 shrink-0 text-slate-500 dark:text-slate-500"
+        strokeWidth={1.6}
+      />
+      <span className="text-[12px] leading-snug text-slate-600 dark:text-slate-400">
+        {props.children}
+      </span>
+    </div>
+  );
+};
 
 export default function RpCard({ student }) {
   const [open, setOpen] = useState(false);
@@ -33,6 +37,24 @@ export default function RpCard({ student }) {
   const [internalData, setInternalData] = useState(null);
   const internalCache = React.useRef(new Map());
 
+  // Rank state
+  const [rankModalOpen, setRankModalOpen] = useState(false);
+  const [rankLoading, setRankLoading] = useState(false);
+  const [rankError, setRankError] = useState("");
+  const [rankData, setRankData] = useState(null);
+  const rankCache = React.useRef(new Map());
+
+  const { data: averages = {}, isFetching: isAveragesLoading } = useQuery({
+    queryKey: ["rp-averages"],
+    queryFn: async () => {
+      const res = await api.get("/averages");
+      return res?.data?.averages || {};
+    },
+    enabled: open && Boolean(student),
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
   if (!student) return null;
 
   const rollNo = String(student.roll_no || "").trim();
@@ -46,17 +68,6 @@ export default function RpCard({ student }) {
   };
 
   const studentPoints = parseNumeric(student?.balance_points);
-
-  const { data: averages = {}, isFetching: isAveragesLoading } = useQuery({
-    queryKey: ["rp-averages"],
-    queryFn: async () => {
-      const res = await api.get("/averages");
-      return res?.data?.averages || {};
-    },
-    enabled: open,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
 
   const resolveYearKey = (year) => {
     const value = String(year || "").trim().toLowerCase();
@@ -158,6 +169,39 @@ export default function RpCard({ student }) {
     }
   };
 
+  const fetchRank = async (forceRefresh = false) => {
+    setRankModalOpen(true);
+    setRankError("");
+
+    if (!forceRefresh && rankCache.current.has(rollNo)) {
+      setRankData(rankCache.current.get(rollNo));
+      setRankLoading(false);
+      return;
+    }
+
+    setRankLoading(true);
+    try {
+      const res = await api.get("/rank", {
+        params: {
+          roll_no: rollNo,
+          refresh: forceRefresh ? "true" : undefined,
+        },
+      });
+      const data = res?.data;
+      rankCache.current.set(rollNo, data);
+      setRankData(data);
+    } catch (err) {
+      setRankError(
+        err?.response?.data?.error ||
+          err?.response?.data?.message ||
+          err?.message ||
+          "Failed to calculate student rank. Please try again."
+      );
+    } finally {
+      setRankLoading(false);
+    }
+  };
+
   return (
     <>
       {/* Card */}
@@ -212,6 +256,23 @@ export default function RpCard({ student }) {
 
           {/* CTA Buttons */}
           <div className="flex flex-col gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => fetchRank()}
+              className="
+                flex w-full items-center justify-between
+                rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 border border-amber-300/60 dark:from-amber-950/40 dark:via-orange-950/30 dark:to-yellow-950/30 dark:border-amber-700/60
+                px-4 py-2.5 text-[12px] font-semibold text-amber-900 dark:text-amber-300
+                transition-all hover:from-amber-500/20 hover:via-orange-500/20 hover:to-yellow-500/20 dark:hover:from-amber-900/50 dark:hover:to-orange-900/40 active:scale-[.98] cursor-pointer shadow-2xs
+              "
+            >
+              <div className="flex items-center gap-2">
+                <Trophy className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                <span>View rank</span>
+              </div>
+              <ChevronRight className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" strokeWidth={2} />
+            </button>
+
             <button
               type="button"
               onClick={() => fetchPoints(1)}
@@ -448,6 +509,17 @@ export default function RpCard({ student }) {
         loading={internalLoading}
         error={internalError}
         onRefresh={() => fetchInternalMarks(true)}
+      />
+
+      {/* Rank Modal */}
+      <RankModal
+        open={rankModalOpen}
+        onClose={() => setRankModalOpen(false)}
+        student={student}
+        data={rankData}
+        loading={rankLoading}
+        error={rankError}
+        onRefresh={() => fetchRank(true)}
       />
     </>
   );
