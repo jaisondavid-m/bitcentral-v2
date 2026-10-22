@@ -1,20 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Trophy,
   X,
   RefreshCw,
   Sparkles,
-  TrendingUp,
-  Medal,
-  Award,
-  Crown,
-  Users,
   GraduationCap,
   Building2,
+  Users,
   Globe,
   Loader2,
   AlertCircle,
-  CheckCircle2,
 } from "lucide-react";
 import { haptics } from "@/utils/haptics.js";
 
@@ -26,43 +21,6 @@ function formatPoints(num) {
   });
 }
 
-function getRankBadgeColor(rank) {
-  if (rank === 1) {
-    return {
-      bg: "bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-bold shadow-sm shadow-amber-500/20",
-      border: "border-amber-300 dark:border-amber-500/50",
-      ring: "ring-2 ring-amber-400/50",
-      icon: Crown,
-      iconColor: "text-amber-500",
-    };
-  }
-  if (rank === 2) {
-    return {
-      bg: "bg-gradient-to-r from-slate-200 to-slate-300 text-slate-900 font-bold",
-      border: "border-slate-300 dark:border-slate-600",
-      ring: "ring-2 ring-slate-300/50",
-      icon: Medal,
-      iconColor: "text-slate-400",
-    };
-  }
-  if (rank === 3) {
-    return {
-      bg: "bg-gradient-to-r from-amber-700 to-amber-800 text-white font-bold",
-      border: "border-amber-600 dark:border-amber-700/60",
-      ring: "ring-2 ring-amber-700/40",
-      icon: Award,
-      iconColor: "text-amber-600",
-    };
-  }
-  return {
-    bg: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300",
-    border: "border-slate-200 dark:border-slate-800",
-    ring: "",
-    icon: Trophy,
-    iconColor: "text-slate-400",
-  };
-}
-
 export default function RankModal({
   open,
   onClose,
@@ -72,8 +30,6 @@ export default function RankModal({
   error,
   onRefresh,
 }) {
-  const [metric, setMetric] = useState("balance"); // "balance" or "cumulative"
-
   React.useEffect(() => {
     if (open && error) {
       haptics.error();
@@ -90,18 +46,15 @@ export default function RankModal({
   const deptName = studentInfo.department || studentInfo.tab || "Department";
   const yearText = studentInfo.year || studentInfo.normalized_year || "Year";
 
-  const ranks = metric === "cumulative" ? data?.cumulative_ranks : data?.ranks;
+  const ranks = data?.ranks;
   const deptYearRank = ranks?.dept_year;
   const deptRank = ranks?.dept;
   const yearRank = ranks?.year;
   const collegeRank = ranks?.college;
 
-  const currentPoints =
-    metric === "cumulative"
-      ? Number(studentInfo.cumulative_points || student?.cumulative_reward_points || 0)
-      : Number(studentInfo.balance_points || student?.balance_points || 0);
-
-  const toppers = data?.toppers || [];
+  const currentPoints = Number(
+    studentInfo.balance_points || student?.balance_points || 0
+  );
 
   const rankCards = [
     {
@@ -144,7 +97,7 @@ export default function RankModal({
     {
       id: "college",
       title: "College Overall Rank",
-      subtitle: collegeRank?.scope || "All Departments & Years",
+      subtitle: collegeRank?.scope || "Entire College",
       stat: collegeRank,
       icon: Globe,
       color: "emerald",
@@ -154,11 +107,6 @@ export default function RankModal({
       featured: false,
     },
   ];
-
-  // Compare with dept & year average
-  const avgDiff = deptYearRank?.avgScore
-    ? Math.round(currentPoints - deptYearRank.avgScore)
-    : null;
 
   return (
     <div
@@ -170,7 +118,7 @@ export default function RankModal({
           w-full sm:max-w-3xl rounded-t-3xl sm:rounded-3xl
           bg-white border border-slate-200/90 dark:bg-slate-900 dark:border-slate-800
           shadow-2xl shadow-slate-950/20 dark:shadow-black/70
-          max-h-[92dvh] sm:max-h-[88vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200
+          max-h-[92dvh] sm:max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200
         "
         onClick={(e) => e.stopPropagation()}
       >
@@ -185,7 +133,7 @@ export default function RankModal({
                 <span>Reward Points Rank</span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950/80 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
                   <Sparkles className="h-3 w-3" />
-                  Live Rank
+                  Balance Rank
                 </span>
               </h3>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
@@ -194,7 +142,7 @@ export default function RankModal({
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             {onRefresh && (
               <button
                 type="button"
@@ -225,7 +173,7 @@ export default function RankModal({
         </div>
 
         {/* Modal Body */}
-        <div className="overflow-y-auto flex-1 p-5 sm:p-6 space-y-5">
+        <div className="overflow-y-auto flex-1 p-5 sm:p-6 space-y-4">
           {loading ? (
             <div className="flex flex-col items-center justify-center gap-3 py-20 text-slate-500">
               <Loader2 className="h-7 w-7 animate-spin text-amber-500" />
@@ -234,7 +182,7 @@ export default function RankModal({
                   Calculating ranks across Google Sheets…
                 </p>
                 <p className="text-xs text-slate-400 mt-1">
-                  Parsing department tabs and computing year standings
+                  Parsing department tabs and computing rankings
                 </p>
               </div>
             </div>
@@ -265,47 +213,14 @@ export default function RankModal({
             </div>
           ) : (
             <>
-              {/* Metric Switcher Tab */}
-              <div className="flex items-center justify-between flex-wrap gap-2 pb-1">
-                <div className="inline-flex items-center rounded-xl bg-slate-100 p-1 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      haptics.light();
-                      setMetric("balance");
-                    }}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-                      metric === "balance"
-                        ? "bg-white text-slate-900 shadow-xs dark:bg-slate-900 dark:text-white"
-                        : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-                    }`}
-                  >
-                    Balance Points Rank
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      haptics.light();
-                      setMetric("cumulative");
-                    }}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-                      metric === "cumulative"
-                        ? "bg-white text-slate-900 shadow-xs dark:bg-slate-900 dark:text-white"
-                        : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-                    }`}
-                  >
-                    Earned Points Rank
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-1.5 text-xs font-mono text-slate-500 dark:text-slate-400">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                    Your Score:
-                  </span>
-                  <span className="font-bold text-slate-900 dark:text-white">
-                    {formatPoints(currentPoints)} RP
-                  </span>
-                </div>
+              {/* Score Indicator */}
+              <div className="flex items-center justify-between pb-1 text-xs">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Current Balance
+                </span>
+                <span className="font-mono font-bold text-slate-900 dark:text-white text-sm">
+                  {formatPoints(currentPoints)} RP
+                </span>
               </div>
 
               {/* Rank Cards Grid */}
@@ -380,117 +295,6 @@ export default function RankModal({
                   );
                 })}
               </div>
-
-              {/* Performance Insights Banner */}
-              {deptYearRank && (
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/40 p-4 space-y-3">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-emerald-500" />
-                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                        Department & Year Standing Insights
-                      </span>
-                    </div>
-
-                    {avgDiff !== null && (
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-                          avgDiff >= 0
-                            ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300"
-                            : "bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300"
-                        }`}
-                      >
-                        {avgDiff >= 0 ? `+${avgDiff.toLocaleString()} RP above average` : `${Math.abs(avgDiff).toLocaleString()} RP below average`}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-3 divide-x divide-slate-200 dark:divide-slate-700/60 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 py-2.5">
-                    <div className="text-center px-2">
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                        Your Points
-                      </p>
-                      <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white font-mono mt-0.5">
-                        {formatPoints(currentPoints)}
-                      </p>
-                    </div>
-                    <div className="text-center px-2">
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                        Dept Average
-                      </p>
-                      <p className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 font-mono mt-0.5">
-                        {deptYearRank.avg_score ? formatPoints(deptYearRank.avg_score) : "—"}
-                      </p>
-                    </div>
-                    <div className="text-center px-2">
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                        Dept Highest
-                      </p>
-                      <p className="text-xs sm:text-sm font-bold text-amber-600 dark:text-amber-400 font-mono mt-0.5">
-                        {deptYearRank.top_score ? formatPoints(deptYearRank.top_score) : "—"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Toppers Mini Section */}
-              {toppers.length > 0 && (
-                <div className="space-y-2.5 pt-1">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                      <Crown className="h-3.5 w-3.5 text-amber-500" />
-                      <span>Top Performers in {deptYearRank?.scope || "Dept & Year"}</span>
-                    </h4>
-                    <span className="text-[11px] text-slate-400 font-medium">Balance RP</span>
-                  </div>
-
-                  <div className="divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900 overflow-hidden shadow-2xs">
-                    {toppers.map((t) => {
-                      const badge = getRankBadgeColor(t.rank);
-                      const isTargetStudent =
-                        String(t.roll_no).toUpperCase().replace(/\s+/g, "") ===
-                        String(rollNo).toUpperCase().replace(/\s+/g, "");
-
-                      return (
-                        <div
-                          key={t.roll_no}
-                          className={`flex items-center justify-between px-3.5 py-2.5 transition-colors ${
-                            isTargetStudent
-                              ? "bg-amber-50/70 dark:bg-amber-950/30"
-                              : "hover:bg-slate-50 dark:hover:bg-slate-800/40"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <div
-                              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-xs ${badge.bg}`}
-                            >
-                              {t.rank}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-xs font-semibold text-slate-900 dark:text-white truncate flex items-center gap-1.5">
-                                <span>{t.student_name}</span>
-                                {isTargetStudent && (
-                                  <span className="rounded-sm bg-amber-500 px-1 py-0.2 text-[9px] font-bold text-slate-950">
-                                    YOU
-                                  </span>
-                                )}
-                              </p>
-                              <p className="text-[10px] font-mono text-slate-400 truncate">
-                                {t.roll_no}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="font-mono text-xs font-bold text-slate-800 dark:text-slate-200">
-                            {formatPoints(t.balance_points)}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
             </>
           )}
         </div>
