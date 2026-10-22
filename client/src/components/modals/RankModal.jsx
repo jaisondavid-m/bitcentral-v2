@@ -283,14 +283,6 @@ export default function RankModal({
                           </div>
                         )}
                       </div>
-
-                      {/* Bottom context / progress */}
-                      <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                        <span>Cohort Top:</span>
-                        <span className="font-semibold text-slate-700 dark:text-slate-300 font-mono">
-                          {stat?.top_score ? formatPoints(stat.top_score) : "—"} RP
-                        </span>
-                      </div>
                     </div>
                   );
                 })}
