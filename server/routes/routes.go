@@ -191,6 +191,8 @@ func SetupRouter(
 		api.GET("/profile/v2", trackerUserHandler.GetProfileV2)
 
 		api.GET("/top10", leaderboardHandler.GetTop10Students)
+		api.GET("/rank", leaderboardHandler.GetStudentRank)
+		api.GET("/rewards/rank", leaderboardHandler.GetStudentRank)
 
 		// Feedback Chat User API
 		api.POST("/feedback/messages", feedbackHandler.SendMessage)
