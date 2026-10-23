@@ -86,14 +86,13 @@ self.addEventListener("fetch", (event) => {
   const request = event.request;
   const url = new URL(request.url);
 
-  // Bypass non-GET requests, backend API calls, analytics, adsense, or chrome-extension URLs
+  // Only handle same-origin GET requests; bypass external domains (e.g. Google Ads, Analytics, Razorpay)
+  if (request.method !== "GET" || url.origin !== self.location.origin) {
+    return;
+  }
+
+  // Bypass backend API calls, auth, admin, and WebSocket/dev ports
   if (
-    request.method !== "GET" ||
-    url.protocol.startsWith("chrome-extension") ||
-    url.hostname.includes("google-analytics") ||
-    url.hostname.includes("googletagmanager") ||
-    url.hostname.includes("googlesyndication") ||
-    url.hostname.includes("onrender.com") ||
     url.port === "8080" ||
     url.pathname.startsWith("/api") ||
     url.pathname.startsWith("/auth") ||
@@ -136,10 +135,14 @@ self.addEventListener("fetch", (event) => {
             caches.open(DYNAMIC_CACHE).then((cache) => cache.put(request, responseClone));
           }
           return networkResponse;
-        })
-        .catch(() => cachedResponse);
+        });
 
-      return cachedResponse || fetchPromise;
+      if (cachedResponse) {
+        // Return cached asset immediately; background fetch updates cache
+        fetchPromise.catch(() => {});
+        return cachedResponse;
+      }
+      return fetchPromise;
     })
   );
 });
