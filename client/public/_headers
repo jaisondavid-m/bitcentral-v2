@@ -1,0 +1,46 @@
+# Cloudflare Pages Custom HTTP Headers Configuration
+# Optimized for 3,000+ Daily Active Users within Free Tier limits
+
+# 1. Hashed JS/CSS chunks: Immutable caching (1 Year)
+# Vite embeds content hashes in filenames, so these can be cached forever in browser & edge CDN.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+  Access-Control-Allow-Origin: *
+
+# 2. Web Fonts: 1 Year Immutable Cache
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+# 3. Lottie Animations: 30 Days Cache with Background Revalidation
+/lotties/*
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+  Access-Control-Allow-Origin: *
+
+# 4. Static Images & Icons: 7 Days Cache with Stale-While-Revalidate
+/CardImgs/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/icons/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/favicon.ico
+  Cache-Control: public, max-age=604800
+
+# 5. PWA Manifest & Service Worker
+/manifest.json
+  Cache-Control: public, max-age=86400, stale-while-revalidate=43200
+  Content-Type: application/manifest+json; charset=utf-8
+
+# Service Worker must NOT be cached long-term so updates propagate immediately
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+# 6. HTML & Dynamic Pages: Always validate so user gets fresh releases immediately
+/*
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()

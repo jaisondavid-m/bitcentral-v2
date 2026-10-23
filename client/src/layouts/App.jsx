@@ -312,6 +312,14 @@ function App() {
                 }
               />
               <Route
+                path="/admin/cloudflare"
+                element={
+                  <AdminRoute>
+                    <AdminDashboard />
+                  </AdminRoute>
+                }
+              />
+              <Route
                 path="/admin/super"
                 element={
                   <AdminRoute>

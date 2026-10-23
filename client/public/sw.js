@@ -86,13 +86,18 @@ self.addEventListener("fetch", (event) => {
   const request = event.request;
   const url = new URL(request.url);
 
-  // Bypass non-GET requests, analytics, adsense, or chrome-extension URLs
+  // Bypass non-GET requests, backend API calls, analytics, adsense, or chrome-extension URLs
   if (
     request.method !== "GET" ||
     url.protocol.startsWith("chrome-extension") ||
     url.hostname.includes("google-analytics") ||
     url.hostname.includes("googletagmanager") ||
-    url.hostname.includes("googlesyndication")
+    url.hostname.includes("googlesyndication") ||
+    url.hostname.includes("onrender.com") ||
+    url.port === "8080" ||
+    url.pathname.startsWith("/api") ||
+    url.pathname.startsWith("/auth") ||
+    url.pathname.startsWith("/admin")
   ) {
     return;
   }
@@ -126,7 +131,7 @@ self.addEventListener("fetch", (event) => {
     caches.match(request).then((cachedResponse) => {
       const fetchPromise = fetch(request)
         .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200 && networkResponse.type === "basic") {
+          if (networkResponse && networkResponse.status === 200) {
             const responseClone = networkResponse.clone();
             caches.open(DYNAMIC_CACHE).then((cache) => cache.put(request, responseClone));
           }

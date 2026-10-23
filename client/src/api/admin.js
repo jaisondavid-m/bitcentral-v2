@@ -710,7 +710,29 @@ export async function deleteAdminNotification(id) {
   return response.data;
 }
 
+// Cloudflare Pages Admin API
+export async function getCloudflareUsage(projectName = "") {
+  const headers = await getAdminHeaders();
+  const params = projectName ? `?project=${encodeURIComponent(projectName)}` : "";
+  const response = await api.get(`/admin/cloudflare/usage${params}`, { headers });
+  return response.data;
+}
 
+export async function getCloudflareConfig() {
+  const headers = await getAdminHeaders();
+  const response = await api.get("/admin/cloudflare/config", { headers });
+  return response.data;
+}
 
+export async function updateCloudflareConfig(payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.put("/admin/cloudflare/config", payload, { headers });
+  return response.data;
+}
 
+export async function testCloudflareConnection(payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.post("/admin/cloudflare/test", payload || {}, { headers });
+  return response.data;
+}
 

@@ -96,9 +96,25 @@ export async function getAuthenticatedHeaders() {
   };
 }
 
+let meCache = { data: null, timestamp: 0 };
 let inFlightMePromise = null;
+let v2Cache = { data: null, timestamp: 0 };
+let inFlightV2Promise = null;
 
-export async function getMeProfile() {
+export function clearProfileCache() {
+  meCache = { data: null, timestamp: 0 };
+  v2Cache = { data: null, timestamp: 0 };
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("auth_state_changed", clearProfileCache);
+}
+
+export async function getMeProfile(forceRefresh = false) {
+  const now = Date.now();
+  if (!forceRefresh && meCache.data && now - meCache.timestamp < 60 * 1000) {
+    return meCache.data;
+  }
   if (inFlightMePromise) {
     return inFlightMePromise;
   }
@@ -106,7 +122,9 @@ export async function getMeProfile() {
     try {
       const headers = await getAuthenticatedHeaders();
       const response = await api.get("/me", { headers });
-      return response.data?.data || null;
+      const data = response.data?.data || null;
+      meCache = { data, timestamp: Date.now() };
+      return data;
     } finally {
       inFlightMePromise = null;
     }
@@ -114,9 +132,11 @@ export async function getMeProfile() {
   return inFlightMePromise;
 }
 
-let inFlightV2Promise = null;
-
-export async function getV2Profile() {
+export async function getV2Profile(forceRefresh = false) {
+  const now = Date.now();
+  if (!forceRefresh && v2Cache.data && now - v2Cache.timestamp < 60 * 1000) {
+    return v2Cache.data;
+  }
   if (inFlightV2Promise) {
     return inFlightV2Promise;
   }
@@ -124,7 +144,9 @@ export async function getV2Profile() {
     try {
       const headers = await getAuthenticatedHeaders();
       const response = await api.get("/v2/profile", { headers });
-      return response.data?.data || null;
+      const data = response.data?.data || null;
+      v2Cache = { data, timestamp: Date.now() };
+      return data;
     } finally {
       inFlightV2Promise = null;
     }
@@ -132,12 +154,19 @@ export async function getV2Profile() {
   return inFlightV2Promise;
 }
 
-export async function getSponsorsLeaderboard() {
+let sponsorsLeaderboardCache = { data: null, timestamp: 0 };
+
+export async function getSponsorsLeaderboard(forceRefresh = false) {
+  const now = Date.now();
+  if (!forceRefresh && sponsorsLeaderboardCache.data && now - sponsorsLeaderboardCache.timestamp < 2 * 60 * 1000) {
+    return sponsorsLeaderboardCache.data;
+  }
   try {
     const response = await api.get("/sponsors/leaderboard");
+    sponsorsLeaderboardCache = { data: response.data, timestamp: Date.now() };
     return response.data;
   } catch (error) {
-    return {
+    return sponsorsLeaderboardCache.data || {
       success: true,
       total_raised: 0,
       total_supporters: 0,
@@ -147,12 +176,19 @@ export async function getSponsorsLeaderboard() {
   }
 }
 
-export async function getDepartmentLeaderboard() {
+let deptLeaderboardCache = { data: null, timestamp: 0 };
+
+export async function getDepartmentLeaderboard(forceRefresh = false) {
+  const now = Date.now();
+  if (!forceRefresh && deptLeaderboardCache.data && now - deptLeaderboardCache.timestamp < 2 * 60 * 1000) {
+    return deptLeaderboardCache.data;
+  }
   try {
     const response = await api.get("/sponsors/department-leaderboard");
+    deptLeaderboardCache = { data: response.data, timestamp: Date.now() };
     return response.data;
   } catch (error) {
-    return {
+    return deptLeaderboardCache.data || {
       success: true,
       department_leaderboard: [],
     };

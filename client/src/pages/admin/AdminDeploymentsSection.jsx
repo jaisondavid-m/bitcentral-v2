@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import {
   Server,
   Cloud,
@@ -290,6 +291,33 @@ Failover Fallback 2: bitcentral-v2.onrender.com`;
             <span>{refreshing ? "Checking..." : "Re-Check Status"}</span>
           </button>
         </div>
+      </div>
+
+      {/* Cloudflare Pages Monitor Promotion Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl bg-gradient-to-r from-orange-500/10 via-amber-500/10 to-transparent border border-orange-200 dark:border-orange-900/60 p-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white shadow-sm shadow-orange-500/20">
+            <Cloud className="h-5 w-5" />
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              Cloudflare Pages Usage & Limits API
+              <span className="rounded-full bg-orange-100 px-2 py-0.2 text-[10px] font-bold text-orange-700 dark:bg-orange-900 dark:text-orange-200">
+                New
+              </span>
+            </h4>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Track your 500 monthly deployments quota, concurrent build limits, and real-time build statuses securely via Go SDK.
+            </p>
+          </div>
+        </div>
+        <Link
+          to="/admin/cloudflare"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-orange-600 px-4 py-2 text-xs font-bold text-white hover:bg-orange-700 transition shadow-sm shrink-0"
+        >
+          <span>Open Cloudflare Monitor</span>
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
 
       {/* Hero: Active Serving Origin Status */}

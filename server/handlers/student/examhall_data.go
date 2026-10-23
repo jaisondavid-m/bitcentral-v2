@@ -520,7 +520,7 @@ func LookupHall(registerNo, courseCode string) (string, bool) {
 		meta := entry.meta
 
 		for _, record := range records {
-			actualCode := resolveCourseCode(record.CourseCode, meta.Date, meta.Session)
+			actualCode := resolveCourseCode(record.CourseCode, meta.Date, meta.Session, meta.Semester)
 			if strings.ToUpper(actualCode) != courseCode && strings.ToUpper(record.CourseCode) != courseCode {
 				continue
 			}
@@ -538,9 +538,10 @@ func LookupHall(registerNo, courseCode string) (string, bool) {
 
 // LookupAllByRegister returns all exam sessions for a given register number.
 type sessionMeta struct {
-	Date    string
-	Session string
-	Time    string
+	Date     string
+	Session  string
+	Time     string
+	Semester string
 }
 
 // sessionIndex maps each build function's records to their date/session/time.
@@ -548,30 +549,30 @@ var sessionMetaList = []struct {
 	builder func() []studentmodels.SeatingRecord
 	meta    sessionMeta
 }{
-	{buildSeatingData09Oct2026FN, sessionMeta{"09-10-2026", "FN", "08:45 AM – 12:00 Noon"}},
-	{buildSeatingData09Oct2026AN, sessionMeta{"09-10-2026", "AN", "01:30 PM – 04:30 PM"}},
-	{buildSeatingData10Oct2026FN, sessionMeta{"10-10-2026", "FN", "08:45 AM – 12:00 Noon"}},
-	{buildSeatingData10Oct2026AN, sessionMeta{"10-10-2026", "AN", "01:30 PM – 04:30 PM"}},
-	{buildSeatingData12Oct2026FN, sessionMeta{"12-10-2026", "FN", "08:45 AM – 12:00 Noon"}},
-	{buildSeatingData12Oct2026AN, sessionMeta{"12-10-2026", "AN", "01:30 PM – 04:30 PM"}},
-	{buildSeatingData13Oct2026FN, sessionMeta{"13-10-2026", "FN", "08:45 AM – 12:00 Noon"}},
-	{buildSeatingData13Oct2026AN, sessionMeta{"13-10-2026", "AN", "01:30 PM – 04:30 PM"}},
-	{buildSeatingData22Oct2026FN, sessionMeta{"22-10-2026", "FN", "10:45 AM – 12:15 PM"}},
-	{buildSeatingData22Oct2026AN, sessionMeta{"22-10-2026", "AN", "03:00 PM – 04:30 PM"}},
-	{buildSeatingData23Oct2026FN, sessionMeta{"23-10-2026", "FN", "10:45 AM – 12:15 PM"}},
-	{buildSeatingData23Oct2026AN, sessionMeta{"23-10-2026", "AN", "03:00 PM – 04:30 PM"}},
-	{buildSeatingData24Oct2026FN, sessionMeta{"24-10-2026", "FN", "10:45 AM – 12:15 PM"}},
-	{buildSeatingData24Oct2026AN, sessionMeta{"24-10-2026", "AN", "03:00 PM – 04:30 PM"}},
-	{buildSeatingData26Oct2026FN, sessionMeta{"26-10-2026", "FN", "10:45 AM – 12:15 PM"}},
-	{buildSeatingData26Oct2026AN, sessionMeta{"26-10-2026", "AN", "03:00 PM – 04:30 PM"}},
+	{buildSeatingData09Oct2026FN, sessionMeta{"09-10-2026", "FN", "08:45 AM – 12:00 Noon", ""}},
+	{buildSeatingData09Oct2026AN, sessionMeta{"09-10-2026", "AN", "01:30 PM – 04:30 PM", ""}},
+	{buildSeatingData10Oct2026FN, sessionMeta{"10-10-2026", "FN", "08:45 AM – 12:00 Noon", ""}},
+	{buildSeatingData10Oct2026AN, sessionMeta{"10-10-2026", "AN", "01:30 PM – 04:30 PM", ""}},
+	{buildSeatingData12Oct2026FN, sessionMeta{"12-10-2026", "FN", "08:45 AM – 12:00 Noon", ""}},
+	{buildSeatingData12Oct2026AN, sessionMeta{"12-10-2026", "AN", "01:30 PM – 04:30 PM", ""}},
+	{buildSeatingData13Oct2026FN, sessionMeta{"13-10-2026", "FN", "08:45 AM – 12:00 Noon", ""}},
+	{buildSeatingData13Oct2026AN, sessionMeta{"13-10-2026", "AN", "01:30 PM – 04:30 PM", ""}},
+	{buildSeatingData22Oct2026FN, sessionMeta{"22-10-2026", "FN", "10:45 AM – 12:15 PM", "SEM5"}},
+	{buildSeatingData22Oct2026AN, sessionMeta{"22-10-2026", "AN", "03:00 PM – 04:30 PM", "SEM5"}},
+	{buildSeatingData23Oct2026FN, sessionMeta{"23-10-2026", "FN", "10:45 AM – 12:15 PM", "SEM5"}},
+	{buildSeatingData23Oct2026AN, sessionMeta{"23-10-2026", "AN", "03:00 PM – 04:30 PM", "SEM5"}},
+	{buildSeatingData24Oct2026FN, sessionMeta{"24-10-2026", "FN", "10:45 AM – 12:15 PM", "SEM5"}},
+	{buildSeatingData24Oct2026AN, sessionMeta{"24-10-2026", "AN", "03:00 PM – 04:30 PM", "SEM5"}},
+	{buildSeatingData26Oct2026FN, sessionMeta{"26-10-2026", "FN", "10:45 AM – 12:15 PM", "SEM5"}},
+	{buildSeatingData26Oct2026AN, sessionMeta{"26-10-2026", "AN", "03:00 PM – 04:30 PM", "SEM5"}},
 	// Semester III Sessions
-	{buildSeatingData24to26Oct2026Sem3FN, sessionMeta{"24-10-2026", "FN", "10:45 AM – 12:15 PM"}},
-	{buildSeatingData24to26Oct2026Sem3AN, sessionMeta{"24-10-2026", "AN", "03:00 PM – 04:30 PM"}},
-	{buildSeatingData24to26Oct2026Sem3FN, sessionMeta{"26-10-2026", "FN", "10:45 AM – 12:15 PM"}},
-	{buildSeatingData24to26Oct2026Sem3AN, sessionMeta{"26-10-2026", "AN", "03:00 PM – 04:30 PM"}},
-	{buildSeatingData27to28Oct2026Sem3FN, sessionMeta{"27-10-2026", "FN", "10:45 AM – 12:15 PM"}},
-	{buildSeatingData27to28Oct2026Sem3AN, sessionMeta{"27-10-2026", "AN", "03:00 PM – 04:30 PM"}},
-	{buildSeatingData27to28Oct2026Sem3FN, sessionMeta{"28-10-2026", "FN", "10:45 AM – 12:15 PM"}},
+	{buildSeatingData24to26Oct2026Sem3FN, sessionMeta{"24-10-2026", "FN", "10:45 AM – 12:15 PM", "SEM3"}},
+	{buildSeatingData24to26Oct2026Sem3AN, sessionMeta{"24-10-2026", "AN", "03:00 PM – 04:30 PM", "SEM3"}},
+	{buildSeatingData24to26Oct2026Sem3FN, sessionMeta{"26-10-2026", "FN", "10:45 AM – 12:15 PM", "SEM3"}},
+	{buildSeatingData24to26Oct2026Sem3AN, sessionMeta{"26-10-2026", "AN", "03:00 PM – 04:30 PM", "SEM3"}},
+	{buildSeatingData27to28Oct2026Sem3FN, sessionMeta{"27-10-2026", "FN", "10:45 AM – 12:15 PM", "SEM3"}},
+	{buildSeatingData27to28Oct2026Sem3AN, sessionMeta{"27-10-2026", "AN", "03:00 PM – 04:30 PM", "SEM3"}},
+	{buildSeatingData27to28Oct2026Sem3FN, sessionMeta{"28-10-2026", "FN", "10:45 AM – 12:15 PM", "SEM3"}},
 }
 
 var courseNameMap = map[string]string{
@@ -812,94 +813,101 @@ var courseNameMap = map[string]string{
 	"24MB204": "",
 }
 
-// deptSessionToCourse maps "BRANCH|DATE|SESSION" to official course code from the Periodical Test II timetable
+// deptSessionToCourse maps "[SEMESTER|]BRANCH|DATE|SESSION" to official course code from the Periodical Test II timetable
 var deptSessionToCourse = map[string]string{
 	// ─── 2nd Year (Semester III) ──────────────────────────────────────────────
 	// 24.10.2026 FN - Common to all Semester III
-	"AD|24-10-2026|FN": "22HS004", "AG|24-10-2026|FN": "22HS004", "AL|24-10-2026|FN": "22HS004",
-	"AM|24-10-2026|FN": "22HS004", "BT|24-10-2026|FN": "22HS004", "CB|24-10-2026|FN": "22HS004",
-	"CS|24-10-2026|FN": "22HS004", "EC|24-10-2026|FN": "22HS004", "EE|24-10-2026|FN": "22HS004",
-	"EI|24-10-2026|FN": "22HS004", "IT|24-10-2026|FN": "22HS004", "ME|24-10-2026|FN": "22HS004",
-	"MC|24-10-2026|FN": "22HS004", "MZ|24-10-2026|FN": "22HS004",
+	"SEM3|AD|24-10-2026|FN": "22HS004", "SEM3|AG|24-10-2026|FN": "22HS004", "SEM3|AL|24-10-2026|FN": "22HS004",
+	"SEM3|AM|24-10-2026|FN": "22HS004", "SEM3|BT|24-10-2026|FN": "22HS004", "SEM3|CB|24-10-2026|FN": "22HS004",
+	"SEM3|CS|24-10-2026|FN": "22HS004", "SEM3|EC|24-10-2026|FN": "22HS004", "SEM3|EE|24-10-2026|FN": "22HS004",
+	"SEM3|EI|24-10-2026|FN": "22HS004", "SEM3|IT|24-10-2026|FN": "22HS004", "SEM3|ME|24-10-2026|FN": "22HS004",
+	"SEM3|MC|24-10-2026|FN": "22HS004", "SEM3|MZ|24-10-2026|FN": "22HS004",
 
 	// 24.10.2026 AN - Common to all Semester III
-	"AD|24-10-2026|AN": "22HS005", "AG|24-10-2026|AN": "22HS005", "AL|24-10-2026|AN": "22HS005",
-	"AM|24-10-2026|AN": "22HS005", "BT|24-10-2026|AN": "22HS005", "CB|24-10-2026|AN": "22HS005",
-	"CS|24-10-2026|AN": "22HS005", "EC|24-10-2026|AN": "22HS005", "EE|24-10-2026|AN": "22HS005",
-	"EI|24-10-2026|AN": "22HS005", "IT|24-10-2026|AN": "22HS005", "ME|24-10-2026|AN": "22HS005",
-	"MC|24-10-2026|AN": "22HS005", "MZ|24-10-2026|AN": "22HS005",
+	"SEM3|AD|24-10-2026|AN": "22HS005", "SEM3|AG|24-10-2026|AN": "22HS005", "SEM3|AL|24-10-2026|AN": "22HS005",
+	"SEM3|AM|24-10-2026|AN": "22HS005", "SEM3|BT|24-10-2026|AN": "22HS005", "SEM3|CB|24-10-2026|AN": "22HS005",
+	"SEM3|CS|24-10-2026|AN": "22HS005", "SEM3|EC|24-10-2026|AN": "22HS005", "SEM3|EE|24-10-2026|AN": "22HS005",
+	"SEM3|EI|24-10-2026|AN": "22HS005", "SEM3|IT|24-10-2026|AN": "22HS005", "SEM3|ME|24-10-2026|AN": "22HS005",
+	"SEM3|MC|24-10-2026|AN": "22HS005", "SEM3|MZ|24-10-2026|AN": "22HS005",
 
 	// 26.10.2026 FN
-	"AG|26-10-2026|FN": "22AG301", "AD|26-10-2026|FN": "22AI301", "AL|26-10-2026|FN": "22AM301",
-	"AM|26-10-2026|FN": "22AM301", "BT|26-10-2026|FN": "22BT301", "CS|26-10-2026|FN": "22CS301",
-	"IT|26-10-2026|FN": "22IT301", "EC|26-10-2026|FN": "22EC301", "EE|26-10-2026|FN": "22EE301",
-	"EI|26-10-2026|FN": "22EI301", "MC|26-10-2026|FN": "22MC301", "MZ|26-10-2026|FN": "22MC301",
-	"ME|26-10-2026|FN": "22ME301",
+	"SEM3|AG|26-10-2026|FN": "22AG301", "SEM3|AD|26-10-2026|FN": "22AI301", "SEM3|AL|26-10-2026|FN": "22AM301",
+	"SEM3|AM|26-10-2026|FN": "22AM301", "SEM3|BT|26-10-2026|FN": "22BT301", "SEM3|CS|26-10-2026|FN": "22CS301",
+	"SEM3|IT|26-10-2026|FN": "22IT301", "SEM3|EC|26-10-2026|FN": "22EC301", "SEM3|EE|26-10-2026|FN": "22EE301",
+	"SEM3|EI|26-10-2026|FN": "22EI301", "SEM3|MC|26-10-2026|FN": "22MC301", "SEM3|MZ|26-10-2026|FN": "22MC301",
+	"SEM3|ME|26-10-2026|FN": "22ME301",
 
 	// 26.10.2026 AN
-	"AG|26-10-2026|AN": "22AG302", "AD|26-10-2026|AN": "22AI302", "AL|26-10-2026|AN": "22AM302",
-	"AM|26-10-2026|AN": "22AM302", "CS|26-10-2026|AN": "22CS302", "IT|26-10-2026|AN": "22IT302",
-	"BT|26-10-2026|AN": "22BT302", "EC|26-10-2026|AN": "22EC302", "EE|26-10-2026|AN": "22EE302",
-	"EI|26-10-2026|AN": "22EI302", "MC|26-10-2026|AN": "22MC302", "MZ|26-10-2026|AN": "22MC302",
-	"ME|26-10-2026|AN": "22ME302",
+	"SEM3|AG|26-10-2026|AN": "22AG302", "SEM3|AD|26-10-2026|AN": "22AI302", "SEM3|AL|26-10-2026|AN": "22AM302",
+	"SEM3|AM|26-10-2026|AN": "22AM302", "SEM3|CS|26-10-2026|AN": "22CS302", "SEM3|IT|26-10-2026|AN": "22IT302",
+	"SEM3|BT|26-10-2026|AN": "22BT302", "SEM3|EC|26-10-2026|AN": "22EC302", "SEM3|EE|26-10-2026|AN": "22EE302",
+	"SEM3|EI|26-10-2026|AN": "22EI302", "SEM3|MC|26-10-2026|AN": "22MC302", "SEM3|MZ|26-10-2026|AN": "22MC302",
+	"SEM3|ME|26-10-2026|AN": "22ME302",
 
 	// 27.10.2026 FN
-	"AG|27-10-2026|FN": "22AG303", "BT|27-10-2026|FN": "22BT303", "ME|27-10-2026|FN": "22ME303",
-	"AD|27-10-2026|FN": "22AI303", "AL|27-10-2026|FN": "22AM303", "AM|27-10-2026|FN": "22AM303",
-	"CS|27-10-2026|FN": "22CS303", "IT|27-10-2026|FN": "22IT303", "EC|27-10-2026|FN": "22EC303",
-	"EI|27-10-2026|FN": "22EI303", "MC|27-10-2026|FN": "22MC303", "MZ|27-10-2026|FN": "22MC303",
-	"EE|27-10-2026|FN": "22EE303",
+	"SEM3|AG|27-10-2026|FN": "22AG303", "SEM3|BT|27-10-2026|FN": "22BT303", "SEM3|ME|27-10-2026|FN": "22ME303",
+	"SEM3|AD|27-10-2026|FN": "22AI303", "SEM3|AL|27-10-2026|FN": "22AM303", "SEM3|AM|27-10-2026|FN": "22AM303",
+	"SEM3|CS|27-10-2026|FN": "22CS303", "SEM3|IT|27-10-2026|FN": "22IT303", "SEM3|EC|27-10-2026|FN": "22EC303",
+	"SEM3|EI|27-10-2026|FN": "22EI303", "SEM3|MC|27-10-2026|FN": "22MC303", "SEM3|MZ|27-10-2026|FN": "22MC303",
+	"SEM3|EE|27-10-2026|FN": "22EE303",
 
 	// 27.10.2026 AN
-	"AG|27-10-2026|AN": "22AG304", "ME|27-10-2026|AN": "22ME304", "MC|27-10-2026|AN": "22MC304",
-	"MZ|27-10-2026|AN": "22MC304", "AD|27-10-2026|AN": "22AI304", "AL|27-10-2026|AN": "22AM304",
-	"AM|27-10-2026|AN": "22AM304", "CS|27-10-2026|AN": "22CS304", "IT|27-10-2026|AN": "22IT304",
-	"BT|27-10-2026|AN": "22BT304", "EC|27-10-2026|AN": "22EC304", "EE|27-10-2026|AN": "22EE304",
-	"EI|27-10-2026|AN": "22EI304",
+	"SEM3|AG|27-10-2026|AN": "22AG304", "SEM3|ME|27-10-2026|AN": "22ME304", "SEM3|MC|27-10-2026|AN": "22MC304",
+	"SEM3|MZ|27-10-2026|AN": "22MC304", "SEM3|AD|27-10-2026|AN": "22AI304", "SEM3|AL|27-10-2026|AN": "22AM304",
+	"SEM3|AM|27-10-2026|AN": "22AM304", "SEM3|CS|27-10-2026|AN": "22CS304", "SEM3|IT|27-10-2026|AN": "22IT304",
+	"SEM3|BT|27-10-2026|AN": "22BT304", "SEM3|EC|27-10-2026|AN": "22EC304", "SEM3|EE|27-10-2026|AN": "22EE304",
+	"SEM3|EI|27-10-2026|AN": "22EI304",
 
 	// 28.10.2026 FN
-	"AG|28-10-2026|FN": "22AG305", "AD|28-10-2026|FN": "22AI305", "AL|28-10-2026|FN": "22AM305",
-	"AM|28-10-2026|FN": "22AM305", "CS|28-10-2026|FN": "22CS305", "IT|28-10-2026|FN": "22IT305",
-	"BT|28-10-2026|FN": "22BT305", "EC|28-10-2026|FN": "22EC305", "EE|28-10-2026|FN": "22EE305",
-	"EI|28-10-2026|FN": "22EI305", "ME|28-10-2026|FN": "22ME305", "MC|28-10-2026|FN": "22MC305",
-	"MZ|28-10-2026|FN": "22MC305",
+	"SEM3|AG|28-10-2026|FN": "22AG305", "SEM3|AD|28-10-2026|FN": "22AI305", "SEM3|AL|28-10-2026|FN": "22AM305",
+	"SEM3|AM|28-10-2026|FN": "22AM305", "SEM3|CS|28-10-2026|FN": "22CS305", "SEM3|IT|28-10-2026|FN": "22IT305",
+	"SEM3|BT|28-10-2026|FN": "22BT305", "SEM3|EC|28-10-2026|FN": "22EC305", "SEM3|EE|28-10-2026|FN": "22EE305",
+	"SEM3|EI|28-10-2026|FN": "22EI305", "SEM3|ME|28-10-2026|FN": "22ME305", "SEM3|MC|28-10-2026|FN": "22MC305",
+	"SEM3|MZ|28-10-2026|FN": "22MC305",
 
 	// ─── 3rd Year (Semester V) ───────────────────────────────────────────────
 	// 23.10.2026 FN
-	"AG|23-10-2026|FN": "22AG501", "AD|23-10-2026|FN": "22AI501", "AL|23-10-2026|FN": "22AM501",
-	"AM|23-10-2026|FN": "22AM501", "BT|23-10-2026|FN": "22BT501", "CB|23-10-2026|FN": "22CB501",
-	"CS|23-10-2026|FN": "22CS501", "EE|23-10-2026|FN": "22EE501", "EC|23-10-2026|FN": "22EC501",
-	"EI|23-10-2026|FN": "22EI501", "IT|23-10-2026|FN": "22IT501", "ME|23-10-2026|FN": "22ME501",
-	"MC|23-10-2026|FN": "22MC501", "MZ|23-10-2026|FN": "22MC501",
+	"SEM5|AG|23-10-2026|FN": "22AG501", "SEM5|AD|23-10-2026|FN": "22AI501", "SEM5|AL|23-10-2026|FN": "22AM501",
+	"SEM5|AM|23-10-2026|FN": "22AM501", "SEM5|BT|23-10-2026|FN": "22BT501", "SEM5|CB|23-10-2026|FN": "22CB501",
+	"SEM5|CS|23-10-2026|FN": "22CS501", "SEM5|EE|23-10-2026|FN": "22EE501", "SEM5|EC|23-10-2026|FN": "22EC501",
+	"SEM5|EI|23-10-2026|FN": "22EI501", "SEM5|IT|23-10-2026|FN": "22IT501", "SEM5|ME|23-10-2026|FN": "22ME501",
+	"SEM5|MC|23-10-2026|FN": "22MC501", "SEM5|MZ|23-10-2026|FN": "22MC501",
 
 	// 23.10.2026 AN
-	"AG|23-10-2026|AN": "22AG502", "AD|23-10-2026|AN": "22AI502", "CS|23-10-2026|AN": "22CS502",
-	"IT|23-10-2026|AN": "22IT502", "AL|23-10-2026|AN": "22AM502", "AM|23-10-2026|AN": "22AM502",
-	"BT|23-10-2026|AN": "22BT502", "CB|23-10-2026|AN": "22CB502", "EE|23-10-2026|AN": "22EE502",
-	"EC|23-10-2026|AN": "22EC502", "EI|23-10-2026|AN": "22EI502", "ME|23-10-2026|AN": "22ME502",
-	"MC|23-10-2026|AN": "22MC502", "MZ|23-10-2026|AN": "22MC502",
+	"SEM5|AG|23-10-2026|AN": "22AG502", "SEM5|AD|23-10-2026|AN": "22AI502", "SEM5|CS|23-10-2026|AN": "22CS502",
+	"SEM5|IT|23-10-2026|AN": "22IT502", "SEM5|AL|23-10-2026|AN": "22AM502", "SEM5|AM|23-10-2026|AN": "22AM502",
+	"SEM5|BT|23-10-2026|AN": "22BT502", "SEM5|CB|23-10-2026|AN": "22CB502", "SEM5|EE|23-10-2026|AN": "22EE502",
+	"SEM5|EC|23-10-2026|AN": "22EC502", "SEM5|EI|23-10-2026|AN": "22EI502", "SEM5|ME|23-10-2026|AN": "22ME502",
+	"SEM5|MC|23-10-2026|AN": "22MC502", "SEM5|MZ|23-10-2026|AN": "22MC502",
 
 	// 24.10.2026 FN
-	"AG|24-10-2026|FN": "22AG503", "AD|24-10-2026|FN": "22AI503", "AL|24-10-2026|FN": "22AM503",
-	"AM|24-10-2026|FN": "22AM503", "BT|24-10-2026|FN": "22BT503", "CB|24-10-2026|FN": "22CB503",
-	"CS|24-10-2026|FN": "22CS503", "EE|24-10-2026|FN": "22EE503", "EC|24-10-2026|FN": "22EC503",
-	"EI|24-10-2026|FN": "22EI503", "IT|24-10-2026|FN": "22IT503", "ME|24-10-2026|FN": "22ME503",
-	"MC|24-10-2026|FN": "22MC503", "MZ|24-10-2026|FN": "22MC503",
+	"SEM5|AG|24-10-2026|FN": "22AG503", "SEM5|AD|24-10-2026|FN": "22AI503", "SEM5|AL|24-10-2026|FN": "22AM503",
+	"SEM5|AM|24-10-2026|FN": "22AM503", "SEM5|BT|24-10-2026|FN": "22BT503", "SEM5|CB|24-10-2026|FN": "22CB503",
+	"SEM5|CS|24-10-2026|FN": "22CS503", "SEM5|EE|24-10-2026|FN": "22EE503", "SEM5|EC|24-10-2026|FN": "22EC503",
+	"SEM5|EI|24-10-2026|FN": "22EI503", "SEM5|IT|24-10-2026|FN": "22IT503", "SEM5|ME|24-10-2026|FN": "22ME503",
+	"SEM5|MC|24-10-2026|FN": "22MC503", "SEM5|MZ|24-10-2026|FN": "22MC503",
 
 	// 24.10.2026 AN
-	"AG|24-10-2026|AN": "22AG504", "AD|24-10-2026|AN": "22AI504", "AL|24-10-2026|AN": "22AM504",
-	"AM|24-10-2026|AN": "22AM504", "BT|24-10-2026|AN": "22BT504", "CB|24-10-2026|AN": "22CB504",
-	"CS|24-10-2026|AN": "22CS504", "EE|24-10-2026|AN": "22EE504", "EI|24-10-2026|AN": "22EI504",
-	"EC|24-10-2026|AN": "22EC504", "IT|24-10-2026|AN": "22IT504", "ME|24-10-2026|AN": "22ME504",
-	"MC|24-10-2026|AN": "22MC504", "MZ|24-10-2026|AN": "22MC504",
+	"SEM5|AG|24-10-2026|AN": "22AG504", "SEM5|AD|24-10-2026|AN": "22AI504", "SEM5|AL|24-10-2026|AN": "22AM504",
+	"SEM5|AM|24-10-2026|AN": "22AM504", "SEM5|BT|24-10-2026|AN": "22BT504", "SEM5|CB|24-10-2026|AN": "22CB504",
+	"SEM5|CS|24-10-2026|AN": "22CS504", "SEM5|EE|24-10-2026|AN": "22EE504", "SEM5|EI|24-10-2026|AN": "22EI504",
+	"SEM5|EC|24-10-2026|AN": "22EC504", "SEM5|IT|24-10-2026|AN": "22IT504", "SEM5|ME|24-10-2026|AN": "22ME504",
+	"SEM5|MC|24-10-2026|AN": "22MC504", "SEM5|MZ|24-10-2026|AN": "22MC504",
 }
 
 // resolveCourseCode resolves department codes (e.g., "AD", "CS") to the specific course code
 // scheduled for that date and session in the official timetable. If already a course code, it returns it unchanged.
-func resolveCourseCode(rawCode, date, session string) string {
+func resolveCourseCode(rawCode, date, session, semester string) string {
 	upper := strings.ToUpper(strings.TrimSpace(rawCode))
-	key := upper + "|" + strings.TrimSpace(date) + "|" + strings.TrimSpace(session)
-	if courseCode, exists := deptSessionToCourse[key]; exists {
+	date = strings.TrimSpace(date)
+	session = strings.TrimSpace(session)
+	if semester != "" {
+		if courseCode, exists := deptSessionToCourse[semester+"|"+upper+"|"+date+"|"+session]; exists {
+			return courseCode
+		}
+	}
+	// Fallback to direct key if present
+	if courseCode, exists := deptSessionToCourse[upper+"|"+date+"|"+session]; exists {
 		return courseCode
 	}
 	return rawCode
@@ -925,7 +933,7 @@ func LookupAllByRegister(registerNo string) []studentmodels.ExamSession {
 						timeVal = record.Time
 					}
 
-					actualCourseCode := resolveCourseCode(record.CourseCode, meta.Date, meta.Session)
+					actualCourseCode := resolveCourseCode(record.CourseCode, meta.Date, meta.Session, meta.Semester)
 					courseName := courseNameMap[strings.ToUpper(actualCourseCode)]
 					if courseName == "" {
 						courseName = courseNameMap[strings.ToUpper(record.CourseCode)]
