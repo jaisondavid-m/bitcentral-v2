@@ -95,6 +95,7 @@ import {
   X,
   Zap,
   Server,
+  Cloud,
 } from "lucide-react";
 import SuperAdminPanel from "./SuperAdminPanel.jsx";
 import AdminFeedbackPage from "./AdminFeedbackPage.jsx";
@@ -103,6 +104,7 @@ import AdminLeavesSection from "./AdminLeavesSection.jsx";
 import AdminNotificationsSection from "./AdminNotificationsSection.jsx";
 import AdminHelpPage from "./AdminHelpPage.jsx";
 import AdminDeploymentsSection from "./AdminDeploymentsSection.jsx";
+import CloudflarePagesSection from "./CloudflarePagesSection.jsx";
 
 function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
@@ -389,6 +391,15 @@ const ADMIN_TABS = [
     description: "Real-time serving origin inspection (Own Server vs Vercel / Render), failover network health checks, and TiDB Cloud status.",
   },
   {
+    key: "cloudflare",
+    label: "Cloudflare Pages",
+    href: "/admin/cloudflare",
+    icon: Cloud,
+    gradient: "from-amber-500 to-orange-600",
+    badge: "Limits & Usage",
+    description: "Monitor Cloudflare Pages deployment limits, monthly quota, build status, and custom domains.",
+  },
+  {
     key: "super",
     label: "Super Admin",
     href: "/admin/super",
@@ -403,6 +414,7 @@ function getAdminTabFromPath(pathname) {
   if (pathname === "/admin" || pathname === "/admin/") return "overview";
   if (pathname.startsWith("/admin/analytics")) return "analytics";
   if (pathname.startsWith("/admin/deployments")) return "deployments";
+  if (pathname.startsWith("/admin/cloudflare")) return "cloudflare";
   if (pathname.startsWith("/admin/user-directory")) return "user-directory";
   if (pathname.startsWith("/admin/sponsors")) return "sponsors";
   if (pathname.startsWith("/admin/qb")) return "qb";
@@ -7289,6 +7301,8 @@ function AdminDashboard({ initialTab } = {}) {
         <AIKeySection />
       ) : activeTab === "deployments" ? (
         <AdminDeploymentsSection />
+      ) : activeTab === "cloudflare" ? (
+        <CloudflarePagesSection />
       ) : activeTab === "super" ? (
         <SuperAdminPanel />
       ) : (
@@ -7296,6 +7310,10 @@ function AdminDashboard({ initialTab } = {}) {
       )}
     </AdminDashboardShell>
   );
+}
+
+function AdminCloudflarePage() {
+  return <AdminDashboard initialTab="cloudflare" />;
 }
 
 export function AdminDeploymentsPage() {
@@ -7372,5 +7390,6 @@ export {
   AdminFeedbackPageRoute as AdminFeedbackPage,
   AdminAIKeyPage,
   AdminMailSenderPage,
+  AdminCloudflarePage,
 };
 export default AdminDashboard;

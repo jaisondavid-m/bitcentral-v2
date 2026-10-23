@@ -9,7 +9,22 @@ import "@/utils/lottiePreloader.js";
 import "./index.css";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration.js";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Cache data as fresh for 5 minutes (prevents repeat requests from 3,000 users)
+      staleTime: 5 * 60 * 1000,
+      // Keep inactive queries in memory for 30 minutes
+      gcTime: 30 * 60 * 1000,
+      // Don't refetch whenever student switches browser tabs or apps
+      refetchOnWindowFocus: false,
+      // Re-sync on network reconnect
+      refetchOnReconnect: "always",
+      // Single retry to avoid cascading thundering herd on backend
+      retry: 1,
+    },
+  },
+});
 
 // Handle stale asset preload errors when a new build is deployed
 window.addEventListener("vite:preloadError", (event) => {

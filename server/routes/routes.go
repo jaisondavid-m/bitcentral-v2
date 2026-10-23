@@ -37,6 +37,7 @@ func SetupRouter(
 	internalMarksHandler *student.InternalMarksHandler,
 	notificationHandler *common.NotificationHandler,
 	helpHandler *common.HelpHandler,
+	cloudflareHandler *admin.CloudflareHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -61,7 +62,8 @@ func SetupRouter(
 		AllowOriginFunc: func(origin string) bool {
 			return strings.HasSuffix(origin, ".bitsathy.in") ||
 				strings.HasSuffix(origin, ".jaisondavidm.xyz") ||
-				strings.HasSuffix(origin, ".vercel.app")
+				strings.HasSuffix(origin, ".vercel.app") ||
+				strings.HasSuffix(origin, ".pages.dev")
 		},
 		AllowMethods: []string{
 			"GET", "POST", "PUT", "DELETE", "OPTIONS",
@@ -327,6 +329,12 @@ func SetupRouter(
 		admin.POST("/help/reports/:id/action", helpHandler.AdminActionReport)
 		admin.GET("/help/restrictions", helpHandler.AdminGetRestrictions)
 		admin.POST("/help/restrictions", helpHandler.AdminManageRestriction)
+
+		// Cloudflare Pages Admin API
+		admin.GET("/cloudflare/usage", cloudflareHandler.GetCloudflareUsage)
+		admin.GET("/cloudflare/config", cloudflareHandler.GetCloudflareConfig)
+		admin.PUT("/cloudflare/config", cloudflareHandler.UpdateCloudflareConfig)
+		admin.POST("/cloudflare/test", cloudflareHandler.TestCloudflareConnection)
 	}
 
 	// Super-admin routes: manage admins and allowed external emails/domains
