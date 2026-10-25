@@ -6,8 +6,13 @@ import { ThemeProvider } from "@/context/ThemeContext.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HelmetProvider } from "react-helmet-async";
 import "@/utils/lottiePreloader.js";
+import UnderConstructionPage from "@/components/common/UnderConstructionPage.jsx";
 import "./index.css";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration.js";
+
+const underConstrictionFlag =
+  import.meta.env.under_constriction ?? import.meta.env.VITE_under_constriction ?? "";
+const isUnderConstrictionEnabled = String(underConstrictionFlag).trim().toLowerCase() === "true";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,18 +43,25 @@ window.addEventListener("vite:preloadError", (event) => {
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </HelmetProvider>
+    {isUnderConstrictionEnabled ? (
+      <UnderConstructionPage />
+    ) : (
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </HelmetProvider>
+    )}
   </StrictMode>
 );
 
 // Register service worker for production-ready PWA functionality
-serviceWorkerRegistration.register();
-
+if (isUnderConstrictionEnabled) {
+  serviceWorkerRegistration.unregister();
+} else {
+  serviceWorkerRegistration.register();
+}

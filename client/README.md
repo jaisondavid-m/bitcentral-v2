@@ -194,6 +194,11 @@ VITE_ADMIN_FIREBASE_UID=your_admin_firebase_uid
 
 # Optional Features
 PING_ON=true
+
+# Frontend Maintenance Mode
+# Set to true to show only the under-construction page.
+# Set to false (or remove it) to run the app normally.
+under_constriction=false
 ```
 
 ### Server Environment Variables (`server/.env`)
