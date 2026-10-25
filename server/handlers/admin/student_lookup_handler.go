@@ -396,33 +396,41 @@ func (h *StudentLookupHandler) MobileGoogleLogin(c *gin.Context) {
 		tokenStr = utils.ExtractAuthToken(c)
 	}
 
-	var email, googleID, displayName, photoURL string
-
-	if tokenStr != "" {
-		claims, err := config.VerifyGoogleToken(tokenStr)
-		if err == nil && claims != nil {
-			email = strings.ToLower(strings.TrimSpace(claims.Email))
-			googleID = claims.UID
-			displayName = claims.Name
-			photoURL = claims.Picture
-		}
+	if tokenStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "Google authentication token is required",
+		})
+		return
 	}
 
-	// Fallback to email/name provided in request body for mobile app student authentication
-	if email == "" && req.Email != "" {
-		email = strings.ToLower(strings.TrimSpace(req.Email))
+	claims, err := config.VerifyGoogleToken(tokenStr)
+	if err != nil || claims == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"error":   "Invalid Google authentication token: " + err.Error(),
+		})
+		return
+	}
+
+	email := strings.ToLower(strings.TrimSpace(claims.Email))
+	googleID := claims.UID
+	displayName := claims.Name
+	if displayName == "" {
 		displayName = strings.TrimSpace(req.Name)
-		if displayName == "" {
-			displayName = strings.Split(email, "@")[0]
-		}
+	}
+	if displayName == "" && email != "" {
+		displayName = strings.Split(email, "@")[0]
+	}
+	photoURL := claims.Picture
+	if photoURL == "" {
 		photoURL = strings.TrimSpace(req.PhotoURL)
-		googleID = email
 	}
 
 	if email == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"error":   "Google authentication token or valid email is required",
+			"error":   "Verified Google token did not contain an email address",
 		})
 		return
 	}
@@ -510,11 +518,6 @@ func (h *StudentLookupHandler) GoogleLogin(c *gin.Context) {
 	}
 	if tokenStr == "" {
 		tokenStr = utils.ExtractAuthToken(c)
-	}
-
-	if tokenStr == "" && req.Email != "" {
-		h.MobileGoogleLogin(c)
-		return
 	}
 
 	if tokenStr == "" {

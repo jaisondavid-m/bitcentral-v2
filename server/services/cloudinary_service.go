@@ -37,14 +37,8 @@ func UploadToCloudinary(fileHeader *multipart.FileHeader, customFolder ...string
 	apiKey := strings.TrimSpace(os.Getenv("CLOUDINARY_API_KEY"))
 	apiSecret := strings.TrimSpace(os.Getenv("CLOUDINARY_API_SECRET"))
 
-	if cloudName == "" {
-		cloudName = "root"
-	}
-	if apiKey == "" {
-		apiKey = "332117387278742"
-	}
-	if apiSecret == "" {
-		apiSecret = "Hta5Baon5D6e4Lc7s10OOtTvKYw"
+	if cloudName == "" || apiKey == "" || apiSecret == "" {
+		return "", fmt.Errorf("cloudinary credentials (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET) are not configured")
 	}
 
 	folder := strings.TrimSpace(os.Getenv("CLOUDINARY_FOLDER"))
