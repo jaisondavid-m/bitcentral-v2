@@ -194,6 +194,9 @@ VITE_ADMIN_FIREBASE_UID=your_admin_firebase_uid
 
 # Optional Features
 PING_ON=true
+
+# Frontend maintenance mode (when true, only the under-construction page is shown)
+under_constriction=false
 ```
 
 ### Server Environment Variables (`server/.env`)

@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "@/layouts/App.jsx";
+import UnderConstructionScreen from "@/components/common/UnderConstructionScreen.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@/context/ThemeContext.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -26,6 +27,11 @@ const queryClient = new QueryClient({
   },
 });
 
+const isUnderConstructionEnabled =
+  String(import.meta.env.under_constriction || "")
+    .trim()
+    .toLowerCase() === "true";
+
 // Handle stale asset preload errors when a new build is deployed
 window.addEventListener("vite:preloadError", (event) => {
   event.preventDefault();
@@ -38,18 +44,21 @@ window.addEventListener("vite:preloadError", (event) => {
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </HelmetProvider>
+    {isUnderConstructionEnabled ? (
+      <UnderConstructionScreen />
+    ) : (
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </HelmetProvider>
+    )}
   </StrictMode>
 );
 
 // Register service worker for production-ready PWA functionality
 serviceWorkerRegistration.register();
-

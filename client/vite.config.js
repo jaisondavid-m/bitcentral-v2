@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
 export default defineConfig({
-  envPrefix: ['VITE_', 'PING_'],
+  envPrefix: ['VITE_', 'PING_', 'under_constriction'],
   plugins: [
     react(),
     tailwindcss(),
