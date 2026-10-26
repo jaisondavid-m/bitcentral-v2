@@ -963,3 +963,258 @@ func LookupAllByRegister(registerNo string) []studentmodels.ExamSession {
 
 	return results
 }
+
+var deptCodeNames = map[string]string{
+	"AD": "Artificial Intelligence and Data Science",
+	"AG": "Agricultural Engineering",
+	"AL": "Artificial Intelligence and Machine Learning",
+	"AM": "Artificial Intelligence and Machine Learning",
+	"BT": "Biotechnology",
+	"CB": "Computer Science and Business Systems",
+	"CS": "Computer Science and Engineering",
+	"EC": "Electronics and Communication Engineering",
+	"EE": "Electrical and Electronics Engineering",
+	"EI": "Electronics and Instrumentation Engineering",
+	"IT": "Information Technology",
+	"ME": "Mechanical Engineering",
+	"MC": "Mechatronics Engineering",
+	"MZ": "Mechatronics Engineering",
+	"FD": "Food Technology",
+	"FT": "Fashion Technology",
+	"TX": "Textile Technology",
+	"CT": "Computer Technology",
+	"IS": "Information Science and Engineering",
+}
+
+func normalizeHallStr(h string) string {
+	return strings.ToUpper(strings.Join(strings.Fields(strings.TrimSpace(h)), " "))
+}
+
+func compactHallStr(h string) string {
+	return strings.ToUpper(strings.ReplaceAll(strings.TrimSpace(h), " ", ""))
+}
+
+func normalizeDateStr(d string) string {
+	d = strings.TrimSpace(d)
+	d = strings.ReplaceAll(d, ".", "-")
+	d = strings.ReplaceAll(d, "/", "-")
+	parts := strings.Split(d, "-")
+	if len(parts) == 3 && len(parts[0]) == 4 {
+		return fmt.Sprintf("%02s-%02s-%s", parts[2], parts[1], parts[0])
+	}
+	return d
+}
+
+func normalizeTimeStr(t string) string {
+	t = strings.ReplaceAll(t, "–", "-")
+	t = strings.ReplaceAll(t, "—", "-")
+	t = strings.ReplaceAll(t, " - ", "-")
+	t = strings.ReplaceAll(t, " -", "-")
+	t = strings.ReplaceAll(t, "- ", "-")
+	t = strings.Join(strings.Fields(strings.TrimSpace(t)), " ")
+	return strings.ToUpper(t)
+}
+
+func extractDeptName(regNo, courseCode string) string {
+	reg := strings.ToUpper(strings.TrimSpace(regNo))
+	var letters strings.Builder
+	for _, r := range reg {
+		if r >= 'A' && r <= 'Z' {
+			letters.WriteRune(r)
+		}
+	}
+	code := letters.String()
+	if code != "" {
+		if dept, ok := deptCodeNames[code]; ok {
+			return dept
+		}
+	}
+	courseCodeUpper := strings.ToUpper(strings.TrimSpace(courseCode))
+	if dept, ok := deptCodeNames[courseCodeUpper]; ok {
+		return dept
+	}
+	if name, ok := courseNameMap[courseCodeUpper]; ok && name != "" {
+		return name
+	}
+	if code != "" {
+		return code
+	}
+	return courseCodeUpper
+}
+
+// LookupHallMembers returns the list of students seated in a given hall for a given date and time/session.
+func LookupHallMembers(hallNo, date, session, timeStr string) (studentmodels.HallMembersResponse, bool) {
+	normTargetHall := normalizeHallStr(hallNo)
+	compactTargetHall := compactHallStr(hallNo)
+
+	if normTargetHall == "" {
+		return studentmodels.HallMembersResponse{}, false
+	}
+
+	normTargetDate := normalizeDateStr(date)
+	normTargetSession := strings.ToUpper(strings.TrimSpace(session))
+	normTargetTime := normalizeTimeStr(timeStr)
+
+	var (
+		matchedHallName   string
+		allSessions       []studentmodels.HallSessionOption
+		seenSessions      = make(map[string]bool)
+		members           []studentmodels.HallMember
+		seenRegs          = make(map[string]bool)
+		courseCountMap    = make(map[string]int)
+		courseMetaMap     = make(map[string]studentmodels.HallCourseSummary)
+		selectedDate      = normTargetDate
+		selectedSession   = normTargetSession
+		selectedTime      = timeStr
+		anyHallMatchFound = false
+	)
+
+	// First pass: collect all available sessions for this hall and find exact matches
+	for _, entry := range sessionMetaList {
+		records := entry.builder()
+		meta := entry.meta
+		entryDateNorm := normalizeDateStr(meta.Date)
+
+		for _, record := range records {
+			recNormHall := normalizeHallStr(record.HallNo)
+			recCompactHall := compactHallStr(record.HallNo)
+
+			if recNormHall != normTargetHall && recCompactHall != compactTargetHall {
+				continue
+			}
+
+			anyHallMatchFound = true
+			if matchedHallName == "" {
+				matchedHallName = record.HallNo
+			}
+
+			timeVal := meta.Time
+			if record.Time != "" {
+				timeVal = record.Time
+			}
+
+			sessKey := entryDateNorm + "|" + meta.Session + "|" + normalizeTimeStr(timeVal)
+			if !seenSessions[sessKey] {
+				seenSessions[sessKey] = true
+				allSessions = append(allSessions, studentmodels.HallSessionOption{
+					Date:    meta.Date,
+					Session: meta.Session,
+					Time:    timeVal,
+				})
+			}
+		}
+	}
+
+	if !anyHallMatchFound {
+		return studentmodels.HallMembersResponse{}, false
+	}
+
+	// If no date was provided and sessions exist, pick the first available
+	if selectedDate == "" && len(allSessions) > 0 {
+		selectedDate = normalizeDateStr(allSessions[0].Date)
+		selectedSession = allSessions[0].Session
+		selectedTime = allSessions[0].Time
+		normTargetTime = normalizeTimeStr(selectedTime)
+	}
+
+	// Second pass: collect students for the selected session
+	for _, entry := range sessionMetaList {
+		records := entry.builder()
+		meta := entry.meta
+		entryDateNorm := normalizeDateStr(meta.Date)
+
+		if selectedDate != "" && entryDateNorm != selectedDate {
+			continue
+		}
+
+		if selectedSession != "" && !strings.EqualFold(meta.Session, selectedSession) {
+			continue
+		}
+
+		for _, record := range records {
+			recNormHall := normalizeHallStr(record.HallNo)
+			recCompactHall := compactHallStr(record.HallNo)
+
+			if recNormHall != normTargetHall && recCompactHall != compactTargetHall {
+				continue
+			}
+
+			timeVal := meta.Time
+			if record.Time != "" {
+				timeVal = record.Time
+			}
+
+			if normTargetTime != "" && normalizeTimeStr(timeVal) != normTargetTime {
+				continue
+			}
+
+			if selectedTime == "" {
+				selectedTime = timeVal
+			}
+			if selectedSession == "" {
+				selectedSession = meta.Session
+			}
+			if selectedDate == "" {
+				selectedDate = meta.Date
+			}
+
+			actualCourseCode := resolveCourseCode(record.CourseCode, meta.Date, meta.Session, meta.Semester)
+			courseName := courseNameMap[strings.ToUpper(actualCourseCode)]
+			if courseName == "" {
+				courseName = courseNameMap[strings.ToUpper(record.CourseCode)]
+			}
+			if courseName == "" {
+				courseName = actualCourseCode
+			}
+
+			for _, reg := range record.RegisterNos {
+				regUpper := strings.ToUpper(strings.TrimSpace(reg))
+				if regUpper == "" || seenRegs[regUpper] {
+					continue
+				}
+				seenRegs[regUpper] = true
+
+				dept := extractDeptName(regUpper, record.CourseCode)
+
+				member := studentmodels.HallMember{
+					SeatNo:     len(members) + 1,
+					RegisterNo: regUpper,
+					CourseCode: actualCourseCode,
+					CourseName: courseName,
+					Department: dept,
+					Time:       timeVal,
+				}
+				members = append(members, member)
+
+				courseCountMap[actualCourseCode]++
+				if _, ok := courseMetaMap[actualCourseCode]; !ok {
+					courseMetaMap[actualCourseCode] = studentmodels.HallCourseSummary{
+						CourseCode: actualCourseCode,
+						CourseName: courseName,
+						Department: dept,
+					}
+				}
+			}
+		}
+	}
+
+	var coursesSummary []studentmodels.HallCourseSummary
+	for code, summary := range courseMetaMap {
+		summary.Count = courseCountMap[code]
+		coursesSummary = append(coursesSummary, summary)
+	}
+
+	response := studentmodels.HallMembersResponse{
+		Success:           true,
+		HallNo:            matchedHallName,
+		Date:              selectedDate,
+		Session:           selectedSession,
+		Time:              selectedTime,
+		TotalStudents:     len(members),
+		Courses:           coursesSummary,
+		Members:           members,
+		AvailableSessions: allSessions,
+	}
+
+	return response, true
+}

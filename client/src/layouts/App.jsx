@@ -33,6 +33,7 @@ const NotFound = lazyWithRetry(() => import("@/pages/NotFound.jsx"));
 const LeaveDetails = lazyWithRetry(() => import("@/pages/student/LeaveDetails.jsx"));
 const ExamHall = lazyWithRetry(() => import("@/pages/student/ExamHall.jsx"));
 const ExamHallDownload = lazyWithRetry(() => import("@/pages/student/ExamHallDownload.jsx"));
+const ExamHallMembers = lazyWithRetry(() => import("@/pages/student/ExamHallMembers.jsx"));
 const SupportDev = lazyWithRetry(() => import("@/pages/student/SupportDev.jsx"));
 const PaymentSuccessful = lazyWithRetry(() => import("@/pages/student/PaymentSuccessful.jsx"));
 const WifiDetails = lazyWithRetry(() => import("@/pages/student/WifiDetails.jsx"));
@@ -336,6 +337,8 @@ function App() {
               <Route path="/pcdp" element={<PCDP />} />
               <Route path="/exam-hall" element={<ExamHallDownload />} />
               <Route path="/exam-hall-manual" element={<ExamHall />} />
+              <Route path="/exam-hall/members" element={<ExamHallMembers />} />
+              <Route path="/exam-hall-members" element={<ExamHallMembers />} />
               <Route path="/leavedetails" element={<LeaveDetails />} />
               <Route path="/semester" element={<Semester />} />
               <Route path="/mess" element={<MessMenu />} />

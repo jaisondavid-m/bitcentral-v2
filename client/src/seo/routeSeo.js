@@ -187,6 +187,20 @@ export const ROUTE_SEO = {
     noIndex: true,
   },
 
+  "/exam-hall/members": {
+    title: "Exam Hall Members & Venue Roster",
+    description: "Protected BIT Central exam hall members and seating roster for signed-in BIT Sathy students.",
+    keywords: ["BIT Sathy exam hall members", "hall venue students"],
+    noIndex: true,
+  },
+
+  "/exam-hall-members": {
+    title: "Exam Hall Members & Venue Roster",
+    description: "Protected BIT Central exam hall members and seating roster for signed-in BIT Sathy students.",
+    keywords: ["BIT Sathy exam hall members", "hall venue students"],
+    noIndex: true,
+  },
+
   "/leavedetails": {
     title: "Leave Schedule",
     description: "Protected BIT Central leave schedule page for signed-in BIT Sathy students.",
