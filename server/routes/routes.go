@@ -166,6 +166,7 @@ func SetupRouter(
 		// Exam Hall
 		api.GET("/exam-hall", examHallHandler.GetHall)
 		api.GET("/exam-hall/all", examHallHandler.GetAllHallsByRegNo)
+		api.GET("/exam-hall/members", examHallHandler.GetHallMembers)
 
 		// Faculty Directory
 		api.GET("/faculty-directory", facultyDirectoryHandler.GetFacultyDirectory)

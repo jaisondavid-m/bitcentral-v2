@@ -3,7 +3,7 @@ import { useAuth } from "@/context/StudentContext.jsx";
 import { useTheme } from "@/context/ThemeContext.jsx";
 import {
   Loader2, AlertCircle, MapPin, BookOpen,
-  Clock, CalendarDays, FileDown, GraduationCap, Building2, Search, ArrowLeft, Mail
+  Clock, CalendarDays, FileDown, GraduationCap, Building2, Search, ArrowLeft, Mail, Users
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "@/api/axios.js";
@@ -364,7 +364,8 @@ function getExamCountdown(dateStr, timeStr) {
   };
 }
 
-function ExamCard({ session: s }) {
+function ExamCard({ session: s, searchedRegNo }) {
+  const navigate = useNavigate();
   const dt = fmt(s.date);
   const countdown = getExamCountdown(s.date, s.time);
   const arr = s.is_arrear;
@@ -397,24 +398,45 @@ function ExamCard({ session: s }) {
         ${arr ? "bg-amber-100 dark:bg-amber-900/30" : "bg-blue-100 dark:bg-blue-900/30"}`} />
 
       <div className="flex flex-1 flex-col gap-2 px-3 py-2.5 min-w-0">
-        <div className="flex items-center justify-between gap-1.5">
-          <div className="flex flex-wrap items-center gap-1 min-w-0">
+        <div className="flex items-start justify-between gap-1.5">
+          <div className="flex flex-wrap items-center gap-1 min-w-0 pt-0.5">
             <SessionPill session={s.session} />
             {arr && <ArrearPill />}
           </div>
 
-          <div className={`flex items-center gap-1 rounded-lg px-2 py-1 shrink-0
-            ${arr
-              ? "bg-amber-50 ring-1 ring-amber-200 dark:bg-amber-900/20 dark:ring-amber-700/50"
-              : "bg-blue-50 ring-1 ring-blue-200 dark:bg-blue-900/20 dark:ring-blue-700/50"}`}>
-            <MapPin className={`h-3 w-3 shrink-0 ${arr ? "text-amber-400" : "text-blue-400"}`} />
-            <span className={`text-xs font-medium ${arr ? "text-amber-300" : "text-blue-300"} dark:opacity-60`}>
-              Hall
-            </span>
-            <span className={`text-base font-black leading-none
-              ${arr ? "text-amber-700 dark:text-amber-300" : "text-blue-700 dark:text-blue-200"}`}>
-              {s.hall_no}
-            </span>
+          <div className="flex flex-col items-end gap-1.5 shrink-0">
+            <div className={`flex items-center gap-1 rounded-lg px-2 py-1 shrink-0
+              ${arr
+                ? "bg-amber-50 ring-1 ring-amber-200 dark:bg-amber-900/20 dark:ring-amber-700/50"
+                : "bg-blue-50 ring-1 ring-blue-200 dark:bg-blue-900/20 dark:ring-blue-700/50"}`}>
+              <MapPin className={`h-3 w-3 shrink-0 ${arr ? "text-amber-400" : "text-blue-400"}`} />
+              <span className={`text-xs font-medium ${arr ? "text-amber-300" : "text-blue-300"} dark:opacity-60`}>
+                Hall
+              </span>
+              <span className={`text-base font-black leading-none
+                ${arr ? "text-amber-700 dark:text-amber-300" : "text-blue-700 dark:text-blue-200"}`}>
+                {s.hall_no}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(
+                  `/exam-hall/members?hall=${encodeURIComponent(s.hall_no)}&date=${encodeURIComponent(s.date)}&session=${encodeURIComponent(s.session || "")}&time=${encodeURIComponent(s.time || "")}${searchedRegNo ? `&student=${encodeURIComponent(searchedRegNo)}` : ""}`
+                );
+              }}
+              className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-semibold transition-all cursor-pointer shadow-xs active:scale-95 ${
+                arr
+                  ? "bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/60 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800/40"
+                  : "bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200/60 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800/40"
+              }`}
+              title={`View all students seated in ${s.hall_no}`}
+            >
+              <Users className="h-2.5 w-2.5" />
+              <span>View Hall Members</span>
+            </button>
           </div>
         </div>
 
@@ -699,7 +721,7 @@ const ExamHall = () => {
 
                       <div className="space-y-2.5">
                         {exams.map((s, idx) => (
-                          <ExamCard key={idx} session={s} />
+                          <ExamCard key={idx} session={s} searchedRegNo={searchedRegNo} />
                         ))}
                       </div>
                     </div>

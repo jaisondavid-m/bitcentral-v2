@@ -1,13 +1,17 @@
 package student
 
 import (
-    "net/http"
-    "strings"
+	"database/sql"
+	"fmt"
+	"net/http"
+	"strings"
 
-    "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
+	"server/config"
 )
 
 type ExamHallHandler struct{}
+
 
 func NewExamHallHandler() *ExamHallHandler {
     return &ExamHallHandler{}
@@ -114,3 +118,92 @@ func (h *ExamHallHandler) GetAllHallsByRegNo(c *gin.Context) {
 		"sessions":   sessions,
 	})
 }
+
+func fetchStudentNames(db *sql.DB, regNos []string) map[string]string {
+	names := make(map[string]string)
+	if db == nil || len(regNos) == 0 {
+		return names
+	}
+
+	chunkSize := 50
+	for i := 0; i < len(regNos); i += chunkSize {
+		end := i + chunkSize
+		if end > len(regNos) {
+			end = len(regNos)
+		}
+		chunk := regNos[i:end]
+		placeholders := make([]string, len(chunk))
+		args := make([]interface{}, len(chunk))
+		for j, reg := range chunk {
+			placeholders[j] = "?"
+			args[j] = strings.ToUpper(strings.TrimSpace(reg))
+		}
+
+		query := fmt.Sprintf("SELECT UPPER(TRIM(user_id)), name FROM tracker_users WHERE UPPER(TRIM(user_id)) IN (%s)", strings.Join(placeholders, ","))
+		rows, err := db.Query(query, args...)
+		if err != nil {
+			continue
+		}
+		for rows.Next() {
+			var uid, name string
+			if err := rows.Scan(&uid, &name); err == nil && name != "" {
+				names[uid] = strings.TrimSpace(name)
+			}
+		}
+		rows.Close()
+	}
+
+	return names
+}
+
+func (h *ExamHallHandler) GetHallMembers(c *gin.Context) {
+	hallNo := c.Query("hall")
+	if hallNo == "" {
+		hallNo = c.Query("hallNo")
+	}
+	if hallNo == "" {
+		hallNo = c.Query("hall_no")
+	}
+
+	if strings.TrimSpace(hallNo) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "hall query parameter is required (e.g. ?hall=WW 214)",
+		})
+		return
+	}
+
+	date := c.Query("date")
+	session := c.Query("session")
+	timeStr := c.Query("time")
+
+	resp, found := LookupHallMembers(hallNo, date, session, timeStr)
+	if !found {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": fmt.Sprintf("no seating arrangement found for hall %s", strings.TrimSpace(hallNo)),
+			"hall_no": strings.TrimSpace(hallNo),
+		})
+		return
+	}
+
+	// Attach block label
+	resp.Block = hallBlock(resp.HallNo)
+
+	// Enrich student names from DB if available
+	if config.DB != nil && len(resp.Members) > 0 {
+		regNos := make([]string, len(resp.Members))
+		for i, m := range resp.Members {
+			regNos[i] = m.RegisterNo
+		}
+		nameMap := fetchStudentNames(config.DB, regNos)
+		for i := range resp.Members {
+			if name, ok := nameMap[resp.Members[i].RegisterNo]; ok && name != "" {
+				resp.Members[i].Name = name
+			}
+		}
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
