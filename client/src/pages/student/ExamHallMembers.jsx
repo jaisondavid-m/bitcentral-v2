@@ -17,7 +17,8 @@ import {
   Loader2,
   AlertCircle,
   Filter,
-  Sparkles
+  Sparkles,
+  Info
 } from "lucide-react";
 import api from "@/api/axios.js";
 
@@ -345,22 +346,28 @@ const ExamHallMembers = () => {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-0.5">
-                  <span>
-                    Showing <strong className="text-slate-800 dark:text-slate-200">{filteredMembers.length}</strong>{" "}
-                    of {hallData.total_students} students
-                  </span>
-                  {selectedCourseFilter !== "ALL" && (
-                    <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400">
-                      Filtered by: {selectedCourseFilter}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs text-slate-500 dark:text-slate-400 px-0.5">
+                  <div className="flex items-center gap-2">
+                    <span>
+                      Showing <strong className="text-slate-800 dark:text-slate-200">{filteredMembers.length}</strong>{" "}
+                      of {hallData.total_students} students
                     </span>
-                  )}
+                    {selectedCourseFilter !== "ALL" && (
+                      <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400">
+                        • Filtered by: {selectedCourseFilter}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[10.5px] text-slate-400 dark:text-slate-500">
+                    * Roster reference only, not physical seating placement.
+                  </span>
                 </div>
               </div>
 
               {/* ── Student Members Grid (Compact & Ordered) ── */}
               {filteredMembers.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
+                <>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
                   {filteredMembers.map((member) => {
                     const isCurrentUser =
                       currentUserRegNo &&
@@ -420,7 +427,13 @@ const ExamHallMembers = () => {
                     );
                   })}
                 </div>
-              ) : (
+
+                {/* Minute disclaimer note */}
+                <p className="pt-2 text-center text-[11px] text-slate-400 dark:text-slate-600">
+                  Note: This list shows all students allocated to this venue, not the physical desk or seating arrangement inside the hall.
+                </p>
+              </>
+            ) : (
                 <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-blue-200 bg-white p-12 text-center dark:border-blue-900/40 dark:bg-[#0F1C33]">
                   <Search className="h-8 w-8 text-slate-300 dark:text-slate-600" />
                   <div className="max-w-xs space-y-1">
