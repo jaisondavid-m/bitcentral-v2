@@ -8,12 +8,10 @@ import {
   AlertCircle,
   BookOpen,
   Award,
-  CheckCircle2,
   ChevronDown,
   ChevronUp,
   FileText,
   Info,
-  TrendingUp,
   Copy,
   Check,
 } from "lucide-react";
@@ -191,144 +189,8 @@ export default function InternalMarksConversionModal({
               <span className="text-xs">No internal marks records available for {rollNo}.</span>
             </div>
           ) : (
-            <div className="space-y-4">
-              {/* 1. OVERALL SUMMARY KPI DASHBOARD */}
-              {overall && (overall.totalInternalMarks || overall.totalRewardPoints) && (
-                <div className="rounded-2xl border border-indigo-100 dark:border-indigo-900/50 bg-gradient-to-br from-indigo-50/50 via-white to-purple-50/40 dark:from-indigo-950/30 dark:via-slate-900 dark:to-purple-950/20 p-4 sm:p-5 shadow-xs space-y-3.5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-xs">
-                        <TrendingUp className="h-4 w-4" />
-                      </div>
-                      <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                        Overall Performance Summary
-                      </span>
-                    </div>
-
-                    {completionPercentage === 100 ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-950/80 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 dark:text-emerald-300 border border-emerald-300/70 dark:border-emerald-800">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                        100% Full Marks
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-indigo-100 dark:bg-indigo-950/80 px-2.5 py-0.5 text-[11px] font-bold text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                        {completionPercentage}% Achieved
-                      </span>
-                    )}
-                  </div>
-
-                  {/* 3 KPI Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {/* KPI 1: Total Internal Marks */}
-                    <div className="flex flex-col justify-between p-3.5 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 shadow-2xs">
-                      <div>
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                          Total Internal Marks
-                        </span>
-                        <div className="mt-1 flex items-baseline gap-1.5 font-mono">
-                          <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
-                            {overall.totalInternalMarks || "0.00"}
-                          </span>
-                          {totalMaxMarks > 0 && (
-                            <span className="text-xs text-slate-400 font-medium">
-                              / {totalMaxMarks}.00
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Internal marks period breakdown */}
-                      {overall.internalMarksBreakdown?.periods &&
-                        Object.keys(overall.internalMarksBreakdown.periods).length > 0 && (
-                          <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex flex-wrap items-center gap-1.5">
-                            {Object.entries(overall.internalMarksBreakdown.periods).map(([pk, pv]) => (
-                              <span
-                                key={pk}
-                                className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60"
-                              >
-                                {pk}: <span className="font-bold">{pv}m</span>
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                    </div>
-
-                    {/* KPI 2: Total Reward Points Redeemed */}
-                    <div className="flex flex-col justify-between p-3.5 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 shadow-2xs">
-                      <div>
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                          Total RP Redeemed
-                        </span>
-                        <div className="mt-1 flex items-baseline gap-1.5 font-mono">
-                          <span className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400">
-                            {overall.totalRewardPoints || "0.00"}
-                          </span>
-                          <span className="text-xs text-slate-400 font-medium">pts</span>
-                        </div>
-                      </div>
-
-                      {/* Reward points period breakdown */}
-                      {overall.rewardPointsBreakdown?.periods &&
-                        Object.keys(overall.rewardPointsBreakdown.periods).length > 0 && (
-                          <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex flex-wrap items-center gap-1.5">
-                            {Object.entries(overall.rewardPointsBreakdown.periods).map(([pk, pv]) => (
-                              <span
-                                key={pk}
-                                className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/60"
-                              >
-                                {pk}: <span className="font-bold">{pv}</span>
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                    </div>
-
-                    {/* KPI 3: Evaluated Subjects */}
-                    <div className="flex flex-col justify-between p-3.5 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 shadow-2xs">
-                      <div>
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                          Evaluated Subjects
-                        </span>
-                        <div className="mt-1 flex items-baseline gap-1.5 font-mono">
-                          <span className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white">
-                            {overall.totalSubjects || subjects.length || "0"}
-                          </span>
-                          <span className="text-xs text-slate-400 font-medium">
-                            {overall.rewardPointsBreakdown?.category?.split(":")[0]?.trim() || "Theory Subjects"}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-700/60">
-                        <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                          <Award className="h-3 w-3 text-amber-500" />
-                          Max 30 internal marks / subject
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Visual Overall Progress Bar */}
-                  {totalMaxMarks > 0 && (
-                    <div className="space-y-1 pt-1">
-                      <div className="flex items-center justify-between text-[10.5px] font-mono text-slate-500 dark:text-slate-400">
-                        <span>Overall Conversion Progress</span>
-                        <span className="font-bold text-slate-700 dark:text-slate-200">
-                          {totalEarnedMarks} / {totalMaxMarks} Marks ({completionPercentage}%)
-                        </span>
-                      </div>
-                      <div className="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 transition-all duration-500"
-                          style={{ width: `${completionPercentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* 2. SUBJECT-BY-SUBJECT BREAKDOWN */}
+            <div className="space-y-3">
+              {/* SUBJECT-BY-SUBJECT BREAKDOWN */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between px-1">
                   <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
