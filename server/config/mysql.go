@@ -95,7 +95,10 @@ func InitMySQL() {
 
 	createTokenTable()
 	createUsersTable()
-	dropUserPresenceTable()
+	if os.Getenv("RUN_LEGACY_CLEANUP") == "true" {
+		dropUserPresenceTable()
+		dropAcademicTables()
+	}
 	createQBAnswerKeyTable()
 	createSemesterSubjectsTable()
 	createCardsTable()
@@ -107,7 +110,6 @@ func InitMySQL() {
 	createSponsorDepartmentTables()
 	createSponsorTransactionOverridesTable()
 	createSponsorTransactionsTable()
-	dropAcademicTables()
 	createFeedbackMessagesTable()
 	createFacultyDirectoryTable()
 	createAuditLogsTable()

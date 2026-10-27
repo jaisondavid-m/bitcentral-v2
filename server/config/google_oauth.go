@@ -2,14 +2,17 @@ package config
 
 import (
 	"crypto/hmac"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"sync"
@@ -40,6 +43,8 @@ var (
 	GoogleOAuthInstance *GoogleOAuth
 	googleOAuthOnce     sync.Once
 	tokenCache          sync.Map
+	jwtSecretOnce       sync.Once
+	fallbackJWTSecret   []byte
 )
 
 func GetJWTSecret() []byte {
@@ -47,11 +52,19 @@ func GetJWTSecret() []byte {
 	if secret == "" {
 		secret = strings.TrimSpace(os.Getenv("SESSION_SECRET"))
 	}
-	if secret == "" {
-		// Persistent default secret so server restarts / redeploys on Render do not invalidate active 30-day sessions
-		secret = "bitcentral_jwt_secret_persistent_auth_key_2024_v2_9843777817"
+	if secret != "" {
+		return []byte(secret)
 	}
-	return []byte(secret)
+
+	jwtSecretOnce.Do(func() {
+		buf := make([]byte, 32)
+		if _, err := rand.Read(buf); err != nil {
+			log.Fatalf("❌ Failed to generate JWT signing secret: %v", err)
+		}
+		fallbackJWTSecret = []byte(hex.EncodeToString(buf))
+		log.Println("⚠️ JWT_SECRET is not set in environment; generated ephemeral signing key. Set JWT_SECRET in .env to persist sessions across restarts.")
+	})
+	return fallbackJWTSecret
 }
 
 func GenerateAppJWT(claims *GoogleUserClaims, duration time.Duration) (string, error) {
@@ -195,65 +208,6 @@ func InitGoogleOAuth() {
 	})
 }
 
-func parseLocalJWTClaims(tokenString string) (*GoogleUserClaims, int64) {
-	parts := strings.Split(tokenString, ".")
-	if len(parts) != 3 {
-		return nil, 0
-	}
-
-	payloadBytes, err := base64.RawURLEncoding.DecodeString(parts[1])
-	if err != nil {
-		payloadBytes, err = base64.URLEncoding.DecodeString(parts[1])
-		if err != nil {
-			return nil, 0
-		}
-	}
-
-	var raw struct {
-		Sub     string `json:"sub"`
-		UserID  string `json:"user_id"`
-		Email   string `json:"email"`
-		Name    string `json:"name"`
-		Picture string `json:"picture"`
-		Role    string `json:"role"`
-		Aud     string `json:"aud"`
-		Exp     int64  `json:"exp"`
-		Iss     string `json:"iss"`
-	}
-
-	if err := json.Unmarshal(payloadBytes, &raw); err != nil {
-		return nil, 0
-	}
-
-	if raw.Email == "" {
-		return nil, 0
-	}
-
-	nowSec := time.Now().Unix()
-	if raw.Exp > 0 && raw.Exp < nowSec {
-		return nil, 0
-	}
-
-	uid := raw.Sub
-	if uid == "" {
-		uid = raw.UserID
-	}
-	if uid == "" {
-		uid = raw.Email
-	}
-
-	claims := &GoogleUserClaims{
-		UID:      uid,
-		Email:    raw.Email,
-		Name:     raw.Name,
-		Picture:  raw.Picture,
-		Role:     raw.Role,
-		Audience: raw.Aud,
-	}
-
-	return claims, raw.Exp
-}
-
 func VerifyGoogleToken(tokenString string) (*GoogleUserClaims, error) {
 	tokenString = strings.TrimSpace(tokenString)
 	if tokenString == "" {
@@ -283,23 +237,7 @@ func VerifyGoogleToken(tokenString string) (*GoogleUserClaims, error) {
 		InitGoogleOAuth()
 	}
 
-	// 2. Fast local Google JWT payload parsing (< 0.01 ms)
-	if localClaims, exp := parseLocalJWTClaims(tokenString); localClaims != nil {
-		ttl := 30 * 24 * time.Hour // 1 month cache
-		if exp > 0 {
-			remaining := time.Until(time.Unix(exp, 0))
-			if remaining > 0 {
-				ttl = remaining
-			}
-		}
-		tokenCache.Store(tokenString, &cachedTokenClaims{
-			claims:    localClaims,
-			expiresAt: time.Now().Add(ttl),
-		})
-		return localClaims, nil
-	}
-
-	// 3. Check Google UserInfo endpoint if token is an OAuth access token (starts with ya29)
+	// 2. Check Google UserInfo endpoint if token is an OAuth access token (starts with ya29)
 	if strings.HasPrefix(tokenString, "ya29.") {
 		userInfoURL := "https://www.googleapis.com/oauth2/v3/userinfo"
 		req, err := http.NewRequest("GET", userInfoURL, nil)
@@ -332,8 +270,8 @@ func VerifyGoogleToken(tokenString string) (*GoogleUserClaims, error) {
 		}
 	}
 
-	// 4. Fallback: Google Tokeninfo endpoint for ID tokens
-	tokenInfoURL := fmt.Sprintf("https://oauth2.googleapis.com/tokeninfo?id_token=%s", tokenString)
+	// 3. Fallback: Google Tokeninfo endpoint for ID tokens
+	tokenInfoURL := fmt.Sprintf("https://oauth2.googleapis.com/tokeninfo?id_token=%s", url.QueryEscape(tokenString))
 	req, err := http.NewRequest("GET", tokenInfoURL, nil)
 	if err == nil {
 		resp, err := GoogleOAuthInstance.httpClient.Do(req)
