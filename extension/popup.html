@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=400, initial-scale=1.0" />
+  <title>BitCentral PS Connector</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 380px;
+      min-height: 320px;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0f0f17;
+      color: #e4e4ed;
+      overflow-x: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #6c5ce7 0%, #a855f7 50%, #ec4899 100%);
+      padding: 18px 20px 16px;
+      text-align: center;
+      position: relative;
+    }
+
+    .header h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.3px;
+    }
+
+    .header p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.85);
+      margin-top: 3px;
+    }
+
+    .body {
+      padding: 16px 18px 18px;
+    }
+
+    /* Status Card */
+    .status-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-dot.connected { background: #22c55e; box-shadow: 0 0 10px rgba(34,197,94,0.6); }
+    .status-dot.disconnected { background: #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.4); }
+    .status-dot.loading { background: #f59e0b; animation: pulse 1.2s infinite; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.9); }
+    }
+
+    .status-label {
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+
+    .status-detail {
+      font-size: 11px;
+      color: rgba(255,255,255,0.55);
+      margin-left: 20px;
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+
+    /* Student Profile Card (Decoded from PS JWT) */
+    .profile-card {
+      background: linear-gradient(135deg, rgba(108,92,231,0.12) 0%, rgba(168,85,247,0.12) 100%);
+      border: 1px solid rgba(168,85,247,0.25);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6c5ce7, #a855f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .profile-name-box {
+      overflow: hidden;
+    }
+
+    .profile-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .profile-email {
+      font-size: 11px;
+      color: #c084fc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .profile-item {
+      background: rgba(0,0,0,0.2);
+      border-radius: 6px;
+      padding: 6px 8px;
+    }
+
+    .profile-item-label {
+      font-size: 9.5px;
+      color: rgba(255,255,255,0.45);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .profile-item-val {
+      font-size: 11.5px;
+      color: #e4e4ed;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 11px;
+      border-radius: 10px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6c5ce7, #a855f7);
+      color: #fff;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .btn-danger {
+      background: rgba(239,68,68,0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239,68,68,0.25);
+    }
+    .btn-danger:hover { background: rgba(239,68,68,0.25); }
+
+    .btn-outline {
+      background: transparent;
+      color: #a855f7;
+      border: 1px solid rgba(168,85,247,0.3);
+    }
+    .btn-outline:hover { background: rgba(168,85,247,0.1); }
+
+    /* Message */
+    .message {
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .message.success { background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+    .message.error { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+    .message.info { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25); }
+
+    /* Server URL bar (collapsible) */
+    .server-bar {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 10.5px;
+      color: rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .server-bar select {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      color: #e4e4ed;
+      padding: 3px 6px;
+      font-size: 10px;
+      outline: none;
+    }
+
+    .hidden { display: none !important; }
+
+    .footer {
+      text-align: center;
+      padding: 8px 18px 14px;
+      font-size: 10.5px;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .footer a {
+      color: #a855f7;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🔗 BitCentral PS Connector</h1>
+    <p>Seamlessly sync your PS session to BitCentral</p>
+  </div>
+
+  <div class="body">
+    <!-- Status -->
+    <div class="status-card">
+      <div class="status-row">
+        <div class="status-dot loading" id="statusDot"></div>
+        <span class="status-label" id="statusLabel">Checking PS Session...</span>
+      </div>
+      <div class="status-detail" id="statusDetail">Detecting PS cookie on ps.bitsathy.ac.in...</div>
+    </div>
+
+    <!-- Message area -->
+    <div id="messageArea" class="hidden"></div>
+
+    <!-- Decoded Student Profile from PS JWT -->
+    <div class="profile-card hidden" id="profileCard">
+      <div class="profile-header">
+        <div class="profile-avatar" id="avatarInitial">🎓</div>
+        <div class="profile-name-box">
+          <div class="profile-name" id="studentName">--</div>
+          <div class="profile-email" id="studentEmail">--</div>
+        </div>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-item">
+          <div class="profile-item-label">Roll Number</div>
+          <div class="profile-item-val" id="studentRoll">--</div>
+        </div>
+        <div class="profile-item">
+          <div class="profile-item-label">Register ID</div>
+          <div class="profile-item-val" id="studentRegId">--</div>
+        </div>
+        <div class="profile-item">
+          <div class="profile-item-label">Dept / Year</div>
+          <div class="profile-item-val" id="studentDeptYear">--</div>
+        </div>
+        <div class="profile-item">
+          <div class="profile-item-label">Token Expiry</div>
+          <div class="profile-item-val" id="studentExp">--</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <button class="btn btn-primary" id="syncBtn" disabled>
+      <span>⚡</span> Sync to BitCentral
+    </button>
+
+    <button class="btn btn-danger hidden" id="disconnectBtn">
+      <span>🔌</span> Disconnect PS
+    </button>
+
+    <button class="btn btn-outline" id="refreshBtn">
+      <span>🔄</span> Re-check PS Session
+    </button>
+
+    <!-- Server Target Config -->
+    <div class="server-bar">
+      <span>Target API:</span>
+      <select id="serverSelect">
+        <option value="https://bitcentral-v2.onrender.com">Production (Render)</option>
+        <option value="http://localhost:8080">Local Server (:8080)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="footer">
+    <a href="https://ps.bitsathy.ac.in" target="_blank">Open PS Site</a> • <a href="https://bitcentral.bitsathy.in" target="_blank">Open BitCentral</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

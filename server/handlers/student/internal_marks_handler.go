@@ -252,31 +252,34 @@ func (h *InternalMarksHandler) GetInternalMarksConversion(c *gin.Context) {
 	}
 
 	normRoll := strings.ToUpper(strings.ReplaceAll(rollNo, " ", ""))
+	forceRefresh := c.Query("refresh") == "true"
 
-	// 1. Check in-memory cache (fastest)
-	if entry, found := h.getFromMemory(normRoll); found {
-		c.JSON(http.StatusOK, gin.H{
-			"success":    true,
-			"roll_no":    normRoll,
-			"raw":        entry.RawData,
-			"cached":     true,
-			"cached_at":  formatIST(entry.CachedAt),
-			"expires_at": formatIST(entry.ExpiresAt),
-		})
-		return
-	}
+	if !forceRefresh {
+		// 1. Check in-memory cache (fastest)
+		if entry, found := h.getFromMemory(normRoll); found {
+			c.JSON(http.StatusOK, gin.H{
+				"success":    true,
+				"roll_no":    normRoll,
+				"raw":        entry.RawData,
+				"cached":     true,
+				"cached_at":  formatIST(entry.CachedAt),
+				"expires_at": formatIST(entry.ExpiresAt),
+			})
+			return
+		}
 
-	// 2. Check DB cache
-	if entry, found := h.getFromDB(normRoll); found {
-		c.JSON(http.StatusOK, gin.H{
-			"success":    true,
-			"roll_no":    normRoll,
-			"raw":        entry.RawData,
-			"cached":     true,
-			"cached_at":  formatIST(entry.CachedAt),
-			"expires_at": formatIST(entry.ExpiresAt),
-		})
-		return
+		// 2. Check DB cache
+		if entry, found := h.getFromDB(normRoll); found {
+			c.JSON(http.StatusOK, gin.H{
+				"success":    true,
+				"roll_no":    normRoll,
+				"raw":        entry.RawData,
+				"cached":     true,
+				"cached_at":  formatIST(entry.CachedAt),
+				"expires_at": formatIST(entry.ExpiresAt),
+			})
+			return
+		}
 	}
 
 	// 3. Prevent duplicate concurrent in-flight requests for the same roll number (Single-flight protection)

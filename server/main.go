@@ -59,6 +59,7 @@ func main() {
 	notificationHandler := common.NewNotificationHandler()
 	helpHandler := common.NewHelpHandler()
 	cloudflareHandler := admin.NewCloudflareHandler()
+	psHandler := student.NewPSHandler()
 
 	r := routes.SetupRouter(
 		sheetHandler,
@@ -83,6 +84,7 @@ func main() {
 		notificationHandler,
 		helpHandler,
 		cloudflareHandler,
+		psHandler,
 	)
 	r.Static("/pdfs", "./pdfs")
 
