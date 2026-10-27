@@ -13,6 +13,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"server/config"
+	"server/utils"
 )
 
 type AIHandler struct {
@@ -180,6 +181,18 @@ func (h *AIHandler) UpdateAIKeyAdmin(c *gin.Context) {
 
 // GetInternalAIKey returns unmasked API key and provider info for mcp-server background requests
 func (h *AIHandler) GetInternalAIKey(c *gin.Context) {
+	roleVal, _ := c.Get("role")
+	roleStr := strings.ToLower(strings.TrimSpace(fmt.Sprintf("%v", roleVal)))
+	isAdmin := roleStr == "admin" || roleStr == "superadmin" || roleStr == "super_admin"
+
+	if !utils.IsInternalServiceRequest(c) && !isAdmin {
+		c.JSON(http.StatusForbidden, gin.H{
+			"success": false,
+			"message": "Forbidden: internal service authentication required",
+		})
+		return
+	}
+
 	h.ensureTableExists()
 
 	var apiKey, provider, model, status sql.NullString

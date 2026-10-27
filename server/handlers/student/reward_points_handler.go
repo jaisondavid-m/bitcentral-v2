@@ -156,6 +156,12 @@ func (h *SheetHandler) HandleCallback(c *gin.Context) {
 
 func (h *SheetHandler) RequireAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if utils.IsInternalServiceRequest(c) {
+			c.Set("internal_service", true)
+			c.Next()
+			return
+		}
+
 		token := utils.ExtractAuthToken(c)
 		if token != "" {
 			if claims, err := config.VerifyGoogleToken(token); err == nil && claims != nil {
@@ -163,9 +169,25 @@ func (h *SheetHandler) RequireAuth() gin.HandlerFunc {
 				c.Set("email", claims.Email)
 				c.Set("uid", claims.UID)
 				c.Set("role", claims.Role)
+				c.Next()
+				return
 			}
 		}
-		c.Next()
+
+		// Allow public static/read-only paths mounted under the group
+		path := c.Request.URL.Path
+		if strings.HasPrefix(path, "/uploads/") ||
+			strings.HasPrefix(path, "/help/public/") ||
+			strings.HasPrefix(path, "/sponsors/certificate/") {
+			c.Next()
+			return
+		}
+
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"message": "Authentication required",
+		})
+		c.Abort()
 	}
 }
 

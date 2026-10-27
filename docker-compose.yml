@@ -13,6 +13,7 @@ services:
     environment:
       - PORT=8080
       - GIN_MODE=release
+      - INTERNAL_API_SECRET=${INTERNAL_API_SECRET:-}
     volumes:
       - server_pdfs:/app/pdfs
     networks:
@@ -58,6 +59,7 @@ services:
     environment:
       - PORT=${MCP_PORT:-8082}
       - BACKEND_URL=http://server:8080
+      - BACKEND_AUTH_TOKEN=${INTERNAL_API_SECRET:-}
     networks:
       - bitcentral-net
     depends_on:
