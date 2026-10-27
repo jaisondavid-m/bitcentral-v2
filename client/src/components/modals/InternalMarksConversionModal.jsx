@@ -16,15 +16,17 @@ function getPeriodTargetPoints(periodKey, rollNo) {
   const clean = String(rollNo || "").trim().toUpperCase().replace(/\s+/g, "");
   const p = String(periodKey || "").toUpperCase();
 
-  const isBatch24 = clean.startsWith("737624") || /^24[A-Z]/i.test(clean) || clean.includes("737624");
-  if (isBatch24) {
-    if (p.includes("IP-1") || p.includes("IP1")) return "495.00";
-    if (p.includes("IP-2") || p.includes("IP2")) return "495.00";
-    if (p.includes("TOTAL")) return "990.00";
+  // 3rd Year (Batch 2024 / starting with 737624): Max RP for 15 marks is 990.00
+  const is3rdYear =
+    clean.startsWith("737624") || /^24[A-Z]/i.test(clean) || clean.includes("737624");
+  if (is3rdYear) {
+    if (p.includes("IP-1") || p.includes("IP1")) return "990.00";
+    if (p.includes("IP-2") || p.includes("IP2")) return "990.00";
+    if (p.includes("TOTAL")) return "1980.00";
     return "990.00";
   }
 
-  // Default standard target (Batch 22 & 25): IP-1: 672.00 | IP-2: 612.00 | Total: 1284.00
+  // 2nd Year (Batch 2025 / starting with 737625): IP-1: 672.00 | IP-2: 612.00 | Total: 1284.00
   if (p.includes("IP-1") || p.includes("IP1")) return "672.00";
   if (p.includes("IP-2") || p.includes("IP2")) return "612.00";
   if (p.includes("TOTAL")) return "1284.00";
