@@ -38,6 +38,7 @@ func SetupRouter(
 	notificationHandler *common.NotificationHandler,
 	helpHandler *common.HelpHandler,
 	cloudflareHandler *admin.CloudflareHandler,
+	psHandler *student.PSHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -131,6 +132,13 @@ func SetupRouter(
 	r.POST("/auth/mobile/google", studentLookupHandler.MobileGoogleLogin)
 	r.POST("/api/auth/mobile/google", studentLookupHandler.MobileGoogleLogin)
 	r.GET("/faculty-directory/auth/login", facultyDirectoryHandler.HandleDirectoryLogin)
+
+	// PS Integration routes (Public - Authenticates via decoded PS JWT claims or student email)
+	r.POST("/ps/connect", psHandler.ConnectPS)
+	r.POST("/ps/disconnect", psHandler.DisconnectPS)
+	r.GET("/ps/status", psHandler.GetPSStatus)
+	r.GET("/ps/proxy/image", psHandler.ProxyPSImage)
+	r.Any("/ps/proxy/api", psHandler.ProxyPSAPI)
 
 	// Protected routes (Requires logged-in user)
 	api := r.Group("/")
@@ -235,6 +243,8 @@ func SetupRouter(
 
 		// Proxy PDF by Google Drive ID
 		api.GET("/pdf/:id", uploadHandler.ProxyPDF)
+
+
 	}
 
 	// Admin routes

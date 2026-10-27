@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "BitCentral PS Connector",
+  "version": "1.0.0",
+  "description": "Connect your PS (ps.bitsathy.ac.in) account with BitCentral to access PS features seamlessly.",
+  "permissions": ["cookies", "storage", "activeTab"],
+  "host_permissions": [
+    "https://ps.bitsathy.ac.in/*",
+    "http://localhost:8080/*",
+    "https://bitcentral-v2.onrender.com/*",
+    "https://bitcentral.bitsathy.in/*"
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://ps.bitsathy.ac.in/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

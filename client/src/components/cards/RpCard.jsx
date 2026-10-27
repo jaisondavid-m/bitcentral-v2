@@ -157,7 +157,7 @@ export default function RpCard({ student }) {
 
     setInternalLoading(true);
     try {
-      const parsedData = await fetchInternalMarkConversion(rollNo);
+      const parsedData = await fetchInternalMarkConversion(rollNo, forceRefresh);
       internalCache.current.set(rollNo, parsedData);
       setInternalData(parsedData);
     } catch (err) {
