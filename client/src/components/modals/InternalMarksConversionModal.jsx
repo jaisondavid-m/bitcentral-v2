@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   X,
   Calculator,
@@ -8,12 +8,6 @@ import {
   AlertCircle,
   BookOpen,
   Award,
-  ChevronDown,
-  ChevronUp,
-  FileText,
-  Info,
-  Copy,
-  Check,
 } from "lucide-react";
 import { haptics } from "@/utils/haptics.js";
 
@@ -46,9 +40,6 @@ export default function InternalMarksConversionModal({
   error,
   onRefresh,
 }) {
-  const [showRawText, setShowRawText] = useState(false);
-  const [copiedRaw, setCopiedRaw] = useState(false);
-
   React.useEffect(() => {
     if (open && error) {
       haptics.error();
@@ -64,23 +55,7 @@ export default function InternalMarksConversionModal({
   const subjects = data?.subjects || [];
   const hasParsedSubjects = subjects.length > 0;
   const overall = data?.overall || null;
-
   const totalEarnedMarks = parseFloat(overall?.totalInternalMarks) || 0;
-  const totalMaxMarks =
-    overall?.maxMarks || (subjects.length > 0 ? subjects.length * 30 : 0);
-  const completionPercentage =
-    totalMaxMarks > 0
-      ? Math.min(100, Math.round((totalEarnedMarks / totalMaxMarks) * 100))
-      : overall?.percentage || 0;
-
-  const handleCopyRaw = (e) => {
-    e.stopPropagation();
-    if (!data?.raw) return;
-    navigator.clipboard.writeText(data.raw);
-    setCopiedRaw(true);
-    haptics.light();
-    setTimeout(() => setCopiedRaw(false), 2000);
-  };
 
   return (
     <div
@@ -342,76 +317,6 @@ export default function InternalMarksConversionModal({
                   );
                 })}
               </div>
-
-              {/* 3. INNOVATIVE PRACTICE (IP) CONVERSION CRITERIA CALLOUT */}
-              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-3.5 sm:p-4 text-xs text-slate-600 dark:text-slate-400 space-y-1.5">
-                <div className="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200">
-                  <Info className="h-4 w-4 text-indigo-500 shrink-0" />
-                  <span>How Innovative Practice (IP) Conversion Works</span>
-                </div>
-                <p className="text-[11px] leading-relaxed">
-                  Each theory subject awards up to <strong className="text-slate-900 dark:text-white">30 internal marks</strong> through Innovative Practice. Marks are evaluated in two cycles:
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 font-mono text-[10.5px]">
-                  <div className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
-                    <span className="font-bold text-indigo-600 dark:text-indigo-400">IP-1 Cycle:</span> Max 15 internal marks (Target: ~672 RP)
-                  </div>
-                  <div className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
-                    <span className="font-bold text-purple-600 dark:text-purple-400">IP-2 Cycle:</span> Max 15 internal marks (Target: ~612 RP)
-                  </div>
-                </div>
-              </div>
-
-              {/* 4. COLLAPSIBLE RAW SUMMARY ACCORDION */}
-              {data.raw && (
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      haptics.light();
-                      setShowRawText(!showRawText);
-                    }}
-                    className="flex w-full items-center justify-between px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition cursor-pointer"
-                  >
-                    <span className="flex items-center gap-2">
-                      <FileText className="h-3.5 w-3.5 text-slate-400" />
-                      <span>View Raw Summary Output</span>
-                    </span>
-                    <div className="flex items-center gap-2">
-                      {showRawText ? (
-                        <ChevronUp className="h-4 w-4 text-slate-400" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4 text-slate-400" />
-                      )}
-                    </div>
-                  </button>
-
-                  {showRawText && (
-                    <div className="border-t border-slate-100 dark:border-slate-800 p-3 sm:p-4 bg-slate-950 text-slate-200 relative">
-                      <button
-                        type="button"
-                        onClick={handleCopyRaw}
-                        className="absolute top-4 right-4 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-mono text-slate-200 border border-slate-700 transition cursor-pointer"
-                      >
-                        {copiedRaw ? (
-                          <>
-                            <Check className="h-3 w-3 text-emerald-400" />
-                            <span>Copied</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="h-3 w-3" />
-                            <span>Copy</span>
-                          </>
-                        )}
-                      </button>
-                      <pre className="text-[11px] font-mono whitespace-pre-wrap leading-relaxed overflow-x-auto select-all pr-14">
-                        {data.raw}
-                      </pre>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           )}
         </div>
