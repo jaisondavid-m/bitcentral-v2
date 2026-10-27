@@ -28,6 +28,13 @@ export default function InternalMarksConversionModal({
 
   if (!open) return null;
 
+  const formatScore = (val) => {
+    if (val === null || val === undefined || val === "") return "0";
+    const num = typeof val === "number" ? val : parseFloat(String(val).replace(/[^0-9.-]/g, ""));
+    if (isNaN(num)) return String(val);
+    return num % 1 === 0 ? num.toFixed(0) : num.toFixed(2);
+  };
+
   const rollNo = String(
     student?.roll_no || student?.user_id || student?.reg_no || data?.roll_no || ""
   ).trim();
@@ -36,6 +43,7 @@ export default function InternalMarksConversionModal({
   const hasParsedSubjects = subjects.length > 0;
   const overall = data?.overall || null;
   const totalEarnedMarks = parseFloat(overall?.totalInternalMarks) || 0;
+  const maxPossibleMarks = subjects.length * 30;
 
   return (
     <div
@@ -44,7 +52,7 @@ export default function InternalMarksConversionModal({
     >
       <div
         className="
-          w-full sm:max-w-2xl rounded-t-3xl sm:rounded-3xl
+          w-full sm:max-w-xl rounded-t-3xl sm:rounded-3xl
           bg-white border border-slate-200/90 dark:bg-slate-900 dark:border-slate-800
           shadow-2xl shadow-slate-950/20 dark:shadow-black/70
           max-h-[92dvh] sm:max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200
@@ -144,15 +152,17 @@ export default function InternalMarksConversionModal({
               <span className="text-xs">No internal marks records available for {rollNo}.</span>
             </div>
           ) : (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between px-1">
-                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between px-1 pb-1">
+                <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                   <BookOpen className="h-3.5 w-3.5 text-indigo-500" />
-                  <span>Subjects ({subjects.length})</span>
+                  <span>Theory Subjects ({subjects.length})</span>
                 </h4>
-                <span className="text-[11px] text-slate-400 font-mono">
-                  Max 30 marks / subject
-                </span>
+                {totalEarnedMarks > 0 && (
+                  <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                    Total: {formatScore(totalEarnedMarks)} / {maxPossibleMarks}
+                  </span>
+                )}
               </div>
 
               {subjects.map((sub, idx) => {
@@ -174,64 +184,65 @@ export default function InternalMarksConversionModal({
                   <div
                     key={sub.code || idx}
                     className="
-                      p-3.5 sm:p-4 rounded-2xl border border-slate-200/90 dark:border-slate-800
-                      bg-white dark:bg-slate-900 shadow-2xs hover:border-indigo-300 dark:hover:border-indigo-700/60
-                      transition flex flex-col gap-3
+                      p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800
+                      bg-white dark:bg-slate-900/90 shadow-2xs hover:border-indigo-300 dark:hover:border-indigo-800/60
+                      transition flex flex-col gap-2.5
                     "
                   >
-                    {/* Top Row: Subject Code & Total Marks */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200/70 dark:border-indigo-800/80 text-xs font-bold text-indigo-600 dark:text-indigo-400 font-mono shrink-0">
+                    {/* Top Row: Subject Code & Total Score */}
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-600 dark:text-slate-400 font-mono shrink-0">
                           #{idx + 1}
                         </span>
-                        <span className="font-mono font-bold text-sm text-slate-900 dark:text-white truncate">
+                        <span className="font-mono font-bold text-sm text-slate-900 dark:text-white tracking-wide">
                           {sub.code}
                         </span>
                       </div>
 
-                      <span
-                        className={`
-                          inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-mono font-bold shrink-0
-                          ${
+                      <div className="flex items-center gap-1 font-mono shrink-0">
+                        <span
+                          className={`text-sm font-bold ${
                             isSubjectFullMarks
-                              ? "bg-emerald-50 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60"
-                              : "bg-indigo-50 dark:bg-indigo-950/70 text-indigo-800 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/60"
-                          }
-                        `}
-                      >
-                        <Award className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                        <span>{subjectTotalMarks.toFixed(2)} / 30.00 Marks</span>
-                      </span>
+                              ? "text-emerald-600 dark:text-emerald-400"
+                              : "text-indigo-600 dark:text-indigo-400"
+                          }`}
+                        >
+                          {formatScore(subjectTotalMarks)}
+                        </span>
+                        <span className="text-xs text-slate-400">/ 30 marks</span>
+                      </div>
                     </div>
 
-                    {/* Periods Breakdown (IP-1 & IP-2) */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {periodKeys.map((pKey) => {
-                        const rpVal = sub.rewardPoints?.[pKey] || "0.00";
-                        const imVal = sub.internalMarks?.[pKey] || "0.00";
+                    {/* Breakdown: Clean inline pill for IP-1 and IP-2 */}
+                    {periodKeys.length > 0 && (
+                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                        {periodKeys.map((pKey) => {
+                          const rpVal = sub.rewardPoints?.[pKey] || "0";
+                          const imVal = sub.internalMarks?.[pKey] || "0";
 
-                        return (
-                          <div
-                            key={pKey}
-                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-800 text-xs font-mono"
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/80 px-1.5 py-0.5 rounded border border-indigo-200/60 dark:border-indigo-800/60 text-[10.5px]">
-                                {pKey}
-                              </span>
-                              <span className="text-slate-600 dark:text-slate-300">
-                                {rpVal} RP
+                          return (
+                            <div
+                              key={pKey}
+                              className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-800/70 text-xs font-mono"
+                            >
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <span className="font-bold text-indigo-600 dark:text-indigo-400 text-[11px]">
+                                  {pKey}:
+                                </span>
+                                <span className="text-slate-500 dark:text-slate-400 text-[11px] truncate">
+                                  {formatScore(rpVal)} RP
+                                </span>
+                              </div>
+
+                              <span className="font-bold text-emerald-600 dark:text-emerald-400 text-[11.5px] shrink-0">
+                                {formatScore(imVal)}/15
                               </span>
                             </div>
-
-                            <span className="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200/60 dark:border-emerald-800/60">
-                              {imVal} / 15.00
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -240,20 +251,10 @@ export default function InternalMarksConversionModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 px-5 sm:px-6 py-3.5 shrink-0 bg-slate-50/70 dark:bg-slate-900/60 text-[11px] text-slate-500 dark:text-slate-400">
-          <div className="flex items-center gap-2">
-            <span className="font-mono">
-              {subjects.length > 0 ? `${subjects.length} subjects evaluated` : "Innovative Practice"}
-            </span>
-            {totalEarnedMarks > 0 && (
-              <>
-                <span>·</span>
-                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                  {totalEarnedMarks.toFixed(2)} total marks
-                </span>
-              </>
-            )}
-          </div>
+        <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 px-5 sm:px-6 py-3.5 shrink-0 bg-slate-50/70 dark:bg-slate-900/60 text-xs text-slate-500 dark:text-slate-400">
+          <span className="font-mono">
+            {subjects.length > 0 ? `${subjects.length} subjects evaluated` : "Innovative Practice"}
+          </span>
 
           <button
             type="button"
