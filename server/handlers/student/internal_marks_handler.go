@@ -45,7 +45,7 @@ type GradioSSEEvent struct {
 }
 
 const (
-	InternalMarksCacheDuration = 48 * time.Hour
+	InternalMarksCacheDuration = 6 * time.Hour
 	GradioSpaceHost            = "https://praneshjs-rewardpointssite.hf.space"
 )
 
@@ -100,6 +100,10 @@ func (h *InternalMarksHandler) getFromMemory(rollNo string) (InternalMarksCacheE
 	if time.Now().After(entry.ExpiresAt) {
 		return InternalMarksCacheEntry{}, false
 	}
+	// If the cache only has IP-1 but lacks IP-2, expire it so fresh complete marks can be fetched
+	if !strings.Contains(entry.RawData, "IP-2") && time.Since(entry.CachedAt) > 30*time.Minute {
+		return InternalMarksCacheEntry{}, false
+	}
 	return entry, true
 }
 
@@ -118,6 +122,10 @@ func (h *InternalMarksHandler) getFromDB(rollNo string) (InternalMarksCacheEntry
 	var entry InternalMarksCacheEntry
 	err := config.DB.QueryRow(query, rollNo).Scan(&entry.RollNo, &entry.RawData, &entry.CachedAt, &entry.ExpiresAt)
 	if err != nil {
+		return InternalMarksCacheEntry{}, false
+	}
+	// If the cache only has IP-1 but lacks IP-2, expire it so fresh complete marks can be fetched
+	if !strings.Contains(entry.RawData, "IP-2") && time.Since(entry.CachedAt) > 30*time.Minute {
 		return InternalMarksCacheEntry{}, false
 	}
 	// Sync back to in-memory cache
