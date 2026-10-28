@@ -1,4 +1,4 @@
-import api from "@/api/axios.js";
+import api, { getApiBaseUrl } from "@/api/axios.js";
 
 // Connect PS account (store token from extension)
 export async function connectPS(psToken) {
@@ -40,7 +40,7 @@ export async function getPSStatus(email = null) {
 
 // Get PS proxy image URL (returns the URL string to use as img src)
 export function getPSImageUrl(path = "/api/ps_v2/user/images/image.jpg", email = null) {
-  const baseUrl = api.defaults.baseURL || "http://localhost:8080";
+  const baseUrl = getApiBaseUrl();
   let url = `${baseUrl}/ps/proxy/image?path=${encodeURIComponent(path)}`;
   if (email) url += `&email=${encodeURIComponent(email)}`;
   return url;

@@ -2,17 +2,20 @@ import axios from "axios";
 import { auth, getStoredToken } from "@/config/auth.js";
 
 export function getApiBaseUrl() {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, "");
+  }
   if (typeof window !== "undefined") {
     const host = window.location.hostname;
     if (host === "localhost" || host === "127.0.0.1") {
       return "http://localhost:8080";
     }
   }
-  return import.meta.env.VITE_API_BASE_URL || "https://bitcentral-v2-dgvs.onrender.com";
+  return "https://bitcentral-v2-dgvs.onrender.com";
 }
 
 const api = axios.create({
-  baseURL: "https://bitcentral-v2-dgvs.onrender.com",
+  baseURL: getApiBaseUrl(),
   timeout: 15000,
   withCredentials: true,
   headers: {
