@@ -12,7 +12,7 @@ const PS_COOKIE_NAME = "PS";
 // Default API base URL
 async function getApiBaseUrl() {
   const data = await chrome.storage.local.get(["custom_api_url"]);
-  return data.custom_api_url || "https://bitcentral-v2.onrender.com";
+  return data.custom_api_url || "https://bitcentral-v2-dgvs.onrender.com";
 }
 
 // Extract PS JWT from Chrome cookies

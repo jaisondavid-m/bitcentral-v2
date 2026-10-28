@@ -8,11 +8,11 @@ export function getApiBaseUrl() {
       return "http://localhost:8080";
     }
   }
-  return import.meta.env.VITE_API_BASE_URL || "https://bitcentral-v2.onrender.com";
+  return import.meta.env.VITE_API_BASE_URL || "https://bitcentral-v2-dgvs.onrender.com";
 }
 
 const api = axios.create({
-  baseURL: "https://bitcentral-v2.onrender.com",
+  baseURL: "https://bitcentral-v2-dgvs.onrender.com",
   timeout: 15000,
   withCredentials: true,
   headers: {
@@ -28,7 +28,7 @@ api.interceptors.request.use(
       if (token && !config.headers.Authorization) {
         config.headers.Authorization = `Bearer ${token}`;
       }
-    } catch (e) {}
+    } catch (e) { }
     return config;
   },
   (error) => Promise.reject(error)

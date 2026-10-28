@@ -86,7 +86,7 @@ export default function AdminDeploymentsSection() {
       id: "fallback-be",
       name: "Render Cloud (Backend API)",
       role: "Automated Standby",
-      url: "https://bitcentral-v2.onrender.com",
+      url: "https://bitcentral-v2-dgvs.onrender.com",
       status: "checking",
       ping: null,
       type: "cloud",
@@ -329,11 +329,10 @@ Failover Fallback 2: bitcentral-v2.onrender.com`;
               Active Frontend Origin
             </span>
             <span
-              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-                frontendOrigin.type === "own_server"
+              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${frontendOrigin.type === "own_server"
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800"
                   : "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800"
-              }`}
+                }`}
             >
               <span className={`h-1.5 w-1.5 rounded-full ${frontendOrigin.type === "own_server" ? "bg-emerald-500" : "bg-amber-500"}`} />
               {frontendOrigin.type === "own_server" ? "Primary Server Active" : "Fallback Active (Vercel)"}
@@ -375,11 +374,10 @@ Failover Fallback 2: bitcentral-v2.onrender.com`;
               Active Backend API Origin
             </span>
             <span
-              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-                backendOrigin.type === "own_server"
+              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${backendOrigin.type === "own_server"
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800"
                   : "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800"
-              }`}
+                }`}
             >
               <span className={`h-1.5 w-1.5 rounded-full ${backendOrigin.type === "own_server" ? "bg-emerald-500" : "bg-amber-500"}`} />
               {backendOrigin.type === "own_server" ? "Primary Server Active" : "Fallback Active (Render)"}
@@ -496,11 +494,10 @@ Failover Fallback 2: bitcentral-v2.onrender.com`;
           <div className="space-y-3">
             {/* Primary Node */}
             <div
-              className={`rounded-xl border p-3 text-left transition ${
-                frontendOrigin.type === "own_server"
+              className={`rounded-xl border p-3 text-left transition ${frontendOrigin.type === "own_server"
                   ? "border-emerald-300 bg-emerald-50/60 dark:border-emerald-800 dark:bg-emerald-950/40 shadow-xs"
                   : "border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900 opacity-60"
-              }`}
+                }`}
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
@@ -518,11 +515,10 @@ Failover Fallback 2: bitcentral-v2.onrender.com`;
 
             {/* Fallback Node */}
             <div
-              className={`rounded-xl border p-3 text-left transition ${
-                frontendOrigin.type === "vercel"
+              className={`rounded-xl border p-3 text-left transition ${frontendOrigin.type === "vercel"
                   ? "border-amber-300 bg-amber-50/60 dark:border-amber-800 dark:bg-amber-950/40 shadow-xs"
                   : "border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900 opacity-60"
-              }`}
+                }`}
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
@@ -597,22 +593,20 @@ Failover Fallback 2: bitcentral-v2.onrender.com`;
                   </td>
                   <td className="py-3 pr-1 text-right">
                     <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold ${
-                        ep.status === "online"
+                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold ${ep.status === "online"
                           ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300"
                           : ep.status === "checking"
-                          ? "bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300"
-                          : "bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300"
-                      }`}
+                            ? "bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300"
+                            : "bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300"
+                        }`}
                     >
                       <span
-                        className={`h-1.5 w-1.5 rounded-full ${
-                          ep.status === "online"
+                        className={`h-1.5 w-1.5 rounded-full ${ep.status === "online"
                             ? "bg-emerald-500"
                             : ep.status === "checking"
-                            ? "bg-blue-500 animate-pulse"
-                            : "bg-rose-500"
-                        }`}
+                              ? "bg-blue-500 animate-pulse"
+                              : "bg-rose-500"
+                          }`}
                       />
                       {ep.status === "online" ? "Online" : ep.status === "checking" ? "Checking" : "Unreachable"}
                     </span>

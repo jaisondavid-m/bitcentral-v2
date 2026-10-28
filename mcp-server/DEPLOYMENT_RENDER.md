@@ -22,7 +22,7 @@ In your **Render Dashboard** ➡️ **Web Service** ➡️ **Environment**:
 
 1. Add `GEMINI_API_KEY`: Set to your Google Gemini API key.
 2. Add `GEMINI_MODEL`: `gemini-2.0-flash` (Optional, defaults to `gemini-2.0-flash`).
-3. Add `BACKEND_URL`: `https://bitcentral-v2.onrender.com` (or your main backend API URL).
+3. Add `BACKEND_URL`: `https://bitcentral-v2-dgvs.onrender.com` (or your main backend API URL).
 4. Add `PORT`: `10000` (Render default).
 
 > [!SECURITY NOTE]

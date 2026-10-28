@@ -68,7 +68,7 @@ function setStatus(state, label, detail) {
 // Get chosen API base URL
 async function getApiBaseUrl() {
   const stored = await chrome.storage.local.get(["custom_api_url"]);
-  return stored.custom_api_url || serverSelect.value || "https://bitcentral-v2.onrender.com";
+  return stored.custom_api_url || serverSelect.value || "https://bitcentral-v2-dgvs.onrender.com";
 }
 
 // Save selected server
