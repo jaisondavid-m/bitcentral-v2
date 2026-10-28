@@ -145,6 +145,13 @@ export const ROUTE_SEO = {
     pageType: "WebPage",
   },
 
+  "/dsa": {
+    title: "DSA Lab Experiments - BIT Central",
+    description: "Protected Data Structures & Algorithms lab repository for BIT Sathy students with complete Python programs and interactive simulators.",
+    keywords: ["DSA lab", "Data Structures", "Python DSA"],
+    noIndex: true,
+  },
+
   "/rpsite": {
     title: "Reward Points",
     description: "Protected BIT Central reward points access page for signed-in BIT Sathy students.",
