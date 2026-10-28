@@ -280,7 +280,7 @@ export default function DSAPage() {
                       <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 font-mono text-[11px] font-bold text-blue-700 dark:bg-blue-950 dark:text-blue-300 mt-0.5">
                         {idx + 1}
                       </span>
-                      <span className="pt-0.5 break-words flex-1 min-w-0">
+                      <span className="pt-0.5 break-words flex-1 min-w-0 whitespace-pre-line">
                         {step.replace(/^\d+\.\s*/, "")}
                       </span>
                     </li>

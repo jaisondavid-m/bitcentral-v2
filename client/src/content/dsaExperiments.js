@@ -19,22 +19,9 @@ export const dsaExperiments = [
     shortTitle: "Supermarket Basket & Checkout Queue (Stack & Queue)",
     filename: "exp1_supermarket_stack_queue.py",
     aim: "To implement Stack and Queue data structures in Python using the list and dequeue collections, respectively, to simulate a supermarket scenario involving basket item storage and checkout queue processing.",
-    possibleIdeas: [
-      "1. Limited-Capacity Basket Using Stack: Implement a stack with maximum capacity to simulate real-world basket size limit.",
-      "2. Express Checkout Simulation: Use multiple queues to simulate regular and express checkout lines based on basket size.",
-      "3. Undo/Redo Cart Operations: Allow customers to undo and redo adding/removing items using two stacks.",
-      "4. Time-Based Checkout Queue: Assign checkout times and process in FIFO order while displaying estimated wait times.",
-      "5. Category-Based Item Grouping: Organize basket items into sub-stacks based on item categories (food, hygiene).",
-    ],
     algorithm: [
-      "1. Stack Implementation (Basket): Initialize an empty list self.stack.",
-      "2. Add Item (Push): Use append() to push an item to the basket stack.",
-      "3. Remove Item (Pop): If stack not empty, use pop() to remove the top item; otherwise show empty message.",
-      "4. View Basket: Display all current items in the basket stack.",
-      "5. Queue Implementation (CheckoutQueue): Initialize an empty queue using collections.deque().",
-      "6. Join Queue (Enqueue): Add customer name to the checkout queue using append().",
-      "7. Process Customer (Dequeue FIFO): If queue not empty, pop the front customer using popleft().",
-      "8. View Queue: Display list of waiting customers in the checkout queue.",
+      "Stack Implementation (Basket Class):\n• Initialize an empty stack (Python list).\n• Add Item: Use append() to push an item to the stack. Print confirmation message.\n• Remove Item: If stack is not empty, use pop() to remove the last item. Print the removed item. If empty, display appropriate message.\n• View Basket: Display current items in the stack if not empty.",
+      "Queue Implementation (CheckoutQueue Class):\n• Initialize an empty queue using collections.deque.\n• Join Queue: Add customer name using append(). Print confirmation.\n• Process Customer: Use popleft() to remove the first customer. Print the processed customer name. If queue is empty, print appropriate message.\n• View Queue: Display the list of customers in queue.",
     ],
     code: `from collections import deque
 
@@ -86,14 +73,14 @@ class CheckoutQueue:
 basket = Basket()
 checkout = CheckoutQueue()
 
-# Customer actions (Stack: LIFO)
+# Customer actions
 basket.add_item("Milk")
 basket.add_item("Bread")
 basket.view_basket()
 basket.remove_item()
 basket.view_basket()
 
-# Checkout process (Queue: FIFO)
+# Checkout process
 checkout.join_queue("Customer1")
 checkout.join_queue("Customer2")
 checkout.view_queue()
@@ -123,19 +110,12 @@ Checkout queue: ['Customer2']`,
     shortTitle: "Train Passenger Management (Singly Linked List)",
     filename: "exp2_train_passengers_linked_list.py",
     aim: "To develop a Python program using singly linked list data structure to manage train passengers by adding, removing, and displaying passenger records based on ticket number.",
-    possibleIdeas: [
-      "1. Coach-Wise Passenger Allocation: Represent each coach of the train as a separate linked list.",
-      "2. Boarding and Deboarding Log: Maintain real-time linked list of passengers boarding (tail) or deboarding (head).",
-      "3. Ticket Number Based Ordered Insertion: Keep the linked list sorted by ticket numbers for faster search.",
-      "4. Circular Linked List for Staff: Use circular linked list to manage staff shift rotations on the train.",
-      "5. Middle Node Update for Announcements: Insert or update middle node periodically for station broadcast.",
-    ],
     algorithm: [
-      "1. Passenger Node Structure: Define PassengerNode with fields: name, ticket_number, and next = None.",
-      "2. Initialization: Initialize TrainPassengerList with self.head = None.",
-      "3. Add Passenger: Create PassengerNode. If head is None, set head = new node; otherwise traverse to end and link.",
-      "4. Remove Passenger: If head matches ticket_number, update head = head.next. Otherwise traverse with prev and current pointers, unlink matching node.",
-      "5. Display Passengers: Traverse nodes from head to end and print passenger name and ticket number.",
+      "Passenger Node Structure:\n• Define PassengerNode class with fields:\n  - name\n  - ticket_number\n  - next pointer to next node",
+      "Train Passenger List (Linked List) Initialization:\n• Start with head = None.",
+      "Add Passenger:\n• Create new node.\n• If head is None, assign new node to head.\n• Else, traverse to the end and append the node.",
+      "Remove Passenger (by ticket number):\n• If head is empty, show 'No passengers'.\n• If head matches, update head.\n• Otherwise, traverse and find the match; update links.",
+      "Display All Passengers:\n• Traverse the list.\n• Print each passenger's name and ticket number.",
     ],
     code: `# Node class to represent a Passenger
 class PassengerNode:
@@ -232,26 +212,19 @@ Name: Charlie, Ticket No: 103`,
     id: "exp-3",
     expNumber: "3",
     courseOutcome: "CO1",
-    badge: "Dictionary / Hash Map",
+    badge: "Hash Map / Dictionary",
     title:
       "Ex.No:3 CREATE A PYTHON PROGRAM THAT ALLOWS USERS TO SEARCH FOR A PERSON'S PHONE NUMBER QUICKLY IN THE PHONE DIRECTORY.",
     shortTitle: "Phone Directory Search (Hash Map Dictionary)",
     filename: "exp3_phone_directory_hashmap.py",
     aim: "To implement a phone directory system using Python dictionaries (hash maps) to add, search, delete, and display contacts efficiently.",
-    possibleIdeas: [
-      "1. Auto-Suggestion with Prefix Matching: Suggest contacts based on entered prefix.",
-      "2. Case-Insensitive Search: Normalize names to lowercase for robust lookup.",
-      "3. Contact Groups: Organize contacts into family, work, and emergency groups.",
-      "4. Search and Update Feature: Allow updating phone number if found.",
-      "5. Frequent Contact Sorting: Display top 5 most frequently searched contacts.",
-    ],
     algorithm: [
-      "1. Initialize Directory: Create dictionary self.directory = {} to store contacts (name as key, phone_number as value).",
-      "2. Add Contact: Convert name to lowercase and store self.directory[name.lower()] = phone_number.",
-      "3. Search Contact: Convert input to lowercase. Check if name exists in dictionary; display number if found.",
-      "4. Delete Contact: Convert input to lowercase. If name exists, delete using del self.directory[name_lower].",
-      "5. Display All Contacts: Traverse dictionary and print sorted names and phone numbers.",
-      "6. Menu Loop: Continuously prompt user until Exit (choice 5) is selected.",
+      "Initialize Directory:\n• Create a dictionary to store contacts (name as key, phone_number as value).",
+      "Add Contact:\n• Convert the name to lowercase for consistency.\n• Add key-value pair to the dictionary.",
+      "Search Contact:\n• Convert the input name to lowercase.\n• Check if the name exists in the dictionary and return the number.",
+      "Delete Contact:\n• Convert the name to lowercase.\n• Delete the entry if it exists.",
+      "Display All Contacts:\n• Traverse the dictionary and print names and numbers (sorted alphabetically).",
+      "Exit:\n• Terminate the loop and program when user chooses to exit.",
     ],
     code: `# Phone Directory using a Dictionary (Hash Map)
 class PhoneDirectory:
@@ -293,7 +266,7 @@ class PhoneDirectory:
 def main():
     phone_directory = PhoneDirectory()
     while True:
-        print("\nPhone Directory Menu:")
+        print("\\nPhone Directory Menu:")
         print("1. Add Contact")
         print("2. Search Contact")
         print("3. Delete Contact")
@@ -318,6 +291,7 @@ def main():
         else:
             print("Invalid choice. Please try again.")
 
+# Run the program
 if __name__ == "__main__":
     main()
 `,
@@ -331,29 +305,23 @@ Enter your choice: 1
 Enter contact name: Alice
 Enter phone number: 9876543210
 Contact Alice added successfully.
-
 Enter your choice: 1
 Enter contact name: Bob
 Enter phone number: 9123456789
 Contact Bob added successfully.
-
 Enter your choice: 4
 Phone Directory:
 Alice: 9876543210
 Bob: 9123456789
-
 Enter your choice: 2
 Enter name to search: Alice
 Alice: 9876543210
-
 Enter your choice: 3
 Enter name to delete: Bob
 Contact Bob deleted successfully.
-
 Enter your choice: 4
 Phone Directory:
 Alice: 9876543210
-
 Enter your choice: 5
 Exiting Phone Directory. Goodbye!`,
     result:
@@ -369,23 +337,17 @@ Exiting Phone Directory. Goodbye!`,
     shortTitle: "Quiz Competition Student Grade Sorter",
     filename: "exp4_quiz_grades_sorting.py",
     aim: "To develop a comprehensive Python program to manage student names and grades for a quiz competition using lists and sorting, along with additional features like searching, updating, and displaying top performers.",
-    possibleIdeas: [
-      "1. Sort with Stable Tie-Breaker: If two students have equal grades, sort alphabetically by name.",
-      "2. Top-N Performer Display: Allow user to enter N and display only top N ranked students.",
-      "3. Section-Based Sorting: Store students based on section (A, B, C) and sort independently.",
-      "4. Real-Time Leaderboard: Automatically display sorted leaderboard after each addition.",
-      "5. Grade Distribution Histogram: Generate grade bracket counts.",
-    ],
     algorithm: [
-      "1. Initialize List: Create self.students = [] to store student data as (name, grade) tuples.",
-      "2. Add Student: Append (name, grade) tuple to self.students.",
-      "3. Sort Students: Use sorted(self.students, key=lambda x: x[1], reverse=True) to sort descending by grade.",
-      "4. Search Student: Traverse list and compare name using .lower() for case-insensitive match.",
-      "5. Update Grade: Locate student by name and replace tuple with updated grade.",
-      "6. Top N Performers: Sort list and slice sorted_students[:n].",
-      "7. Menu Loop: Continuously prompt user with options 1-6 until Exit.",
+      "Initialize an empty list to store student data as tuples (name, grade).",
+      "Add Student:\n• Take input for name and grade.\n• Append to the list as a tuple.",
+      "Sort Students:\n• Use sorted() with lambda to sort by grade in descending order.",
+      "Search Student:\n• Traverse list and match name using .lower() for case-insensitive search.",
+      "Update Grade:\n• Locate student by name and update grade value in the list.",
+      "Display Top N Performers:\n• Sort and slice first N entries from the list.",
+      "Menu:\n• Continuously prompt the user for operation until exit is chosen.",
     ],
     code: `# Enhanced Student Grade Management System for Quiz Competition
+
 class QuizCompetition:
     def __init__(self):
         self.students = []
@@ -399,7 +361,7 @@ class QuizCompetition:
             print("No student records available.")
             return
         sorted_students = sorted(self.students, key=lambda x: x[1], reverse=True)
-        print("\n--- Sorted Student Grades ---")
+        print("\\n--- Sorted Student Grades ---")
         print("{:<5} {:<15} {:<10}".format("Rank", "Name", "Grade"))
         for idx, (name, grade) in enumerate(sorted_students, start=1):
             print("{:<5} {:<15} {:<10}".format(idx, name, grade))
@@ -427,7 +389,7 @@ class QuizCompetition:
             print("No student records available.")
             return
         sorted_students = sorted(self.students, key=lambda x: x[1], reverse=True)
-        print(f"\n--- Top {n} Performers ---")
+        print(f"\\n--- Top {n} Performers ---")
         print("{:<5} {:<15} {:<10}".format("Rank", "Name", "Grade"))
         for idx, (name, grade) in enumerate(sorted_students[:n], start=1):
             print("{:<5} {:<15} {:<10}".format(idx, name, grade))
@@ -435,7 +397,7 @@ class QuizCompetition:
 def main():
     quiz = QuizCompetition()
     while True:
-        print("\n===== Quiz Competition Grade Manager =====")
+        print("\\n===== Quiz Competition Grade Manager =====")
         print("1. Add Student")
         print("2. Display Sorted Results")
         print("3. Search Student")
@@ -508,18 +470,10 @@ Rank Name Grade
     shortTitle: "Digital Signature Generator & Verifier (Hashing)",
     filename: "exp5_digital_signature_hashing.py",
     aim: "To implement a digital signature generator and verifier using hash functions in Python, applying hashing concepts from Data Structures.",
-    possibleIdeas: [
-      "1. Simple Hash-Based Signature: Concatenate document and passphrase, then hash using custom string formula.",
-      "2. Signature Tamper Detection: Modify document to demonstrate failed verification.",
-      "3. Multiple Document Signing: Store multiple documents and signatures in dictionary.",
-      "4. Block-wise Hash Verification: Break large document into parts and hash individually.",
-      "5. Timestamp-Appended Signature: Append timestamp to simulate time-sensitive signing.",
-    ],
     algorithm: [
-      "1. Hash Function: For each character at index i, add (i + 1) * ord(char) to hash_value; return hash_value % 1000000007.",
-      "2. Generate Signature: Concatenate document + passcode, calculate and return hash value.",
-      "3. Verify Signature: Recalculate hash for entered document + passcode; if recalculated_signature == given_signature, mark authentic, else mismatch.",
-      "4. Menu Interface: Options to 1. Generate Signature, 2. Verify Signature, 3. Exit.",
+      "Hash Function (Simple):\n• Convert each character of the string to its ASCII value.\n• Multiply it with its index and sum all values.\n• Return final hash modulo a large number (e.g., 10^9 + 7).",
+      "Signature Generation:\n• Take input: document and passcode (secret).\n• Concatenate both: combined = document + passcode.\n• Generate hash using the above function — acts as a digital signature.",
+      "Signature Verification:\n• Take original document, secret passcode, and the stored/generated hash.\n• Recalculate the hash using the same method.\n• Compare with the given signature. If they match → authentic.",
     ],
     code: `# Simple hashing function (data structures concept)
 def simple_hash(text):
@@ -540,14 +494,14 @@ def verify_signature(document, passcode, given_signature):
     combined = document + passcode
     recalculated_signature = simple_hash(combined)
     if recalculated_signature == given_signature:
-        print("Document is authentic. Signature verified.")
+        print("✅ Document is authentic. Signature verified.")
     else:
-        print("Document integrity check failed. Signature mismatch.")
+        print("❌ Document integrity check failed. Signature mismatch.")
 
 # Menu-driven interface
 def main():
     while True:
-        print("\n--- Digital Signature Simulator (Hashing Only) ---")
+        print("\\n--- Digital Signature Simulator (Hashing Only) ---")
         print("1. Generate Signature")
         print("2. Verify Signature")
         print("3. Exit")
@@ -571,6 +525,7 @@ def main():
         else:
             print("Invalid choice. Try again.")
 
+# Run the main program
 if __name__ == "__main__":
     main()
 `,
@@ -601,17 +556,9 @@ Document is authentic. Signature verified.`,
     shortTitle: "Landmark Navigation using Graph Traversal (BFS & DFS)",
     filename: "exp6_landmark_graph_bfs_dfs.py",
     aim: "To implement a Python program that provides directions between landmarks, using graph traversal techniques such as Breadth-First Search (BFS) and Depth-First Search (DFS). Each landmark is a node, and the path between landmarks is a link.",
-    possibleIdeas: [
-      "1. Campus Navigation: Model campus buildings as nodes and pathways as undirected edges.",
-      "2. Dynamic Graph: Let users define custom landmarks and connections dynamically.",
-      "3. Shortest Path by Step Count: Use BFS to calculate minimum hops between landmarks.",
-      "4. 2D Grid Landmark Layout: Traverse grid map in 4 directions with BFS/DFS.",
-      "5. Category Filter: Find paths only through specific landmark types (e.g. food, labs).",
-    ],
     algorithm: [
-      "1. Breadth-First Search (BFS): Initialize queue with [(start, [start])]. Dequeue node and path; if node == end, return path. Add unvisited neighbors to queue. Return None if no path.",
-      "2. Depth-First Search (DFS): Mark current visited, append to path. If current == end, return path.copy(). Recursively visit unvisited neighbors; backtrack with path.pop() if path fails.",
-      "3. Driver Function: Display available landmarks, prompt start and destination, prompt BFS or DFS method, and output directional path (A -> B -> E -> G).",
+      "Breadth-First Search (BFS):\n• Initialize a queue with the start node and its path.\n• While the queue is not empty:\n  - Dequeue a node and path.\n  - If it matches the destination, return the path.\n  - Otherwise, enqueue all unvisited neighbors with updated paths.\n• If no path is found, return None.",
+      "Depth-First Search (DFS):\n• Mark the current node as visited.\n• Add it to the current path.\n• If current node is the destination, return the path.\n• Recursively explore unvisited neighbors.\n• Backtrack if destination not found.",
     ],
     code: `from collections import deque
 
@@ -668,7 +615,7 @@ def main():
     end = input("Enter destination landmark: ").strip().upper()
 
     if start not in landmarks or end not in landmarks:
-        print("Invalid landmarks entered.")
+        print(" Invalid landmarks entered.")
         return
 
     choice = input("Choose method - BFS or DFS? (B/F): ").strip().upper()
@@ -684,8 +631,8 @@ def main():
         return
 
     if path:
-        print(f"\nDirections using {method}:")
-        print(" -> ".join(path))
+        print(f"\\n Directions using {method}:")
+        print(" ➡️ ".join(path))
     else:
         print(f"No path found from {start} to {end} using {method}.")
 
@@ -707,7 +654,7 @@ Enter destination landmark: G
 Choose method - BFS or DFS? (B/F): B
 
 Directions using BFS:
-A -> B -> E -> G`,
+A ➡️ B ➡️ E ➡️ G`,
     result:
       "The program efficiently provides directions between landmarks using graph traversal techniques.",
   },
