@@ -2,12 +2,15 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/oauth2"
 
 	"server/handlers/admin"
 	"server/handlers/common"
@@ -104,29 +107,59 @@ func SetupRouter(
 	r.GET("/auth/callback", func(c *gin.Context) {
 		code := c.Query("code")
 		if code == "" {
-			c.JSON(400, gin.H{"error": "Missing authorization code"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Missing authorization code"})
 			return
 		}
 
-		// Try Directory OAuth token exchange first
-		dirCfg := facultyDirectoryHandler.GetOAuthConfig()
-		token, err := dirCfg.Exchange(c.Request.Context(), code)
-		if err == nil && token != nil && token.AccessToken != "" {
-			f, err := os.Create("token.json")
-			if err == nil {
-				_ = json.NewEncoder(f).Encode(token)
-				f.Close()
+		var token *oauth2.Token
+		var err error
+
+		// Try SheetHandler OAuth config first
+		sheetCfg := handler.GetOAuthConfig()
+		if sheetCfg != nil {
+			token, err = sheetCfg.Exchange(c.Request.Context(), code)
+		}
+
+		// Fallback to Directory OAuth config if needed
+		if err != nil || token == nil || token.AccessToken == "" {
+			dirCfg := facultyDirectoryHandler.GetOAuthConfig()
+			if dirCfg != nil {
+				token, err = dirCfg.Exchange(c.Request.Context(), code)
 			}
-			go facultyDirectoryHandler.SyncGoogleDirectory()
-			c.JSON(200, gin.H{
-				"success": true,
-				"message": "Google Contacts & Directory authentication successful! Faculty Directory synced.",
+		}
+
+		if err != nil || token == nil || token.AccessToken == "" {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": fmt.Sprintf("Token exchange failed: %v", err),
 			})
 			return
 		}
 
-		// Fallback to SheetHandler callback
-		handler.HandleCallback(c)
+		// Persist token to token.json
+		if f, fErr := os.Create("token.json"); fErr == nil {
+			_ = json.NewEncoder(f).Encode(token)
+			f.Close()
+		}
+
+		// Initialize Sheets service in memory
+		sheetErr := handler.SetTokenAndInitService(token)
+
+		// Sync Faculty Directory in background
+		go facultyDirectoryHandler.SyncGoogleDirectory()
+
+		if sheetErr != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"success": true,
+				"warning": fmt.Sprintf("Token saved, but Sheets initialization returned: %v", sheetErr),
+				"message": "Authentication successful! Token saved.",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"message": "Google Sheets & Contacts authentication successful! Sheets service is active.",
+		})
 	})
 	r.POST("/auth/google", studentLookupHandler.GoogleLogin)
 	r.POST("/auth/mobile/google", studentLookupHandler.MobileGoogleLogin)

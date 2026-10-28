@@ -182,6 +182,7 @@ func (h *FacultyDirectoryHandler) GetOAuthConfig() *oauth2.Config {
 		ClientSecret: clientSecret,
 		RedirectURL:  redirectURL,
 		Scopes: []string{
+			"https://www.googleapis.com/auth/spreadsheets.readonly",
 			"https://www.googleapis.com/auth/contacts.readonly",
 			"https://www.googleapis.com/auth/contacts.other.readonly",
 			"https://www.googleapis.com/auth/directory.readonly",
@@ -223,13 +224,27 @@ func (h *FacultyDirectoryHandler) SyncGoogleDirectory() {
 	var httpClient *http.Client
 	cfg := h.GetOAuthConfig()
 
-	// Fallback to loading token.json with Bearer authorization header
-	if f, err := os.Open("token.json"); err == nil {
-		defer f.Close()
+	// Try loading token from environment first
+	envToken := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_TOKEN_JSON"))
+	if envToken == "" {
+		envToken = strings.TrimSpace(os.Getenv("TOKEN_JSON"))
+	}
+	if envToken != "" {
 		var tok oauth2.Token
-		if err := json.NewDecoder(f).Decode(&tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
-			ctx := context.Background()
-			httpClient = cfg.Client(ctx, &tok)
+		if err := json.Unmarshal([]byte(envToken), &tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
+			httpClient = cfg.Client(context.Background(), &tok)
+		}
+	}
+
+	// Fallback to loading token.json
+	if httpClient == nil {
+		if f, err := os.Open("token.json"); err == nil {
+			defer f.Close()
+			var tok oauth2.Token
+			if err := json.NewDecoder(f).Decode(&tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
+				ctx := context.Background()
+				httpClient = cfg.Client(ctx, &tok)
+			}
 		}
 	}
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -82,29 +83,74 @@ func (h *SheetHandler) InitOAuth() {
 		}
 	}
 
+	if redirectURL == "" {
+		redirectURL = "http://localhost:8080/auth/callback"
+	}
+
 	h.oauthConfig = &oauth2.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		RedirectURL:  redirectURL,
-		Scopes:       []string{sheets.SpreadsheetsReadonlyScope},
-		Endpoint:     google.Endpoint,
+		Scopes: []string{
+			sheets.SpreadsheetsReadonlyScope,
+			"https://www.googleapis.com/auth/contacts.readonly",
+			"https://www.googleapis.com/auth/contacts.other.readonly",
+			"https://www.googleapis.com/auth/directory.readonly",
+			"https://www.googleapis.com/auth/userinfo.profile",
+			"https://www.googleapis.com/auth/userinfo.email",
+		},
+		Endpoint: google.Endpoint,
 	}
 }
 
+func (h *SheetHandler) GetOAuthConfig() *oauth2.Config {
+	return h.oauthConfig
+}
+
+func (h *SheetHandler) SetTokenAndInitService(token *oauth2.Token) error {
+	h.mu.Lock()
+	h.oauthToken = token
+	h.mu.Unlock()
+	h.saveToken(token)
+	return h.createSheetsService()
+}
+
 func (h *SheetHandler) LoadSavedToken() bool {
-	f, err := os.Open("token.json")
-	if err != nil {
+	var tok oauth2.Token
+	loaded := false
+
+	// 1. Try env variable (useful for cloud platforms like Render where disks are ephemeral)
+	envToken := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_TOKEN_JSON"))
+	if envToken == "" {
+		envToken = strings.TrimSpace(os.Getenv("TOKEN_JSON"))
+	}
+	if envToken != "" {
+		if err := json.Unmarshal([]byte(envToken), &tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
+			loaded = true
+		}
+	}
+
+	// 2. Try token.json file
+	if !loaded {
+		f, err := os.Open("token.json")
+		if err == nil {
+			defer f.Close()
+			if err := json.NewDecoder(f).Decode(&tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
+				loaded = true
+			}
+		}
+	}
+
+	if !loaded {
 		return false
 	}
-	defer f.Close()
 
-	tok := &oauth2.Token{}
-	if err := json.NewDecoder(f).Decode(tok); err != nil {
-		return false
-	}
+	h.mu.Lock()
+	h.oauthToken = &tok
+	h.mu.Unlock()
 
-	h.oauthToken = tok
 	if err := h.createSheetsService(); err != nil {
+		log.Printf("⚠️ createSheetsService error from saved token: %v", err)
 		return false
 	}
 	return true
@@ -147,7 +193,10 @@ func (h *SheetHandler) getSheetsService() *sheets.Service {
 }
 
 func (h *SheetHandler) HandleLogin(c *gin.Context) {
-	url := h.oauthConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+	if h.oauthConfig == nil {
+		h.InitOAuth()
+	}
+	url := h.oauthConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
@@ -164,9 +213,7 @@ func (h *SheetHandler) HandleCallback(c *gin.Context) {
 		return
 	}
 
-	h.oauthToken = token
-	h.saveToken(token)
-	if err := h.createSheetsService(); err != nil {
+	if err := h.SetTokenAndInitService(token); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to initialize Sheets service: %v", err)})
 		return
 	}
