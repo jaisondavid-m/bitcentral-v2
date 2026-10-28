@@ -506,6 +506,12 @@ func buildSeatingData01Sep2026FNto02Sep2026AN() []studentmodels.SeatingRecord {
 	allRecords = append(allRecords, buildSeatingData24to26Oct2026Sem3AN()...)
 	allRecords = append(allRecords, buildSeatingData27to28Oct2026Sem3FN()...)
 	allRecords = append(allRecords, buildSeatingData27to28Oct2026Sem3AN()...)
+	allRecords = append(allRecords, buildSeatingData29Oct2026FN()...)
+	allRecords = append(allRecords, buildSeatingData29Oct2026AN()...)
+	allRecords = append(allRecords, buildSeatingData30Oct2026FN()...)
+	allRecords = append(allRecords, buildSeatingData30Oct2026AN()...)
+	allRecords = append(allRecords, buildSeatingData31Oct2026FN()...)
+	allRecords = append(allRecords, buildSeatingData31Oct2026AN()...)
 
 	return allRecords
 }
@@ -573,6 +579,12 @@ var sessionMetaList = []struct {
 	{buildSeatingData27to28Oct2026Sem3FN, sessionMeta{"27-10-2026", "FN", "10:45 AM – 12:15 PM", "SEM3"}},
 	{buildSeatingData27to28Oct2026Sem3AN, sessionMeta{"27-10-2026", "AN", "03:00 PM – 04:30 PM", "SEM3"}},
 	{buildSeatingData27to28Oct2026Sem3FN, sessionMeta{"28-10-2026", "FN", "10:45 AM – 12:15 PM", "SEM3"}},
+	{buildSeatingData29Oct2026FN, sessionMeta{"29-10-2026", "FN", "08:45 AM – 12:00 Noon", "SEM3"}},
+	{buildSeatingData29Oct2026AN, sessionMeta{"29-10-2026", "AN", "01:30 PM – 04:30 PM", "SEM3"}},
+	{buildSeatingData30Oct2026FN, sessionMeta{"30-10-2026", "FN", "08:45 AM – 12:00 Noon", "SEM3"}},
+	{buildSeatingData30Oct2026AN, sessionMeta{"30-10-2026", "AN", "01:30 PM – 04:30 PM", "SEM3"}},
+	{buildSeatingData31Oct2026FN, sessionMeta{"31-10-2026", "FN", "08:45 AM – 12:00 Noon", "SEM3"}},
+	{buildSeatingData31Oct2026AN, sessionMeta{"31-10-2026", "AN", "01:30 PM – 04:30 PM", "SEM3"}},
 }
 
 var courseNameMap = map[string]string{
@@ -987,10 +999,12 @@ var deptCodeNames = map[string]string{
 }
 
 func normalizeHallStr(h string) string {
+	h = strings.ReplaceAll(strings.ToUpper(h), "COMMMUNICATION", "COMMUNICATION")
 	return strings.ToUpper(strings.Join(strings.Fields(strings.TrimSpace(h)), " "))
 }
 
 func compactHallStr(h string) string {
+	h = strings.ReplaceAll(strings.ToUpper(h), "COMMMUNICATION", "COMMUNICATION")
 	return strings.ToUpper(strings.ReplaceAll(strings.TrimSpace(h), " ", ""))
 }
 
@@ -1008,6 +1022,8 @@ func normalizeDateStr(d string) string {
 func normalizeTimeStr(t string) string {
 	t = strings.ReplaceAll(t, "–", "-")
 	t = strings.ReplaceAll(t, "—", "-")
+	t = strings.ReplaceAll(t, " TO ", "-")
+	t = strings.ReplaceAll(t, " to ", "-")
 	t = strings.ReplaceAll(t, " - ", "-")
 	t = strings.ReplaceAll(t, " -", "-")
 	t = strings.ReplaceAll(t, "- ", "-")

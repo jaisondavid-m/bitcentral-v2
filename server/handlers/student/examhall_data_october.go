@@ -8367,3 +8367,366 @@ func buildSeatingData27to28Oct2026Sem3AN() []studentmodels.SeatingRecord {
 		},
 	}
 }
+
+// --- MODEL EXAMINATIONS – OCTOBER 2026 (Semester III: IT & ECE) ---
+
+func buildSeatingData29Oct2026FN() []studentmodels.SeatingRecord {
+	return []studentmodels.SeatingRecord{
+		// IT LAB 1 | 22IT302 & DATA STRUCTURES I (26 candidates)
+		{
+			HallNo:      "IT LAB 1",
+			CourseCode:  "22IT302",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376252IT102", "7376252IT127"),
+		},
+		// IT LAB 1 | 22IT302 & DATA STRUCTURES I (25 candidates)
+		{
+			HallNo:      "IT LAB 1",
+			CourseCode:  "22IT302",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376252IT128", "7376252IT152"),
+		},
+		// IT LAB 5 | 22IT304 & PRINCIPLES OF PROGRAMMING LANGUAGES (25 candidates)
+		{
+			HallNo:      "IT LAB 5",
+			CourseCode:  "22IT304",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376252IT304", "7376252IT328"),
+		},
+		// IT LAB 5 | 22IT304 & PRINCIPLES OF PROGRAMMING LANGUAGES (25 candidates)
+		{
+			HallNo:      "IT LAB 5",
+			CourseCode:  "22IT304",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: append(expandRange("7376252IT329", "7376252IT336"), expandRange("7376252IT338", "7376252IT354")...),
+		},
+		// DIGITAL ELECTRONICS LAB | 22EC303 & DIGITAL LOGIC CIRCUIT DESIGN (35 candidates)
+		{
+			HallNo:      "DIGITAL ELECTRONICS LAB",
+			CourseCode:  "22EC303",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376251EC101", "7376251EC135"),
+		},
+		// DIGITAL ELECTRONICS LAB | 22EC303 & DIGITAL LOGIC CIRCUIT DESIGN (33 candidates)
+		{
+			HallNo:      "DIGITAL ELECTRONICS LAB",
+			CourseCode:  "22EC303",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376251EC136", "7376251EC168"),
+		},
+		// ANALOG COMMUNICATION LAB | 22EC304 & ANALOG ELECTRONICS AND INTEGRATED CIRCUITS (34 candidates)
+		{
+			HallNo:      "ANALOG COMMUNICATION LAB",
+			CourseCode:  "22EC304",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: append(expandRange("7376251EC237", "7376251EC269"), "7376251EC271"),
+		},
+		// ANALOG COMMUNICATION LAB | 22EC304 & ANALOG ELECTRONICS AND INTEGRATED CIRCUITS (34 candidates)
+		{
+			HallNo:      "ANALOG COMMUNICATION LAB",
+			CourseCode:  "22EC304",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376251EC272", "7376251EC305"),
+		},
+	}
+}
+
+func buildSeatingData29Oct2026AN() []studentmodels.SeatingRecord {
+	return []studentmodels.SeatingRecord{
+		// IT LAB 1 | 22IT302 & DATA STRUCTURES I (25 candidates)
+		{
+			HallNo:      "IT LAB 1",
+			CourseCode:  "22IT302",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376252IT153", "7376252IT177"),
+		},
+		// IT LAB 1 | 22IT302 & DATA STRUCTURES I (25 candidates)
+		{
+			HallNo:      "IT LAB 1",
+			CourseCode:  "22IT302",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT178", "7376252IT202"),
+		},
+		// IT LAB 5 | 22IT304 & PRINCIPLES OF PROGRAMMING LANGUAGES (25 candidates)
+		{
+			HallNo:      "IT LAB 5",
+			CourseCode:  "22IT304",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376252IT355", "7376252IT379"),
+		},
+		// IT LAB 5 | 22IT304 & PRINCIPLES OF PROGRAMMING LANGUAGES (24 candidates)
+		{
+			HallNo:      "IT LAB 5",
+			CourseCode:  "22IT304",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376252IT380", "7376252IT388"), expandRange("7376262IT502", "7376262IT516")...),
+		},
+		// DIGITAL ELECTRONICS LAB | 22EC303 & DIGITAL LOGIC CIRCUIT DESIGN (34 candidates)
+		{
+			HallNo:      "DIGITAL ELECTRONICS LAB",
+			CourseCode:  "22EC303",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376251EC169", "7376251EC202"),
+		},
+		// DIGITAL ELECTRONICS LAB | 22EC303 & DIGITAL LOGIC CIRCUIT DESIGN (34 candidates)
+		{
+			HallNo:      "DIGITAL ELECTRONICS LAB",
+			CourseCode:  "22EC303",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC203", "7376251EC236"),
+		},
+		// ANALOG COMMUNICATION LAB | 22EC304 & ANALOG ELECTRONICS AND INTEGRATED CIRCUITS (34 candidates)
+		{
+			HallNo:      "ANALOG COMMUNICATION LAB",
+			CourseCode:  "22EC304",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376251EC306", "7376251EC339"),
+		},
+		// ANALOG COMMUNICATION LAB | 22EC304 & ANALOG ELECTRONICS AND INTEGRATED CIRCUITS (32 candidates)
+		{
+			HallNo:      "ANALOG COMMUNICATION LAB",
+			CourseCode:  "22EC304",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251EC340", "7376251EC352"), expandRange("7376261EC502", "7376261EC520")...),
+		},
+	}
+}
+
+func buildSeatingData30Oct2026FN() []studentmodels.SeatingRecord {
+	return []studentmodels.SeatingRecord{
+		// IT LAB 1 | 22IT302 & DATA STRUCTURES I (26 candidates)
+		{
+			HallNo:      "IT LAB 1",
+			CourseCode:  "22IT302",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376252IT203", "7376252IT228"),
+		},
+		// IT LAB 1 | 22IT302 & DATA STRUCTURES I (25 candidates)
+		{
+			HallNo:      "IT LAB 1",
+			CourseCode:  "22IT302",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376252IT229", "7376252IT253"),
+		},
+		// IT LAB 5 | 22IT304 & PRINCIPLES OF PROGRAMMING LANGUAGES (26 candidates)
+		{
+			HallNo:      "IT LAB 5",
+			CourseCode:  "22IT304",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376252IT102", "7376252IT127"),
+		},
+		// IT LAB 5 | 22IT304 & PRINCIPLES OF PROGRAMMING LANGUAGES (25 candidates)
+		{
+			HallNo:      "IT LAB 5",
+			CourseCode:  "22IT304",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376252IT128", "7376252IT152"),
+		},
+		// DIGITAL ELECTRONICS LAB | 22EC303 & DIGITAL LOGIC CIRCUIT DESIGN (34 candidates)
+		{
+			HallNo:      "DIGITAL ELECTRONICS LAB",
+			CourseCode:  "22EC303",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: append(expandRange("7376251EC237", "7376251EC269"), "7376251EC271"),
+		},
+		// DIGITAL ELECTRONICS LAB | 22EC303 & DIGITAL LOGIC CIRCUIT DESIGN (34 candidates)
+		{
+			HallNo:      "DIGITAL ELECTRONICS LAB",
+			CourseCode:  "22EC303",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376251EC272", "7376251EC305"),
+		},
+		// ANALOG COMMUNICATION LAB | 22EC304 & ANALOG ELECTRONICS AND INTEGRATED CIRCUITS (34 candidates)
+		{
+			HallNo:      "ANALOG COMMUNICATION LAB",
+			CourseCode:  "22EC304",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376251EC101", "7376251EC134"),
+		},
+		// ANALOG COMMUNICATION LAB | 22EC304 & ANALOG ELECTRONICS AND INTEGRATED CIRCUITS (34 candidates)
+		{
+			HallNo:      "ANALOG COMMUNICATION LAB",
+			CourseCode:  "22EC304",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376251EC135", "7376251EC168"),
+		},
+	}
+}
+
+func buildSeatingData30Oct2026AN() []studentmodels.SeatingRecord {
+	return []studentmodels.SeatingRecord{
+		// IT LAB 1 | 22IT302 & DATA STRUCTURES I (25 candidates)
+		{
+			HallNo:      "IT LAB 1",
+			CourseCode:  "22IT302",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376252IT254", "7376252IT278"),
+		},
+		// IT LAB 1 | 22IT302 & DATA STRUCTURES I (25 candidates)
+		{
+			HallNo:      "IT LAB 1",
+			CourseCode:  "22IT302",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT279", "7376252IT303"),
+		},
+		// IT LAB 5 | 22IT304 & PRINCIPLES OF PROGRAMMING LANGUAGES (25 candidates)
+		{
+			HallNo:      "IT LAB 5",
+			CourseCode:  "22IT304",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376252IT153", "7376252IT177"),
+		},
+		// IT LAB 5 | 22IT304 & PRINCIPLES OF PROGRAMMING LANGUAGES (25 candidates)
+		{
+			HallNo:      "IT LAB 5",
+			CourseCode:  "22IT304",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT178", "7376252IT202"),
+		},
+		// DIGITAL ELECTRONICS LAB | 22EC303 & DIGITAL LOGIC CIRCUIT DESIGN (34 candidates)
+		{
+			HallNo:      "DIGITAL ELECTRONICS LAB",
+			CourseCode:  "22EC303",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376251EC306", "7376251EC339"),
+		},
+		// DIGITAL ELECTRONICS LAB | 22EC303 & DIGITAL LOGIC CIRCUIT DESIGN (32 candidates)
+		{
+			HallNo:      "DIGITAL ELECTRONICS LAB",
+			CourseCode:  "22EC303",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251EC340", "7376251EC352"), expandRange("7376261EC502", "7376261EC520")...),
+		},
+		// ANALOG COMMUNICATION LAB | 22EC304 & ANALOG ELECTRONICS AND INTEGRATED CIRCUITS (34 candidates)
+		{
+			HallNo:      "ANALOG COMMUNICATION LAB",
+			CourseCode:  "22EC304",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376251EC169", "7376251EC202"),
+		},
+		// ANALOG COMMUNICATION LAB | 22EC304 & ANALOG ELECTRONICS AND INTEGRATED CIRCUITS (34 candidates)
+		{
+			HallNo:      "ANALOG COMMUNICATION LAB",
+			CourseCode:  "22EC304",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251EC203", "7376251EC236"),
+		},
+	}
+}
+
+func buildSeatingData31Oct2026FN() []studentmodels.SeatingRecord {
+	return []studentmodels.SeatingRecord{
+		// IT LAB 1 | 22IT302 & DATA STRUCTURES I (25 candidates)
+		{
+			HallNo:      "IT LAB 1",
+			CourseCode:  "22IT302",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376252IT304", "7376252IT328"),
+		},
+		// IT LAB 1 | 22IT302 & DATA STRUCTURES I (25 candidates)
+		{
+			HallNo:      "IT LAB 1",
+			CourseCode:  "22IT302",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: append(expandRange("7376252IT329", "7376252IT336"), expandRange("7376252IT338", "7376252IT354")...),
+		},
+		// IT LAB 5 | 22IT304 & PRINCIPLES OF PROGRAMMING LANGUAGES (26 candidates)
+		{
+			HallNo:      "IT LAB 5",
+			CourseCode:  "22IT304",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376252IT203", "7376252IT228"),
+		},
+		// IT LAB 5 | 22IT304 & PRINCIPLES OF PROGRAMMING LANGUAGES (25 candidates)
+		{
+			HallNo:      "IT LAB 5",
+			CourseCode:  "22IT304",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376252IT229", "7376252IT253"),
+		},
+		// Communication Protocol Lab 1 | 22EC305 & DATA STRUCTURES AND ALGORITHMS (40 candidates)
+		{
+			HallNo:      "Communication Protocol Lab 1",
+			CourseCode:  "22EC305",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376251EC101", "7376251EC140"),
+		},
+		// Communication Protocol Lab 1 | 22EC305 & DATA STRUCTURES AND ALGORITHMS (40 candidates)
+		{
+			HallNo:      "Communication Protocol Lab 1",
+			CourseCode:  "22EC305",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376251EC221", "7376251EC260"),
+		},
+		// Communication Protocol Lab 2 | 22EC305 & DATA STRUCTURES AND ALGORITHMS (40 candidates)
+		{
+			HallNo:      "Communication Protocol Lab 2",
+			CourseCode:  "22EC305",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376251EC141", "7376251EC180"),
+		},
+		// Communication Protocol Lab 2 | 22EC305 & DATA STRUCTURES AND ALGORITHMS (40 candidates)
+		{
+			HallNo:      "Communication Protocol Lab 2",
+			CourseCode:  "22EC305",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: append(expandRange("7376251EC261", "7376251EC269"), expandRange("7376251EC271", "7376251EC301")...),
+		},
+		// Communication Protocol Lab 3 | 22EC305 & DATA STRUCTURES AND ALGORITHMS (40 candidates)
+		{
+			HallNo:      "Communication Protocol Lab 3",
+			CourseCode:  "22EC305",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376251EC181", "7376251EC220"),
+		},
+		// Communication Protocol Lab 3 | 22EC305 & DATA STRUCTURES AND ALGORITHMS (40 candidates)
+		{
+			HallNo:      "Communication Protocol Lab 3",
+			CourseCode:  "22EC305",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376251EC302", "7376251EC341"),
+		},
+	}
+}
+
+func buildSeatingData31Oct2026AN() []studentmodels.SeatingRecord {
+	return []studentmodels.SeatingRecord{
+		// IT LAB 1 | 22IT302 & DATA STRUCTURES I (25 candidates)
+		{
+			HallNo:      "IT LAB 1",
+			CourseCode:  "22IT302",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376252IT355", "7376252IT379"),
+		},
+		// IT LAB 1 | 22IT302 & DATA STRUCTURES I (24 candidates)
+		{
+			HallNo:      "IT LAB 1",
+			CourseCode:  "22IT302",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376252IT380", "7376252IT388"), expandRange("7376262IT502", "7376262IT516")...),
+		},
+		// IT LAB 5 | 22IT304 & PRINCIPLES OF PROGRAMMING LANGUAGES (25 candidates)
+		{
+			HallNo:      "IT LAB 5",
+			CourseCode:  "22IT304",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376252IT254", "7376252IT278"),
+		},
+		// IT LAB 5 | 22IT304 & PRINCIPLES OF PROGRAMMING LANGUAGES (25 candidates)
+		{
+			HallNo:      "IT LAB 5",
+			CourseCode:  "22IT304",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376252IT279", "7376252IT303"),
+		},
+		// Communication Protocol Lab 1 | 22EC305 & DATA STRUCTURES AND ALGORITHMS (30 candidates)
+		{
+			HallNo:      "Communication Protocol Lab 1",
+			CourseCode:  "22EC305",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: append(expandRange("7376251EC342", "7376251EC352"), expandRange("7376261EC502", "7376261EC520")...),
+		},
+	}
+}
+
+

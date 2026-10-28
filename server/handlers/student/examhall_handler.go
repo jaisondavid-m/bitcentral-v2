@@ -73,6 +73,8 @@ func hallBlock(hallNo string) *string {
 		label = "-"
 	case strings.HasPrefix(upper, "IT"):
 		label = "-"
+	case strings.HasPrefix(upper, "DIGITAL") || strings.HasPrefix(upper, "ANALOG") || strings.HasPrefix(upper, "COMMUNICATION") || strings.HasPrefix(upper, "COMMM"):
+		label = "-"
 	case strings.HasPrefix(upper, "AI BASED"):
 		label = "AS Block"
 	case strings.HasPrefix(upper, "LATHE"):
