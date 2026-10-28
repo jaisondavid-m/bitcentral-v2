@@ -8368,7 +8368,7 @@ func buildSeatingData27to28Oct2026Sem3AN() []studentmodels.SeatingRecord {
 	}
 }
 
-// --- MODEL EXAMINATIONS – OCTOBER 2026 (Semester III: AIML, CSE, IT & ECE) ---
+// --- MODEL EXAMINATIONS – OCTOBER 2026 (Semester III: AD, AIML, CSE, IT & ECE) ---
 
 func buildSeatingData29Oct2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -8573,6 +8573,41 @@ func buildSeatingData29Oct2026AN() []studentmodels.SeatingRecord {
 			Time:        "03:00 PM – 04:30 PM",
 			RegisterNos: expandRange("7376251CS405", "7376251CS437"),
 		},
+		// CC LAB 20 | 22AI302 & DATA STRUCTURES I (60 candidates)
+		{
+			HallNo:      "CC LAB 20",
+			CourseCode:  "22AI302",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376252AD101", "7376252AD160"),
+		},
+		// CC LAB 21 | 22AI302 & DATA STRUCTURES I (60 candidates)
+		{
+			HallNo:      "CC LAB 21",
+			CourseCode:  "22AI302",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376252AD161", "7376252AD220"),
+		},
+		// CC LAB 22 | 22AI302 & DATA STRUCTURES I (60 candidates)
+		{
+			HallNo:      "CC LAB 22",
+			CourseCode:  "22AI302",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376252AD221", "7376252AD280"),
+		},
+		// CC LAB 23 | 22AI302 & DATA STRUCTURES I (60 candidates)
+		{
+			HallNo:      "CC LAB 23",
+			CourseCode:  "22AI302",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376252AD281", "7376252AD340"),
+		},
+		// CC LAB 25 | 22AI302 & DATA STRUCTURES I (63 candidates)
+		{
+			HallNo:      "CC LAB 25",
+			CourseCode:  "22AI302",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: append(expandRange("7376252AD341", "7376252AD381"), expandRange("7376262AD501", "7376262AD522")...),
+		},
 	}
 }
 
@@ -8647,6 +8682,41 @@ func buildSeatingData30Oct2026FN() []studentmodels.SeatingRecord {
 			CourseCode:  "22AM302",
 			Time:        "10:30 AM – 12:00 Noon",
 			RegisterNos: expandRange("7376252AL153", "7376252AL204"),
+		},
+		// CC LAB 20 | 22AI304 & PRINCIPLES OF PROGRAMMING LANGUAGES (60 candidates)
+		{
+			HallNo:      "CC LAB 20",
+			CourseCode:  "22AI304",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376252AD101", "7376252AD160"),
+		},
+		// CC LAB 21 | 22AI304 & PRINCIPLES OF PROGRAMMING LANGUAGES (60 candidates)
+		{
+			HallNo:      "CC LAB 21",
+			CourseCode:  "22AI304",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376252AD161", "7376252AD220"),
+		},
+		// CC LAB 22 | 22AI304 & PRINCIPLES OF PROGRAMMING LANGUAGES (60 candidates)
+		{
+			HallNo:      "CC LAB 22",
+			CourseCode:  "22AI304",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376252AD221", "7376252AD280"),
+		},
+		// CC LAB 23 | 22AI304 & PRINCIPLES OF PROGRAMMING LANGUAGES (60 candidates)
+		{
+			HallNo:      "CC LAB 23",
+			CourseCode:  "22AI304",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376252AD281", "7376252AD340"),
+		},
+		// CC LAB 25 | 22AI304 & PRINCIPLES OF PROGRAMMING LANGUAGES (63 candidates)
+		{
+			HallNo:      "CC LAB 25",
+			CourseCode:  "22AI304",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: append(expandRange("7376252AD341", "7376252AD381"), expandRange("7376262AD501", "7376262AD522")...),
 		},
 	}
 }
