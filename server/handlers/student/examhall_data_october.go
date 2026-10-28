@@ -8368,7 +8368,7 @@ func buildSeatingData27to28Oct2026Sem3AN() []studentmodels.SeatingRecord {
 	}
 }
 
-// --- MODEL EXAMINATIONS – OCTOBER 2026 (Semester III: IT & ECE) ---
+// --- MODEL EXAMINATIONS – OCTOBER 2026 (Semester III: CSE, IT & ECE) ---
 
 func buildSeatingData29Oct2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -8427,6 +8427,48 @@ func buildSeatingData29Oct2026FN() []studentmodels.SeatingRecord {
 			CourseCode:  "22EC304",
 			Time:        "10:30 AM – 12:00 Noon",
 			RegisterNos: expandRange("7376251EC272", "7376251EC305"),
+		},
+		// AIML LAB 1 / COMPUTER LAB 12 | 22CS302 & DATA STRUCTURES I (34 candidates)
+		{
+			HallNo:      "AIML LAB 1 / COMPUTER LAB 12",
+			CourseCode:  "22CS302",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376251CS136", "7376251CS170"),
+		},
+		// AIML LAB 1 / COMPUTER LAB 12 | 22CS302 & DATA STRUCTURES I (33 candidates)
+		{
+			HallNo:      "AIML LAB 1 / COMPUTER LAB 12",
+			CourseCode:  "22CS302",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376251CS239", "7376251CS271"),
+		},
+		// AIML LAB 6 / COMPUTER LAB 17 | 22CS302 & DATA STRUCTURES I (34 candidates)
+		{
+			HallNo:      "AIML LAB 6 / COMPUTER LAB 17",
+			CourseCode:  "22CS302",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376251CS171", "7376251CS204"),
+		},
+		// AIML LAB 6 / COMPUTER LAB 17 | 22CS302 & DATA STRUCTURES I (33 candidates)
+		{
+			HallNo:      "AIML LAB 6 / COMPUTER LAB 17",
+			CourseCode:  "22CS302",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376251CS272", "7376251CS304"),
+		},
+		// CSE LAB 5 / COMPUTER LAB 11 | 22CS302 & DATA STRUCTURES I (34 candidates)
+		{
+			HallNo:      "CSE LAB 5 / COMPUTER LAB 11",
+			CourseCode:  "22CS302",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: append(expandRange("7376251CS101", "7376251CS128"), expandRange("7376251CS130", "7376251CS135")...),
+		},
+		// CSE LAB 5 / COMPUTER LAB 11 | 22CS302 & DATA STRUCTURES I (33 candidates)
+		{
+			HallNo:      "CSE LAB 5 / COMPUTER LAB 11",
+			CourseCode:  "22CS302",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376251CS205", "7376251CS238"),
 		},
 	}
 }
@@ -8488,6 +8530,48 @@ func buildSeatingData29Oct2026AN() []studentmodels.SeatingRecord {
 			CourseCode:  "22EC304",
 			Time:        "03:00 PM – 04:30 PM",
 			RegisterNos: append(expandRange("7376251EC340", "7376251EC352"), expandRange("7376261EC502", "7376261EC520")...),
+		},
+		// AIML LAB 1 / COMPUTER LAB 12 | 22CS302 & DATA STRUCTURES I (33 candidates)
+		{
+			HallNo:      "AIML LAB 1 / COMPUTER LAB 12",
+			CourseCode:  "22CS302",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376251CS338", "7376251CS370"),
+		},
+		// AIML LAB 1 / COMPUTER LAB 12 | 22CS302 & DATA STRUCTURES I (33 candidates)
+		{
+			HallNo:      "AIML LAB 1 / COMPUTER LAB 12",
+			CourseCode:  "22CS302",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS438", "7376251CS470"),
+		},
+		// AIML LAB 6 / COMPUTER LAB 17 | 22CS302 & DATA STRUCTURES I (33 candidates)
+		{
+			HallNo:      "AIML LAB 6 / COMPUTER LAB 17",
+			CourseCode:  "22CS302",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376251CS371", "7376251CS404"),
+		},
+		// AIML LAB 6 / COMPUTER LAB 17 | 22CS302 & DATA STRUCTURES I (32 candidates)
+		{
+			HallNo:      "AIML LAB 6 / COMPUTER LAB 17",
+			CourseCode:  "22CS302",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251CS471", "7376251CS479"), expandRange("7376261CS501", "7376261CS524")...),
+		},
+		// CSE LAB 5 / COMPUTER LAB 11 | 22CS302 & DATA STRUCTURES I (33 candidates)
+		{
+			HallNo:      "CSE LAB 5 / COMPUTER LAB 11",
+			CourseCode:  "22CS302",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376251CS305", "7376251CS337"),
+		},
+		// CSE LAB 5 / COMPUTER LAB 11 | 22CS302 & DATA STRUCTURES I (33 candidates)
+		{
+			HallNo:      "CSE LAB 5 / COMPUTER LAB 11",
+			CourseCode:  "22CS302",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS405", "7376251CS437"),
 		},
 	}
 }
@@ -8686,6 +8770,48 @@ func buildSeatingData31Oct2026FN() []studentmodels.SeatingRecord {
 			Time:        "10:30 AM – 12:00 Noon",
 			RegisterNos: expandRange("7376251EC302", "7376251EC341"),
 		},
+		// AIML LAB 1 / COMPUTER LAB 12 | 22CS304 & PRINCIPLES OF PROGRAMMING LANGUAGES (34 candidates)
+		{
+			HallNo:      "AIML LAB 1 / COMPUTER LAB 12",
+			CourseCode:  "22CS304",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376251CS136", "7376251CS170"),
+		},
+		// AIML LAB 1 / COMPUTER LAB 12 | 22CS304 & PRINCIPLES OF PROGRAMMING LANGUAGES (33 candidates)
+		{
+			HallNo:      "AIML LAB 1 / COMPUTER LAB 12",
+			CourseCode:  "22CS304",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376251CS239", "7376251CS271"),
+		},
+		// AIML LAB 6 / COMPUTER LAB 17 | 22CS304 & PRINCIPLES OF PROGRAMMING LANGUAGES (34 candidates)
+		{
+			HallNo:      "AIML LAB 6 / COMPUTER LAB 17",
+			CourseCode:  "22CS304",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376251CS171", "7376251CS204"),
+		},
+		// AIML LAB 6 / COMPUTER LAB 17 | 22CS304 & PRINCIPLES OF PROGRAMMING LANGUAGES (33 candidates)
+		{
+			HallNo:      "AIML LAB 6 / COMPUTER LAB 17",
+			CourseCode:  "22CS304",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376251CS272", "7376251CS304"),
+		},
+		// CSE LAB 5 / COMPUTER LAB 11 | 22CS304 & PRINCIPLES OF PROGRAMMING LANGUAGES (34 candidates)
+		{
+			HallNo:      "CSE LAB 5 / COMPUTER LAB 11",
+			CourseCode:  "22CS304",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: append(expandRange("7376251CS101", "7376251CS128"), expandRange("7376251CS130", "7376251CS135")...),
+		},
+		// CSE LAB 5 / COMPUTER LAB 11 | 22CS304 & PRINCIPLES OF PROGRAMMING LANGUAGES (33 candidates)
+		{
+			HallNo:      "CSE LAB 5 / COMPUTER LAB 11",
+			CourseCode:  "22CS304",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376251CS205", "7376251CS238"),
+		},
 	}
 }
 
@@ -8725,6 +8851,48 @@ func buildSeatingData31Oct2026AN() []studentmodels.SeatingRecord {
 			CourseCode:  "22EC305",
 			Time:        "01:30 PM – 03:00 PM",
 			RegisterNos: append(expandRange("7376251EC342", "7376251EC352"), expandRange("7376261EC502", "7376261EC520")...),
+		},
+		// AIML LAB 1 / COMPUTER LAB 12 | 22CS304 & PRINCIPLES OF PROGRAMMING LANGUAGES (33 candidates)
+		{
+			HallNo:      "AIML LAB 1 / COMPUTER LAB 12",
+			CourseCode:  "22CS304",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376251CS338", "7376251CS370"),
+		},
+		// AIML LAB 1 / COMPUTER LAB 12 | 22CS304 & PRINCIPLES OF PROGRAMMING LANGUAGES (32 candidates)
+		{
+			HallNo:      "AIML LAB 1 / COMPUTER LAB 12",
+			CourseCode:  "22CS304",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS438", "7376251CS469"),
+		},
+		// AIML LAB 6 / COMPUTER LAB 17 | 22CS304 & PRINCIPLES OF PROGRAMMING LANGUAGES (33 candidates)
+		{
+			HallNo:      "AIML LAB 6 / COMPUTER LAB 17",
+			CourseCode:  "22CS304",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376251CS371", "7376251CS404"),
+		},
+		// AIML LAB 6 / COMPUTER LAB 17 | 22CS304 & PRINCIPLES OF PROGRAMMING LANGUAGES (33 candidates)
+		{
+			HallNo:      "AIML LAB 6 / COMPUTER LAB 17",
+			CourseCode:  "22CS304",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: append(expandRange("7376251CS470", "7376251CS479"), expandRange("7376261CS501", "7376261CS524")...),
+		},
+		// CSE LAB 5 / COMPUTER LAB 11 | 22CS304 & PRINCIPLES OF PROGRAMMING LANGUAGES (33 candidates)
+		{
+			HallNo:      "CSE LAB 5 / COMPUTER LAB 11",
+			CourseCode:  "22CS304",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376251CS305", "7376251CS337"),
+		},
+		// CSE LAB 5 / COMPUTER LAB 11 | 22CS304 & PRINCIPLES OF PROGRAMMING LANGUAGES (33 candidates)
+		{
+			HallNo:      "CSE LAB 5 / COMPUTER LAB 11",
+			CourseCode:  "22CS304",
+			Time:        "03:00 PM – 04:30 PM",
+			RegisterNos: expandRange("7376251CS405", "7376251CS437"),
 		},
 	}
 }
