@@ -110,14 +110,7 @@ export default function NotificationBell({ className = "" }) {
     }
   }, []);
 
-  // Polling every 60s
-  useEffect(() => {
-    fetchNotifs();
-    const interval = setInterval(() => {
-      fetchNotifs(true);
-    }, 60000);
-    return () => clearInterval(interval);
-  }, [fetchNotifs]);
+  // Only fetch when the user explicitly clicks the bell button (no automatic mount fetch or 60s interval)
 
   // Handle click outside & escape key to close
   useEffect(() => {
@@ -204,8 +197,11 @@ export default function NotificationBell({ className = "" }) {
       <button
         type="button"
         onClick={() => {
-          setIsOpen((prev) => !prev);
-          if (!isOpen) fetchNotifs(true);
+          setIsOpen((prev) => {
+            const next = !prev;
+            if (next) fetchNotifs(false);
+            return next;
+          });
         }}
         className="relative flex items-center justify-center h-9 w-9 rounded-full border border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/40 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/40"
         aria-label="Open notifications"
@@ -261,6 +257,15 @@ export default function NotificationBell({ className = "" }) {
                 </div>
 
                 <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => fetchNotifs(false)}
+                    disabled={loading}
+                    className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-500 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+                    title="Refresh notifications"
+                  >
+                    <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-blue-500" : ""}`} />
+                  </button>
                   {unreadCount > 0 && (
                     <button
                       onClick={handleMarkAllAsRead}
