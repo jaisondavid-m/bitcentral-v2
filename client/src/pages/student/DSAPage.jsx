@@ -99,7 +99,7 @@ export default function DSAPage() {
                   DSA Lab Experiments
                 </h1>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 sm:text-xs truncate">
-                  22CS302 Data Structures-I • Exp {currentIndex + 1} of {dsaExperiments.length}
+                  Data Structures-I • Exp {currentIndex + 1} of {dsaExperiments.length}
                 </p>
               </div>
             </div>
@@ -318,24 +318,8 @@ export default function DSAPage() {
                 </button>
               </div>
 
-              {/* Code Box Container: Light theme with horizontal scroll to preserve straight Python lines */}
+              {/* Code Box Container: Clean light theme with horizontal scroll to preserve straight Python lines */}
               <div className="w-full max-w-full min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/60 shadow-sm">
-                {/* Window Top Bar */}
-                <div className="flex items-center justify-between border-b border-slate-200 bg-slate-100/90 px-3 py-2 text-xs text-slate-600 dark:border-slate-800 dark:bg-slate-800/80 dark:text-slate-300 min-w-0">
-                  <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f56] border border-[#e0443e]/30 shrink-0" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e] border border-[#dea123]/30 shrink-0" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#27c93f] border border-[#1aab29]/30 shrink-0" />
-                    <span className="ml-2 font-mono text-[11px] sm:text-xs font-semibold text-slate-700 dark:text-slate-200 truncate">
-                      {currentExp.filename}
-                    </span>
-                  </div>
-                  <span className="font-mono text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 shrink-0 ml-2">
-                    Python 3
-                  </span>
-                </div>
-
-                {/* Code Body: Preserved straight lines, horizontal scroll inside code box, no line numbers */}
                 <div className="w-full max-w-full overflow-x-auto p-3 sm:p-4 text-slate-800 dark:text-slate-100 overscroll-x-contain touch-pan-x">
                   <pre className="whitespace-pre font-mono text-xs sm:text-[13px] leading-relaxed w-max min-w-full">
                     <code>{currentExp.code}</code>

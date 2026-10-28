@@ -1,5 +1,5 @@
 export const dsaCourseInfo = {
-  courseCode: "22CS302",
+  courseCode: "",
   courseName: "DATA STRUCTURES-I",
   department: "Department of Computer Science and Engineering",
   institution: "Bannari Amman Institute of Technology",

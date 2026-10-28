@@ -147,8 +147,22 @@ export const ROUTE_SEO = {
 
   "/dsa": {
     title: "DSA Lab Experiments - BIT Central",
-    description: "Protected Data Structures & Algorithms lab repository for BIT Sathy students with complete Python programs and interactive simulators.",
+    description: "Protected Data Structures & Algorithms lab repository for BIT Sathy students with complete Python programs and verified manual records.",
     keywords: ["DSA lab", "Data Structures", "Python DSA"],
+    noIndex: true,
+  },
+
+  "/ppl": {
+    title: "PPL Lab Experiments - BIT Central",
+    description: "Protected Principles of Programming Laboratory repository for BIT Sathy AI & ML students with complete Python programs and record procedures.",
+    keywords: ["PPL lab", "Principles of Programming", "Python PPL"],
+    noIndex: true,
+  },
+
+  "/records-manual": {
+    title: "Lab Records & Manuals - BIT Central",
+    description: "Protected academic lab manuals and record repositories for BIT Sathy students including DSA and PPL.",
+    keywords: ["Lab manual", "DSA manual", "PPL manual", "BIT Sathy lab records"],
     noIndex: true,
   },
 

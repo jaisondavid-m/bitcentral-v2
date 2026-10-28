@@ -40,6 +40,8 @@ const WifiDetails = lazyWithRetry(() => import("@/pages/student/WifiDetails.jsx"
 const FacultyDirectory = lazyWithRetry(() => import("@/pages/student/FacultyDirectory.jsx"));
 const PSConnect = lazyWithRetry(() => import("@/pages/student/PSConnect.jsx"));
 const DSAPage = lazyWithRetry(() => import("@/pages/student/DSAPage.jsx"));
+const PPLPage = lazyWithRetry(() => import("@/pages/student/PPLPage.jsx"));
+const RecordsManual = lazyWithRetry(() => import("@/pages/student/RecordsManual.jsx"));
 
 // const DocsPage = lazyWithRetry(() => import("@/pages/public/AboutDocs.jsx"));
 const AuthScope = lazyWithRetry(() => import("../routes/AuthScope.jsx"));
@@ -345,6 +347,8 @@ function App() {
               <Route path="/semester" element={<Semester />} />
               <Route path="/mess" element={<MessMenu />} />
               <Route path="/dsa" element={<DSAPage />} />
+              <Route path="/ppl" element={<PPLPage />} />
+              <Route path="/records-manual" element={<RecordsManual />} />
               <Route path="/support-dev" element={<SupportDev />} />
               <Route path="/ps-connect" element={<PSConnect />} />
               <Route path="/payment-successful" element={<PaymentSuccessful />} />
