@@ -60,10 +60,32 @@ func NewSheetHandler() *SheetHandler {
 }
 
 func (h *SheetHandler) InitOAuth() {
+	clientID := strings.TrimSpace(os.Getenv("CLIENT_ID"))
+	if clientID == "" {
+		clientID = strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_ID"))
+	}
+	clientSecret := strings.TrimSpace(os.Getenv("CLIENT_SECRET"))
+	if clientSecret == "" {
+		clientSecret = strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_SECRET"))
+	}
+	redirectURL := strings.TrimSpace(os.Getenv("REDIRECT_URL"))
+	if redirectURL == "" {
+		redirectURL = strings.TrimSpace(os.Getenv("GOOGLE_CONTACTS_REDIRECT_URI"))
+	}
+	if redirectURL == "" {
+		redirectURL = strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_REDIRECT_URI"))
+	}
+	if redirectURL == "" {
+		redirectURIS := strings.Split(os.Getenv("GOOGLE_OAUTH_REDIRECT_URIS"), ",")
+		if len(redirectURIS) > 0 && strings.TrimSpace(redirectURIS[0]) != "" {
+			redirectURL = strings.TrimSpace(redirectURIS[0])
+		}
+	}
+
 	h.oauthConfig = &oauth2.Config{
-		ClientID:     os.Getenv("CLIENT_ID"),
-		ClientSecret: os.Getenv("CLIENT_SECRET"),
-		RedirectURL:  os.Getenv("REDIRECT_URL"),
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		RedirectURL:  redirectURL,
 		Scopes:       []string{sheets.SpreadsheetsReadonlyScope},
 		Endpoint:     google.Endpoint,
 	}
