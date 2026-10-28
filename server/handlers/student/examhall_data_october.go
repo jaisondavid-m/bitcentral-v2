@@ -8368,7 +8368,7 @@ func buildSeatingData27to28Oct2026Sem3AN() []studentmodels.SeatingRecord {
 	}
 }
 
-// --- MODEL EXAMINATIONS – OCTOBER 2026 (Semester III: CSE, IT & ECE) ---
+// --- MODEL EXAMINATIONS – OCTOBER 2026 (Semester III: AIML, CSE, IT & ECE) ---
 
 func buildSeatingData29Oct2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -8634,6 +8634,20 @@ func buildSeatingData30Oct2026FN() []studentmodels.SeatingRecord {
 			Time:        "10:30 AM – 12:00 Noon",
 			RegisterNos: expandRange("7376251EC135", "7376251EC168"),
 		},
+		// AIML LAB 2 (CC LAB 13) | 22AM302 & DATA STRUCTURES I (65 candidates)
+		{
+			HallNo:      "AIML LAB 2 (CC LAB 13)",
+			CourseCode:  "22AM302",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: append(append(expandRange("7376252AL101", "7376252AL152"), expandRange("7376252AL243", "7376252AL246")...), expandRange("7376262AL501", "7376262AL509")...),
+		},
+		// AIML LAB 2 (CC LAB 13) | 22AM302 & DATA STRUCTURES I (52 candidates)
+		{
+			HallNo:      "AIML LAB 2 (CC LAB 13)",
+			CourseCode:  "22AM302",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376252AL153", "7376252AL204"),
+		},
 	}
 }
 
@@ -8694,6 +8708,13 @@ func buildSeatingData30Oct2026AN() []studentmodels.SeatingRecord {
 			CourseCode:  "22EC304",
 			Time:        "03:00 PM – 04:30 PM",
 			RegisterNos: expandRange("7376251EC203", "7376251EC236"),
+		},
+		// AIML LAB 2 (CC LAB 13) | 22AM302 & DATA STRUCTURES I (38 candidates)
+		{
+			HallNo:      "AIML LAB 2 (CC LAB 13)",
+			CourseCode:  "22AM302",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: expandRange("7376252AL205", "7376252AL242"),
 		},
 	}
 }
@@ -8812,6 +8833,20 @@ func buildSeatingData31Oct2026FN() []studentmodels.SeatingRecord {
 			Time:        "10:30 AM – 12:00 Noon",
 			RegisterNos: expandRange("7376251CS205", "7376251CS238"),
 		},
+		// AIML LAB 2 (CC LAB 13) | 22AM304 & PRINCIPLES OF PROGRAMMING LANGUAGES (52 candidates)
+		{
+			HallNo:      "AIML LAB 2 (CC LAB 13)",
+			CourseCode:  "22AM304",
+			Time:        "08:45 AM – 10:15 AM",
+			RegisterNos: expandRange("7376252AL101", "7376252AL152"),
+		},
+		// AIML LAB 2 (CC LAB 13) | 22AM304 & PRINCIPLES OF PROGRAMMING LANGUAGES (52 candidates)
+		{
+			HallNo:      "AIML LAB 2 (CC LAB 13)",
+			CourseCode:  "22AM304",
+			Time:        "10:30 AM – 12:00 Noon",
+			RegisterNos: expandRange("7376252AL153", "7376252AL204"),
+		},
 	}
 }
 
@@ -8893,6 +8928,13 @@ func buildSeatingData31Oct2026AN() []studentmodels.SeatingRecord {
 			CourseCode:  "22CS304",
 			Time:        "03:00 PM – 04:30 PM",
 			RegisterNos: expandRange("7376251CS405", "7376251CS437"),
+		},
+		// AIML LAB 2 (CC LAB 13) | 22AM304 & PRINCIPLES OF PROGRAMMING LANGUAGES (51 candidates)
+		{
+			HallNo:      "AIML LAB 2 (CC LAB 13)",
+			CourseCode:  "22AM304",
+			Time:        "01:30 PM – 03:00 PM",
+			RegisterNos: append(expandRange("7376252AL205", "7376252AL246"), expandRange("7376262AL501", "7376262AL509")...),
 		},
 	}
 }
