@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -122,10 +123,20 @@ func isParentEmail(email string) bool {
 	return strings.Contains(lower, "parent") || strings.Contains(lower, "parents") || strings.HasSuffix(lower, "@parents.bitsathy.ac.in")
 }
 
+var studentEmailPattern = regexp.MustCompile(`\.[a-z]{2,4}[0-9]{2}@`)
+
+func isStudentEmail(email string) bool {
+	return studentEmailPattern.MatchString(strings.ToLower(strings.TrimSpace(email)))
+}
+
 func isValidFacultyRecord(email, phone string) bool {
 	cleanEmail := strings.ToLower(strings.TrimSpace(email))
 
 	if cleanEmail == "" {
+		return false
+	}
+
+	if isStudentEmail(cleanEmail) {
 		return false
 	}
 
@@ -216,6 +227,7 @@ func (h *FacultyDirectoryHandler) SyncGoogleDirectory() {
 			WHERE LOWER(email) LIKE '%gmail.com' 
 			   OR LOWER(email) LIKE '%parent%' 
 			   OR LOWER(email) LIKE '%parents%'
+			   OR LOWER(email) REGEXP '\\.[a-z]{2,4}[0-9]{2}@'
 			   OR (LOWER(email) NOT LIKE '%bitsathy.ac.in' AND LOWER(email) NOT LIKE '%bitsathy.in');
 		`)
 		if err == nil {
@@ -577,6 +589,7 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 	whereClause := `WHERE LOWER(email) NOT LIKE '%gmail.com' 
 		AND LOWER(email) NOT LIKE '%parent%' 
 		AND LOWER(email) NOT LIKE '%parents%'
+		AND LOWER(email) NOT REGEXP '\\.[a-z]{2,4}[0-9]{2}@'
 		AND (LOWER(email) LIKE '%bitsathy.ac.in' OR LOWER(email) LIKE '%bitsathy.in')`
 	var args []interface{}
 
@@ -613,6 +626,7 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 		WHERE LOWER(email) NOT LIKE '%gmail.com' 
 			AND LOWER(email) NOT LIKE '%parent%' 
 			AND LOWER(email) NOT LIKE '%parents%'
+			AND LOWER(email) NOT REGEXP '\\.[a-z]{2,4}[0-9]{2}@'
 			AND (LOWER(email) LIKE '%bitsathy.ac.in' OR LOWER(email) LIKE '%bitsathy.in')
 		GROUP BY dept_name
 		ORDER BY dept_name ASC
