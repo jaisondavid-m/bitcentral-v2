@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -135,13 +134,12 @@ func SetupRouter(
 			return
 		}
 
-		// Persist token to token.json
-		if f, fErr := os.Create("token.json"); fErr == nil {
-			_ = json.NewEncoder(f).Encode(token)
-			f.Close()
+		// If Google didn't return a refresh_token in this exchange, keep existing one
+		if token.RefreshToken == "" && handler.GetOAuthToken() != nil && handler.GetOAuthToken().RefreshToken != "" {
+			token.RefreshToken = handler.GetOAuthToken().RefreshToken
 		}
 
-		// Initialize Sheets service in memory
+		// Initialize Sheets service in memory & persist to MySQL and token.json
 		sheetErr := handler.SetTokenAndInitService(token)
 
 		// Sync Faculty Directory in background

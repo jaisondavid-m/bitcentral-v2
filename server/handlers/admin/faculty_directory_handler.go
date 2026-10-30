@@ -195,7 +195,11 @@ func (h *FacultyDirectoryHandler) GetOAuthConfig() *oauth2.Config {
 
 func (h *FacultyDirectoryHandler) HandleDirectoryLogin(c *gin.Context) {
 	cfg := h.GetOAuthConfig()
-	authURL := cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
+	authURL := cfg.AuthCodeURL(
+		"state-token",
+		oauth2.AccessTypeOffline,
+		oauth2.SetAuthURLParam("prompt", "consent"),
+	)
 	c.Redirect(http.StatusTemporaryRedirect, authURL)
 }
 
@@ -224,19 +228,38 @@ func (h *FacultyDirectoryHandler) SyncGoogleDirectory() {
 	var httpClient *http.Client
 	cfg := h.GetOAuthConfig()
 
-	// Try loading token from environment first
-	envToken := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_TOKEN_JSON"))
-	if envToken == "" {
-		envToken = strings.TrimSpace(os.Getenv("TOKEN_JSON"))
+	// 1. Try using SheetHandler's managed HTTP client first (handles automatic token refreshing & persistence)
+	if h.sheetsHandler != nil {
+		httpClient = h.sheetsHandler.GetHTTPClient()
 	}
-	if envToken != "" {
-		var tok oauth2.Token
-		if err := json.Unmarshal([]byte(envToken), &tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
-			httpClient = cfg.Client(context.Background(), &tok)
+
+	// 2. Try loading token from MySQL database
+	if httpClient == nil && h.DB != nil {
+		var tokenStr string
+		err := h.DB.QueryRow("SELECT token FROM ps_tokens WHERE token_key = 'google_oauth_token' LIMIT 1").Scan(&tokenStr)
+		if err == nil && strings.TrimSpace(tokenStr) != "" {
+			var tok oauth2.Token
+			if err := json.Unmarshal([]byte(tokenStr), &tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
+				httpClient = cfg.Client(context.Background(), &tok)
+			}
 		}
 	}
 
-	// Fallback to loading token.json
+	// 3. Try loading token from environment first
+	if httpClient == nil {
+		envToken := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_TOKEN_JSON"))
+		if envToken == "" {
+			envToken = strings.TrimSpace(os.Getenv("TOKEN_JSON"))
+		}
+		if envToken != "" {
+			var tok oauth2.Token
+			if err := json.Unmarshal([]byte(envToken), &tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
+				httpClient = cfg.Client(context.Background(), &tok)
+			}
+		}
+	}
+
+	// 4. Fallback to loading token.json
 	if httpClient == nil {
 		if f, err := os.Open("token.json"); err == nil {
 			defer f.Close()
@@ -248,7 +271,7 @@ func (h *FacultyDirectoryHandler) SyncGoogleDirectory() {
 		}
 	}
 
-	// Try using SheetHandler's OAuth Token if token.json is not present
+	// 5. Try using SheetHandler's raw OAuth Token if still nil
 	if httpClient == nil && h.sheetsHandler != nil && h.sheetsHandler.GetOAuthToken() != nil {
 		httpClient = cfg.Client(context.Background(), h.sheetsHandler.GetOAuthToken())
 	}

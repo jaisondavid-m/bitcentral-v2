@@ -107,10 +107,45 @@ func (h *SheetHandler) GetOAuthConfig() *oauth2.Config {
 	return h.oauthConfig
 }
 
+const GoogleOAuthDBKey = "google_oauth_token"
+
+type notifyingTokenSource struct {
+	src    oauth2.TokenSource
+	mu     sync.Mutex
+	last   *oauth2.Token
+	onSave func(*oauth2.Token)
+}
+
+func (s *notifyingTokenSource) Token() (*oauth2.Token, error) {
+	tok, err := s.src.Token()
+	if err != nil {
+		return nil, err
+	}
+	s.mu.Lock()
+	changed := s.last == nil || s.last.AccessToken != tok.AccessToken
+	if changed {
+		s.last = tok
+	}
+	s.mu.Unlock()
+
+	if changed && s.onSave != nil {
+		s.onSave(tok)
+	}
+	return tok, nil
+}
+
 func (h *SheetHandler) SetTokenAndInitService(token *oauth2.Token) error {
+	if token == nil {
+		return fmt.Errorf("token is nil")
+	}
 	h.mu.Lock()
+	// Critical: If Google didn't return a refresh_token in this exchange, keep the previous valid one
+	if token.RefreshToken == "" && h.oauthToken != nil && h.oauthToken.RefreshToken != "" {
+		token.RefreshToken = h.oauthToken.RefreshToken
+	}
 	h.oauthToken = token
 	h.mu.Unlock()
+
 	h.saveToken(token)
 	return h.createSheetsService()
 }
@@ -119,24 +154,44 @@ func (h *SheetHandler) LoadSavedToken() bool {
 	var tok oauth2.Token
 	loaded := false
 
-	// 1. Try env variable (useful for cloud platforms like Render where disks are ephemeral)
-	envToken := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_TOKEN_JSON"))
-	if envToken == "" {
-		envToken = strings.TrimSpace(os.Getenv("TOKEN_JSON"))
-	}
-	if envToken != "" {
-		if err := json.Unmarshal([]byte(envToken), &tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
-			loaded = true
+	// 1. Try MySQL Database first (persists across Docker container recreations & restarts)
+	if config.DB != nil {
+		var tokenStr string
+		err := config.DB.QueryRow("SELECT token FROM ps_tokens WHERE token_key = ? LIMIT 1", GoogleOAuthDBKey).Scan(&tokenStr)
+		if err == nil && strings.TrimSpace(tokenStr) != "" {
+			if err := json.Unmarshal([]byte(tokenStr), &tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
+				loaded = true
+				log.Println("✅ Loaded Google OAuth token from MySQL database (ps_tokens)")
+				// Sync to local token.json file as cache
+				_ = os.WriteFile("token.json", []byte(tokenStr), 0600)
+			}
 		}
 	}
 
-	// 2. Try token.json file
+	// 2. Try env variable (useful for cloud platforms like Render where disks are ephemeral)
+	if !loaded {
+		envToken := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_TOKEN_JSON"))
+		if envToken == "" {
+			envToken = strings.TrimSpace(os.Getenv("TOKEN_JSON"))
+		}
+		if envToken != "" {
+			if err := json.Unmarshal([]byte(envToken), &tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
+				loaded = true
+				log.Println("✅ Loaded Google OAuth token from environment variable")
+				h.saveToken(&tok)
+			}
+		}
+	}
+
+	// 3. Try token.json file
 	if !loaded {
 		f, err := os.Open("token.json")
 		if err == nil {
 			defer f.Close()
 			if err := json.NewDecoder(f).Decode(&tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
 				loaded = true
+				log.Println("✅ Loaded Google OAuth token from token.json")
+				h.saveToken(&tok)
 			}
 		}
 	}
@@ -157,12 +212,59 @@ func (h *SheetHandler) LoadSavedToken() bool {
 }
 
 func (h *SheetHandler) saveToken(token *oauth2.Token) {
-	f, err := os.Create("token.json")
-	if err != nil {
+	if token == nil {
 		return
 	}
-	defer f.Close()
-	_ = json.NewEncoder(f).Encode(token)
+
+	data, err := json.Marshal(token)
+	if err != nil {
+		log.Printf("⚠️ Failed to marshal oauth token: %v", err)
+		return
+	}
+
+	// 1. Save to local token.json
+	if f, err := os.Create("token.json"); err == nil {
+		_, _ = f.Write(data)
+		_ = f.Close()
+	}
+
+	// 2. Persist to MySQL database (survives Docker restarts, container redeployments)
+	if config.DB != nil {
+		query := `
+			INSERT INTO ps_tokens (token_key, token, updated_at, updated_by)
+			VALUES (?, ?, NOW(), 'google_oauth')
+			ON DUPLICATE KEY UPDATE token = VALUES(token), updated_at = NOW(), updated_by = VALUES(updated_by);
+		`
+		if _, err := config.DB.Exec(query, GoogleOAuthDBKey, string(data)); err != nil {
+			log.Printf("⚠️ Failed to persist OAuth token in MySQL: %v", err)
+		} else {
+			log.Println("✅ Google OAuth token saved to MySQL ps_tokens successfully")
+		}
+	}
+}
+
+func (h *SheetHandler) GetHTTPClient() *http.Client {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	if h.oauthConfig == nil || h.oauthToken == nil {
+		return nil
+	}
+	baseSource := h.oauthConfig.TokenSource(context.Background(), h.oauthToken)
+	wrappedSource := &notifyingTokenSource{
+		src:  baseSource,
+		last: h.oauthToken,
+		onSave: func(newTok *oauth2.Token) {
+			log.Println("🔄 Google OAuth token automatically refreshed, saving to DB and disk...")
+			h.mu.Lock()
+			if newTok.RefreshToken == "" && h.oauthToken != nil && h.oauthToken.RefreshToken != "" {
+				newTok.RefreshToken = h.oauthToken.RefreshToken
+			}
+			h.oauthToken = newTok
+			h.mu.Unlock()
+			h.saveToken(newTok)
+		},
+	}
+	return oauth2.NewClient(context.Background(), wrappedSource)
 }
 
 func (h *SheetHandler) createSheetsService() error {
@@ -170,7 +272,11 @@ func (h *SheetHandler) createSheetsService() error {
 		return fmt.Errorf("oauth config or token not initialized")
 	}
 
-	client := h.oauthConfig.Client(context.Background(), h.oauthToken)
+	client := h.GetHTTPClient()
+	if client == nil {
+		return fmt.Errorf("failed to create oauth http client")
+	}
+
 	srv, err := sheets.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
 		return err
@@ -196,7 +302,11 @@ func (h *SheetHandler) HandleLogin(c *gin.Context) {
 	if h.oauthConfig == nil {
 		h.InitOAuth()
 	}
-	url := h.oauthConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
+	url := h.oauthConfig.AuthCodeURL(
+		"state-token",
+		oauth2.AccessTypeOffline,
+		oauth2.SetAuthURLParam("prompt", "consent"),
+	)
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
