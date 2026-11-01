@@ -355,6 +355,8 @@ func isPublicPath(path string) bool {
 		"/qb",
 		"/faculty-directory",
 		"/faculty",
+		"/faculty-photos",
+		"/faculty/photos",
 		"/exam-hall",
 		"/internal-marks/conversion",
 		"/notifications",

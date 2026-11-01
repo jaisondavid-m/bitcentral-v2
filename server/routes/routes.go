@@ -164,6 +164,12 @@ func SetupRouter(
 	r.POST("/api/auth/mobile/google", studentLookupHandler.MobileGoogleLogin)
 	r.GET("/faculty-directory/auth/login", facultyDirectoryHandler.HandleDirectoryLogin)
 
+	// Faculty Photos with access middleware
+	r.GET("/faculty-photos/:filename", middleware.FacultyPhotoAccess(), facultyDirectoryHandler.ServeFacultyPhoto)
+	r.GET("/faculty/photos/:filename", middleware.FacultyPhotoAccess(), facultyDirectoryHandler.ServeFacultyPhoto)
+	r.GET("/api/faculty-photos/:filename", middleware.FacultyPhotoAccess(), facultyDirectoryHandler.ServeFacultyPhoto)
+	r.GET("/api/faculty/photos/:filename", middleware.FacultyPhotoAccess(), facultyDirectoryHandler.ServeFacultyPhoto)
+
 	// PS Integration routes (Public - Authenticates via decoded PS JWT claims or student email)
 	r.POST("/ps/connect", psHandler.ConnectPS)
 	r.POST("/ps/disconnect", psHandler.DisconnectPS)

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import { getFacultyDirectory } from "@/api/axios.js";
+import { getFacultyDirectory, getApiBaseUrl } from "@/api/axios.js";
+import { getStoredToken } from "@/config/auth.js";
 import {
   AlertCircle,
   Building2,
@@ -15,6 +16,22 @@ import {
   Users,
   X,
 } from "lucide-react";
+
+function getFacultyPhotoUrl(url) {
+  if (!url) return null;
+  const baseUrl = getApiBaseUrl();
+  let fullUrl = url.startsWith("http://") || url.startsWith("https://")
+    ? url
+    : `${baseUrl}${url.startsWith("/") ? "" : "/"}${url}`;
+
+  // Attach token if user is signed in to pass auth check across origins
+  const token = getStoredToken();
+  if (token && !fullUrl.includes("token=")) {
+    const sep = fullUrl.includes("?") ? "&" : "?";
+    fullUrl = `${fullUrl}${sep}token=${encodeURIComponent(token)}`;
+  }
+  return fullUrl;
+}
 
 function getInitials(name = "") {
   if (!name) return "FC";
@@ -412,11 +429,11 @@ export default function FacultyDirectory() {
                     <div className="flex items-start gap-3 sm:gap-4">
                       {member.photo_url ? (
                         <img
-                          src={member.photo_url}
+                          src={getFacultyPhotoUrl(member.photo_url)}
                           alt={member.name}
                           onError={(e) => {
                             e.target.style.display = "none";
-                            e.target.nextSibling.style.display = "flex";
+                            if (e.target.nextSibling) e.target.nextSibling.style.display = "flex";
                           }}
                           className="h-11 w-11 rounded-xl object-cover shadow-inner sm:h-14 sm:w-14 sm:rounded-2xl"
                         />
@@ -432,21 +449,30 @@ export default function FacultyDirectory() {
                         <h3 className="truncate text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors sm:text-base">
                           {member.name}
                         </h3>
-                        <div className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 dark:text-blue-400 sm:mt-1 sm:text-xs">
-                          <Building2 className="h-3 w-3 shrink-0" />
-                          <span className="truncate">{member.department || "Faculty"}</span>
+                        {member.job_title && (
+                          <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
+                            {member.job_title}
+                          </div>
+                        )}
+                        <div className="mt-1 flex items-start gap-1.5 text-[11px] font-semibold text-blue-600 dark:text-blue-400 sm:mt-1.5 sm:text-xs min-w-0 w-full">
+                          <Building2 className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                          <span className="line-clamp-2 leading-tight break-words min-w-0" title={member.department}>
+                            {member.department || "Faculty"}
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     <div className="mt-2.5 space-y-1.5 border-t border-slate-100 pt-2.5 dark:border-slate-800/80 sm:mt-4 sm:space-y-2 sm:pt-3">
-                      <a
-                        href={`mailto:${member.email}`}
-                        className="flex items-center gap-2 truncate text-[11px] text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors sm:text-xs"
-                      >
-                        <Mail className="h-3.5 w-3.5 flex-shrink-0 text-slate-400" />
-                        <span className="truncate">{member.email}</span>
-                      </a>
+                      {member.email && (
+                        <a
+                          href={`mailto:${member.email}`}
+                          className="flex items-center gap-2 truncate text-[11px] text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors sm:text-xs"
+                        >
+                          <Mail className="h-3.5 w-3.5 flex-shrink-0 text-slate-400" />
+                          <span className="truncate">{member.email}</span>
+                        </a>
+                      )}
 
                       {member.phone && (
                         <div className="flex items-center justify-between text-[11px] text-slate-700 dark:text-slate-300 sm:text-xs">
@@ -576,11 +602,11 @@ export default function FacultyDirectory() {
               <div className="flex flex-col items-center text-center">
                 {activeCallModal.photo_url ? (
                   <img
-                    src={activeCallModal.photo_url}
+                    src={getFacultyPhotoUrl(activeCallModal.photo_url)}
                     alt={activeCallModal.name}
                     onError={(e) => {
                       e.target.style.display = "none";
-                      e.target.nextSibling.style.display = "flex";
+                      if (e.target.nextSibling) e.target.nextSibling.style.display = "flex";
                     }}
                     className="h-28 w-28 rounded-3xl object-cover shadow-lg ring-4 ring-blue-500/20"
                   />
@@ -598,9 +624,9 @@ export default function FacultyDirectory() {
                   {activeCallModal.name}
                 </h2>
 
-                <div className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 dark:bg-blue-950/60 dark:text-blue-300">
-                  <Building2 className="h-3.5 w-3.5" />
-                  <span>{activeCallModal.department || "Faculty & Staff"}</span>
+                <div className="mt-1.5 inline-flex max-w-full items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 dark:bg-blue-950/60 dark:text-blue-300 min-w-0">
+                  <Building2 className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">{activeCallModal.department || "Faculty & Staff"}</span>
                 </div>
 
                 {activeCallModal.job_title && activeCallModal.job_title !== "Faculty / Staff" && (
@@ -609,10 +635,12 @@ export default function FacultyDirectory() {
                   </p>
                 )}
 
-                <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
-                  <Mail className="h-3.5 w-3.5 text-slate-400" />
-                  <span>{activeCallModal.email}</span>
-                </div>
+                {activeCallModal.email && (
+                  <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
+                    <Mail className="h-3.5 w-3.5 text-slate-400" />
+                    <span>{activeCallModal.email}</span>
+                  </div>
+                )}
 
                 {/* Big Phone Number Box */}
                 <div className="mt-6 flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-800/60">

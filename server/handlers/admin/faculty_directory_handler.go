@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -34,6 +35,7 @@ type FacultyMember struct {
 	PhotoURL   string `json:"photo_url"`
 	Department string `json:"department"`
 	JobTitle   string `json:"job_title"`
+	ProfileURL string `json:"profile_url,omitempty"`
 	UpdatedAt  string `json:"updated_at"`
 }
 
@@ -534,6 +536,47 @@ func extractDeptFromEmail(email string) string {
 	return "Faculty & Staff"
 }
 
+func (h *FacultyDirectoryHandler) getFacultyDetailsTableName() string {
+	if h.DB == nil {
+		return "faculty_details"
+	}
+	var exists string
+	err := h.DB.QueryRow("SHOW TABLES LIKE 'faculty_details'").Scan(&exists)
+	if err == nil && exists != "" {
+		return "faculty_details"
+	}
+	err = h.DB.QueryRow("SHOW TABLES LIKE 'facutly_details'").Scan(&exists)
+	if err == nil && exists != "" {
+		return "facutly_details"
+	}
+	return "faculty_directory"
+}
+
+// ServeFacultyPhoto serves faculty photo files securely verified by middleware
+func (h *FacultyDirectoryHandler) ServeFacultyPhoto(c *gin.Context) {
+	path := c.GetString("faculty_photo_path")
+	if path == "" {
+		filename := c.Param("filename")
+		if filename != "" {
+			cleanName := filepath.Base(filepath.Clean(filename))
+			candidate := filepath.Join("data", "faculty_photos", cleanName)
+			if fi, err := os.Stat(candidate); err == nil && !fi.IsDir() {
+				path = candidate
+			}
+		}
+	}
+
+	if path == "" {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": "Faculty photo not found",
+		})
+		return
+	}
+
+	c.File(path)
+}
+
 func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 	if c.Query("sync") == "true" || c.Query("force_sync") == "true" || c.Query("refresh") == "true" {
 		h.SyncGoogleDirectory()
@@ -567,7 +610,7 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 
 	// Parse pagination parameters
 	pageStr := c.DefaultQuery("page", "1")
-	limitStr := c.DefaultQuery("limit", "20")
+	limitStr := c.DefaultQuery("limit", "24")
 	if c.Query("limit") == "" && c.Query("per_page") != "" {
 		limitStr = c.Query("per_page")
 	}
@@ -578,7 +621,7 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 	}
 
 	isAll := c.Query("all") == "true" || limitStr == "all" || limitStr == "0" || limitStr == "-1"
-	limit := 20
+	limit := 24
 	if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
 		limit = l
 		if limit > 100 {
@@ -586,6 +629,163 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 		}
 	}
 
+	tableName := h.getFacultyDetailsTableName()
+
+	// If using faculty_details or facutly_details
+	if tableName == "faculty_details" || tableName == "facutly_details" {
+		whereClause := "WHERE 1=1"
+		var args []interface{}
+
+		if searchQuery != "" {
+			whereClause += " AND (LOWER(d.staff_name) LIKE ? OR LOWER(d.department) LIKE ? OR LOWER(d.designation) LIKE ? OR CAST(d.phone_number AS CHAR) LIKE ?)"
+			like := "%" + searchQuery + "%"
+			args = append(args, like, like, like, like)
+		}
+
+		if deptQuery != "" && deptQuery != "all" {
+			whereClause += " AND LOWER(d.department) LIKE ?"
+			args = append(args, "%"+deptQuery+"%")
+		}
+
+		// Count matching records
+		var total int
+		countQuery := fmt.Sprintf("SELECT COUNT(*) FROM %s d %s", tableName, whereClause)
+		if err := h.DB.QueryRow(countQuery, args...).Scan(&total); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+			return
+		}
+
+		totalPages := 1
+		if total > 0 && limit > 0 {
+			totalPages = (total + limit - 1) / limit
+		} else if total == 0 {
+			totalPages = 0
+		}
+
+		// Fetch department names & counts for filter dropdown
+		deptRows, deptErr := h.DB.Query(fmt.Sprintf(`
+			SELECT COALESCE(NULLIF(TRIM(department), ''), 'Faculty & Staff') AS dept_name, COUNT(*) AS count
+			FROM %s
+			WHERE department IS NOT NULL AND department != ''
+			GROUP BY dept_name
+			ORDER BY dept_name ASC
+		`, tableName))
+		departments := make([]gin.H, 0)
+		if deptErr == nil {
+			defer deptRows.Close()
+			for deptRows.Next() {
+				var name string
+				var count int
+				if err := deptRows.Scan(&name, &count); err == nil {
+					departments = append(departments, gin.H{
+						"name":  name,
+						"count": count,
+					})
+				}
+			}
+		}
+
+		// Prepare server baseURL for photo links
+		scheme := "http"
+		if c.Request.TLS != nil || c.GetHeader("X-Forwarded-Proto") == "https" {
+			scheme = "https"
+		}
+		host := c.Request.Host
+		if host == "" {
+			host = os.Getenv("BACKEND_HOST")
+			if host == "" {
+				host = "localhost:8080"
+			}
+		}
+		baseURL := fmt.Sprintf("%s://%s", scheme, host)
+
+		// Build data query
+		var dataQuery string
+		var queryArgs []interface{}
+		baseSelect := fmt.Sprintf(`
+			SELECT 
+				d.id,
+				COALESCE(NULLIF(TRIM(d.staff_name), ''), 'Faculty') AS name,
+				COALESCE((
+					SELECT dir.email FROM faculty_directory dir 
+					WHERE (d.phone_number IS NOT NULL AND d.phone_number != 0 AND dir.phone LIKE CONCAT('%%', d.phone_number, '%%'))
+					   OR LOWER(TRIM(dir.name)) = LOWER(TRIM(d.staff_name))
+					ORDER BY (dir.phone LIKE CONCAT('%%', d.phone_number, '%%')) DESC, dir.email ASC
+					LIMIT 1
+				), '') AS email,
+				COALESCE(NULLIF(CAST(d.phone_number AS CHAR), '0'), '') AS phone,
+				COALESCE(d.department, '') AS department,
+				COALESCE(d.designation, '') AS job_title,
+				COALESCE(d.profile_url, '') AS profile_url,
+				COALESCE(d.photo_path, '') AS photo_path,
+				COALESCE(d.photo_status, '') AS photo_status,
+				COALESCE(d.scraped_at, '') AS updated_at
+			FROM %s d
+			%s
+			ORDER BY d.id ASC
+		`, tableName, whereClause)
+
+		if isAll {
+			dataQuery = baseSelect
+			queryArgs = args
+		} else {
+			offset := (page - 1) * limit
+			dataQuery = baseSelect + " LIMIT ? OFFSET ?"
+			queryArgs = append(args, limit, offset)
+		}
+
+		rows, err := h.DB.Query(dataQuery, queryArgs...)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+			return
+		}
+		defer rows.Close()
+
+		list := make([]FacultyMember, 0)
+		for rows.Next() {
+			var f FacultyMember
+			var rawPhotoPath, rawPhotoStatus string
+			if err := rows.Scan(
+				&f.ID,
+				&f.Name,
+				&f.Email,
+				&f.Phone,
+				&f.Department,
+				&f.JobTitle,
+				&f.ProfileURL,
+				&rawPhotoPath,
+				&rawPhotoStatus,
+				&f.UpdatedAt,
+			); err == nil {
+				// Map photo_path to served image link
+				photoPath := strings.TrimSpace(rawPhotoPath)
+				photoStatus := strings.TrimSpace(rawPhotoStatus)
+				if photoPath != "" && (photoStatus == "ok" || photoStatus == "") {
+					cleanName := filepath.Base(strings.ReplaceAll(photoPath, "\\", "/"))
+					if cleanName != "" && cleanName != "." {
+						diskPath := filepath.Join("data", "faculty_photos", cleanName)
+						if fi, err := os.Stat(diskPath); err == nil && !fi.IsDir() {
+							f.PhotoURL = fmt.Sprintf("%s/faculty-photos/%s", baseURL, url.PathEscape(cleanName))
+						}
+					}
+				}
+				list = append(list, f)
+			}
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"success":     true,
+			"total":       total,
+			"page":        page,
+			"limit":       limit,
+			"total_pages": totalPages,
+			"departments": departments,
+			"data":        list,
+		})
+		return
+	}
+
+	// Fallback to faculty_directory if table does not exist
 	whereClause := `WHERE LOWER(email) NOT LIKE '%gmail.com' 
 		AND LOWER(email) NOT LIKE '%parent%' 
 		AND LOWER(email) NOT LIKE '%parents%'
@@ -604,7 +804,6 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 		args = append(args, "%"+deptQuery+"%")
 	}
 
-	// Get total matching count for current filter
 	var total int
 	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM faculty_directory %s", whereClause)
 	if err := h.DB.QueryRow(countQuery, args...).Scan(&total); err != nil {
@@ -619,7 +818,6 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 		totalPages = 0
 	}
 
-	// Fetch all available department names and counts for filtering dropdown
 	deptRows, deptErr := h.DB.Query(`
 		SELECT COALESCE(NULLIF(TRIM(department), ''), 'Faculty & Staff') AS dept_name, COUNT(*) AS count
 		FROM faculty_directory
@@ -650,7 +848,7 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 	var queryArgs []interface{}
 	if isAll {
 		dataQuery = fmt.Sprintf(`
-			SELECT id, name, email, phone, COALESCE(photo_url, ''), COALESCE(department, ''), COALESCE(job_title, ''), DATE_FORMAT(updated_at, '%%Y-%%m-%%dT%%H:%%i:%%sZ')
+			SELECT id, name, email, phone, COALESCE(photo_url, ''), COALESCE(department, ''), COALESCE(job_title, ''), DATE_FORMAT(updated_at, '%%%%Y-%%%%m-%%%%dT%%%%H:%%%%i:%%%%sZ')
 			FROM faculty_directory
 			%s
 			ORDER BY name ASC
@@ -659,7 +857,7 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 	} else {
 		offset := (page - 1) * limit
 		dataQuery = fmt.Sprintf(`
-			SELECT id, name, email, phone, COALESCE(photo_url, ''), COALESCE(department, ''), COALESCE(job_title, ''), DATE_FORMAT(updated_at, '%%Y-%%m-%%dT%%H:%%i:%%sZ')
+			SELECT id, name, email, phone, COALESCE(photo_url, ''), COALESCE(department, ''), COALESCE(job_title, ''), DATE_FORMAT(updated_at, '%%%%Y-%%%%m-%%%%dT%%%%H:%%%%i:%%%%sZ')
 			FROM faculty_directory
 			%s
 			ORDER BY name ASC

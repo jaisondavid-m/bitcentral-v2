@@ -112,6 +112,7 @@ func InitMySQL() {
 	createSponsorTransactionsTable()
 	createFeedbackMessagesTable()
 	createFacultyDirectoryTable()
+	ensureFacultyDetailsTableOrView()
 	createAuditLogsTable()
 	createDailyActiveUserStatsTable()
 	createAdminSentEmailsTable()
@@ -780,6 +781,15 @@ func createFacultyDirectoryTable() {
 		log.Printf("ℹ️ faculty_directory table notice: %v", err)
 	} else {
 		log.Println("✅ faculty_directory table ready")
+	}
+}
+
+func ensureFacultyDetailsTableOrView() {
+	query := `CREATE OR REPLACE VIEW faculty_details AS SELECT * FROM facutly_details;`
+	if _, err := DB.Exec(query); err != nil {
+		log.Printf("ℹ️ faculty_details view notice: %v", err)
+	} else {
+		log.Println("✅ faculty_details view ready")
 	}
 }
 
