@@ -1,36 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import api from "@/api/axios.js";
 import DynamicIcon from "@/components/common/DynamicIcon.jsx";
 
 export function Card({ id, name, description, link, img, icon, btntext }) {
   const navigate = useNavigate();
 
-  const trackClick = () => {
-    if (!id) return;
-
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || api.defaults.baseURL || window.location.origin;
-    const endpoint = new URL(`/cards/${id}/click`, baseUrl).toString();
-
-    if (navigator.sendBeacon) {
-      const body = new Blob(["{}"], { type: "application/json" });
-      navigator.sendBeacon(endpoint, body);
-      return;
-    }
-
-    void fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: "{}",
-      keepalive: true,
-    }).catch(() => { });
-  };
-
   const handleNavigate = () => {
-    trackClick();
-
     if (link?.startsWith("/")) {
       navigate(link);
     } else {
