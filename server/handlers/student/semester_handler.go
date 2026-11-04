@@ -2,9 +2,12 @@ package student
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"server/config"
 	"server/data"
@@ -12,6 +15,22 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+type semCacheEntry struct {
+	result    []studentmodels.SemesterSubject
+	expiresAt time.Time
+}
+
+var (
+	semCacheMu sync.RWMutex
+	semCache   = make(map[string]semCacheEntry)
+)
+
+func invalidateSemCache() {
+	semCacheMu.Lock()
+	semCache = make(map[string]semCacheEntry)
+	semCacheMu.Unlock()
+}
 
 type SemesterHandler struct {
 	DB *sql.DB
@@ -33,6 +52,15 @@ func (h *SemesterHandler) GetSemesterByYear(c *gin.Context) {
 	deptParam := strings.TrimSpace(c.Query("dept"))
 	if deptParam == "" {
 		deptParam = strings.TrimSpace(c.Query("department"))
+	}
+
+	cacheKey := fmt.Sprintf("%d_%s", year, deptParam)
+	semCacheMu.RLock()
+	entry, found := semCache[cacheKey]
+	semCacheMu.RUnlock()
+	if found && time.Now().Before(entry.expiresAt) {
+		c.JSON(http.StatusOK, gin.H{"success": true, "year": year, "count": len(entry.result), "data": entry.result})
+		return
 	}
 
 	query := `
@@ -112,6 +140,13 @@ func (h *SemesterHandler) GetSemesterByYear(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "Year not found"})
 		return
 	}
+
+	semCacheMu.Lock()
+	semCache[cacheKey] = semCacheEntry{
+		result:    result,
+		expiresAt: time.Now().Add(10 * time.Minute),
+	}
+	semCacheMu.Unlock()
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "year": year, "count": len(result), "data": result})
 }
@@ -199,6 +234,8 @@ func (h *SemesterHandler) UpdateSemesterByYear(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
 		return
 	}
+
+	invalidateSemCache()
 
 	// also update in-memory map for compatibility
 	data.SemestersData[year] = payload

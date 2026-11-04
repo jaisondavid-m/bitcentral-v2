@@ -61,8 +61,13 @@ func (h *FacultyDirectoryHandler) startPeriodicSync() {
 	// Wait brief moment for DB initialization
 	time.Sleep(3 * time.Second)
 
-	// Run initial sync on startup if table is empty or stale
+	// Run initial sync on startup if table is empty
 	h.checkAndRunInitialSync()
+
+	if os.Getenv("ENABLE_FACULTY_PERIODIC_SYNC") != "true" {
+		log.Println("ℹ️ Automatic 24h faculty directory sync is idle (set ENABLE_FACULTY_PERIODIC_SYNC=true to enable). Admins can sync manually via API.")
+		return
+	}
 
 	ticker := time.NewTicker(24 * time.Hour)
 	defer ticker.Stop()
@@ -75,6 +80,11 @@ func (h *FacultyDirectoryHandler) startPeriodicSync() {
 
 func (h *FacultyDirectoryHandler) checkAndRunInitialSync() {
 	if h.DB == nil {
+		return
+	}
+	var count int
+	if err := h.DB.QueryRow("SELECT COUNT(*) FROM faculty_directory").Scan(&count); err == nil && count > 0 {
+		log.Printf("ℹ️ Faculty Directory already populated (%d records). Skipping startup sync to save TiDB limits.", count)
 		return
 	}
 	log.Println("⚡ Initializing Faculty Directory table with full Google Contacts/Directory sync...")

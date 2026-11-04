@@ -252,7 +252,7 @@ func (h *MailHandler) runQueueWorkerLoop() {
 			// No pending items, wait for wake trigger or poll every 3 seconds
 			select {
 			case <-h.triggerChan:
-			case <-time.After(3 * time.Second):
+			case <-time.After(5 * time.Minute):
 			}
 		}
 	}

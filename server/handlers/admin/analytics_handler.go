@@ -58,7 +58,7 @@ func (h *AnalyticsHandler) startPeriodicDAUSync() {
 	// Initial sync on startup
 	h.SyncDailyActiveUsers()
 
-	ticker := time.NewTicker(1 * time.Hour)
+	ticker := time.NewTicker(6 * time.Hour)
 	defer ticker.Stop()
 
 	for range ticker.C {
@@ -75,6 +75,14 @@ func (h *AnalyticsHandler) SyncDailyActiveUsers() {
 
 	var totalUsers int
 	_ = h.DB.QueryRow("SELECT COUNT(*) FROM users").Scan(&totalUsers)
+
+	// If history already exists, only update today's active count to save TiDB Request Units
+	var statsCount int
+	_ = h.DB.QueryRow("SELECT COUNT(*) FROM daily_active_user_stats").Scan(&statsCount)
+	if statsCount > 0 {
+		h.syncTodayDAU(totalUsers)
+		return
+	}
 
 	// 1. Group all historical dates from last_seen_at / last_sign_in_time
 	query := `
@@ -131,6 +139,30 @@ func (h *AnalyticsHandler) SyncDailyActiveUsers() {
 	`, todayIST, todayLocal, todayIST, todayLocal).Scan(&todayCount)
 
 	_, _ = upsertStmt.Exec(todayIST, todayCount, totalUsers)
+}
+
+func (h *AnalyticsHandler) syncTodayDAU(totalUsers int) {
+	if h.DB == nil {
+		return
+	}
+	todayIST := time.Now().UTC().Add(5*time.Hour + 30*time.Minute).Format("2006-01-02")
+	todayLocal := time.Now().Format("2006-01-02")
+
+	var todayCount int
+	_ = h.DB.QueryRow(`
+		SELECT COUNT(DISTINCT id) FROM users 
+		WHERE (last_seen_at IS NOT NULL AND (last_seen_at LIKE CONCAT(?, '%') OR last_seen_at LIKE CONCAT(?, '%')))
+		   OR (last_sign_in_time IS NOT NULL AND (last_sign_in_time LIKE CONCAT(?, '%') OR last_sign_in_time LIKE CONCAT(?, '%')))
+	`, todayIST, todayLocal, todayIST, todayLocal).Scan(&todayCount)
+
+	_, _ = h.DB.Exec(`
+		INSERT INTO daily_active_user_stats (date, active_users_count, total_users_count)
+		VALUES (?, ?, ?)
+		ON DUPLICATE KEY UPDATE 
+			active_users_count = VALUES(active_users_count),
+			total_users_count = VALUES(total_users_count),
+			updated_at = CURRENT_TIMESTAMP;
+	`, todayIST, todayCount, totalUsers)
 }
 
 func (h *AnalyticsHandler) GetAnalytics(c *gin.Context) {

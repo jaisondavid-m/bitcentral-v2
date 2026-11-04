@@ -5,11 +5,13 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"server/config"
@@ -23,6 +25,24 @@ type CardHandler struct{}
 
 func NewCardHandler() *CardHandler {
 	return &CardHandler{}
+}
+
+var (
+	lastSeenCache sync.Map // map[string]time.Time
+
+	cardsCacheMu sync.RWMutex
+	cardsCache   = make(map[string]cardsCacheEntry)
+)
+
+type cardsCacheEntry struct {
+	cards     []studentmodels.Card
+	expiresAt time.Time
+}
+
+func invalidateCardCache() {
+	cardsCacheMu.Lock()
+	cardsCache = make(map[string]cardsCacheEntry)
+	cardsCacheMu.Unlock()
 }
 
 func updateLastSeenIfAuthenticated(c *gin.Context) {
@@ -47,22 +67,30 @@ func updateLastSeenIfAuthenticated(c *gin.Context) {
 		return
 	}
 
-	nowSeen := time.Now().Format("2006-01-02 15:04:05")
+	dedupKey := userEmail
+	if dedupKey == "" {
+		dedupKey = userUID
+	}
+
+	now := time.Now()
+	if val, ok := lastSeenCache.Load(dedupKey); ok {
+		if lastTime, ok := val.(time.Time); ok && now.Sub(lastTime) < 15*time.Minute {
+			return // Skip DB write if already updated within 15 minutes
+		}
+	}
+	lastSeenCache.Store(dedupKey, now)
+
+	nowSeen := now.Format("2006-01-02 15:04:05")
 	go func(targetEmail, targetUID, seenTime string) {
-		if targetEmail != "" && targetUID != "" {
+		if targetUID != "" {
 			_, _ = config.DB.Exec(
-				`UPDATE users SET last_seen_at = ? WHERE (email != '' AND (email = ? OR LOWER(TRIM(email)) = ?)) OR (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?)`,
-				seenTime, targetEmail, targetEmail, targetUID, targetUID,
+				`UPDATE users SET last_seen_at = ? WHERE google_id = ? OR uid = ?`,
+				seenTime, targetUID, targetUID,
 			)
 		} else if targetEmail != "" {
 			_, _ = config.DB.Exec(
-				`UPDATE users SET last_seen_at = ? WHERE email = ? OR LOWER(TRIM(email)) = ?`,
-				seenTime, targetEmail, targetEmail,
-			)
-		} else if targetUID != "" {
-			_, _ = config.DB.Exec(
-				`UPDATE users SET last_seen_at = ? WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?)`,
-				seenTime, targetUID, targetUID,
+				`UPDATE users SET last_seen_at = ? WHERE email = ?`,
+				seenTime, targetEmail,
 			)
 		}
 	}(userEmail, userUID, nowSeen)
@@ -73,6 +101,16 @@ func GetCards(c *gin.Context) {
 
 	platform := strings.ToLower(strings.TrimSpace(c.Query("platform")))
 	isAdminReq := strings.Contains(c.Request.URL.Path, "/admin/") || c.Query("all") == "true"
+
+	// Fast in-memory cache lookup to save TiDB Request Units
+	cacheKey := fmt.Sprintf("%v_%s", isAdminReq, platform)
+	cardsCacheMu.RLock()
+	entry, found := cardsCache[cacheKey]
+	cardsCacheMu.RUnlock()
+	if found && time.Now().Before(entry.expiresAt) {
+		c.JSON(http.StatusOK, gin.H{"success": true, "count": len(entry.cards), "data": entry.cards})
+		return
+	}
 
 	query := `SELECT id, card_order, img, name, keywords, link, COALESCE(app_route, ''), btntext, click_count, COALESCE(show_on_site, 1), COALESCE(show_on_app, 1) FROM cards`
 	if !isAdminReq {
@@ -122,6 +160,13 @@ func GetCards(c *gin.Context) {
 		})
 	}
 
+	cardsCacheMu.Lock()
+	cardsCache[cacheKey] = cardsCacheEntry{
+		cards:     cards,
+		expiresAt: time.Now().Add(5 * time.Minute),
+	}
+	cardsCacheMu.Unlock()
+
 	c.JSON(http.StatusOK, gin.H{"success": true, "count": len(cards), "data": cards})
 }
 
@@ -158,6 +203,7 @@ func CreateCard(c *gin.Context) {
 	appBool := showOnApp == 1
 	payload.ShowOnSite = &siteBool
 	payload.ShowOnApp = &appBool
+	invalidateCardCache()
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": payload})
 }
 
@@ -203,6 +249,7 @@ func UpdateCard(c *gin.Context) {
 	appBool := showOnApp == 1
 	payload.ShowOnSite = &siteBool
 	payload.ShowOnApp = &appBool
+	invalidateCardCache()
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": payload})
 }
 
@@ -272,6 +319,7 @@ func ReorderCards(c *gin.Context) {
 		return
 	}
 
+	invalidateCardCache()
 	c.JSON(http.StatusOK, gin.H{"success": true})
 }
 
@@ -302,6 +350,7 @@ func DeleteCard(c *gin.Context) {
 			position++
 		}
 	}
+	invalidateCardCache()
 	c.JSON(http.StatusOK, gin.H{"success": true})
 }
 

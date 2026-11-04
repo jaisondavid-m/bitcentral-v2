@@ -79,11 +79,11 @@ func InitMySQL() {
 		log.Fatalf("❌ DB open error: %v", err)
 	}
 
-	// 🔥 Connection Pool (Production Optimized)
-	db.SetMaxOpenConns(50)
-	db.SetMaxIdleConns(25)
+	// 🔥 Connection Pool (Serverless & TiDB Optimized)
+	db.SetMaxOpenConns(15)
+	db.SetMaxIdleConns(5)
 	db.SetConnMaxLifetime(10 * time.Minute)
-	db.SetConnMaxIdleTime(5 * time.Minute)
+	db.SetConnMaxIdleTime(2 * time.Minute)
 
 	// Test connection
 	if err := db.Ping(); err != nil {
@@ -93,6 +93,16 @@ func InitMySQL() {
 	DB = db
 	log.Println("✅ MySQL connected successfully")
 
+	// Skip repeated DDL statements on every boot if DB already initialized (saves ~50 DDLs + TiDB RUs)
+	if os.Getenv("FORCE_DB_MIGRATIONS") != "true" {
+		var checkUsers int
+		if err := DB.QueryRow("SELECT 1 FROM users LIMIT 1").Scan(&checkUsers); err == nil {
+			log.Println("ℹ️ Database schema already initialized. Skipping DDL migrations to save TiDB limits (set FORCE_DB_MIGRATIONS=true to force).")
+			return
+		}
+	}
+
+	log.Println("⚡ Running initial database schema setup...")
 	createTokenTable()
 	createUsersTable()
 	if os.Getenv("RUN_LEGACY_CLEANUP") == "true" {
