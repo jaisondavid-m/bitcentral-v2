@@ -29,10 +29,22 @@ import {
 } from "lucide-react";
 import { getAdminAuditLogs, getAdminAuditLogUsers } from "@/api/admin.js";
 
+function parseDateSafe(value) {
+  if (!value) return null;
+  if (value instanceof Date) return value;
+  let str = String(value).trim();
+  // If string is raw MySQL datetime "YYYY-MM-DD HH:MM:SS" without timezone, treat as UTC
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(str)) {
+    str = str.replace(" ", "T") + "Z";
+  }
+  const date = new Date(str);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
 function formatISTDateTime(value) {
   if (!value) return "-";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
+  const date = parseDateSafe(value);
+  if (!date) return value;
   return date.toLocaleString("en-IN", {
     timeZone: "Asia/Kolkata",
     day: "numeric",
@@ -47,10 +59,11 @@ function formatISTDateTime(value) {
 
 function timeAgo(dateString) {
   if (!dateString) return "-";
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return "-";
+  const date = parseDateSafe(dateString);
+  if (!date) return "-";
   const now = new Date();
-  const diffSec = Math.floor((now - date) / 1000);
+  const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (diffSec < 5) return "Just now";
   if (diffSec < 60) return `${Math.max(1, diffSec)}s ago`;
   const diffMin = Math.floor(diffSec / 60);
   if (diffMin < 60) return `${diffMin}m ago`;

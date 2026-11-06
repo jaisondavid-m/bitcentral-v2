@@ -922,7 +922,7 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 	selectQuery := `
 		SELECT id, method, endpoint, COALESCE(query, ''), COALESCE(payload, ''), ip_address,
 		       COALESCE(user_uid, ''), COALESCE(user_name, ''), COALESCE(roll_no, ''), COALESCE(role, ''),
-		       status_code, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s')
+		       status_code, DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', '+05:30'), '%Y-%m-%dT%H:%i:%s+05:30')
 		FROM audit_logs
 	` + whereSQL + " ORDER BY id DESC LIMIT ? OFFSET ?"
 
@@ -993,7 +993,7 @@ func (h *AdminHandler) GetAuditLogUsers(c *gin.Context) {
 		       COALESCE(MAX(role), '') AS role,
 		       COUNT(*) AS log_count,
 		       COALESCE(MAX(ip_address), '') AS last_ip,
-		       DATE_FORMAT(MAX(created_at), '%Y-%m-%d %H:%i:%s') AS last_active
+		       DATE_FORMAT(CONVERT_TZ(MAX(created_at), '+00:00', '+05:30'), '%Y-%m-%dT%H:%i:%s+05:30') AS last_active
 		FROM audit_logs
 		` + whereSQL + `
 		GROUP BY user_uid
