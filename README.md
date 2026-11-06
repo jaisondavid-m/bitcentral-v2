@@ -26,6 +26,7 @@ BIT-CENTRAL is a comprehensive, production-grade web application built to centra
 - [Available Scripts](#available-scripts)
 - [Role-Based Access Control (RBAC)](#role-based-access-control-rbac)
 - [Contributing & License](#contributing--license)
+- [Database Partitioning (3-DB Architecture)](#️-database-partitioning-3-db-architecture)
 
 ---
 
@@ -335,3 +336,15 @@ BIT-CENTRAL enforces strict multi-tier permissions:
 3. **Push** to the branch and open a **Pull Request**.
 
 This project is licensed under the **MIT License**. Feel free to customize and extend for your campus! 🚀
+
+---
+
+## 🗄️ Database Partitioning (3-DB Architecture)
+
+The system isolates database workloads across 3 connections to protect quotas and handle high write throughput:
+
+| Database | Connection Config | Tables |
+| :--- | :--- | :--- |
+| **DB 1: Primary / Core** | `MYSQL_HOST` / `MYSQL_CORE_*` | `users`, `admins`, `allowed_emails`, `tracker_users`, `ps_tokens` |
+| **DB 2: Academic & Content** | `MYSQL_ACADEMIC_*` | `cards`, `mess_menu_items`, `semester_subjects`, `qb_answer_keys`, `college_leaves`, `faculty_directory`, `faculty_details`, `sponsor_*` tables |
+| **DB 3: Logs & Free DB (High-Write)** | `MYSQL_LOGS_*` | `audit_logs`, `daily_active_user_stats`, `feedback_messages`, `help_*` (rooms, messages, participants, reports, blocks, restrictions), `notifications`, `user_notification_reads`, `user_notification_dismissals`, `email_job_batches`, `email_queue_items`, `admin_sent_emails`, `lost_found_*` |
