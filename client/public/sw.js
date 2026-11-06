@@ -1,18 +1,21 @@
-/* BIT Central Service Worker v1.0.0
- * PWABuilder-compatible production service worker
- * Features: Static pre-caching, Network-First navigation, Stale-While-Revalidate assets, offline support, update handling
+/**
+ * BIT Central - Production Progressive Web App Service Worker
+ * Version: 2.1.0
+ * Architecture: App Shell + Stale-While-Revalidate Assets + Network-First Navigations
+ * Security: Strictly bypasses all API, Auth, Admin, and Payment transactions.
  */
 
-const CACHE_NAME = "bitcentral-v1.0.0";
-const DYNAMIC_CACHE = "bitcentral-dynamic-v1.0.0";
+const VERSION = "bitcentral-v2.1.0";
+const CACHE_STATIC = `${VERSION}-static`;
+const CACHE_DYNAMIC = `${VERSION}-dynamic`;
+const CACHE_IMAGES = `${VERSION}-images`;
 
-// Core assets to pre-cache on installation
 const PRECACHE_ASSETS = [
   "/",
   "/index.html",
+  "/manifest.webmanifest",
   "/manifest.json",
-  "/CardImgs/cropped_circle_image.png",
-  "/CardImgs/Logo.png",
+  "/icons/icon-48x48.png",
   "/icons/icon-72x72.png",
   "/icons/icon-96x96.png",
   "/icons/icon-128x128.png",
@@ -23,57 +26,118 @@ const PRECACHE_ASSETS = [
   "/icons/icon-384x384.png",
   "/icons/icon-512x512.png",
   "/icons/icon-maskable-192x192.png",
-  "/icons/icon-maskable-512x512.png"
+  "/icons/icon-maskable-512x512.png",
+  "/icons/screenshot-wide.png",
+  "/icons/screenshot-narrow.png",
+  "/CardImgs/Logo.png",
+  "/CardImgs/cropped_circle_image.png"
 ];
 
-// Offline HTML fallback snippet
-const OFFLINE_HTML = `
-<!DOCTYPE html>
+const OFFLINE_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Offline | BIT Central</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #0f172a; color: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; padding: 20px; }
-    .card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 32px; max-width: 400px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
-    h1 { color: #3b82f6; margin-bottom: 12px; font-size: 24px; }
-    p { color: #94a3b8; font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
-    button { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: transform 0.2s; }
-    button:active { transform: scale(0.96); }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 36px 28px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    .icon-badge {
+      width: 64px;
+      height: 64px;
+      background: rgba(37, 99, 235, 0.15);
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      color: #3b82f6;
+      font-size: 28px;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 26px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 12px 28px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn:active {
+      transform: scale(0.98);
+      background: #1d4ed8;
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>You're Offline</h1>
-    <p>Please check your internet connection. Some saved pages remain available offline.</p>
-    <button onclick="window.location.reload()">Retry Connection</button>
+    <div class="icon-badge">⚡</div>
+    <h1>You are currently offline</h1>
+    <p>BIT Central cannot reach the campus network right now. Cached academic papers and offline tools remain accessible.</p>
+    <button class="btn" onclick="window.location.reload()">Check Connection & Retry</button>
   </div>
 </body>
-</html>
-`;
+</html>`;
 
-// 1. Install Event: Pre-cache static assets
+// 1. Install event: Pre-cache core shell
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log("[SW] Pre-caching core assets");
+    caches.open(CACHE_STATIC).then((cache) => {
       return cache.addAll(PRECACHE_ASSETS).catch((err) => {
-        console.warn("[SW] Pre-cache non-critical error:", err);
+        console.warn("[SW] Non-critical precache warning:", err);
       });
     }).then(() => self.skipWaiting())
   );
 });
 
-// 2. Activate Event: Clean up old caches & take control immediately
+// 2. Activate event: Clean up old versions
 self.addEventListener("activate", (event) => {
+  const currentCaches = [CACHE_STATIC, CACHE_DYNAMIC, CACHE_IMAGES];
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then((keys) => {
       return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME && cacheName !== DYNAMIC_CACHE) {
-            console.log("[SW] Deleting obsolete cache:", cacheName);
-            return caches.delete(cacheName);
+        keys.map((key) => {
+          if (!currentCaches.includes(key)) {
+            console.log("[SW] Removing outdated cache:", key);
+            return caches.delete(key);
           }
         })
       );
@@ -81,110 +145,111 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// 3. Fetch Event Strategy: Network-First for HTML/Navigations, Stale-While-Revalidate for Assets
+// 3. Fetch event: Strategic caching
 self.addEventListener("fetch", (event) => {
-  const request = event.request;
+  const { request } = event;
   const url = new URL(request.url);
 
-  // Only handle same-origin GET requests; bypass external domains (e.g. Google Ads, Analytics, Razorpay)
-  if (request.method !== "GET" || url.origin !== self.location.origin) {
+  // Security & Boundary Rules: Only handle GET requests
+  if (request.method !== "GET") {
     return;
   }
 
-  // Bypass backend API calls, auth, admin, and WebSocket/dev ports
+  // Security Rule: NEVER cache authenticated backend APIs, admin panels, or auth flows
   if (
-    url.port === "8080" ||
     url.pathname.startsWith("/api") ||
     url.pathname.startsWith("/auth") ||
-    url.pathname.startsWith("/admin")
+    url.pathname.startsWith("/admin") ||
+    url.port === "8080" ||
+    url.port === "4000"
   ) {
     return;
   }
 
-  // A. Navigation / HTML requests: Network-First with Cache Fallback & Offline HTML
+  // Security Rule: Bypass third-party payment, analytics, ads, and Google OAuth endpoints
+  if (
+    url.hostname.includes("razorpay") ||
+    url.hostname.includes("accounts.google.com") ||
+    url.hostname.includes("googletagmanager.com") ||
+    url.hostname.includes("google-analytics.com") ||
+    url.hostname.includes("pagead2.googlesyndication.com")
+  ) {
+    return;
+  }
+
+  // A. Navigation / HTML Requests: Network-First with Cache / Offline Fallback
   if (request.mode === "navigate" || request.headers.get("accept")?.includes("text/html")) {
     event.respondWith(
       fetch(request)
-        .then((response) => {
-          if (response.status === 200) {
-            const responseClone = response.clone();
-            caches.open(DYNAMIC_CACHE).then((cache) => cache.put(request, responseClone));
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_DYNAMIC).then((cache) => cache.put(request, clone));
           }
-          return response;
+          return networkResponse;
         })
         .catch(async () => {
-          const cachedResponse = await caches.match(request);
-          if (cachedResponse) return cachedResponse;
-          const rootCached = await caches.match("/index.html");
-          if (rootCached) return rootCached;
+          // Attempt matched navigation cache
+          const cached = await caches.match(request);
+          if (cached) return cached;
+
+          // Attempt App Shell (SPA index.html)
+          const appShell = await caches.match("/index.html");
+          if (appShell) return appShell;
+
+          // Fallback to standalone offline HTML
           return new Response(OFFLINE_HTML, {
-            headers: { "Content-Type": "text/html" }
+            headers: { "Content-Type": "text/html; charset=utf-8" }
           });
         })
     );
     return;
   }
 
-  // B. Static Assets (JS, CSS, Images, Fonts, Lotties): Stale-While-Revalidate
-  event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      const fetchPromise = fetch(request)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const responseClone = networkResponse.clone();
-            caches.open(DYNAMIC_CACHE).then((cache) => cache.put(request, responseClone));
-          }
-          return networkResponse;
-        });
+  // B. Static Assets (Vite chunks in /assets/, fonts, images, icons): Stale-While-Revalidate
+  const isStaticAsset =
+    url.pathname.startsWith("/assets/") ||
+    url.pathname.startsWith("/icons/") ||
+    url.pathname.startsWith("/CardImgs/") ||
+    url.pathname.startsWith("/lotties/") ||
+    url.pathname.endsWith(".js") ||
+    url.pathname.endsWith(".css") ||
+    url.pathname.endsWith(".png") ||
+    url.pathname.endsWith(".svg") ||
+    url.pathname.endsWith(".webp") ||
+    url.pathname.endsWith(".woff2");
 
-      if (cachedResponse) {
-        // Return cached asset immediately; background fetch updates cache
-        fetchPromise.catch(() => {});
-        return cachedResponse;
-      }
-      return fetchPromise;
-    })
+  if (isStaticAsset) {
+    event.respondWith(
+      caches.match(request).then((cachedResponse) => {
+        const fetchPromise = fetch(request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              const clone = networkResponse.clone();
+              const targetCache = url.pathname.match(/\.(png|jpg|jpeg|webp|svg|ico)$/i)
+                ? CACHE_IMAGES
+                : CACHE_DYNAMIC;
+              caches.open(targetCache).then((cache) => cache.put(request, clone));
+            }
+            return networkResponse;
+          })
+          .catch(() => cachedResponse);
+
+        return cachedResponse || fetchPromise;
+      })
+    );
+    return;
+  }
+
+  // C. Default: Network with Cache Fallback
+  event.respondWith(
+    fetch(request).catch(() => caches.match(request))
   );
 });
 
-// 4. Handle skipWaiting message from client for instant updates
+// 4. Client Message Event (Instant update trigger)
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
-});
-
-// 5. Handle Push Notifications (if integrated)
-self.addEventListener("push", (event) => {
-  if (!event.data) return;
-  try {
-    const data = event.data.json();
-    const options = {
-      body: data.body || "New update available on BIT Central",
-      icon: "/icons/icon-192x192.png",
-      badge: "/icons/icon-72x72.png",
-      vibrate: [100, 50, 100],
-      data: { url: data.url || "/" }
-    };
-    event.waitUntil(self.registration.showNotification(data.title || "BIT Central", options));
-  } catch (err) {
-    console.error("[SW] Push notification error:", err);
-  }
-});
-
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
-  const targetUrl = event.notification.data?.url || "/";
-  event.waitUntil(
-    clients.matchAll({ type: "window", includeUncontrolled: true }).then((windowClients) => {
-      for (const client of windowClients) {
-        if (client.url === targetUrl && "focus" in client) {
-          return client.focus();
-        }
-      }
-      if (clients.openWindow) {
-        return clients.openWindow(targetUrl);
-      }
-    })
-  );
 });

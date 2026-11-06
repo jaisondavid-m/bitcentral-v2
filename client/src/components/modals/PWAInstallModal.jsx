@@ -10,8 +10,12 @@ function isStandalone() {
   if (typeof window === "undefined") return false;
   return (
     window.matchMedia("(display-mode: standalone)").matches ||
+    window.matchMedia("(display-mode: fullscreen)").matches ||
+    window.matchMedia("(display-mode: minimal-ui)").matches ||
     window.navigator.standalone === true ||
-    document.referrer.includes("android-app://")
+    document.referrer.includes("android-app://") ||
+    window.location.search.includes("utm_source=pwa") ||
+    window.location.search.includes("utm_source=twa")
   );
 }
 

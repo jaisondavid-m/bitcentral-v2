@@ -1,0 +1,64 @@
+{
+  "packageId": "com.bitcentral",
+  "host": "bitcentral.bitsathy.in",
+  "name": "BIT Central",
+  "launcherName": "BIT Central",
+  "display": "standalone",
+  "themeColor": "#2563eb",
+  "themeColorDark": "#0f172a",
+  "navigationColor": "#0f172a",
+  "navigationColorDark": "#0f172a",
+  "navigationDividerColor": "#334155",
+  "navigationDividerColorDark": "#334155",
+  "backgroundColor": "#0f172a",
+  "enableNotifications": true,
+  "startUrl": "/?utm_source=twa",
+  "iconUrl": "https://bitcentral.bitsathy.in/icons/icon-512x512.png",
+  "maskableIconUrl": "https://bitcentral.bitsathy.in/icons/icon-maskable-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "E:\\Projects\\bitcentral-v2\\android\\bitcentral-release.keystore",
+    "alias": "bitcentral"
+  },
+  "appVersion": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "Question Bank",
+      "shortName": "Question Bank",
+      "url": "/#qb",
+      "chosenIconUrl": "http://127.0.0.1:3099/icons/icon-96x96.png"
+    },
+    {
+      "name": "Mess Menu",
+      "shortName": "Mess Menu",
+      "url": "/#mess",
+      "chosenIconUrl": "http://127.0.0.1:3099/icons/icon-96x96.png"
+    },
+    {
+      "name": "Hall Finder",
+      "shortName": "Hall Finder",
+      "url": "/#hallfinder",
+      "chosenIconUrl": "http://127.0.0.1:3099/icons/icon-96x96.png"
+    },
+    {
+      "name": "GPA Calculator",
+      "shortName": "GPA Calculator",
+      "url": "/#gpa",
+      "chosenIconUrl": "http://127.0.0.1:3099/icons/icon-96x96.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://bitcentral.bitsathy.in/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": true
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": "true",
+  "orientation": "any"
+}

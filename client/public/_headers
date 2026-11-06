@@ -33,9 +33,22 @@
   Cache-Control: public, max-age=86400, stale-while-revalidate=43200
   Content-Type: application/manifest+json; charset=utf-8
 
+/manifest.webmanifest
+  Cache-Control: public, max-age=86400, stale-while-revalidate=43200
+  Content-Type: application/manifest+json; charset=utf-8
+
 # Service Worker must NOT be cached long-term so updates propagate immediately
 /sw.js
   Cache-Control: public, max-age=0, must-revalidate
+
+/service-worker.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Digital Asset Links for Android TWA verification
+/.well-known/assetlinks.json
+  Cache-Control: public, max-age=86400
+  Content-Type: application/json; charset=utf-8
+  Access-Control-Allow-Origin: *
 
 # 6. HTML & Dynamic Pages: Always validate so user gets fresh releases immediately
 /*

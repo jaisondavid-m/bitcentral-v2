@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.bitcentral",
+      "sha256_cert_fingerprints": [
+        "8C:BB:1A:86:83:6C:D3:1C:0D:39:C3:11:A0:FE:27:35:7F:41:09:AB:54:D2:79:B8:89:5B:F5:6E:20:43:CB:EF"
+      ]
+    }
+  }
+]

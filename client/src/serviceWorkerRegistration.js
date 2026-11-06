@@ -24,7 +24,8 @@ export function register(config) {
               installingWorker.onstatechange = () => {
                 if (installingWorker.state === "installed") {
                   if (navigator.serviceWorker.controller) {
-                    console.log("[PWA] New content is available; please refresh.");
+                    console.log("[PWA] New content is available; activating update.");
+                    installingWorker.postMessage({ type: "SKIP_WAITING" });
                     if (config && config.onUpdate) {
                       config.onUpdate(registration);
                     }

@@ -2,19 +2,33 @@
   "id": "/",
   "name": "BIT Central - BIT Sathy Student Portal",
   "short_name": "BIT Central",
-  "description": "BIT Central is the all-in-one student portal for Bannari Amman Institute of Technology (BIT Sathy), offering quick access to academic resources, question banks, answer keys, mess menus, timetable, GPA calculator, hall finder, and campus services.",
+  "description": "BIT Central is the all-in-one student portal for Bannari Amman Institute of Technology (BIT Sathy), offering fast access to academic resources, question banks, answer keys, mess menus, timetable, GPA calculator, hall finder, and campus services.",
   "start_url": "/?utm_source=pwa",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui", "window-controls-overlay"],
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "window-controls-overlay"
+  ],
   "orientation": "any",
   "background_color": "#0f172a",
   "theme_color": "#2563eb",
   "lang": "en-US",
   "dir": "ltr",
-  "categories": ["education", "productivity", "utilities"],
+  "categories": [
+    "education",
+    "productivity",
+    "utilities"
+  ],
   "prefer_related_applications": false,
   "icons": [
+    {
+      "src": "/icons/icon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/icons/icon-72x72.png",
       "sizes": "72x72",
@@ -138,18 +152,18 @@
   ],
   "screenshots": [
     {
-      "src": "/CardImgs/image.png",
+      "src": "/icons/screenshot-wide.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "BIT Central Dashboard"
+      "label": "BIT Central Academic & Campus Dashboard"
     },
     {
-      "src": "/icons/icon-512x512.png",
-      "sizes": "512x512",
+      "src": "/icons/screenshot-narrow.png",
+      "sizes": "720x1280",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "BIT Central Mobile View"
+      "label": "BIT Central Mobile Student Portal"
     }
   ],
   "handle_links": "preferred",
