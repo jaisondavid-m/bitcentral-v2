@@ -735,4 +735,38 @@ export async function testCloudflareConnection(payload) {
   const response = await api.post("/admin/cloudflare/test", payload || {}, { headers });
   return response.data;
 }
+
+// Audit Logs Admin API (DB 3)
+export async function getAdminAuditLogs({
+  page = 1,
+  limit = 50,
+  search = "",
+  method = "",
+  status = "",
+  user_uid = "",
+  roll_no = "",
+} = {}) {
+  const headers = await getAdminHeaders();
+  const params = new URLSearchParams();
+  if (page) params.set("page", page);
+  if (limit) params.set("limit", limit);
+  if (search) params.set("search", search);
+  if (method) params.set("method", method);
+  if (status) params.set("status", status);
+  if (user_uid) params.set("user_uid", user_uid);
+  if (roll_no) params.set("roll_no", roll_no);
+
+  const response = await api.get(`/admin/audit-logs?${params.toString()}`, { headers });
+  return response.data;
+}
+
+export async function getAdminAuditLogUsers({ search = "" } = {}) {
+  const headers = await getAdminHeaders();
+  const params = new URLSearchParams();
+  if (search) params.set("search", search);
+
+  const response = await api.get(`/admin/audit-logs/users?${params.toString()}`, { headers });
+  return response.data;
+}
+
 

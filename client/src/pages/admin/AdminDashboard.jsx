@@ -105,6 +105,7 @@ import AdminNotificationsSection from "./AdminNotificationsSection.jsx";
 import AdminHelpPage from "./AdminHelpPage.jsx";
 import AdminDeploymentsSection from "./AdminDeploymentsSection.jsx";
 import CloudflarePagesSection from "./CloudflarePagesSection.jsx";
+import AdminAuditLogsSection from "./AdminAuditLogsSection.jsx";
 
 function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
@@ -391,6 +392,15 @@ const ADMIN_TABS = [
     description: "Real-time serving origin inspection (Own Server vs Vercel / Render), failover network health checks, and TiDB Cloud status.",
   },
   {
+    key: "audit-logs",
+    label: "Audit Logs",
+    href: "/admin/audit-logs",
+    icon: ShieldAlert,
+    gradient: "from-amber-600 to-rose-600",
+    badge: "DB 3 Logs",
+    description: "Inspect live API audit logs, request payloads, user activity, IPs, and HTTP status codes recorded in DB 3.",
+  },
+  {
     key: "cloudflare",
     label: "Cloudflare Pages",
     href: "/admin/cloudflare",
@@ -414,6 +424,7 @@ function getAdminTabFromPath(pathname) {
   if (pathname === "/admin" || pathname === "/admin/") return "overview";
   if (pathname.startsWith("/admin/analytics")) return "analytics";
   if (pathname.startsWith("/admin/deployments")) return "deployments";
+  if (pathname.startsWith("/admin/audit-logs")) return "audit-logs";
   if (pathname.startsWith("/admin/cloudflare")) return "cloudflare";
   if (pathname.startsWith("/admin/user-directory")) return "user-directory";
   if (pathname.startsWith("/admin/sponsors")) return "sponsors";
@@ -7301,6 +7312,8 @@ function AdminDashboard({ initialTab } = {}) {
         <AIKeySection />
       ) : activeTab === "deployments" ? (
         <AdminDeploymentsSection />
+      ) : activeTab === "audit-logs" ? (
+        <AdminAuditLogsSection />
       ) : activeTab === "cloudflare" ? (
         <CloudflarePagesSection />
       ) : activeTab === "super" ? (
@@ -7324,7 +7337,7 @@ function AdminAnalyticsPage() {
   return <AdminDashboard initialTab="analytics" />;
 }
 
-function AdminAuditLogsPage() {
+export function AdminAuditLogsPage() {
   return <AdminDashboard initialTab="audit-logs" />;
 }
 

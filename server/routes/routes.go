@@ -297,6 +297,7 @@ func SetupRouter(
 	{
 		admin.GET("/analytics", analyticsHandler.GetAnalytics)
 		admin.GET("/audit-logs", adminHandler.GetAuditLogs)
+		admin.GET("/audit-logs/users", adminHandler.GetAuditLogUsers)
 		admin.GET("/sponsors", sponsorsHandler.GetSponsorsAdmin)
 		admin.GET("/sponsors/leaderboard", sponsorsHandler.GetSponsorsLeaderboardAdmin)
 		admin.PUT("/sponsors/name-override", sponsorsHandler.UpdateSponsorNameOverride)

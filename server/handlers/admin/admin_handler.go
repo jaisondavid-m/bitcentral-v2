@@ -867,17 +867,67 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 	}
 	offset := (page - 1) * limit
 
-	var total int
-	_ = db.QueryRow("SELECT COUNT(*) FROM audit_logs").Scan(&total)
+	search := strings.TrimSpace(c.Query("search"))
+	method := strings.ToUpper(strings.TrimSpace(c.Query("method")))
+	status := strings.TrimSpace(c.Query("status"))
+	userUID := strings.TrimSpace(c.Query("user_uid"))
+	rollNo := strings.TrimSpace(c.Query("roll_no"))
 
-	rows, err := db.Query(`
+	var whereClauses []string
+	var args []any
+
+	if userUID != "" {
+		whereClauses = append(whereClauses, "user_uid = ?")
+		args = append(args, userUID)
+	}
+
+	if rollNo != "" {
+		whereClauses = append(whereClauses, "roll_no = ?")
+		args = append(args, rollNo)
+	}
+
+	if method != "" && method != "ALL" {
+		whereClauses = append(whereClauses, "method = ?")
+		args = append(args, method)
+	}
+
+	if status != "" && status != "ALL" {
+		if status == "2xx" {
+			whereClauses = append(whereClauses, "status_code >= 200 AND status_code < 300")
+		} else if status == "4xx" {
+			whereClauses = append(whereClauses, "status_code >= 400 AND status_code < 500")
+		} else if status == "5xx" {
+			whereClauses = append(whereClauses, "status_code >= 500")
+		} else if sc, err := strconv.Atoi(status); err == nil {
+			whereClauses = append(whereClauses, "status_code = ?")
+			args = append(args, sc)
+		}
+	}
+
+	if search != "" {
+		whereClauses = append(whereClauses, "(endpoint LIKE ? OR user_name LIKE ? OR roll_no LIKE ? OR ip_address LIKE ?)")
+		pattern := "%" + search + "%"
+		args = append(args, pattern, pattern, pattern, pattern)
+	}
+
+	whereSQL := ""
+	if len(whereClauses) > 0 {
+		whereSQL = " WHERE " + strings.Join(whereClauses, " AND ")
+	}
+
+	var total int
+	countQuery := "SELECT COUNT(*) FROM audit_logs" + whereSQL
+	_ = db.QueryRow(countQuery, args...).Scan(&total)
+
+	selectQuery := `
 		SELECT id, method, endpoint, COALESCE(query, ''), COALESCE(payload, ''), ip_address,
 		       COALESCE(user_uid, ''), COALESCE(user_name, ''), COALESCE(roll_no, ''), COALESCE(role, ''),
 		       status_code, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s')
 		FROM audit_logs
-		ORDER BY id DESC
-		LIMIT ? OFFSET ?
-	`, limit, offset)
+	` + whereSQL + " ORDER BY id DESC LIMIT ? OFFSET ?"
+
+	selectArgs := append(args, limit, offset)
+	rows, err := db.Query(selectQuery, selectArgs...)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -916,5 +966,68 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 		"total":   total,
 		"page":    page,
 		"limit":   limit,
+	})
+}
+
+// GET /admin/audit-logs/users retrieves aggregated user list with log counts from DB 3
+func (h *AdminHandler) GetAuditLogUsers(c *gin.Context) {
+	db := config.GetLogsDB()
+	if db == nil {
+		c.JSON(http.StatusOK, gin.H{"success": true, "users": []any{}})
+		return
+	}
+
+	search := strings.TrimSpace(c.Query("search"))
+	whereSQL := "WHERE user_uid != '' AND user_uid IS NOT NULL"
+	var args []any
+	if search != "" {
+		whereSQL += " AND (user_name LIKE ? OR roll_no LIKE ? OR user_uid LIKE ?)"
+		pattern := "%" + search + "%"
+		args = append(args, pattern, pattern, pattern)
+	}
+
+	query := `
+		SELECT user_uid,
+		       COALESCE(MAX(user_name), '') AS user_name,
+		       COALESCE(MAX(roll_no), '') AS roll_no,
+		       COALESCE(MAX(role), '') AS role,
+		       COUNT(*) AS log_count,
+		       COALESCE(MAX(ip_address), '') AS last_ip,
+		       DATE_FORMAT(MAX(created_at), '%Y-%m-%d %H:%i:%s') AS last_active
+		FROM audit_logs
+		` + whereSQL + `
+		GROUP BY user_uid
+		ORDER BY MAX(created_at) DESC
+		LIMIT 200
+	`
+
+	rows, err := db.Query(query, args...)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	type AuditUser struct {
+		UserUID    string `json:"user_uid"`
+		UserName   string `json:"user_name"`
+		RollNo     string `json:"roll_no"`
+		Role       string `json:"role"`
+		LogCount   int    `json:"log_count"`
+		LastIP     string `json:"last_ip"`
+		LastActive string `json:"last_active"`
+	}
+
+	users := make([]AuditUser, 0)
+	for rows.Next() {
+		var u AuditUser
+		if err := rows.Scan(&u.UserUID, &u.UserName, &u.RollNo, &u.Role, &u.LogCount, &u.LastIP, &u.LastActive); err == nil {
+			users = append(users, u)
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"users":   users,
 	})
 }
