@@ -14,126 +14,287 @@ import (
 	"server/data"
 )
 
-var DB *sql.DB
+var (
+	// DB is the primary Core MySQL connection (Auth, Users, Admins, Allowed Emails, Tracker Users, PS Tokens)
+	DB *sql.DB
 
-func InitMySQL() {
-	user := os.Getenv("MYSQL_USER")
-	password := os.Getenv("MYSQL_PASSWORD")
-	host := os.Getenv("MYSQL_HOST")
-	port := os.Getenv("MYSQL_PORT")
-	database := os.Getenv("MYSQL_DATABASE")
+	// DBAcademic is the Academic & Portal Content MySQL connection (Cards, Mess Menu, Subjects, QB, Leaves, Faculty, Sponsors)
+	DBAcademic *sql.DB
 
-	if user == "" || password == "" || host == "" || database == "" {
-		log.Fatal("❌ Missing required MySQL environment variables")
+	// DBLogs is the High-Write Logs & Activity Free MySQL connection (Audit Logs, BIT Help Community, Feedback Chat, Notifications, Email Queue, DAU)
+	DBLogs *sql.DB
+)
+
+// GetCoreDB returns the primary Core database connection
+func GetCoreDB() *sql.DB {
+	return DB
+}
+
+// GetAcademicDB returns the Academic & Content database connection, falling back to Core DB if unconfigured
+func GetAcademicDB() *sql.DB {
+	if DBAcademic != nil {
+		return DBAcademic
 	}
+	return DB
+}
 
-	if port == "" {
-		port = "3306"
+// GetLogsDB returns the high-write Logs database connection, falling back to Core DB if unconfigured
+func GetLogsDB() *sql.DB {
+	if DBLogs != nil {
+		return DBLogs
 	}
+	return DB
+}
 
-	useSSL := os.Getenv("MYSQL_SSL_ENABLED") == "true"
+type dbConnConfig struct {
+	Name     string
+	Host     string
+	Port     string
+	User     string
+	Password string
+	Database string
+	UseSSL   bool
+	CAPath   string
+	TLSName  string
+}
+
+func getEnvFirst(keys ...string) string {
+	for _, k := range keys {
+		if v := strings.TrimSpace(os.Getenv(k)); v != "" {
+			return v
+		}
+	}
+	return ""
+}
+
+func connectDatabase(cfg dbConnConfig) (*sql.DB, error) {
+	if cfg.Host == "" || cfg.User == "" || cfg.Database == "" {
+		return nil, fmt.Errorf("missing required connection parameters for %s", cfg.Name)
+	}
+	if cfg.Port == "" {
+		cfg.Port = "3306"
+	}
 
 	var dsn string
-
-	if useSSL {
-		caPath := os.Getenv("MYSQL_SSL_CA_PATH")
-		if caPath == "" {
-			log.Fatal("❌ MYSQL_SSL_CA_PATH is required when SSL is enabled")
+	if cfg.UseSSL {
+		if cfg.CAPath == "" {
+			return nil, fmt.Errorf("MYSQL_SSL_CA_PATH is required for %s when SSL is enabled", cfg.Name)
 		}
 
 		rootCertPool := x509.NewCertPool()
-
-		pem, err := os.ReadFile(caPath)
+		pem, err := os.ReadFile(cfg.CAPath)
 		if err != nil {
-			log.Fatalf("❌ Failed to read CA file: %v", err)
+			return nil, fmt.Errorf("failed to read CA file (%s) for %s: %w", cfg.CAPath, cfg.Name, err)
 		}
 
 		if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
-			log.Fatal("❌ Failed to append CA cert")
+			return nil, fmt.Errorf("failed to append CA cert for %s", cfg.Name)
 		}
 
 		tlsConfig := &tls.Config{
 			RootCAs:            rootCertPool,
 			MinVersion:         tls.VersionTLS12,
-			InsecureSkipVerify: false, // NEVER set true in production
+			InsecureSkipVerify: false,
 		}
 
-		if err := mysql.RegisterTLSConfig("custom", tlsConfig); err != nil {
-			log.Fatalf("❌ TLS config error: %v", err)
+		if err := mysql.RegisterTLSConfig(cfg.TLSName, tlsConfig); err != nil {
+			return nil, fmt.Errorf("TLS config registration error for %s: %w", cfg.Name, err)
 		}
 
 		dsn = fmt.Sprintf(
-			"%s:%s@tcp(%s:%s)/%s?tls=custom&parseTime=true&timeout=5s&readTimeout=5s&writeTimeout=5s",
-			user, password, host, port, database,
+			"%s:%s@tcp(%s:%s)/%s?tls=%s&parseTime=true&timeout=5s&readTimeout=5s&writeTimeout=5s",
+			cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Database, cfg.TLSName,
 		)
-
 	} else {
 		dsn = fmt.Sprintf(
 			"%s:%s@tcp(%s:%s)/%s?parseTime=true&timeout=5s&readTimeout=5s&writeTimeout=5s",
-			user, password, host, port, database,
+			cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Database,
 		)
 	}
 
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
-		log.Fatalf("❌ DB open error: %v", err)
+		return nil, fmt.Errorf("DB open error for %s: %w", cfg.Name, err)
 	}
 
-	// 🔥 Connection Pool (Serverless & TiDB Optimized)
+	// Serverless & TiDB connection pool tuning
 	db.SetMaxOpenConns(15)
 	db.SetMaxIdleConns(5)
 	db.SetConnMaxLifetime(10 * time.Minute)
 	db.SetConnMaxIdleTime(2 * time.Minute)
 
-	// Test connection
 	if err := db.Ping(); err != nil {
-		log.Fatalf("❌ DB connection failed: %v", err)
+		_ = db.Close()
+		return nil, fmt.Errorf("DB ping failed for %s (%s:%s/%s): %w", cfg.Name, cfg.Host, cfg.Port, cfg.Database, err)
 	}
 
-	DB = db
-	log.Println("✅ MySQL connected successfully")
-
-	// Skip repeated DDL statements on every boot if DB already initialized (saves ~50 DDLs + TiDB RUs)
-	if os.Getenv("FORCE_DB_MIGRATIONS") != "true" {
-		var checkUsers int
-		if err := DB.QueryRow("SELECT 1 FROM users LIMIT 1").Scan(&checkUsers); err == nil {
-			log.Println("ℹ️ Database schema already initialized. Skipping DDL migrations to save TiDB limits (set FORCE_DB_MIGRATIONS=true to force).")
-			return
-		}
-	}
-
-	log.Println("⚡ Running initial database schema setup...")
-	createTokenTable()
-	createUsersTable()
-	if os.Getenv("RUN_LEGACY_CLEANUP") == "true" {
-		dropUserPresenceTable()
-		dropAcademicTables()
-	}
-	createQBAnswerKeyTable()
-	createSemesterSubjectsTable()
-	createCardsTable()
-	createMessMenuTables()
-	createAdminsTable()
-	createAllowedEmailsTable()
-	createTrackerUsersTable()
-	createSponsorNameOverridesTable()
-	createSponsorDepartmentTables()
-	createSponsorTransactionOverridesTable()
-	createSponsorTransactionsTable()
-	createFeedbackMessagesTable()
-	createFacultyDirectoryTable()
-	ensureFacultyDetailsTableOrView()
-	createAuditLogsTable()
-	createDailyActiveUserStatsTable()
-	createAdminSentEmailsTable()
-	createEmailJobQueuesTables()
-	createCollegeLeavesTable()
-	createNotificationsTables()
-	createLostFoundTables()
-	createHelpTables()
+	log.Printf("✅ %s connected successfully (%s:%s/%s)", cfg.Name, cfg.Host, cfg.Port, cfg.Database)
+	return db, nil
 }
 
-func createAdminsTable() {
+func InitMySQL() {
+	// -------------------------------------------------------------
+	// 1. Core / Primary DB Connection (Auth, Users, Admins, Tokens)
+	// -------------------------------------------------------------
+	coreHost := getEnvFirst("MYSQL_CORE_HOST", "MYSQL_PRIMARY_HOST", "MYSQL_HOST")
+	coreUser := getEnvFirst("MYSQL_CORE_USER", "MYSQL_PRIMARY_USER", "MYSQL_USER")
+	corePass := getEnvFirst("MYSQL_CORE_PASSWORD", "MYSQL_PRIMARY_PASSWORD", "MYSQL_PASSWORD")
+	corePort := getEnvFirst("MYSQL_CORE_PORT", "MYSQL_PRIMARY_PORT", "MYSQL_PORT")
+	coreDatabase := getEnvFirst("MYSQL_CORE_DATABASE", "MYSQL_PRIMARY_DATABASE", "MYSQL_DATABASE")
+	coreSSL := getEnvFirst("MYSQL_CORE_SSL_ENABLED", "MYSQL_PRIMARY_SSL_ENABLED", "MYSQL_SSL_ENABLED") == "true"
+	coreCAPath := getEnvFirst("MYSQL_CORE_SSL_CA_PATH", "MYSQL_PRIMARY_SSL_CA_PATH", "MYSQL_SSL_CA_PATH")
+
+	if coreHost == "" || coreUser == "" || coreDatabase == "" {
+		log.Fatal("❌ Missing required MySQL Core environment variables (MYSQL_HOST/MYSQL_CORE_HOST, MYSQL_USER, MYSQL_DATABASE)")
+	}
+
+	coreDB, err := connectDatabase(dbConnConfig{
+		Name:     "Core / Primary DB",
+		Host:     coreHost,
+		Port:     corePort,
+		User:     coreUser,
+		Password: corePass,
+		Database: coreDatabase,
+		UseSSL:   coreSSL,
+		CAPath:   coreCAPath,
+		TLSName:  "custom_core",
+	})
+	if err != nil {
+		log.Fatalf("❌ Failed to connect to Core MySQL database: %v", err)
+	}
+	DB = coreDB
+
+	// -------------------------------------------------------------
+	// 2. Academic & Content DB Connection (Cards, Mess, Leaves, Semesters, Sponsors)
+	// -------------------------------------------------------------
+	acadHost := getEnvFirst("MYSQL_ACADEMIC_HOST", "MYSQL_CONTENT_HOST")
+	if acadHost != "" {
+		acadUser := getEnvFirst("MYSQL_ACADEMIC_USER", "MYSQL_CONTENT_USER")
+		acadPass := getEnvFirst("MYSQL_ACADEMIC_PASSWORD", "MYSQL_CONTENT_PASSWORD")
+		acadPort := getEnvFirst("MYSQL_ACADEMIC_PORT", "MYSQL_CONTENT_PORT")
+		acadDatabase := getEnvFirst("MYSQL_ACADEMIC_DATABASE", "MYSQL_CONTENT_DATABASE")
+		acadSSL := getEnvFirst("MYSQL_ACADEMIC_SSL_ENABLED", "MYSQL_CONTENT_SSL_ENABLED", "MYSQL_SSL_ENABLED") == "true"
+		acadCAPath := getEnvFirst("MYSQL_ACADEMIC_SSL_CA_PATH", "MYSQL_CONTENT_SSL_CA_PATH", "MYSQL_SSL_CA_PATH")
+
+		acadDB, err := connectDatabase(dbConnConfig{
+			Name:     "Academic & Content DB",
+			Host:     acadHost,
+			Port:     acadPort,
+			User:     acadUser,
+			Password: acadPass,
+			Database: acadDatabase,
+			UseSSL:   acadSSL,
+			CAPath:   acadCAPath,
+			TLSName:  "custom_academic",
+		})
+		if err != nil {
+			log.Printf("⚠️ Academic DB connection failed (%v). Falling back to Core DB.", err)
+			DBAcademic = DB
+		} else {
+			DBAcademic = acadDB
+		}
+	} else {
+		log.Println("ℹ️ Academic DB credentials not configured (MYSQL_ACADEMIC_HOST). Falling back to Core DB.")
+		DBAcademic = DB
+	}
+
+	// -------------------------------------------------------------
+	// 3. Logs & Free High-Write DB Connection (Audit Logs, Help Forum, Feedback, Notifications, Mail Queues)
+	// -------------------------------------------------------------
+	logsHost := getEnvFirst("MYSQL_LOGS_HOST", "MYSQL_FREE_HOST", "MYSQL_AUDIT_HOST")
+	if logsHost != "" {
+		logsUser := getEnvFirst("MYSQL_LOGS_USER", "MYSQL_FREE_USER", "MYSQL_AUDIT_USER")
+		logsPass := getEnvFirst("MYSQL_LOGS_PASSWORD", "MYSQL_FREE_PASSWORD", "MYSQL_AUDIT_PASSWORD")
+		logsPort := getEnvFirst("MYSQL_LOGS_PORT", "MYSQL_FREE_PORT", "MYSQL_AUDIT_PORT")
+		logsDatabase := getEnvFirst("MYSQL_LOGS_DATABASE", "MYSQL_FREE_DATABASE", "MYSQL_AUDIT_DATABASE")
+		logsSSL := getEnvFirst("MYSQL_LOGS_SSL_ENABLED", "MYSQL_FREE_SSL_ENABLED", "MYSQL_SSL_ENABLED") == "true"
+		logsCAPath := getEnvFirst("MYSQL_LOGS_SSL_CA_PATH", "MYSQL_FREE_SSL_CA_PATH", "MYSQL_SSL_CA_PATH")
+
+		logsDB, err := connectDatabase(dbConnConfig{
+			Name:     "Logs & High-Write Free DB",
+			Host:     logsHost,
+			Port:     logsPort,
+			User:     logsUser,
+			Password: logsPass,
+			Database: logsDatabase,
+			UseSSL:   logsSSL,
+			CAPath:   logsCAPath,
+			TLSName:  "custom_logs",
+		})
+		if err != nil {
+			log.Printf("⚠️ Logs DB connection failed (%v). Falling back to Core DB.", err)
+			DBLogs = DB
+		} else {
+			DBLogs = logsDB
+		}
+	} else {
+		log.Println("ℹ️ Logs & Free DB credentials not configured (MYSQL_LOGS_HOST/MYSQL_FREE_HOST). Falling back to Core DB.")
+		DBLogs = DB
+	}
+
+	forceMigrations := os.Getenv("FORCE_DB_MIGRATIONS") == "true"
+
+	// -------------------------------------------------------------
+	// Schema Migrations - Executed per target DB cluster
+	// -------------------------------------------------------------
+
+	// A. Core Schema Migrations (DB)
+	var checkUsers int
+	shouldInitCore := forceMigrations || DB.QueryRow("SELECT 1 FROM users LIMIT 1").Scan(&checkUsers) != nil
+	if shouldInitCore {
+		log.Println("⚡ Running Core DB schema setup...")
+		createTokenTable(DB)
+		createUsersTable(DB)
+		if os.Getenv("RUN_LEGACY_CLEANUP") == "true" {
+			dropUserPresenceTable(DB)
+		}
+		createAdminsTable(DB)
+		createAllowedEmailsTable(DB)
+		createTrackerUsersTable(DB)
+	} else {
+		log.Println("ℹ️ Core DB schema already initialized. Skipping DDL migrations.")
+	}
+
+	// B. Academic & Content Schema Migrations (DBAcademic)
+	var checkCards int
+	shouldInitAcademic := forceMigrations || DBAcademic.QueryRow("SELECT 1 FROM cards LIMIT 1").Scan(&checkCards) != nil
+	if shouldInitAcademic {
+		log.Println("⚡ Running Academic & Content DB schema setup...")
+		if os.Getenv("RUN_LEGACY_CLEANUP") == "true" {
+			dropAcademicTables(DBAcademic)
+		}
+		createQBAnswerKeyTable(DBAcademic)
+		createSemesterSubjectsTable(DBAcademic)
+		createCardsTable(DBAcademic)
+		createMessMenuTables(DBAcademic)
+		createCollegeLeavesTable(DBAcademic)
+		createFacultyDirectoryTable(DBAcademic)
+		ensureFacultyDetailsTableOrView(DBAcademic)
+		createSponsorNameOverridesTable(DBAcademic)
+		createSponsorDepartmentTables(DBAcademic)
+	} else {
+		log.Println("ℹ️ Academic & Content DB schema already initialized. Skipping DDL migrations.")
+	}
+
+	// C. Logs & High-Write Schema Migrations (DBLogs)
+	var checkAudit int
+	shouldInitLogs := forceMigrations || DBLogs.QueryRow("SELECT 1 FROM audit_logs LIMIT 1").Scan(&checkAudit) != nil
+	if shouldInitLogs {
+		log.Println("⚡ Running Logs & High-Write DB schema setup...")
+		createAuditLogsTable(DBLogs)
+		createDailyActiveUserStatsTable(DBLogs)
+		createFeedbackMessagesTable(DBLogs)
+		createNotificationsTables(DBLogs)
+		createAdminSentEmailsTable(DBLogs)
+		createEmailJobQueuesTables(DBLogs)
+		createLostFoundTables(DBLogs)
+		createHelpTables(DBLogs)
+	} else {
+		log.Println("ℹ️ Logs & High-Write DB schema already initialized. Skipping DDL migrations.")
+	}
+}
+
+func createAdminsTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS admins (
 		uid VARCHAR(128) PRIMARY KEY,
@@ -141,13 +302,13 @@ func createAdminsTable() {
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	) ENGINE=InnoDB;`
 
-	if _, err := DB.Exec(query); err != nil {
+	if _, err := db.Exec(query); err != nil {
 		log.Fatalf("❌ Failed to create admins table: %v", err)
 	}
 	log.Println("✅ admins table ready")
 }
 
-func createFeedbackMessagesTable() {
+func createFeedbackMessagesTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS feedback_messages (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -162,13 +323,13 @@ func createFeedbackMessagesTable() {
 		INDEX idx_user_uid_created (user_uid, created_at)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(query); err != nil {
+	if _, err := db.Exec(query); err != nil {
 		log.Fatalf("❌ Failed to create feedback_messages table: %v", err)
 	}
 	log.Println("✅ feedback_messages table ready")
 }
 
-func createAllowedEmailsTable() {
+func createAllowedEmailsTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS allowed_emails (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -178,14 +339,14 @@ func createAllowedEmailsTable() {
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	) ENGINE=InnoDB;`
 
-	if _, err := DB.Exec(query); err != nil {
+	if _, err := db.Exec(query); err != nil {
 		log.Fatalf("❌ Failed to create allowed_emails table: %v", err)
 	}
 	log.Println("✅ allowed_emails table ready")
 }
 
 // ✅ Create table with dynamic name
-func createTokenTable() {
+func createTokenTable(db *sql.DB) {
 	table := os.Getenv("MYSQL_TOKEN_TABLE")
 	if table == "" {
 		table = "ps_tokens"
@@ -200,7 +361,7 @@ func createTokenTable() {
 	) ENGINE=InnoDB;
 	`, table)
 
-	_, err := DB.Exec(query)
+	_, err := db.Exec(query)
 	if err != nil {
 		log.Fatalf("❌ Failed to create table: %v", err)
 	}
@@ -208,7 +369,7 @@ func createTokenTable() {
 	log.Printf("✅ %s table ready\n", table)
 }
 
-func createUsersTable() {
+func createUsersTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS users (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -228,26 +389,26 @@ func createUsersTable() {
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 	) ENGINE=InnoDB;`
 
-	if _, err := DB.Exec(query); err != nil {
+	if _, err := db.Exec(query); err != nil {
 		log.Printf("ℹ️ createUsersTable notice: %v", err)
 	}
 
 	// 1. Add google_id column if missing
-	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN google_id VARCHAR(255) NULL`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE users ADD COLUMN google_id VARCHAR(255) NULL`); err != nil {
 		log.Printf("ℹ️ google_id column status: %v", err)
 	}
 
 	// 2. Backfill google_id from uid for 4000+ existing users
-	if _, err := DB.Exec(`UPDATE users SET google_id = uid WHERE (google_id IS NULL OR google_id = '') AND (uid IS NOT NULL AND uid != '')`); err != nil {
+	if _, err := db.Exec(`UPDATE users SET google_id = uid WHERE (google_id IS NULL OR google_id = '') AND (uid IS NOT NULL AND uid != '')`); err != nil {
 		log.Printf("ℹ️ google_id backfill status: %v", err)
 	}
 
 	// 3. Add id column auto-increment if missing
 	var hasID int
-	_ = DB.QueryRow(`SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'id'`).Scan(&hasID)
+	_ = db.QueryRow(`SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'id'`).Scan(&hasID)
 	if hasID == 0 {
-		if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN id INT AUTO_INCREMENT UNIQUE KEY FIRST`); err != nil {
-			if _, err2 := DB.Exec(`ALTER TABLE users ADD COLUMN id INT AUTO_INCREMENT UNIQUE KEY`); err2 != nil {
+		if _, err := db.Exec(`ALTER TABLE users ADD COLUMN id INT AUTO_INCREMENT UNIQUE KEY FIRST`); err != nil {
+			if _, err2 := db.Exec(`ALTER TABLE users ADD COLUMN id INT AUTO_INCREMENT UNIQUE KEY`); err2 != nil {
 				log.Printf("⚠️ id column add error: %v / %v", err, err2)
 			} else {
 				log.Println("✅ Successfully added id AUTO_INCREMENT UNIQUE KEY column for 4000+ users")
@@ -258,54 +419,54 @@ func createUsersTable() {
 	}
 
 	// 4. Ensure unique index on google_id
-	if _, err := DB.Exec(`ALTER TABLE users ADD UNIQUE INDEX idx_google_id (google_id)`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE users ADD UNIQUE INDEX idx_google_id (google_id)`); err != nil {
 		log.Printf("ℹ️ idx_google_id index status: %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN last_seen_at VARCHAR(64) NULL`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE users ADD COLUMN last_seen_at VARCHAR(64) NULL`); err != nil {
 		log.Printf("ℹ️ last_seen_at column status: %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN blocked TINYINT(1) NOT NULL DEFAULT 0`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE users ADD COLUMN blocked TINYINT(1) NOT NULL DEFAULT 0`); err != nil {
 		log.Printf("ℹ️ blocked column status: %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN blocked_at DATETIME NULL`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE users ADD COLUMN blocked_at DATETIME NULL`); err != nil {
 		log.Printf("ℹ️ blocked_at column status: %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN flagged TINYINT(1) NOT NULL DEFAULT 0`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE users ADD COLUMN flagged TINYINT(1) NOT NULL DEFAULT 0`); err != nil {
 		log.Printf("ℹ️ flagged column status: %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN flagged_at DATETIME NULL`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE users ADD COLUMN flagged_at DATETIME NULL`); err != nil {
 		log.Printf("ℹ️ flagged_at column status: %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN flag_reason VARCHAR(255) NULL`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE users ADD COLUMN flag_reason VARCHAR(255) NULL`); err != nil {
 		log.Printf("ℹ️ flag_reason column status: %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN flagged_by VARCHAR(255) NULL`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE users ADD COLUMN flagged_by VARCHAR(255) NULL`); err != nil {
 		log.Printf("ℹ️ flagged_by column status: %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN phone VARCHAR(64) NULL`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE users ADD COLUMN phone VARCHAR(64) NULL`); err != nil {
 		log.Printf("ℹ️ phone column status: %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE users ADD COLUMN role VARCHAR(64) NOT NULL DEFAULT 'user'`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE users ADD COLUMN role VARCHAR(64) NOT NULL DEFAULT 'user'`); err != nil {
 		log.Printf("ℹ️ role column status: %v", err)
 	}
 
 	log.Println("✅ users table schema & 4000+ user migration ready")
 }
 
-func dropUserPresenceTable() {
-	DB.Exec("DROP TABLE IF EXISTS user_presence")
+func dropUserPresenceTable(db *sql.DB) {
+	db.Exec("DROP TABLE IF EXISTS user_presence")
 }
 
-func createQBAnswerKeyTable() {
+func createQBAnswerKeyTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS qb_answer_keys (
 		id           INT AUTO_INCREMENT PRIMARY KEY,
@@ -319,14 +480,14 @@ func createQBAnswerKeyTable() {
 		UNIQUE KEY unique_qb (semester, subject_code, year)
 	) ENGINE=InnoDB;`
 
-	_, err := DB.Exec(query)
+	_, err := db.Exec(query)
 	if err != nil {
 		log.Fatalf("❌ Failed to create qb_answer_keys table: %v", err)
 	}
 	log.Println("✅ qb_answer_keys table ready")
 }
 
-func createSemesterSubjectsTable() {
+func createSemesterSubjectsTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS semester_subjects (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -345,34 +506,34 @@ func createSemesterSubjectsTable() {
 		UNIQUE KEY unique_year_idx (year, idx)
 	) ENGINE=InnoDB;`
 
-	_, err := DB.Exec(query)
+	_, err := db.Exec(query)
 	if err != nil {
 		log.Fatalf("❌ Failed to create semester_subjects table: %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE semester_subjects DROP INDEX unique_year_idx`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE semester_subjects DROP INDEX unique_year_idx`); err != nil {
 		log.Printf("ℹ️ unique_year_idx index drop status: %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE semester_subjects DROP INDEX unique_year_code`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE semester_subjects DROP INDEX unique_year_code`); err != nil {
 		log.Printf("ℹ️ unique_year_code index drop status: %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE semester_subjects ADD COLUMN department VARCHAR(50) NOT NULL DEFAULT 'ALL'`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE semester_subjects ADD COLUMN department VARCHAR(50) NOT NULL DEFAULT 'ALL'`); err != nil {
 		log.Printf("ℹ️ department column not created (may already exist): %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE semester_subjects ADD INDEX idx_sem_sub_year_dept (year, department)`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE semester_subjects ADD INDEX idx_sem_sub_year_dept (year, department)`); err != nil {
 		log.Printf("ℹ️ idx_sem_sub_year_dept index not created (may already exist): %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE semester_subjects ADD INDEX idx_sem_sub_year_idx (year, idx)`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE semester_subjects ADD INDEX idx_sem_sub_year_idx (year, idx)`); err != nil {
 		log.Printf("ℹ️ idx_sem_sub_year_idx index not created (may already exist): %v", err)
 	}
 	log.Println("✅ semester_subjects table ready")
 }
 
-func createCardsTable() {
+func createCardsTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS cards (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -387,38 +548,38 @@ func createCardsTable() {
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 	) ENGINE=InnoDB;`
 
-	_, err := DB.Exec(query)
+	_, err := db.Exec(query)
 	if err != nil {
 		log.Fatalf("❌ Failed to create cards table: %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE cards ADD COLUMN card_order INT NOT NULL DEFAULT 0 AFTER id`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE cards ADD COLUMN card_order INT NOT NULL DEFAULT 0 AFTER id`); err != nil {
 		log.Printf("ℹ️ card_order column not created (may already exist): %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE cards ADD COLUMN click_count INT NOT NULL DEFAULT 0 AFTER card_order`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE cards ADD COLUMN click_count INT NOT NULL DEFAULT 0 AFTER card_order`); err != nil {
 		log.Printf("ℹ️ click_count column not created (may already exist): %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE cards ADD INDEX idx_cards_card_order (card_order)`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE cards ADD INDEX idx_cards_card_order (card_order)`); err != nil {
 		log.Printf("ℹ️ idx_cards_card_order not created (may already exist): %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE cards ADD COLUMN app_route VARCHAR(255) NOT NULL DEFAULT '' AFTER link`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE cards ADD COLUMN app_route VARCHAR(255) NOT NULL DEFAULT '' AFTER link`); err != nil {
 		log.Printf("ℹ️ app_route column not created (may already exist): %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE cards ADD COLUMN show_on_site TINYINT(1) NOT NULL DEFAULT 1 AFTER btntext`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE cards ADD COLUMN show_on_site TINYINT(1) NOT NULL DEFAULT 1 AFTER btntext`); err != nil {
 		log.Printf("ℹ️ show_on_site column not created (may already exist): %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE cards ADD COLUMN show_on_app TINYINT(1) NOT NULL DEFAULT 1 AFTER show_on_site`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE cards ADD COLUMN show_on_app TINYINT(1) NOT NULL DEFAULT 1 AFTER show_on_site`); err != nil {
 		log.Printf("ℹ️ show_on_app column not created (may already exist): %v", err)
 	}
 
 	// Seed default cards if empty
 	var count int
-	if err := DB.QueryRow("SELECT COUNT(*) FROM cards").Scan(&count); err == nil && count == 0 {
+	if err := db.QueryRow("SELECT COUNT(*) FROM cards").Scan(&count); err == nil && count == 0 {
 		type seedCard struct {
 			ID         int
 			Order      int
@@ -553,7 +714,7 @@ func createCardsTable() {
 			},
 		}
 
-		stmt, err := DB.Prepare(`
+		stmt, err := db.Prepare(`
 			INSERT INTO cards (id, card_order, click_count, img, name, keywords, link, app_route, btntext, created_at, updated_at)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		`)
@@ -571,7 +732,7 @@ func createCardsTable() {
 	log.Println("✅ cards table ready")
 }
 
-func createMessMenuTables() {
+func createMessMenuTables(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS mess_menu_items (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -589,38 +750,38 @@ func createMessMenuTables() {
 		INDEX idx_mess_meal_order (hostel, menu_date, meal_type, item_order)
 	) ENGINE=InnoDB;`
 
-	if _, err := DB.Exec(query); err != nil {
+	if _, err := db.Exec(query); err != nil {
 		log.Fatalf("❌ Failed to create mess_menu_items table: %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE mess_menu_items ADD COLUMN source_file VARCHAR(255) NULL AFTER item`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE mess_menu_items ADD COLUMN source_file VARCHAR(255) NULL AFTER item`); err != nil {
 		log.Printf("ℹ️ source_file column not created (may already exist): %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE mess_menu_items ADD COLUMN uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP AFTER source_file`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE mess_menu_items ADD COLUMN uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP AFTER source_file`); err != nil {
 		log.Printf("ℹ️ uploaded_at column not created (may already exist): %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE mess_menu_items ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER uploaded_at`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE mess_menu_items ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER uploaded_at`); err != nil {
 		log.Printf("ℹ️ updated_at column not created (may already exist): %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE mess_menu_items ADD UNIQUE KEY unique_menu_row (hostel, menu_date, meal_type, item_order)`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE mess_menu_items ADD UNIQUE KEY unique_menu_row (hostel, menu_date, meal_type, item_order)`); err != nil {
 		log.Printf("ℹ️ unique_menu_row index not created (may already exist): %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE mess_menu_items ADD INDEX idx_mess_lookup (hostel, menu_date)`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE mess_menu_items ADD INDEX idx_mess_lookup (hostel, menu_date)`); err != nil {
 		log.Printf("ℹ️ idx_mess_lookup not created (may already exist): %v", err)
 	}
 
-	if _, err := DB.Exec(`ALTER TABLE mess_menu_items ADD INDEX idx_mess_meal_order (hostel, menu_date, meal_type, item_order)`); err != nil {
+	if _, err := db.Exec(`ALTER TABLE mess_menu_items ADD INDEX idx_mess_meal_order (hostel, menu_date, meal_type, item_order)`); err != nil {
 		log.Printf("ℹ️ idx_mess_meal_order not created (may already exist): %v", err)
 	}
 
 	log.Println("✅ mess_menu_items table ready")
 }
 
-func createTrackerUsersTable() {
+func createTrackerUsersTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS tracker_users (
 		user_id VARCHAR(128) NULL,
@@ -637,19 +798,19 @@ func createTrackerUsersTable() {
 		INDEX idx_tracker_users_email (email)
 	) ENGINE=InnoDB;`
 
-	if _, err := DB.Exec(query); err != nil {
+	if _, err := db.Exec(query); err != nil {
 		log.Printf("ℹ️ tracker_users table notice: %v", err)
 	} else {
 		log.Println("✅ tracker_users table ready")
 	}
 
 	// Safe column additions for existing tables
-	DB.Exec(`ALTER TABLE tracker_users ADD COLUMN batch VARCHAR(64) NULL`)
-	DB.Exec(`ALTER TABLE tracker_users ADD COLUMN phone VARCHAR(64) NULL`)
-	DB.Exec(`ALTER TABLE tracker_users ADD COLUMN department VARCHAR(255) NULL`)
+	db.Exec(`ALTER TABLE tracker_users ADD COLUMN batch VARCHAR(64) NULL`)
+	db.Exec(`ALTER TABLE tracker_users ADD COLUMN phone VARCHAR(64) NULL`)
+	db.Exec(`ALTER TABLE tracker_users ADD COLUMN department VARCHAR(255) NULL`)
 }
 
-func dropAcademicTables() {
+func dropAcademicTables(db *sql.DB) {
 	tables := []string{
 		"academic_exam_schedules",
 		"academic_question_papers",
@@ -663,11 +824,11 @@ func dropAcademicTables() {
 		"academic_regulations",
 	}
 	for _, t := range tables {
-		DB.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", t))
+		db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", t))
 	}
 }
 
-func createSponsorNameOverridesTable() {
+func createSponsorNameOverridesTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS sponsor_name_overrides (
 		donor_key VARCHAR(255) PRIMARY KEY,
@@ -679,14 +840,14 @@ func createSponsorNameOverridesTable() {
 		INDEX idx_sponsor_overrides_phone (phone)
 	) ENGINE=InnoDB;`
 
-	if _, err := DB.Exec(query); err != nil {
+	if _, err := db.Exec(query); err != nil {
 		log.Printf("ℹ️ sponsor_name_overrides table notice: %v", err)
 	} else {
 		log.Println("✅ sponsor_name_overrides table ready")
 	}
 }
 
-func createSponsorDepartmentTables() {
+func createSponsorDepartmentTables(db *sql.DB) {
 	queryDept := `
 	CREATE TABLE IF NOT EXISTS sponsor_departments (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -700,15 +861,15 @@ func createSponsorDepartmentTables() {
 		UNIQUE KEY uk_dept_code_year (code, year)
 	) ENGINE=InnoDB;`
 
-	if _, err := DB.Exec(queryDept); err != nil {
+	if _, err := db.Exec(queryDept); err != nil {
 		log.Printf("ℹ️ sponsor_departments table notice: %v", err)
 	} else {
 		log.Println("✅ sponsor_departments table ready")
 	}
 
 	// Add email_code and year_code columns if missing (for existing databases)
-	_, _ = DB.Exec("ALTER TABLE sponsor_departments ADD COLUMN email_code VARCHAR(50) NOT NULL DEFAULT '' AFTER code")
-	_, _ = DB.Exec("ALTER TABLE sponsor_departments ADD COLUMN year_code VARCHAR(50) NOT NULL DEFAULT '' AFTER year")
+	_, _ = db.Exec("ALTER TABLE sponsor_departments ADD COLUMN email_code VARCHAR(50) NOT NULL DEFAULT '' AFTER code")
+	_, _ = db.Exec("ALTER TABLE sponsor_departments ADD COLUMN year_code VARCHAR(50) NOT NULL DEFAULT '' AFTER year")
 
 	queryMapping := `
 	CREATE TABLE IF NOT EXISTS sponsor_department_mappings (
@@ -718,14 +879,14 @@ func createSponsorDepartmentTables() {
 		INDEX idx_sponsor_dept_id (department_id)
 	) ENGINE=InnoDB;`
 
-	if _, err := DB.Exec(queryMapping); err != nil {
+	if _, err := db.Exec(queryMapping); err != nil {
 		log.Printf("ℹ️ sponsor_department_mappings table notice: %v", err)
 	}
-	createSponsorTransactionOverridesTable()
-	createSponsorTransactionsTable()
+	createSponsorTransactionOverridesTable(db)
+	createSponsorTransactionsTable(db)
 }
 
-func createSponsorTransactionOverridesTable() {
+func createSponsorTransactionOverridesTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS sponsor_transaction_overrides (
 		payment_id VARCHAR(255) PRIMARY KEY,
@@ -733,14 +894,14 @@ func createSponsorTransactionOverridesTable() {
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 	) ENGINE=InnoDB;`
 
-	if _, err := DB.Exec(query); err != nil {
+	if _, err := db.Exec(query); err != nil {
 		log.Printf("ℹ️ sponsor_transaction_overrides table notice: %v", err)
 	} else {
 		log.Println("✅ sponsor_transaction_overrides table ready")
 	}
 }
 
-func createSponsorTransactionsTable() {
+func createSponsorTransactionsTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS sponsor_transactions (
 		payment_id VARCHAR(255) PRIMARY KEY,
@@ -761,15 +922,15 @@ func createSponsorTransactionsTable() {
 		INDEX idx_tx_status (payment_status)
 	) ENGINE=InnoDB;`
 
-	if _, err := DB.Exec(query); err != nil {
+	if _, err := db.Exec(query); err != nil {
 		log.Printf("ℹ️ sponsor_transactions table notice: %v", err)
 	} else {
 		log.Println("✅ sponsor_transactions table ready")
 	}
-	_, _ = DB.Exec("CREATE INDEX idx_tx_status ON sponsor_transactions (payment_status)")
+	_, _ = db.Exec("CREATE INDEX idx_tx_status ON sponsor_transactions (payment_status)")
 }
 
-func createFacultyDirectoryTable() {
+func createFacultyDirectoryTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS faculty_directory (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -787,23 +948,23 @@ func createFacultyDirectoryTable() {
 		INDEX idx_fac_dept (department)
 	) ENGINE=InnoDB;`
 
-	if _, err := DB.Exec(query); err != nil {
+	if _, err := db.Exec(query); err != nil {
 		log.Printf("ℹ️ faculty_directory table notice: %v", err)
 	} else {
 		log.Println("✅ faculty_directory table ready")
 	}
 }
 
-func ensureFacultyDetailsTableOrView() {
+func ensureFacultyDetailsTableOrView(db *sql.DB) {
 	query := `CREATE OR REPLACE VIEW faculty_details AS SELECT * FROM facutly_details;`
-	if _, err := DB.Exec(query); err != nil {
+	if _, err := db.Exec(query); err != nil {
 		log.Printf("ℹ️ faculty_details view notice: %v", err)
 	} else {
 		log.Println("✅ faculty_details view ready")
 	}
 }
 
-func createAuditLogsTable() {
+func createAuditLogsTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS audit_logs (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -825,14 +986,14 @@ func createAuditLogsTable() {
 		INDEX idx_audit_method (method)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(query); err != nil {
+	if _, err := db.Exec(query); err != nil {
 		log.Printf("ℹ️ audit_logs table notice: %v", err)
 	} else {
 		log.Println("✅ audit_logs table ready")
 	}
 }
 
-func createDailyActiveUserStatsTable() {
+func createDailyActiveUserStatsTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS daily_active_user_stats (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -844,14 +1005,14 @@ func createDailyActiveUserStatsTable() {
 		INDEX idx_dau_date (date)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(query); err != nil {
+	if _, err := db.Exec(query); err != nil {
 		log.Printf("ℹ️ daily_active_user_stats table notice: %v", err)
 	} else {
 		log.Println("✅ daily_active_user_stats table ready")
 	}
 }
 
-func createAdminSentEmailsTable() {
+func createAdminSentEmailsTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS admin_sent_emails (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -870,14 +1031,14 @@ func createAdminSentEmailsTable() {
 		INDEX idx_admin_uid (admin_uid)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(query); err != nil {
+	if _, err := db.Exec(query); err != nil {
 		log.Printf("ℹ️ admin_sent_emails table notice: %v", err)
 	} else {
 		log.Println("✅ admin_sent_emails table ready")
 	}
 }
 
-func createEmailJobQueuesTables() {
+func createEmailJobQueuesTables(db *sql.DB) {
 	queryBatches := `
 	CREATE TABLE IF NOT EXISTS email_job_batches (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -901,7 +1062,7 @@ func createEmailJobQueuesTables() {
 		INDEX idx_batch_admin (admin_uid)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(queryBatches); err != nil {
+	if _, err := db.Exec(queryBatches); err != nil {
 		log.Printf("ℹ️ email_job_batches table notice: %v", err)
 	} else {
 		log.Println("✅ email_job_batches table ready")
@@ -928,14 +1089,14 @@ func createEmailJobQueuesTables() {
 		INDEX idx_eq_recipient (recipient_email)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(queryItems); err != nil {
+	if _, err := db.Exec(queryItems); err != nil {
 		log.Printf("ℹ️ email_queue_items table notice: %v", err)
 	} else {
 		log.Println("✅ email_queue_items table ready")
 	}
 }
 
-func createCollegeLeavesTable() {
+func createCollegeLeavesTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS college_leaves (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -953,23 +1114,23 @@ func createCollegeLeavesTable() {
 		INDEX idx_leaves_from (from_date)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(query); err != nil {
+	if _, err := db.Exec(query); err != nil {
 		log.Printf("ℹ️ college_leaves table notice: %v", err)
 	} else {
 		log.Println("✅ college_leaves table ready")
 	}
 
 	// Safe column additions for existing tables
-	_, _ = DB.Exec(`ALTER TABLE college_leaves ADD COLUMN from_half_day VARCHAR(10) NOT NULL DEFAULT '' AFTER day`)
-	_, _ = DB.Exec(`ALTER TABLE college_leaves ADD COLUMN to_half_day VARCHAR(10) NOT NULL DEFAULT '' AFTER from_half_day`)
-	_, _ = DB.Exec(`ALTER TABLE college_leaves ADD COLUMN leave_type VARCHAR(50) NOT NULL DEFAULT 'GP' AFTER to_half_day`)
-	_, _ = DB.Exec(`ALTER TABLE college_leaves ADD COLUMN remarks TEXT NULL AFTER leave_type`)
+	_, _ = db.Exec(`ALTER TABLE college_leaves ADD COLUMN from_half_day VARCHAR(10) NOT NULL DEFAULT '' AFTER day`)
+	_, _ = db.Exec(`ALTER TABLE college_leaves ADD COLUMN to_half_day VARCHAR(10) NOT NULL DEFAULT '' AFTER from_half_day`)
+	_, _ = db.Exec(`ALTER TABLE college_leaves ADD COLUMN leave_type VARCHAR(50) NOT NULL DEFAULT 'GP' AFTER to_half_day`)
+	_, _ = db.Exec(`ALTER TABLE college_leaves ADD COLUMN remarks TEXT NULL AFTER leave_type`)
 
 	// Seed initial holidays if table is empty
 	var count int
-	err := DB.QueryRow("SELECT COUNT(*) FROM college_leaves").Scan(&count)
+	err := db.QueryRow("SELECT COUNT(*) FROM college_leaves").Scan(&count)
 	if err == nil && count == 0 {
-		stmt, err := DB.Prepare(`
+		stmt, err := db.Prepare(`
 			INSERT INTO college_leaves (name, from_date, to_date, day, from_half_day, to_half_day, leave_type, remarks)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 		`)
@@ -1007,7 +1168,7 @@ func createCollegeLeavesTable() {
 	}
 }
 
-func createNotificationsTables() {
+func createNotificationsTables(db *sql.DB) {
 	queryNotif := `
 	CREATE TABLE IF NOT EXISTS notifications (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -1033,7 +1194,7 @@ func createNotificationsTables() {
 		INDEX idx_notif_roll (target_roll_no)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(queryNotif); err != nil {
+	if _, err := db.Exec(queryNotif); err != nil {
 		log.Printf("ℹ️ notifications table notice: %v", err)
 	} else {
 		log.Println("✅ notifications table ready")
@@ -1049,7 +1210,7 @@ func createNotificationsTables() {
 		INDEX idx_user_reads (user_uid)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(queryReads); err != nil {
+	if _, err := db.Exec(queryReads); err != nil {
 		log.Printf("ℹ️ user_notification_reads table notice: %v", err)
 	} else {
 		log.Println("✅ user_notification_reads table ready")
@@ -1065,14 +1226,14 @@ func createNotificationsTables() {
 		INDEX idx_user_dismiss (user_uid)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(queryDismiss); err != nil {
+	if _, err := db.Exec(queryDismiss); err != nil {
 		log.Printf("ℹ️ user_notification_dismissals table notice: %v", err)
 	} else {
 		log.Println("✅ user_notification_dismissals table ready")
 	}
 }
 
-func createLostFoundTables() {
+func createLostFoundTables(db *sql.DB) {
 	queryItems := `
 	CREATE TABLE IF NOT EXISTS lost_found_items (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -1118,18 +1279,18 @@ func createLostFoundTables() {
 		INDEX idx_created (created_at DESC)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(queryItems); err != nil {
+	if _, err := db.Exec(queryItems); err != nil {
 		log.Printf("ℹ️ lost_found_items table notice: %v", err)
 	} else {
 		log.Println("✅ lost_found_items table ready")
 	}
 
 	// Safe column additions for existing table
-	_, _ = DB.Exec("ALTER TABLE lost_found_items ADD COLUMN latitude DOUBLE NULL AFTER status")
-	_, _ = DB.Exec("ALTER TABLE lost_found_items ADD COLUMN longitude DOUBLE NULL AFTER latitude")
-	_, _ = DB.Exec("ALTER TABLE lost_found_items ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0 AFTER is_flagged")
-	_, _ = DB.Exec("ALTER TABLE lost_found_items ADD COLUMN deleted_at DATETIME NULL AFTER is_deleted")
-	_, _ = DB.Exec("ALTER TABLE lost_found_items ADD COLUMN deleted_by VARCHAR(255) NULL AFTER deleted_at")
+	_, _ = db.Exec("ALTER TABLE lost_found_items ADD COLUMN latitude DOUBLE NULL AFTER status")
+	_, _ = db.Exec("ALTER TABLE lost_found_items ADD COLUMN longitude DOUBLE NULL AFTER latitude")
+	_, _ = db.Exec("ALTER TABLE lost_found_items ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0 AFTER is_flagged")
+	_, _ = db.Exec("ALTER TABLE lost_found_items ADD COLUMN deleted_at DATETIME NULL AFTER is_deleted")
+	_, _ = db.Exec("ALTER TABLE lost_found_items ADD COLUMN deleted_by VARCHAR(255) NULL AFTER deleted_at")
 
 	queryClaims := `
 	CREATE TABLE IF NOT EXISTS lost_found_claims (
@@ -1148,14 +1309,14 @@ func createLostFoundTables() {
 		INDEX idx_claimant (claimant_uid)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(queryClaims); err != nil {
+	if _, err := db.Exec(queryClaims); err != nil {
 		log.Printf("ℹ️ lost_found_claims table notice: %v", err)
 	} else {
 		log.Println("✅ lost_found_claims table ready")
 	}
 }
 
-func createHelpTables() {
+func createHelpTables(db *sql.DB) {
 	queryRooms := `
 	CREATE TABLE IF NOT EXISTS help_rooms (
 		id VARCHAR(64) PRIMARY KEY,
@@ -1174,7 +1335,7 @@ func createHelpTables() {
 		INDEX idx_creator_uid (creator_uid)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(queryRooms); err != nil {
+	if _, err := db.Exec(queryRooms); err != nil {
 		log.Printf("ℹ️ help_rooms table notice: %v", err)
 	} else {
 		log.Println("✅ help_rooms table ready")
@@ -1191,7 +1352,7 @@ func createHelpTables() {
 		INDEX idx_room_id (room_id)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(queryParticipants); err != nil {
+	if _, err := db.Exec(queryParticipants); err != nil {
 		log.Printf("ℹ️ help_participants table notice: %v", err)
 	} else {
 		log.Println("✅ help_participants table ready")
@@ -1213,13 +1374,13 @@ func createHelpTables() {
 		INDEX idx_sender_uid (sender_uid)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(queryMessages); err != nil {
+	if _, err := db.Exec(queryMessages); err != nil {
 		log.Printf("ℹ️ help_messages table notice: %v", err)
 	} else {
 		log.Println("✅ help_messages table ready")
 	}
-	_, _ = DB.Exec("ALTER TABLE help_messages ADD COLUMN parent_id VARCHAR(64) NULL AFTER id")
-	_, _ = DB.Exec("ALTER TABLE help_messages ADD INDEX idx_parent_created (parent_id, created_at)")
+	_, _ = db.Exec("ALTER TABLE help_messages ADD COLUMN parent_id VARCHAR(64) NULL AFTER id")
+	_, _ = db.Exec("ALTER TABLE help_messages ADD INDEX idx_parent_created (parent_id, created_at)")
 
 	queryReports := `
 	CREATE TABLE IF NOT EXISTS help_reports (
@@ -1235,7 +1396,7 @@ func createHelpTables() {
 		INDEX idx_target (target_type, target_id)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(queryReports); err != nil {
+	if _, err := db.Exec(queryReports); err != nil {
 		log.Printf("ℹ️ help_reports table notice: %v", err)
 	} else {
 		log.Println("✅ help_reports table ready")
@@ -1253,7 +1414,7 @@ func createHelpTables() {
 		INDEX idx_blocked (blocked_uid)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(queryBlocks); err != nil {
+	if _, err := db.Exec(queryBlocks); err != nil {
 		log.Printf("ℹ️ help_blocks table notice: %v", err)
 	} else {
 		log.Println("✅ help_blocks table ready")
@@ -1271,7 +1432,7 @@ func createHelpTables() {
 		INDEX idx_user_status (user_uid, status)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 
-	if _, err := DB.Exec(queryRestrictions); err != nil {
+	if _, err := db.Exec(queryRestrictions); err != nil {
 		log.Printf("ℹ️ help_user_restrictions table notice: %v", err)
 	} else {
 		log.Println("✅ help_user_restrictions table ready")

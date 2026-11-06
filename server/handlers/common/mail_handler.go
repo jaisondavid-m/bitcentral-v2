@@ -30,7 +30,7 @@ type MailHandler struct {
 
 func NewMailHandler() *MailHandler {
 	h := &MailHandler{
-		DB:          config.DB,
+		DB:          config.GetLogsDB(),
 		triggerChan: make(chan struct{}, 50),
 	}
 	return h
@@ -611,9 +611,10 @@ func replaceTemplateVariables(db *sql.DB, templateStr string, r EmailRecipient) 
 		registerNo = strings.TrimSpace(r.RollNo)
 	}
 
-	if db != nil {
+	coreDB := config.GetCoreDB()
+	if coreDB != nil {
 		var tName, tUserID, tID, tDept, tBatch string
-		_ = db.QueryRow(
+		_ = coreDB.QueryRow(
 			`SELECT COALESCE(name, ''), COALESCE(user_id, ''), COALESCE(id, ''), COALESCE(department, ''), COALESCE(batch, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
 			r.Email,
 		).Scan(&tName, &tUserID, &tID, &tDept, &tBatch)
@@ -786,8 +787,8 @@ func (h *MailHandler) SendAdminEmail(c *gin.Context) {
 	adminUIDStr, _ := actorUID.(string)
 
 	var adminEmailStr string
-	if h.DB != nil && adminUIDStr != "" {
-		_ = h.DB.QueryRow(`SELECT email FROM users WHERE uid = ? OR google_id = ?`, adminUIDStr, adminUIDStr).Scan(&adminEmailStr)
+	if coreDB := config.GetCoreDB(); coreDB != nil && adminUIDStr != "" {
+		_ = coreDB.QueryRow(`SELECT email FROM users WHERE uid = ? OR google_id = ?`, adminUIDStr, adminUIDStr).Scan(&adminEmailStr)
 	}
 
 	// Generate batch ID

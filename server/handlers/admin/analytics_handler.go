@@ -13,12 +13,14 @@ import (
 )
 
 type AnalyticsHandler struct {
-	DB *sql.DB
+	DB     *sql.DB // Core DB (for users table)
+	LogsDB *sql.DB // Logs & Free DB (for daily_active_user_stats)
 }
 
 func NewAnalyticsHandler() *AnalyticsHandler {
 	h := &AnalyticsHandler{
-		DB: config.DB,
+		DB:     config.GetCoreDB(),
+		LogsDB: config.GetLogsDB(),
 	}
 
 	// Start periodic background aggregation for daily active users
@@ -78,7 +80,9 @@ func (h *AnalyticsHandler) SyncDailyActiveUsers() {
 
 	// If history already exists, only update today's active count to save TiDB Request Units
 	var statsCount int
-	_ = h.DB.QueryRow("SELECT COUNT(*) FROM daily_active_user_stats").Scan(&statsCount)
+	if h.LogsDB != nil {
+		_ = h.LogsDB.QueryRow("SELECT COUNT(*) FROM daily_active_user_stats").Scan(&statsCount)
+	}
 	if statsCount > 0 {
 		h.syncTodayDAU(totalUsers)
 		return
@@ -102,7 +106,10 @@ func (h *AnalyticsHandler) SyncDailyActiveUsers() {
 	}
 	defer rows.Close()
 
-	upsertStmt, err := h.DB.Prepare(`
+	if h.LogsDB == nil {
+		return
+	}
+	upsertStmt, err := h.LogsDB.Prepare(`
 		INSERT INTO daily_active_user_stats (date, active_users_count, total_users_count)
 		VALUES (?, ?, ?)
 		ON DUPLICATE KEY UPDATE 
@@ -155,7 +162,10 @@ func (h *AnalyticsHandler) syncTodayDAU(totalUsers int) {
 		   OR (last_sign_in_time IS NOT NULL AND (last_sign_in_time LIKE CONCAT(?, '%') OR last_sign_in_time LIKE CONCAT(?, '%')))
 	`, todayIST, todayLocal, todayIST, todayLocal).Scan(&todayCount)
 
-	_, _ = h.DB.Exec(`
+	if h.LogsDB == nil {
+		return
+	}
+	_, _ = h.LogsDB.Exec(`
 		INSERT INTO daily_active_user_stats (date, active_users_count, total_users_count)
 		VALUES (?, ?, ?)
 		ON DUPLICATE KEY UPDATE 
@@ -193,8 +203,8 @@ func (h *AnalyticsHandler) GetAnalytics(c *gin.Context) {
 	var peakDate string = ""
 	var totalDAUSum int = 0
 
-	if h.DB != nil {
-		historyRows, err := h.DB.Query(`
+	if h.LogsDB != nil {
+		historyRows, err := h.LogsDB.Query(`
 			SELECT date, active_users_count, total_users_count
 			FROM daily_active_user_stats
 			ORDER BY date DESC

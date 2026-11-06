@@ -45,6 +45,9 @@ func SetupRouter(
 
 	r := gin.Default()
 
+	// High-write Audit Logging Middleware (logs to config.DBLogs)
+	r.Use(middleware.AuditLogger())
+
 	// CORS configuration
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
@@ -90,14 +93,16 @@ func SetupRouter(
 	// Live Deployment Info
 	r.GET("/api/deployment/status", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"status":      "ok",
-			"server_type": "own_server",
-			"server_name": "BitCentral Primary Engine (Local Docker)",
-			"environment": os.Getenv("GIN_MODE"),
-			"port":        os.Getenv("PORT"),
-			"db_host":     os.Getenv("MYSQL_HOST"),
-			"db_database": os.Getenv("MYSQL_DATABASE"),
-			"time":        time.Now().UTC().Format(time.RFC3339),
+			"status":                 "ok",
+			"server_type":            "own_server",
+			"server_name":            "BitCentral Primary Engine (Local Docker)",
+			"environment":            os.Getenv("GIN_MODE"),
+			"port":                   os.Getenv("PORT"),
+			"db_host":                os.Getenv("MYSQL_HOST"),
+			"db_database":            os.Getenv("MYSQL_DATABASE"),
+			"db_academic_configured": os.Getenv("MYSQL_ACADEMIC_HOST") != "",
+			"db_logs_configured":     os.Getenv("MYSQL_LOGS_HOST") != "" || os.Getenv("MYSQL_FREE_HOST") != "",
+			"time":                   time.Now().UTC().Format(time.RFC3339),
 		})
 	})
 
@@ -291,6 +296,7 @@ func SetupRouter(
 	admin.Use(middleware.RequireAdmin())
 	{
 		admin.GET("/analytics", analyticsHandler.GetAnalytics)
+		admin.GET("/audit-logs", adminHandler.GetAuditLogs)
 		admin.GET("/sponsors", sponsorsHandler.GetSponsorsAdmin)
 		admin.GET("/sponsors/leaderboard", sponsorsHandler.GetSponsorsLeaderboardAdmin)
 		admin.PUT("/sponsors/name-override", sponsorsHandler.UpdateSponsorNameOverride)

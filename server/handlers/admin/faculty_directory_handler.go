@@ -47,7 +47,7 @@ type FacultyDirectoryHandler struct {
 
 func NewFacultyDirectoryHandler(sheetsHandler *student.SheetHandler) *FacultyDirectoryHandler {
 	h := &FacultyDirectoryHandler{
-		DB:            config.DB,
+		DB:            config.GetAcademicDB(),
 		sheetsHandler: sheetsHandler,
 	}
 
@@ -257,10 +257,10 @@ func (h *FacultyDirectoryHandler) SyncGoogleDirectory() {
 		httpClient = h.sheetsHandler.GetHTTPClient()
 	}
 
-	// 2. Try loading token from MySQL database
-	if httpClient == nil && h.DB != nil {
+	// 2. Try loading token from MySQL database (ps_tokens on Core DB)
+	if httpClient == nil && config.GetCoreDB() != nil {
 		var tokenStr string
-		err := h.DB.QueryRow("SELECT token FROM ps_tokens WHERE token_key = 'google_oauth_token' LIMIT 1").Scan(&tokenStr)
+		err := config.GetCoreDB().QueryRow("SELECT token FROM ps_tokens WHERE token_key = 'google_oauth_token' LIMIT 1").Scan(&tokenStr)
 		if err == nil && strings.TrimSpace(tokenStr) != "" {
 			var tok oauth2.Token
 			if err := json.Unmarshal([]byte(tokenStr), &tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {

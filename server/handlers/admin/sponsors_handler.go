@@ -196,10 +196,10 @@ func cleanPhone(phone string) string {
 
 func getOverridesMap() map[string]string {
 	overrides := make(map[string]string)
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		return overrides
 	}
-	rows, err := config.DB.Query("SELECT donor_key, custom_name, COALESCE(email, ''), COALESCE(phone, '') FROM sponsor_name_overrides")
+	rows, err := config.GetAcademicDB().Query("SELECT donor_key, custom_name, COALESCE(email, ''), COALESCE(phone, '') FROM sponsor_name_overrides")
 	if err != nil {
 		return overrides
 	}
@@ -256,10 +256,10 @@ type SponsorDepartment struct {
 func getDepartmentsMap() (map[int]SponsorDepartment, []SponsorDepartment) {
 	deptMap := make(map[int]SponsorDepartment)
 	var deptList []SponsorDepartment
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		return deptMap, deptList
 	}
-	rows, err := config.DB.Query("SELECT id, name, code, COALESCE(email_code, ''), year, COALESCE(year_code, '') FROM sponsor_departments ORDER BY name ASC, year ASC")
+	rows, err := config.GetAcademicDB().Query("SELECT id, name, code, COALESCE(email_code, ''), year, COALESCE(year_code, '') FROM sponsor_departments ORDER BY name ASC, year ASC")
 	if err != nil {
 		return deptMap, deptList
 	}
@@ -277,10 +277,10 @@ func getDepartmentsMap() (map[int]SponsorDepartment, []SponsorDepartment) {
 
 func getDepartmentMappingsMap() map[string]int {
 	mappings := make(map[string]int)
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		return mappings
 	}
-	rows, err := config.DB.Query("SELECT donor_key, department_id FROM sponsor_department_mappings")
+	rows, err := config.GetAcademicDB().Query("SELECT donor_key, department_id FROM sponsor_department_mappings")
 	if err != nil {
 		return mappings
 	}
@@ -521,7 +521,7 @@ func syncRazorpayTransactionsToDatabaseAsync() {
 func syncRazorpayTransactionsToDatabase() {
 	keyID := os.Getenv("RAZORPAY_KEY_ID")
 	keySecret := os.Getenv("RAZORPAY_KEY_SECRET")
-	if keyID == "" || keySecret == "" || config.DB == nil {
+	if keyID == "" || keySecret == "" || config.GetAcademicDB() == nil {
 		return
 	}
 
@@ -554,7 +554,7 @@ func syncRazorpayTransactionsToDatabase() {
 
 	// 1. Single query to fetch all existing payment IDs
 	existingMap := make(map[string]bool)
-	rows, err := config.DB.Query("SELECT payment_id FROM sponsor_transactions")
+	rows, err := config.GetAcademicDB().Query("SELECT payment_id FROM sponsor_transactions")
 	if err == nil {
 		for rows.Next() {
 			var pid string
@@ -566,7 +566,7 @@ func syncRazorpayTransactionsToDatabase() {
 	}
 
 	// 2. Perform batched execution inside a single database transaction
-	tx, err := config.DB.Begin()
+	tx, err := config.GetAcademicDB().Begin()
 	if err != nil {
 		return
 	}
@@ -659,8 +659,8 @@ func (h *SponsorsHandler) GetSponsorsLeaderboard(c *gin.Context) {
 	deptMappings := getDepartmentMappingsMap()
 	aggregatedMap := make(map[string]*AggregatedDonor)
 
-	if config.DB != nil {
-		rows, err := config.DB.Query(`SELECT payment_id, donor_name, email, phone, phone_digits, amount, is_anonymous, target_department_id, target_department_code, DATE_FORMAT(created_at, '%Y-%m-%d') as date_str FROM sponsor_transactions WHERE payment_status IN ('captured', 'authorized')`)
+	if config.GetAcademicDB() != nil {
+		rows, err := config.GetAcademicDB().Query(`SELECT payment_id, donor_name, email, phone, phone_digits, amount, is_anonymous, target_department_id, target_department_code, DATE_FORMAT(created_at, '%Y-%m-%d') as date_str FROM sponsor_transactions WHERE payment_status IN ('captured', 'authorized')`)
 		if err == nil {
 			defer rows.Close()
 			for rows.Next() {
@@ -1042,7 +1042,7 @@ func (h *SponsorsHandler) UpdateSponsorNameOverride(c *gin.Context) {
 		return
 	}
 
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Database connection not available"})
 		return
 	}
@@ -1056,7 +1056,7 @@ func (h *SponsorsHandler) UpdateSponsorNameOverride(c *gin.Context) {
 			phone = VALUES(phone);
 	`
 
-	_, err := config.DB.Exec(query, donorKey, customName, strings.TrimSpace(req.Email), strings.TrimSpace(req.Phone))
+	_, err := config.GetAcademicDB().Exec(query, donorKey, customName, strings.TrimSpace(req.Email), strings.TrimSpace(req.Phone))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to update name override: %v", err)})
 		return
@@ -1084,12 +1084,12 @@ func (h *SponsorsHandler) DeleteSponsorNameOverride(c *gin.Context) {
 		return
 	}
 
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Database connection not available"})
 		return
 	}
 
-	_, err := config.DB.Exec("DELETE FROM sponsor_name_overrides WHERE donor_key = ?", donorKey)
+	_, err := config.GetAcademicDB().Exec("DELETE FROM sponsor_name_overrides WHERE donor_key = ?", donorKey)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to reset name override: %v", err)})
 		return
@@ -1103,10 +1103,10 @@ func (h *SponsorsHandler) DeleteSponsorNameOverride(c *gin.Context) {
 
 func getTransactionOverridesMap() map[string]bool {
 	overrides := make(map[string]bool)
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		return overrides
 	}
-	rows, err := config.DB.Query("SELECT payment_id, is_anonymous FROM sponsor_transaction_overrides")
+	rows, err := config.GetAcademicDB().Query("SELECT payment_id, is_anonymous FROM sponsor_transaction_overrides")
 	if err != nil {
 		return overrides
 	}
@@ -1142,7 +1142,7 @@ func (h *SponsorsHandler) UpdateSponsorTransactionOverride(c *gin.Context) {
 		return
 	}
 
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Database connection not available"})
 		return
 	}
@@ -1152,7 +1152,7 @@ func (h *SponsorsHandler) UpdateSponsorTransactionOverride(c *gin.Context) {
 		anonVal = 1
 	}
 
-	_, _ = config.DB.Exec("UPDATE sponsor_transactions SET is_anonymous = ? WHERE payment_id = ?", anonVal, paymentID)
+	_, _ = config.GetAcademicDB().Exec("UPDATE sponsor_transactions SET is_anonymous = ? WHERE payment_id = ?", anonVal, paymentID)
 
 	query := `
 		INSERT INTO sponsor_transaction_overrides (payment_id, is_anonymous)
@@ -1161,7 +1161,7 @@ func (h *SponsorsHandler) UpdateSponsorTransactionOverride(c *gin.Context) {
 			is_anonymous = VALUES(is_anonymous);
 	`
 
-	_, err := config.DB.Exec(query, paymentID, req.IsAnonymous)
+	_, err := config.GetAcademicDB().Exec(query, paymentID, req.IsAnonymous)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to update transaction override: %v", err)})
 		return
@@ -1221,8 +1221,8 @@ func (h *SponsorsHandler) CheckContribution(c *gin.Context) {
 	aggregatedMap := make(map[string]*InternalDonor)
 	overridesMap := getOverridesMap()
 
-	if config.DB != nil {
-		rows, err := config.DB.Query(`SELECT payment_id, donor_name, email, phone, phone_digits, amount, is_anonymous, DATE_FORMAT(created_at, '%Y-%m-%d') as date_str FROM sponsor_transactions WHERE payment_status IN ('captured', 'authorized')`)
+	if config.GetAcademicDB() != nil {
+		rows, err := config.GetAcademicDB().Query(`SELECT payment_id, donor_name, email, phone, phone_digits, amount, is_anonymous, DATE_FORMAT(created_at, '%Y-%m-%d') as date_str FROM sponsor_transactions WHERE payment_status IN ('captured', 'authorized')`)
 		if err == nil {
 			defer rows.Close()
 			for rows.Next() {
@@ -1769,8 +1769,8 @@ func (h *SponsorsHandler) GetDepartmentLeaderboard(c *gin.Context) {
 	_, deptList := getDepartmentsMap()
 	deptMappings := getDepartmentMappingsMap()
 
-	if config.DB != nil {
-		rows, err := config.DB.Query(`SELECT payment_id, donor_name, email, phone, phone_digits, amount, is_anonymous, target_department_id, target_department_code, DATE_FORMAT(created_at, '%Y-%m-%d') as date_str FROM sponsor_transactions WHERE payment_status IN ('captured', 'authorized')`)
+	if config.GetAcademicDB() != nil {
+		rows, err := config.GetAcademicDB().Query(`SELECT payment_id, donor_name, email, phone, phone_digits, amount, is_anonymous, target_department_id, target_department_code, DATE_FORMAT(created_at, '%Y-%m-%d') as date_str FROM sponsor_transactions WHERE payment_status IN ('captured', 'authorized')`)
 		if err == nil {
 			defer rows.Close()
 			for rows.Next() {
@@ -1873,12 +1873,12 @@ func (h *SponsorsHandler) CreateSponsorDepartment(c *gin.Context) {
 		year = "1st Year"
 	}
 
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Database not available"})
 		return
 	}
 
-	res, err := config.DB.Exec("INSERT INTO sponsor_departments (name, code, email_code, year, year_code) VALUES (?, ?, ?, ?, ?)", name, code, emailCode, year, yearCode)
+	res, err := config.GetAcademicDB().Exec("INSERT INTO sponsor_departments (name, code, email_code, year, year_code) VALUES (?, ?, ?, ?, ?)", name, code, emailCode, year, yearCode)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": fmt.Sprintf("Failed to create department: %v", err)})
 		return
@@ -1930,7 +1930,7 @@ func (h *SponsorsHandler) UpdateSponsorDepartment(c *gin.Context) {
 		return
 	}
 
-	_, err = config.DB.Exec("UPDATE sponsor_departments SET name = ?, code = ?, email_code = ?, year = ?, year_code = ? WHERE id = ?", name, code, emailCode, year, yearCode, id)
+	_, err = config.GetAcademicDB().Exec("UPDATE sponsor_departments SET name = ?, code = ?, email_code = ?, year = ?, year_code = ? WHERE id = ?", name, code, emailCode, year, yearCode, id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to update department: %v", err)})
 		return
@@ -1950,8 +1950,8 @@ func (h *SponsorsHandler) DeleteSponsorDepartment(c *gin.Context) {
 		return
 	}
 
-	_, _ = config.DB.Exec("DELETE FROM sponsor_department_mappings WHERE department_id = ?", id)
-	_, err = config.DB.Exec("DELETE FROM sponsor_departments WHERE id = ?", id)
+	_, _ = config.GetAcademicDB().Exec("DELETE FROM sponsor_department_mappings WHERE department_id = ?", id)
+	_, err = config.GetAcademicDB().Exec("DELETE FROM sponsor_departments WHERE id = ?", id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to delete department: %v", err)})
 		return
@@ -1981,13 +1981,13 @@ func (h *SponsorsHandler) UpdateSponsorDepartmentMapping(c *gin.Context) {
 		return
 	}
 
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Database not available"})
 		return
 	}
 
 	if req.DepartmentID <= 0 {
-		_, err := config.DB.Exec("DELETE FROM sponsor_department_mappings WHERE donor_key = ?", donorKey)
+		_, err := config.GetAcademicDB().Exec("DELETE FROM sponsor_department_mappings WHERE donor_key = ?", donorKey)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to remove mapping: %v", err)})
 			return
@@ -2001,7 +2001,7 @@ func (h *SponsorsHandler) UpdateSponsorDepartmentMapping(c *gin.Context) {
 		VALUES (?, ?)
 		ON DUPLICATE KEY UPDATE department_id = VALUES(department_id);
 	`
-	_, err := config.DB.Exec(query, donorKey, req.DepartmentID)
+	_, err := config.GetAcademicDB().Exec(query, donorKey, req.DepartmentID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": fmt.Sprintf("Failed to update mapping: %v", err)})
 		return
@@ -2034,12 +2034,12 @@ func (h *SponsorsHandler) CreateSponsorDepartmentsBatch(c *gin.Context) {
 		return
 	}
 
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Database not available"})
 		return
 	}
 
-	stmt, err := config.DB.Prepare(`
+	stmt, err := config.GetAcademicDB().Prepare(`
 		INSERT INTO sponsor_departments (name, code, email_code, year, year_code)
 		VALUES (?, ?, ?, ?, ?)
 		ON DUPLICATE KEY UPDATE name = VALUES(name), email_code = VALUES(email_code), year_code = VALUES(year_code)
@@ -2097,7 +2097,7 @@ func (h *SponsorsHandler) UpdateSponsorDepartmentMappingsBatch(c *gin.Context) {
 		return
 	}
 
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "Database not available"})
 		return
 	}
@@ -2111,7 +2111,7 @@ func (h *SponsorsHandler) UpdateSponsorDepartmentMappingsBatch(c *gin.Context) {
 		lookupByCode[strings.ToLower(d.Code)] = d.ID
 	}
 
-	stmt, err := config.DB.Prepare(`
+	stmt, err := config.GetAcademicDB().Prepare(`
 		INSERT INTO sponsor_department_mappings (donor_key, department_id)
 		VALUES (?, ?)
 		ON DUPLICATE KEY UPDATE department_id = VALUES(department_id)

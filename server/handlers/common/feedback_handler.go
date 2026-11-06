@@ -17,7 +17,7 @@ type FeedbackHandler struct {
 }
 
 func NewFeedbackHandler() *FeedbackHandler {
-	return &FeedbackHandler{DB: config.DB}
+	return &FeedbackHandler{DB: config.GetLogsDB()}
 }
 
 type FeedbackMessage struct {

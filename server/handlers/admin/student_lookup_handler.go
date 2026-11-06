@@ -291,7 +291,9 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 			newUID := claims.UID
 			_, _ = h.DB.Exec(`UPDATE users SET google_id = ?, uid = ? WHERE LOWER(TRIM(email)) = LOWER(TRIM(?))`, newUID, newUID, emailID)
 			_, _ = h.DB.Exec(`UPDATE admins SET uid = ? WHERE uid = ?`, newUID, oldUID)
-			_, _ = h.DB.Exec(`UPDATE feedback_messages SET user_uid = ? WHERE user_uid = ?`, newUID, oldUID)
+			if logsDB := config.GetLogsDB(); logsDB != nil {
+				_, _ = logsDB.Exec(`UPDATE feedback_messages SET user_uid = ? WHERE user_uid = ?`, newUID, oldUID)
+			}
 			user.GoogleID = newUID
 			user.UID = newUID
 		}

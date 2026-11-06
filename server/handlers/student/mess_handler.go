@@ -137,7 +137,7 @@ type messMenuRowInput struct {
 }
 
 func NewMessHandler() *MessHandler {
-	return &MessHandler{DB: config.DB}
+	return &MessHandler{DB: config.GetAcademicDB()}
 }
 
 func currentMealType() string {

@@ -17,7 +17,7 @@ type QBHandler struct {
 }
 
 func NewQBHandler() *QBHandler {
-	return &QBHandler{DB: config.DB}
+	return &QBHandler{DB: config.GetAcademicDB()}
 }
 
 // GET /admin/qb?semester=3&year=2024&dept=CSE

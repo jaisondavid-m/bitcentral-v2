@@ -18,7 +18,7 @@ type NotificationHandler struct {
 }
 
 func NewNotificationHandler() *NotificationHandler {
-	return &NotificationHandler{DB: config.DB}
+	return &NotificationHandler{DB: config.GetLogsDB()}
 }
 
 // Helper to extract UID and email from auth header
@@ -37,7 +37,8 @@ func (h *NotificationHandler) getAuthUser(c *gin.Context) (uid, email string) {
 
 // Helper to resolve student profile details for targeted notifications
 func (h *NotificationHandler) resolveStudentInfo(uid, email string) (rollNo, batch, dept string) {
-	if h.DB == nil {
+	coreDB := config.GetCoreDB()
+	if coreDB == nil {
 		return "", "", ""
 	}
 
@@ -50,7 +51,7 @@ func (h *NotificationHandler) resolveStudentInfo(uid, email string) (rollNo, bat
 		WHERE email = ? OR user_id = ? OR id = ?
 		LIMIT 1
 	`
-	_ = h.DB.QueryRow(query, email, uid, uid).Scan(&rollNo, &batch, &dept)
+	_ = coreDB.QueryRow(query, email, uid, uid).Scan(&rollNo, &batch, &dept)
 	return rollNo, batch, dept
 }
 

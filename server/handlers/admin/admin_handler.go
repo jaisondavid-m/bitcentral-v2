@@ -848,3 +848,73 @@ func (h *AdminHandler) UpdateUserRole(c *gin.Context) {
 		"role":    role,
 	})
 }
+
+// GET /admin/audit-logs retrieves API audit trail from the Logs & High-Write Free DB
+func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
+	db := config.GetLogsDB()
+	if db == nil {
+		c.JSON(http.StatusOK, gin.H{"success": true, "logs": []any{}, "total": 0})
+		return
+	}
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if page < 1 {
+		page = 1
+	}
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "50"))
+	if limit < 1 || limit > 100 {
+		limit = 50
+	}
+	offset := (page - 1) * limit
+
+	var total int
+	_ = db.QueryRow("SELECT COUNT(*) FROM audit_logs").Scan(&total)
+
+	rows, err := db.Query(`
+		SELECT id, method, endpoint, COALESCE(query, ''), COALESCE(payload, ''), ip_address,
+		       COALESCE(user_uid, ''), COALESCE(user_name, ''), COALESCE(roll_no, ''), COALESCE(role, ''),
+		       status_code, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s')
+		FROM audit_logs
+		ORDER BY id DESC
+		LIMIT ? OFFSET ?
+	`, limit, offset)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	type AuditEntry struct {
+		ID         int    `json:"id"`
+		Method     string `json:"method"`
+		Endpoint   string `json:"endpoint"`
+		Query      string `json:"query"`
+		Payload    string `json:"payload"`
+		IPAddress  string `json:"ip_address"`
+		UserUID    string `json:"user_uid"`
+		UserName   string `json:"user_name"`
+		RollNo     string `json:"roll_no"`
+		Role       string `json:"role"`
+		StatusCode int    `json:"status_code"`
+		CreatedAt  string `json:"created_at"`
+	}
+
+	logs := make([]AuditEntry, 0)
+	for rows.Next() {
+		var entry AuditEntry
+		if err := rows.Scan(
+			&entry.ID, &entry.Method, &entry.Endpoint, &entry.Query, &entry.Payload, &entry.IPAddress,
+			&entry.UserUID, &entry.UserName, &entry.RollNo, &entry.Role, &entry.StatusCode, &entry.CreatedAt,
+		); err == nil {
+			logs = append(logs, entry)
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"logs":    logs,
+		"total":   total,
+		"page":    page,
+		"limit":   limit,
+	})
+}

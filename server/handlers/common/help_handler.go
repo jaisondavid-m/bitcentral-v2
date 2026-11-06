@@ -34,7 +34,7 @@ type HelpHandler struct {
 
 func NewHelpHandler() *HelpHandler {
 	return &HelpHandler{
-		DB:           config.DB,
+		DB:           config.GetLogsDB(),
 		roomLimitMap: make(map[string][]time.Time),
 		msgLimitMap:  make(map[string][]time.Time),
 		repLimitMap:  make(map[string][]time.Time),
@@ -220,19 +220,20 @@ func (h *HelpHandler) loadUserIdentity(uid string) commonmodels.AdminUserIdentit
 	identity := commonmodels.AdminUserIdentity{
 		UID: uid,
 	}
-	if h.DB == nil || uid == "" {
+	coreDB := config.GetCoreDB()
+	if coreDB == nil || uid == "" {
 		return identity
 	}
 
 	var name, email, googleID string
-	err := h.DB.QueryRow(`SELECT COALESCE(display_name, ''), COALESCE(email, ''), COALESCE(google_id, '') FROM users WHERE uid = ? OR google_id = ? LIMIT 1`, uid, uid).Scan(&name, &email, &googleID)
+	err := coreDB.QueryRow(`SELECT COALESCE(display_name, ''), COALESCE(email, ''), COALESCE(google_id, '') FROM users WHERE uid = ? OR google_id = ? LIMIT 1`, uid, uid).Scan(&name, &email, &googleID)
 	if err == nil {
 		identity.Name = name
 		identity.Email = email
 	}
 
 	var rollNo string
-	err = h.DB.QueryRow(`SELECT COALESCE(user_id, '') FROM tracker_users WHERE (uid = ? OR LOWER(TRIM(email)) = LOWER(TRIM(?))) AND COALESCE(user_id, '') != '' LIMIT 1`, uid, email).Scan(&rollNo)
+	err = coreDB.QueryRow(`SELECT COALESCE(user_id, '') FROM tracker_users WHERE (uid = ? OR LOWER(TRIM(email)) = LOWER(TRIM(?))) AND COALESCE(user_id, '') != '' LIMIT 1`, uid, email).Scan(&rollNo)
 	if err == nil {
 		identity.RegisterNo = rollNo
 	}
@@ -701,7 +702,9 @@ func (h *HelpHandler) DeleteOwnMessage(c *gin.Context) {
 
 	isAdmin := false
 	var role string
-	_ = h.DB.QueryRow(`SELECT role FROM users WHERE (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, uid, strings.ToLower(strings.TrimSpace(email))).Scan(&role)
+	if coreDB := config.GetCoreDB(); coreDB != nil {
+		_ = coreDB.QueryRow(`SELECT role FROM users WHERE (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, uid, strings.ToLower(strings.TrimSpace(email))).Scan(&role)
+	}
 	r := strings.ToLower(strings.TrimSpace(role))
 	if r == "admin" || r == "superadmin" || r == "super_admin" {
 		isAdmin = true
@@ -735,7 +738,9 @@ func (h *HelpHandler) AdminBlockUserFromMessage(c *gin.Context) {
 
 	isAdmin := false
 	var role string
-	_ = h.DB.QueryRow(`SELECT role FROM users WHERE (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, uid, strings.ToLower(strings.TrimSpace(email))).Scan(&role)
+	if coreDB := config.GetCoreDB(); coreDB != nil {
+		_ = coreDB.QueryRow(`SELECT role FROM users WHERE (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, uid, strings.ToLower(strings.TrimSpace(email))).Scan(&role)
+	}
 	r := strings.ToLower(strings.TrimSpace(role))
 	if r == "admin" || r == "superadmin" || r == "super_admin" {
 		isAdmin = true

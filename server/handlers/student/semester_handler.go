@@ -37,7 +37,7 @@ type SemesterHandler struct {
 }
 
 func NewSemesterHandler() *SemesterHandler {
-	return &SemesterHandler{DB: config.DB}
+	return &SemesterHandler{DB: config.GetAcademicDB()}
 }
 
 func (h *SemesterHandler) GetSemesterByYear(c *gin.Context) {

@@ -21,7 +21,7 @@ func NewLeaveHandler() *LeaveHandler {
 
 // GetAllLeaves retrieves all leaves/holidays from database, ordered by from_date ascending
 func (h *LeaveHandler) GetAllLeaves(c *gin.Context) {
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		h.fallbackLeaves(c)
 		return
 	}
@@ -43,7 +43,7 @@ func (h *LeaveHandler) GetAllLeaves(c *gin.Context) {
 		ORDER BY from_date ASC, id ASC
 	`
 
-	rows, err := config.DB.Query(query)
+	rows, err := config.GetAcademicDB().Query(query)
 	if err != nil {
 		// Fallback to hardcoded data if database table has issue
 		h.fallbackLeaves(c)
@@ -148,7 +148,7 @@ type LeaveRequest struct {
 
 // CreateLeave adds a new leave/holiday record (Admin only)
 func (h *LeaveHandler) CreateLeave(c *gin.Context) {
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Database not connected"})
 		return
 	}
@@ -209,7 +209,7 @@ func (h *LeaveHandler) CreateLeave(c *gin.Context) {
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	`
 
-	res, err := config.DB.Exec(query, req.Name, req.FromDate, req.ToDate, req.Day, req.FromHalfDay, req.ToHalfDay, req.LeaveType, req.Remarks)
+	res, err := config.GetAcademicDB().Exec(query, req.Name, req.FromDate, req.ToDate, req.Day, req.FromHalfDay, req.ToHalfDay, req.LeaveType, req.Remarks)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": fmt.Sprintf("Failed to create leave: %v", err)})
 		return
@@ -236,7 +236,7 @@ func (h *LeaveHandler) CreateLeave(c *gin.Context) {
 
 // UpdateLeave updates an existing leave/holiday (Admin only)
 func (h *LeaveHandler) UpdateLeave(c *gin.Context) {
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Database not connected"})
 		return
 	}
@@ -295,7 +295,7 @@ func (h *LeaveHandler) UpdateLeave(c *gin.Context) {
 		WHERE id = ?
 	`
 
-	res, err := config.DB.Exec(query, req.Name, req.FromDate, req.ToDate, req.Day, req.FromHalfDay, req.ToHalfDay, req.LeaveType, req.Remarks, id)
+	res, err := config.GetAcademicDB().Exec(query, req.Name, req.FromDate, req.ToDate, req.Day, req.FromHalfDay, req.ToHalfDay, req.LeaveType, req.Remarks, id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": fmt.Sprintf("Failed to update leave: %v", err)})
 		return
@@ -305,7 +305,7 @@ func (h *LeaveHandler) UpdateLeave(c *gin.Context) {
 	if rowsAffected == 0 {
 		// Check if record exists
 		var exists int
-		_ = config.DB.QueryRow("SELECT COUNT(*) FROM college_leaves WHERE id = ?", id).Scan(&exists)
+		_ = config.GetAcademicDB().QueryRow("SELECT COUNT(*) FROM college_leaves WHERE id = ?", id).Scan(&exists)
 		if exists == 0 {
 			c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "Leave record not found"})
 			return
@@ -320,7 +320,7 @@ func (h *LeaveHandler) UpdateLeave(c *gin.Context) {
 
 // DeleteLeave removes a leave/holiday record (Admin only)
 func (h *LeaveHandler) DeleteLeave(c *gin.Context) {
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Database not connected"})
 		return
 	}
@@ -333,7 +333,7 @@ func (h *LeaveHandler) DeleteLeave(c *gin.Context) {
 	}
 
 	query := `DELETE FROM college_leaves WHERE id = ?`
-	res, err := config.DB.Exec(query, id)
+	res, err := config.GetAcademicDB().Exec(query, id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": fmt.Sprintf("Failed to delete leave: %v", err)})
 		return
@@ -353,7 +353,7 @@ func (h *LeaveHandler) DeleteLeave(c *gin.Context) {
 
 // BatchCreateLeaves adds multiple leave items at once (Admin only)
 func (h *LeaveHandler) BatchCreateLeaves(c *gin.Context) {
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Database not connected"})
 		return
 	}
@@ -369,7 +369,7 @@ func (h *LeaveHandler) BatchCreateLeaves(c *gin.Context) {
 		return
 	}
 
-	stmt, err := config.DB.Prepare(`
+	stmt, err := config.GetAcademicDB().Prepare(`
 		INSERT INTO college_leaves (name, from_date, to_date, day, from_half_day, to_half_day, leave_type, remarks)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	`)
@@ -427,14 +427,14 @@ func (h *LeaveHandler) BatchCreateLeaves(c *gin.Context) {
 
 // ResetToDefaultLeaves clears and reseeds default holidays (Admin only)
 func (h *LeaveHandler) ResetToDefaultLeaves(c *gin.Context) {
-	if config.DB == nil {
+	if config.GetAcademicDB() == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Database not connected"})
 		return
 	}
 
-	_, _ = config.DB.Exec("TRUNCATE TABLE college_leaves")
+	_, _ = config.GetAcademicDB().Exec("TRUNCATE TABLE college_leaves")
 
-	stmt, err := config.DB.Prepare(`
+	stmt, err := config.GetAcademicDB().Prepare(`
 		INSERT INTO college_leaves (name, from_date, to_date, day, from_half_day, to_half_day, leave_type, remarks)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	`)
