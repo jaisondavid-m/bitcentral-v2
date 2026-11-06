@@ -865,3 +865,4 @@ func buildSeatingData14Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 227", CourseCode: "22HS005", RegisterNos: expandRange("7376252AL167", "7376252AL191"), Time: "09:00 AM – 12:00 PM"},
 	}
 }
+
