@@ -512,6 +512,10 @@ func buildSeatingData01Sep2026FNto02Sep2026AN() []studentmodels.SeatingRecord {
 	allRecords = append(allRecords, buildSeatingData30Oct2026AN()...)
 	allRecords = append(allRecords, buildSeatingData31Oct2026FN()...)
 	allRecords = append(allRecords, buildSeatingData31Oct2026AN()...)
+	allRecords = append(allRecords, buildSeatingData11Nov2026FN()...)
+	allRecords = append(allRecords, buildSeatingData11Nov2026AN()...)
+	allRecords = append(allRecords, buildSeatingData13Nov2026FN()...)
+	allRecords = append(allRecords, buildSeatingData13Nov2026AN()...)
 
 	return allRecords
 }
@@ -527,7 +531,13 @@ func LookupHall(registerNo, courseCode string) (string, bool) {
 
 		for _, record := range records {
 			actualCode := resolveCourseCode(record.CourseCode, meta.Date, meta.Session, meta.Semester)
-			if strings.ToUpper(actualCode) != courseCode && strings.ToUpper(record.CourseCode) != courseCode {
+			actualUpper := strings.ToUpper(actualCode)
+			recordUpper := strings.ToUpper(record.CourseCode)
+			match := actualUpper == courseCode ||
+				recordUpper == courseCode ||
+				strings.TrimSuffix(actualUpper, "*") == strings.TrimSuffix(courseCode, "*") ||
+				strings.TrimSuffix(recordUpper, "*") == strings.TrimSuffix(courseCode, "*")
+			if !match {
 				continue
 			}
 
@@ -585,6 +595,11 @@ var sessionMetaList = []struct {
 	{buildSeatingData30Oct2026AN, sessionMeta{"30-10-2026", "AN", "01:30 PM – 04:30 PM", "SEM3"}},
 	{buildSeatingData31Oct2026FN, sessionMeta{"31-10-2026", "FN", "08:45 AM – 12:00 Noon", "SEM3"}},
 	{buildSeatingData31Oct2026AN, sessionMeta{"31-10-2026", "AN", "01:30 PM – 04:30 PM", "SEM3"}},
+	// November 2026 Regular Sessions
+	{buildSeatingData11Nov2026FN, sessionMeta{"11-11-2026", "FN", "09:00 AM – 12:00 PM", ""}},
+	{buildSeatingData11Nov2026AN, sessionMeta{"11-11-2026", "AN", "01:30 PM – 04:30 PM", ""}},
+	{buildSeatingData13Nov2026FN, sessionMeta{"13-11-2026", "FN", "09:00 AM – 12:00 PM", ""}},
+	{buildSeatingData13Nov2026AN, sessionMeta{"13-11-2026", "AN", "01:30 PM – 04:30 PM", ""}},
 }
 
 var courseNameMap = map[string]string{
