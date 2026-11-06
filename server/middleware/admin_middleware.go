@@ -35,7 +35,7 @@ func RequireAdmin() gin.HandlerFunc {
 		if token == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"success": false,
-				"message": "Unauthorized",
+				"message": "Unauthorized: Authentication token is required",
 			})
 			c.Abort()
 			return
@@ -45,23 +45,45 @@ func RequireAdmin() gin.HandlerFunc {
 		if err != nil || claims == nil {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"success": false,
-				"message": "Invalid authentication token",
+				"message": "Invalid or expired authentication token",
 			})
 			c.Abort()
 			return
 		}
 
-		uid := claims.UID
+		uid := strings.TrimSpace(claims.UID)
 		email := strings.ToLower(strings.TrimSpace(claims.Email))
 
-		// Check role in users table
+		// Strict server-side database validation: NEVER trust client claims
 		if config.DB != nil {
 			var role string
-			err := config.DB.QueryRow(`SELECT role FROM users WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, uid, uid, email).Scan(&role)
+			var blocked int
+			err := config.DB.QueryRow(`
+				SELECT COALESCE(role, 'user'), COALESCE(blocked, 0)
+				FROM users
+				WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)
+				LIMIT 1`,
+				uid, uid, email,
+			).Scan(&role, &blocked)
+
 			if err == nil {
+				if blocked != 0 {
+					c.JSON(http.StatusForbidden, gin.H{
+						"success": false,
+						"message": "Account is blocked. Contact support for assistance.",
+					})
+					c.Abort()
+					return
+				}
+
 				r := strings.ToLower(strings.TrimSpace(role))
+				// If role in DB is admin or superadmin, grant access
 				if r == "admin" || r == "superadmin" || r == "super_admin" {
 					c.Set("actor_uid", uid)
+					c.Set("actor_email", email)
+					c.Set("actor_role", r)
+					c.Set("is_admin", true)
+					c.Set("is_super_admin", r == "superadmin" || r == "super_admin")
 					c.Next()
 					return
 				}
@@ -69,15 +91,30 @@ func RequireAdmin() gin.HandlerFunc {
 
 			// Fallback: check admins table in DB
 			var count int
-			err = config.DB.QueryRow(`SELECT COUNT(*) FROM admins a LEFT JOIN users u ON a.uid = u.uid WHERE a.uid = ? OR LOWER(TRIM(u.email)) = ?`, uid, email).Scan(&count)
+			err = config.DB.QueryRow(`
+				SELECT COUNT(*)
+				FROM admins a
+				LEFT JOIN users u ON a.uid = u.uid
+				WHERE (a.uid = ? OR LOWER(TRIM(u.email)) = ?)
+				  AND COALESCE(u.blocked, 0) = 0`,
+				uid, email,
+			).Scan(&count)
+
 			if err == nil && count > 0 {
 				c.Set("actor_uid", uid)
+				c.Set("actor_email", email)
+				c.Set("actor_role", "admin")
+				c.Set("is_admin", true)
+				c.Set("is_super_admin", false)
 				c.Next()
 				return
 			}
 		}
 
-		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized admin access"})
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"message": "Unauthorized admin access: insufficient privileges",
+		})
 		c.Abort()
 	}
 }
@@ -86,36 +123,66 @@ func RequireSuperAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := getToken(c)
 		if token == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized"})
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"success": false,
+				"message": "Unauthorized: Authentication token is required",
+			})
 			c.Abort()
 			return
 		}
 
 		claims, err := config.VerifyGoogleToken(token)
 		if err != nil || claims == nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized"})
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"success": false,
+				"message": "Invalid or expired authentication token",
+			})
 			c.Abort()
 			return
 		}
 
-		uid := claims.UID
+		uid := strings.TrimSpace(claims.UID)
 		email := strings.ToLower(strings.TrimSpace(claims.Email))
 
-		// Check role in users table
+		// Strict server-side database validation: only superadmin role in DB is allowed
 		if config.DB != nil {
 			var role string
-			err := config.DB.QueryRow(`SELECT role FROM users WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, uid, uid, email).Scan(&role)
+			var blocked int
+			err := config.DB.QueryRow(`
+				SELECT COALESCE(role, 'user'), COALESCE(blocked, 0)
+				FROM users
+				WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)
+				LIMIT 1`,
+				uid, uid, email,
+			).Scan(&role, &blocked)
+
 			if err == nil {
+				if blocked != 0 {
+					c.JSON(http.StatusForbidden, gin.H{
+						"success": false,
+						"message": "Account is blocked.",
+					})
+					c.Abort()
+					return
+				}
+
 				r := strings.ToLower(strings.TrimSpace(role))
 				if r == "superadmin" || r == "super_admin" {
 					c.Set("actor_uid", uid)
+					c.Set("actor_email", email)
+					c.Set("actor_role", r)
+					c.Set("is_admin", true)
+					c.Set("is_super_admin", true)
 					c.Next()
 					return
 				}
 			}
 		}
 
-		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized super admin access"})
+		c.JSON(http.StatusForbidden, gin.H{
+			"success": false,
+			"message": "Unauthorized super admin access: super privileges required",
+		})
 		c.Abort()
 	}
 }

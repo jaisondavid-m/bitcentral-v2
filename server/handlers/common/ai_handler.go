@@ -185,6 +185,28 @@ func (h *AIHandler) GetInternalAIKey(c *gin.Context) {
 	roleStr := strings.ToLower(strings.TrimSpace(fmt.Sprintf("%v", roleVal)))
 	isAdmin := roleStr == "admin" || roleStr == "superadmin" || roleStr == "super_admin"
 
+	if !isAdmin {
+		token := utils.ExtractAuthToken(c)
+		if token != "" {
+			if claims, err := config.VerifyGoogleToken(token); err == nil && claims != nil {
+				if h.DB != nil {
+					var r string
+					_ = h.DB.QueryRow(`
+						SELECT COALESCE(role, 'user')
+						FROM users
+						WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)
+						LIMIT 1`,
+						claims.UID, claims.UID, strings.ToLower(claims.Email),
+					).Scan(&r)
+					rLower := strings.ToLower(strings.TrimSpace(r))
+					if rLower == "admin" || rLower == "superadmin" || rLower == "super_admin" {
+						isAdmin = true
+					}
+				}
+			}
+		}
+	}
+
 	if !utils.IsInternalServiceRequest(c) && !isAdmin {
 		c.JSON(http.StatusForbidden, gin.H{
 			"success": false,

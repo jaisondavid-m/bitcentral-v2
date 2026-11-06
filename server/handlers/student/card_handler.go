@@ -100,7 +100,29 @@ func GetCards(c *gin.Context) {
 	updateLastSeenIfAuthenticated(c)
 
 	platform := strings.ToLower(strings.TrimSpace(c.Query("platform")))
-	isAdminReq := strings.Contains(c.Request.URL.Path, "/admin/") || c.Query("all") == "true"
+	isAdminReq := strings.Contains(c.Request.URL.Path, "/admin/")
+	if !isAdminReq && c.Query("all") == "true" {
+		// Strict server-side check: only allow 'all' if caller is a verified admin in DB
+		token := utils.ExtractAuthToken(c)
+		if token != "" {
+			if claims, err := config.VerifyGoogleToken(token); err == nil && claims != nil {
+				if config.DB != nil {
+					var role string
+					_ = config.DB.QueryRow(`
+						SELECT COALESCE(role, 'user')
+						FROM users
+						WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)
+						LIMIT 1`,
+						claims.UID, claims.UID, strings.ToLower(claims.Email),
+					).Scan(&role)
+					r := strings.ToLower(strings.TrimSpace(role))
+					if r == "admin" || r == "superadmin" || r == "super_admin" {
+						isAdminReq = true
+					}
+				}
+			}
+		}
+	}
 
 	// Fast in-memory cache lookup to save TiDB Request Units
 	cacheKey := fmt.Sprintf("%v_%s", isAdminReq, platform)

@@ -18,7 +18,8 @@ function AdminRoute({ children }) {
     role === "admin" ||
     role === "superadmin" ||
     role === "super_admin" ||
-    user?.isAdmin === true;
+    user?.isAdmin === true ||
+    profile?.is_admin === true;
 
   if (!isAdmin) {
     return <Navigate to="/home" replace />;

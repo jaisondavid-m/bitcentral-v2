@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "@/api/axios";
 import {
   deleteAdminUser,
@@ -7265,6 +7265,7 @@ function AIKeySection() {
 /* -- Pages ------------------------------------------------------------------- */
 function AdminDashboard({ initialTab } = {}) {
   const location = useLocation();
+  const navigate = useNavigate();
   const activeTab = initialTab || getAdminTabFromPath(location.pathname);
 
   const [isSuper, setIsSuper] = useState(false);
@@ -7274,13 +7275,18 @@ function AdminDashboard({ initialTab } = {}) {
       try {
         const res = await checkSuperAdmin();
         if (!mounted) return;
+        if (res && res.is_admin === false) {
+          // Strict server-side validation rejected: not an admin in DB
+          navigate("/home", { replace: true });
+          return;
+        }
         setIsSuper(Boolean(res?.is_super));
       } catch (err) {
         if (mounted) setIsSuper(false);
       }
     })();
     return () => { mounted = false };
-  }, []);
+  }, [navigate]);
 
   return (
     <AdminDashboardShell activeTab={activeTab} isSuper={isSuper}>

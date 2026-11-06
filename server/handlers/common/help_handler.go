@@ -702,12 +702,20 @@ func (h *HelpHandler) DeleteOwnMessage(c *gin.Context) {
 
 	isAdmin := false
 	var role string
-	if coreDB := config.GetCoreDB(); coreDB != nil {
+	coreDB := config.GetCoreDB()
+	if coreDB != nil {
 		_ = coreDB.QueryRow(`SELECT role FROM users WHERE (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, uid, strings.ToLower(strings.TrimSpace(email))).Scan(&role)
 	}
 	r := strings.ToLower(strings.TrimSpace(role))
 	if r == "admin" || r == "superadmin" || r == "super_admin" {
 		isAdmin = true
+	}
+	if !isAdmin && coreDB != nil {
+		var cnt int
+		_ = coreDB.QueryRow(`SELECT COUNT(*) FROM admins WHERE uid = ?`, uid).Scan(&cnt)
+		if cnt > 0 {
+			isAdmin = true
+		}
 	}
 
 	if senderUID != uid && !isAdmin {
@@ -738,12 +746,20 @@ func (h *HelpHandler) AdminBlockUserFromMessage(c *gin.Context) {
 
 	isAdmin := false
 	var role string
-	if coreDB := config.GetCoreDB(); coreDB != nil {
+	coreDB := config.GetCoreDB()
+	if coreDB != nil {
 		_ = coreDB.QueryRow(`SELECT role FROM users WHERE (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, uid, strings.ToLower(strings.TrimSpace(email))).Scan(&role)
 	}
 	r := strings.ToLower(strings.TrimSpace(role))
 	if r == "admin" || r == "superadmin" || r == "super_admin" {
 		isAdmin = true
+	}
+	if !isAdmin && coreDB != nil {
+		var cnt int
+		_ = coreDB.QueryRow(`SELECT COUNT(*) FROM admins WHERE uid = ?`, uid).Scan(&cnt)
+		if cnt > 0 {
+			isAdmin = true
+		}
 	}
 
 	if !isAdmin {

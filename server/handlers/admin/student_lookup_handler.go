@@ -341,6 +341,18 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		userID = trackerUserID
 	}
 
+	// Synchronize admin status from admins table if not superadmin
+	if h.DB != nil && user.Role != "superadmin" && user.Role != "super_admin" {
+		var inAdmins int
+		_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins WHERE uid = ? OR uid = ?`, user.UID, user.GoogleID).Scan(&inAdmins)
+		if inAdmins > 0 {
+			user.Role = "admin"
+		}
+	}
+
+	isAdminUser := user.Role == "admin" || user.Role == "superadmin" || user.Role == "super_admin"
+	isSuperUser := user.Role == "superadmin" || user.Role == "super_admin"
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"data": gin.H{
@@ -357,6 +369,8 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 			"is_blocked":        user.IsBlocked,
 			"blocked_at":        user.BlockedAt,
 			"role":              user.Role,
+			"is_admin":          isAdminUser,
+			"is_super":          isSuperUser,
 			"roll_no":           rollNo,
 			"phone":             phoneNo,
 			"phone_no":          phoneNo,

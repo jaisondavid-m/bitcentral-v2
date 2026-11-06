@@ -137,10 +137,22 @@ export const StudentContext = ({ children }) => {
         setProfile(backendProfile);
         setStudent((prev) => toProfileStudent(backendProfile, decoded || prev));
         const userRole = (backendProfile.role || "").toLowerCase().trim();
+        const isAdmin = Boolean(
+          backendProfile.is_admin ||
+          userRole === "admin" ||
+          userRole === "superadmin" ||
+          userRole === "super_admin"
+        );
+        const isSuper = Boolean(
+          backendProfile.is_super ||
+          userRole === "superadmin" ||
+          userRole === "super_admin"
+        );
         setUser((prev) => ({
           ...prev,
           role: userRole || "user",
-          isAdmin: userRole === "admin" || userRole === "superadmin" || userRole === "super_admin",
+          isAdmin,
+          isSuper,
         }));
       } else {
         setProfile(null);
@@ -175,6 +187,17 @@ export const StudentContext = ({ children }) => {
           const backendProfile = await getMeProfile();
           if (backendProfile?.email && !cancelled) {
             const userRole = (backendProfile.role || "").toLowerCase().trim();
+            const isAdmin = Boolean(
+              backendProfile.is_admin ||
+              userRole === "admin" ||
+              userRole === "superadmin" ||
+              userRole === "super_admin"
+            );
+            const isSuper = Boolean(
+              backendProfile.is_super ||
+              userRole === "superadmin" ||
+              userRole === "super_admin"
+            );
             setUser((prev) => ({
               ...prev,
               uid: backendProfile.uid || prev?.uid,
@@ -182,7 +205,8 @@ export const StudentContext = ({ children }) => {
               displayName: backendProfile.display_name || prev?.displayName,
               photoURL: backendProfile.photo_url || prev?.photoURL,
               role: userRole || "user",
-              isAdmin: userRole === "admin" || userRole === "superadmin" || userRole === "super_admin",
+              isAdmin,
+              isSuper,
             }));
             setProfile(backendProfile);
             const decoded = decodeCollegeEmail(backendProfile.email);

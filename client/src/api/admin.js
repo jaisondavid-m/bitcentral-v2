@@ -224,10 +224,10 @@ export async function deleteCard(id) {
 // Super-admin related API
 export async function checkSuperAdmin() {
   const currentUser = auth.currentUser;
-  if (!currentUser) return { is_super: false };
+  if (!currentUser) return { is_admin: false, is_super: false, role: "user" };
   const idToken = await currentUser.getIdToken();
   const response = await api.get(`/admin/super/check`, { headers: { Authorization: `Bearer ${idToken}` } });
-  return response.data || { is_super: false };
+  return response.data || { is_admin: false, is_super: false, role: "user" };
 }
 
 export async function listAdmins() {
