@@ -516,6 +516,7 @@ func buildSeatingData01Sep2026FNto02Sep2026AN() []studentmodels.SeatingRecord {
 	allRecords = append(allRecords, buildSeatingData11Nov2026AN()...)
 	allRecords = append(allRecords, buildSeatingData13Nov2026FN()...)
 	allRecords = append(allRecords, buildSeatingData13Nov2026AN()...)
+	allRecords = append(allRecords, buildSeatingData14Nov2026FN()...)
 
 	return allRecords
 }
@@ -600,6 +601,7 @@ var sessionMetaList = []struct {
 	{buildSeatingData11Nov2026AN, sessionMeta{"11-11-2026", "AN", "01:30 PM – 04:30 PM", ""}},
 	{buildSeatingData13Nov2026FN, sessionMeta{"13-11-2026", "FN", "09:00 AM – 12:00 PM", ""}},
 	{buildSeatingData13Nov2026AN, sessionMeta{"13-11-2026", "AN", "01:30 PM – 04:30 PM", ""}},
+	{buildSeatingData14Nov2026FN, sessionMeta{"14-11-2026", "FN", "09:00 AM – 12:00 PM", ""}},
 }
 
 var courseNameMap = map[string]string{
