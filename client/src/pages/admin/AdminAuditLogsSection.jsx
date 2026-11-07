@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   ShieldAlert,
   Search,
@@ -26,8 +26,12 @@ import {
   Sparkles,
   ExternalLink,
   ShieldCheck,
+  BarChart3,
+  TrendingUp,
+  ArrowUpRight,
+  SlidersHorizontal,
 } from "lucide-react";
-import { getAdminAuditLogs, getAdminAuditLogUsers } from "@/api/admin.js";
+import { getAdminAuditLogs, getAdminAuditLogUsers, getAdminAuditAPIUsage } from "@/api/admin.js";
 
 function parseDateSafe(value) {
   if (!value) return null;
@@ -264,6 +268,58 @@ export default function AdminAuditLogsSection() {
     }
   }, [activeMode, selectedUser, fetchSelectedUserLogs]);
 
+  // 4. API Usage State & Fetch
+  const [apiEndpoints, setApiEndpoints] = useState([]);
+  const [apiUsageTotalCalls, setApiUsageTotalCalls] = useState(0);
+  const [apiUsageUniqueCount, setApiUsageUniqueCount] = useState(0);
+  const [apiUsageLoading, setApiUsageLoading] = useState(false);
+  const [apiSearch, setApiSearch] = useState("");
+  const [apiSearchInput, setApiSearchInput] = useState("");
+  const [apiMethod, setApiMethod] = useState("ALL");
+  const [apiTimeframe, setApiTimeframe] = useState("all");
+  const [apiSortBy, setApiSortBy] = useState("calls-desc");
+  const [copiedEndpoint, setCopiedEndpoint] = useState("");
+
+  const fetchApiUsage = useCallback(async () => {
+    setApiUsageLoading(true);
+    try {
+      const res = await getAdminAuditAPIUsage({
+        search: apiSearch,
+        method: apiMethod === "ALL" ? "" : apiMethod,
+        timeframe: apiTimeframe,
+      });
+      if (res && res.success) {
+        setApiEndpoints(res.endpoints || []);
+        setApiUsageTotalCalls(res.total_calls || 0);
+        setApiUsageUniqueCount(res.unique_endpoints || 0);
+      }
+    } catch (err) {
+      console.error("Failed to fetch API usage from DB 3:", err);
+    } finally {
+      setApiUsageLoading(false);
+    }
+  }, [apiSearch, apiMethod, apiTimeframe]);
+
+  useEffect(() => {
+    if (activeMode === "api-usage") {
+      fetchApiUsage();
+    }
+  }, [activeMode, fetchApiUsage]);
+
+  const sortedEndpoints = useMemo(() => {
+    return [...apiEndpoints].sort((a, b) => {
+      if (apiSortBy === "calls-desc") return b.call_count - a.call_count;
+      if (apiSortBy === "calls-asc") return a.call_count - b.call_count;
+      if (apiSortBy === "errors") {
+        const errA = (a.client_error_count || 0) + (a.server_error_count || 0);
+        const errB = (b.client_error_count || 0) + (b.server_error_count || 0);
+        return errB - errA;
+      }
+      if (apiSortBy === "name") return a.endpoint.localeCompare(b.endpoint);
+      return 0;
+    });
+  }, [apiEndpoints, apiSortBy]);
+
   // Handlers
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -275,6 +331,29 @@ export default function AdminAuditLogsSection() {
     e.preventDefault();
     setUserPage(1);
     setUserSearchText(userSearchInput.trim());
+  };
+
+  const handleApiSearchSubmit = (e) => {
+    e.preventDefault();
+    setApiSearch(apiSearchInput.trim());
+  };
+
+  const handleCopyEndpoint = (text) => {
+    navigator.clipboard.writeText(text);
+    setCopiedEndpoint(text);
+    setTimeout(() => setCopiedEndpoint(""), 2000);
+  };
+
+  const handleViewInStream = (endpointPath, endpointMethod) => {
+    setSearch(endpointPath);
+    setSearchInput(endpointPath);
+    if (endpointMethod && endpointMethod !== "ALL") {
+      setMethod(endpointMethod);
+    } else {
+      setMethod("ALL");
+    }
+    setPage(1);
+    setActiveMode("streaming");
   };
 
   const handleCopyPayload = (text) => {
@@ -336,6 +415,21 @@ export default function AdminAuditLogsSection() {
             <Users className="h-3.5 w-3.5 text-purple-500" />
             <span>User-Wise Logs</span>
           </button>
+
+          <button
+            onClick={() => {
+              setActiveMode("api-usage");
+              setSelectedUser(null);
+            }}
+            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition ${
+              activeMode === "api-usage"
+                ? "bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"
+                : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+            }`}
+          >
+            <BarChart3 className="h-3.5 w-3.5 text-amber-500" />
+            <span>API Usage</span>
+          </button>
         </div>
       </div>
 
@@ -343,56 +437,88 @@ export default function AdminAuditLogsSection() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Recorded Logs</span>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              {activeMode === "api-usage" ? "Total API Invocations" : "Total Recorded Logs"}
+            </span>
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
               <Activity className="h-4 w-4" />
             </div>
           </div>
           <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            {total.toLocaleString()}
+            {activeMode === "api-usage" ? apiUsageTotalCalls.toLocaleString() : total.toLocaleString()}
           </p>
-          <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">Global requests in DB 3</p>
+          <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+            {activeMode === "api-usage" ? "Total calls recorded in DB 3" : "Global requests in DB 3"}
+          </p>
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Database Engine</span>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              {activeMode === "api-usage" ? "Tracked Endpoints" : "Database Engine"}
+            </span>
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
-              <Database className="h-4 w-4" />
+              {activeMode === "api-usage" ? <BarChart3 className="h-4 w-4" /> : <Database className="h-4 w-4" />}
             </div>
           </div>
           <p className="mt-2 text-lg font-bold text-slate-900 dark:text-white truncate">
-            DB 3: Logs Cluster
+            {activeMode === "api-usage" ? `${apiUsageUniqueCount} Unique Routes` : "DB 3: Logs Cluster"}
           </p>
-          <p className="mt-1 text-[11px] text-emerald-600 dark:text-emerald-400">Zero impact on Core & Academic DBs</p>
+          <p className="mt-1 text-[11px] text-emerald-600 dark:text-emerald-400">
+            {activeMode === "api-usage" ? "Actively monitored in DB 3" : "Zero impact on Core & Academic DBs"}
+          </p>
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Active Viewing Mode</span>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              {activeMode === "api-usage" ? "Top Endpoint" : "Active Viewing Mode"}
+            </span>
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400">
-              {activeMode === "streaming" ? <Radio className="h-4 w-4" /> : <Users className="h-4 w-4" />}
+              {activeMode === "streaming" ? (
+                <Radio className="h-4 w-4" />
+              ) : activeMode === "user-wise" ? (
+                <Users className="h-4 w-4" />
+              ) : (
+                <TrendingUp className="h-4 w-4" />
+              )}
             </div>
           </div>
-          <p className="mt-2 text-lg font-bold text-slate-900 dark:text-white">
-            {activeMode === "streaming" ? "Live Stream" : selectedUser ? selectedUser.user_name || "User Logs" : "User Cards Grid"}
+          <p className="mt-2 text-lg font-bold text-slate-900 dark:text-white truncate font-mono text-sm">
+            {activeMode === "api-usage"
+              ? sortedEndpoints[0]?.endpoint || "None"
+              : activeMode === "streaming"
+              ? "Live Stream"
+              : selectedUser
+              ? selectedUser.user_name || "User Logs"
+              : "User Cards Grid"}
           </p>
-          <p className="mt-1 text-[11px] text-purple-600 dark:text-purple-400">
-            {activeMode === "streaming" ? "Showing all platform actions" : "Filtered by unique actor"}
+          <p className="mt-1 text-[11px] text-purple-600 dark:text-purple-400 truncate">
+            {activeMode === "api-usage"
+              ? `${sortedEndpoints[0]?.call_count.toLocaleString() || 0} calls (${
+                  sortedEndpoints[0]?.percentage ? sortedEndpoints[0].percentage.toFixed(1) : 0
+                }%)`
+              : activeMode === "streaming"
+              ? "Showing all platform actions"
+              : "Filtered by unique actor"}
           </p>
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Payload Redaction</span>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              {activeMode === "api-usage" ? "Service Storage" : "Payload Redaction"}
+            </span>
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400">
-              <ShieldAlert className="h-4 w-4" />
+              {activeMode === "api-usage" ? <Database className="h-4 w-4" /> : <ShieldAlert className="h-4 w-4" />}
             </div>
           </div>
           <p className="mt-2 text-lg font-bold text-slate-900 dark:text-white">
-            Auto-Sanitized
+            {activeMode === "api-usage" ? "DB 3 Free Engine" : "Auto-Sanitized"}
           </p>
-          <p className="mt-1 text-[11px] text-amber-600 dark:text-amber-400">Passwords & tokens masked</p>
+          <p className="mt-1 text-[11px] text-amber-600 dark:text-amber-400">
+            {activeMode === "api-usage" ? "High-write isolated cluster" : "Passwords & tokens masked"}
+          </p>
         </div>
       </div>
 
@@ -1024,6 +1150,240 @@ export default function AdminAuditLogsSection() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MODE 3: API USAGE BY ENDPOINT                           */}
+      {/* ======================================================== */}
+      {activeMode === "api-usage" && (
+        <div className="space-y-4">
+          {/* Controls Bar */}
+          <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/60 sm:flex-row sm:items-center sm:justify-between">
+            <form onSubmit={handleApiSearchSubmit} className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                value={apiSearchInput}
+                onChange={(e) => setApiSearchInput(e.target.value)}
+                placeholder="Search endpoint path (e.g. /cards, /admin, /qb, /me)..."
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-9 pr-20 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-amber-500"
+              />
+              <button
+                type="submit"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-amber-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-amber-700 transition"
+              >
+                Search
+              </button>
+            </form>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Method Filter */}
+              <div className="flex items-center gap-1.5">
+                <Filter className="h-3.5 w-3.5 text-slate-400" />
+                <select
+                  value={apiMethod}
+                  onChange={(e) => setApiMethod(e.target.value)}
+                  className="rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-xs font-medium text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300"
+                >
+                  <option value="ALL">All Methods</option>
+                  <option value="GET">GET</option>
+                  <option value="POST">POST</option>
+                  <option value="PUT">PUT</option>
+                  <option value="DELETE">DELETE</option>
+                  <option value="PATCH">PATCH</option>
+                </select>
+              </div>
+
+              {/* Timeframe Filter */}
+              <select
+                value={apiTimeframe}
+                onChange={(e) => setApiTimeframe(e.target.value)}
+                className="rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-xs font-medium text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300"
+              >
+                <option value="all">All Time</option>
+                <option value="24h">Last 24 Hours</option>
+                <option value="7d">Last 7 Days</option>
+                <option value="30d">Last 30 Days</option>
+              </select>
+
+              {/* Sort By Filter */}
+              <div className="flex items-center gap-1.5">
+                <SlidersHorizontal className="h-3.5 w-3.5 text-slate-400" />
+                <select
+                  value={apiSortBy}
+                  onChange={(e) => setApiSortBy(e.target.value)}
+                  className="rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-xs font-medium text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300"
+                >
+                  <option value="calls-desc">Most Called (High → Low)</option>
+                  <option value="calls-asc">Least Called (Low → High)</option>
+                  <option value="errors">Most Errors (4xx/5xx)</option>
+                  <option value="name">Endpoint Path (A → Z)</option>
+                </select>
+              </div>
+
+              {/* Refresh Button */}
+              <button
+                onClick={fetchApiUsage}
+                disabled={apiUsageLoading}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-amber-600 px-3 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-amber-700 disabled:opacity-70 dark:bg-amber-600 dark:hover:bg-amber-500"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${apiUsageLoading ? "animate-spin" : ""}`} />
+                <span>Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Endpoints Table */}
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50/75 text-[11px] font-semibold text-slate-500 uppercase tracking-wider dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
+                    <th className="py-3 px-4">Endpoint Path</th>
+                    <th className="py-3 px-3">Method</th>
+                    <th className="py-3 px-4">Calls & Traffic Share</th>
+                    <th className="py-3 px-3">Status Breakdown</th>
+                    <th className="py-3 px-3">Unique Callers</th>
+                    <th className="py-3 px-4">Last Invocated (IST)</th>
+                    <th className="py-3 px-4 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                  {apiUsageLoading && sortedEndpoints.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="py-12 text-center text-slate-400">
+                        <RefreshCw className="mx-auto h-6 w-6 animate-spin text-amber-500 mb-2" />
+                        <span>Aggregating endpoint usage from DB 3...</span>
+                      </td>
+                    </tr>
+                  ) : sortedEndpoints.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="py-12 text-center text-slate-400">
+                        <BarChart3 className="mx-auto h-8 w-8 text-slate-300 dark:text-slate-700 mb-2" />
+                        <p className="font-medium text-slate-600 dark:text-slate-300">No endpoint usage records found</p>
+                        <p className="text-xs text-slate-400 mt-1">Try broadening your search or timeframe.</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    sortedEndpoints.map((ep, idx) => {
+                      const totalErrors = (ep.client_error_count || 0) + (ep.server_error_count || 0);
+                      return (
+                        <tr
+                          key={`${ep.method}-${ep.endpoint}-${idx}`}
+                          className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
+                        >
+                          {/* Endpoint */}
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs font-bold text-slate-900 dark:text-white">
+                                {ep.endpoint}
+                              </span>
+                              <button
+                                onClick={() => handleCopyEndpoint(ep.endpoint)}
+                                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                                title="Copy endpoint path"
+                              >
+                                {copiedEndpoint === ep.endpoint ? (
+                                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                                ) : (
+                                  <Copy className="h-3.5 w-3.5" />
+                                )}
+                              </button>
+                            </div>
+                          </td>
+
+                          {/* Method */}
+                          <td className="py-3 px-3 whitespace-nowrap">
+                            <span
+                              className={`inline-block px-2 py-0.5 text-[10px] font-bold rounded-md border ${getMethodBadge(
+                                ep.method
+                              )}`}
+                            >
+                              {ep.method}
+                            </span>
+                          </td>
+
+                          {/* Calls & Traffic Share */}
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              <span className="font-bold text-slate-900 dark:text-white text-xs min-w-[3.5rem]">
+                                {ep.call_count.toLocaleString()}
+                              </span>
+                              <div className="flex-1 max-w-[120px] bg-slate-100 rounded-full h-1.5 dark:bg-slate-800 overflow-hidden">
+                                <div
+                                  className="bg-amber-500 h-1.5 rounded-full"
+                                  style={{ width: `${Math.min(100, Math.max(3, ep.percentage))}%` }}
+                                />
+                              </div>
+                              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                                {ep.percentage ? ep.percentage.toFixed(1) : 0}%
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* Status Breakdown */}
+                          <td className="py-3 px-3 whitespace-nowrap">
+                            <div className="flex items-center gap-1.5 text-[10px] font-bold">
+                              <span className="inline-block px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800">
+                                {ep.success_count || 0} ok
+                              </span>
+                              {totalErrors > 0 && (
+                                <span className="inline-block px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800">
+                                  {totalErrors} err
+                                </span>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* Unique Callers */}
+                          <td className="py-3 px-3 whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                              <User className="h-3 w-3 text-slate-400" />
+                              <span>{ep.unique_users || 0}</span>
+                            </span>
+                          </td>
+
+                          {/* Last Invocated */}
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            <div className="font-medium text-slate-900 dark:text-white text-xs">
+                              {timeAgo(ep.last_called_at)}
+                            </div>
+                            <div className="text-[10px] text-slate-400">
+                              {formatISTDateTime(ep.last_called_at)}
+                            </div>
+                          </td>
+
+                          {/* Action */}
+                          <td className="py-3 px-4 text-right whitespace-nowrap">
+                            <button
+                              onClick={() => handleViewInStream(ep.endpoint, ep.method)}
+                              className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-700 shadow-2xs hover:bg-slate-50 hover:text-blue-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-400"
+                              title="Inspect calls in streaming mode"
+                            >
+                              <span>View Stream</span>
+                              <ArrowUpRight className="h-3 w-3" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Table Footer */}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-t border-slate-200 p-4 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 text-xs text-slate-500 dark:text-slate-400">
+              <div>
+                Displaying <span className="font-semibold text-slate-900 dark:text-white">{sortedEndpoints.length}</span> endpoints
+                {" · "}Total traffic: <span className="font-semibold text-slate-900 dark:text-white">{apiUsageTotalCalls.toLocaleString()}</span> calls recorded in DB 3
+              </div>
+              <div className="text-[11px] text-slate-400">
+                Sorted by: {apiSortBy === "calls-desc" ? "Most Called" : apiSortBy === "calls-asc" ? "Least Called" : apiSortBy === "errors" ? "Most Errors" : "Endpoint Path"}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

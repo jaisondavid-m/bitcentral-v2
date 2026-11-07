@@ -769,4 +769,15 @@ export async function getAdminAuditLogUsers({ search = "" } = {}) {
   return response.data;
 }
 
+export async function getAdminAuditAPIUsage({ search = "", method = "", timeframe = "all" } = {}) {
+  const headers = await getAdminHeaders();
+  const params = new URLSearchParams();
+  if (search) params.set("search", search);
+  if (method) params.set("method", method);
+  if (timeframe) params.set("timeframe", timeframe);
+
+  const response = await api.get(`/admin/audit-logs/api-usage?${params.toString()}`, { headers });
+  return response.data;
+}
+
 

@@ -1031,3 +1031,113 @@ func (h *AdminHandler) GetAuditLogUsers(c *gin.Context) {
 		"users":   users,
 	})
 }
+
+// GET /admin/audit-logs/api-usage retrieves aggregated API endpoint usage stats from DB 3
+func (h *AdminHandler) GetAuditAPIUsage(c *gin.Context) {
+	db := config.GetLogsDB()
+	if db == nil {
+		c.JSON(http.StatusOK, gin.H{"success": true, "endpoints": []any{}, "total_calls": 0, "unique_endpoints": 0})
+		return
+	}
+
+	search := strings.TrimSpace(c.Query("search"))
+	method := strings.ToUpper(strings.TrimSpace(c.Query("method")))
+	timeframe := strings.ToLower(strings.TrimSpace(c.Query("timeframe")))
+
+	var whereClauses []string
+	var args []any
+
+	if method != "" && method != "ALL" {
+		whereClauses = append(whereClauses, "method = ?")
+		args = append(args, method)
+	}
+
+	if search != "" {
+		whereClauses = append(whereClauses, "endpoint LIKE ?")
+		args = append(args, "%"+search+"%")
+	}
+
+	if timeframe == "24h" {
+		whereClauses = append(whereClauses, "created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)")
+	} else if timeframe == "7d" {
+		whereClauses = append(whereClauses, "created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")
+	} else if timeframe == "30d" {
+		whereClauses = append(whereClauses, "created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)")
+	}
+
+	whereSQL := ""
+	if len(whereClauses) > 0 {
+		whereSQL = " WHERE " + strings.Join(whereClauses, " AND ")
+	}
+
+	var totalCalls int
+	var uniqueEndpoints int
+	totalQuery := `
+		SELECT COUNT(*), COUNT(DISTINCT endpoint)
+		FROM audit_logs
+	` + whereSQL
+	_ = db.QueryRow(totalQuery, args...).Scan(&totalCalls, &uniqueEndpoints)
+
+	query := `
+		SELECT 
+			endpoint,
+			method,
+			COUNT(*) AS call_count,
+			SUM(CASE WHEN status_code >= 200 AND status_code < 300 THEN 1 ELSE 0 END) AS success_count,
+			SUM(CASE WHEN status_code >= 400 AND status_code < 500 THEN 1 ELSE 0 END) AS client_error_count,
+			SUM(CASE WHEN status_code >= 500 THEN 1 ELSE 0 END) AS server_error_count,
+			COUNT(DISTINCT NULLIF(user_uid, '')) AS unique_users,
+			DATE_FORMAT(CONVERT_TZ(MAX(created_at), '+00:00', '+05:30'), '%Y-%m-%dT%H:%i:%s+05:30') AS last_called_at
+		FROM audit_logs
+		` + whereSQL + `
+		GROUP BY endpoint, method
+		ORDER BY call_count DESC
+		LIMIT 200
+	`
+
+	rows, err := db.Query(query, args...)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	type EndpointUsage struct {
+		Endpoint         string  `json:"endpoint"`
+		Method           string  `json:"method"`
+		CallCount        int     `json:"call_count"`
+		SuccessCount     int     `json:"success_count"`
+		ClientErrorCount int     `json:"client_error_count"`
+		ServerErrorCount int     `json:"server_error_count"`
+		UniqueUsers      int     `json:"unique_users"`
+		LastCalledAt     string  `json:"last_called_at"`
+		Percentage       float64 `json:"percentage"`
+	}
+
+	endpoints := make([]EndpointUsage, 0)
+	for rows.Next() {
+		var ep EndpointUsage
+		if err := rows.Scan(
+			&ep.Endpoint,
+			&ep.Method,
+			&ep.CallCount,
+			&ep.SuccessCount,
+			&ep.ClientErrorCount,
+			&ep.ServerErrorCount,
+			&ep.UniqueUsers,
+			&ep.LastCalledAt,
+		); err == nil {
+			if totalCalls > 0 {
+				ep.Percentage = float64(ep.CallCount) / float64(totalCalls) * 100
+			}
+			endpoints = append(endpoints, ep)
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success":          true,
+		"endpoints":        endpoints,
+		"total_calls":      totalCalls,
+		"unique_endpoints": uniqueEndpoints,
+	})
+}
