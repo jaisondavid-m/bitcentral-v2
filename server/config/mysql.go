@@ -778,7 +778,29 @@ func createMessMenuTables(db *sql.DB) {
 		log.Printf("ℹ️ idx_mess_meal_order not created (may already exist): %v", err)
 	}
 
-	log.Println("✅ mess_menu_items table ready")
+	closureQuery := `
+	CREATE TABLE IF NOT EXISTS mess_closures (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		hostel VARCHAR(10) NOT NULL DEFAULT 'all',
+		start_date DATE NOT NULL,
+		start_meal VARCHAR(20) NOT NULL,
+		end_date DATE NOT NULL,
+		end_meal VARCHAR(20) NOT NULL,
+		reason VARCHAR(255) NOT NULL,
+		notes TEXT,
+		created_by VARCHAR(255) NULL,
+		is_active BOOLEAN NOT NULL DEFAULT TRUE,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		INDEX idx_mess_closures_dates (start_date, end_date),
+		INDEX idx_mess_closures_hostel (hostel, is_active)
+	) ENGINE=InnoDB;`
+
+	if _, err := db.Exec(closureQuery); err != nil {
+		log.Fatalf("❌ Failed to create mess_closures table: %v", err)
+	}
+
+	log.Println("✅ mess_menu_items and mess_closures tables ready")
 }
 
 func createTrackerUsersTable(db *sql.DB) {

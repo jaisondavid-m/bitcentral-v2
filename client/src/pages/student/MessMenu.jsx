@@ -35,6 +35,9 @@ const MessMenu = () => {
   const [dayLabel, setDayLabel] = useState("");
   const [currentMeal, setCurrentMeal] = useState(null);
   const [isDefaultMenu, setIsDefaultMenu] = useState(false);
+  const [closures, setClosures] = useState({});
+  const [isDayClosed, setIsDayClosed] = useState(false);
+  const [dayClosureReason, setDayClosureReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -55,6 +58,9 @@ const MessMenu = () => {
       setMenu(data?.full_menu ?? {});
       setDayLabel(data?.day ?? "");
       setIsDefaultMenu(Boolean(data?.default_menu));
+      setClosures(data?.closures ?? {});
+      setIsDayClosed(Boolean(data?.is_day_closed));
+      setDayClosureReason(data?.day_closure_reason || "");
 
       const active = data?.current_meal?.meal_type?.toLowerCase?.();
       if (active && MEAL_ORDER.includes(active)) {
@@ -68,6 +74,9 @@ const MessMenu = () => {
       setMenu({});
       setCurrentMeal(null);
       setIsDefaultMenu(false);
+      setClosures({});
+      setIsDayClosed(false);
+      setDayClosureReason("");
       setError("Unable to load menu for the selected date.");
     } finally {
       setLoading(false);
@@ -80,6 +89,13 @@ const MessMenu = () => {
 
   const isToday = selectedDate === todayIST();
   const selectedItems = menu?.[activeTab] ?? [];
+  const currentClosure = closures?.[activeTab] ?? null;
+
+  const closedMealsList = useMemo(() => {
+    return MEAL_ORDER.filter((m) => closures?.[m]?.is_closed);
+  }, [closures]);
+
+  const hasAnyClosure = closedMealsList.length > 0;
 
   const totalItems = useMemo(() => {
     return MEAL_ORDER.reduce((sum, meal) => sum + (menu?.[meal]?.length ?? 0), 0);
@@ -141,22 +157,57 @@ const MessMenu = () => {
 
             <div className="rounded-xl bg-slate-100 p-1 dark:bg-slate-800/70">
               <div className="grid grid-cols-3 gap-1">
-                {MEAL_ORDER.map((meal) => (
-                  <button
-                    key={meal}
-                    onClick={() => setActiveTab(meal)}
-                    className={`rounded-lg px-1.5 py-2 text-[11px] font-semibold leading-tight transition sm:px-2 sm:text-xs ${
-                      activeTab === meal
-                        ? "bg-blue-600 text-white shadow"
-                        : "text-slate-600 hover:bg-white hover:text-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100"
-                    }`}
-                  >
-                    <span className="mr-1">{MEAL_META[meal].icon}</span>{MEAL_META[meal].label}
-                  </button>
-                ))}
+                {MEAL_ORDER.map((meal) => {
+                  const mealIsClosed = Boolean(closures?.[meal]?.is_closed);
+                  return (
+                    <button
+                      key={meal}
+                      onClick={() => setActiveTab(meal)}
+                      className={`relative rounded-lg px-1.5 py-2 text-[11px] font-semibold leading-tight transition sm:px-2 sm:text-xs ${
+                        activeTab === meal
+                          ? mealIsClosed
+                            ? "bg-red-600 text-white shadow"
+                            : "bg-blue-600 text-white shadow"
+                          : mealIsClosed
+                          ? "bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-950/70"
+                          : "text-slate-600 hover:bg-white hover:text-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+                      }`}
+                    >
+                      <span className="mr-1">{MEAL_META[meal].icon}</span>
+                      {MEAL_META[meal].label}
+                      {mealIsClosed && (
+                        <span className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
+
+          {hasAnyClosure && (
+            <div className="mt-3 flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50/90 p-3 text-red-900 shadow-xs dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200">
+              <span className="text-lg">📢</span>
+              <div className="flex-1 text-xs">
+                <p className="font-bold text-red-800 dark:text-red-300">
+                  Mess Closure Notice
+                </p>
+                <p className="mt-0.5 text-red-700 dark:text-red-200">
+                  {dayClosureReason || "Mess is closed for certain meals on this date."}
+                </p>
+                <div className="mt-1.5 flex flex-wrap gap-1.5 text-[10px]">
+                  {closedMealsList.map((m) => (
+                    <span
+                      key={m}
+                      className="rounded-full border border-red-300 bg-white px-2 py-0.5 font-bold uppercase tracking-wide text-red-700 dark:border-red-800 dark:bg-red-900/60 dark:text-red-200"
+                    >
+                      {m} Closed
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="mt-3">
@@ -173,7 +224,13 @@ const MessMenu = () => {
               </button>
             </div>
           ) : (
-            <MealCard type={activeTab} items={selectedItems} isActive={true} isDefaultMenu={isDefaultMenu} />
+            <MealCard
+              type={activeTab}
+              items={selectedItems}
+              isActive={true}
+              isDefaultMenu={isDefaultMenu}
+              closure={currentClosure}
+            />
           )}
         </div>
       </div>

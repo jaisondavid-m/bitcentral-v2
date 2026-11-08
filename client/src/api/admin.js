@@ -159,6 +159,33 @@ export async function deleteMessMenuRow(id) {
   return response.data;
 }
 
+export async function listMessClosures({ hostel, status } = {}) {
+  const headers = await getAdminHeaders();
+  const params = new URLSearchParams();
+  if (hostel) params.set("hostel", hostel);
+  if (status) params.set("status", status);
+  const response = await api.get(`/admin/mess/closures?${params.toString()}`, { headers });
+  return response.data;
+}
+
+export async function createMessClosure(payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.post(`/admin/mess/closures`, payload, { headers });
+  return response.data;
+}
+
+export async function updateMessClosure(id, payload) {
+  const headers = await getAdminHeaders();
+  const response = await api.put(`/admin/mess/closures/${id}`, payload, { headers });
+  return response.data;
+}
+
+export async function deleteMessClosure(id) {
+  const headers = await getAdminHeaders();
+  const response = await api.delete(`/admin/mess/closures/${id}`, { headers });
+  return response.data;
+}
+
 export async function uploadAdminFile(formData) {
   const headers = await getAdminHeaders();
   // Let axios set Content-Type with boundary for multipart

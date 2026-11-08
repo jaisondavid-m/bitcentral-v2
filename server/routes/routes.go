@@ -240,6 +240,7 @@ func SetupRouter(
 		api.GET("/qb", qbHandler.List)
 		api.GET("/mess", messHandler.GetMess)
 		api.GET("/mess/timings", messHandler.GetMealTimings)
+		api.GET("/mess/closures", messHandler.GetActiveClosures)
 		api.GET("/v2/profile", trackerUserHandler.GetProfileV2)
 		api.GET("/profile/v2", trackerUserHandler.GetProfileV2)
 
@@ -330,6 +331,10 @@ func SetupRouter(
 		admin.POST("/mess/upload", messHandler.UploadCSV)
 		admin.PUT("/mess/:id", messHandler.UpdateAdmin)
 		admin.DELETE("/mess/:id", messHandler.DeleteAdmin)
+		admin.GET("/mess/closures", messHandler.ListClosuresAdmin)
+		admin.POST("/mess/closures", messHandler.CreateClosureAdmin)
+		admin.PUT("/mess/closures/:id", messHandler.UpdateClosureAdmin)
+		admin.DELETE("/mess/closures/:id", messHandler.DeleteClosureAdmin)
 		admin.PUT("/semesters/:year", semesterHandler.UpdateSemesterByYear)
 		admin.POST("/upload", uploadHandler.Upload)
 

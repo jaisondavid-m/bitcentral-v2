@@ -16,6 +16,10 @@ import {
   listMessMenuRows,
   updateMessMenuRow,
   deleteMessMenuRow,
+  listMessClosures,
+  createMessClosure,
+  updateMessClosure,
+  deleteMessClosure,
   uploadAdminFile,
   listAdminCards,
   createCard,
@@ -4675,6 +4679,7 @@ function QBSection() {
 
 /* -- Mess Section ----------------------------------------------------------- */
 function MessSection() {
+  const [activeSubTab, setActiveSubTab] = useState("menu"); // "menu" | "closures"
   const [hostel, setHostel] = useState("boys");
   const [selectedDate, setSelectedDate] = useState(todayIST());
   const [preview, setPreview] = useState(null);
@@ -4687,6 +4692,16 @@ function MessSection() {
   const [deleteConfirmRow, setDeleteConfirmRow] = useState(null);
   const [editingRow, setEditingRow] = useState(null);
   const [banner, setBanner] = useState({ type: "", message: "" });
+
+  // Closures states
+  const [closures, setClosures] = useState([]);
+  const [closuresLoading, setClosuresLoading] = useState(false);
+  const [closureHostelFilter, setClosureHostelFilter] = useState("all");
+  const [closureStatusFilter, setClosureStatusFilter] = useState("all"); // "all" | "active" | "upcoming" | "past"
+  const [editingClosure, setEditingClosure] = useState(null);
+  const [savingClosure, setSavingClosure] = useState(false);
+  const [deletingClosure, setDeletingClosure] = useState(null);
+  const [deletingClosureBusy, setDeletingClosureBusy] = useState(false);
 
   const loadPreview = useCallback(async () => {
     if (!hostel || !selectedDate) return;
@@ -4722,10 +4737,30 @@ function MessSection() {
     }
   }, [hostel, selectedDate]);
 
+  const loadClosures = useCallback(async () => {
+    setClosuresLoading(true);
+    try {
+      const result = await listMessClosures({
+        hostel: closureHostelFilter,
+        status: closureStatusFilter,
+      });
+      setClosures(result?.data || []);
+    } catch (err) {
+      setClosures([]);
+      setBanner({ type: "error", message: normalizeError(err, "Failed to load mess closures") });
+    } finally {
+      setClosuresLoading(false);
+    }
+  }, [closureHostelFilter, closureStatusFilter]);
+
   useEffect(() => {
     loadPreview();
     loadRows();
   }, [loadPreview, loadRows]);
+
+  useEffect(() => {
+    loadClosures();
+  }, [loadClosures]);
 
   const fullMenu = preview?.full_menu || {};
   const totalItems = useMemo(() => {
@@ -4733,6 +4768,24 @@ function MessSection() {
   }, [fullMenu]);
 
   const currentMeal = preview?.current_meal?.meal_type?.toLowerCase?.() || "breakfast";
+
+  const closedMealsInPreview = useMemo(() => {
+    if (!preview?.closures) return [];
+    return ["breakfast", "lunch", "dinner"].filter((m) => preview.closures[m]?.is_closed);
+  }, [preview?.closures]);
+
+  const closureStats = useMemo(() => {
+    const today = todayIST();
+    let activeNow = 0;
+    let upcoming = 0;
+    closures.forEach((c) => {
+      if (c.is_active) {
+        if (c.start_date <= today && c.end_date >= today) activeNow++;
+        else if (c.start_date > today) upcoming++;
+      }
+    });
+    return { activeNow, upcoming, total: closures.length };
+  }, [closures]);
 
   const editingForm = editingRow || {
     hostel,
@@ -4802,12 +4855,151 @@ function MessSection() {
     try {
       const result = await uploadMessMenuCsv(formData);
       setBanner({ type: "success", message: result?.message || "Mess menu uploaded successfully" });
-      await loadPreview();
+      await Promise.all([loadPreview(), loadRows()]);
     } catch (err) {
       setBanner({ type: "error", message: normalizeError(err, "Failed to upload mess CSV") });
     } finally {
       setUploading(false);
     }
+  }
+
+  function mealOrderNumber(meal) {
+    switch ((meal || "").toLowerCase()) {
+      case "breakfast": return 1;
+      case "lunch": return 2;
+      case "dinner": return 3;
+      default: return 1;
+    }
+  }
+
+  function applyClosurePreset(presetKey) {
+    const today = todayIST();
+    const d = new Date();
+
+    if (presetKey === "diwali") {
+      const end = new Date(d);
+      end.setDate(end.getDate() + 4);
+      const endStr = end.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+      setEditingClosure((prev) => ({
+        ...prev,
+        reason: "Mess closed due to Diwali holiday",
+        notes: "Mess is closed for Diwali festival holidays. Dining services will resume as scheduled.",
+        start_date: today,
+        start_meal: "Lunch",
+        end_date: endStr,
+        end_meal: "Dinner",
+      }));
+    } else if (presetKey === "pongal") {
+      const end = new Date(d);
+      end.setDate(end.getDate() + 4);
+      const endStr = end.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+      setEditingClosure((prev) => ({
+        ...prev,
+        reason: "Mess closed due to Pongal holidays",
+        notes: "Mess is closed for Pongal holidays. Regular mess service resumes on reopening morning.",
+        start_date: today,
+        start_meal: "Lunch",
+        end_date: endStr,
+        end_meal: "Dinner",
+      }));
+    } else if (presetKey === "vacation") {
+      const end = new Date(d);
+      end.setDate(end.getDate() + 7);
+      const endStr = end.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+      setEditingClosure((prev) => ({
+        ...prev,
+        reason: "Mess closed for semester vacation",
+        notes: "Hostel mess is closed during the academic vacation period.",
+        start_date: today,
+        start_meal: "Breakfast",
+        end_date: endStr,
+        end_meal: "Dinner",
+      }));
+    } else if (presetKey === "maintenance") {
+      setEditingClosure((prev) => ({
+        ...prev,
+        reason: "Mess closed for kitchen maintenance",
+        notes: "Mess is closed for deep kitchen cleaning and routine maintenance.",
+        start_date: today,
+        start_meal: "Lunch",
+        end_date: today,
+        end_meal: "Dinner",
+      }));
+    }
+  }
+
+  async function handleSaveClosure(e) {
+    e.preventDefault();
+    if (!editingClosure) return;
+
+    if (!editingClosure.start_date || !editingClosure.end_date) {
+      setBanner({ type: "error", message: "Start date and end date are required" });
+      return;
+    }
+    if (!editingClosure.reason || !editingClosure.reason.trim()) {
+      setBanner({ type: "error", message: "Reason / holiday note is required (e.g. Mess closed due to Diwali holiday)" });
+      return;
+    }
+
+    if (
+      editingClosure.start_date > editingClosure.end_date ||
+      (editingClosure.start_date === editingClosure.end_date &&
+        mealOrderNumber(editingClosure.start_meal) > mealOrderNumber(editingClosure.end_meal))
+    ) {
+      setBanner({ type: "error", message: "Start date/meal must be earlier than or equal to end date/meal" });
+      return;
+    }
+
+    setSavingClosure(true);
+    setBanner({ type: "", message: "" });
+
+    try {
+      if (editingClosure.id) {
+        const res = await updateMessClosure(editingClosure.id, editingClosure);
+        setBanner({ type: "success", message: res?.message || "Mess closure updated" });
+      } else {
+        const res = await createMessClosure(editingClosure);
+        setBanner({ type: "success", message: res?.message || "Mess closure scheduled" });
+      }
+      setEditingClosure(null);
+      await Promise.all([loadClosures(), loadPreview()]);
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to save mess closure") });
+    } finally {
+      setSavingClosure(false);
+    }
+  }
+
+  async function handleToggleClosureActive(closure) {
+    try {
+      await updateMessClosure(closure.id, { is_active: !closure.is_active });
+      await Promise.all([loadClosures(), loadPreview()]);
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to toggle closure status") });
+    }
+  }
+
+  async function handleDeleteClosure() {
+    if (!deletingClosure) return;
+    setDeletingClosureBusy(true);
+    try {
+      const res = await deleteMessClosure(deletingClosure.id);
+      setBanner({ type: "success", message: res?.message || "Mess closure deleted" });
+      setDeletingClosure(null);
+      await Promise.all([loadClosures(), loadPreview()]);
+    } catch (err) {
+      setBanner({ type: "error", message: normalizeError(err, "Failed to delete mess closure") });
+    } finally {
+      setDeletingClosureBusy(false);
+    }
+  }
+
+  function getClosureStatus(c) {
+    if (!c.is_active) return { label: "Disabled", color: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400" };
+    const today = todayIST();
+    if (c.end_date < today) return { label: "Past", color: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400" };
+    if (c.start_date > today) return { label: "Upcoming", color: "bg-blue-100 text-blue-700 dark:bg-blue-950/80 dark:text-blue-300" };
+    return { label: "Active Now", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300 animate-pulse" };
   }
 
   return (
@@ -4816,24 +5008,89 @@ function MessSection() {
         <div>
           <h2 className="flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-slate-100">
             <Database className="h-5 w-5 text-blue-600" />
-            Mess Menu
+            Mess Controller
           </h2>
-          <p className="mt-0.5 text-sm text-gray-500 dark:text-slate-400">Upload a CSV for boys or girls in the same date/day/meal/item format.</p>
+          <p className="mt-0.5 text-sm text-gray-500 dark:text-slate-400">
+            Manage daily dining menu items, CSV imports, and scheduled holiday closures (Pongal, Diwali, vacation breaks).
+          </p>
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+          {activeSubTab === "menu" ? (
+            <>
+              <button
+                type="button"
+                onClick={downloadMessTemplate}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900 sm:w-auto"
+              >
+                <Download className="h-4 w-4" />
+                Download template
+              </button>
+              <label className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto">
+                {uploading ? <Loader className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                {uploading ? "Uploading..." : "Upload CSV"}
+                <input type="file" accept=".csv,text/csv" onChange={handleUpload} className="sr-only" disabled={uploading} />
+              </label>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() =>
+                setEditingClosure({
+                  hostel: "all",
+                  start_date: todayIST(),
+                  start_meal: "Lunch",
+                  end_date: todayIST(),
+                  end_meal: "Dinner",
+                  reason: "Mess closed due to Diwali holiday",
+                  notes: "",
+                  is_active: true,
+                })
+              }
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-red-700 sm:w-auto"
+            >
+              <Plus className="h-4 w-4" />
+              Schedule Mess Closure
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Subtab Navigation Pills */}
+      <div className="flex border-b border-gray-100 bg-slate-50/70 px-4 pt-2 dark:border-blue-900/60 dark:bg-slate-900/40 sm:px-6">
+        <div className="flex gap-2">
           <button
             type="button"
-            onClick={downloadMessTemplate}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900 sm:w-auto"
+            onClick={() => setActiveSubTab("menu")}
+            className={`flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
+              activeSubTab === "menu"
+                ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+            }`}
           >
-            <Download className="h-4 w-4" />
-            Download template
+            <Database className="h-4 w-4" />
+            Daily Menu & CSV
           </button>
-          <label className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto">
-            {uploading ? <Loader className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-            {uploading ? "Uploading..." : "Upload CSV"}
-            <input type="file" accept=".csv,text/csv" onChange={handleUpload} className="sr-only" disabled={uploading} />
-          </label>
+          <button
+            type="button"
+            onClick={() => setActiveSubTab("closures")}
+            className={`flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
+              activeSubTab === "closures"
+                ? "border-red-600 text-red-600 dark:border-red-400 dark:text-red-400"
+                : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+            }`}
+          >
+            <AlertTriangle className="h-4 w-4" />
+            Mess Closures & Holidays
+            {closureStats.activeNow > 0 ? (
+              <span className="rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-bold text-red-700 dark:bg-red-950/80 dark:text-red-300">
+                {closureStats.activeNow} Active
+              </span>
+            ) : closureStats.upcoming > 0 ? (
+              <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700 dark:bg-blue-950/80 dark:text-blue-300">
+                {closureStats.upcoming} Upcoming
+              </span>
+            ) : null}
+          </button>
         </div>
       </div>
 
@@ -4844,68 +5101,94 @@ function MessSection() {
           </div>
         )}
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
-            <p className="text-[10px] uppercase tracking-wide text-slate-400">Hostel</p>
-            <div className="mt-2 flex gap-2">
-              {["boys", "girls"].map((value) => (
+        {activeSubTab === "menu" && (
+          <>
+            {closedMealsInPreview.length > 0 && (
+              <div className="mb-5 flex flex-col gap-2 rounded-2xl border border-red-200 bg-red-50/90 p-4 text-red-900 shadow-xs dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">🚫</span>
+                  <div>
+                    <h4 className="text-sm font-bold text-red-800 dark:text-red-300">
+                      Mess is Scheduled CLOSED on {selectedDate} ({closedMealsInPreview.map((m) => m.toUpperCase()).join(", ")})
+                    </h4>
+                    <p className="mt-0.5 text-xs text-red-700 dark:text-red-200">
+                      Reason: <span className="font-semibold">{preview?.day_closure_reason || "Scheduled Holiday Closure"}</span>
+                    </p>
+                  </div>
+                </div>
                 <button
-                  key={value}
                   type="button"
-                  onClick={() => setHostel(value)}
-                  className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${hostel === value ? "bg-blue-600 text-white" : "bg-white text-slate-700 hover:bg-slate-100 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800"}`}
+                  onClick={() => setActiveSubTab("closures")}
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-red-300 bg-white px-3 py-1.5 text-xs font-bold text-red-700 shadow-xs hover:bg-red-100 dark:border-red-800 dark:bg-red-900/60 dark:text-red-200"
                 >
-                  {value === "boys" ? "Boys" : "Girls"}
+                  Manage Closures &rarr;
                 </button>
-              ))}
+              </div>
+            )}
+
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+                <p className="text-[10px] uppercase tracking-wide text-slate-400">Hostel</p>
+                <div className="mt-2 flex gap-2">
+                  {["boys", "girls"].map((value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setHostel(value)}
+                      className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${hostel === value ? "bg-blue-600 text-white" : "bg-white text-slate-700 hover:bg-slate-100 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800"}`}
+                    >
+                      {value === "boys" ? "Boys" : "Girls"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+                <p className="text-[10px] uppercase tracking-wide text-slate-400">Date</p>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                />
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+                <p className="text-[10px] uppercase tracking-wide text-slate-400">Items</p>
+                <p className="mt-2 text-2xl font-black text-slate-900 dark:text-slate-100">{totalItems}</p>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+                <p className="text-[10px] uppercase tracking-wide text-slate-400">Loaded day</p>
+                <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-100">{preview?.day || "-"}</p>
+                <button
+                  type="button"
+                  onClick={loadPreview}
+                  className="mt-3 inline-flex rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                  Refresh preview
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
-            <p className="text-[10px] uppercase tracking-wide text-slate-400">Date</p>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
-            />
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
-            <p className="text-[10px] uppercase tracking-wide text-slate-400">Items</p>
-            <p className="mt-2 text-2xl font-black text-slate-900 dark:text-slate-100">{totalItems}</p>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
-            <p className="text-[10px] uppercase tracking-wide text-slate-400">Loaded day</p>
-            <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-100">{preview?.day || "-"}</p>
-            <button
-              type="button"
-              onClick={loadPreview}
-              className="mt-3 inline-flex rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800"
-            >
-              Refresh preview
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-5 grid gap-4 lg:grid-cols-3">
-          {loading ? (
-            <div className="lg:col-span-3 rounded-2xl border border-dashed border-slate-300 bg-slate-50 py-16 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
-              Loading mess menu preview...
+            <div className="mt-5 grid gap-4 lg:grid-cols-3">
+              {loading ? (
+                <div className="lg:col-span-3 rounded-2xl border border-dashed border-slate-300 bg-slate-50 py-16 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+                  Loading mess menu preview...
+                </div>
+              ) : (
+                ["breakfast", "lunch", "dinner"].map((meal) => (
+                  <MealCard
+                    key={meal}
+                    type={meal}
+                    items={fullMenu[meal] || []}
+                    isActive={currentMeal === meal}
+                    isServingNow={preview?.current_meal?.meal_type?.toLowerCase?.() === meal}
+                    closure={preview?.closures?.[meal]}
+                  />
+                ))
+              )}
             </div>
-          ) : (
-            ["breakfast", "lunch", "dinner"].map((meal) => (
-              <MealCard
-                key={meal}
-                type={meal}
-                items={fullMenu[meal] || []}
-                isActive={currentMeal === meal}
-                isServingNow={preview?.current_meal?.meal_type?.toLowerCase?.() === meal}
-              />
-            ))
-          )}
-        </div>
 
         {editingRow && (
           <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-slate-950/60 px-4 py-6 backdrop-blur-sm sm:px-6">
@@ -5088,8 +5371,428 @@ function MessSection() {
             </div>
           )}
         </div>
+          </>
+        )}
+
+        {/* ===================== VIEW 2: MESS CLOSURES & HOLIDAYS ===================== */}
+        {activeSubTab === "closures" && (
+          <div className="space-y-6">
+            {/* Metric Cards */}
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl border border-red-200/80 bg-red-50/50 p-4 dark:border-red-900/60 dark:bg-red-950/20">
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">Active Closures</p>
+                  <span className="flex h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse" />
+                </div>
+                <p className="mt-2 text-2xl font-black text-red-900 dark:text-red-100">{closureStats.activeNow}</p>
+                <p className="mt-1 text-xs text-red-700 dark:text-red-300">Mess currently closed right now</p>
+              </div>
+
+              <div className="rounded-2xl border border-blue-200/80 bg-blue-50/50 p-4 dark:border-blue-900/60 dark:bg-blue-950/20">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Upcoming Closures</p>
+                <p className="mt-2 text-2xl font-black text-blue-900 dark:text-blue-100">{closureStats.upcoming}</p>
+                <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">Scheduled for future holidays</p>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-900/50">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Recorded</p>
+                <p className="mt-2 text-2xl font-black text-slate-900 dark:text-slate-100">{closureStats.total}</p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Historical & scheduled in DB 2</p>
+              </div>
+            </div>
+
+            {/* Filter Controls & Actions */}
+            <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs dark:border-slate-800 dark:bg-slate-950 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-wrap items-center gap-3">
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Hostel</label>
+                  <select
+                    value={closureHostelFilter}
+                    onChange={(e) => setClosureHostelFilter(e.target.value)}
+                    className="mt-1 block rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 outline-none focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  >
+                    <option value="all">All Hostels</option>
+                    <option value="boys">Boys Hostel</option>
+                    <option value="girls">Girls Hostel</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Status</label>
+                  <select
+                    value={closureStatusFilter}
+                    onChange={(e) => setClosureStatusFilter(e.target.value)}
+                    className="mt-1 block rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 outline-none focus:ring dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="active">Active Now</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="past">Past</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={loadClosures}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${closuresLoading ? "animate-spin" : ""}`} />
+                  Refresh
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setEditingClosure({
+                      hostel: "all",
+                      start_date: todayIST(),
+                      start_meal: "Lunch",
+                      end_date: todayIST(),
+                      end_meal: "Dinner",
+                      reason: "Mess closed due to Diwali holiday",
+                      notes: "",
+                      is_active: true,
+                    })
+                  }
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3.5 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-red-700"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  + Add Closure
+                </button>
+              </div>
+            </div>
+
+            {/* Closures Cards / Table */}
+            {closuresLoading ? (
+              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 py-16 text-center text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+                <Loader className="mx-auto h-6 w-6 animate-spin text-slate-400" />
+                <p className="mt-2">Loading mess closure schedules...</p>
+              </div>
+            ) : closures.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 py-16 text-center dark:border-slate-800 dark:bg-slate-900">
+                <AlertTriangle className="mx-auto h-8 w-8 text-slate-400" />
+                <h4 className="mt-2 text-sm font-bold text-slate-800 dark:text-slate-200">No Mess Closures Scheduled</h4>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  Click "+ Add Closure" to record upcoming holiday closures (Pongal, Diwali, vacation breaks).
+                </p>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setEditingClosure({
+                      hostel: "all",
+                      start_date: todayIST(),
+                      start_meal: "Lunch",
+                      end_date: todayIST(),
+                      end_meal: "Dinner",
+                      reason: "Mess closed due to Diwali holiday",
+                      notes: "",
+                      is_active: true,
+                    })
+                  }
+                  className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-red-700"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Schedule First Closure
+                </button>
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2">
+                {closures.map((c) => {
+                  const status = getClosureStatus(c);
+                  return (
+                    <div
+                      key={c.id}
+                      className={`relative flex flex-col justify-between overflow-hidden rounded-2xl border bg-white p-5 shadow-2xs transition hover:shadow-md dark:bg-slate-950 ${
+                        !c.is_active
+                          ? "border-slate-200 opacity-60 dark:border-slate-800"
+                          : status.label === "Active Now"
+                          ? "border-red-300 ring-1 ring-red-200 dark:border-red-900 dark:ring-red-950"
+                          : "border-slate-200 dark:border-slate-800"
+                      }`}
+                    >
+                      <div>
+                        {/* Top Badge & Hostel */}
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold ${status.color}`}>
+                            {status.label}
+                          </span>
+                          <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+                            {c.hostel === "boys" ? "Boys Hostel" : c.hostel === "girls" ? "Girls Hostel" : "All Hostels"}
+                          </span>
+                        </div>
+
+                        {/* Title & Reason */}
+                        <h4 className="mt-3 text-base font-bold text-slate-900 dark:text-slate-100">
+                          {c.reason}
+                        </h4>
+
+                        {/* Date & Meal Range */}
+                        <div className="mt-3 flex items-center gap-2 rounded-xl bg-slate-50 p-2.5 text-xs text-slate-700 dark:bg-slate-900 dark:text-slate-300">
+                          <CalendarDays className="h-4 w-4 shrink-0 text-red-500" />
+                          <span className="font-semibold">{c.start_date} ({c.start_meal})</span>
+                          <span className="text-slate-400">&rarr;</span>
+                          <span className="font-semibold">{c.end_date} ({c.end_meal})</span>
+                        </div>
+
+                        {/* Admin Notes */}
+                        {c.notes ? (
+                          <p className="mt-2.5 text-xs text-slate-500 dark:text-slate-400">
+                            <span className="font-semibold text-slate-600 dark:text-slate-300">Admin Note: </span>
+                            {c.notes}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      {/* Footer Actions */}
+                      <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-3 dark:border-slate-800/80">
+                        <label className="flex cursor-pointer items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-300">
+                          <input
+                            type="checkbox"
+                            checked={c.is_active}
+                            onChange={() => handleToggleClosureActive(c)}
+                            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <span>{c.is_active ? "Enabled" : "Disabled"}</span>
+                        </label>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setEditingClosure({ ...c })}
+                            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                          >
+                            <Edit2 className="h-3.5 w-3.5" />
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDeletingClosure(c)}
+                            className="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-400"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
+      {/* Modal: Add or Edit Mess Closure */}
+      {editingClosure && (
+        <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-slate-950/60 px-4 py-6 backdrop-blur-sm sm:px-6">
+          <div className="absolute inset-0" onClick={() => setEditingClosure(null)} />
+          <div className="relative z-50 w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
+            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4 dark:border-slate-800 sm:px-6">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-red-500">
+                  {editingClosure.id ? "Edit Scheduled Closure" : "Schedule Mess Closure"}
+                </p>
+                <h3 className="mt-1 text-base font-bold text-slate-900 dark:text-slate-100">
+                  {editingClosure.id ? editingClosure.reason : "New Holiday / Emergency Mess Closure"}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingClosure(null)}
+                className="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveClosure} className="space-y-4 p-4 sm:p-6">
+              {/* Presets */}
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Quick Holiday Presets
+                </label>
+                <div className="mt-1.5 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => applyClosurePreset("diwali")}
+                    className="rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 transition hover:bg-amber-100 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300"
+                  >
+                    🪔 Diwali Holidays
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyClosurePreset("pongal")}
+                    className="rounded-lg border border-emerald-300 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300"
+                  >
+                    🌾 Pongal Holidays
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyClosurePreset("vacation")}
+                    className="rounded-lg border border-sky-300 bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-800 transition hover:bg-sky-100 dark:border-sky-900 dark:bg-sky-950/40 dark:text-sky-300"
+                  >
+                    🏖️ Semester Vacation
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyClosurePreset("maintenance")}
+                    className="rounded-lg border border-purple-300 bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-800 transition hover:bg-purple-100 dark:border-purple-900 dark:bg-purple-950/40 dark:text-purple-300"
+                  >
+                    🔧 Maintenance
+                  </button>
+                </div>
+              </div>
+
+              {/* Hostel Scope */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Hostel Scope
+                </label>
+                <div className="flex gap-2">
+                  {[
+                    { key: "all", label: "All Hostels" },
+                    { key: "boys", label: "Boys Hostel" },
+                    { key: "girls", label: "Girls Hostel" },
+                  ].map((tab) => (
+                    <button
+                      key={tab.key}
+                      type="button"
+                      onClick={() => setEditingClosure((prev) => ({ ...prev, hostel: tab.key }))}
+                      className={`flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition ${
+                        (editingClosure.hostel || "all") === tab.key
+                          ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
+                          : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Range Selection: Start Date & Meal to End Date & Meal */}
+              <div className="grid gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 dark:border-slate-800 dark:bg-slate-900/60 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                    Closed From (Start)
+                  </label>
+                  <div className="space-y-1.5">
+                    <input
+                      type="date"
+                      value={editingClosure.start_date || ""}
+                      onChange={(e) => setEditingClosure((prev) => ({ ...prev, start_date: e.target.value }))}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                      required
+                    />
+                    <select
+                      value={editingClosure.start_meal || "Breakfast"}
+                      onChange={(e) => setEditingClosure((prev) => ({ ...prev, start_meal: e.target.value }))}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    >
+                      <option value="Breakfast">Starting with Breakfast</option>
+                      <option value="Lunch">Starting with Lunch</option>
+                      <option value="Dinner">Starting with Dinner</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                    Closed Until (End)
+                  </label>
+                  <div className="space-y-1.5">
+                    <input
+                      type="date"
+                      value={editingClosure.end_date || ""}
+                      onChange={(e) => setEditingClosure((prev) => ({ ...prev, end_date: e.target.value }))}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                      required
+                    />
+                    <select
+                      value={editingClosure.end_meal || "Dinner"}
+                      onChange={(e) => setEditingClosure((prev) => ({ ...prev, end_meal: e.target.value }))}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    >
+                      <option value="Breakfast">Ending after Breakfast</option>
+                      <option value="Lunch">Ending after Lunch</option>
+                      <option value="Dinner">Ending after Dinner</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Reason / Title */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Reason / Holiday Title *
+                </label>
+                <input
+                  type="text"
+                  value={editingClosure.reason || ""}
+                  onChange={(e) => setEditingClosure((prev) => ({ ...prev, reason: e.target.value }))}
+                  placeholder="e.g. Mess closed due to Diwali holiday"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                  required
+                />
+                <p className="text-[11px] text-slate-400">
+                  This reason is displayed directly on the student mess page and alerts.
+                </p>
+              </div>
+
+              {/* Admin Notes */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Admin Notes / Special Instructions (Optional)
+                </label>
+                <textarea
+                  rows={2}
+                  value={editingClosure.notes || ""}
+                  onChange={(e) => setEditingClosure((prev) => ({ ...prev, notes: e.target.value }))}
+                  placeholder="e.g. Dining hall reopens for regular breakfast on Monday morning."
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                />
+              </div>
+
+              {/* Status Toggle */}
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  type="checkbox"
+                  id="closure-active-check"
+                  checked={editingClosure.is_active !== false}
+                  onChange={(e) => setEditingClosure((prev) => ({ ...prev, is_active: e.target.checked }))}
+                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                />
+                <label htmlFor="closure-active-check" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Active immediately (students see mess closed for this schedule)
+                </label>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setEditingClosure(null)}
+                  className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingClosure}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {savingClosure ? <Loader className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+                  {savingClosure ? "Saving..." : editingClosure.id ? "Update Closure" : "Schedule Closure"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Deletion for Menu Row */}
       <ConfirmModal
         open={Boolean(deleteConfirmRow)}
         title="Delete Mess Menu Item"
@@ -5098,6 +5801,17 @@ function MessSection() {
         busy={Boolean(deletingRowId)}
         onConfirm={executeDeleteRow}
         onCancel={() => setDeleteConfirmRow(null)}
+      />
+
+      {/* Confirm Deletion for Mess Closure */}
+      <ConfirmModal
+        open={Boolean(deletingClosure)}
+        title="Delete Scheduled Mess Closure"
+        description={`Are you sure you want to delete the closure schedule "${deletingClosure?.reason}" (${deletingClosure?.start_date} to ${deletingClosure?.end_date})?`}
+        confirmLabel="Delete Closure"
+        busy={deletingClosureBusy}
+        onConfirm={handleDeleteClosure}
+        onCancel={() => setDeletingClosure(null)}
       />
     </section>
   );
