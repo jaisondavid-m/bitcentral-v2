@@ -490,7 +490,16 @@ const ExamHall = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  const [registerNo, setRegisterNo] = useState("");
+  const defaultInitialRegNo =
+    profile?.register_no ||
+    profile?.registerNo ||
+    student?.register_no ||
+    student?.registerNo ||
+    profile?.roll_no ||
+    profile?.rollNo ||
+    "7376251CS221";
+
+  const [registerNo, setRegisterNo] = useState(defaultInitialRegNo);
   const [sessions, setSessions] = useState(null);
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
@@ -503,11 +512,15 @@ const ExamHall = () => {
   useEffect(() => {
     if (hasAppliedDefaultRegisterNo.current) return;
     const defaultRollNo =
+      profile?.register_no ||
+      profile?.registerNo ||
+      student?.register_no ||
+      student?.registerNo ||
       profile?.roll_no ||
       profile?.rollNo ||
       student?.roll_no ||
       student?.rollNo ||
-      "";
+      "7376251CS221";
 
     if (defaultRollNo) {
       setRegisterNo(defaultRollNo);

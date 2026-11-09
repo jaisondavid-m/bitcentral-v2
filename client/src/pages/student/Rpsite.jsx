@@ -34,7 +34,7 @@ function findCachedAncestor(cache, query) {
 function filterStudents(students, query) {
   const q = query.toLowerCase();
   return students.filter((s) =>
-    [s.student_name, s.roll_no, s.department, s.mentor_name, s.tab]
+    [s.student_name, s.roll_no, s.register_no, s.department, s.mentor_name, s.tab]
       .filter(Boolean)
       .some((field) => String(field).toLowerCase().includes(q))
   );
@@ -60,8 +60,17 @@ function RpCardSkeleton() {
 
 function RpsiteContent() {
   const { student, profile } = useAuth();
-  const [search, setSearch] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const defaultInitial =
+    profile?.register_no ||
+    profile?.registerNo ||
+    student?.register_no ||
+    student?.registerNo ||
+    profile?.roll_no ||
+    profile?.rollNo ||
+    "7376251CS221";
+
+  const [search, setSearch] = useState(defaultInitial);
+  const [debouncedQuery, setDebouncedQuery] = useState(defaultInitial.trim());
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAverages, setShowAverages] = useState(false);
   const resultCache = useRef(new Map());
@@ -70,8 +79,6 @@ function RpsiteContent() {
   const updateQuery = useRef(
     debounce((value) => setDebouncedQuery(value), 300)
   ).current;
-
-
 
   useEffect(() => {
     return () => {
@@ -82,10 +89,19 @@ function RpsiteContent() {
   useEffect(() => {
     if (hasAppliedDefaultSearch.current) return;
 
-    const defaultRollNo = profile?.roll_no || profile?.rollNo || student?.roll_no || student?.rollNo || "";
+    const defaultRollNo =
+      profile?.register_no ||
+      profile?.registerNo ||
+      student?.register_no ||
+      student?.registerNo ||
+      profile?.roll_no ||
+      profile?.rollNo ||
+      student?.roll_no ||
+      student?.rollNo ||
+      "7376251CS221";
     if (!defaultRollNo) return;
 
-    if (search.trim()) {
+    if (search.trim() && search.trim() !== "7376251CS221") {
       hasAppliedDefaultSearch.current = true;
       return;
     }

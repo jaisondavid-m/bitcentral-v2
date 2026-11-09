@@ -556,12 +556,30 @@ export default function ExamHallDownload() {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [error, setError] = useState("");
   const [noExams, setNoExams] = useState(false);
-  const [registerNo, setRegisterNo] = useState("");
+  const defaultInitialRoll =
+    profile?.register_no ||
+    profile?.registerNo ||
+    student?.register_no ||
+    student?.registerNo ||
+    profile?.roll_no ||
+    profile?.rollNo ||
+    "7376251CS221";
+
+  const [registerNo, setRegisterNo] = useState(defaultInitialRoll);
   const hasFetched = useRef(false);
 
   useEffect(() => {
     if (hasFetched.current) return;
-    const roll = profile?.roll_no || profile?.rollNo || student?.roll_no || student?.rollNo || "";
+    const roll =
+      profile?.register_no ||
+      profile?.registerNo ||
+      student?.register_no ||
+      student?.registerNo ||
+      profile?.roll_no ||
+      profile?.rollNo ||
+      student?.roll_no ||
+      student?.rollNo ||
+      "7376251CS221";
     if (!roll) return;
     hasFetched.current = true;
     setRegisterNo(roll);
