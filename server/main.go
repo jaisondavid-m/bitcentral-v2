@@ -53,6 +53,7 @@ func main() {
 	mailHandler.StartQueueWorker()
 	internalMarksHandler := student.NewInternalMarksHandler()
 	notificationHandler := common.NewNotificationHandler()
+	surveyHandler := common.NewSurveyHandler()
 
 	r := routes.SetupRouter(
 		sheetHandler,
@@ -71,6 +72,7 @@ func main() {
 		mailHandler,
 		internalMarksHandler,
 		notificationHandler,
+		surveyHandler,
 	)
 
 	port := os.Getenv("PORT")

@@ -75,6 +75,7 @@ import {
   ShieldAlert,
   ShieldCheck,
   Smartphone,
+  Sparkles,
   Tablet,
   Trash2,
   TrendingUp,
@@ -91,6 +92,7 @@ import AdminMailSender from "./AdminMailSender.jsx";
 import AdminLeavesSection from "./AdminLeavesSection.jsx";
 import AdminNotificationsSection from "./AdminNotificationsSection.jsx";
 import AdminAuditLogsSection from "./AdminAuditLogsSection.jsx";
+import AdminSurveySection from "./AdminSurveySection.jsx";
 
 function normalizeError(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
@@ -294,6 +296,15 @@ const ADMIN_TABS = [
     description: "Dispatch broadcast announcements and targeted direct alerts to students with real-time modal delivery.",
   },
   {
+    key: "survey",
+    label: "Survey & UI Feedback",
+    href: "/admin/survey",
+    icon: Sparkles,
+    gradient: "from-blue-600 to-emerald-600",
+    badge: "Student Survey",
+    description: "Inspect live user feedback on the newly refreshed UI, satisfaction ratings, and student suggestions.",
+  },
+  {
     key: "feedback",
     label: "Feedback & Support",
     href: "/admin/feedback",
@@ -333,6 +344,7 @@ const ADMIN_TABS = [
 
 function getAdminTabFromPath(pathname) {
   if (pathname === "/admin" || pathname === "/admin/") return "overview";
+  if (pathname.startsWith("/admin/survey")) return "survey";
   if (pathname.startsWith("/admin/audit-logs")) return "audit-logs";
   if (pathname.startsWith("/admin/user-directory")) return "user-directory";
   if (pathname.startsWith("/admin/sponsors")) return "sponsors";
@@ -6305,6 +6317,8 @@ function AdminDashboard({ initialTab } = {}) {
         <AdminLeavesSection />
       ) : activeTab === "notifications" ? (
         <AdminNotificationsSection />
+      ) : activeTab === "survey" ? (
+        <AdminSurveySection />
       ) : activeTab === "feedback" ? (
         <AdminFeedbackPage />
       ) : activeTab === "mail" || activeTab === "mail-sender" ? (
@@ -6318,6 +6332,10 @@ function AdminDashboard({ initialTab } = {}) {
       )}
     </AdminDashboardShell>
   );
+}
+
+function AdminSurveyPage() {
+  return <AdminDashboard initialTab="survey" />;
 }
 
 export function AdminAuditLogsPage() {
@@ -6370,5 +6388,6 @@ export {
   AdminNotificationsPage,
   AdminFeedbackPageRoute as AdminFeedbackPage,
   AdminMailSenderPage,
+  AdminSurveyPage,
 };
 export default AdminDashboard;

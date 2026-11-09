@@ -33,6 +33,7 @@ func SetupRouter(
 	mailHandler *common.MailHandler,
 	internalMarksHandler *student.InternalMarksHandler,
 	notificationHandler *common.NotificationHandler,
+	surveyHandler *common.SurveyHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -186,6 +187,10 @@ func SetupRouter(
 		api.POST("/feedback/messages", feedbackHandler.SendMessage)
 		api.GET("/feedback/messages", feedbackHandler.GetUserMessages)
 
+		// UI Survey Feedback API
+		api.POST("/survey/feedback", surveyHandler.SubmitFeedback)
+		api.GET("/survey/status", surveyHandler.CheckUserSurveyStatus)
+
 		// Notifications User Actions API
 		api.POST("/notifications/:id/read", notificationHandler.MarkNotificationAsRead)
 		api.POST("/notifications/read-all", notificationHandler.MarkAllNotificationsAsRead)
@@ -285,6 +290,10 @@ func SetupRouter(
 		admin.POST("/notifications", notificationHandler.CreateNotification)
 		admin.PUT("/notifications/:id", notificationHandler.UpdateNotification)
 		admin.DELETE("/notifications/:id", notificationHandler.DeleteNotification)
+
+		// UI Survey Feedback Admin API
+		admin.GET("/survey/feedback", surveyHandler.GetFeedbackList)
+		admin.DELETE("/survey/feedback/:id", surveyHandler.DeleteFeedback)
 
 	}
 
