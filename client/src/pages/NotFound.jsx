@@ -1,24 +1,37 @@
+import React from "react";
 import { Link } from "react-router-dom";
+import { Compass, Home } from "lucide-react";
 
 function NotFound() {
   return (
-    <main className="min-h-[70vh] lg:min-h-[82vh] flex items-center justify-center bg-gradient-to-br from-blue-100 via-blue-200 to-white px-4 dark:from-black dark:via-slate-900 dark:to-blue-950">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center dark:bg-slate-950 dark:border dark:border-blue-900">
+    <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-[#f8fafc] px-4 py-12 dark:bg-[#090d16] text-zinc-900 dark:text-zinc-50 transition-colors">
+      <div className="mx-auto max-w-md w-full rounded-2xl border border-zinc-900 bg-white p-8 text-center shadow-[4px_4px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[4px_4px_0px_#ffffff]">
+        {/* Stamp */}
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-zinc-900 bg-blue-50 text-blue-600 shadow-[2px_2px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[2px_2px_0px_#ffffff]">
+          <Compass className="h-7 w-7" />
+        </div>
 
-        <h1 className="text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">404</h1>
-        <p className="mt-4 text-xl font-semibold text-blue-900 dark:text-blue-300">Page Not Found</p>
+        <h1 className="text-6xl sm:text-7xl font-black text-zinc-900 dark:text-white tracking-tight">
+          404
+        </h1>
+        <p className="mt-2 text-lg sm:text-xl font-black text-blue-600 dark:text-blue-400">
+          Page Not Found
+        </p>
 
-        <p className="mt-2 text-blue-700 leading-relaxed dark:text-blue-200">
+        <p className="mt-3 text-xs sm:text-sm font-semibold text-zinc-600 dark:text-zinc-400 leading-relaxed">
           The page you are looking for does not exist or may have been moved.
-          Please verify the URL or return to the homepage.
+          Please check the URL or return to the student hub.
         </p>
 
         <div className="mt-6">
-          <Link to="/home" className="inline-block px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 transition-colors duration-300">
-            Go to Home
+          <Link
+            to="/home"
+            className="inline-flex items-center gap-2 rounded-xl border border-zinc-900 bg-blue-600 px-6 py-2.5 text-xs sm:text-sm font-black text-white shadow-[2px_2px_0px_#18181b] hover:bg-blue-700 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:shadow-[2px_2px_0px_#ffffff] transition-all"
+          >
+            <Home className="h-4 w-4" />
+            <span>Go to Home</span>
           </Link>
         </div>
-        <p className="mt-6 text-sm text-blue-500 dark:text-blue-400">Error code: 404</p>
       </div>
     </main>
   );

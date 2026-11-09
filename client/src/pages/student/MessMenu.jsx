@@ -102,21 +102,21 @@ const MessMenu = () => {
   }, [menu]);
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-blue-50 via-sky-50 to-slate-100 px-3 py-3 dark:from-[#090b16] dark:via-[#0f172a] dark:to-[#04050b] sm:px-4 sm:py-4 md:px-6">
+    <div className="min-h-[calc(100vh-4rem)] bg-[#f8fafc] px-3 py-4 dark:bg-[#090d16] text-zinc-900 dark:text-zinc-50 transition-colors sm:px-4 sm:py-6 md:px-6">
       <div className="mx-auto w-full max-w-3xl">
-        <div className="rounded-2xl border border-blue-200/70 bg-white/85 p-3 shadow-lg backdrop-blur dark:border-slate-700 dark:bg-slate-900/85 sm:p-4 md:p-5">
+        <div className="rounded-2xl border border-zinc-900 bg-white p-4 shadow-[4px_4px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[4px_4px_0px_#ffffff] sm:p-5 md:p-6 mb-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <h1 className="mt-1 text-2xl font-bold leading-tight text-slate-800 dark:text-slate-100 sm:text-3xl">Mess Menu</h1>
+              <h1 className="text-2xl font-black leading-tight text-zinc-900 dark:text-zinc-50 tracking-tight sm:text-3xl">Mess Menu</h1>
               {isDefaultMenu ? (
-                <p className="mt-1 inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300">
+                <p className="mt-1.5 inline-flex rounded-md border border-zinc-900 bg-amber-50 px-2.5 py-0.5 text-xs font-black uppercase tracking-wider text-amber-800 dark:border-white dark:bg-amber-950/60 dark:text-amber-200">
                   Default menu template
                 </p>
               ) : null}
             </div>
 
             <div className="w-full md:w-auto md:min-w-60">
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-300">
+              <label className="mb-1 block text-xs font-black uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                 Date Selector
               </label>
               <div className="flex gap-2">
@@ -124,11 +124,11 @@ const MessMenu = () => {
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"
+                  className="w-full rounded-xl border border-zinc-900 bg-white px-3 py-2 text-sm font-bold text-zinc-900 shadow-[2px_2px_0px_#18181b] outline-none dark:border-white dark:bg-zinc-800 dark:text-white dark:shadow-[2px_2px_0px_#ffffff]"
                 />
                 <button
                   onClick={() => setSelectedDate(todayIST())}
-                  className="shrink-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                  className="rounded-xl border border-zinc-900 bg-blue-600 px-3.5 py-2 text-xs font-black text-white shadow-[2px_2px_0px_#18181b] hover:bg-blue-700 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer whitespace-nowrap"
                 >
                   Today
                 </button>
@@ -136,17 +136,17 @@ const MessMenu = () => {
             </div>
           </div>
 
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">
-            <div className="rounded-xl bg-slate-100 p-1 dark:bg-slate-800/70">
+          <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+            <div className="rounded-xl border border-zinc-900 bg-blue-50/70 p-1 dark:border-white dark:bg-zinc-800/80 shadow-[2px_2px_0px_#18181b] dark:shadow-[2px_2px_0px_#ffffff]">
               <div className="flex gap-1">
                 {hostelTabs.map((tab) => (
                   <button
                     key={tab.key}
                     onClick={() => setHostel(tab.key)}
-                    className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                    className={`flex-1 rounded-lg px-3 py-1.5 text-xs font-black transition cursor-pointer ${
                       hostel === tab.key
-                        ? "bg-blue-600 text-white shadow"
-                        : "text-slate-600 hover:bg-white hover:text-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+                        ? "bg-blue-600 text-white border border-zinc-900 dark:border-white shadow-[1px_1px_0px_#18181b] dark:shadow-[1px_1px_0px_#ffffff]"
+                        : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
                     }`}
                   >
                     {tab.label}
@@ -155,7 +155,7 @@ const MessMenu = () => {
               </div>
             </div>
 
-            <div className="rounded-xl bg-slate-100 p-1 dark:bg-slate-800/70">
+            <div className="rounded-xl border border-zinc-900 bg-blue-50/70 p-1 dark:border-white dark:bg-zinc-800/80 shadow-[2px_2px_0px_#18181b] dark:shadow-[2px_2px_0px_#ffffff]">
               <div className="grid grid-cols-3 gap-1">
                 {MEAL_ORDER.map((meal) => {
                   const mealIsClosed = Boolean(closures?.[meal]?.is_closed);
@@ -163,14 +163,14 @@ const MessMenu = () => {
                     <button
                       key={meal}
                       onClick={() => setActiveTab(meal)}
-                      className={`relative rounded-lg px-1.5 py-2 text-[11px] font-semibold leading-tight transition sm:px-2 sm:text-xs ${
+                      className={`relative rounded-lg px-1.5 py-1.5 text-[11px] font-black leading-tight transition cursor-pointer sm:px-2 sm:text-xs ${
                         activeTab === meal
                           ? mealIsClosed
-                            ? "bg-red-600 text-white shadow"
-                            : "bg-blue-600 text-white shadow"
+                            ? "bg-red-600 text-white border border-zinc-900 dark:border-white shadow-[1px_1px_0px_#18181b] dark:shadow-[1px_1px_0px_#ffffff]"
+                            : "bg-blue-600 text-white border border-zinc-900 dark:border-white shadow-[1px_1px_0px_#18181b] dark:shadow-[1px_1px_0px_#ffffff]"
                           : mealIsClosed
-                          ? "bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-950/70"
-                          : "text-slate-600 hover:bg-white hover:text-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+                          ? "bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-300"
+                          : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
                       }`}
                     >
                       <span className="mr-1">{MEAL_META[meal].icon}</span>

@@ -1,115 +1,83 @@
-import React, { useState, useEffect } from "react";
-import { logout } from "@/config/auth.js";
-import { useAuth, decodeCollegeEmail } from "@/context/StudentContext.jsx";
+import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
-import profileAvatar from "@/assets/profile.jpg";
-import { getV2Profile } from "@/api/axios.js";
 import {
-  Loader,
-  CheckCircle,
   AlertTriangle,
-  GraduationCap,
+  Building2,
   Calendar,
+  CheckCircle,
   Clock,
+  GraduationCap,
+  Hash,
+  Loader,
   LogOut,
   Phone,
-  Hash,
-  Building2,
 } from "lucide-react";
+import profileAvatar from "@/assets/profile.jpg";
+import { logout } from "@/config/auth.js";
+import { useAuth } from "@/context/StudentContext.jsx";
+import { haptics } from "@/utils/haptics.js";
+
+function formatAuthDate(dateValue) {
+  if (!dateValue) return "-";
+  const parsed = new Date(dateValue);
+  if (Number.isNaN(parsed.getTime())) return "-";
+  return parsed.toLocaleDateString("en-IN", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
 
 function ProfileV2() {
-  const { user, student, profile, loading: authLoading } = useAuth();
-  const [profileV2, setProfileV2] = useState(null);
-  const [fetchingProfile, setFetchingProfile] = useState(true);
+  const { user, profile, student } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  useEffect(() => {
-    let isMounted = true;
-    async function loadV2Profile() {
-      if (!user) {
-        setFetchingProfile(false);
-        return;
-      }
+  if (!user) return <Navigate to="/login" replace />;
 
-      try {
-        setFetchingProfile(true);
-        const data = await getV2Profile();
-        if (isMounted) {
-          setProfileV2(data);
-        }
-      } catch (error) {
-        console.error("Failed to load v2 profile:", error);
-      } finally {
-        if (isMounted) {
-          setFetchingProfile(false);
-        }
-      }
-    }
-
-    if (!authLoading) {
-      loadV2Profile();
-    }
-
-    return () => {
-      isMounted = false;
-    };
-  }, [user, authLoading]);
-
-  const formatAuthDate = (value) => {
-    if (value == null || value === "") {
-      return "-";
-    }
-
-    const numericValue = Number(value);
-    const timestamp = Number.isFinite(numericValue) ? numericValue : Date.parse(value);
-
-    if (!Number.isFinite(timestamp)) {
-      return value;
-    }
-
-    return new Date(timestamp).toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  };
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    try {
-      await logout();
-    } catch (error) {
-      setIsLoggingOut(false);
-    }
-  };
-
-  if (authLoading || fetchingProfile) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-black">
-        <div className="text-center">
-          <Loader className="mx-auto h-12 w-12 animate-spin text-blue-600" />
-          <p className="mt-4 text-gray-600 dark:text-slate-300">Loading Profile...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) return <Navigate to="/login" />;
-
+  const profileV2 = user?.profileV2 || {};
   const isBitsathyEmail = user.email?.endsWith("@bitsathy.ac.in");
 
-  // Fallback decoded email info
-  const decoded = decodeCollegeEmail(user?.email);
-
-  // Robust field mapping supporting tracker_users, /me profile, student context, and email decoding
   const name =
     profileV2?.name ||
-    profileV2?.display_name ||
-    profile?.display_name ||
+    profile?.name ||
+    student?.name ||
     user?.displayName ||
     "User";
 
-  const email = profileV2?.email || profile?.email || user?.email || "";
+  const email = profileV2?.email || profile?.email || user?.email || "-";
+
+  const registerNo =
+    profileV2?.register_no ||
+    profile?.register_no ||
+    student?.roll_no ||
+    student?.rollNo ||
+    "-";
+
+  const userId =
+    profileV2?.user_id ||
+    profile?.user_id ||
+    profile?.roll_no ||
+    student?.roll_no ||
+    student?.rollNo ||
+    "-";
+
+  const department =
+    profileV2?.department ||
+    profile?.department ||
+    student?.department ||
+    "-";
+
+  const batch =
+    profileV2?.batch ||
+    profile?.batch ||
+    student?.batch ||
+    "-";
+
+  const phone =
+    profileV2?.phone ||
+    profile?.phone ||
+    student?.phone ||
+    "-";
 
   const avatarUrl =
     profileV2?.photo_url ||
@@ -117,44 +85,22 @@ function ProfileV2() {
     user?.photoURL ||
     profileAvatar;
 
-  const registerNo =
-    profileV2?.register_no ||
-    profileV2?.roll_no ||
-    profileV2?.user_id ||
-    profile?.roll_no ||
-    student?.roll_no ||
-    student?.rollNo ||
-    "-";
-
-  const userId =
-    profileV2?.user_id ||
-    profileV2?.uid ||
-    profile?.uid ||
-    user?.uid ||
-    "-";
-
-  const department =
-    profileV2?.department ||
-    student?.department ||
-    decoded?.department ||
-    "-";
-
-  const batch =
-    profileV2?.batch ||
-    student?.batch ||
-    decoded?.batch ||
-    "-";
-
-  const phone =
-    profileV2?.phone ||
-    profile?.phone ||
-    "-";
+  const handleLogout = async () => {
+    haptics.action();
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Error logging out:", error);
+      setIsLoggingOut(false);
+    }
+  };
 
   const creationTime =
     profileV2?.creation_time ||
     profile?.creation_time ||
-    user?.metadata?.createdAt ||
     user?.metadata?.creationTime ||
+    user?.metadata?.createdAt ||
     "";
 
   const lastSignInTime =
@@ -165,27 +111,27 @@ function ProfileV2() {
     "";
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 lg:px-8 dark:bg-black">
+    <main className="min-h-[calc(100vh-4rem)] bg-[#f8fafc] px-4 py-6 sm:px-6 lg:px-8 dark:bg-[#090d16] text-zinc-900 dark:text-zinc-50 transition-colors">
       <div className="mx-auto max-w-4xl">
         {/* Profile Header Banner */}
-        <div className="mb-6 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-blue-900 dark:bg-slate-950">
-          <div className="bg-blue-600 px-6 py-8 sm:px-8">
+        <div className="mb-6 overflow-hidden rounded-2xl border border-zinc-900 bg-blue-600 shadow-[4px_4px_0px_#18181b] dark:border-white dark:bg-blue-950 dark:shadow-[4px_4px_0px_#ffffff]">
+          <div className="px-6 py-8 sm:px-8">
             <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
               <div className="relative">
                 <img
                   src={avatarUrl}
                   alt="Profile Avatar"
-                  className="h-20 w-20 rounded-full border-4 border-white object-cover shadow-md sm:h-24 sm:w-24"
+                  className="h-20 w-20 rounded-full border-4 border-white object-cover shadow-[2px_2px_0px_#18181b] sm:h-24 sm:w-24"
                 />
                 {user.emailVerified && (
-                  <div className="absolute -right-1 bottom-1 flex h-7 w-7 items-center justify-center rounded-full bg-green-500 shadow-md ring-1 ring-white">
+                  <div className="absolute -right-1 bottom-1 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 shadow-sm border-2 border-white">
                     <CheckCircle className="h-4 w-4 text-white" />
                   </div>
                 )}
               </div>
               <div className="flex-1 text-center sm:text-left">
-                <h1 className="mb-1 text-2xl font-bold text-white sm:text-3xl">{name}</h1>
-                <p className="break-all text-sm text-white/90 sm:text-base">{email}</p>
+                <h1 className="mb-1 text-2xl font-black text-white sm:text-3xl tracking-tight">{name}</h1>
+                <p className="break-all text-sm font-semibold text-blue-100 sm:text-base">{email}</p>
               </div>
             </div>
           </div>
@@ -193,12 +139,12 @@ function ProfileV2() {
 
         {/* Email Warning */}
         {!isBitsathyEmail && (
-          <div className="mb-6 overflow-hidden rounded-lg border border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950/30">
-            <div className="flex items-start gap-3 px-5 py-4 sm:items-center sm:gap-4">
-              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-yellow-400">
-                <AlertTriangle className="h-5 w-5 text-white" />
+          <div className="mb-6 overflow-hidden rounded-xl border border-zinc-900 bg-amber-50 p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-amber-950/40 dark:shadow-[3px_3px_0px_#ffffff]">
+            <div className="flex items-start gap-3 sm:items-center sm:gap-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-900 bg-amber-400 text-zinc-900 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white">
+                <AlertTriangle className="h-5 w-5" />
               </div>
-              <p className="flex-1 text-sm font-medium text-yellow-800 sm:text-base dark:text-yellow-300">
+              <p className="flex-1 text-xs sm:text-sm font-bold text-amber-900 dark:text-amber-200">
                 Please use your BITSATHY college email for a better experience.
               </p>
             </div>
@@ -208,102 +154,102 @@ function ProfileV2() {
         {/* Details Grid */}
         <div className="mb-6 grid gap-4 sm:grid-cols-2">
           {/* Register No */}
-          <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-blue-900 dark:bg-slate-950">
+          <div className="rounded-xl border border-zinc-900 bg-white p-5 shadow-[3px_3px_0px_#18181b] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">
+              <h3 className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 Register No
               </h3>
-              <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-950/60">
-                <GraduationCap className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-900 bg-blue-50 text-blue-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
+                <GraduationCap className="h-5 w-5" />
               </div>
             </div>
-            <p className="text-base font-bold leading-tight text-blue-900 sm:text-lg dark:text-blue-300">
+            <p className="text-base sm:text-lg font-black text-zinc-900 dark:text-zinc-50">
               {registerNo}
             </p>
           </div>
 
           {/* User ID */}
-          <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-blue-900 dark:bg-slate-950">
+          <div className="rounded-xl border border-zinc-900 bg-white p-5 shadow-[3px_3px_0px_#18181b] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">
+              <h3 className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 User ID
               </h3>
-              <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-950/60">
-                <Hash className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-900 bg-blue-50 text-blue-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
+                <Hash className="h-5 w-5" />
               </div>
             </div>
-            <p className="text-base font-bold leading-tight text-blue-900 sm:text-lg dark:text-blue-300">
+            <p className="text-base sm:text-lg font-black text-zinc-900 dark:text-zinc-50">
               {userId}
             </p>
           </div>
 
           {/* Department */}
-          <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-blue-900 dark:bg-slate-950">
+          <div className="rounded-xl border border-zinc-900 bg-white p-5 shadow-[3px_3px_0px_#18181b] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">
+              <h3 className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 Department
               </h3>
-              <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-950/60">
-                <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-900 bg-blue-50 text-blue-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
+                <Building2 className="h-5 w-5" />
               </div>
             </div>
-            <p className="text-base font-bold leading-tight text-blue-900 sm:text-lg dark:text-blue-300">
+            <p className="text-base sm:text-lg font-black text-zinc-900 dark:text-zinc-50">
               {department}
             </p>
           </div>
 
           {/* Batch */}
-          <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-blue-900 dark:bg-slate-950">
+          <div className="rounded-xl border border-zinc-900 bg-white p-5 shadow-[3px_3px_0px_#18181b] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">
+              <h3 className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 Batch
               </h3>
-              <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-950/60">
-                <Calendar className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-900 bg-blue-50 text-blue-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
+                <Calendar className="h-5 w-5" />
               </div>
             </div>
-            <p className="text-xl font-bold text-blue-900 dark:text-blue-300">{batch}</p>
+            <p className="text-base sm:text-lg font-black text-zinc-900 dark:text-zinc-50">{batch}</p>
           </div>
 
           {/* Phone */}
-          <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-blue-900 dark:bg-slate-950">
+          <div className="rounded-xl border border-zinc-900 bg-white p-5 shadow-[3px_3px_0px_#18181b] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">
+              <h3 className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 Phone
               </h3>
-              <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-950/60">
-                <Phone className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-900 bg-blue-50 text-blue-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
+                <Phone className="h-5 w-5" />
               </div>
             </div>
-            <p className="text-xl font-bold text-blue-900 dark:text-blue-300">{phone}</p>
+            <p className="text-base sm:text-lg font-black text-zinc-900 dark:text-zinc-50">{phone}</p>
           </div>
 
-          {/* Creation Time / First Login */}
-          <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-blue-900 dark:bg-slate-950">
+          {/* First Login */}
+          <div className="rounded-xl border border-zinc-900 bg-white p-5 shadow-[3px_3px_0px_#18181b] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">
+              <h3 className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 First Login
               </h3>
-              <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-950/60">
-                <Clock className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-900 bg-blue-50 text-blue-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
+                <Clock className="h-5 w-5" />
               </div>
             </div>
-            <p className="text-xl font-bold text-blue-900 dark:text-blue-300">
+            <p className="text-base sm:text-lg font-black text-zinc-900 dark:text-zinc-50">
               {formatAuthDate(creationTime)}
             </p>
           </div>
 
-          {/* Last Sign-In Time */}
-          <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-blue-900 dark:bg-slate-950">
+          {/* Last Login */}
+          <div className="rounded-xl border border-zinc-900 bg-white p-5 shadow-[3px_3px_0px_#18181b] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 sm:col-span-2 dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">
+              <h3 className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 Last Login
               </h3>
-              <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-950/60">
-                <Clock className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-900 bg-blue-50 text-blue-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
+                <Clock className="h-5 w-5" />
               </div>
             </div>
-            <p className="text-xl font-bold text-blue-900 dark:text-blue-300">
+            <p className="text-base sm:text-lg font-black text-zinc-900 dark:text-zinc-50">
               {formatAuthDate(lastSignInTime)}
             </p>
           </div>
@@ -314,16 +260,18 @@ function ProfileV2() {
           <button
             onClick={handleLogout}
             disabled={isLoggingOut}
-            className="w-full rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-[200px] dark:border-blue-900 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-900 bg-rose-600 px-8 py-3 text-sm font-black text-white shadow-[3px_3px_0px_#18181b] hover:bg-rose-700 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 disabled:opacity-50 dark:border-white dark:shadow-[3px_3px_0px_#ffffff] transition-all cursor-pointer"
           >
             {isLoggingOut ? (
-              <span className="flex items-center justify-center gap-2">
-                <Loader className="h-5 w-5 animate-spin" /> Logging out...
-              </span>
+              <>
+                <Loader className="h-4 w-4 animate-spin stroke-[2.5]" />
+                <span>Logging out...</span>
+              </>
             ) : (
-              <span className="flex items-center justify-center gap-2">
-                <LogOut className="h-5 w-5" /> Logout
-              </span>
+              <>
+                <LogOut className="h-4 w-4 stroke-[2.5]" />
+                <span>Sign Out</span>
+              </>
             )}
           </button>
         </div>

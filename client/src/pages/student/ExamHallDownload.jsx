@@ -423,33 +423,26 @@ function ExamCard({ session: s, registerNo }) {
   const arr = s.is_arrear;
 
   return (
-    <div className={`flex overflow-hidden rounded-xl border bg-white shadow-sm
-      transition-all duration-200 hover:shadow-md hover:-translate-y-px
-      dark:bg-[#0F1C33]
-      ${arr
-        ? "border-amber-200 dark:border-amber-800/40"
-        : "border-blue-100 dark:border-blue-900/30"}`}>
+    <div className={`flex overflow-hidden rounded-xl border border-zinc-900 bg-white shadow-[3px_3px_0px_#18181b]
+      transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5
+      dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]`}>
 
       {/* Date sidebar — narrower on mobile */}
-      <div className={`flex w-[68px] shrink-0 flex-col items-center justify-center gap-0.5 py-3
-        ${arr ? "bg-amber-50 dark:bg-amber-900/20" : "bg-blue-50 dark:bg-[#0A1628]"}`}>
-        <span className={`text-[8px] font-bold uppercase tracking-[0.14em]
-          ${arr ? "text-amber-400 dark:text-amber-500" : "text-blue-300 dark:text-blue-600"}`}>
+      <div className={`flex w-[68px] shrink-0 flex-col items-center justify-center gap-0.5 py-3 border-r border-zinc-900 dark:border-white
+        ${arr ? "bg-amber-100 dark:bg-amber-950/60" : "bg-blue-100 dark:bg-blue-950/60"}`}>
+        <span className={`text-[9px] font-black uppercase tracking-[0.14em]
+          ${arr ? "text-amber-800 dark:text-amber-400" : "text-blue-800 dark:text-blue-300"}`}>
           {dt.short}
         </span>
         <span className={`text-[26px] font-black leading-none tabular-nums
-          ${arr ? "text-amber-700 dark:text-amber-300" : "text-blue-700 dark:text-blue-200"}`}>
+          ${arr ? "text-amber-950 dark:text-amber-200" : "text-blue-950 dark:text-blue-100"}`}>
           {dt.day}
         </span>
-        <span className={`text-[10px] font-semibold leading-tight text-center
-          ${arr ? "text-amber-500 dark:text-amber-500" : "text-blue-400 dark:text-blue-500"}`}>
+        <span className={`text-[10px] font-bold leading-tight text-center
+          ${arr ? "text-amber-800 dark:text-amber-400" : "text-blue-800 dark:text-blue-300"}`}>
           {dt.month} {dt.year}
         </span>
       </div>
-
-      {/* Divider */}
-      <div className={`w-px self-stretch
-        ${arr ? "bg-amber-100 dark:bg-amber-900/30" : "bg-blue-100 dark:bg-blue-900/30"}`} />
 
       {/* Content — tighter padding */}
       <div className="flex flex-1 flex-col gap-2 px-3 py-2.5 min-w-0">
@@ -457,23 +450,31 @@ function ExamCard({ session: s, registerNo }) {
         {/* Row 1: session pill + hall badge on same line */}
         <div className="flex items-start justify-between gap-1.5">
           {/* Left: pills */}
-          <div className="flex flex-wrap items-center gap-1 min-w-0 pt-0.5">
-            <SessionPill session={s.session} />
-            {arr && <ArrearPill />}
+          <div className="flex flex-wrap items-center gap-1.5 min-w-0 pt-0.5">
+            <span className={`inline-flex items-center gap-1 rounded-md border border-zinc-900 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider dark:border-white
+              ${s.session === "FN"
+                ? "bg-blue-100 text-blue-900 dark:bg-blue-900/60 dark:text-blue-100 shadow-[1px_1px_0px_#18181b] dark:shadow-[1px_1px_0px_#ffffff]"
+                : "bg-violet-100 text-violet-900 dark:bg-violet-900/60 dark:text-violet-100 shadow-[1px_1px_0px_#18181b] dark:shadow-[1px_1px_0px_#ffffff]"}`}>
+              {s.session === "FN" ? "Forenoon" : "Afternoon"}
+            </span>
+            {arr && (
+              <span className="inline-flex items-center rounded-md border border-zinc-900 bg-amber-100 px-2 py-0.5 text-[10px] font-black text-amber-900 shadow-[1px_1px_0px_#18181b] dark:border-white dark:bg-amber-900/60 dark:text-amber-200 dark:shadow-[1px_1px_0px_#ffffff]">
+                Arrear
+              </span>
+            )}
           </div>
 
           {/* Right: hall badge & members button */}
           <div className="flex flex-col items-end gap-1.5 shrink-0">
-            <div className={`flex items-center gap-1 rounded-lg px-2 py-1 shrink-0
+            <div className={`flex items-center gap-1 rounded-lg border border-zinc-900 px-2.5 py-1 shrink-0 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:shadow-[1.5px_1.5px_0px_#ffffff]
               ${arr
-                ? "bg-amber-50 ring-1 ring-amber-200 dark:bg-amber-900/20 dark:ring-amber-700/50"
-                : "bg-blue-50 ring-1 ring-blue-200 dark:bg-blue-900/20 dark:ring-blue-700/50"}`}>
-              <MapPin className={`h-3 w-3 shrink-0 ${arr ? "text-amber-400" : "text-blue-400"}`} />
-              <span className={`text-xs font-medium ${arr ? "text-amber-300" : "text-blue-300"} dark:opacity-60`}>
+                ? "bg-amber-100 dark:bg-amber-950/60"
+                : "bg-blue-100 dark:bg-blue-950/60"}`}>
+              <MapPin className="h-3 w-3 shrink-0 text-blue-600 dark:text-blue-400" />
+              <span className="text-xs font-black text-zinc-600 dark:text-zinc-400">
                 Hall
               </span>
-              <span className={`text-base font-black leading-none
-                ${arr ? "text-amber-700 dark:text-amber-300" : "text-blue-700 dark:text-blue-200"}`}>
+              <span className="text-base font-black leading-none text-zinc-900 dark:text-white">
                 {s.hall_no}
               </span>
             </div>
@@ -486,11 +487,7 @@ function ExamCard({ session: s, registerNo }) {
                   `/exam-hall/members?hall=${encodeURIComponent(s.hall_no)}&date=${encodeURIComponent(s.date)}&session=${encodeURIComponent(s.session || "")}&time=${encodeURIComponent(s.time || "")}${registerNo ? `&student=${encodeURIComponent(registerNo)}` : ""}`
                 );
               }}
-              className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-semibold transition-all cursor-pointer shadow-xs active:scale-95 ${
-                arr
-                  ? "bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/60 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800/40"
-                  : "bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200/60 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800/40"
-              }`}
+              className="inline-flex items-center gap-1 rounded-md border border-zinc-900 bg-blue-50 px-2 py-0.5 text-[10px] font-black text-blue-700 shadow-[1px_1px_0px_#18181b] hover:bg-blue-100 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:bg-zinc-800 dark:text-blue-300 dark:shadow-[1px_1px_0px_#ffffff] transition-all cursor-pointer"
               title={`View all students seated in ${s.hall_no}`}
             >
               <Users className="h-2.5 w-2.5" />
@@ -623,14 +620,14 @@ export default function ExamHallDownload() {
   return (
     <div className={isDark ? "dark" : ""}>
       {/* light: very pale blue-white bg  |  dark: deep navy bg */}
-      <div className="min-h-screen bg-[#EEF4FF] px-4 py-8 dark:bg-[#080F1E]">
+      <div className="min-h-[calc(100vh-4rem)] bg-[#f8fafc] px-4 py-8 dark:bg-[#090d16] text-zinc-900 dark:text-zinc-50 transition-colors">
         <div className="mx-auto max-w-2xl space-y-6">
 
           {/* ── Header card ── */}
-          <div className="overflow-hidden rounded-2xl bg-white p-4 border border-blue-100 shadow-sm dark:bg-[#0F1C33] dark:border-blue-900/30">
+          <div className="overflow-hidden rounded-2xl bg-white p-4 border border-zinc-900 shadow-[3px_3px_0px_#18181b] dark:bg-[#111827] dark:border-white dark:shadow-[3px_3px_0px_#ffffff]">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl bg-blue-600 shadow-sm">
+                <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl border border-zinc-900 bg-blue-600 text-white shadow-[2px_2px_0px_#18181b] dark:border-white">
                   <span className="text-[12px] font-black leading-none text-white">BIT</span>
                   <span className="text-[7px] font-bold leading-none text-blue-200">SATHY</span>
                 </div>
@@ -649,7 +646,7 @@ export default function ExamHallDownload() {
 
               <button
                 onClick={() => navigate("/exam-hall-manual")}
-                className="rounded-xl bg-white border border-blue-500 px-3.5 py-1.5 text-xs font-bold text-blue-600 shadow-sm transition-all hover:bg-blue-50 hover:border-blue-600 hover:scale-[1.02] active:scale-[0.98] cursor-pointer dark:bg-slate-900 dark:text-blue-400 dark:border-blue-500 dark:hover:bg-slate-800 shrink-0"
+                className="rounded-xl border border-zinc-900 bg-white px-3.5 py-1.5 text-xs font-black text-blue-600 shadow-[2px_2px_0px_#18181b] hover:bg-blue-50 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[2px_2px_0px_#ffffff] transition-all shrink-0"
               >
                 Manual Search
               </button>

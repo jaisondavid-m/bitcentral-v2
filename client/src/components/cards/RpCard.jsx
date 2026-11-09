@@ -207,29 +207,30 @@ export default function RpCard({ student }) {
       {/* Card */}
       <article className="
         group flex flex-col overflow-hidden rounded-2xl
-        bg-white border border-slate-200 dark:bg-slate-900 dark:border-slate-800
+        bg-white border border-zinc-900 shadow-[3px_3px_0px_#18181b]
+        dark:bg-[#111827] dark:border-white dark:shadow-[3px_3px_0px_#ffffff]
         transition-all duration-200
-        hover:border-slate-300 dark:hover:border-slate-700 hover:-translate-y-px
-        hover:shadow-lg hover:shadow-slate-900/10 dark:hover:shadow-black/30
+        hover:-translate-x-0.5 hover:-translate-y-0.5
+        hover:shadow-[5px_5px_0px_#18181b] dark:hover:shadow-[5px_5px_0px_#ffffff]
       ">
         <div className="flex flex-col gap-4 p-5">
 
           {/* Header */}
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="truncate text-[13.5px] font-semibold text-slate-900 dark:text-white leading-tight">
+              <h3 className="truncate text-sm sm:text-base font-black text-zinc-900 dark:text-white leading-tight">
                 {student.student_name}
               </h3>
-              <p className="mt-0.5 font-mono text-[11px] font-medium text-slate-600 dark:text-slate-400">
+              <p className="mt-0.5 font-mono text-[11px] font-bold text-zinc-600 dark:text-zinc-400">
                 {rollNo}
               </p>
             </div>
-            <span className="shrink-0 rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400">
+            <span className="shrink-0 rounded-md border border-zinc-900 bg-blue-100 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-blue-900 dark:border-white dark:bg-blue-900/60 dark:text-blue-100 shadow-[1px_1px_0px_#18181b] dark:shadow-[1px_1px_0px_#ffffff]">
               {student.tab}
             </span>
           </div>
 
-          <div className="border-t border-slate-200 dark:border-slate-800" />
+          <div className="border-t border-zinc-200 dark:border-zinc-800" />
 
           {/* Meta */}
           <div className="space-y-2">
@@ -239,17 +240,17 @@ export default function RpCard({ student }) {
           </div>
 
           {/* Points */}
-          <div className="grid grid-cols-3 divide-x divide-slate-200 rounded-xl bg-slate-50 border border-slate-200 dark:divide-slate-800 dark:bg-slate-800/60 dark:border-slate-800">
+          <div className="grid grid-cols-3 divide-x divide-zinc-900 rounded-xl bg-blue-50/50 border border-zinc-900 dark:divide-white dark:bg-zinc-800/80 dark:border-white shadow-[2px_2px_0px_#18181b] dark:shadow-[2px_2px_0px_#ffffff]">
             {[
-              { label: "Earned", value: student.cumulative_reward_points, color: "text-slate-900 dark:text-white" },
-              { label: "Balance", value: student.balance_points, color: "text-amber-400" },
-              { label: "Redeemed", value: student.redeemed_points, color: "text-emerald-400" },
+              { label: "Earned", value: student.cumulative_reward_points, color: "text-zinc-900 dark:text-white" },
+              { label: "Balance", value: student.balance_points, color: "text-amber-500 dark:text-amber-400" },
+              { label: "Redeemed", value: student.redeemed_points, color: "text-emerald-600 dark:text-emerald-400" },
             ].map(({ label, value, color }) => (
               <div key={label} className="flex flex-col items-center gap-1 py-3">
-                <span className="text-[9px] font-semibold uppercase tracking-widest text-slate-500">
+                <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
                   {label}
                 </span>
-                <span className={`text-sm font-bold tabular-nums ${color}`}>{value}</span>
+                <span className={`text-sm font-black tabular-nums ${color}`}>{value}</span>
               </div>
             ))}
           </div>
@@ -261,16 +262,18 @@ export default function RpCard({ student }) {
               onClick={() => fetchRank()}
               className="
                 flex w-full items-center justify-between
-                rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 border border-amber-300/60 dark:from-amber-950/40 dark:via-orange-950/30 dark:to-yellow-950/30 dark:border-amber-700/60
-                px-4 py-2.5 text-[12px] font-semibold text-amber-900 dark:text-amber-300
-                transition-all hover:from-amber-500/20 hover:via-orange-500/20 hover:to-yellow-500/20 dark:hover:from-amber-900/50 dark:hover:to-orange-900/40 active:scale-[.98] cursor-pointer shadow-2xs
+                rounded-xl border border-zinc-900 bg-amber-500/10 dark:border-white dark:bg-amber-950/40
+                px-4 py-2.5 text-[12px] font-black text-amber-900 dark:text-amber-300
+                shadow-[2px_2px_0px_#18181b] dark:shadow-[2px_2px_0px_#ffffff]
+                hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5
+                transition-all cursor-pointer
               "
             >
               <div className="flex items-center gap-2">
                 <Trophy className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
                 <span>View rank</span>
               </div>
-              <ChevronRight className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" strokeWidth={2} />
+              <ChevronRight className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" strokeWidth={2} />
             </button>
 
             <button
@@ -278,13 +281,15 @@ export default function RpCard({ student }) {
               onClick={() => fetchPoints(1)}
               className="
                 flex w-full items-center justify-between
-                rounded-xl bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700
-                px-4 py-2.5 text-[12px] font-medium text-slate-700 dark:text-slate-300
-                transition-colors hover:bg-slate-200 dark:hover:bg-slate-700/70 hover:text-slate-900 dark:hover:text-white active:scale-[.98] cursor-pointer
+                rounded-xl border border-zinc-900 bg-blue-600 dark:border-white
+                px-4 py-2.5 text-[12px] font-black text-white
+                shadow-[2px_2px_0px_#18181b] dark:shadow-[2px_2px_0px_#ffffff]
+                hover:bg-blue-700 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5
+                transition-all cursor-pointer
               "
             >
               <span>View detailed points</span>
-              <ChevronRight className="h-3.5 w-3.5 text-slate-500" strokeWidth={2} />
+              <ChevronRight className="h-3.5 w-3.5 text-white" strokeWidth={2} />
             </button>
 
             <button
@@ -292,16 +297,18 @@ export default function RpCard({ student }) {
               onClick={() => fetchInternalMarks()}
               className="
                 flex w-full items-center justify-between
-                rounded-xl bg-gradient-to-r from-indigo-50/90 to-purple-50/90 border border-indigo-200/80 dark:from-indigo-950/40 dark:to-purple-950/30 dark:border-indigo-800/60
-                px-4 py-2.5 text-[12px] font-semibold text-indigo-900 dark:text-indigo-300
-                transition-all hover:from-indigo-100 hover:to-purple-100 dark:hover:from-indigo-900/50 dark:hover:to-purple-900/40 active:scale-[.98] cursor-pointer shadow-2xs
+                rounded-xl border border-zinc-900 bg-indigo-50/90 dark:border-white dark:bg-indigo-950/40
+                px-4 py-2.5 text-[12px] font-black text-indigo-900 dark:text-indigo-300
+                shadow-[2px_2px_0px_#18181b] dark:shadow-[2px_2px_0px_#ffffff]
+                hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5
+                transition-all cursor-pointer
               "
             >
               <div className="flex items-center gap-2">
                 <Calculator className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>View internal mark conversion</span>
               </div>
-              <ChevronRight className="h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400" strokeWidth={2} />
+              <ChevronRight className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" strokeWidth={2} />
             </button>
           </div>
         </div>
@@ -310,29 +317,30 @@ export default function RpCard({ student }) {
       {/* Modal */}
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-0 sm:p-6"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-zinc-900/70 p-0 sm:p-6 backdrop-blur-xs"
           onClick={() => setOpen(false)}
         >
           <div
             className="
               w-full sm:max-w-3xl rounded-t-2xl sm:rounded-2xl
-              bg-white border border-slate-200 dark:bg-slate-900 dark:border-slate-800 shadow-2xl shadow-slate-900/20 dark:shadow-black/60
+              bg-white border border-zinc-900 dark:bg-[#111827] dark:border-white
+              shadow-[5px_5px_0px_#18181b] dark:shadow-[5px_5px_0px_#ffffff]
               max-h-[92dvh] sm:max-h-[80vh] flex flex-col overflow-hidden
             "
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal header */}
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-5 py-4 shrink-0">
+            <div className="flex items-center justify-between border-b border-zinc-900 dark:border-white px-5 py-4 shrink-0 bg-blue-50/50 dark:bg-zinc-800/50">
               <div className="min-w-0">
-                <p className="text-[13px] font-semibold text-slate-900 dark:text-white">Reward points breakdown</p>
-                <p className="mt-0.5 text-[11px] text-slate-500 truncate">
+                <p className="text-sm font-black text-zinc-900 dark:text-white">Reward points breakdown</p>
+                <p className="mt-0.5 text-xs font-bold text-zinc-500 dark:text-zinc-400 truncate">
                   {student.student_name}&nbsp;&bull;&nbsp;{rollNo}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-lg border border-slate-200 dark:border-slate-700 p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="rounded-lg border border-zinc-900 dark:border-white p-1.5 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
@@ -413,27 +421,27 @@ export default function RpCard({ student }) {
                   </div>
 
                   {/* Desktop table */}
-                  <div className="hidden sm:block rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                  <div className="hidden sm:block rounded-xl border border-zinc-900 dark:border-white overflow-hidden shadow-[2px_2px_0px_#18181b] dark:shadow-[2px_2px_0px_#ffffff]">
                     <table className="w-full text-left text-xs">
                       <thead>
-                        <tr className="bg-slate-100 dark:bg-slate-800/60">
+                        <tr className="bg-blue-50/70 border-b border-zinc-900 dark:bg-zinc-800/80 dark:border-white">
                           {["Date", "Activity type", "Activity name", "Points"].map((h) => (
-                            <th key={h} className="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-500 last:text-right">
+                            <th key={h} className="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-zinc-900 dark:text-white last:text-right">
                               {h}
                             </th>
                           ))}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800/70">
+                      <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
                         {points.map((e, i) => (
-                          <tr key={`${e?.date}-${e?.activity_name}-${i}`} className="text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                            <td className="px-4 py-3 whitespace-nowrap text-slate-500">{e?.date || "—"}</td>
-                            <td className="px-4 py-3 whitespace-nowrap text-slate-700 dark:text-slate-300">{e?.activity_type || "—"}</td>
-                            <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{e?.activity_name || "—"}</td>
+                          <tr key={`${e?.date}-${e?.activity_name}-${i}`} className="text-zinc-700 dark:text-zinc-300 hover:bg-blue-50/30 dark:hover:bg-zinc-800/40 transition-colors">
+                            <td className="px-4 py-3 whitespace-nowrap text-zinc-500 font-semibold">{e?.date || "—"}</td>
+                            <td className="px-4 py-3 whitespace-nowrap font-bold text-zinc-800 dark:text-zinc-200">{e?.activity_type || "—"}</td>
+                            <td className="px-4 py-3 font-semibold text-zinc-800 dark:text-zinc-200">{e?.activity_name || "—"}</td>
                             <td
-                              className={`px-4 py-3 text-right font-semibold tabular-nums ${e?.type === "negative"
-                                ? "text-red-400"
-                                : "text-emerald-400"
+                              className={`px-4 py-3 text-right font-black tabular-nums ${e?.type === "negative"
+                                ? "text-red-500"
+                                : "text-emerald-600 dark:text-emerald-400"
                                 }`}
                             >
                               {e?.type === "negative" ? "-" : "+"}
@@ -450,11 +458,11 @@ export default function RpCard({ student }) {
 
             {/* Pagination Footer */}
             {!loading && !error && points.length > 0 && totalCount > 10 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200 dark:border-slate-800 px-5 py-4 bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
-                <div className="text-[12px] text-slate-500 dark:text-slate-400">
-                  Showing <span className="font-semibold text-slate-800 dark:text-slate-200">{(currentPage - 1) * 10 + 1}</span> to{" "}
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">{Math.min(currentPage * 10, totalCount)}</span> of{" "}
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">{totalCount}</span> entries
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-zinc-900 dark:border-white px-5 py-4 bg-zinc-50 dark:bg-[#111827] shrink-0">
+                <div className="text-[12px] font-bold text-zinc-600 dark:text-zinc-400">
+                  Showing <span className="font-black text-zinc-900 dark:text-white">{(currentPage - 1) * 10 + 1}</span> to{" "}
+                  <span className="font-black text-zinc-900 dark:text-white">{Math.min(currentPage * 10, totalCount)}</span> of{" "}
+                  <span className="font-black text-zinc-900 dark:text-white">{totalCount}</span> entries
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -463,19 +471,18 @@ export default function RpCard({ student }) {
                     onClick={() => fetchPoints(currentPage - 1)}
                     className="
                       inline-flex items-center gap-1 px-3 py-1.5 rounded-lg
-                      border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950
-                      text-[12px] font-medium text-slate-700 dark:text-slate-300
-                      transition-all duration-200
-                      hover:bg-slate-50 dark:hover:bg-slate-900
-                      disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-slate-950
+                      border border-zinc-900 dark:border-white bg-white dark:bg-zinc-800
+                      text-[12px] font-black text-zinc-900 dark:text-white shadow-[1px_1px_0px_#18181b] dark:shadow-[1px_1px_0px_#ffffff]
+                      transition-all hover:bg-blue-50/50
+                      disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none
                     "
                   >
                     <ChevronLeft className="h-4 w-4" />
                     <span>Prev</span>
                   </button>
-                  <div className="px-3 py-1 text-[12px] font-medium text-slate-500 dark:text-slate-400">
-                    Page <span className="text-slate-800 dark:text-slate-200 font-semibold">{currentPage}</span> of{" "}
-                    <span className="text-slate-800 dark:text-slate-200 font-semibold">{Math.ceil(totalCount / 10)}</span>
+                  <div className="px-3 py-1 text-[12px] font-bold text-zinc-600 dark:text-zinc-400">
+                    Page <span className="text-zinc-900 dark:text-white font-black">{currentPage}</span> of{" "}
+                    <span className="text-zinc-900 dark:text-white font-black">{Math.ceil(totalCount / 10)}</span>
                   </div>
                   <button
                     type="button"
@@ -483,11 +490,10 @@ export default function RpCard({ student }) {
                     onClick={() => fetchPoints(currentPage + 1)}
                     className="
                       inline-flex items-center gap-1 px-3 py-1.5 rounded-lg
-                      border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950
-                      text-[12px] font-medium text-slate-700 dark:text-slate-300
-                      transition-all duration-200
-                      hover:bg-slate-50 dark:hover:bg-slate-900
-                      disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-slate-950
+                      border border-zinc-900 dark:border-white bg-white dark:bg-zinc-800
+                      text-[12px] font-black text-zinc-900 dark:text-white shadow-[1px_1px_0px_#18181b] dark:shadow-[1px_1px_0px_#ffffff]
+                      transition-all hover:bg-blue-50/50
+                      disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none
                     "
                   >
                     <span>Next</span>

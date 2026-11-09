@@ -11,7 +11,7 @@ function ProtectedLayout() {
         Skip to main content
       </a>
       <Navbar />
-      <div id="main-content" role="main">
+      <div id="main-content" role="main" className="min-h-[calc(100vh-14rem)] bg-[#f8fafc] dark:bg-[#090d16] text-zinc-900 dark:text-zinc-50 transition-colors">
         <Outlet />
       </div>
       <Footer />

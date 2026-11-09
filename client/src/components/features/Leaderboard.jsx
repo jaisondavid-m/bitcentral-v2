@@ -184,14 +184,14 @@ export default function Leaderboard({ onClose }) {
     );
 
     return (
-        <div className="w-full overflow-hidden rounded-3xl border border-blue-100 bg-white text-slate-900 shadow-2xl shadow-blue-900/10 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100">
-            <div className="flex items-start justify-between gap-4 border-b border-blue-100 bg-linear-to-r from-blue-50 via-white to-white px-5 py-4 dark:border-slate-800 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 sm:px-6">
+        <div className="w-full overflow-hidden rounded-2xl border border-zinc-900 bg-white text-zinc-900 shadow-[4px_4px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:text-zinc-50 dark:shadow-[4px_4px_0px_#ffffff]">
+            <div className="flex items-start justify-between gap-4 border-b border-zinc-900 bg-blue-50/70 px-5 py-4 dark:border-white dark:bg-zinc-800/80 sm:px-6">
                 <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-600/20 dark:from-blue-500 dark:to-blue-700">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-zinc-900 bg-blue-600 text-white shadow-[2px_2px_0px_#18181b] dark:border-white dark:shadow-[2px_2px_0px_#ffffff]">
                         <Trophy className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 hidden lg:block">
-                        <h2 className="truncate text-xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
+                        <h2 className="truncate text-xl font-black tracking-tight text-zinc-900 dark:text-white sm:text-2xl">
                             Leaderboard
                         </h2>
                     </div>
@@ -201,7 +201,7 @@ export default function Leaderboard({ onClose }) {
                     <button
                         type="button"
                         onClick={() => setShowFilters((v) => !v)}
-                        className="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-50 dark:border-slate-700 dark:bg-slate-900 dark:text-blue-300 dark:hover:bg-slate-800 lg:hidden"
+                        className="inline-flex items-center gap-2 rounded-xl border border-zinc-900 bg-white px-3 py-2 text-sm font-bold text-blue-700 shadow-[2px_2px_0px_#18181b] hover:bg-blue-50 dark:border-white dark:bg-zinc-800 dark:text-blue-300 dark:shadow-[2px_2px_0px_#ffffff] lg:hidden cursor-pointer"
                     >
                         <Filter className="h-4 w-4" />
                         Filters
@@ -210,7 +210,7 @@ export default function Leaderboard({ onClose }) {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-blue-200 bg-white text-slate-500 transition-colors hover:bg-blue-50 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-900 bg-white text-zinc-700 shadow-[2px_2px_0px_#18181b] hover:bg-blue-50 hover:text-blue-700 dark:border-white dark:bg-zinc-800 dark:text-zinc-200 dark:shadow-[2px_2px_0px_#ffffff] cursor-pointer"
                             aria-label="Close leaderboard"
                         >
                             <X className="h-4 w-4" />
@@ -221,8 +221,8 @@ export default function Leaderboard({ onClose }) {
 
             <div className="grid gap-5 p-4 sm:p-6 lg:grid-cols-[300px_minmax(0,1fr)]">
                 <aside className={`${showFilters ? "block" : "hidden lg:block"} space-y-4`}>
-                    <div className="rounded-2xl border border-blue-100 bg-blue-50/60 p-4 dark:border-slate-800 dark:bg-slate-900/70">
-                        <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+                    <div className="rounded-xl border border-zinc-900 bg-blue-50/40 p-4 dark:border-white dark:bg-zinc-800/60 shadow-[2px_2px_0px_#18181b] dark:shadow-[2px_2px_0px_#ffffff]">
+                        <p className="mb-2 text-[11px] font-black uppercase tracking-[0.24em] text-zinc-600 dark:text-zinc-300">
                             Year
                         </p>
                         <div className="grid grid-cols-2 gap-2">
@@ -232,9 +232,9 @@ export default function Leaderboard({ onClose }) {
                                     <button
                                         key={y}
                                         onClick={() => setDraftYear(y === draftYear ? "" : y)}
-                                        className={`rounded-xl px-3 py-2.5 text-sm font-semibold transition-all ${active
-                                            ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25"
-                                            : "border border-blue-100 bg-white text-slate-700 hover:bg-blue-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-800"
+                                        className={`rounded-lg px-3 py-2 text-sm font-black transition-all cursor-pointer ${active
+                                            ? "bg-blue-600 text-white border border-zinc-900 dark:border-white shadow-[2px_2px_0px_#18181b] dark:shadow-[2px_2px_0px_#ffffff]"
+                                            : "border border-zinc-900 bg-white text-zinc-800 hover:bg-blue-50 dark:border-white dark:bg-zinc-800 dark:text-zinc-200"
                                             }`}
                                     >
                                         Year {y}
@@ -244,15 +244,15 @@ export default function Leaderboard({ onClose }) {
                         </div>
                     </div>
 
-                    <div className="rounded-2xl border border-blue-100 bg-blue-50/60 p-4 dark:border-slate-800 dark:bg-slate-900/70">
-                        <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+                    <div className="rounded-xl border border-zinc-900 bg-blue-50/40 p-4 dark:border-white dark:bg-zinc-800/60 shadow-[2px_2px_0px_#18181b] dark:shadow-[2px_2px_0px_#ffffff]">
+                        <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.24em] text-zinc-600 dark:text-zinc-300">
                             Department
                         </label>
                         <div className="relative">
                             <button
                                 type="button"
                                 onClick={() => setDeptOpen((v) => !v)}
-                                className="w-full flex items-center justify-between rounded-xl border border-blue-200 bg-white px-3 py-2.5 text-sm text-slate-700 shadow-sm transition hover:border-blue-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300"
+                                className="w-full flex items-center justify-between rounded-lg border border-zinc-900 bg-white px-3 py-2 text-sm font-bold text-zinc-800 shadow-[1px_1px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-zinc-100 cursor-pointer"
                             >
                                 <span className="truncate">
                                     {selectedDept?.name || "All Departments"}
@@ -264,13 +264,12 @@ export default function Leaderboard({ onClose }) {
 
                             {/* Dropdown */}
                             {deptOpen && (
-                                <div className="absolute z-50 mt-2 w-full rounded-xl border border-slate-200 bg-white shadow-lg dark:bg-slate-900 dark:border-slate-700 animate-in fade-in zoom-in-95">
-
+                                <div className="absolute z-50 mt-2 w-full rounded-xl border border-zinc-900 bg-white shadow-[4px_4px_0px_#18181b] dark:bg-[#111827] dark:border-white dark:shadow-[4px_4px_0px_#ffffff] animate-in fade-in zoom-in-95 overflow-hidden">
                                     {/* Search */}
                                     <input
                                         placeholder="Search department..."
                                         onChange={(e) => setDeptSearch(e.target.value)}
-                                        className="w-full border-b border-slate-200 px-3 py-2 text-sm outline-none dark:bg-slate-900 dark:border-slate-700"
+                                        className="w-full border-b border-zinc-900 px-3 py-2 text-sm font-bold outline-none dark:bg-zinc-800 dark:border-white text-zinc-900 dark:text-white"
                                     />
 
                                     {/* Options */}
@@ -282,9 +281,9 @@ export default function Leaderboard({ onClose }) {
                                                     setDraftDept(d.code);
                                                     setDeptOpen(false);
                                                 }}
-                                                className={`w-full flex items-center justify-between px-3 py-2 text-sm transition ${draftDept === d.code
-                                                    ? "bg-blue-50 text-blue-600 dark:bg-slate-800"
-                                                    : "text-slate-700 hover:bg-blue-50 dark:text-slate-300 dark:hover:bg-slate-800"
+                                                className={`w-full flex items-center justify-between px-3 py-2 text-sm font-semibold transition cursor-pointer ${draftDept === d.code
+                                                    ? "bg-blue-600 text-white font-black"
+                                                    : "text-zinc-700 hover:bg-blue-50 dark:text-zinc-200 dark:hover:bg-zinc-800"
                                                     }`}
                                             >
                                                 {d.name}
@@ -300,13 +299,13 @@ export default function Leaderboard({ onClose }) {
                             <button
                                 onClick={handleApply}
                                 disabled={!canApply || loading}
-                                className="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 disabled:text-white dark:bg-blue-600 dark:hover:bg-blue-500 dark:disabled:bg-slate-700 dark:disabled:text-slate-400"
+                                className="inline-flex w-full items-center justify-center rounded-xl border border-zinc-900 bg-blue-600 px-4 py-2.5 text-sm font-black text-white shadow-[2px_2px_0px_#18181b] hover:bg-blue-700 disabled:opacity-50 disabled:shadow-none dark:border-white dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer"
                             >
                                 Show Results
                             </button>
                             <button
                                 onClick={handleReset}
-                                className="w-full rounded-xl border border-blue-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-blue-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-800"
+                                className="w-full rounded-xl border border-zinc-900 bg-white px-4 py-2.5 text-sm font-bold text-zinc-700 shadow-[2px_2px_0px_#18181b] hover:bg-blue-50 dark:border-white dark:bg-zinc-800 dark:text-zinc-200 dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer"
                             >
                                 Reset
                             </button>
@@ -315,20 +314,20 @@ export default function Leaderboard({ onClose }) {
                 </aside>
 
                 <main className="space-y-4">
-                    <div className="grid gap-3 sm:grid-cols-3">
-                        <div className="rounded-2xl border border-blue-100 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/70">
-                            <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-blue-700/70 dark:text-blue-300/70">Year</p>
-                            <p className="mt-1 text-base font-bold text-slate-900 dark:text-white">{applied ? (appliedYear ? `Year ${appliedYear}` : "All") : "—"}</p>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[2px_2px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[2px_2px_0px_#ffffff]">
+                            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-blue-700 dark:text-blue-300">Year</p>
+                            <p className="mt-1 text-base font-black text-zinc-900 dark:text-white">{applied ? (appliedYear ? `Year ${appliedYear}` : "All") : "—"}</p>
                         </div>
-                        <div className="rounded-2xl border border-blue-100 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/70">
-                            <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-blue-700/70 dark:text-blue-300/70">Department</p>
-                            <p className="mt-1 truncate text-base font-bold text-slate-900 dark:text-white">{applied ? appliedDeptName : "—"}</p>
+                        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[2px_2px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[2px_2px_0px_#ffffff]">
+                            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-blue-700 dark:text-blue-300">Department</p>
+                            <p className="mt-1 truncate text-base font-black text-zinc-900 dark:text-white">{applied ? appliedDeptName : "—"}</p>
                         </div>
                     </div>
 
-                    <div className="rounded-2xl border border-blue-100 bg-white px-3 py-2.5 dark:border-slate-800 dark:bg-slate-900/70">
+                    <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[2px_2px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[2px_2px_0px_#ffffff]">
                         <div className="mb-2 flex items-center justify-between">
-                            <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-blue-700/70 dark:text-blue-300/70">
+                            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-blue-700 dark:text-blue-300">
                                 Year Averages
                             </p>
                             {avgLoading && <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-600 dark:text-blue-300" />}
@@ -337,78 +336,76 @@ export default function Leaderboard({ onClose }) {
                             {averageItems.map((item) => (
                                 <div
                                     key={item.key}
-                                    className="rounded-lg border border-blue-100 bg-blue-50/60 px-2 py-2 text-center dark:border-slate-700 dark:bg-slate-800/70"
+                                    className="rounded-lg border border-zinc-900 bg-blue-50/70 px-2 py-2 text-center dark:border-white dark:bg-zinc-800/80 shadow-[1px_1px_0px_#18181b] dark:shadow-[1px_1px_0px_#ffffff]"
                                 >
-                                    <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Year {item.label}</p>
-                                    <p className="mt-0.5 text-sm font-bold tabular-nums text-slate-900 dark:text-white">{item.value}</p>
+                                    <p className="text-[10px] font-bold text-zinc-600 dark:text-zinc-400">Year {item.label}</p>
+                                    <p className="mt-0.5 text-sm font-black tabular-nums text-zinc-900 dark:text-white">{item.value}</p>
                                 </div>
                             ))}
                         </div>
                     </div>
 
                     {loading ? (
-                        <div className="flex min-h-64 items-center justify-center rounded-3xl border border-blue-100 bg-white dark:border-slate-800 dark:bg-slate-900/60">
-                            <div className="flex flex-col items-center gap-2 text-blue-700 dark:text-blue-300">
+                        <div className="flex min-h-64 items-center justify-center rounded-2xl border border-zinc-900 bg-white shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
+                            <div className="flex flex-col items-center gap-2 text-blue-600 dark:text-blue-400 font-bold">
                                 <Loader2 className="h-6 w-6 animate-spin" />
                                 <p className="text-sm">Fetching leaderboard...</p>
                             </div>
                         </div>
                     ) : !applied ? (
-                        <div className="flex min-h-64 items-center justify-center rounded-3xl border border-dashed border-blue-200 bg-white p-6 text-center text-slate-500 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-400">
+                        <div className="flex min-h-64 items-center justify-center rounded-2xl border border-dashed border-zinc-900 bg-white p-6 text-center text-sm font-bold text-zinc-600 dark:border-white dark:bg-[#111827] dark:text-zinc-400">
                             Select a year or department and press Show Results.
                         </div>
                     ) : students?.length === 0 ? (
-                        <div className="flex min-h-64 items-center justify-center rounded-3xl border border-dashed border-blue-200 bg-white p-6 text-center text-slate-500 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-400">
+                        <div className="flex min-h-64 items-center justify-center rounded-2xl border border-dashed border-zinc-900 bg-white p-6 text-center text-sm font-bold text-zinc-600 dark:border-white dark:bg-[#111827] dark:text-zinc-400">
                             No students found for this filter.
                         </div>
                     ) : (
                         <>
                             <div className="space-y-3 sm:hidden">
                                 {students.map((s, i) => (
-                                    <article key={`${s.roll_no}-${i}`} className="rounded-2xl border border-blue-100 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
+                                    <article key={`${s.roll_no}-${i}`} className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[2px_2px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[2px_2px_0px_#ffffff]">
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="flex min-w-0 items-start gap-3">
-                                                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold ${getRankClass(i)}`}>
+                                                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-900 text-sm font-black shadow-[1px_1px_0px_#18181b] ${getRankClass(i)}`}>
                                                     {i + 1}
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">{s.student_name}</p>
-                                                    <p className="mt-1 text-[11px] font-medium tracking-wide text-slate-500 dark:text-slate-400">{s.roll_no}</p>
+                                                    <p className="truncate text-sm font-black text-zinc-900 dark:text-white">{s.student_name}</p>
+                                                    <p className="mt-1 font-mono text-[11px] font-bold tracking-wide text-zinc-500 dark:text-zinc-400">{s.roll_no}</p>
                                                 </div>
                                             </div>
-                                            <p className="text-sm font-bold tabular-nums text-blue-700 dark:text-blue-300">{s.balance_points}</p>
+                                            <p className="text-sm font-black tabular-nums text-blue-600 dark:text-blue-400">{s.balance_points}</p>
                                         </div>
-                                        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">{s.department}</p>
+                                        <p className="mt-3 text-xs font-semibold text-zinc-600 dark:text-zinc-400">{s.department}</p>
                                     </article>
                                 ))}
                             </div>
 
-                            <div className="hidden rounded-2xl border border-blue-100 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:block">
-    
-    <div className="max-h-105 overflow-y-auto overflow-x-auto scrollbar-thin scrollbar-thumb-blue-300 dark:scrollbar-thumb-slate-700">
-        
-        <table className="w-full text-left">
-                                        <thead className="bg-blue-50 dark:bg-slate-900 sticky top-0 z-10">
+                            <div className="hidden rounded-xl border border-zinc-900 bg-white shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff] sm:block overflow-hidden">
+                                <div className="max-h-105 overflow-y-auto overflow-x-auto scrollbar-thin scrollbar-thumb-blue-600">
+                                    <table className="w-full text-left">
+                                        <thead className="bg-blue-50/70 border-b border-zinc-900 dark:bg-zinc-800/80 dark:border-white sticky top-0 z-10">
                                             <tr>
-                                                <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Rank</th>
-                                                <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Student</th>
-                                                <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Roll No</th>
-                                                <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Department</th>
-                                                <th className="px-4 py-3 text-right text-[11px] font-bold uppercase tracking-[0.24em] text-blue-700 dark:text-blue-300">Points</th>
+                                                <th className="px-4 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-zinc-900 dark:text-white">Rank</th>
+                                                <th className="px-4 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-zinc-900 dark:text-white">Student</th>
+                                                <th className="px-4 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-zinc-900 dark:text-white">Roll No</th>
+                                                <th className="px-4 py-3 text-[11px] font-black uppercase tracking-[0.24em] text-zinc-900 dark:text-white">Department</th>
+                                                <th className="px-4 py-3 text-right text-[11px] font-black uppercase tracking-[0.24em] text-blue-600 dark:text-blue-400">Points</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
                                             {students.map((s, i) => (
-                                                <tr key={`${s.roll_no}-${i}`} className="border-t border-blue-100 transition-colors hover:bg-blue-50/60 dark:border-slate-800 dark:hover:bg-slate-800/40">
+                                                <tr key={`${s.roll_no}-${i}`} className="transition-colors hover:bg-blue-50/40 dark:hover:bg-zinc-800/40">
                                                     <td className="px-4 py-3">
-                                                        <span className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold ${getRankClass(i)}`}>
+                                                        <span className={`inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-900 text-xs font-black shadow-[1px_1px_0px_#18181b] ${getRankClass(i)}`}>
                                                             {i + 1}
                                                         </span>
                                                     </td>
-                                                    <td className="px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white">{s.student_name}</td>
-                                                    <td className="px-4 py-3 font-mono text-sm text-slate-500 dark:text-slate-400">{s.roll_no}</td>
-                                                    <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">{s.department}</td>
-                                                    <td className="px-4 py-3 text-right text-sm font-bold tabular-nums text-blue-700 dark:text-blue-300">{s.balance_points}</td>
+                                                    <td className="px-4 py-3 text-sm font-bold text-zinc-900 dark:text-white">{s.student_name}</td>
+                                                    <td className="px-4 py-3 font-mono text-xs font-bold text-zinc-600 dark:text-zinc-400">{s.roll_no}</td>
+                                                    <td className="px-4 py-3 text-xs font-semibold text-zinc-700 dark:text-zinc-300">{s.department}</td>
+                                                    <td className="px-4 py-3 text-right text-sm font-black tabular-nums text-blue-600 dark:text-blue-400">{s.balance_points}</td>
                                                 </tr>
                                             ))}
                                         </tbody>

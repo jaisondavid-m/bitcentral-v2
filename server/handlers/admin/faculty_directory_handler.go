@@ -643,7 +643,7 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 
 	// If using faculty_details or facutly_details
 	if tableName == "faculty_details" || tableName == "facutly_details" {
-		whereClause := "WHERE 1=1"
+		whereClause := "WHERE d.phone_number IS NOT NULL AND d.phone_number != 0 AND TRIM(CAST(d.phone_number AS CHAR)) != ''"
 		var args []interface{}
 
 		if searchQuery != "" {
@@ -672,11 +672,12 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 			totalPages = 0
 		}
 
-		// Fetch department names & counts for filter dropdown
+		// Fetch department names & counts for filter dropdown (only members with phone)
 		deptRows, deptErr := h.DB.Query(fmt.Sprintf(`
 			SELECT COALESCE(NULLIF(TRIM(department), ''), 'Faculty & Staff') AS dept_name, COUNT(*) AS count
 			FROM %s
 			WHERE department IS NOT NULL AND department != ''
+			  AND phone_number IS NOT NULL AND phone_number != 0 AND TRIM(CAST(phone_number AS CHAR)) != ''
 			GROUP BY dept_name
 			ORDER BY dept_name ASC
 		`, tableName))
@@ -800,7 +801,8 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 		AND LOWER(email) NOT LIKE '%parent%' 
 		AND LOWER(email) NOT LIKE '%parents%'
 		AND LOWER(email) NOT REGEXP '\\.[a-z]{2,4}[0-9]{2}@'
-		AND (LOWER(email) LIKE '%bitsathy.ac.in' OR LOWER(email) LIKE '%bitsathy.in')`
+		AND (LOWER(email) LIKE '%bitsathy.ac.in' OR LOWER(email) LIKE '%bitsathy.in')
+		AND phone IS NOT NULL AND TRIM(phone) != '' AND TRIM(phone) != '0'`
 	var args []interface{}
 
 	if searchQuery != "" {
@@ -836,6 +838,7 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 			AND LOWER(email) NOT LIKE '%parents%'
 			AND LOWER(email) NOT REGEXP '\\.[a-z]{2,4}[0-9]{2}@'
 			AND (LOWER(email) LIKE '%bitsathy.ac.in' OR LOWER(email) LIKE '%bitsathy.in')
+			AND phone IS NOT NULL AND TRIM(phone) != '' AND TRIM(phone) != '0'
 		GROUP BY dept_name
 		ORDER BY dept_name ASC
 	`)

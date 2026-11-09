@@ -96,7 +96,7 @@ function SearchableDeptDropdown({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-left text-sm font-semibold text-slate-800 shadow-xs transition-all hover:bg-slate-50 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800/80 cursor-pointer"
+        className="flex w-full items-center justify-between gap-2 rounded-xl border border-zinc-900 bg-white px-4 py-3 text-left text-sm font-black text-zinc-900 shadow-[2px_2px_0px_#18181b] transition-all hover:bg-blue-50/50 dark:border-white dark:bg-[#111827] dark:text-white dark:shadow-[2px_2px_0px_#ffffff] cursor-pointer"
       >
         <div className="flex items-center gap-2.5 truncate">
           <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0" />
@@ -104,7 +104,7 @@ function SearchableDeptDropdown({
             {selected && selected !== "ALL" ? currentDept?.name : "All Departments"}
           </span>
           {currentDept?.count !== undefined && (
-            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-bold text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 shrink-0">
+            <span className="rounded-md border border-zinc-900 bg-blue-100 px-2 py-0.5 text-[11px] font-black text-blue-900 dark:border-white dark:bg-blue-900/60 dark:text-blue-100 shrink-0">
               {currentDept.count}
             </span>
           )}
@@ -118,13 +118,13 @@ function SearchableDeptDropdown({
                 onSelect("ALL");
               }}
               title="Clear department filter"
-              className="rounded-full p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-700 dark:hover:bg-slate-700 dark:hover:text-white cursor-pointer"
+              className="rounded-md p-1 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 dark:hover:bg-zinc-700 dark:hover:text-white cursor-pointer"
             >
               <X className="h-3.5 w-3.5" />
             </span>
           )}
           <ChevronDown
-            className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${
+            className={`h-4 w-4 text-zinc-500 transition-transform duration-200 ${
               isOpen ? "rotate-180 text-blue-600 dark:text-blue-400" : ""
             }`}
           />
@@ -132,22 +132,22 @@ function SearchableDeptDropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-full min-w-[280px] overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl dark:border-slate-800 dark:bg-slate-900 animate-in fade-in zoom-in-95 duration-150">
-          <div className="relative mb-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-950">
-            <Search className="h-4 w-4 text-slate-400 shrink-0 mr-2" />
+        <div className="absolute right-0 top-full z-50 mt-2 w-full min-w-[280px] overflow-hidden rounded-xl border border-zinc-900 bg-white p-2 shadow-[4px_4px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[4px_4px_0px_#ffffff] animate-in fade-in zoom-in-95 duration-150">
+          <div className="relative mb-2 flex items-center rounded-lg border border-zinc-900 bg-zinc-50 px-3 py-2 dark:border-white dark:bg-zinc-900">
+            <Search className="h-4 w-4 text-zinc-400 shrink-0 mr-2" />
             <input
               ref={searchInputRef}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={placeholder}
-              className="w-full bg-transparent text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none dark:text-white"
+              className="w-full bg-transparent text-xs font-bold text-zinc-900 placeholder-zinc-400 focus:outline-none dark:text-white"
             />
             {query && (
               <button
                 type="button"
                 onClick={() => setQuery("")}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                className="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -156,7 +156,7 @@ function SearchableDeptDropdown({
 
           <div className="max-h-60 overflow-y-auto space-y-1 pr-1 scrollbar-thin">
             {filteredDepts.length === 0 ? (
-              <div className="py-4 text-center text-xs text-slate-400 italic">
+              <div className="py-4 text-center text-xs text-zinc-400 font-bold italic">
                 No matching departments found
               </div>
             ) : (
@@ -171,19 +171,19 @@ function SearchableDeptDropdown({
                       setIsOpen(false);
                       setQuery("");
                     }}
-                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs transition cursor-pointer ${
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition cursor-pointer ${
                       isSelected
-                        ? "bg-blue-600 text-white font-bold shadow-xs"
-                        : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800/70"
+                        ? "bg-blue-600 text-white font-black border border-zinc-900 dark:border-white shadow-[1px_1px_0px_#18181b] dark:shadow-[1px_1px_0px_#ffffff]"
+                        : "text-zinc-700 font-bold hover:bg-blue-50/50 dark:text-zinc-200 dark:hover:bg-zinc-800/70"
                     }`}
                   >
                     <span className="truncate pr-2">{dept.name}</span>
                     <div className="flex items-center gap-1.5 shrink-0">
                       <span
-                        className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold ${
+                        className={`rounded-md px-1.5 py-0.5 text-[10px] font-black ${
                           isSelected
-                            ? "bg-blue-700 text-white"
-                            : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                            ? "bg-blue-800 text-white"
+                            : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
                         }`}
                       >
                         {dept.count}
@@ -283,6 +283,12 @@ export default function FacultyDirectory() {
     setPage(1);
   };
 
+  const phoneOnlyFaculty = useMemo(() => {
+    return faculty.filter(
+      (member) => Boolean(member.phone && member.phone.trim() && member.phone.trim() !== "0")
+    );
+  }, [faculty]);
+
   const departmentOptions = useMemo(() => {
     if (departments.length > 0) {
       const totalAll = departments.reduce((sum, d) => sum + (d.count || 0), 0);
@@ -298,7 +304,7 @@ export default function FacultyDirectory() {
     }
 
     const counts = {};
-    faculty.forEach((member) => {
+    phoneOnlyFaculty.forEach((member) => {
       const dept = (member.department || "Other").trim();
       if (dept) {
         counts[dept] = (counts[dept] || 0) + 1;
@@ -314,10 +320,10 @@ export default function FacultyDirectory() {
       .sort((a, b) => a.name.localeCompare(b.name));
 
     return [
-      { id: "ALL", name: "All Departments", count: totalRecords || faculty.length },
+      { id: "ALL", name: "All Departments", count: totalRecords || phoneOnlyFaculty.length },
       ...list,
     ];
-  }, [departments, faculty, totalRecords]);
+  }, [departments, phoneOnlyFaculty, totalRecords]);
 
   const getPageNumbers = (current, total) => {
     if (total <= 7) {
@@ -333,19 +339,19 @@ export default function FacultyDirectory() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 px-3 py-4 dark:bg-slate-950 sm:px-6 sm:py-8 lg:px-8">
+    <div className="min-h-[calc(100vh-4rem)] bg-[#f8fafc] px-3 py-4 dark:bg-[#090d16] text-zinc-900 dark:text-zinc-50 transition-colors sm:px-6 sm:py-8 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Page Title & Count */}
         <div className="mb-3.5 flex items-center justify-between sm:mb-6">
-          <h1 className="text-xl font-bold text-slate-900 dark:text-white sm:text-3xl">
+          <h1 className="text-xl font-black text-zinc-900 dark:text-white sm:text-3xl tracking-tight">
             Faculty Directory
           </h1>
-          <span className="rounded-full bg-slate-200/80 px-2.5 py-0.5 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300 sm:bg-transparent sm:p-0 sm:text-sm sm:text-slate-500 dark:sm:text-slate-400">
+          <span className="inline-flex items-center rounded-lg border border-zinc-900 bg-white px-2.5 py-1 text-xs font-black shadow-[2px_2px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-white dark:shadow-[2px_2px_0px_#ffffff]">
             {totalRecords > 0
               ? `Showing ${Math.min((page - 1) * limit + 1, totalRecords)}-${Math.min(
                   page * limit,
                   totalRecords
-                )} of ${totalRecords} Members`
+                )} of ${totalRecords}`
               : "0 Members"}
           </span>
         </div>
@@ -353,19 +359,19 @@ export default function FacultyDirectory() {
         {/* Search & Searchable Department Dropdown Filter */}
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 sm:left-4 sm:h-5 sm:w-5" />
+            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 sm:left-4 sm:h-5 sm:w-5" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name, email, department, or phone..."
-              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-9 text-xs font-medium text-slate-900 shadow-2xs transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:focus:border-blue-500 sm:rounded-2xl sm:py-3.5 sm:pl-12 sm:pr-10 sm:text-sm"
+              className="w-full rounded-xl border border-zinc-900 bg-white py-2.5 pl-10 pr-9 text-xs font-bold text-zinc-900 shadow-[2px_2px_0px_#18181b] transition-all focus:border-blue-600 focus:outline-none dark:border-white dark:bg-[#111827] dark:text-white dark:shadow-[2px_2px_0px_#ffffff] sm:rounded-xl sm:py-3.5 sm:pl-12 sm:pr-10 sm:text-sm placeholder-zinc-400"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200 cursor-pointer"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 cursor-pointer"
               >
                 <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </button>
@@ -386,36 +392,36 @@ export default function FacultyDirectory() {
             {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={i}
-                className="animate-pulse rounded-xl border border-slate-200 bg-white p-3.5 dark:border-slate-800 dark:bg-slate-900 sm:rounded-2xl sm:p-5"
+                className="animate-pulse rounded-xl border border-zinc-900 bg-white p-3.5 shadow-[2px_2px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[2px_2px_0px_#ffffff] sm:rounded-2xl sm:p-5"
               >
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="h-11 w-11 rounded-xl bg-slate-200 dark:bg-slate-800 sm:h-14 sm:w-14 sm:rounded-2xl" />
+                  <div className="h-11 w-11 rounded-xl bg-zinc-200 dark:bg-zinc-800 sm:h-14 sm:w-14 sm:rounded-2xl" />
                   <div className="flex-1 space-y-1.5 sm:space-y-2">
-                    <div className="h-3.5 w-3/4 rounded bg-slate-200 dark:bg-slate-800 sm:h-4" />
-                    <div className="h-2.5 w-1/2 rounded bg-slate-200 dark:bg-slate-800 sm:h-3" />
+                    <div className="h-3.5 w-3/4 rounded bg-zinc-200 dark:bg-zinc-800 sm:h-4" />
+                    <div className="h-2.5 w-1/2 rounded bg-zinc-200 dark:bg-zinc-800 sm:h-3" />
                   </div>
                 </div>
                 <div className="mt-3 space-y-1.5 sm:mt-4 sm:space-y-2">
-                  <div className="h-2.5 w-full rounded bg-slate-200 dark:bg-slate-800 sm:h-3" />
-                  <div className="h-2.5 w-2/3 rounded bg-slate-200 dark:bg-slate-800 sm:h-3" />
+                  <div className="h-2.5 w-full rounded bg-zinc-200 dark:bg-zinc-800 sm:h-3" />
+                  <div className="h-2.5 w-2/3 rounded bg-zinc-200 dark:bg-zinc-800 sm:h-3" />
                 </div>
               </div>
             ))}
           </div>
-        ) : faculty.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center dark:border-slate-800 dark:bg-slate-900 sm:rounded-3xl sm:p-12">
-            <Users className="mx-auto h-10 w-10 text-slate-400 dark:text-slate-600 sm:h-12 sm:w-12" />
-            <h3 className="mt-3 text-sm font-semibold text-slate-900 dark:text-white sm:mt-4 sm:text-base">
+        ) : phoneOnlyFaculty.length === 0 ? (
+          <div className="rounded-2xl border border-zinc-900 bg-white p-8 text-center shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff] sm:rounded-3xl sm:p-12">
+            <Users className="mx-auto h-10 w-10 text-zinc-400 dark:text-zinc-600 sm:h-12 sm:w-12" />
+            <h3 className="mt-3 text-sm font-black text-zinc-900 dark:text-white sm:mt-4 sm:text-base">
               No Faculty Contacts Found
             </h3>
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
+            <p className="mt-1 text-xs font-semibold text-zinc-600 dark:text-zinc-400 sm:text-sm">
               Try adjusting your search query or department filter.
             </p>
           </div>
         ) : (
           <>
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
-              {faculty.map((member) => {
+              {phoneOnlyFaculty.map((member) => {
               const avatarColor = getAvatarColor(member.name);
               const initials = getInitials(member.name);
               const isCopied = copiedId === member.id;
@@ -423,7 +429,7 @@ export default function FacultyDirectory() {
               return (
                 <div
                   key={member.id || member.email}
-                  className="group relative flex flex-col justify-between overflow-hidden rounded-xl border border-slate-200/90 bg-white p-3.5 shadow-2xs transition-all hover:-translate-y-0.5 hover:shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 sm:rounded-2xl sm:p-5 sm:hover:-translate-y-1 sm:hover:shadow-md"
+                  className="group relative flex flex-col justify-between overflow-hidden rounded-xl border border-zinc-900 bg-white p-3.5 shadow-[3px_3px_0px_#18181b] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff] sm:rounded-2xl sm:p-5"
                 >
                   <div>
                     <div className="flex items-start gap-3 sm:gap-4">
@@ -500,7 +506,7 @@ export default function FacultyDirectory() {
                     <div className="mt-2.5 pt-1 sm:mt-4 sm:pt-2">
                       <button
                         onClick={() => setActiveCallModal(member)}
-                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-50 py-2 text-[11px] font-semibold text-blue-600 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-900/60 transition-all cursor-pointer active:scale-[0.98] sm:rounded-xl sm:py-2.5 sm:text-xs"
+                        className="flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-900 bg-blue-600 py-2 text-xs font-bold text-white shadow-[2px_2px_0px_#18181b] hover:bg-blue-700 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer sm:py-2.5"
                       >
                         <PhoneCall className="h-3.5 w-3.5" />
                         Call Faculty
@@ -514,10 +520,10 @@ export default function FacultyDirectory() {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-2xs dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:px-6 sm:py-4">
-              <div className="text-xs font-medium text-slate-600 dark:text-slate-400 sm:text-sm">
-                Page <span className="font-semibold text-slate-900 dark:text-white">{page}</span> of{" "}
-                <span className="font-semibold text-slate-900 dark:text-white">{totalPages}</span>
+            <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff] sm:flex-row sm:px-6 sm:py-4">
+              <div className="text-xs font-bold text-zinc-600 dark:text-zinc-400 sm:text-sm">
+                Page <span className="font-black text-zinc-900 dark:text-white">{page}</span> of{" "}
+                <span className="font-black text-zinc-900 dark:text-white">{totalPages}</span>
               </div>
 
               <div className="flex items-center gap-1.5 sm:gap-2">
@@ -528,7 +534,7 @@ export default function FacultyDirectory() {
                     setPage((p) => Math.max(1, p - 1));
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+                  className="flex items-center justify-center rounded-lg border border-zinc-900 bg-white p-2 text-zinc-900 shadow-[1px_1px_0px_#18181b] hover:bg-blue-50/50 disabled:opacity-40 disabled:hover:bg-white dark:border-white dark:bg-zinc-800 dark:text-white dark:shadow-[1px_1px_0px_#ffffff] transition-all cursor-pointer"
                   title="Previous Page"
                 >
                   <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -538,7 +544,7 @@ export default function FacultyDirectory() {
                   pNum === "..." ? (
                     <span
                       key={`ellipsis-${idx}`}
-                      className="px-2 text-xs font-medium text-slate-400 dark:text-slate-600 sm:text-sm"
+                      className="px-2 text-xs font-black text-zinc-400 dark:text-zinc-500 sm:text-sm"
                     >
                       ...
                     </span>
@@ -551,10 +557,10 @@ export default function FacultyDirectory() {
                         setPage(pNum);
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      className={`h-8 min-w-[32px] rounded-xl text-xs font-semibold sm:h-10 sm:min-w-[40px] sm:text-sm transition-colors cursor-pointer ${
+                      className={`h-8 min-w-[32px] rounded-lg text-xs font-black sm:h-10 sm:min-w-[40px] sm:text-sm transition-all cursor-pointer ${
                         page === pNum
-                          ? "bg-blue-600 text-white shadow-xs dark:bg-blue-500"
-                          : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                          ? "bg-blue-600 text-white border border-zinc-900 shadow-[2px_2px_0px_#18181b] dark:border-white dark:shadow-[2px_2px_0px_#ffffff]"
+                          : "border border-zinc-900 bg-white text-zinc-900 shadow-[1px_1px_0px_#18181b] hover:bg-blue-50/50 dark:border-white dark:bg-zinc-800 dark:text-white dark:shadow-[1px_1px_0px_#ffffff]"
                       }`}
                     >
                       {pNum}
@@ -569,7 +575,7 @@ export default function FacultyDirectory() {
                     setPage((p) => Math.min(totalPages, p + 1));
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+                  className="flex items-center justify-center rounded-lg border border-zinc-900 bg-white p-2 text-zinc-900 shadow-[1px_1px_0px_#18181b] hover:bg-blue-50/50 disabled:opacity-40 disabled:hover:bg-white dark:border-white dark:bg-zinc-800 dark:text-white dark:shadow-[1px_1px_0px_#ffffff] transition-all cursor-pointer"
                   title="Next Page"
                 >
                   <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -583,19 +589,19 @@ export default function FacultyDirectory() {
         {/* Big Confirmation Call Modal */}
         {activeCallModal && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 p-4 backdrop-blur-md transition-all animate-in fade-in duration-200"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/70 p-4 backdrop-blur-xs transition-all animate-in fade-in duration-200"
             onClick={() => setActiveCallModal(null)}
           >
             <div
-              className="relative w-full max-w-md scale-100 overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl transition-all dark:border-slate-800 dark:bg-slate-900 sm:p-8"
+              className="relative w-full max-w-md scale-100 overflow-hidden rounded-2xl border border-zinc-900 bg-white p-6 shadow-[5px_5px_0px_#18181b] transition-all dark:border-white dark:bg-[#111827] dark:shadow-[5px_5px_0px_#ffffff] sm:p-8"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
               <button
                 onClick={() => setActiveCallModal(null)}
-                className="absolute right-4 top-4 rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                className="absolute right-4 top-4 rounded-lg border border-zinc-900 p-1.5 text-zinc-700 hover:bg-zinc-100 dark:border-white dark:text-zinc-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
 
               {/* Faculty Big Picture & Details */}
@@ -608,51 +614,51 @@ export default function FacultyDirectory() {
                       e.target.style.display = "none";
                       if (e.target.nextSibling) e.target.nextSibling.style.display = "flex";
                     }}
-                    className="h-28 w-28 rounded-3xl object-cover shadow-lg ring-4 ring-blue-500/20"
+                    className="h-28 w-28 rounded-2xl border border-zinc-900 object-cover shadow-[3px_3px_0px_#18181b] dark:border-white dark:shadow-[3px_3px_0px_#ffffff]"
                   />
                 ) : null}
                 <div
                   style={{ display: activeCallModal.photo_url ? "none" : "flex" }}
-                  className={`h-28 w-28 items-center justify-center rounded-3xl text-3xl font-bold text-white shadow-lg ring-4 ring-blue-500/20 ${getAvatarColor(
+                  className={`h-28 w-28 items-center justify-center rounded-2xl border border-zinc-900 text-3xl font-black text-white shadow-[3px_3px_0px_#18181b] dark:border-white dark:shadow-[3px_3px_0px_#ffffff] ${getAvatarColor(
                     activeCallModal.name
                   )}`}
                 >
                   {getInitials(activeCallModal.name)}
                 </div>
 
-                <h2 className="mt-4 text-xl font-bold text-slate-900 dark:text-white sm:text-2xl">
+                <h2 className="mt-4 text-xl font-black text-zinc-900 dark:text-white sm:text-2xl">
                   {activeCallModal.name}
                 </h2>
 
-                <div className="mt-1.5 inline-flex max-w-full items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 dark:bg-blue-950/60 dark:text-blue-300 min-w-0">
+                <div className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-md border border-zinc-900 bg-blue-100 px-3 py-1 text-xs font-black text-blue-900 dark:border-white dark:bg-blue-900/60 dark:text-blue-100 shadow-[1px_1px_0px_#18181b] dark:shadow-[1px_1px_0px_#ffffff] min-w-0">
                   <Building2 className="h-3.5 w-3.5 shrink-0" />
                   <span className="truncate">{activeCallModal.department || "Faculty & Staff"}</span>
                 </div>
 
                 {activeCallModal.job_title && activeCallModal.job_title !== "Faculty / Staff" && (
-                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  <p className="mt-1 text-xs font-bold text-zinc-500 dark:text-zinc-400">
                     {activeCallModal.job_title}
                   </p>
                 )}
 
                 {activeCallModal.email && (
-                  <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
-                    <Mail className="h-3.5 w-3.5 text-slate-400" />
+                  <div className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+                    <Mail className="h-3.5 w-3.5 text-zinc-400" />
                     <span>{activeCallModal.email}</span>
                   </div>
                 )}
 
                 {/* Big Phone Number Box */}
-                <div className="mt-6 flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-800/60">
+                <div className="mt-6 flex w-full items-center justify-between rounded-xl border border-zinc-900 bg-blue-50/70 p-4 dark:border-white dark:bg-zinc-800/80 shadow-[2px_2px_0px_#18181b] dark:shadow-[2px_2px_0px_#ffffff]">
                   <div className="flex items-center gap-3">
-                    <div className="rounded-xl bg-blue-600/10 p-2 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400">
+                    <div className="rounded-lg border border-zinc-900 bg-blue-600 p-2 text-white dark:border-white shadow-[1px_1px_0px_#18181b] dark:shadow-[1px_1px_0px_#ffffff]">
                       <Phone className="h-5 w-5" />
                     </div>
                     <div className="text-left">
-                      <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                      <div className="text-[10px] font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                         Phone Number
                       </div>
-                      <div className="font-mono text-base font-bold text-slate-900 dark:text-white">
+                      <div className="font-mono text-base font-black text-zinc-900 dark:text-white">
                         {activeCallModal.phone}
                       </div>
                     </div>
@@ -661,10 +667,10 @@ export default function FacultyDirectory() {
                   <button
                     onClick={() => handleCopyPhone(activeCallModal.phone, activeCallModal.id)}
                     title="Copy phone number"
-                    className="rounded-xl border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors"
+                    className="rounded-lg border border-zinc-900 bg-white p-2 text-zinc-700 hover:bg-zinc-100 dark:border-white dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 shadow-[1px_1px_0px_#18181b] dark:shadow-[1px_1px_0px_#ffffff] transition-all cursor-pointer"
                   >
                     {copiedId === activeCallModal.id ? (
-                      <Check className="h-4 w-4 text-emerald-500" />
+                      <Check className="h-4 w-4 text-emerald-600" />
                     ) : (
                       <Copy className="h-4 w-4" />
                     )}
@@ -672,7 +678,7 @@ export default function FacultyDirectory() {
                 </div>
 
                 {/* Confirmation Notice */}
-                <div className="mt-4 flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-left text-xs text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/60 dark:border-amber-900/50">
+                <div className="mt-4 flex items-start gap-2 rounded-xl border border-zinc-900 bg-amber-50 p-3 text-left text-xs font-bold text-amber-950 dark:border-white dark:bg-amber-950/60 dark:text-amber-200 shadow-[2px_2px_0px_#18181b] dark:shadow-[2px_2px_0px_#ffffff]">
                   <AlertCircle className="h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
                   <span>
                     Please confirm before placing the call. Only contact faculty during official working hours for academic queries.
@@ -684,7 +690,7 @@ export default function FacultyDirectory() {
                   <button
                     type="button"
                     onClick={() => setActiveCallModal(null)}
-                    className="flex-1 rounded-2xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                    className="flex-1 rounded-xl border border-zinc-900 bg-white py-2.5 text-xs sm:text-sm font-black text-zinc-800 hover:bg-zinc-100 dark:border-white dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 shadow-[2px_2px_0px_#18181b] dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -692,7 +698,7 @@ export default function FacultyDirectory() {
                   <a
                     href={`tel:${activeCallModal.phone}`}
                     onClick={() => setActiveCallModal(null)}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:from-emerald-700 hover:to-teal-700 transition-all cursor-pointer active:scale-[0.98]"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-900 bg-emerald-600 py-2.5 text-xs sm:text-sm font-black text-white shadow-[2px_2px_0px_#18181b] hover:bg-emerald-700 dark:border-white dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer"
                   >
                     <PhoneCall className="h-4 w-4" />
                     Call Now

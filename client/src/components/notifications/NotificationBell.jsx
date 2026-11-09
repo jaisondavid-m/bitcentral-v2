@@ -203,7 +203,7 @@ export default function NotificationBell({ className = "" }) {
             return next;
           });
         }}
-        className="relative flex items-center justify-center h-9 w-9 rounded-full border border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/40 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/40"
+        className="relative flex items-center justify-center h-9 w-9 rounded-lg border border-[#0a0a0a] bg-white text-[#0a0a0a] shadow-[2px_2px_0px_#0a0a0a] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_#0a0a0a] hover:bg-[#eff6ff] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none dark:border-white dark:bg-[#1e293b] dark:text-white dark:hover:bg-[#334155] dark:shadow-[2px_2px_0px_#ffffff] transition-all duration-150 focus:outline-none"
         aria-label="Open notifications"
         title="Notifications"
       >
@@ -211,9 +211,9 @@ export default function NotificationBell({ className = "" }) {
 
         {/* Unread badge */}
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-black text-white shadow-sm ring-2 ring-blue-600 dark:ring-black animate-in zoom-in duration-200">
+          <span className="absolute -top-1.5 -right-1.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-md bg-rose-500 px-1 text-[10px] font-black text-white border border-[#0a0a0a] dark:border-white shadow-none animate-in zoom-in duration-200">
             {unreadCount > 99 ? "99+" : unreadCount}
-            <span className="absolute inset-0 rounded-full bg-rose-400 animate-ping opacity-75" />
+            <span className="absolute inset-0 rounded-md bg-rose-400 animate-ping opacity-75" />
           </span>
         )}
       </button>
@@ -224,7 +224,7 @@ export default function NotificationBell({ className = "" }) {
           <>
             {/* Backdrop for mobile */}
             <div
-              className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-xs md:hidden"
+              className="fixed inset-0 z-40 bg-[#0a0a0a]/60 backdrop-blur-xs md:hidden"
               onClick={() => setIsOpen(false)}
             />
 
@@ -234,21 +234,21 @@ export default function NotificationBell({ className = "" }) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -8 }}
               transition={{ duration: 0.18, ease: "easeOut" }}
-              className="fixed inset-x-3 top-16 z-50 mx-auto max-w-md rounded-3xl border border-slate-200/90 bg-white/95 p-4 shadow-2xl backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/95 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[420px] sm:max-w-none text-left"
+              className="fixed inset-x-3 top-16 z-50 mx-auto max-w-md rounded-xl border border-[#0a0a0a] bg-white p-4 shadow-[6px_6px_0px_#0a0a0a] dark:border-white dark:bg-[#090d16] dark:shadow-[6px_6px_0px_#ffffff] sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[420px] sm:max-w-none text-left"
             >
               {/* Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-between pb-3 border-b border-[#0a0a0a] dark:border-white">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#0a0a0a] bg-[#3b82f6] text-white shadow-[1.5px_1.5px_0px_#0a0a0a] dark:border-white dark:shadow-[1.5px_1.5px_0px_#ffffff]">
                     <Bell className="h-4 w-4" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                      <h3 className="text-sm font-black text-slate-900 dark:text-white">
                         Notifications
                       </h3>
                       {unreadCount > 0 && (
-                        <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">
+                        <span className="rounded-md border border-[#0a0a0a] bg-rose-100 px-2 py-0.5 text-[10px] font-black text-rose-700 dark:border-white dark:bg-rose-950 dark:text-rose-200">
                           {unreadCount} new
                         </span>
                       )}

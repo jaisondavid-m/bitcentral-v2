@@ -152,22 +152,22 @@ const ExamHallMembers = () => {
 
   return (
     <div className={isDark ? "dark" : ""}>
-      <div className="min-h-screen bg-[#EEF4FF] px-4 py-6 md:py-8 dark:bg-[#080F1E] text-slate-800 dark:text-slate-100 transition-colors">
+      <div className="min-h-[calc(100vh-4rem)] bg-[#f8fafc] px-4 py-6 md:py-8 dark:bg-[#090d16] text-zinc-900 dark:text-zinc-50 transition-colors">
         <div className="mx-auto max-w-5xl space-y-4">
           {/* ── Top Navigation & Title Bar ── */}
-          <div className="overflow-hidden rounded-2xl border border-blue-100 bg-white p-4 shadow-sm dark:border-blue-900/30 dark:bg-[#0F1C33]">
+          <div className="overflow-hidden rounded-2xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-blue-200 bg-white px-3 py-1.5 text-xs font-semibold text-blue-700 shadow-xs transition-all hover:bg-blue-50 active:scale-95 cursor-pointer dark:border-blue-800/60 dark:bg-slate-900 dark:text-blue-300 dark:hover:bg-slate-800"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-900 bg-white px-3 py-1.5 text-xs font-black text-blue-700 shadow-[2px_2px_0px_#18181b] hover:bg-blue-50 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer dark:border-white dark:bg-zinc-800 dark:text-blue-300 dark:shadow-[2px_2px_0px_#ffffff] transition-all"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 <span>Back to Schedule</span>
               </button>
 
               <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 shrink-0 flex-col items-center justify-center rounded-xl bg-blue-600 shadow-xs">
+                <div className="flex h-9 w-9 shrink-0 flex-col items-center justify-center rounded-xl border border-zinc-900 bg-blue-600 text-white shadow-[1.5px_1.5px_0px_#18181b] dark:border-white">
                   <span className="text-[11px] font-black leading-none text-white">BIT</span>
                   <span className="text-[6.5px] font-bold leading-none text-blue-200">SATHY</span>
                 </div>
@@ -186,7 +186,7 @@ const ExamHallMembers = () => {
 
           {/* ── Loading State ── */}
           {loading && (
-            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-blue-100 bg-white py-20 dark:border-blue-900/30 dark:bg-[#0F1C33]">
+            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-zinc-900 bg-white py-20 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
               <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-400" />
               <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
                 Loading students seated in {hallParam || "hall"}...
@@ -196,7 +196,7 @@ const ExamHallMembers = () => {
 
           {/* ── Error State ── */}
           {!loading && error && (
-            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-red-200 bg-white p-8 text-center dark:border-red-900/40 dark:bg-[#0F1C33]">
+            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-red-500 bg-white p-8 text-center shadow-[3px_3px_0px_#18181b] dark:border-red-400 dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
               <div className="rounded-full bg-red-50 p-3 dark:bg-red-950/40">
                 <AlertCircle className="h-7 w-7 text-red-500 dark:text-red-400" />
               </div>
@@ -209,7 +209,7 @@ const ExamHallMembers = () => {
               <button
                 type="button"
                 onClick={() => navigate("/exam-hall")}
-                className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 cursor-pointer"
+                className="mt-2 inline-flex items-center gap-1.5 rounded-xl border border-zinc-900 bg-blue-600 px-4 py-2 text-xs font-black text-white shadow-[2px_2px_0px_#18181b] hover:bg-blue-700 cursor-pointer dark:border-white"
               >
                 Go to Exam Hall
               </button>
@@ -220,16 +220,16 @@ const ExamHallMembers = () => {
           {!loading && hallData && (
             <>
               {/* Hall Overview Card */}
-              <div className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm dark:border-blue-900/30 dark:bg-[#0F1C33] space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-blue-50 pb-4 dark:border-blue-900/20">
+              <div className="rounded-2xl border border-zinc-900 bg-white p-5 shadow-[4px_4px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[4px_4px_0px_#ffffff] space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200 pb-4 dark:border-zinc-800">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1 text-sm font-black text-white shadow-xs tracking-wide">
+                      <span className="inline-flex items-center gap-1 rounded-lg border border-zinc-900 bg-blue-600 px-3 py-1 text-sm font-black text-white shadow-[1.5px_1.5px_0px_#18181b] tracking-wide dark:border-white dark:shadow-[1.5px_1.5px_0px_#ffffff]">
                         <MapPin className="h-3.5 w-3.5" />
                         Hall {hallData.hall_no}
                       </span>
                       {hallData.block && (
-                        <span className="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                        <span className="inline-flex items-center gap-1 rounded-lg border border-zinc-900 bg-blue-50 px-2.5 py-1 text-xs font-black text-blue-900 shadow-[1px_1px_0px_#18181b] dark:border-white dark:bg-blue-900/40 dark:text-blue-100 dark:shadow-[1px_1px_0px_#ffffff]">
                           <Building2 className="h-3 w-3" />
                           {hallData.block}
                         </span>
@@ -284,22 +284,22 @@ const ExamHallMembers = () => {
                             onClick={() =>
                               setSelectedCourseFilter(isSelected ? "ALL" : c.course_code)
                             }
-                            className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer border ${
+                            className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-black transition-all cursor-pointer border border-zinc-900 dark:border-white shadow-[1.5px_1.5px_0px_#18181b] dark:shadow-[1.5px_1.5px_0px_#ffffff] ${
                               isSelected
-                                ? "bg-blue-600 border-blue-600 text-white shadow-sm"
-                                : "bg-blue-50/70 border-blue-100 text-blue-800 hover:bg-blue-100 dark:bg-blue-900/20 dark:border-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/40"
+                                ? "bg-blue-600 text-white"
+                                : "bg-blue-50/70 text-blue-900 hover:bg-blue-100 dark:bg-zinc-800 dark:text-blue-300"
                             }`}
                           >
                             <BookOpen className="h-3 w-3" />
-                            <span className="font-mono font-bold">{c.course_code}</span>
-                            <span className="opacity-90 max-w-[180px] sm:max-w-[260px] truncate text-[11px]">
+                            <span className="font-mono font-black">{c.course_code}</span>
+                            <span className="opacity-90 max-w-[180px] sm:max-w-[260px] truncate text-[11px] font-semibold">
                               {c.course_name}
                             </span>
                             <span
-                              className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
+                              className={`rounded-md border border-zinc-900 px-1.5 py-0.2 text-[10px] font-black dark:border-white ${
                                 isSelected
-                                  ? "bg-white/20 text-white"
-                                  : "bg-blue-200/60 text-blue-900 dark:bg-blue-800/60 dark:text-blue-200"
+                                  ? "bg-white text-blue-700"
+                                  : "bg-blue-200 text-blue-950 dark:bg-zinc-700 dark:text-blue-100"
                               }`}
                             >
                               {c.count}
@@ -313,22 +313,22 @@ const ExamHallMembers = () => {
               </div>
 
               {/* ── Search & Filter Bar ── */}
-              <div className="rounded-2xl border border-blue-100 bg-white p-3.5 shadow-sm dark:border-blue-900/30 dark:bg-[#0F1C33] space-y-3">
+              <div className="rounded-2xl border border-zinc-900 bg-white p-3.5 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff] space-y-3">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search register no, subject code, or department..."
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2 pl-9 pr-3 text-xs sm:text-sm text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500 dark:focus:ring-blue-900/30"
+                      className="w-full rounded-xl border border-zinc-900 bg-white py-2 pl-9 pr-3 text-xs sm:text-sm font-bold text-zinc-900 shadow-[2px_2px_0px_#18181b] placeholder:text-zinc-400 focus:outline-none dark:border-white dark:bg-zinc-900 dark:text-white dark:shadow-[2px_2px_0px_#ffffff]"
                     />
                     {searchQuery && (
                       <button
                         type="button"
                         onClick={() => setSearchQuery("")}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
                       >
                         ✕
                       </button>
@@ -339,26 +339,26 @@ const ExamHallMembers = () => {
                     <button
                       type="button"
                       onClick={() => setSelectedCourseFilter("ALL")}
-                      className="rounded-xl px-3 py-2 text-xs font-semibold transition-all cursor-pointer border bg-white text-slate-600 border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 shrink-0"
+                      className="rounded-xl border border-zinc-900 px-3 py-2 text-xs font-black transition-all cursor-pointer bg-white text-zinc-800 shadow-[2px_2px_0px_#18181b] hover:bg-zinc-50 dark:border-white dark:bg-zinc-800 dark:text-zinc-200 dark:shadow-[2px_2px_0px_#ffffff] shrink-0"
                     >
                       Show All ({hallData.total_students})
                     </button>
                   )}
                 </div>
 
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs text-slate-500 dark:text-slate-400 px-0.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs text-zinc-500 dark:text-zinc-400 px-0.5">
                   <div className="flex items-center gap-2">
                     <span>
-                      Showing <strong className="text-slate-800 dark:text-slate-200">{filteredMembers.length}</strong>{" "}
+                      Showing <strong className="text-zinc-900 dark:text-white font-black">{filteredMembers.length}</strong>{" "}
                       of {hallData.total_students} students
                     </span>
                     {selectedCourseFilter !== "ALL" && (
-                      <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400">
+                      <span className="text-[11px] font-black text-blue-600 dark:text-blue-400">
                         • Filtered by: {selectedCourseFilter}
                       </span>
                     )}
                   </div>
-                  <span className="text-[10.5px] text-slate-400 dark:text-slate-500">
+                  <span className="text-[10.5px] font-semibold text-zinc-400 dark:text-zinc-500">
                     * Roster reference only, not physical seating placement.
                   </span>
                 </div>
@@ -367,7 +367,7 @@ const ExamHallMembers = () => {
               {/* ── Student Members Grid (Compact & Ordered) ── */}
               {filteredMembers.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3">
                   {filteredMembers.map((member) => {
                     const isCurrentUser =
                       currentUserRegNo &&
@@ -379,18 +379,18 @@ const ExamHallMembers = () => {
                         key={member.register_no}
                         onClick={() => handleCopyRegNo(member.register_no)}
                         title={`Click to copy ${member.register_no}${member.course_name ? ` • ${member.course_name}` : ""}`}
-                        className={`group relative flex flex-col justify-between rounded-xl border p-2.5 shadow-2xs transition-all duration-150 hover:shadow-xs hover:-translate-y-0.5 cursor-pointer select-none ${
+                        className={`group relative flex flex-col justify-between rounded-xl border border-zinc-900 p-2.5 shadow-[2px_2px_0px_#18181b] transition-all duration-150 hover:-translate-x-0.5 hover:-translate-y-0.5 cursor-pointer select-none dark:border-white dark:shadow-[2px_2px_0px_#ffffff] ${
                           isCurrentUser
-                            ? "border-blue-500 bg-blue-50/80 ring-2 ring-blue-500/40 dark:border-blue-400 dark:bg-blue-950/40"
-                            : "border-blue-100/90 bg-white hover:border-blue-300 dark:border-blue-900/40 dark:bg-[#0F1C33] dark:hover:border-blue-800"
+                            ? "bg-blue-100/90 dark:bg-blue-950/70"
+                            : "bg-white dark:bg-[#111827]"
                         }`}
                       >
                         {/* Top: Seat Number & Course Code */}
                         <div className="flex items-center justify-between gap-1 mb-1">
-                          <span className="flex h-4.5 min-w-[20px] items-center justify-center rounded bg-blue-100/80 px-1 text-[10px] font-black text-blue-700 dark:bg-blue-900/60 dark:text-blue-200">
+                          <span className="flex h-4.5 min-w-[20px] items-center justify-center rounded-md border border-zinc-900 bg-blue-100 px-1 text-[10px] font-black text-blue-900 dark:border-white dark:bg-blue-900/60 dark:text-blue-100">
                             #{member.seat_no}
                           </span>
-                          <span className="rounded bg-blue-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-blue-600 dark:bg-blue-900/40 dark:text-blue-300">
+                          <span className="rounded-md border border-zinc-900 bg-blue-50 px-1.5 py-0.5 font-mono text-[10px] font-black text-blue-600 dark:border-white dark:bg-blue-900/40 dark:text-blue-300">
                             {member.course_code}
                           </span>
                         </div>

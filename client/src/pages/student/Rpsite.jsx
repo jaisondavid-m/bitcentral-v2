@@ -42,17 +42,17 @@ function filterStudents(students, query) {
 
 function RpCardSkeleton() {
   return (
-    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
+    <article className="overflow-hidden rounded-2xl border border-zinc-900 bg-white p-5 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
       <div className="animate-pulse space-y-3">
-        <div className="h-4 w-2/3 rounded bg-slate-200 dark:bg-slate-800" />
-        <div className="h-3 w-1/3 rounded bg-slate-200 dark:bg-slate-800" />
-        <div className="h-px w-full bg-slate-200 dark:bg-slate-800" />
+        <div className="h-4 w-2/3 rounded bg-zinc-200 dark:bg-zinc-800" />
+        <div className="h-3 w-1/3 rounded bg-zinc-200 dark:bg-zinc-800" />
+        <div className="h-px w-full bg-zinc-200 dark:bg-zinc-800" />
         <div className="space-y-2">
-          <div className="h-3 w-5/6 rounded bg-slate-200 dark:bg-slate-800" />
-          <div className="h-3 w-4/6 rounded bg-slate-200 dark:bg-slate-800" />
-          <div className="h-3 w-3/6 rounded bg-slate-200 dark:bg-slate-800" />
+          <div className="h-3 w-5/6 rounded bg-zinc-200 dark:bg-zinc-800" />
+          <div className="h-3 w-4/6 rounded bg-zinc-200 dark:bg-zinc-800" />
+          <div className="h-3 w-3/6 rounded bg-zinc-200 dark:bg-zinc-800" />
         </div>
-        <div className="h-20 rounded-xl bg-slate-100 dark:bg-slate-800/80" />
+        <div className="h-20 rounded-xl bg-blue-50 dark:bg-zinc-800/80" />
       </div>
     </article>
   );
@@ -155,13 +155,13 @@ function RpsiteContent() {
     hasMinimumSearchLength && (isLoading || isSearching) && visibleStudents.length === 0;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-indigo-500/20 dark:bg-[#020617] dark:text-slate-200 dark:selection:bg-indigo-500/30">
+    <div className="min-h-[calc(100vh-4rem)] bg-[#f8fafc] text-zinc-900 dark:bg-[#090d16] dark:text-zinc-50 transition-colors">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
-        <header className="mb-6 rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/40 sm:p-5">
+        <header className="mb-6 rounded-2xl border border-zinc-900 bg-white p-4 shadow-[4px_4px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[4px_4px_0px_#ffffff] sm:p-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div className="shrink-0">
-              <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
-                Reward <span className="text-indigo-500">Points</span>
+              <h1 className="text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl dark:text-white">
+                Reward <span className="text-blue-600 dark:text-blue-400">Points</span>
               </h1>
             </div>
 
@@ -180,7 +180,7 @@ function RpsiteContent() {
                   haptics.light();
                   setShowLeaderboard(true);
                 }}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm font-semibold text-indigo-700 shadow-sm transition-all hover:-translate-y-px hover:border-indigo-300 hover:bg-indigo-100 dark:border-slate-700 dark:bg-slate-900 dark:text-indigo-300 dark:hover:border-slate-600 dark:hover:bg-slate-800"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-900 bg-blue-600 px-4 py-3 text-sm font-black text-white shadow-[2px_2px_0px_#18181b] hover:bg-blue-700 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer"
               >
                 <Medal className="h-4 w-4" />
                 Leaderboard
@@ -191,7 +191,7 @@ function RpsiteContent() {
                   haptics.light();
                   setShowAverages(true);
                 }}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:-translate-y-px hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-900 bg-white px-4 py-3 text-sm font-black text-zinc-800 shadow-[2px_2px_0px_#18181b] hover:bg-zinc-100 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:bg-zinc-800 dark:text-zinc-200 dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer"
               >
                 <BarChart3 className="h-4 w-4" />
                 Average RP
@@ -261,11 +261,11 @@ function RpsiteContent() {
 
       {showLeaderboard && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/70 px-0 py-0 backdrop-blur-sm sm:items-center sm:p-6"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 px-0 py-0 backdrop-blur-sm sm:items-center sm:p-6"
           onClick={() => setShowLeaderboard(false)}
         >
           <div
-            className="relative flex h-[92dvh] w-full max-w-6xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-slate-50 shadow-2xl shadow-slate-950/50 dark:border-slate-800 dark:bg-[#020617] sm:rounded-3xl"
+            className="relative flex h-[92dvh] w-full max-w-6xl flex-col overflow-hidden rounded-t-2xl border border-zinc-900 bg-white shadow-[6px_6px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[6px_6px_0px_#ffffff] sm:rounded-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="h-full overflow-auto p-3 sm:p-5">
@@ -277,26 +277,26 @@ function RpsiteContent() {
 
       {showAverages && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/70 px-0 py-0 backdrop-blur-sm sm:items-center sm:p-6"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 px-0 py-0 backdrop-blur-sm sm:items-center sm:p-6"
           onClick={() => setShowAverages(false)}
         >
           <div
-            className="w-full max-w-md rounded-t-3xl border border-slate-200 bg-white shadow-2xl shadow-slate-950/40 dark:border-slate-800 dark:bg-slate-950 sm:rounded-3xl"
+            className="w-full max-w-md rounded-t-2xl border border-zinc-900 bg-white shadow-[6px_6px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[6px_6px_0px_#ffffff] sm:rounded-2xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+            <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+                <p className="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">
                   Average RP
                 </p>
-                <h2 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+                <h2 className="mt-1 text-lg font-black text-zinc-900 dark:text-white">
                   Year-wise averages
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setShowAverages(false)}
-                className="rounded-lg border border-slate-200 p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+                className="rounded-lg border border-zinc-900 p-1.5 text-zinc-600 hover:bg-zinc-100 dark:border-white dark:text-zinc-300 dark:hover:bg-zinc-800 shadow-[1px_1px_0px_#18181b] dark:shadow-[1px_1px_0px_#ffffff] cursor-pointer"
                 aria-label="Close averages modal"
               >
                 <X className="h-4 w-4" />
@@ -305,7 +305,7 @@ function RpsiteContent() {
 
             <div className="p-5">
               {isAverageFetching ? (
-                <div className="flex items-center justify-center py-10 text-slate-500 dark:text-slate-400">
+                <div className="flex items-center justify-center py-10 text-zinc-500 dark:text-zinc-400">
                   <Loader2 className="h-5 w-5 animate-spin" />
                 </div>
               ) : (
@@ -318,12 +318,12 @@ function RpsiteContent() {
                   ].map(([year, value]) => (
                     <div
                       key={year}
-                      className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-center dark:border-slate-800 dark:bg-slate-900/70"
+                      className="rounded-xl border border-zinc-900 bg-blue-50/50 px-3 py-3 text-center shadow-[2px_2px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:shadow-[2px_2px_0px_#ffffff]"
                     >
-                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                      <p className="text-[10px] font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                         Year {year}
                       </p>
-                      <p className="mt-1 text-lg font-extrabold tabular-nums text-slate-900 dark:text-white">
+                      <p className="mt-1 text-lg font-black tabular-nums text-zinc-900 dark:text-white">
                         {value ?? "0"}
                       </p>
                     </div>

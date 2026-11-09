@@ -53,15 +53,15 @@ function Login() {
       <button
         type="button"
         onClick={toggleTheme}
-        className="fixed right-5 top-5 z-20 inline-flex items-center gap-2 rounded-lg border-[2.5px] border-[#0a0a0a] bg-white px-3.5 py-2 text-xs font-bold text-[#0a0a0a] shadow-[3px_3px_0px_#0a0a0a] transition hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#0a0a0a] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none dark:border-white dark:bg-[#111827] dark:text-white dark:shadow-[3px_3px_0px_#ffffff]"
+        className="fixed right-5 top-5 z-20 inline-flex items-center gap-2 rounded-lg border border-[#0a0a0a] bg-white px-3.5 py-2 text-xs font-bold text-[#0a0a0a] shadow-[3px_3px_0px_#0a0a0a] transition hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#0a0a0a] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none dark:border-white dark:bg-[#111827] dark:text-white dark:shadow-[3px_3px_0px_#ffffff]"
       >
         {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         {theme === "dark" ? "Light" : "Dark"}
       </button>
 
-      <div className="w-full max-w-md overflow-hidden rounded-xl border-[2.5px] border-[#0a0a0a] bg-white shadow-[6px_6px_0px_#0a0a0a] dark:border-white dark:bg-[#111827] dark:shadow-[6px_6px_0px_#ffffff]">
-        <div className="border-b-[2.5px] border-[#0a0a0a] bg-[#3b82f6] px-6 py-6 text-center text-white dark:border-white">
-          <span className="inline-block rounded-md border-2 border-[#0a0a0a] bg-white px-2.5 py-0.5 text-xs font-black uppercase tracking-wider text-[#0a0a0a] shadow-[2px_2px_0px_#0a0a0a]">
+      <div className="w-full max-w-md overflow-hidden rounded-xl border border-[#0a0a0a] bg-white shadow-[6px_6px_0px_#0a0a0a] dark:border-white dark:bg-[#111827] dark:shadow-[6px_6px_0px_#ffffff]">
+        <div className="border-b border-[#0a0a0a] bg-[#3b82f6] px-6 py-6 text-center text-white dark:border-white">
+          <span className="inline-block rounded-md border border-[#0a0a0a] bg-white px-2.5 py-0.5 text-xs font-black uppercase tracking-wider text-[#0a0a0a] shadow-[2px_2px_0px_#0a0a0a]">
             Student Portal
           </span>
           <h1 className="mt-2 text-2xl font-black tracking-tight text-white">BIT Central</h1>
@@ -69,7 +69,7 @@ function Login() {
         </div>
 
         <div className="px-6 py-7">
-          <div className="mb-6 rounded-lg border-2 border-[#0a0a0a] bg-[#dbeafe] p-3 text-center dark:border-white dark:bg-[#1e293b]">
+          <div className="mb-6 rounded-lg border border-[#0a0a0a] bg-[#dbeafe] p-3 text-center dark:border-white dark:bg-[#1e293b]">
             <p className="text-xs font-bold text-[#1e3a8a] dark:text-[#93c5fd]">
               Institutional Access Only
             </p>
@@ -79,7 +79,7 @@ function Login() {
           </div>
 
           {error && (
-            <div className="mb-5 rounded-lg border-[2.5px] border-[#0a0a0a] bg-[#fecaca] p-3.5 shadow-[3px_3px_0px_#0a0a0a] dark:border-white dark:bg-[#7f1d1d] dark:shadow-[3px_3px_0px_#ffffff]">
+            <div className="mb-5 rounded-lg border border-[#0a0a0a] bg-[#fecaca] p-3.5 shadow-[3px_3px_0px_#0a0a0a] dark:border-white dark:bg-[#7f1d1d] dark:shadow-[3px_3px_0px_#ffffff]">
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="h-5 w-5 flex-shrink-0 text-[#991b1b] dark:text-[#fca5a5] mt-0.5" />
                 <p className="text-xs font-bold text-[#7f1d1d] dark:text-white leading-relaxed">{error}</p>
@@ -90,7 +90,7 @@ function Login() {
           <button
             disabled={isLoading}
             onClick={handleSignIn}
-            className={`flex w-full items-center justify-center gap-3 rounded-lg border-[2.5px] border-[#0a0a0a] px-5 py-3.5 text-sm font-extrabold text-white transition-all dark:border-white ${
+            className={`flex w-full items-center justify-center gap-3 rounded-lg border border-[#0a0a0a] px-5 py-3.5 text-sm font-extrabold text-white transition-all dark:border-white ${
               isLoading
                 ? "cursor-not-allowed bg-blue-300 opacity-70"
                 : "bg-[#3b82f6] shadow-[4px_4px_0px_#0a0a0a] hover:bg-[#1d4ed8] hover:translate-x-[-1.5px] hover:translate-y-[-1.5px] hover:shadow-[5px_5px_0px_#0a0a0a] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none dark:shadow-[4px_4px_0px_#ffffff]"

@@ -9,6 +9,8 @@ import FloatingMenu from "@/components/layout/FloatingMenu.jsx";
 import ErrorBoundary from "@/components/common/ErrorBoundary.jsx";
 import { lazyWithRetry } from "@/utils/lazyWithRetry.js";
 import { getRouteSeo } from "@/seo/routeSeo.js";
+import { getCurrentUser } from "@/config/auth.js";
+import { isAllowedEmail } from "@/services/authRules.js";
 
 const Login = lazyWithRetry(() => import("@/pages/public/Login.jsx"));
 const LandingPage = lazyWithRetry(() => import("@/pages/public/LandingPage.jsx"));
@@ -48,6 +50,9 @@ function App() {
   const location = useLocation();
 
   const currentMeta = getRouteSeo(location.pathname);
+  const storedUser = getCurrentUser();
+  const isLoggedIn = Boolean(storedUser && isAllowedEmail(storedUser?.email));
+
   const protectedRoutePrefixes = [
     "/home",
     "/dashboard",
@@ -60,6 +65,7 @@ function App() {
     "/leavedetails",
     "/mess",
     "/support-dev",
+    ...(isLoggedIn ? ["/about"] : []),
   ];
   const isProtectedRoute = protectedRoutePrefixes.some(
     (prefix) => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)
@@ -155,7 +161,14 @@ function App() {
                 </AuthScope>
               }
             />
-            <Route path="/about" element={<About />} />
+            <Route
+              path="/about"
+              element={
+                <AuthScope>
+                  <About />
+                </AuthScope>
+              }
+            />
             <Route path="/developer" element={<Developer />} />
             <Route path="/features" element={<Features />} />
             <Route path="/faq" element={<FAQ />} />

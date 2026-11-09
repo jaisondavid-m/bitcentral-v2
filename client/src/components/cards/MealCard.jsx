@@ -12,106 +12,100 @@ export const MealCard = ({ type, items = [], isActive, isServingNow = false, isD
 
   return (
     <div
-      className={`overflow-hidden rounded-2xl border bg-white transition-all duration-200 dark:bg-slate-900
-        ${isClosed
-          ? 'border-red-300 shadow-md ring-1 ring-red-200/50 dark:border-red-900/60 dark:ring-red-900/30'
-          : isActive
-          ? 'border-blue-300 shadow-xl ring-1 ring-blue-200 dark:border-blue-800 dark:ring-blue-900/60'
-          : 'border-slate-200 shadow-sm hover:shadow-md dark:border-slate-700'
-        }`}
+      className={`overflow-hidden rounded-2xl border border-zinc-900 bg-white shadow-[3px_3px_0px_#18181b] transition-all duration-200 dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff] ${
+        isActive ? 'ring-2 ring-blue-600 shadow-[5px_5px_0px_#18181b] dark:shadow-[5px_5px_0px_#ffffff]' : ''
+      }`}
     >
-      <div className={`flex items-center justify-between border-b px-4 py-3 sm:px-5
-        ${isClosed
-          ? 'border-red-200/50 bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white dark:border-red-900/60'
-          : isActive
-          ? 'border-blue-500/30 bg-linear-to-r from-blue-700 to-cyan-600'
-          : 'border-slate-100 dark:border-slate-800'
+      <div
+        className={`flex items-center justify-between border-b border-zinc-900 px-4 py-3 sm:px-5 dark:border-white ${
+          isClosed
+            ? 'bg-rose-600 text-white'
+            : isActive
+            ? 'bg-blue-600 text-white'
+            : 'bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white'
         }`}
       >
         <div className="flex items-center gap-2.5">
           <span className="text-xl sm:text-2xl">{isClosed ? '🚫' : config.icon}</span>
           <div>
-            <h3 className={`text-sm font-bold leading-none sm:text-base ${isClosed || isActive ? 'text-white' : 'text-slate-800 dark:text-slate-100'}`}>
+            <h3 className="text-sm font-black leading-none sm:text-base tracking-tight">
               {config.title}
             </h3>
-            <p className={`text-xs mt-0.5 ${isClosed ? 'text-red-100' : isActive ? 'text-[#e8c547]/70' : 'text-slate-400'}`}>
+            <p className={`text-xs mt-0.5 font-semibold ${isClosed || isActive ? 'text-blue-100' : 'text-zinc-500 dark:text-zinc-400'}`}>
               {config.time}
             </p>
           </div>
         </div>
+
         {isClosed ? (
-          <span className="rounded-full border border-white/30 bg-white/20 px-2.5 py-1 text-xs font-bold text-white shadow-xs backdrop-blur-sm">
+          <span className="rounded-md border border-zinc-900 bg-white px-2.5 py-0.5 text-xs font-black text-rose-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:shadow-[1.5px_1.5px_0px_#ffffff]">
             Mess Closed
           </span>
         ) : isDefaultMenu ? (
-          <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${isActive ? 'border-amber-200/40 bg-amber-400/15 text-amber-100' : 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300'}`}>
-            Default menu
+          <span className="rounded-md border border-zinc-900 bg-amber-100 px-2.5 py-0.5 text-xs font-black text-amber-800 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-amber-950 dark:text-amber-200 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
+            Default
           </span>
         ) : isServingNow ? (
-          <span className="rounded-full border border-white/30 bg-white/15 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">
+          <span className="rounded-md border border-zinc-900 bg-emerald-500 px-2.5 py-0.5 text-xs font-black text-white shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:shadow-[1.5px_1.5px_0px_#ffffff] animate-pulse">
             Serving now
           </span>
         ) : (
-          <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${isActive ? 'border border-white/30 bg-white/10 text-white' : 'border border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'}`}>
+          <span className="rounded-md border border-zinc-900 bg-white px-2 py-0.5 text-xs font-bold text-zinc-900 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-900 dark:text-white dark:shadow-[1.5px_1.5px_0px_#ffffff]">
             {items.length} {items.length === 1 ? 'item' : 'items'}
           </span>
         )}
       </div>
 
       {isClosed ? (
-        <div className="border-b border-red-200 bg-red-50/80 px-4 py-2 text-[11px] font-semibold text-red-800 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300 sm:px-5">
-          ⚠️ Mess is not serving meals during this holiday / closure period.
+        <div className="border-b border-zinc-900 bg-rose-50 px-4 py-2 text-xs font-bold text-rose-800 dark:border-white dark:bg-rose-950/40 dark:text-rose-200 sm:px-5">
+          ⚠️ Mess is not serving meals during this closure period.
         </div>
       ) : isDefaultMenu ? (
-        <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-[11px] font-medium text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-300 sm:px-5">
-          Default menu is displayed because the original data has not been updated.
+        <div className="border-b border-zinc-900 bg-amber-50 px-4 py-2 text-xs font-bold text-amber-900 dark:border-white dark:bg-amber-950/40 dark:text-amber-200 sm:px-5">
+          Default menu is displayed because real-time schedule is pending.
         </div>
       ) : null}
 
       <div className="px-4 py-3 sm:px-5 sm:py-4">
         {isClosed ? (
           <div className="flex flex-col items-center justify-center py-6 text-center sm:py-8">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 text-2xl shadow-inner dark:bg-red-950/80">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-zinc-900 bg-rose-100 text-2xl shadow-[2px_2px_0px_#18181b] dark:border-white dark:bg-rose-950">
               🚫
             </div>
-            <h4 className="mt-3 text-base font-bold text-red-600 dark:text-red-400">
-              {closure.reason || 'Mess Closed for Holiday'}
+            <h4 className="mt-3 text-base font-black text-rose-600 dark:text-rose-400">
+              {closure.reason || 'Mess Closed'}
             </h4>
-            {closure.notes ? (
-              <p className="mt-1.5 max-w-sm text-xs font-medium text-slate-600 dark:text-slate-300">
+            {closure.notes && (
+              <p className="mt-1 max-w-sm text-xs font-semibold text-zinc-600 dark:text-zinc-400">
                 {closure.notes}
               </p>
-            ) : null}
-            <div className="mt-3.5 inline-flex flex-wrap items-center justify-center gap-1.5 rounded-full border border-red-200 bg-red-50/90 px-3.5 py-1.5 text-[11px] font-semibold text-red-700 dark:border-red-900/60 dark:bg-red-950/60 dark:text-red-300">
-              <span>📅</span>
-              <span>
-                {closure.start_date} ({closure.start_meal}) &rarr; {closure.end_date} ({closure.end_meal})
-              </span>
-            </div>
+            )}
           </div>
         ) : items.length > 0 ? (
           <>
-            <ul className="space-y-0">
+            <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
               {items.map((item, i) => (
-                <li key={i} className="flex items-center gap-2.5 border-b border-slate-100 py-2.5 last:border-0 dark:border-slate-800">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[10px] font-bold text-slate-500 dark:bg-slate-800 sm:h-6 sm:w-6">
+                <li key={i} className="flex items-center gap-2.5 py-2.5">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-zinc-900 bg-blue-50 text-[10px] font-black text-blue-700 dark:border-white dark:bg-zinc-800 dark:text-blue-300">
                     {i + 1}
                   </span>
-                  <span className="text-sm leading-snug font-medium text-slate-700 dark:text-slate-200">{item}</span>
+                  <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200">{item}</span>
                 </li>
               ))}
             </ul>
-            <p className="mt-3 text-xs text-slate-400 dark:text-slate-500 text-right pb-1">
+            <p className="mt-3 text-xs font-black text-zinc-500 dark:text-zinc-400 text-right">
               {items.length} {items.length === 1 ? 'item' : 'items'}
             </p>
           </>
         ) : (
-          <div className="flex flex-col items-center gap-2 py-8 text-slate-400 dark:text-slate-500 sm:py-10">
+          <div className="flex flex-col items-center gap-2 py-8 text-zinc-400 dark:text-zinc-500 sm:py-10">
             <span className="text-3xl">🍽️</span>
-            <p className="text-sm">No items available for this meal</p>
+            <p className="text-sm font-bold">No menu items recorded</p>
           </div>
         )}
       </div>
     </div>
   );
 };
+
+export default MealCard;

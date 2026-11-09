@@ -53,48 +53,48 @@ const sections = [
 
 function Terms() {
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-800 dark:bg-black dark:text-slate-100">
+    <main className="min-h-screen bg-[#f8fafc] text-zinc-900 dark:bg-[#090d16] dark:text-zinc-50 transition-colors">
       <PublicNav />
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="rounded-lg bg-white p-8 shadow-sm ring-1 ring-slate-200 sm:p-10 dark:bg-slate-950 dark:ring-slate-800">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">
+        <div className="rounded-2xl border border-zinc-900 bg-white p-8 shadow-[4px_4px_0px_#18181b] sm:p-10 dark:border-white dark:bg-[#111827] dark:shadow-[4px_4px_0px_#ffffff]">
+          <div className="inline-flex items-center gap-2 rounded-lg border border-zinc-900 bg-blue-600 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-white shadow-[2px_2px_0px_#18181b] dark:border-white dark:shadow-[2px_2px_0px_#ffffff]">
             BIT CENTRAL
-          </p>
-          <h1 className="mt-3 text-3xl font-bold text-slate-950 sm:text-4xl">
+          </div>
+          <h1 className="mt-4 text-3xl sm:text-4xl font-black text-zinc-900 dark:text-white">
             Terms of Service
           </h1>
-          <p className="mt-4 text-sm text-slate-500">Effective date: May 17, 2026</p>
-          <p className="mt-6 text-base leading-7 text-slate-600">
+          <p className="mt-2 text-xs font-bold text-zinc-500 dark:text-zinc-400">Effective date: May 17, 2026</p>
+          <p className="mt-4 text-sm sm:text-base font-semibold leading-relaxed text-zinc-600 dark:text-zinc-300">
             Summary: These terms explain responsible use of BIT Central, including public information pages and protected student tools for academic resources, question banks, answer keys, mess menu information, and campus services.
           </p>
 
           <div className="mt-10 space-y-8">
             {sections.map((section) => (
               <section key={section.title}>
-                <h2 className="text-lg font-semibold text-slate-950">{section.title}</h2>
-                <p className="mt-2 leading-7 text-slate-600">{section.content}</p>
+                <h2 className="text-lg font-black text-zinc-900 dark:text-white">{section.title}</h2>
+                <p className="mt-2 text-sm font-semibold leading-relaxed text-zinc-600 dark:text-zinc-300">{section.content}</p>
               </section>
             ))}
           </div>
 
-          <section className="mt-10 rounded-lg bg-slate-100 p-6 dark:bg-slate-900">
-            <h2 className="text-lg font-semibold text-slate-950">Contact Us</h2>
-            <p className="mt-2 leading-7 text-slate-600">
+          <section className="mt-10 rounded-xl border border-zinc-900 bg-blue-50/40 p-6 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-zinc-800/80 dark:shadow-[3px_3px_0px_#ffffff]">
+            <h2 className="text-lg font-black text-zinc-900 dark:text-white">Contact Us</h2>
+            <p className="mt-2 text-sm font-semibold leading-relaxed text-zinc-600 dark:text-zinc-300">
               Questions about these Terms can be sent to{" "}
-              <a className="font-medium text-blue-700 hover:underline" href="mailto:developer@bitsathy.in">
+              <a className="font-black text-blue-600 hover:underline dark:text-blue-400" href="mailto:developer@bitsathy.in">
                 developer@bitsathy.in
               </a>{" "}
               or by phone at{" "}
-              <a className="font-medium text-blue-700 hover:underline" href="tel:+919843777817">
+              <a className="font-black text-blue-600 hover:underline dark:text-blue-400" href="tel:+919843777817">
                 +91 98437 77817
               </a>.
             </p>
           </section>
-          <nav className="mt-8 flex flex-wrap gap-3" aria-label="Related public pages">
-            <Link className="font-medium text-blue-700 hover:underline" to="/about">About</Link>
-            <Link className="font-medium text-blue-700 hover:underline" to="/features">Features</Link>
-            <Link className="font-medium text-blue-700 hover:underline" to="/faq">FAQ</Link>
-            <Link className="font-medium text-blue-700 hover:underline" to="/contact">Contact</Link>
+          <nav className="mt-8 flex flex-wrap gap-4 text-xs font-black uppercase tracking-wider" aria-label="Related public pages">
+            <Link className="text-blue-600 hover:underline dark:text-blue-400" to="/about">About</Link>
+            <Link className="text-blue-600 hover:underline dark:text-blue-400" to="/features">Features</Link>
+            <Link className="text-blue-600 hover:underline dark:text-blue-400" to="/faq">FAQ</Link>
+            <Link className="text-blue-600 hover:underline dark:text-blue-400" to="/contact">Contact</Link>
           </nav>
         </div>
       </div>
