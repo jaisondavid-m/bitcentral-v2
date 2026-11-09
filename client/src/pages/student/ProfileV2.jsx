@@ -11,6 +11,7 @@ import {
   Loader,
   LogOut,
   Phone,
+  Home,
 } from "lucide-react";
 import profileAvatar from "@/assets/profile.jpg";
 import { logout } from "@/config/auth.js";
@@ -49,18 +50,15 @@ function ProfileV2() {
   const email = profileV2?.email || profile?.email || user?.email || "-";
 
   const registerNo =
-    profileV2?.register_no ||
     profile?.register_no ||
-    student?.roll_no ||
-    student?.rollNo ||
+    student?.register_no ||
     "-";
 
   const userId =
-    profileV2?.user_id ||
-    profile?.user_id ||
     profile?.roll_no ||
     student?.roll_no ||
-    student?.rollNo ||
+    profile?.user_id ||
+    student?.user_id ||
     "-";
 
   const department =
@@ -78,8 +76,21 @@ function ProfileV2() {
   const phone =
     profileV2?.phone ||
     profile?.phone ||
+    profile?.phone_no ||
     student?.phone ||
+    student?.phone_no ||
     "-";
+
+  const rawResident =
+    profile?.resident ||
+    student?.resident ||
+    "";
+  const resident =
+    rawResident === "H"
+      ? "Hosteller"
+      : rawResident === "D"
+      ? "Day Scholar"
+      : rawResident || "-";
 
   const avatarUrl =
     profileV2?.photo_url ||
@@ -228,6 +239,19 @@ function ProfileV2() {
               </div>
             </div>
             <p className="text-base sm:text-lg font-black text-zinc-900 dark:text-zinc-50">{phone}</p>
+          </div>
+
+          {/* Resident (Hosteller / Day Scholar) */}
+          <div className="rounded-xl border border-zinc-900 bg-white p-5 shadow-[3px_3px_0px_#18181b] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                Resident
+              </h3>
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-900 bg-blue-50 text-blue-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
+                <Home className="h-5 w-5" />
+              </div>
+            </div>
+            <p className="text-base sm:text-lg font-black text-zinc-900 dark:text-zinc-50">{resident}</p>
           </div>
 
           {/* First Login */}

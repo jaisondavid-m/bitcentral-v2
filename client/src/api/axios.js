@@ -136,25 +136,7 @@ export async function getMeProfile(forceRefresh = false) {
 }
 
 export async function getV2Profile(forceRefresh = false) {
-  const now = Date.now();
-  if (!forceRefresh && v2Cache.data && now - v2Cache.timestamp < 60 * 1000) {
-    return v2Cache.data;
-  }
-  if (inFlightV2Promise) {
-    return inFlightV2Promise;
-  }
-  inFlightV2Promise = (async () => {
-    try {
-      const headers = await getAuthenticatedHeaders();
-      const response = await api.get("/v2/profile", { headers });
-      const data = response.data?.data || null;
-      v2Cache = { data, timestamp: Date.now() };
-      return data;
-    } finally {
-      inFlightV2Promise = null;
-    }
-  })();
-  return inFlightV2Promise;
+  return getMeProfile(forceRefresh);
 }
 
 let sponsorsLeaderboardCache = { data: null, timestamp: 0 };

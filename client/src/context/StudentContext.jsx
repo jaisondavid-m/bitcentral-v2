@@ -64,20 +64,56 @@ const toProfileStudent = (studentProfile, fallbackStudent = null) => {
 
   const profileData = studentProfile.data || studentProfile;
 
+  // Use student_details department if present; otherwise fallback to decoded email
+  const department =
+    profileData.dept_name ||
+    profileData.department ||
+    fallbackStudent?.department ||
+    "";
+
+  // Use student_details batch_name if present; otherwise fallback to decoded email
+  const batch =
+    profileData.batch_name ||
+    profileData.batch ||
+    fallbackStudent?.batch ||
+    "";
+
+  const studentName =
+    profileData.student_name ||
+    profileData.name ||
+    profileData.display_name ||
+    fallbackStudent?.displayName ||
+    fallbackStudent?.usernamePart ||
+    "";
+
+  const phoneNo = profileData.phone_no || profileData.phone || fallbackStudent?.phone || "";
+
   return {
     ...fallbackStudent,
-    user_id: profileData.user_id || studentProfile.user_id || fallbackStudent?.user_id || "",
-    email: studentProfile.email || fallbackStudent?.email || null,
-    rollNo: studentProfile.roll_no || fallbackStudent?.rollNo || "",
-    roll_no: studentProfile.roll_no || fallbackStudent?.roll_no || "",
-    uid: studentProfile.uid || fallbackStudent?.uid || null,
-    displayName: studentProfile.display_name || fallbackStudent?.displayName || null,
-    photoURL: studentProfile.photo_url || fallbackStudent?.photoURL || null,
-    creationTime: studentProfile.creation_time || fallbackStudent?.creationTime || null,
-    lastSignInTime: studentProfile.last_sign_in_time || fallbackStudent?.lastSignInTime || null,
-    lastSeenAt: studentProfile.last_seen_at || fallbackStudent?.lastSeenAt || null,
-    phone: profileData.phone || profileData.phone_no || fallbackStudent?.phone || "",
-    phone_no: profileData.phone_no || profileData.phone || fallbackStudent?.phone_no || "",
+    user_id: profileData.user_id || profileData.roll_no || fallbackStudent?.user_id || "",
+    email: profileData.email || studentProfile.email || fallbackStudent?.email || null,
+    rollNo: profileData.roll_no || profileData.user_id || fallbackStudent?.rollNo || "",
+    roll_no: profileData.roll_no || profileData.user_id || fallbackStudent?.roll_no || "",
+    register_no: profileData.register_no || fallbackStudent?.register_no || "",
+    uid: profileData.uid || studentProfile.uid || fallbackStudent?.uid || null,
+    displayName: studentName || fallbackStudent?.displayName || null,
+    name: studentName,
+    photoURL: profileData.photo_url || studentProfile.photo_url || fallbackStudent?.photoURL || null,
+    creationTime: profileData.creation_time || studentProfile.creation_time || fallbackStudent?.creationTime || null,
+    lastSignInTime: profileData.last_sign_in_time || studentProfile.last_sign_in_time || fallbackStudent?.lastSignInTime || null,
+    lastSeenAt: profileData.last_seen_at || studentProfile.last_seen_at || fallbackStudent?.lastSeenAt || null,
+    phone: phoneNo,
+    phone_no: phoneNo,
+    parent_mobile: profileData.parent_mobile || fallbackStudent?.parent_mobile || "",
+    dept: profileData.dept || fallbackStudent?.dept || 0,
+    dept_name: department,
+    department: department,
+    dept_short_name: profileData.dept_short_name || fallbackStudent?.deptCode?.toUpperCase() || "",
+    gender: profileData.gender || fallbackStudent?.gender || "",
+    resident: profileData.resident || fallbackStudent?.resident || "",
+    batch_name: batch,
+    batch: batch,
+    year: profileData.year || fallbackStudent?.year || "",
   };
 };
 

@@ -176,8 +176,6 @@ func SetupRouter(
 		api.GET("/mess", messHandler.GetMess)
 		api.GET("/mess/timings", messHandler.GetMealTimings)
 		api.GET("/mess/closures", messHandler.GetActiveClosures)
-		api.GET("/v2/profile", trackerUserHandler.GetProfileV2)
-		api.GET("/profile/v2", trackerUserHandler.GetProfileV2)
 
 		api.GET("/top10", leaderboardHandler.GetTop10Students)
 		api.GET("/rank", leaderboardHandler.GetStudentRank)

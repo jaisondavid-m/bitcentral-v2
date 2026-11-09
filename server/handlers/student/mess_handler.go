@@ -364,7 +364,11 @@ func parseMessCSV(reader io.Reader) ([]parsedMessRow, error) {
 }
 
 func (h *MessHandler) GetMess(c *gin.Context) {
-	hostel, err := normalizeHostel(c.Query("hostel"))
+	hostelParam := strings.TrimSpace(c.Query("hostel"))
+	if hostelParam == "" {
+		hostelParam = "boys"
+	}
+	hostel, err := normalizeHostel(hostelParam)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "'hostel' query param is required",

@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import api from "@/api/axios.js";
+import { useAuth } from "@/context/StudentContext.jsx";
 import { MealCard } from "@/components/cards/MealCard.jsx";
 import MealCardSkeleton from "@/components/cards/MealCardSkeleton.jsx";
 
@@ -31,6 +32,10 @@ const hostelTabs = [
 ];
 
 const MessMenu = () => {
+  const { profile, student } = useAuth();
+  const gender = (profile?.gender || student?.gender || "").toUpperCase().trim();
+  const defaultHostel = gender === "F" ? "girls" : "boys";
+
   const [menu, setMenu] = useState({});
   const [dayLabel, setDayLabel] = useState("");
   const [currentMeal, setCurrentMeal] = useState(null);
@@ -42,8 +47,17 @@ const MessMenu = () => {
   const [error, setError] = useState("");
 
   const [activeTab, setActiveTab] = useState("breakfast");
-  const [hostel, setHostel] = useState("boys");
+  const [hostel, setHostel] = useState(defaultHostel);
   const [selectedDate, setSelectedDate] = useState(todayIST);
+  const initialGenderSet = useRef(false);
+
+  // Sync default hostel when gender loads from /me if not manually altered
+  useEffect(() => {
+    if (!initialGenderSet.current && gender) {
+      setHostel(gender === "F" ? "girls" : "boys");
+      initialGenderSet.current = true;
+    }
+  }, [gender]);
 
   const fetchMenu = useCallback(async () => {
     setLoading(true);

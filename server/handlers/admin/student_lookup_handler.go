@@ -43,9 +43,15 @@ func (h *StudentLookupHandler) GetRollNoByEmail(c *gin.Context) {
 
 	var rollNo string
 	err := h.DB.QueryRow(
-		`SELECT COALESCE(user_id, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) AND COALESCE(user_id, '') != '' LIMIT 1`,
+		`SELECT COALESCE(NULLIF(id, ''), COALESCE(user_id, '')) FROM student_details WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
 		mailID,
 	).Scan(&rollNo)
+	if (err != nil && errors.Is(err, sql.ErrNoRows)) || rollNo == "" {
+		err = h.DB.QueryRow(
+			`SELECT COALESCE(user_id, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) AND COALESCE(user_id, '') != '' LIMIT 1`,
+			mailID,
+		).Scan(&rollNo)
+	}
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{
 			"success": false,
@@ -323,22 +329,88 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		return
 	}
 
-	var trackerID, trackerUserID, phoneNo string
+	var (
+		sID, sUserID, sName, sPhone, sParentMobile, sDeptName, sDeptShortName, sGender, sResident, sBatchName, sYear string
+		sDept             int
+		hasStudentDetails bool
+	)
+
 	if h.DB != nil {
+		studentQuery := `SELECT 
+			COALESCE(id, ''), 
+			COALESCE(user_id, ''), 
+			COALESCE(name, ''), 
+			COALESCE(phone, ''), 
+			COALESCE(parent_mobile, ''), 
+			COALESCE(dept, 0), 
+			COALESCE(dept_name, ''), 
+			COALESCE(dept_short_name, ''), 
+			COALESCE(gender, ''), 
+			COALESCE(resident, ''), 
+			COALESCE(batch_name, ''), 
+			COALESCE(year, '')
+		FROM student_details 
+		WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) OR LOWER(TRIM(email)) = LOWER(TRIM(?)) 
+		LIMIT 1`
+
+		err := h.DB.QueryRow(studentQuery, emailID, cleanEmail).Scan(
+			&sID, &sUserID, &sName, &sPhone, &sParentMobile,
+			&sDept, &sDeptName, &sDeptShortName, &sGender,
+			&sResident, &sBatchName, &sYear,
+		)
+		if err == nil {
+			hasStudentDetails = true
+		}
+	}
+
+	// Source of truth: student_details.
+	// In student_details:
+	// - id is student_id / user_id / roll_no (e.g. 2025UCS1023)
+	// - user_id is the university Register Number (e.g. 7376251CS221)
+	// If data is not there, fallback to tracker_users or users table.
+	var (
+		rollNo, registerNo, userID, finalName, phoneNo, deptName, batchName string
+	)
+
+	if hasStudentDetails {
+		rollNo = sID
+		registerNo = sUserID
+		if registerNo == "" {
+			registerNo = sID
+		}
+		userID = rollNo
+		finalName = sName
+		phoneNo = sPhone
+		deptName = sDeptName
+		batchName = sBatchName
+	} else if h.DB != nil {
+		// Fallback to tracker_users
+		var trackerID, trackerUserID, tName, tPhone, trackerDept, trackerBatch string
 		_ = h.DB.QueryRow(
-			`SELECT COALESCE(id, ''), COALESCE(user_id, ''), COALESCE(phone, '') FROM tracker_users WHERE email = ? OR LOWER(TRIM(email)) = ? LIMIT 1`,
+			`SELECT COALESCE(id, ''), COALESCE(user_id, ''), COALESCE(name, ''), COALESCE(phone, ''), COALESCE(department, ''), COALESCE(batch, '') FROM tracker_users WHERE email = ? OR LOWER(TRIM(email)) = ? LIMIT 1`,
 			emailID, cleanEmail,
-		).Scan(&trackerID, &trackerUserID, &phoneNo)
-	}
+		).Scan(&trackerID, &trackerUserID, &tName, &tPhone, &trackerDept, &trackerBatch)
 
-	rollNo := trackerUserID
-	if rollNo == "" {
 		rollNo = trackerID
+		if rollNo == "" {
+			rollNo = trackerUserID
+		}
+		registerNo = trackerUserID
+		if registerNo == "" {
+			registerNo = rollNo
+		}
+		userID = rollNo
+		finalName = tName
+		phoneNo = tPhone
+		deptName = trackerDept
+		batchName = trackerBatch
 	}
 
-	userID := trackerID
-	if userID == "" {
-		userID = trackerUserID
+	if finalName == "" {
+		finalName = user.DisplayName
+	}
+	if user.DisplayName == "" || user.DisplayName == "Student" {
+		user.DisplayName = finalName
 	}
 
 	// Synchronize admin status from admins table if not superadmin
@@ -358,10 +430,22 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		"data": gin.H{
 			"id":                user.ID,
 			"google_id":         user.GoogleID,
-			"user_id":           userID,
 			"uid":               user.GoogleID,
+			"user_id":           userID,
+			"roll_no":           rollNo,
+			"register_no":       registerNo,
+			"name":              finalName,
+			"display_name":      finalName,
 			"email":             user.Email,
-			"display_name":      user.DisplayName,
+			"phone_no":          phoneNo,
+			"parent_mobile":     sParentMobile,
+			"dept":              sDept,
+			"dept_name":         deptName,
+			"dept_short_name":   sDeptShortName,
+			"gender":            sGender,
+			"resident":          sResident,
+			"batch_name":        batchName,
+			"year":              sYear,
 			"photo_url":         user.PhotoURL,
 			"creation_time":     user.CreationTime,
 			"last_sign_in_time": user.LastSignInTime,
@@ -371,9 +455,6 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 			"role":              user.Role,
 			"is_admin":          isAdminUser,
 			"is_super":          isSuperUser,
-			"roll_no":           rollNo,
-			"phone":             phoneNo,
-			"phone_no":          phoneNo,
 		},
 	})
 }
@@ -423,24 +504,6 @@ func (h *StudentLookupHandler) GoogleLogin(c *gin.Context) {
 	googleID := claims.UID
 	displayName := claims.Name
 	photoURL := claims.Picture
-
-	// Enforce email domain if configured
-	if strings.ToLower(strings.TrimSpace(os.Getenv("ENFORCE_EMAIL_DOMAIN"))) == "true" {
-		if !(strings.HasSuffix(email, "@bitsathy.ac.in") || strings.HasSuffix(email, "@bitsathy.in")) {
-			domain := ""
-			if at := strings.LastIndex(email, "@"); at >= 0 {
-				domain = email[at+1:]
-			}
-			var count int
-			if h.DB != nil {
-				_ = h.DB.QueryRow(`SELECT COUNT(*) FROM allowed_emails WHERE (type='email' AND LOWER(value)=?) OR (type='domain' AND LOWER(value)=?)`, email, domain).Scan(&count)
-				if count == 0 {
-					c.JSON(http.StatusForbidden, gin.H{"success": false, "error": "Access restricted to allowed email domain."})
-					return
-				}
-			}
-		}
-	}
 
 	// Sync user profile in database
 	userRole := "user"
