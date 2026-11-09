@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"bytes"
-	"encoding/json"
 	"io"
 	"log"
 	"net/http"
@@ -19,6 +18,7 @@ type auditLogItem struct {
 	Endpoint   string
 	Query      string
 	Payload    string
+	Response   string
 	IPAddress  string
 	UserUID    string
 	UserName   string
@@ -43,14 +43,15 @@ func processAuditLogs() {
 		}
 
 		query := `
-			INSERT INTO audit_logs (method, endpoint, query, payload, ip_address, user_uid, user_name, roll_no, role, status_code)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			INSERT INTO audit_logs (method, endpoint, query, payload, response, ip_address, user_uid, user_name, roll_no, role, status_code)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		`
 		if _, err := db.Exec(query,
 			item.Method,
 			item.Endpoint,
 			item.Query,
-			item.Payload,
+			nullIfEmpty(item.Payload),
+			nullIfEmpty(item.Response),
 			item.IPAddress,
 			nullIfEmpty(item.UserUID),
 			nullIfEmpty(item.UserName),
@@ -70,6 +71,34 @@ func nullIfEmpty(s string) any {
 	return s
 }
 
+type bodyLogWriter struct {
+	gin.ResponseWriter
+	body *bytes.Buffer
+	max  int
+}
+
+func (w *bodyLogWriter) Write(b []byte) (int, error) {
+	if w.body.Len() < w.max {
+		toWrite := len(b)
+		if w.body.Len()+toWrite > w.max {
+			toWrite = w.max - w.body.Len()
+		}
+		w.body.Write(b[:toWrite])
+	}
+	return w.ResponseWriter.Write(b)
+}
+
+func (w *bodyLogWriter) WriteString(s string) (int, error) {
+	if w.body.Len() < w.max {
+		toWrite := len(s)
+		if w.body.Len()+toWrite > w.max {
+			toWrite = w.max - w.body.Len()
+		}
+		w.body.WriteString(s[:toWrite])
+	}
+	return w.ResponseWriter.WriteString(s)
+}
+
 // AuditLogger records incoming API requests into the high-write Logs database (config.DBLogs)
 func AuditLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -87,25 +116,42 @@ func AuditLogger() gin.HandlerFunc {
 		}
 
 		var payload string
-		if c.Request.Method == http.MethodPost || c.Request.Method == http.MethodPut || c.Request.Method == http.MethodDelete || c.Request.Method == http.MethodPatch {
-			if c.Request.Body != nil {
-				bodyBytes, err := io.ReadAll(c.Request.Body)
-				if err == nil {
-					// Restore body for subsequent handlers
-					c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
-					payload = sanitizePayload(bodyBytes)
+		if c.Request.Body != nil {
+			bodyBytes, err := io.ReadAll(c.Request.Body)
+			if err == nil {
+				// Restore body for subsequent handlers
+				c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+				if len(bodyBytes) > 0 {
+					payload = string(bodyBytes)
+					if len(payload) > 100000 {
+						payload = payload[:100000]
+					}
 				}
 			}
 		}
 
+		blw := &bodyLogWriter{
+			ResponseWriter: c.Writer,
+			body:           bytes.NewBuffer(nil),
+			max:            100000,
+		}
+		c.Writer = blw
+
 		// Process request
 		c.Next()
+
+		respBody := blw.body.String()
 
 		// Extract user details if present in context or token
 		var userUID, userName, userRole, rollNo string
 		if uidVal, exists := c.Get("actor_uid"); exists {
 			if s, ok := uidVal.(string); ok {
 				userUID = s
+			}
+		}
+		if roleVal, exists := c.Get("actor_role"); exists {
+			if s, ok := roleVal.(string); ok {
+				userRole = s
 			}
 		}
 
@@ -115,8 +161,12 @@ func AuditLogger() gin.HandlerFunc {
 				if userUID == "" {
 					userUID = claims.UID
 				}
-				userName = claims.Name
-				userRole = claims.Role
+				if userName == "" {
+					userName = claims.Name
+				}
+				if userRole == "" {
+					userRole = claims.Role
+				}
 			}
 		}
 
@@ -125,6 +175,7 @@ func AuditLogger() gin.HandlerFunc {
 			Endpoint:   path,
 			Query:      c.Request.URL.RawQuery,
 			Payload:    payload,
+			Response:   respBody,
 			IPAddress:  c.ClientIP(),
 			UserUID:    userUID,
 			UserName:   userName,
@@ -138,40 +189,6 @@ func AuditLogger() gin.HandlerFunc {
 		case auditQueue <- item:
 		default:
 			// Queue is full under extreme burst; drop to protect memory
-		}
-	}
-}
-
-func sanitizePayload(data []byte) string {
-	if len(data) == 0 {
-		return ""
-	}
-	if len(data) > 2048 {
-		data = data[:2048]
-	}
-
-	var m map[string]any
-	if err := json.Unmarshal(data, &m); err == nil {
-		maskSensitiveKeys(m)
-		if cleaned, err := json.Marshal(m); err == nil {
-			return string(cleaned)
-		}
-	}
-	return string(data)
-}
-
-func maskSensitiveKeys(m map[string]any) {
-	sensitive := []string{"password", "token", "secret", "private_key", "credentials", "authorization"}
-	for k, v := range m {
-		kLower := strings.ToLower(k)
-		for _, s := range sensitive {
-			if strings.Contains(kLower, s) {
-				m[k] = "[REDACTED]"
-				break
-			}
-		}
-		if childMap, ok := v.(map[string]any); ok {
-			maskSensitiveKeys(childMap)
 		}
 	}
 }

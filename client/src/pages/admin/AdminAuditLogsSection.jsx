@@ -163,6 +163,7 @@ export default function AdminAuditLogsSection() {
   // Inspect Modal
   const [selectedLog, setSelectedLog] = useState(null);
   const [copiedPayload, setCopiedPayload] = useState(false);
+  const [copiedResponse, setCopiedResponse] = useState(false);
 
   // 1. Fetch Global Streaming Logs
   const fetchLogs = useCallback(
@@ -362,6 +363,12 @@ export default function AdminAuditLogsSection() {
     setTimeout(() => setCopiedPayload(false), 2000);
   };
 
+  const handleCopyResponse = (text) => {
+    navigator.clipboard.writeText(text);
+    setCopiedResponse(true);
+    setTimeout(() => setCopiedResponse(false), 2000);
+  };
+
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const userTotalPages = Math.max(1, Math.ceil(userLogsTotal / 50));
 
@@ -535,9 +542,23 @@ export default function AdminAuditLogsSection() {
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search endpoint, user name, roll no, or IP..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-9 pr-20 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-blue-500"
+                placeholder="Search anything: endpoint, status, method, user, payload, response..."
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-9 pr-24 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-blue-500"
               />
+              {searchInput && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchInput("");
+                    setSearch("");
+                    setPage(1);
+                  }}
+                  className="absolute right-20 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  title="Clear search"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
               <button
                 type="submit"
                 className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-blue-700 transition"
@@ -648,7 +669,7 @@ export default function AdminAuditLogsSection() {
                     <th className="py-3 px-3">Status</th>
                     <th className="py-3 px-4">Actor</th>
                     <th className="py-3 px-3">Client IP</th>
-                    <th className="py-3 px-4 text-right">Payload</th>
+                    <th className="py-3 px-4 text-right">Payload & Response</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
@@ -970,9 +991,23 @@ export default function AdminAuditLogsSection() {
                     type="text"
                     value={userSearchInput}
                     onChange={(e) => setUserSearchInput(e.target.value)}
-                    placeholder="Search endpoints or queries for this user..."
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-9 pr-20 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-purple-500"
+                    placeholder="Search anything: endpoint, query, payload, response..."
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-9 pr-24 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-purple-500"
                   />
+                  {userSearchInput && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserSearchInput("");
+                        setUserSearchText("");
+                        setUserPage(1);
+                      }}
+                      className="absolute right-20 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      title="Clear search"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                   <button
                     type="submit"
                     className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-purple-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-purple-700 transition"
@@ -1033,7 +1068,7 @@ export default function AdminAuditLogsSection() {
                         <th className="py-3 px-4">Endpoint & Query</th>
                         <th className="py-3 px-3">Status</th>
                         <th className="py-3 px-3">Client IP</th>
-                        <th className="py-3 px-4 text-right">Payload</th>
+                        <th className="py-3 px-4 text-right">Payload & Response</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
@@ -1388,14 +1423,14 @@ export default function AdminAuditLogsSection() {
       )}
 
       {/* ======================================================== */}
-      {/* DETAIL / PAYLOAD INSPECTION MODAL                       */}
+      {/* DETAIL / PAYLOAD & RESPONSE INSPECTION MODAL            */}
       {/* ======================================================== */}
       {selectedLog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 overflow-hidden flex flex-col max-h-[85vh]">
+          <div className="w-full max-w-3xl rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 overflow-hidden flex flex-col max-h-[90vh]">
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5 flex-wrap">
                 <span
                   className={`inline-block px-2 py-0.5 text-xs font-bold rounded-md border ${getMethodBadge(
                     selectedLog.method
@@ -1403,7 +1438,7 @@ export default function AdminAuditLogsSection() {
                 >
                   {selectedLog.method}
                 </span>
-                <span className="font-mono text-sm font-semibold text-slate-900 dark:text-white">
+                <span className="font-mono text-sm font-semibold text-slate-900 dark:text-white break-all">
                   {selectedLog.endpoint}
                 </span>
                 <span
@@ -1416,7 +1451,7 @@ export default function AdminAuditLogsSection() {
               </div>
               <button
                 onClick={() => setSelectedLog(null)}
-                className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800"
+                className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 shrink-0 ml-2"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -1469,7 +1504,7 @@ export default function AdminAuditLogsSection() {
                 <div className="flex items-center justify-between mb-1">
                   <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                     <Code2 className="h-3.5 w-3.5 text-blue-500" />
-                    <span>Request Body (Sanitized)</span>
+                    <span>Request Payload</span>
                   </div>
                   {selectedLog.payload && selectedLog.payload !== "null" && (
                     <button
@@ -1481,8 +1516,33 @@ export default function AdminAuditLogsSection() {
                     </button>
                   )}
                 </div>
-                <pre className="rounded-xl border border-slate-200 bg-slate-950 p-3 font-mono text-xs text-emerald-400 overflow-x-auto max-h-60 dark:border-slate-800 leading-relaxed">
+                <pre className="rounded-xl border border-slate-200 bg-slate-950 p-3 font-mono text-xs text-emerald-400 overflow-x-auto max-h-56 dark:border-slate-800 leading-relaxed select-text">
                   {formatPayload(selectedLog.payload)}
+                </pre>
+              </div>
+
+              {/* Response Body */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <Activity className="h-3.5 w-3.5 text-cyan-500" />
+                    <span>Response Body</span>
+                    <span className={`inline-block px-1.5 py-0.2 text-[10px] font-bold rounded border ${getStatusBadge(selectedLog.status_code)}`}>
+                      HTTP {selectedLog.status_code}
+                    </span>
+                  </div>
+                  {selectedLog.response && selectedLog.response !== "null" && (
+                    <button
+                      onClick={() => handleCopyResponse(formatPayload(selectedLog.response))}
+                      className="inline-flex items-center gap-1 text-[11px] font-medium text-cyan-600 hover:text-cyan-700 dark:text-cyan-400"
+                    >
+                      {copiedResponse ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
+                      <span>{copiedResponse ? "Copied" : "Copy Response"}</span>
+                    </button>
+                  )}
+                </div>
+                <pre className="rounded-xl border border-slate-200 bg-slate-950 p-3 font-mono text-xs text-cyan-300 overflow-x-auto max-h-64 dark:border-slate-800 leading-relaxed select-text">
+                  {formatPayload(selectedLog.response)}
                 </pre>
               </div>
             </div>

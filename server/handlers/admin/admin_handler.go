@@ -905,9 +905,26 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 	}
 
 	if search != "" {
-		whereClauses = append(whereClauses, "(endpoint LIKE ? OR user_name LIKE ? OR roll_no LIKE ? OR ip_address LIKE ?)")
-		pattern := "%" + search + "%"
-		args = append(args, pattern, pattern, pattern, pattern)
+		tokens := strings.Fields(search)
+		for _, token := range tokens {
+			pattern := "%" + token + "%"
+			whereClauses = append(whereClauses, `(
+				endpoint LIKE ? OR 
+				COALESCE(user_name, '') LIKE ? OR 
+				COALESCE(roll_no, '') LIKE ? OR 
+				COALESCE(user_uid, '') LIKE ? OR 
+				COALESCE(ip_address, '') LIKE ? OR 
+				method LIKE ? OR 
+				COALESCE(query, '') LIKE ? OR 
+				COALESCE(payload, '') LIKE ? OR 
+				COALESCE(response, '') LIKE ? OR 
+				COALESCE(role, '') LIKE ? OR 
+				CAST(status_code AS CHAR) LIKE ?
+			)`)
+			for i := 0; i < 11; i++ {
+				args = append(args, pattern)
+			}
+		}
 	}
 
 	whereSQL := ""
@@ -920,7 +937,7 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 	_ = db.QueryRow(countQuery, args...).Scan(&total)
 
 	selectQuery := `
-		SELECT id, method, endpoint, COALESCE(query, ''), COALESCE(payload, ''), ip_address,
+		SELECT id, method, endpoint, COALESCE(query, ''), COALESCE(payload, ''), COALESCE(response, ''), ip_address,
 		       COALESCE(user_uid, ''), COALESCE(user_name, ''), COALESCE(roll_no, ''), COALESCE(role, ''),
 		       status_code, DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', '+05:30'), '%Y-%m-%dT%H:%i:%s+05:30')
 		FROM audit_logs
@@ -940,6 +957,7 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 		Endpoint   string `json:"endpoint"`
 		Query      string `json:"query"`
 		Payload    string `json:"payload"`
+		Response   string `json:"response"`
 		IPAddress  string `json:"ip_address"`
 		UserUID    string `json:"user_uid"`
 		UserName   string `json:"user_name"`
@@ -953,7 +971,7 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 	for rows.Next() {
 		var entry AuditEntry
 		if err := rows.Scan(
-			&entry.ID, &entry.Method, &entry.Endpoint, &entry.Query, &entry.Payload, &entry.IPAddress,
+			&entry.ID, &entry.Method, &entry.Endpoint, &entry.Query, &entry.Payload, &entry.Response, &entry.IPAddress,
 			&entry.UserUID, &entry.UserName, &entry.RollNo, &entry.Role, &entry.StatusCode, &entry.CreatedAt,
 		); err == nil {
 			logs = append(logs, entry)

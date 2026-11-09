@@ -939,6 +939,7 @@ func createAuditLogsTable(db *sql.DB) {
 		roll_no VARCHAR(64) NULL,
 		role VARCHAR(64) NULL,
 		status_code INT NOT NULL DEFAULT 200,
+		response LONGTEXT NULL,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		INDEX idx_audit_created (created_at),
 		INDEX idx_audit_user (user_uid),
@@ -952,6 +953,7 @@ func createAuditLogsTable(db *sql.DB) {
 	} else {
 		log.Println("✅ audit_logs table ready")
 	}
+	db.Exec(`ALTER TABLE audit_logs ADD COLUMN response LONGTEXT NULL`)
 }
 
 func createDailyActiveUserStatsTable(db *sql.DB) {
