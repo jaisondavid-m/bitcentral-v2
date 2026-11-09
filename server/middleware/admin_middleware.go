@@ -81,9 +81,9 @@ func RequireAdmin() gin.HandlerFunc {
 				if r == "admin" || r == "superadmin" || r == "super_admin" {
 					c.Set("actor_uid", uid)
 					c.Set("actor_email", email)
-					c.Set("actor_role", r)
+					c.Set("actor_role", "admin")
 					c.Set("is_admin", true)
-					c.Set("is_super_admin", r == "superadmin" || r == "super_admin")
+					c.Set("is_super_admin", true)
 					c.Next()
 					return
 				}
@@ -105,7 +105,7 @@ func RequireAdmin() gin.HandlerFunc {
 				c.Set("actor_email", email)
 				c.Set("actor_role", "admin")
 				c.Set("is_admin", true)
-				c.Set("is_super_admin", false)
+				c.Set("is_super_admin", true)
 				c.Next()
 				return
 			}
@@ -144,7 +144,7 @@ func RequireSuperAdmin() gin.HandlerFunc {
 		uid := strings.TrimSpace(claims.UID)
 		email := strings.ToLower(strings.TrimSpace(claims.Email))
 
-		// Strict server-side database validation: only superadmin role in DB is allowed
+		// Any admin has full administrative access (admin and superadmin treated identical)
 		if config.DB != nil {
 			var role string
 			var blocked int
@@ -167,21 +167,42 @@ func RequireSuperAdmin() gin.HandlerFunc {
 				}
 
 				r := strings.ToLower(strings.TrimSpace(role))
-				if r == "superadmin" || r == "super_admin" {
+				if r == "admin" || r == "superadmin" || r == "super_admin" {
 					c.Set("actor_uid", uid)
 					c.Set("actor_email", email)
-					c.Set("actor_role", r)
+					c.Set("actor_role", "admin")
 					c.Set("is_admin", true)
 					c.Set("is_super_admin", true)
 					c.Next()
 					return
 				}
 			}
+
+			// Fallback: check admins table in DB
+			var count int
+			err = config.DB.QueryRow(`
+				SELECT COUNT(*)
+				FROM admins a
+				LEFT JOIN users u ON a.uid = u.uid
+				WHERE (a.uid = ? OR LOWER(TRIM(u.email)) = ?)
+				  AND COALESCE(u.blocked, 0) = 0`,
+				uid, email,
+			).Scan(&count)
+
+			if err == nil && count > 0 {
+				c.Set("actor_uid", uid)
+				c.Set("actor_email", email)
+				c.Set("actor_role", "admin")
+				c.Set("is_admin", true)
+				c.Set("is_super_admin", true)
+				c.Next()
+				return
+			}
 		}
 
 		c.JSON(http.StatusForbidden, gin.H{
 			"success": false,
-			"message": "Unauthorized super admin access: super privileges required",
+			"message": "Unauthorized admin access: admin privileges required",
 		})
 		c.Abort()
 	}

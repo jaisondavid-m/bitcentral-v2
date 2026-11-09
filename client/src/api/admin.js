@@ -206,30 +206,32 @@ export async function deleteCard(id) {
   return response.data;
 }
 
-// Super-admin related API
-export async function checkSuperAdmin() {
+// Admin verification & management API
+export async function checkAdmin() {
   const currentUser = auth.currentUser;
   if (!currentUser) return { is_admin: false, is_super: false, role: "user" };
-  const idToken = await currentUser.getIdToken();
-  const response = await api.get(`/admin/super/check`, { headers: { Authorization: `Bearer ${idToken}` } });
+  const headers = await getAdminHeaders();
+  const response = await api.get(`/admin/check`, { headers });
   return response.data || { is_admin: false, is_super: false, role: "user" };
 }
 
+export const checkSuperAdmin = checkAdmin;
+
 export async function listAdmins() {
   const headers = await getAdminHeaders();
-  const res = await api.get(`/admin/super/admins`, { headers });
+  const res = await api.get(`/admin/admins`, { headers });
   return res.data;
 }
 
 export async function addAdmin(uid) {
   const headers = await getAdminHeaders();
-  const res = await api.post(`/admin/super/admins`, { uid }, { headers });
+  const res = await api.post(`/admin/admins`, { uid }, { headers });
   return res.data;
 }
 
 export async function removeAdmin(uid) {
   const headers = await getAdminHeaders();
-  const res = await api.delete(`/admin/super/admins/${uid}`, { headers });
+  const res = await api.delete(`/admin/admins/${uid}`, { headers });
   return res.data;
 }
 

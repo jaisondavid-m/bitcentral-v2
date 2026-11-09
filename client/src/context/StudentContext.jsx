@@ -178,14 +178,11 @@ export const StudentContext = ({ children }) => {
           userRole === "superadmin" ||
           userRole === "super_admin"
         );
-        const isSuper = Boolean(
-          backendProfile.is_super ||
-          userRole === "superadmin" ||
-          userRole === "super_admin"
-        );
+        const isSuper = isAdmin;
+        const effectiveRole = isAdmin ? "admin" : (userRole || "user");
         setUser((prev) => ({
           ...prev,
-          role: userRole || "user",
+          role: effectiveRole,
           isAdmin,
           isSuper,
         }));
@@ -228,18 +225,15 @@ export const StudentContext = ({ children }) => {
               userRole === "superadmin" ||
               userRole === "super_admin"
             );
-            const isSuper = Boolean(
-              backendProfile.is_super ||
-              userRole === "superadmin" ||
-              userRole === "super_admin"
-            );
+            const isSuper = isAdmin;
+            const effectiveRole = isAdmin ? "admin" : (userRole || "user");
             setUser((prev) => ({
               ...prev,
               uid: backendProfile.uid || prev?.uid,
               email: backendProfile.email,
               displayName: backendProfile.display_name || prev?.displayName,
               photoURL: backendProfile.photo_url || prev?.photoURL,
-              role: userRole || "user",
+              role: effectiveRole,
               isAdmin,
               isSuper,
             }));

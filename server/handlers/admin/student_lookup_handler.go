@@ -413,8 +413,8 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		user.DisplayName = finalName
 	}
 
-	// Synchronize admin status from admins table if not superadmin
-	if h.DB != nil && user.Role != "superadmin" && user.Role != "super_admin" {
+	// Synchronize admin status from admins table
+	if h.DB != nil {
 		var inAdmins int
 		_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins WHERE uid = ? OR uid = ?`, user.UID, user.GoogleID).Scan(&inAdmins)
 		if inAdmins > 0 {
@@ -423,7 +423,10 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 	}
 
 	isAdminUser := user.Role == "admin" || user.Role == "superadmin" || user.Role == "super_admin"
-	isSuperUser := user.Role == "superadmin" || user.Role == "super_admin"
+	if isAdminUser {
+		user.Role = "admin"
+	}
+	isSuperUser := isAdminUser
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,

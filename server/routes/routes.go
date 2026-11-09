@@ -211,11 +211,17 @@ func SetupRouter(
 	}
 
 	// Admin routes
-	r.GET("/admin/super/check", adminHandler.CheckSuper)
-
 	admin := r.Group("/admin")
 	admin.Use(middleware.RequireAdmin())
 	{
+		// Admin auth verification
+		admin.GET("/check", adminHandler.CheckAdmin)
+
+		// Admin management (grant & revoke admin roles)
+		admin.GET("/admins", adminHandler.ListAdmins)
+		admin.POST("/admins", adminHandler.AddAdmin)
+		admin.DELETE("/admins/:uid", adminHandler.RemoveAdmin)
+
 		admin.GET("/audit-logs", adminHandler.GetAuditLogs)
 		admin.GET("/audit-logs/users", adminHandler.GetAuditLogUsers)
 		admin.GET("/audit-logs/api-usage", adminHandler.GetAuditAPIUsage)
@@ -293,15 +299,6 @@ func SetupRouter(
 		admin.GET("/survey/feedback", surveyHandler.GetFeedbackList)
 		admin.DELETE("/survey/feedback/:id", surveyHandler.DeleteFeedback)
 
-	}
-
-	// Super-admin routes: manage admins and allowed external emails/domains
-	super := r.Group("/admin/super")
-	super.Use(middleware.RequireSuperAdmin())
-	{
-		super.GET("/admins", adminHandler.ListAdmins)
-		super.POST("/admins", adminHandler.AddAdmin)
-		super.DELETE("/admins/:uid", adminHandler.RemoveAdmin)
 	}
 
 	return r

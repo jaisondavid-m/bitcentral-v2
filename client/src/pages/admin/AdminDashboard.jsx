@@ -35,7 +35,7 @@ import {
   updateSponsorDepartmentMappingsBatch,
   updateSponsorTransactionOverride,
   listTrackerUsers,
-  checkSuperAdmin,
+  checkAdmin,
   addAdmin,
   removeAdmin,
 } from "@/api/admin.js";
@@ -635,11 +635,8 @@ function reorderList(items, fromId, toId) {
 }
 
 /* -- Admin Overview Grid ----------------------------------------------------- */
-function AdminOverviewGrid({ isSuper }) {
-  const visibleTabs = ADMIN_TABS.filter((t) => {
-    if (t.key === "users") return Boolean(isSuper);
-    return true;
-  });
+function AdminOverviewGrid() {
+  const visibleTabs = ADMIN_TABS;
 
   return (
     <div className="space-y-6">
@@ -859,21 +856,19 @@ function UserCard({ userItem, index, onDelete, onToggleBlock, deletingUid, showS
           </div>
 
           <div className="grid grid-cols-2 gap-2 pt-1">
-            {isSuper && (
-              <button
-                type="button"
-                onClick={() => onToggleAdmin(userItem)}
-                disabled={adminActionUid === userItem.uid}
-                className={`inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition disabled:opacity-50 ${
-                  userItem.isAdmin
-                    ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200"
-                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                }`}
-              >
-                {adminActionUid === userItem.uid ? <Loader className="h-3.5 w-3.5 animate-spin" /> : userItem.isAdmin ? <UserMinus className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
-                <span>{userItem.isAdmin ? "Depromote" : "Promote to admin"}</span>
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => onToggleAdmin(userItem)}
+              disabled={adminActionUid === userItem.uid}
+              className={`inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition disabled:opacity-50 ${
+                userItem.isAdmin
+                  ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200"
+                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+              }`}
+            >
+              {adminActionUid === userItem.uid ? <Loader className="h-3.5 w-3.5 animate-spin" /> : userItem.isAdmin ? <UserMinus className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+              <span>{userItem.isAdmin ? "Depromote" : "Promote to admin"}</span>
+            </button>
             <button
               type="button"
               onClick={() => onToggleBlock(userItem.uid, !isBlocked)}
@@ -1046,14 +1041,12 @@ function UserTable({
                 <td className="whitespace-nowrap px-4 py-3.5">
                   <span
                     className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-bold border ${
-                      userItem.role === "superadmin" || userItem.role === "super_admin"
-                        ? "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-900"
-                        : userItem.role === "admin" || userItem.isAdmin
-                          ? "bg-purple-50 text-purple-800 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-900"
-                          : "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                      userItem.role === "admin" || userItem.isAdmin
+                        ? "bg-purple-50 text-purple-800 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-900"
+                        : "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
                     }`}
                   >
-                    {userItem.role || (userItem.isAdmin ? "admin" : "user")}
+                    {userItem.isAdmin ? "admin" : (userItem.role || "user")}
                   </span>
                 </td>
 
@@ -1080,28 +1073,26 @@ function UserTable({
                 {/* Actions */}
                 <td className="whitespace-nowrap px-4 py-3.5 text-right">
                   <div className="inline-flex items-center justify-end gap-1.5">
-                    {isSuper && (
-                      <button
-                        type="button"
-                        onClick={() => onToggleAdmin(userItem)}
-                        disabled={adminActionUid === userItem.uid}
-                        title={userItem.isAdmin ? "Depromote to regular user" : "Promote to admin"}
-                        className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs font-bold transition disabled:opacity-50 ${
-                          userItem.isAdmin
-                            ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200"
-                            : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                        }`}
-                      >
-                        {adminActionUid === userItem.uid ? (
-                          <Loader className="h-3.5 w-3.5 animate-spin" />
-                        ) : userItem.isAdmin ? (
-                          <UserMinus className="h-3.5 w-3.5" />
-                        ) : (
-                          <Plus className="h-3.5 w-3.5" />
-                        )}
-                        <span>{userItem.isAdmin ? "Depromote" : "Promote"}</span>
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => onToggleAdmin(userItem)}
+                      disabled={adminActionUid === userItem.uid}
+                      title={userItem.isAdmin ? "Depromote to regular user" : "Promote to admin"}
+                      className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs font-bold transition disabled:opacity-50 ${
+                        userItem.isAdmin
+                          ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200"
+                          : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                      }`}
+                    >
+                      {adminActionUid === userItem.uid ? (
+                        <Loader className="h-3.5 w-3.5 animate-spin" />
+                      ) : userItem.isAdmin ? (
+                        <UserMinus className="h-3.5 w-3.5" />
+                      ) : (
+                        <Plus className="h-3.5 w-3.5" />
+                      )}
+                      <span>{userItem.isAdmin ? "Depromote" : "Promote"}</span>
+                    </button>
                     <button
                       type="button"
                       onClick={() => onToggleBlock(userItem.uid, !userItem.isBlocked)}
@@ -6288,7 +6279,7 @@ function AdminDashboard({ initialTab } = {}) {
     let mounted = true;
     (async () => {
       try {
-        const res = await checkSuperAdmin();
+        const res = await checkAdmin();
         if (!mounted) return;
         if (res && res.is_admin === false) {
           // Strict server-side validation rejected: not an admin in DB

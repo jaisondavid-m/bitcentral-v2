@@ -397,6 +397,9 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		u.IsBlocked = blocked == 1
 		u.BlockedAt = blockedAt
 		u.IsAdmin = adminByUID[u.UID] || u.Role == "admin" || u.Role == "superadmin" || u.Role == "super_admin"
+		if u.IsAdmin {
+			u.Role = "admin"
+		}
 
 		cleanEmail := strings.ToLower(strings.TrimSpace(u.Email))
 		if tp, ok := trackerMap[cleanEmail]; ok {
@@ -824,7 +827,9 @@ func (h *AdminHandler) UpdateUserRole(c *gin.Context) {
 	}
 
 	role := strings.TrimSpace(strings.ToLower(body.Role))
-	if role == "" {
+	if role == "admin" || role == "superadmin" || role == "super_admin" {
+		role = "admin"
+	} else if role == "" {
 		role = "user"
 	}
 
@@ -834,7 +839,7 @@ func (h *AdminHandler) UpdateUserRole(c *gin.Context) {
 		return
 	}
 
-	if role == "admin" || role == "superadmin" || role == "super_admin" {
+	if role == "admin" {
 		actorUID, _ := c.Get("actor_uid")
 		_, _ = h.DB.Exec(`INSERT IGNORE INTO admins (uid, created_by) VALUES (?, ?)`, uid, actorUID)
 	} else {

@@ -61,7 +61,7 @@ func (h *AdminHandler) AddAdmin(c *gin.Context) {
 	}
 
 	// Synchronize user role in database so user is recognized as admin everywhere
-	_, _ = h.DB.Exec(`UPDATE users SET role = 'admin' WHERE (uid = ? OR google_id = ?) AND role NOT IN ('superadmin', 'super_admin')`, uid, uid)
+	_, _ = h.DB.Exec(`UPDATE users SET role = 'admin' WHERE (uid = ? OR google_id = ?)`, uid, uid)
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Admin added", "uid": uid})
 }
@@ -78,14 +78,14 @@ func (h *AdminHandler) RemoveAdmin(c *gin.Context) {
 		return
 	}
 
-	// Demote user role back to 'user' in database (never demote superadmin)
-	_, _ = h.DB.Exec(`UPDATE users SET role = 'user' WHERE (uid = ? OR google_id = ?) AND role NOT IN ('superadmin', 'super_admin')`, uid, uid)
+	// Demote user role back to 'user' in database
+	_, _ = h.DB.Exec(`UPDATE users SET role = 'user' WHERE (uid = ? OR google_id = ?)`, uid, uid)
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Admin removed", "uid": uid})
 }
 
-// Check if provided bearer token belongs to configured admin or super admin
-func (h *AdminHandler) CheckSuper(c *gin.Context) {
+// Check if provided bearer token belongs to configured admin
+func (h *AdminHandler) CheckAdmin(c *gin.Context) {
 	authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
 	token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
 	if token == "" {
@@ -130,19 +130,10 @@ func (h *AdminHandler) CheckSuper(c *gin.Context) {
 			}
 
 			r := strings.ToLower(strings.TrimSpace(role))
-			if r == "superadmin" || r == "super_admin" {
+			if r == "superadmin" || r == "super_admin" || r == "admin" {
 				c.JSON(http.StatusOK, gin.H{
 					"is_admin": true,
 					"is_super": true,
-					"role":     "superadmin",
-				})
-				return
-			}
-
-			if r == "admin" {
-				c.JSON(http.StatusOK, gin.H{
-					"is_admin": true,
-					"is_super": false,
 					"role":     "admin",
 				})
 				return
@@ -163,7 +154,7 @@ func (h *AdminHandler) CheckSuper(c *gin.Context) {
 		if count > 0 {
 			c.JSON(http.StatusOK, gin.H{
 				"is_admin": true,
-				"is_super": false,
+				"is_super": true,
 				"role":     "admin",
 			})
 			return
@@ -171,4 +162,8 @@ func (h *AdminHandler) CheckSuper(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"is_admin": false, "is_super": false, "role": "user"})
+}
+
+func (h *AdminHandler) CheckSuper(c *gin.Context) {
+	h.CheckAdmin(c)
 }
