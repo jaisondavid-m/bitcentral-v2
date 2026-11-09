@@ -16,6 +16,7 @@ import profileAvatar from "@/assets/profile.jpg";
 import { logout } from "@/config/auth.js";
 import { useAuth } from "@/context/StudentContext.jsx";
 import { haptics } from "@/utils/haptics.js";
+import LogoutConfirmModal from "@/components/modals/LogoutConfirmModal.jsx";
 
 function formatAuthDate(dateValue) {
   if (!dateValue) return "-";
@@ -31,6 +32,7 @@ function formatAuthDate(dateValue) {
 function ProfileV2() {
   const { user, profile, student } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   if (!user) return <Navigate to="/login" replace />;
 
@@ -85,8 +87,12 @@ function ProfileV2() {
     user?.photoURL ||
     profileAvatar;
 
-  const handleLogout = async () => {
-    haptics.action();
+  const handleOpenLogout = () => {
+    haptics.selection();
+    setShowLogoutModal(true);
+  };
+
+  const handleConfirmLogout = async () => {
     setIsLoggingOut(true);
     try {
       await logout();
@@ -258,7 +264,7 @@ function ProfileV2() {
         {/* Logout Button */}
         <div className="flex justify-center">
           <button
-            onClick={handleLogout}
+            onClick={handleOpenLogout}
             disabled={isLoggingOut}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-900 bg-rose-600 px-8 py-3 text-sm font-black text-white shadow-[3px_3px_0px_#18181b] hover:bg-rose-700 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 disabled:opacity-50 dark:border-white dark:shadow-[3px_3px_0px_#ffffff] transition-all cursor-pointer"
           >
@@ -276,6 +282,13 @@ function ProfileV2() {
           </button>
         </div>
       </div>
+
+      <LogoutConfirmModal
+        open={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleConfirmLogout}
+        isLoading={isLoggingOut}
+      />
     </main>
   );
 }

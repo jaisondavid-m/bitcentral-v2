@@ -6,11 +6,14 @@ import { LogOut, Menu, Moon, Star, Sun, X } from "lucide-react";
 import { useAuth } from "@/context/StudentContext.jsx";
 import { useTheme } from "@/context/ThemeContext.jsx";
 import NotificationBell from "@/components/notifications/NotificationBell.jsx";
+import LogoutConfirmModal from "@/components/modals/LogoutConfirmModal.jsx";
 import { haptics } from "@/utils/haptics.js";
 
 function Navbar() {
   const { user, profile } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
@@ -37,14 +40,22 @@ function Navbar() {
     return location.pathname === item.to;
   };
 
-  const handleLogout = async () => {
-    haptics.action();
+  const handleOpenLogout = () => {
+    haptics.selection();
+    setShowLogoutModal(true);
+  };
+
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true);
     try {
       await logout();
+      setShowLogoutModal(false);
       setIsOpen(false);
       navigate("/login", { replace: true });
     } catch (error) {
       console.error("Error logging out:", error);
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -106,7 +117,7 @@ function Navbar() {
               </button>
 
               <button
-                onClick={handleLogout}
+                onClick={handleOpenLogout}
                 className="inline-flex items-center justify-center h-9 px-3 rounded-lg text-xs font-bold text-white bg-rose-500 hover:bg-rose-600 border border-zinc-900 dark:border-white shadow-[2px_2px_0px_#18181b] dark:shadow-[2px_2px_0px_#ffffff] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all gap-1.5 cursor-pointer"
                 aria-label="Logout"
                 title="Sign out"
@@ -211,7 +222,7 @@ function Navbar() {
 
                       <li className="pt-2">
                         <button
-                          onClick={handleLogout}
+                          onClick={handleOpenLogout}
                           className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-zinc-900 bg-rose-600 px-3.5 py-2.5 text-sm font-bold text-white shadow-[2px_2px_0px_#18181b] hover:bg-rose-700 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none dark:border-white dark:shadow-[2px_2px_0px_#ffffff] transition-all"
                         >
                           <LogOut className="h-4 w-4" />
@@ -233,6 +244,13 @@ function Navbar() {
           </>
         )}
       </AnimatePresence>
+
+      <LogoutConfirmModal
+        open={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleConfirmLogout}
+        isLoading={isLoggingOut}
+      />
     </>
   );
 }
