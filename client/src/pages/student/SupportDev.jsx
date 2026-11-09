@@ -422,8 +422,6 @@ export default function SupportDev() {
         } catch (err) {
           // ignore
         }
-
-        navigate(`/payment-successful/${encodeURIComponent(certId)}`);
       },
 
 
@@ -630,13 +628,9 @@ export default function SupportDev() {
                             ₹{Number(userContribution.named_amount || userContribution.amount || 0).toLocaleString("en-IN")}
                           </div>
                           <div className="flex items-center gap-1.5 mt-1">
-                            <button
-                              type="button"
-                              onClick={() => navigate(`/payment-successful/${encodeURIComponent(userContribution.certificate_id || 'BIT-PATRON-VERIFIED')}`)}
-                              className="inline-flex items-center gap-0.5 rounded bg-emerald-700 px-1.5 py-0.5 text-[10px] font-bold text-white hover:bg-emerald-800 transition-colors cursor-pointer"
-                            >
-                              <span>Certificate</span>
-                            </button>
+                            <span className="inline-flex items-center gap-0.5 rounded bg-emerald-700/80 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                              ✓ Verified Patron
+                            </span>
                           </div>
                         </div>
                       </div>

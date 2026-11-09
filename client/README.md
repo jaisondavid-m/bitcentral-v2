@@ -33,7 +33,7 @@ BIT-CENTRAL is a comprehensive, production-grade web application built to centra
 
 Finding study materials, previous year question papers, mess menus, exam seat allotments, and leave pass updates can often be fragmented across multiple channels. **BIT-CENTRAL** solves this by offering a single, responsive, dark-mode-ready portal for BITSians.
 
-Powered by a modern **React 19** frontend and a robust **Go (Gin Framework)** backend with **Firebase Authentication** and **MySQL**, BIT-CENTRAL provides lightning-fast search, inline PDF previews, real-time presence tracking, and role-restricted admin management.
+Powered by a modern **React 19** frontend and a robust **Go (Gin Framework)** backend with Google Sign-In, JWT sessions, and **MySQL**, BIT-CENTRAL provides lightning-fast search, inline PDF previews, and role-restricted admin management.
 
 ---
 
@@ -74,7 +74,7 @@ Powered by a modern **React 19** frontend and a robust **Go (Gin Framework)** ba
 
 ### 🛡️ Admin Governance Suite
 - **Comprehensive Admin Dashboard (`/admin`)**: Real-time overview of active student sessions, system analytics, and quick admin actions.
-- **User Governance (`/admin/users`)**: Manage user roles, grant admin privileges, and inspect active presence (`PING_ON`).
+- **User Governance (`/admin/users`)**: Manage user roles and grant admin privileges.
 - **Question Bank Management (`/admin/qb`)**: Upload, categorize, edit, or remove exam papers and answer key PDFs.
 - **Card & Resource Controls (`/admin/cards`)**: Manage featured cards, announcements, and resource links shown on the user dashboard.
 - **Super Admin Operations (`/admin/super`)**: High-level system configuration and permission overrides.
@@ -91,7 +91,7 @@ Powered by a modern **React 19** frontend and a robust **Go (Gin Framework)** ba
 | **State & Data Fetching** | TanStack Query v5 + Context API | Cached API requests, optimistic updates, and global state |
 | **Search Engine** | Fuse.js | Client-side fuzzy search across question papers & directories |
 | **PDF Processing** | PDF.js (`react-pdf`) | Native, zero-dependency PDF document previewer |
-| **Authentication** | Firebase Auth (Google & Email) | Secure user authentication and JWT session scoping |
+| **Authentication** | Google Sign-In + backend JWT | Secure user authentication and JWT session scoping |
 | **Backend Engine** | Go (Gin Web Framework) | High-throughput REST API server written in Go |
 | **Database** | MySQL | Relational data persistence for users, cards, leaves, & cards |
 | **Integrations** | Google Sheets API OAuth 2.0 | Automated syncing for PS Rewards and Leaderboards |
@@ -116,8 +116,8 @@ Powered by a modern **React 19** frontend and a robust **Go (Gin Framework)** ba
                      |                                                 |
                      v                                                 v
         +------------+------------+                       +------------+------------+
-        |   Firebase Auth Service |                       |     Go (Gin) Backend API    |
-        |  (Google / Email Login) |                       |     (Port 8080 default)   |
+        |    Google Sign-In       |                       |     Go (Gin) Backend API    |
+        |  (OAuth credential)     |                       |     (Port 8080 default)   |
         +-------------------------+                       +------------+------------+
                                                                        |
                                               +------------------------+------------------------+
@@ -142,7 +142,7 @@ bitcentral/
 │   ├── scripts/                 # Sitemap generation & pre-rendering scripts
 │   ├── src/
 │   │   ├── api/                 # Axios configuration and API client helpers
-│   │   ├── Authentication/      # Firebase authentication initialization & config
+│   │   ├── config/              # Authentication and runtime configuration
 │   │   ├── Component/           # Reusable UI components (NavBar, Cards, Modals, SEO)
 │   │   ├── config/              # Application constants and default configs
 │   │   ├── content/             # Markdown and structured content files
@@ -158,7 +158,7 @@ bitcentral/
 │
 └── server/                      # Go Backend API Server
     ├── .env.example             # Example environment variables template
-    ├── config/                  # MySQL & Firebase Admin initialization
+    ├── config/                  # MySQL and application configuration
     ├── handlers/                # HTTP request handlers (Leave, Mess, Exam, QB, Cards...)
     ├── middleware/              # Auth middleware & CORS handling
     ├── models/                  # Database models & structures
@@ -177,23 +177,11 @@ bitcentral/
 Create a `.env` file in the `client/` folder:
 
 ```env
-# Firebase Configuration
-VITE_FIREBASE_API_KEY=your_firebase_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
-
 # Backend API Endpoint
 VITE_API_BASE_URL=http://localhost:8080
 
-# Admin Access Control
-VITE_ADMIN_FIREBASE_UID=your_admin_firebase_uid
-
-# Optional Features
-PING_ON=true
+# Razorpay checkout
+VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
 ```
 
 ### Server Environment Variables (`server/.env`)
@@ -214,10 +202,6 @@ MYSQL_TOKEN_TABLE=ps_tokens
 MYSQL_SSL_ENABLED=false
 MYSQL_SSL_CA_PATH=
 
-# Firebase Configuration
-FIREBASE_CREDENTIALS_FILE=./firebase-service-account.json
-FIREBASE_CREDENTIALS_JSON=
-
 # Google OAuth & Sheets Integration
 CLIENT_ID=your_google_client_id
 CLIENT_SECRET=your_google_client_secret
@@ -237,7 +221,7 @@ PS_COOKIE_HEADER="PS=your_ps_cookie_value; Device-Identifier=your_device_id;"
 PS_REWARDS_BREAKDOWN_BASE_URL=https://ps.bitsathy.ac.in/api/ps_v2/activity/rewards/breakdown
 SELF_PING_INTERVAL_MS=600000
 
-# Optional Debug Flag (Set "true" to bypass MySQL/Firebase init during dev testing)
+# Optional Debug Flag (Set "true" to bypass service initialization during dev testing)
 SKIP_SERVICE_INIT=false
 ```
 
@@ -249,7 +233,7 @@ SKIP_SERVICE_INIT=false
 - **Node.js**: v18.0.0 or higher
 - **Go**: v1.20 or higher
 - **MySQL Database** (or local instance)
-- **Firebase Account** with authentication enabled
+- **Google OAuth credentials** for Google Sign-In
 
 ---
 
@@ -287,7 +271,7 @@ SKIP_SERVICE_INIT=false
    npm install
    ```
 
-3. Setup your `client/.env` file with Firebase and API settings.
+3. Setup your `client/.env` file with API and Razorpay settings.
 
 4. Start the Vite development server:
    ```bash
@@ -304,11 +288,9 @@ In the `client/` directory, you can run:
 | Command | Action |
 | :--- | :--- |
 | `npm run dev` | Launches Vite local development server with HMR |
-| `npm run build` | Builds the app for production, generates sitemaps, and runs pre-rendering |
+| `npm run build` | Builds the app for production with Vite |
 | `npm run preview` | Previews the local production build |
 | `npm run lint` | Runs ESLint to check for code quality and syntax issues |
-| `npm run seo:sitemap` | Executes script to automatically regenerate `sitemap.xml` |
-| `npm run seo:prerender` | Pre-renders static public routes for fast initial page loads |
 
 ---
 
@@ -317,7 +299,7 @@ In the `client/` directory, you can run:
 BIT-CENTRAL enforces strict multi-tier permissions:
 
 - 🔓 **Public Routes**: `/login`, `/landing`, `/privacy-policy`, `/terms`, `/about`, `/features`, `/faq`, `/contact`. Accessible without signing in.
-- 🔒 **Student Protected Routes**: `/home`, `/dashboard`, `/semester`, `/exam-hall`, `/mess`, `/leavedetails`, `/rpsite`, `/apsite`, `/pcdp`, `/findmyway`, `/student-report`. Requires active Firebase user authentication (`ProtectedRoute.jsx`).
+- 🔒 **Student Protected Routes**: `/home`, `/dashboard`, `/semester`, `/exam-hall`, `/mess`, `/leavedetails`, `/rpsite`, `/apsite`, `/pcdp`, `/findmyway`, `/student-report`. Requires an active backend JWT session (`ProtectedRoute.jsx`).
 - 🛡️ **Admin Protected Routes**: `/admin`, `/admin/users`, `/admin/qb`, `/admin/cards`, `/admin/mess`, `/admin/ps-rewards`, `/admin/super`. Restricted to users matching administrative UID roles (`AdminRoute.jsx`).
 
 ---

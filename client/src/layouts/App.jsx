@@ -26,25 +26,17 @@ const Disclaimer = lazyWithRetry(() => import("@/pages/public/Disclaimer.jsx"));
 const GuidesIndex = lazyWithRetry(() => import("@/pages/public/GuidesIndex.jsx"));
 const GuideDetail = lazyWithRetry(() => import("@/pages/public/GuideDetail.jsx"));
 const Rpsite = lazyWithRetry(() => import("@/pages/student/Rpsite.jsx"));
-const Semester = lazyWithRetry(() => import("@/pages/student/Semester.jsx"));
 const MessMenu = lazyWithRetry(() => import("@/pages/student/MessMenu.jsx"));
 const PCDP = lazyWithRetry(() => import("@/pages/student/PCDP.jsx"));
-const FindMyWay = lazyWithRetry(() => import("@/pages/student/FindMyWay.jsx"));
 const NotFound = lazyWithRetry(() => import("@/pages/NotFound.jsx"));
 const LeaveDetails = lazyWithRetry(() => import("@/pages/student/LeaveDetails.jsx"));
 const ExamHall = lazyWithRetry(() => import("@/pages/student/ExamHall.jsx"));
 const ExamHallDownload = lazyWithRetry(() => import("@/pages/student/ExamHallDownload.jsx"));
 const ExamHallMembers = lazyWithRetry(() => import("@/pages/student/ExamHallMembers.jsx"));
 const SupportDev = lazyWithRetry(() => import("@/pages/student/SupportDev.jsx"));
-const PaymentSuccessful = lazyWithRetry(() => import("@/pages/student/PaymentSuccessful.jsx"));
 const WifiDetails = lazyWithRetry(() => import("@/pages/student/WifiDetails.jsx"));
 const FacultyDirectory = lazyWithRetry(() => import("@/pages/student/FacultyDirectory.jsx"));
-const PSConnect = lazyWithRetry(() => import("@/pages/student/PSConnect.jsx"));
-const DSAPage = lazyWithRetry(() => import("@/pages/student/DSAPage.jsx"));
-const PPLPage = lazyWithRetry(() => import("@/pages/student/PPLPage.jsx"));
-const RecordsManual = lazyWithRetry(() => import("@/pages/student/RecordsManual.jsx"));
 
-// const DocsPage = lazyWithRetry(() => import("@/pages/public/AboutDocs.jsx"));
 const AuthScope = lazyWithRetry(() => import("../routes/AuthScope.jsx"));
 const ProtectedRoute = lazyWithRetry(() => import("../routes/ProtectedRoute.jsx"));
 const AdminRoute = lazyWithRetry(() => import("../routes/AdminRoute.jsx"));
@@ -56,6 +48,19 @@ function App() {
   const location = useLocation();
 
   const currentMeta = getRouteSeo(location.pathname);
+  const isPublicUiRoute =
+    location.pathname === "/" ||
+    location.pathname === "/about" ||
+    location.pathname === "/developer" ||
+    location.pathname === "/features" ||
+    location.pathname === "/faq" ||
+    location.pathname === "/contact" ||
+    location.pathname === "/privacy-policy" ||
+    location.pathname === "/terms" ||
+    location.pathname === "/disclaimer" ||
+    location.pathname === "/guides" ||
+    location.pathname.startsWith("/guides/") ||
+    location.pathname === "/wifi-details";
 
   // useEffect(() => {
   //   const handleKeyDown = (e) => {
@@ -121,7 +126,8 @@ function App() {
       <SEO pathname={location.pathname} meta={currentMeta} />
       <ErrorBoundary>
         <Suspense fallback={<FullScreenLoader />}>
-          <Routes>
+          <div className={isPublicUiRoute ? "public-ui" : undefined}>
+            <Routes>
             {/* Public */}
             <Route
               path="/login"
@@ -150,7 +156,6 @@ function App() {
             <Route path="/features" element={<Features />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/contact" element={<Contact />} />
-            {/* <Route path="/docs/about" element={<DocsPage />} /> */}
 
             {/* Protected Layout */}
             <Route
@@ -164,25 +169,8 @@ function App() {
             >
               <Route path="/home" element={<Home />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/findmyway" element={<FindMyWay />} />
               <Route
                 path="/admin"
-                element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/analytics"
-                element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/deployments"
                 element={
                   <AdminRoute>
                     <AdminDashboard />
@@ -215,22 +203,6 @@ function App() {
               />
               <Route
                 path="/admin/sponsors"
-                element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/qb"
-                element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/ps-rewards"
                 element={
                   <AdminRoute>
                     <AdminDashboard />
@@ -278,14 +250,6 @@ function App() {
                 }
               />
               <Route
-                path="/admin/help"
-                element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }
-              />
-              <Route
                 path="/admin/feedback"
                 element={
                   <AdminRoute>
@@ -301,66 +265,22 @@ function App() {
                   </AdminRoute>
                 }
               />
-              <Route
-                path="/admin/mail-sender"
-                element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/ai-key"
-                element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/cloudflare"
-                element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/super"
-                element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }
-              />
               <Route path="/profile" element={<ProfileV2 />} />
-              <Route path="/profile/v2" element={<ProfileV2 />} />
               <Route path="/faculty-directory" element={<FacultyDirectory />} />
-              <Route path="/faculty" element={<FacultyDirectory />} />
-              {/* <Route path="/about" element={<About />} /> */}
               <Route path="/rpsite" element={<Rpsite />} />
               <Route path="/pcdp" element={<PCDP />} />
               <Route path="/exam-hall" element={<ExamHallDownload />} />
               <Route path="/exam-hall-manual" element={<ExamHall />} />
               <Route path="/exam-hall/members" element={<ExamHallMembers />} />
-              <Route path="/exam-hall-members" element={<ExamHallMembers />} />
               <Route path="/leavedetails" element={<LeaveDetails />} />
-              <Route path="/semester" element={<Semester />} />
               <Route path="/mess" element={<MessMenu />} />
-              <Route path="/dsa" element={<DSAPage />} />
-              <Route path="/ppl" element={<PPLPage />} />
-              <Route path="/records-manual" element={<RecordsManual />} />
               <Route path="/support-dev" element={<SupportDev />} />
-              <Route path="/ps-connect" element={<PSConnect />} />
-              <Route path="/payment-successful" element={<PaymentSuccessful />} />
-              <Route path="/payment-successful/:id" element={<PaymentSuccessful />} />
-              <Route path="/payment-successfull" element={<PaymentSuccessful />} />
-              <Route path="/payment-successfull/:id" element={<PaymentSuccessful />} />
 
               <Route path="*" element={<NotFound />} />
             </Route>
             <Route path="*" element={<NotFound />} />
-          </Routes>
+            </Routes>
+          </div>
         </Suspense>
       </ErrorBoundary>
       <Analytics />

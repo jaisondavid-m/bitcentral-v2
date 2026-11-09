@@ -86,7 +86,6 @@ function getPresenceRouteLabel(pathname = "") {
 
   if (!path || path === "/" || path === "/home") return "Home";
   if (path.startsWith("/dashboard") || path.startsWith("/profile")) return "Dashboard";
-  if (path.startsWith("/semester")) return "Semester";
   if (path.startsWith("/mess")) return "Mess Menu";
   if (path.startsWith("/exam-hall")) return "Exam Hall";
   if (path.startsWith("/pcdp")) return "PCDP";

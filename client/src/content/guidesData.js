@@ -636,7 +636,6 @@ This guide provides practical steps for first-year students to transition smooth
 ### 🔒 Protected Student Tools (BIT Sathy Google Login Required)
 - **Exam Hall Finder (\`/exam-hall\`):** Personalized student exam seat allocation lookup.
 - **Attendance & Biometrics (\`/ps-biometrics\`):** Individual fingerprint scan logs and session tracking.
-- **Semester Resources (\`/semester\`):** Department-wise question bank files and full answer key PDFs.
 - **Hostel Mess Menu (\`/mess\`):** Daily live hostel meal menus.
 - **Reward Points & Profile (\`/profile\`, \`/rpsite\`):** Student reward points breakdown and personal profile details.`
       },
@@ -651,8 +650,7 @@ This guide provides practical steps for first-year students to transition smooth
 | Wi-Fi Details Guide | \`/wifi-details\` | Public | Campus Wi-Fi default passwords & password change steps |
 | Portal Overview | \`/about\` & \`/features\` | Public | Architecture, developer details, and platform scope |
 | Exam Hall Finder | \`/exam-hall\` | Authenticated | Hall number, block, and desk allocation lookup |
-| Mess Menu Updates | \`/mess\` | Authenticated | Daily breakfast, lunch, and dinner hostel mess updates |
-| Semester Materials | \`/semester\` | Authenticated | Branch-wise question banks and model answer keys |`
+| Mess Menu Updates | \`/mess\` | Authenticated | Daily breakfast, lunch, and dinner hostel mess updates |`
       },
       {
         id: "developer-story",

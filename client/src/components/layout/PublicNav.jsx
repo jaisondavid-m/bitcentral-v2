@@ -1,38 +1,57 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { LogIn } from "lucide-react";
+import { LogIn, Menu, X } from "lucide-react";
 import { publicLinks } from "@/content/publicContent.js";
 
 export default function PublicNav() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <header className="border-b border-slate-200 bg-white/95 text-slate-900 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95 dark:text-white">
-      <nav className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8" aria-label="Public navigation">
-        <Link to="/" className="flex items-center gap-3 font-bold" aria-label="BIT Central public home">
-          <img src="/CardImgs/cropped_circle_image.png" alt="BIT Central logo" className="h-10 w-10 rounded-lg" width="40" height="40" />
-          <span>BIT Central</span>
+    <header className="public-nav">
+      <nav className="public-nav__inner" aria-label="Public navigation">
+        <Link to="/" className="public-brand" aria-label="BIT Central public home" onClick={() => setIsOpen(false)}>
+          <span className="public-brand__mark">
+            <img src="/CardImgs/cropped_circle_image.png" alt="" width="34" height="34" />
+          </span>
+          <span>
+            <strong>BIT Central</strong>
+            <small>Student knowledge hub</small>
+          </span>
         </Link>
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          {publicLinks.map((link) => (
-            <NavLink
-              key={link.href}
-              to={link.href}
-              className={({ isActive }) =>
-                `rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-200"
-                    : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-900"
-                }`
-              }
-            >
-              {link.label}
-            </NavLink>
-          ))}
+
+        <button
+          type="button"
+          className="public-nav__toggle"
+          aria-expanded={isOpen}
+          aria-controls="public-navigation-links"
+          aria-label={isOpen ? "Close navigation" : "Open navigation"}
+          onClick={() => setIsOpen((open) => !open)}
+        >
+          {isOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+        </button>
+
+        <div id="public-navigation-links" className={`public-nav__links${isOpen ? " is-open" : ""}`}>
+          <div className="public-nav__items">
+            {publicLinks.map((link) => (
+              <NavLink
+                key={link.href}
+                to={link.href}
+                onClick={() => setIsOpen(false)}
+                className={({ isActive }) => `public-nav__link${isActive ? " is-active" : ""}`}
+              >
+                {link.label}
+              </NavLink>
+            ))}
+          </div>
           <Link
             to="/login"
-            onClick={() => localStorage.setItem("visitedLogin", "true")}
-            className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950"
+            onClick={() => {
+              localStorage.setItem("visitedLogin", "true");
+              setIsOpen(false);
+            }}
+            className="public-button public-button--primary public-nav__login"
           >
-            <LogIn className="h-4 w-4" aria-hidden="true" />
+            <LogIn aria-hidden="true" />
             Login
           </Link>
         </div>

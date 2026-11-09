@@ -5,12 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "npm run seo:sitemap",
-    "build": "vite build && node ./scripts/prerender-public.mjs",
+    "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "seo:sitemap": "node ./scripts/generate-sitemap.mjs",
-    "seo:prerender": "node ./scripts/prerender-public.mjs"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@gradio/client": "^2.5.1",

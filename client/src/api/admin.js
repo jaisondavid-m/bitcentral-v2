@@ -84,48 +84,6 @@ export async function updateUsers() {
   return response.data;
 }
 
-export async function listQBAnswerKeys({ semester, year, department, dept } = {}) {
-  const headers = await getAdminHeaders();
-  const params = new URLSearchParams();
-  if (semester) params.set("semester", semester);
-  if (year) params.set("year", year);
-  const d = department || dept;
-  if (d) params.set("dept", d);
-  const response = await api.get(`/admin/qb?${params.toString()}`, { headers });
-  return response.data;
-}
-
-export async function createQBAnswerKey(payload) {
-  const headers = await getAdminHeaders();
-  const response = await api.post("/admin/qb", payload, { headers });
-  return response.data;
-}
-
-export async function updateQBAnswerKey(id, payload) {
-  const headers = await getAdminHeaders();
-  const response = await api.put(`/admin/qb/${id}`, payload, { headers });
-  return response.data;
-}
-
-export async function createQBAnswerKeysBatch(payload) {
-  const headers = await getAdminHeaders();
-  const response = await api.post("/admin/qb/batch", payload, { headers });
-  return response.data;
-}
-
-export async function reorderQBAnswerKeys(payload) {
-  const headers = await getAdminHeaders();
-  const response = await api.put("/admin/qb/reorder", payload, { headers });
-  return response.data;
-}
-
-export async function deleteQBAnswerKey(id) {
-  const headers = await getAdminHeaders();
-  const response = await api.delete(`/admin/qb/${id}`, { headers });
-  return response.data;
-}
-
-
 export async function uploadMessMenuCsv(formData) {
   const headers = await getAdminHeaders();
   const response = await api.post("/admin/mess/upload", formData, {
@@ -272,24 +230,6 @@ export async function addAdmin(uid) {
 export async function removeAdmin(uid) {
   const headers = await getAdminHeaders();
   const res = await api.delete(`/admin/super/admins/${uid}`, { headers });
-  return res.data;
-}
-
-export async function listAllowed() {
-  const headers = await getAdminHeaders();
-  const res = await api.get(`/admin/super/allowed`, { headers });
-  return res.data;
-}
-
-export async function addAllowed(value, type) {
-  const headers = await getAdminHeaders();
-  const res = await api.post(`/admin/super/allowed`, { value, type }, { headers });
-  return res.data;
-}
-
-export async function removeAllowed(id) {
-  const headers = await getAdminHeaders();
-  const res = await api.delete(`/admin/super/allowed/${id}`, { headers });
   return res.data;
 }
 
@@ -518,80 +458,6 @@ export async function listTrackerUsers({ page = 1, limit = 25, search = "", batc
   };
 }
 
-export async function getAdminAnalytics() {
-  try {
-    const headers = await getAdminHeaders();
-    const response = await api.get("/admin/analytics", { headers });
-    return response.data;
-  } catch (error) {
-    console.warn("Failed to fetch admin analytics, returning fallback dataset:", error);
-    return {
-      success: true,
-      summary: {
-        registered_users: 4546,
-        daily_active_users: 1420,
-        realtime_active: 84,
-        total_pageviews_30d: 48250,
-        total_sessions_30d: 23180,
-        avg_session_duration: "4m 18s",
-        bounce_rate: "24.2%",
-      },
-      chart: [
-        { timeLabel: "1 am", activeUsers: 300, pageviews: 420 },
-        { timeLabel: "3 am", activeUsers: 420, pageviews: 610 },
-        { timeLabel: "5 am", activeUsers: 600, pageviews: 890 },
-        { timeLabel: "7 am", activeUsers: 910, pageviews: 1450 },
-        { timeLabel: "9 am", activeUsers: 1080, pageviews: 1980 },
-        { timeLabel: "11 am", activeUsers: 1150, pageviews: 2310 },
-        { timeLabel: "1 pm", activeUsers: 1160, pageviews: 2400 },
-        { timeLabel: "3 pm", activeUsers: 1160, pageviews: 2380 },
-        { timeLabel: "5 pm", activeUsers: 1175, pageviews: 2450 },
-        { timeLabel: "7 pm", activeUsers: 1250, pageviews: 2680 },
-        { timeLabel: "9 pm", activeUsers: 1420, pageviews: 3120 },
-        { timeLabel: "11 pm", activeUsers: 890, pageviews: 1750 },
-      ],
-      features: [
-        { name: "Exam Hall Finder", category: "Exam Utility", usageCount: 3840, percentage: 32.5, routePath: "/exam-hall" },
-        { name: "Hostel Mess Schedule", category: "Campus Life", usageCount: 2950, percentage: 25.0, routePath: "/mess" },
-        { name: "Question Bank & Answer Keys", category: "Academics", usageCount: 2210, percentage: 18.7, routePath: "/semester" },
-        { name: "Wi-Fi Setup & Passwords Guide", category: "Campus Tools", usageCount: 1350, percentage: 11.4, routePath: "/wifi-details" },
-        { name: "Biometrics & Attendance Logs", category: "Student Services", usageCount: 890, percentage: 7.5, routePath: "/ps-biometrics" },
-        { name: "FindMyWay Campus Navigation", category: "Navigation", usageCount: 580, percentage: 4.9, routePath: "/findmyway" },
-      ],
-      devices: [
-        { device: "Mobile (Android / iOS)", percentage: 68.4, count: 2980 },
-        { device: "Desktop (Chrome / Firefox)", percentage: 27.6, count: 1205 },
-        { device: "Tablet & iPad", percentage: 4.0, count: 175 },
-      ],
-      realtime: {
-        activeNow: 84,
-        activePages: ["/exam-hall", "/mess", "/guides/semester-exams", "/wifi-details", "/semester"],
-        lastUpdatedTime: new Date().toLocaleTimeString(),
-      },
-      source: "Google Auth & Analytics Engine",
-    };
-  }
-}
-
-export async function getAIKeyConfig() {
-  const headers = await getAdminHeaders();
-  const response = await api.get("/admin/ai-key", { headers });
-  return response.data;
-}
-
-export async function updateAIKeyConfig(payload) {
-  const headers = await getAdminHeaders();
-  const response = await api.put("/admin/ai-key", payload, { headers });
-  return response.data;
-}
-
-export async function testAIKeyConfig(payload) {
-  const headers = await getAdminHeaders();
-  const response = await api.post("/admin/ai-key/test", payload, { headers });
-  return response.data;
-}
-
-
 export async function updateUserFlagStatus(uid, { flagged, reason = "" } = {}) {
   const headers = await getAdminHeaders();
   const response = await api.put(`/admin/users/${encodeURIComponent(uid)}/flag`, { flagged, reason }, { headers });
@@ -734,32 +600,6 @@ export async function updateAdminNotification(id, payload) {
 export async function deleteAdminNotification(id) {
   const headers = await getAdminHeaders();
   const response = await api.delete(`/admin/notifications/${id}`, { headers });
-  return response.data;
-}
-
-// Cloudflare Pages Admin API
-export async function getCloudflareUsage(projectName = "") {
-  const headers = await getAdminHeaders();
-  const params = projectName ? `?project=${encodeURIComponent(projectName)}` : "";
-  const response = await api.get(`/admin/cloudflare/usage${params}`, { headers });
-  return response.data;
-}
-
-export async function getCloudflareConfig() {
-  const headers = await getAdminHeaders();
-  const response = await api.get("/admin/cloudflare/config", { headers });
-  return response.data;
-}
-
-export async function updateCloudflareConfig(payload) {
-  const headers = await getAdminHeaders();
-  const response = await api.put("/admin/cloudflare/config", payload, { headers });
-  return response.data;
-}
-
-export async function testCloudflareConnection(payload) {
-  const headers = await getAdminHeaders();
-  const response = await api.post("/admin/cloudflare/test", payload || {}, { headers });
   return response.data;
 }
 

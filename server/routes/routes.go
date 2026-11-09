@@ -3,7 +3,6 @@ package routes
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -20,27 +19,20 @@ import (
 func SetupRouter(
 	handler *student.SheetHandler,
 	cardHandler *student.CardHandler,
-	semesterHandler *student.SemesterHandler,
 	adminHandler *admin.AdminHandler,
 	messHandler *student.MessHandler,
 	leaderboardHandler *student.LeaderboardHandler,
 	leaveHandler *student.LeaveHandler,
 	examHallHandler *student.ExamHallHandler,
-	qbHandler *student.QBHandler,
 	studentLookupHandler *admin.StudentLookupHandler,
 	uploadHandler *common.UploadHandler,
 	trackerUserHandler *admin.TrackerUserHandler,
 	sponsorsHandler *admin.SponsorsHandler,
 	feedbackHandler *common.FeedbackHandler,
-	analyticsHandler *admin.AnalyticsHandler,
 	facultyDirectoryHandler *admin.FacultyDirectoryHandler,
-	aiHandler *common.AIHandler,
 	mailHandler *common.MailHandler,
 	internalMarksHandler *student.InternalMarksHandler,
 	notificationHandler *common.NotificationHandler,
-	helpHandler *common.HelpHandler,
-	cloudflareHandler *admin.CloudflareHandler,
-	psHandler *student.PSHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -54,16 +46,8 @@ func SetupRouter(
 			"http://localhost:5173",
 			"http://127.0.0.1:5173",
 			"https://bitcentral.vercel.app",
-			"https://bitcentral-v2-inky.vercel.app",
-			"https://bitcenteral.netlify.app",
 			"https://bitcentral.bitsathy.in",
 			"http://bitcentral.bitsathy.in",
-			"https://bitsathy.in",
-			"http://bitsathy.in",
-			"https://www.bitsathy.in",
-			"http://www.bitsathy.in",
-			"https://bitcentral.jaisondavidm.xyz",
-			"http://bitcentral.jaisondavidm.xyz",
 		},
 		AllowOriginFunc: func(origin string) bool {
 			return strings.HasSuffix(origin, ".bitsathy.in") ||
@@ -87,22 +71,6 @@ func SetupRouter(
 			"status":      "ok",
 			"server_type": "own_server",
 			"time":        time.Now().UTC().Format(time.RFC3339),
-		})
-	})
-
-	// Live Deployment Info
-	r.GET("/api/deployment/status", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status":                 "ok",
-			"server_type":            "own_server",
-			"server_name":            "BitCentral Primary Engine (Local Docker)",
-			"environment":            os.Getenv("GIN_MODE"),
-			"port":                   os.Getenv("PORT"),
-			"db_host":                os.Getenv("MYSQL_HOST"),
-			"db_database":            os.Getenv("MYSQL_DATABASE"),
-			"db_academic_configured": os.Getenv("MYSQL_ACADEMIC_HOST") != "",
-			"db_logs_configured":     os.Getenv("MYSQL_LOGS_HOST") != "" || os.Getenv("MYSQL_FREE_HOST") != "",
-			"time":                   time.Now().UTC().Format(time.RFC3339),
 		})
 	})
 
@@ -165,8 +133,6 @@ func SetupRouter(
 		})
 	})
 	r.POST("/auth/google", studentLookupHandler.GoogleLogin)
-	r.POST("/auth/mobile/google", studentLookupHandler.MobileGoogleLogin)
-	r.POST("/api/auth/mobile/google", studentLookupHandler.MobileGoogleLogin)
 	r.GET("/faculty-directory/auth/login", facultyDirectoryHandler.HandleDirectoryLogin)
 
 	// Faculty Photos with access middleware
@@ -175,40 +141,10 @@ func SetupRouter(
 	r.GET("/api/faculty-photos/:filename", middleware.FacultyPhotoAccess(), facultyDirectoryHandler.ServeFacultyPhoto)
 	r.GET("/api/faculty/photos/:filename", middleware.FacultyPhotoAccess(), facultyDirectoryHandler.ServeFacultyPhoto)
 
-	// PS Integration routes (Public - Authenticates via decoded PS JWT claims or student email)
-	r.POST("/ps/connect", psHandler.ConnectPS)
-	r.POST("/ps/disconnect", psHandler.DisconnectPS)
-	r.GET("/ps/status", psHandler.GetPSStatus)
-	r.GET("/ps/proxy/image", psHandler.ProxyPSImage)
-	r.Any("/ps/proxy/api", psHandler.ProxyPSAPI)
-
 	// Protected routes (Requires logged-in user)
 	api := r.Group("/")
 	api.Use(handler.RequireAuth())
 	{
-		api.GET("/docs/about", func(c *gin.Context) {
-			c.JSON(200, gin.H{
-				"developer": gin.H{
-					"name": "Jaison David M",
-					"bio":  "1st-year CSE student at Bannari Amman Institute of Technology. Builds web apps and freelance services.",
-					"links": gin.H{
-						"github":    "https://github.com/jaisondavid-m",
-						"linkedin":  "https://www.linkedin.com/in/jaison-david-m-a14072360/",
-						"freelance": "https://herostack.netlify.app/",
-					},
-				},
-
-				"contact": gin.H{
-					"email":         "developer@bitsathy.in",
-					"phone":         "+919843777817",
-					"feedback_form": "https://forms.gle/LSMMFVBHSPUvPKKK9",
-				},
-			})
-		})
-
-		// Internal AI Key route
-		api.GET("/internal/ai-key", aiHandler.GetInternalAIKey)
-
 		// Logout
 		api.POST("/auth/logout", studentLookupHandler.GoogleLogout)
 		api.GET("/auth/logout", studentLookupHandler.GoogleLogout)
@@ -236,8 +172,6 @@ func SetupRouter(
 		api.GET("/me", studentLookupHandler.GetMe)
 		api.GET("/student/roll-no", studentLookupHandler.GetRollNoByEmail)
 		api.GET("/averages", handler.GetOverallAverageFromSheet)
-		api.GET("/semesters/:year", semesterHandler.GetSemesterByYear)
-		api.GET("/qb", qbHandler.List)
 		api.GET("/mess", messHandler.GetMess)
 		api.GET("/mess/timings", messHandler.GetMealTimings)
 		api.GET("/mess/closures", messHandler.GetActiveClosures)
@@ -257,22 +191,6 @@ func SetupRouter(
 		api.POST("/notifications/read-all", notificationHandler.MarkAllNotificationsAsRead)
 		api.DELETE("/notifications/:id/dismiss", notificationHandler.DismissNotification)
 
-		// BIT Help Student API (Single Feed & Threads)
-		api.GET("/api/help/messages", helpHandler.GetMessages)
-		api.POST("/api/help/messages", helpHandler.SendMessage)
-		api.DELETE("/api/help/messages/:id", helpHandler.DeleteOwnMessage)
-		api.GET("/api/help/rooms", helpHandler.GetRooms)
-		api.POST("/api/help/rooms", helpHandler.CreateRoom)
-		api.GET("/api/help/rooms/:id", helpHandler.GetRoomByID)
-		api.GET("/api/help/rooms/:id/messages", helpHandler.GetMessages)
-		api.POST("/api/help/rooms/:id/messages", helpHandler.SendMessage)
-		api.POST("/api/help/rooms/:id/resolve", helpHandler.ResolveRoom)
-		api.POST("/api/help/reports", helpHandler.SubmitReport)
-		api.POST("/api/help/block", helpHandler.BlockAnonUser)
-		api.POST("/api/help/block-message", helpHandler.AdminBlockUserFromMessage)
-		api.GET("/api/help/my", helpHandler.GetMyHelpData)
-		api.GET("/help/public/rooms", helpHandler.GetRooms)
-
 		// Serve uploaded files
 		api.Static("/uploads", "./uploads")
 
@@ -287,7 +205,6 @@ func SetupRouter(
 		// Proxy PDF by Google Drive ID
 		api.GET("/pdf/:id", uploadHandler.ProxyPDF)
 
-
 	}
 
 	// Admin routes
@@ -296,7 +213,6 @@ func SetupRouter(
 	admin := r.Group("/admin")
 	admin.Use(middleware.RequireAdmin())
 	{
-		admin.GET("/analytics", analyticsHandler.GetAnalytics)
 		admin.GET("/audit-logs", adminHandler.GetAuditLogs)
 		admin.GET("/audit-logs/users", adminHandler.GetAuditLogUsers)
 		admin.GET("/audit-logs/api-usage", adminHandler.GetAuditAPIUsage)
@@ -321,12 +237,6 @@ func SetupRouter(
 		admin.PUT("/users/:uid/role", adminHandler.UpdateUserRole)
 		admin.DELETE("/users/:uid", adminHandler.DeleteUser)
 		admin.POST("/users/delete-batch", adminHandler.DeleteUsersBatch)
-		admin.GET("/qb", qbHandler.List)
-		admin.POST("/qb", qbHandler.Create)
-		admin.POST("/qb/batch", qbHandler.BatchCreate)
-		admin.PUT("/qb/reorder", qbHandler.Reorder)
-		admin.PUT("/qb/:id", qbHandler.Update)
-		admin.DELETE("/qb/:id", qbHandler.Delete)
 		admin.GET("/mess", messHandler.ListAdmin)
 		admin.POST("/mess/upload", messHandler.UploadCSV)
 		admin.PUT("/mess/:id", messHandler.UpdateAdmin)
@@ -335,14 +245,8 @@ func SetupRouter(
 		admin.POST("/mess/closures", messHandler.CreateClosureAdmin)
 		admin.PUT("/mess/closures/:id", messHandler.UpdateClosureAdmin)
 		admin.DELETE("/mess/closures/:id", messHandler.DeleteClosureAdmin)
-		admin.PUT("/semesters/:year", semesterHandler.UpdateSemesterByYear)
 		admin.POST("/upload", uploadHandler.Upload)
-
-		// AI API Key management
-		admin.GET("/ai-key", aiHandler.GetAIKeyAdmin)
-		admin.PUT("/ai-key", aiHandler.UpdateAIKeyAdmin)
-		admin.POST("/ai-key/test", aiHandler.TestAIKey)
-
+		
 		// Cards admin CRUD
 		admin.GET("/cards", student.GetCards)
 		admin.POST("/cards", student.CreateCard)
@@ -382,20 +286,6 @@ func SetupRouter(
 		admin.PUT("/notifications/:id", notificationHandler.UpdateNotification)
 		admin.DELETE("/notifications/:id", notificationHandler.DeleteNotification)
 
-		// BIT Help Admin Moderation API
-		admin.GET("/help/stats", helpHandler.AdminGetStats)
-		admin.GET("/help/messages", helpHandler.AdminGetMessages)
-		admin.DELETE("/help/messages/:id", helpHandler.AdminDeleteMessage)
-		admin.GET("/help/reports", helpHandler.AdminGetReports)
-		admin.POST("/help/reports/:id/action", helpHandler.AdminActionReport)
-		admin.GET("/help/restrictions", helpHandler.AdminGetRestrictions)
-		admin.POST("/help/restrictions", helpHandler.AdminManageRestriction)
-
-		// Cloudflare Pages Admin API
-		admin.GET("/cloudflare/usage", cloudflareHandler.GetCloudflareUsage)
-		admin.GET("/cloudflare/config", cloudflareHandler.GetCloudflareConfig)
-		admin.PUT("/cloudflare/config", cloudflareHandler.UpdateCloudflareConfig)
-		admin.POST("/cloudflare/test", cloudflareHandler.TestCloudflareConnection)
 	}
 
 	// Super-admin routes: manage admins and allowed external emails/domains
@@ -405,10 +295,6 @@ func SetupRouter(
 		super.GET("/admins", adminHandler.ListAdmins)
 		super.POST("/admins", adminHandler.AddAdmin)
 		super.DELETE("/admins/:uid", adminHandler.RemoveAdmin)
-
-		super.GET("/allowed", adminHandler.ListAllowed)
-		super.POST("/allowed", adminHandler.AddAllowed)
-		super.DELETE("/allowed/:id", adminHandler.RemoveAllowed)
 	}
 
 	return r

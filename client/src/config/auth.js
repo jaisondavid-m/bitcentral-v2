@@ -55,7 +55,7 @@ export const parseJwt = (token) => {
         .join("")
     );
     return JSON.parse(jsonPayload);
-  } catch (e) {
+  } catch {
     return null;
   }
 };
@@ -83,8 +83,6 @@ export const auth = {
   },
 };
 
-export const db = null;
-
 const loadGoogleGsiScript = () => {
   if (window.google?.accounts) {
     return Promise.resolve();
@@ -106,7 +104,7 @@ const loadGoogleGsiScript = () => {
     script.async = true;
     script.defer = true;
     script.onload = () => resolve();
-    script.onerror = (err) => reject(new Error("Failed to load Google Sign-In script"));
+    script.onerror = () => reject(new Error("Failed to load Google Sign-In script"));
     document.head.appendChild(script);
   });
 };
@@ -211,12 +209,16 @@ export const signInWithGoogle = async () => {
 export const logout = async () => {
   try {
     await postGoogleLogout();
-  } catch (e) {}
+  } catch {
+    setStoredToken(null);
+  }
   setStoredToken(null);
   window.dispatchEvent(new Event("auth_state_changed"));
   if (window.google?.accounts?.id) {
     try {
       window.google.accounts.id.disableAutoSelect();
-    } catch (e) {}
+    } catch {
+      return;
+    }
   }
 };

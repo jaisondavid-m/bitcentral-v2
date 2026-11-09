@@ -335,11 +335,8 @@ func (h *SheetHandler) HandleCallback(c *gin.Context) {
 
 func isPublicPath(path string) bool {
 	if strings.HasPrefix(path, "/uploads/") ||
-		strings.HasPrefix(path, "/help/public/") ||
 		strings.HasPrefix(path, "/sponsors/certificate/") ||
-		strings.HasPrefix(path, "/pdf/") ||
-		strings.HasPrefix(path, "/docs/") ||
-		strings.HasPrefix(path, "/ps/") {
+		strings.HasPrefix(path, "/pdf/") {
 		return true
 	}
 
@@ -352,7 +349,6 @@ func isPublicPath(path string) bool {
 		"/mess",
 		"/cards",
 		"/leaves",
-		"/qb",
 		"/faculty-directory",
 		"/faculty",
 		"/faculty-photos",
@@ -361,7 +357,6 @@ func isPublicPath(path string) bool {
 		"/internal-marks/conversion",
 		"/notifications",
 		"/student/roll-no",
-		"/semesters",
 	}
 	for _, p := range publicPrefixes {
 		if path == p || strings.HasPrefix(path, p+"/") {

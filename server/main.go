@@ -38,55 +38,40 @@ func main() {
 	}
 
 	cardHandler := student.NewCardHandler()
-	semesterHandler := student.NewSemesterHandler()
 	adminHandler := admin.NewAdminHandler()
 	examHallHandler := student.NewExamHallHandler()
 	messHandler := student.NewMessHandler()
 	leaderboardHandler := student.NewLeaderboardHandler(sheetHandler)
 	leaveHandler := student.NewLeaveHandler()
-	qbHandler := student.NewQBHandler()
 	studentLookupHandler := admin.NewStudentLookupHandler()
 	uploadHandler := common.NewUploadHandler()
 	trackerUserHandler := admin.NewTrackerUserHandler()
 	sponsorsHandler := admin.NewSponsorsHandler()
 	feedbackHandler := common.NewFeedbackHandler()
-	analyticsHandler := admin.NewAnalyticsHandler()
 	facultyDirectoryHandler := admin.NewFacultyDirectoryHandler(sheetHandler)
-	aiHandler := common.NewAIHandler()
 	mailHandler := common.NewMailHandler()
 	mailHandler.StartQueueWorker()
 	internalMarksHandler := student.NewInternalMarksHandler()
 	notificationHandler := common.NewNotificationHandler()
-	helpHandler := common.NewHelpHandler()
-	cloudflareHandler := admin.NewCloudflareHandler()
-	psHandler := student.NewPSHandler()
 
 	r := routes.SetupRouter(
 		sheetHandler,
 		cardHandler,
-		semesterHandler,
 		adminHandler,
 		messHandler,
 		leaderboardHandler,
 		leaveHandler,
 		examHallHandler,
-		qbHandler,
 		studentLookupHandler,
 		uploadHandler,
 		trackerUserHandler,
 		sponsorsHandler,
 		feedbackHandler,
-		analyticsHandler,
 		facultyDirectoryHandler,
-		aiHandler,
 		mailHandler,
 		internalMarksHandler,
 		notificationHandler,
-		helpHandler,
-		cloudflareHandler,
-		psHandler,
 	)
-	r.Static("/pdfs", "./pdfs")
 
 	port := os.Getenv("PORT")
 	if port == "" {

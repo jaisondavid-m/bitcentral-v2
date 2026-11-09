@@ -81,13 +81,6 @@ export const ROUTE_SEO = {
     noIndex: true,
   },
 
-  "/profile/v2": {
-    title: "My Profile V2",
-    description: "Protected BIT Central profile v2 page for student account information.",
-    keywords: ["my profile", "student profile", "BIT Central"],
-    noIndex: true,
-  },
-
   "/about": {
     title: "About BIT Central",
     description:
@@ -145,27 +138,6 @@ export const ROUTE_SEO = {
     pageType: "WebPage",
   },
 
-  "/dsa": {
-    title: "DSA Lab Experiments - BIT Central",
-    description: "Protected Data Structures & Algorithms lab repository for BIT Sathy students with complete Python programs and verified manual records.",
-    keywords: ["DSA lab", "Data Structures", "Python DSA"],
-    noIndex: true,
-  },
-
-  "/ppl": {
-    title: "PPL Lab Experiments - BIT Central",
-    description: "Protected Principles of Programming Laboratory repository for BIT Sathy AI & ML students with complete Python programs and record procedures.",
-    keywords: ["PPL lab", "Principles of Programming", "Python PPL"],
-    noIndex: true,
-  },
-
-  "/records-manual": {
-    title: "Lab Records & Manuals - BIT Central",
-    description: "Protected academic lab manuals and record repositories for BIT Sathy students including DSA and PPL.",
-    keywords: ["Lab manual", "DSA manual", "PPL manual", "BIT Sathy lab records"],
-    noIndex: true,
-  },
-
   "/rpsite": {
     title: "Reward Points",
     description: "Protected BIT Central reward points access page for signed-in BIT Sathy students.",
@@ -177,13 +149,6 @@ export const ROUTE_SEO = {
     title: "PCDP Setup",
     description: "Protected BIT Central PCDP setup support page for signed-in BIT Sathy students.",
     keywords: ["PCDP", "BIT Central"],
-    noIndex: true,
-  },
-
-  "/findmyway": {
-    title: "FindMyWay",
-    description: "Protected BIT Central FindMyWay installation support page for signed-in BIT Sathy students.",
-    keywords: ["FindMyWay", "BIT Sathy campus resources"],
     noIndex: true,
   },
 
@@ -215,24 +180,10 @@ export const ROUTE_SEO = {
     noIndex: true,
   },
 
-  "/exam-hall-members": {
-    title: "Exam Hall Members & Venue Roster",
-    description: "Protected BIT Central exam hall members and seating roster for signed-in BIT Sathy students.",
-    keywords: ["BIT Sathy exam hall members", "hall venue students"],
-    noIndex: true,
-  },
-
   "/leavedetails": {
     title: "Leave Schedule",
     description: "Protected BIT Central leave schedule page for signed-in BIT Sathy students.",
     keywords: ["BIT Sathy leave schedule"],
-    noIndex: true,
-  },
-
-  "/semester": {
-    title: "Semester Resources",
-    description: "Protected BIT Central semester resources page with academic materials for signed-in BIT Sathy students.",
-    keywords: ["semester resources", "question banks", "answer keys", "BIT Sathy"],
     noIndex: true,
   },
 
@@ -270,19 +221,6 @@ export const ROUTE_SEO = {
     description: "Default Wi-Fi passwords for BIT Sathy campus networks, Sapphire Hostel, Ruby Hostel, Emerald Hostel, and step-by-step password change instructions.",
     keywords: ["BIT Sathy Wi-Fi", "Sapphire Hostel Wi-Fi", "Ruby Hostel Wi-Fi", "Emerald Hostel Wi-Fi", "Wi-Fi password change", "BIT Sathy hostel Wi-Fi"],
     pageType: "WebPage",
-  },
-
-  "/payment-successful": {
-    title: "Thank You for Supporting BIT Central!",
-    description: "Verified contribution acknowledgment page with inspirational quotes for BIT Central supporters.",
-    keywords: ["payment successful", "BIT Central patron", "donator honor"],
-    noIndex: true,
-  },
-
-  "/docs/about": {
-    title: "About BIT CENTRAL Documentation",
-    description: "Learn about BIT CENTRAL features, mission, and system design.",
-    keywords: ["BIT CENTRAL docs"],
   },
 
   "*": {
@@ -444,7 +382,7 @@ export function getRouteSeo(pathname) {
     };
   }
 
-  if (/^\/(student-report|payment-successful|payment-successfull)(\/|$)/.test(pathname)) {
+  if (/^\/(student-report)(\/|$)/.test(pathname)) {
     return ROUTE_SEO["/student-report"] || ROUTE_SEO["*"];
   }
 

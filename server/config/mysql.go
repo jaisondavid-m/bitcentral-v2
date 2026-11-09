@@ -263,8 +263,6 @@ func InitMySQL() {
 		if os.Getenv("RUN_LEGACY_CLEANUP") == "true" {
 			dropAcademicTables(DBAcademic)
 		}
-		createQBAnswerKeyTable(DBAcademic)
-		createSemesterSubjectsTable(DBAcademic)
 		createCardsTable(DBAcademic)
 		createMessMenuTables(DBAcademic)
 		createCollegeLeavesTable(DBAcademic)
@@ -288,7 +286,6 @@ func InitMySQL() {
 		createAdminSentEmailsTable(DBLogs)
 		createEmailJobQueuesTables(DBLogs)
 		createLostFoundTables(DBLogs)
-		createHelpTables(DBLogs)
 	} else {
 		log.Println("ℹ️ Logs & High-Write DB schema already initialized. Skipping DDL migrations.")
 	}
@@ -466,73 +463,6 @@ func dropUserPresenceTable(db *sql.DB) {
 	db.Exec("DROP TABLE IF EXISTS user_presence")
 }
 
-func createQBAnswerKeyTable(db *sql.DB) {
-	query := `
-	CREATE TABLE IF NOT EXISTS qb_answer_keys (
-		id           INT AUTO_INCREMENT PRIMARY KEY,
-		semester     INT NOT NULL,
-		subject_code VARCHAR(50) NOT NULL,
-		subject_name VARCHAR(200) NOT NULL,
-		year         INT NOT NULL,
-		answers      JSON NOT NULL,
-		created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
-		updated_at   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-		UNIQUE KEY unique_qb (semester, subject_code, year)
-	) ENGINE=InnoDB;`
-
-	_, err := db.Exec(query)
-	if err != nil {
-		log.Fatalf("❌ Failed to create qb_answer_keys table: %v", err)
-	}
-	log.Println("✅ qb_answer_keys table ready")
-}
-
-func createSemesterSubjectsTable(db *sql.DB) {
-	query := `
-	CREATE TABLE IF NOT EXISTS semester_subjects (
-		id INT AUTO_INCREMENT PRIMARY KEY,
-		year INT NOT NULL,
-		department VARCHAR(50) NOT NULL DEFAULT 'ALL',
-		idx INT NOT NULL,
-		code VARCHAR(50),
-		name VARCHAR(255),
-		qb1 VARCHAR(1024),
-		qb2 VARCHAR(1024),
-		ak1 VARCHAR(1024),
-		ak2 VARCHAR(1024),
-		sem_qb_with_ans VARCHAR(1024),
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-		UNIQUE KEY unique_year_idx (year, idx)
-	) ENGINE=InnoDB;`
-
-	_, err := db.Exec(query)
-	if err != nil {
-		log.Fatalf("❌ Failed to create semester_subjects table: %v", err)
-	}
-
-	if _, err := db.Exec(`ALTER TABLE semester_subjects DROP INDEX unique_year_idx`); err != nil {
-		log.Printf("ℹ️ unique_year_idx index drop status: %v", err)
-	}
-
-	if _, err := db.Exec(`ALTER TABLE semester_subjects DROP INDEX unique_year_code`); err != nil {
-		log.Printf("ℹ️ unique_year_code index drop status: %v", err)
-	}
-
-	if _, err := db.Exec(`ALTER TABLE semester_subjects ADD COLUMN department VARCHAR(50) NOT NULL DEFAULT 'ALL'`); err != nil {
-		log.Printf("ℹ️ department column not created (may already exist): %v", err)
-	}
-
-	if _, err := db.Exec(`ALTER TABLE semester_subjects ADD INDEX idx_sem_sub_year_dept (year, department)`); err != nil {
-		log.Printf("ℹ️ idx_sem_sub_year_dept index not created (may already exist): %v", err)
-	}
-
-	if _, err := db.Exec(`ALTER TABLE semester_subjects ADD INDEX idx_sem_sub_year_idx (year, idx)`); err != nil {
-		log.Printf("ℹ️ idx_sem_sub_year_idx index not created (may already exist): %v", err)
-	}
-	log.Println("✅ semester_subjects table ready")
-}
-
 func createCardsTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS cards (
@@ -565,16 +495,8 @@ func createCardsTable(db *sql.DB) {
 		log.Printf("ℹ️ idx_cards_card_order not created (may already exist): %v", err)
 	}
 
-	if _, err := db.Exec(`ALTER TABLE cards ADD COLUMN app_route VARCHAR(255) NOT NULL DEFAULT '' AFTER link`); err != nil {
-		log.Printf("ℹ️ app_route column not created (may already exist): %v", err)
-	}
-
 	if _, err := db.Exec(`ALTER TABLE cards ADD COLUMN show_on_site TINYINT(1) NOT NULL DEFAULT 1 AFTER btntext`); err != nil {
 		log.Printf("ℹ️ show_on_site column not created (may already exist): %v", err)
-	}
-
-	if _, err := db.Exec(`ALTER TABLE cards ADD COLUMN show_on_app TINYINT(1) NOT NULL DEFAULT 1 AFTER show_on_site`); err != nil {
-		log.Printf("ℹ️ show_on_app column not created (may already exist): %v", err)
 	}
 
 	// Seed default cards if empty
@@ -588,7 +510,6 @@ func createCardsTable(db *sql.DB) {
 			Name       string
 			Keywords   string
 			Link       string
-			AppRoute   string
 			BtnText    string
 			CreatedAt  string
 			UpdatedAt  string
@@ -603,7 +524,6 @@ func createCardsTable(db *sql.DB) {
 				Name:       "Exam hall finder",
 				Keywords:   "[]",
 				Link:       "",
-				AppRoute:   "/exam-hall",
 				BtnText:    "Find Now",
 				CreatedAt:  "2026-05-21 11:51:02",
 				UpdatedAt:  "2026-08-30 15:16:28",
@@ -616,7 +536,6 @@ func createCardsTable(db *sql.DB) {
 				Name:       "PBL Portal",
 				Keywords:   "[]",
 				Link:       "https://pcdp.bitsathy.ac.in/stf/pbl",
-				AppRoute:   "",
 				BtnText:    "Open Now",
 				CreatedAt:  "2026-05-21 11:51:46",
 				UpdatedAt:  "2026-08-30 15:16:29",
@@ -629,7 +548,6 @@ func createCardsTable(db *sql.DB) {
 				Name:       "Upcoming Leave Details",
 				Keywords:   "[]",
 				Link:       "",
-				AppRoute:   "/leavedetails",
 				BtnText:    "View Now",
 				CreatedAt:  "2026-05-21 11:52:44",
 				UpdatedAt:  "2026-08-30 15:16:29",
@@ -642,7 +560,6 @@ func createCardsTable(db *sql.DB) {
 				Name:       "PCDP App installation",
 				Keywords:   "[]",
 				Link:       "",
-				AppRoute:   "/pcdp",
 				BtnText:    "Install App",
 				CreatedAt:  "2026-05-21 11:53:17",
 				UpdatedAt:  "2026-08-30 15:16:29",
@@ -655,7 +572,6 @@ func createCardsTable(db *sql.DB) {
 				Name:       "Wiki Page",
 				Keywords:   "[]",
 				Link:       "https://wiki.bitsathy.ac.in",
-				AppRoute:   "",
 				BtnText:    "Open Material",
 				CreatedAt:  "2026-05-21 11:54:06",
 				UpdatedAt:  "2026-08-30 15:16:29",
@@ -668,7 +584,6 @@ func createCardsTable(db *sql.DB) {
 				Name:       "RP Checker",
 				Keywords:   `["rp", "reward", "points", "rp", "ap", "internal", "marks", "rewards"]`,
 				Link:       "",
-				AppRoute:   "/rpsite",
 				BtnText:    "Check RP",
 				CreatedAt:  "2026-05-22 02:33:28",
 				UpdatedAt:  "2026-09-25 17:14:13",
@@ -681,7 +596,6 @@ func createCardsTable(db *sql.DB) {
 				Name:       "Exam Hall Finder",
 				Keywords:   `["hall", "venue", "finder", "exam", "sem"]`,
 				Link:       "",
-				AppRoute:   "/exam-hall",
 				BtnText:    "Find Now",
 				CreatedAt:  "2026-05-22 02:34:03",
 				UpdatedAt:  "2026-09-25 17:12:52",
@@ -694,7 +608,6 @@ func createCardsTable(db *sql.DB) {
 				Name:       "Mess Menu",
 				Keywords:   `["food", "mess", "menu", "lunch", "dinner", "breakfast", "snacks"]`,
 				Link:       "",
-				AppRoute:   "/mess",
 				BtnText:    "MessMenu",
 				CreatedAt:  "2026-05-22 02:34:59",
 				UpdatedAt:  "2026-09-25 17:38:41",
@@ -707,7 +620,6 @@ func createCardsTable(db *sql.DB) {
 				Name:       "PBL Portal",
 				Keywords:   `["pbl", "venue", "portal", "assigment"]`,
 				Link:       "https://pcdp.bitsathy.ac.in/stf/pbl",
-				AppRoute:   "",
 				BtnText:    "Open Now",
 				CreatedAt:  "2026-05-22 02:35:17",
 				UpdatedAt:  "2026-09-25 15:41:41",
@@ -715,13 +627,13 @@ func createCardsTable(db *sql.DB) {
 		}
 
 		stmt, err := db.Prepare(`
-			INSERT INTO cards (id, card_order, click_count, img, name, keywords, link, app_route, btntext, created_at, updated_at)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			INSERT INTO cards (id, card_order, click_count, img, name, keywords, link, btntext, created_at, updated_at)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		`)
 		if err == nil {
 			defer stmt.Close()
 			for _, card := range seedCards {
-				_, _ = stmt.Exec(card.ID, card.Order, card.ClickCount, card.Img, card.Name, card.Keywords, card.Link, card.AppRoute, card.BtnText, card.CreatedAt, card.UpdatedAt)
+				_, _ = stmt.Exec(card.ID, card.Order, card.ClickCount, card.Img, card.Name, card.Keywords, card.Link, card.BtnText, card.CreatedAt, card.UpdatedAt)
 			}
 			log.Println("✅ Seeded default cards")
 		} else {
@@ -1337,127 +1249,3 @@ func createLostFoundTables(db *sql.DB) {
 		log.Println("✅ lost_found_claims table ready")
 	}
 }
-
-func createHelpTables(db *sql.DB) {
-	queryRooms := `
-	CREATE TABLE IF NOT EXISTS help_rooms (
-		id VARCHAR(64) PRIMARY KEY,
-		creator_uid VARCHAR(128) NOT NULL,
-		creator_anon_label VARCHAR(64) NOT NULL,
-		title VARCHAR(255) NOT NULL,
-		content TEXT NOT NULL,
-		category VARCHAR(64) NOT NULL,
-		status VARCHAR(32) NOT NULL DEFAULT 'OPEN',
-		views_count INT NOT NULL DEFAULT 0,
-		responses_count INT NOT NULL DEFAULT 0,
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-		INDEX idx_category (category),
-		INDEX idx_status_created (status, created_at),
-		INDEX idx_creator_uid (creator_uid)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
-
-	if _, err := db.Exec(queryRooms); err != nil {
-		log.Printf("ℹ️ help_rooms table notice: %v", err)
-	} else {
-		log.Println("✅ help_rooms table ready")
-	}
-
-	queryParticipants := `
-	CREATE TABLE IF NOT EXISTS help_participants (
-		id INT AUTO_INCREMENT PRIMARY KEY,
-		room_id VARCHAR(64) NOT NULL,
-		user_uid VARCHAR(128) NOT NULL,
-		anon_label VARCHAR(64) NOT NULL,
-		joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		UNIQUE KEY uk_room_user (room_id, user_uid),
-		INDEX idx_room_id (room_id)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
-
-	if _, err := db.Exec(queryParticipants); err != nil {
-		log.Printf("ℹ️ help_participants table notice: %v", err)
-	} else {
-		log.Println("✅ help_participants table ready")
-	}
-
-	queryMessages := `
-	CREATE TABLE IF NOT EXISTS help_messages (
-		id VARCHAR(64) PRIMARY KEY,
-		parent_id VARCHAR(64) NULL,
-		room_id VARCHAR(64) NOT NULL DEFAULT 'main',
-		sender_uid VARCHAR(128) NOT NULL,
-		anon_label VARCHAR(64) NOT NULL,
-		content TEXT NOT NULL,
-		is_system TINYINT(1) DEFAULT 0,
-		is_removed TINYINT(1) DEFAULT 0,
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		INDEX idx_room_created (room_id, created_at),
-		INDEX idx_parent_created (parent_id, created_at),
-		INDEX idx_sender_uid (sender_uid)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
-
-	if _, err := db.Exec(queryMessages); err != nil {
-		log.Printf("ℹ️ help_messages table notice: %v", err)
-	} else {
-		log.Println("✅ help_messages table ready")
-	}
-	_, _ = db.Exec("ALTER TABLE help_messages ADD COLUMN parent_id VARCHAR(64) NULL AFTER id")
-	_, _ = db.Exec("ALTER TABLE help_messages ADD INDEX idx_parent_created (parent_id, created_at)")
-
-	queryReports := `
-	CREATE TABLE IF NOT EXISTS help_reports (
-		id INT AUTO_INCREMENT PRIMARY KEY,
-		reporter_uid VARCHAR(128) NOT NULL,
-		target_type VARCHAR(32) NOT NULL,
-		target_id VARCHAR(64) NOT NULL,
-		reason VARCHAR(64) NOT NULL,
-		details TEXT NULL,
-		status VARCHAR(32) NOT NULL DEFAULT 'PENDING',
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		INDEX idx_status (status),
-		INDEX idx_target (target_type, target_id)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
-
-	if _, err := db.Exec(queryReports); err != nil {
-		log.Printf("ℹ️ help_reports table notice: %v", err)
-	} else {
-		log.Println("✅ help_reports table ready")
-	}
-
-	queryBlocks := `
-	CREATE TABLE IF NOT EXISTS help_blocks (
-		id INT AUTO_INCREMENT PRIMARY KEY,
-		blocker_uid VARCHAR(128) NOT NULL,
-		blocked_uid VARCHAR(128) NOT NULL,
-		room_id VARCHAR(64) NULL,
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		UNIQUE KEY uk_blocker_blocked (blocker_uid, blocked_uid),
-		INDEX idx_blocker (blocker_uid),
-		INDEX idx_blocked (blocked_uid)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
-
-	if _, err := db.Exec(queryBlocks); err != nil {
-		log.Printf("ℹ️ help_blocks table notice: %v", err)
-	} else {
-		log.Println("✅ help_blocks table ready")
-	}
-
-	queryRestrictions := `
-	CREATE TABLE IF NOT EXISTS help_user_restrictions (
-		id INT AUTO_INCREMENT PRIMARY KEY,
-		user_uid VARCHAR(128) NOT NULL,
-		status VARCHAR(32) NOT NULL DEFAULT 'BLOCKED',
-		reason TEXT NULL,
-		created_by VARCHAR(128) NOT NULL,
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		expires_at DATETIME NULL,
-		INDEX idx_user_status (user_uid, status)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
-
-	if _, err := db.Exec(queryRestrictions); err != nil {
-		log.Printf("ℹ️ help_user_restrictions table notice: %v", err)
-	} else {
-		log.Println("✅ help_user_restrictions table ready")
-	}
-}
-

@@ -99,7 +99,6 @@ func updateLastSeenIfAuthenticated(c *gin.Context) {
 func GetCards(c *gin.Context) {
 	updateLastSeenIfAuthenticated(c)
 
-	platform := strings.ToLower(strings.TrimSpace(c.Query("platform")))
 	isAdminReq := strings.Contains(c.Request.URL.Path, "/admin/")
 	if !isAdminReq && c.Query("all") == "true" {
 		// Strict server-side check: only allow 'all' if caller is a verified admin in DB
@@ -125,7 +124,7 @@ func GetCards(c *gin.Context) {
 	}
 
 	// Fast in-memory cache lookup to save TiDB Request Units
-	cacheKey := fmt.Sprintf("%v_%s", isAdminReq, platform)
+	cacheKey := fmt.Sprintf("%v", isAdminReq)
 	cardsCacheMu.RLock()
 	entry, found := cardsCache[cacheKey]
 	cardsCacheMu.RUnlock()
@@ -134,13 +133,9 @@ func GetCards(c *gin.Context) {
 		return
 	}
 
-	query := `SELECT id, card_order, img, name, keywords, link, COALESCE(app_route, ''), btntext, click_count, COALESCE(show_on_site, 1), COALESCE(show_on_app, 1) FROM cards`
+	query := `SELECT id, card_order, img, name, keywords, link, btntext, click_count, COALESCE(show_on_site, 1) FROM cards`
 	if !isAdminReq {
-		if platform == "app" || platform == "mobile" {
-			query += ` WHERE COALESCE(show_on_app, 1) = 1`
-		} else {
-			query += ` WHERE COALESCE(show_on_site, 1) = 1`
-		}
+		query += ` WHERE COALESCE(show_on_site, 1) = 1`
 	}
 	query += ` ORDER BY card_order ASC, id ASC`
 
@@ -155,10 +150,10 @@ func GetCards(c *gin.Context) {
 	for rows.Next() {
 		var id, order int
 		var clickCount int
-		var img, name, link, appRoute, btntext string
+		var img, name, link, btntext string
 		var keywords sql.NullString
-		var showOnSite, showOnApp int
-		if err := rows.Scan(&id, &order, &img, &name, &keywords, &link, &appRoute, &btntext, &clickCount, &showOnSite, &showOnApp); err != nil {
+		var showOnSite int
+		if err := rows.Scan(&id, &order, &img, &name, &keywords, &link, &btntext, &clickCount, &showOnSite); err != nil {
 			continue
 		}
 		var kw []string
@@ -166,7 +161,6 @@ func GetCards(c *gin.Context) {
 			_ = json.Unmarshal([]byte(keywords.String), &kw)
 		}
 		siteBool := showOnSite == 1
-		appBool := showOnApp == 1
 		cards = append(cards, studentmodels.Card{
 			ID:         id,
 			Order:      order,
@@ -174,11 +168,9 @@ func GetCards(c *gin.Context) {
 			Name:       name,
 			Keywords:   kw,
 			Link:       link,
-			AppRoute:   appRoute,
 			BtnText:    btntext,
 			ClickCount: clickCount,
 			ShowOnSite: &siteBool,
-			ShowOnApp:  &appBool,
 		})
 	}
 
@@ -209,12 +201,8 @@ func CreateCard(c *gin.Context) {
 	if payload.ShowOnSite != nil && !*payload.ShowOnSite {
 		showOnSite = 0
 	}
-	showOnApp := 1
-	if payload.ShowOnApp != nil && !*payload.ShowOnApp {
-		showOnApp = 0
-	}
 	kwBytes, _ := json.Marshal(payload.Keywords)
-	res, err := config.GetAcademicDB().Exec(`INSERT INTO cards (card_order, img, name, keywords, link, app_route, btntext, show_on_site, show_on_app) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, payload.Order, payload.Image, payload.Name, string(kwBytes), payload.Link, payload.AppRoute, payload.BtnText, showOnSite, showOnApp)
+	res, err := config.GetAcademicDB().Exec(`INSERT INTO cards (card_order, img, name, keywords, link, btntext, show_on_site) VALUES (?, ?, ?, ?, ?, ?, ?)`, payload.Order, payload.Image, payload.Name, string(kwBytes), payload.Link, payload.BtnText, showOnSite)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -222,9 +210,7 @@ func CreateCard(c *gin.Context) {
 	id, _ := res.LastInsertId()
 	payload.ID = int(id)
 	siteBool := showOnSite == 1
-	appBool := showOnApp == 1
 	payload.ShowOnSite = &siteBool
-	payload.ShowOnApp = &appBool
 	invalidateCardCache()
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": payload})
 }
@@ -256,21 +242,15 @@ func UpdateCard(c *gin.Context) {
 	if payload.ShowOnSite != nil && !*payload.ShowOnSite {
 		showOnSite = 0
 	}
-	showOnApp := 1
-	if payload.ShowOnApp != nil && !*payload.ShowOnApp {
-		showOnApp = 0
-	}
 	kwBytes, _ := json.Marshal(payload.Keywords)
-	_, err = config.GetAcademicDB().Exec(`UPDATE cards SET card_order=?, img=?, name=?, keywords=?, link=?, app_route=?, btntext=?, show_on_site=?, show_on_app=? WHERE id=?`, payload.Order, payload.Image, payload.Name, string(kwBytes), payload.Link, payload.AppRoute, payload.BtnText, showOnSite, showOnApp, id)
+	_, err = config.GetAcademicDB().Exec(`UPDATE cards SET card_order=?, img=?, name=?, keywords=?, link=?, btntext=?, show_on_site=? WHERE id=?`, payload.Order, payload.Image, payload.Name, string(kwBytes), payload.Link, payload.BtnText, showOnSite, id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
 	}
 	payload.ID = id
 	siteBool := showOnSite == 1
-	appBool := showOnApp == 1
 	payload.ShowOnSite = &siteBool
-	payload.ShowOnApp = &appBool
 	invalidateCardCache()
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": payload})
 }
@@ -428,7 +408,6 @@ func parseCardsCSV(reader io.Reader) ([]studentmodels.Card, error) {
 
 		img := getVal(row, "img", "image", "icon", "icon_url")
 		link := getVal(row, "link", "url", "website")
-		appRoute := getVal(row, "app_route", "route", "approute", "app_redirection_route")
 		btnText := getVal(row, "btntext", "btn_text", "button_text", "button")
 
 		kwRaw := getVal(row, "keywords", "keyword", "tags", "tag")
@@ -457,7 +436,6 @@ func parseCardsCSV(reader io.Reader) ([]studentmodels.Card, error) {
 			Name:       name,
 			Keywords:   kwList,
 			Link:       link,
-			AppRoute:   appRoute,
 			BtnText:    btnText,
 		})
 	}
@@ -503,7 +481,7 @@ func BulkUploadCards(c *gin.Context) {
 				cardsToImport = arr
 			} else {
 				var obj struct {
-					Mode  string        `json:"mode"`
+					Mode  string               `json:"mode"`
 					Cards []studentmodels.Card `json:"cards"`
 				}
 				if err2 := json.Unmarshal(body, &obj); err2 == nil {
@@ -532,7 +510,7 @@ func BulkUploadCards(c *gin.Context) {
 			cardsToImport = arr
 		} else {
 			var obj struct {
-				Mode  string        `json:"mode"`
+				Mode  string               `json:"mode"`
 				Cards []studentmodels.Card `json:"cards"`
 			}
 			if err2 := json.Unmarshal(body, &obj); err2 == nil {
@@ -589,9 +567,9 @@ func BulkUploadCards(c *gin.Context) {
 	}
 
 	stmtWithID, err := tx.Prepare(`
-		INSERT INTO cards (id, card_order, click_count, img, name, keywords, link, app_route, btntext)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-		ON DUPLICATE KEY UPDATE card_order=VALUES(card_order), click_count=VALUES(click_count), img=VALUES(img), name=VALUES(name), keywords=VALUES(keywords), link=VALUES(link), app_route=VALUES(app_route), btntext=VALUES(btntext)
+		INSERT INTO cards (id, card_order, click_count, img, name, keywords, link, btntext)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+		ON DUPLICATE KEY UPDATE card_order=VALUES(card_order), click_count=VALUES(click_count), img=VALUES(img), name=VALUES(name), keywords=VALUES(keywords), link=VALUES(link), btntext=VALUES(btntext)
 	`)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -600,8 +578,8 @@ func BulkUploadCards(c *gin.Context) {
 	defer stmtWithID.Close()
 
 	stmtNoID, err := tx.Prepare(`
-		INSERT INTO cards (card_order, click_count, img, name, keywords, link, app_route, btntext)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+		INSERT INTO cards (card_order, click_count, img, name, keywords, link, btntext)
+		VALUES (?, ?, ?, ?, ?, ?, ?)
 	`)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -621,9 +599,9 @@ func BulkUploadCards(c *gin.Context) {
 		}
 
 		if card.ID > 0 {
-			_, err = stmtWithID.Exec(card.ID, order, card.ClickCount, card.Image, card.Name, string(kwBytes), card.Link, card.AppRoute, card.BtnText)
+			_, err = stmtWithID.Exec(card.ID, order, card.ClickCount, card.Image, card.Name, string(kwBytes), card.Link, card.BtnText)
 		} else {
-			_, err = stmtNoID.Exec(order, card.ClickCount, card.Image, card.Name, string(kwBytes), card.Link, card.AppRoute, card.BtnText)
+			_, err = stmtNoID.Exec(order, card.ClickCount, card.Image, card.Name, string(kwBytes), card.Link, card.BtnText)
 		}
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": "failed to insert card '" + card.Name + "': " + err.Error()})
