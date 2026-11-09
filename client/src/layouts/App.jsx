@@ -48,19 +48,23 @@ function App() {
   const location = useLocation();
 
   const currentMeta = getRouteSeo(location.pathname);
-  const isPublicUiRoute =
-    location.pathname === "/" ||
-    location.pathname === "/about" ||
-    location.pathname === "/developer" ||
-    location.pathname === "/features" ||
-    location.pathname === "/faq" ||
-    location.pathname === "/contact" ||
-    location.pathname === "/privacy-policy" ||
-    location.pathname === "/terms" ||
-    location.pathname === "/disclaimer" ||
-    location.pathname === "/guides" ||
-    location.pathname.startsWith("/guides/") ||
-    location.pathname === "/wifi-details";
+  const protectedRoutePrefixes = [
+    "/home",
+    "/dashboard",
+    "/admin",
+    "/profile",
+    "/faculty-directory",
+    "/rpsite",
+    "/pcdp",
+    "/exam-hall",
+    "/leavedetails",
+    "/mess",
+    "/support-dev",
+  ];
+  const isProtectedRoute = protectedRoutePrefixes.some(
+    (prefix) => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)
+  );
+  const isPublicUiRoute = !isProtectedRoute;
 
   // useEffect(() => {
   //   const handleKeyDown = (e) => {

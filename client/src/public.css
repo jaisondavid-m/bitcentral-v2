@@ -1,454 +1,455 @@
-/* Public surface design system. Kept under .public-ui so authenticated screens
-   continue using the existing application theme unchanged. */
+/* ==========================================================================
+   BIT Central — Neo-Brutalist Public Design System (Electric Blue Edition)
+   Applied strictly to public surfaces via .public-ui (and public pages)
+   Preserves authenticated app interface untouched.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+/* --- Root Neo-Brutalist Variables --- */
 .public-ui {
-  --public-ink: #172033;
-  --public-muted: #647084;
-  --public-faint: #8d98a8;
-  --public-line: #e4e9ef;
-  --public-surface: #ffffff;
-  --public-canvas: #f6f8fb;
-  --public-accent: #1d5fe9;
-  --public-accent-dark: #1648b5;
-  --public-radius: 12px;
-  color: var(--public-ink);
-  background: var(--public-canvas);
+  /* Core palette */
+  --nb-bg: #f0f7ff;              /* Crisp neo-brutalist pale ice blue canvas */
+  --nb-surface: #ffffff;         /* Pure crisp white surface */
+  --nb-surface-alt: #dbeafe;     /* Subtle light blue accent container */
+  --nb-black: #0a0a0a;           /* Deep ink black */
+  --nb-muted: #1e293b;           /* High-contrast readable body text */
+  --nb-faint: #64748b;           /* Secondary muted */
+
+  /* Punchy Neo-Brutalist Blue Palette */
+  --nb-blue: #3b82f6;            /* Bold vibrant neo-brutalist Royal Blue */
+  --nb-blue-light: #60a5fa;      /* Electric sky blue */
+  --nb-blue-deep: #1d4ed8;       /* Deep cobalt punch */
+  --nb-blue-ice: #bfdbfe;        /* Pastel ice blue */
+  --nb-cyan: #38bdf8;            /* High-voltage cyan */
+  --nb-indigo: #818cf8;          /* Indigo accent */
+
+  /* Geometry & Solid Brutalist Shadows */
+  --nb-border-w: 2.5px;
+  --nb-border-color: #0a0a0a;
+  --nb-border: var(--nb-border-w) solid var(--nb-border-color);
+  --nb-shadow: 4px 4px 0px #0a0a0a;
+  --nb-shadow-lg: 6px 6px 0px #0a0a0a;
+  --nb-shadow-sm: 2.5px 2.5px 0px #0a0a0a;
+  --nb-radius: 8px;
+
+  /* Typography */
+  --nb-font-display: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  --nb-font-mono: "JetBrains Mono", monospace;
+
+  font-family: var(--nb-font-display);
+  background-color: var(--nb-bg);
+  color: var(--nb-black);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
-.dark .public-ui {
-  --public-ink: #f2f5f9;
-  --public-muted: #a4afbf;
-  --public-faint: #778499;
-  --public-line: #273346;
-  --public-surface: #111a29;
-  --public-canvas: #0a101b;
-  --public-accent: #76a5ff;
-  --public-accent-dark: #a8c4ff;
+/* --- Dark Mode Neo-Brutalism --- */
+.dark .public-ui,
+.public-ui.dark {
+  --nb-bg: #090d16;              /* Deep oceanic obsidian */
+  --nb-surface: #111827;         /* Raised card surface */
+  --nb-surface-alt: #1e293b;
+  --nb-black: #f8fafc;           /* Crisp off-white ink */
+  --nb-muted: #cbd5e1;           /* Readable body */
+  --nb-faint: #94a3b8;
+
+  --nb-border-color: #f8fafc;    /* Crisp white high-contrast outlines */
+  --nb-border: var(--nb-border-w) solid #f8fafc;
+  --nb-shadow: 4px 4px 0px #f8fafc;
+  --nb-shadow-lg: 6px 6px 0px #f8fafc;
+  --nb-shadow-sm: 2.5px 2.5px 0px #f8fafc;
+
+  --nb-blue: #3b82f6;
+  --nb-blue-light: #60a5fa;
+  --nb-blue-ice: #1d4ed8;
+  --nb-cyan: #38bdf8;
 }
 
+/* Base override on main */
 .public-ui main {
-  background: var(--public-canvas) !important;
-  color: var(--public-ink) !important;
+  background-color: var(--nb-bg) !important;
+  color: var(--nb-black) !important;
 }
 
-.public-ui main > section,
-.public-ui main > header {
-  border-color: var(--public-line) !important;
-}
-
-.public-ui main > section:nth-of-type(even) {
-  background: var(--public-surface) !important;
-}
-
+/* --- Neo-Brutalist Typography --- */
 .public-ui h1,
 .public-ui h2,
-.public-ui h3 {
-  color: var(--public-ink) !important;
-  letter-spacing: -0.025em;
+.public-ui h3,
+.public-ui h4,
+.public-ui h5 {
+  font-family: var(--nb-font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--nb-black) !important;
 }
 
 .public-ui p,
-.public-ui li {
-  color: var(--public-muted);
+.public-ui li,
+.public-ui dt,
+.public-ui dd {
+  color: var(--nb-muted);
+  font-weight: 500;
 }
 
-.public-ui a {
-  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+/* --- Global Brutalist Elements: Cards & Articles --- */
+.public-ui article,
+.public-ui section > div > .rounded-xl,
+.public-ui section > div > .rounded-lg,
+.public-ui .rounded-2xl {
+  border: var(--nb-border) !important;
+  box-shadow: var(--nb-shadow) !important;
+  border-radius: var(--nb-radius) !important;
+  background-color: var(--nb-surface) !important;
+  transition: transform 140ms ease, box-shadow 140ms ease;
 }
 
-.public-ui a:focus-visible,
-.public-ui button:focus-visible,
-.public-ui input:focus-visible {
-  outline: 3px solid rgba(29, 95, 233, 0.28);
-  outline-offset: 3px;
+.public-ui article:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--nb-shadow-lg) !important;
 }
 
-.public-ui .text-slate-950,
-.public-ui .text-slate-900 {
-  color: var(--public-ink) !important;
+/* --- Neo-Brutalist Buttons --- */
+.public-ui button,
+.public-ui a.inline-flex,
+.public-ui .public-nav__login {
+  border: var(--nb-border) !important;
+  box-shadow: var(--nb-shadow-sm) !important;
+  border-radius: var(--nb-radius) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em;
+  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
 }
 
-.public-ui .text-slate-700,
-.public-ui .text-slate-600,
-.public-ui .text-slate-500,
-.public-ui .text-slate-400 {
-  color: var(--public-muted) !important;
+.public-ui button:hover:not(:disabled),
+.public-ui a.inline-flex:hover,
+.public-ui .public-nav__login:hover {
+  transform: translate(-1.5px, -1.5px);
+  box-shadow: var(--nb-shadow) !important;
 }
 
-.public-ui .text-blue-600,
-.public-ui .text-blue-700,
-.public-ui .text-blue-800 {
-  color: var(--public-accent) !important;
+.public-ui button:active:not(:disabled),
+.public-ui a.inline-flex:active,
+.public-ui .public-nav__login:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px var(--nb-border-color) !important;
 }
 
-.public-ui .bg-white,
-.public-ui .bg-slate-950,
-.public-ui .bg-slate-900 {
-  background: var(--public-surface) !important;
+/* Primary Brutalist Button (Vibrant Electric Blue / Crisp White Text) */
+.public-ui .bg-blue-600,
+.public-ui .bg-blue-700,
+.public-ui .public-nav__login {
+  background-color: var(--nb-blue) !important;
+  color: #ffffff !important;
 }
 
-.public-ui .bg-slate-50,
-.public-ui .bg-slate-100 {
-  background: var(--public-canvas) !important;
+.public-ui .bg-blue-600:hover,
+.public-ui .public-nav__login:hover {
+  background-color: var(--nb-blue-deep) !important;
+  color: #ffffff !important;
 }
 
-.public-ui .border-slate-100,
-.public-ui .border-slate-200,
+/* Secondary Brutalist Button (Crisp Surface with Solid Stroke) */
 .public-ui .border-slate-300,
-.public-ui .border-slate-700,
-.public-ui .border-slate-800 {
-  border-color: var(--public-line) !important;
+.public-ui .border-slate-700 {
+  background-color: var(--nb-surface) !important;
+  color: var(--nb-black) !important;
 }
 
+/* --- Neo-Brutalist Inputs & Search --- */
+.public-ui input,
+.public-ui select,
+.public-ui textarea {
+  border: var(--nb-border) !important;
+  box-shadow: var(--nb-shadow-sm) !important;
+  border-radius: var(--nb-radius) !important;
+  background-color: var(--nb-surface) !important;
+  color: var(--nb-black) !important;
+  font-weight: 600;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.public-ui input:focus,
+.public-ui select:focus,
+.public-ui textarea:focus {
+  outline: none !important;
+  transform: translate(-1px, -1px);
+  box-shadow: var(--nb-shadow) !important;
+  border-color: var(--nb-border-color) !important;
+}
+
+/* --- Neo-Brutalist Badges / Tags --- */
+.public-ui .rounded-full,
+.public-ui span.rounded-md,
+.public-ui .inline-block {
+  border: var(--nb-border-w) solid var(--nb-border-color);
+  font-weight: 700;
+}
+
+/* --- Public Navigation: Solid Brutalist Bar --- */
 .public-nav {
   position: sticky;
   top: 0;
-  z-index: 40;
-  background: color-mix(in srgb, var(--public-surface) 92%, transparent);
-  border-bottom: 1px solid var(--public-line);
-  backdrop-filter: blur(16px);
+  z-index: 50;
+  border-bottom: var(--nb-border);
+  background-color: var(--nb-surface);
+  box-shadow: 0 4px 0px rgba(0, 0, 0, 0.06);
+}
+
+.dark .public-nav {
+  box-shadow: 0 4px 0px rgba(255, 255, 255, 0.05);
 }
 
 .public-nav__inner {
-  width: min(1180px, calc(100% - 40px));
-  min-height: 72px;
-  margin: 0 auto;
+  width: min(100% - 32px, 1180px);
+  margin-inline: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 28px;
+  padding: 14px 0;
 }
 
 .public-brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  flex: 0 0 auto;
-  color: var(--public-ink) !important;
+  gap: 12px;
   text-decoration: none;
-}
-
-.public-brand:hover {
-  color: var(--public-accent) !important;
+  color: var(--nb-black);
 }
 
 .public-brand__mark {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  place-items: center;
-  border: 1px solid var(--public-line);
-  border-radius: 10px;
-  background: var(--public-canvas);
-}
-
-.public-brand__mark img {
-  display: block;
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-}
-
-.public-brand strong,
-.public-brand small {
-  display: block;
+  display: inline-flex;
+  padding: 3px;
+  background-color: var(--nb-surface-alt);
+  border: var(--nb-border);
+  border-radius: var(--nb-radius);
+  box-shadow: 2px 2px 0px var(--nb-border-color);
 }
 
 .public-brand strong {
-  font-size: 15px;
-  letter-spacing: -0.02em;
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--nb-black);
 }
 
 .public-brand small {
-  margin-top: 2px;
-  color: var(--public-faint);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-}
-
-.public-nav__links,
-.public-nav__items {
-  display: flex;
-  align-items: center;
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--nb-faint);
 }
 
 .public-nav__links {
-  gap: 22px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .public-nav__items {
-  gap: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .public-nav__link {
-  position: relative;
-  padding: 9px 10px;
-  color: var(--public-muted) !important;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  color: var(--nb-black);
   text-decoration: none;
-  white-space: nowrap;
+  border: 2px solid transparent;
+  border-radius: var(--nb-radius);
+  transition: all 120ms ease;
 }
 
-.public-nav__link::after {
-  position: absolute;
-  right: 10px;
-  bottom: 1px;
-  left: 10px;
-  height: 2px;
-  background: var(--public-accent);
-  content: "";
-  transform: scaleX(0);
-  transform-origin: center;
-  transition: transform 160ms ease;
+.public-nav__link:hover {
+  background-color: var(--nb-surface-alt);
+  border-color: var(--nb-border-color);
+  color: var(--nb-black);
+  box-shadow: 2px 2px 0px var(--nb-border-color);
+  transform: translate(-1px, -1px);
 }
 
-.public-nav__link:hover,
 .public-nav__link.is-active {
-  color: var(--public-accent) !important;
+  background-color: var(--nb-blue);
+  color: #ffffff !important;
+  border-color: var(--nb-border-color);
+  box-shadow: 2px 2px 0px var(--nb-border-color);
 }
 
-.public-nav__link.is-active::after,
-.public-nav__link:hover::after {
-  transform: scaleX(1);
+.dark .public-nav__link.is-active {
+  background-color: var(--nb-blue);
+  color: #ffffff !important;
+  border-color: #f8fafc;
+  box-shadow: 2px 2px 0px #f8fafc;
 }
 
-.public-button {
+.public-nav__login {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  min-height: 38px;
-  padding: 0 15px;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
+  padding: 9px 18px;
+  font-size: 0.88rem;
   text-decoration: none;
-  cursor: pointer;
-  transition: transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
-}
-
-.public-button svg,
-.public-nav__login svg {
-  width: 15px;
-  height: 15px;
-}
-
-.public-button:hover {
-  transform: translateY(-1px);
-}
-
-.public-button:active {
-  transform: translateY(0);
-}
-
-.public-button--primary {
-  color: #fff !important;
-  background: var(--public-accent);
-  box-shadow: 0 5px 14px rgba(29, 95, 233, 0.18);
-}
-
-.public-button--primary:hover {
-  background: var(--public-accent-dark);
+  background-color: var(--nb-blue) !important;
+  color: #ffffff !important;
 }
 
 .public-nav__toggle {
   display: none;
-  width: 40px;
-  height: 40px;
-  padding: 8px;
-  border: 1px solid var(--public-line);
-  border-radius: 8px;
-  color: var(--public-ink);
-  background: var(--public-surface);
+  background: var(--nb-surface);
+  color: var(--nb-black);
+  border: var(--nb-border);
+  padding: 6px;
+  border-radius: var(--nb-radius);
+  box-shadow: var(--nb-shadow-sm);
   cursor: pointer;
 }
 
-.public-nav__toggle svg {
-  width: 22px;
-  height: 22px;
-}
-
-.public-ui main > section:first-of-type:not(.public-footer) {
-  position: relative;
-}
-
-.public-ui main > section:first-of-type:not(.public-footer)::before {
-  display: block;
-  width: 44px;
-  height: 3px;
-  margin-bottom: 22px;
-  border-radius: 2px;
-  background: var(--public-accent);
-  content: "";
-}
-
-.public-ui main > section:first-of-type:not(.public-footer) h1 {
-  max-width: 860px;
-  font-size: clamp(2rem, 4vw, 3.65rem) !important;
-  line-height: 1.08 !important;
-}
-
-.public-ui main > section:first-of-type:not(.public-footer) p {
-  max-width: 760px;
-}
-
-.public-ui [class*="rounded-xl"],
-.public-ui [class*="rounded-lg"] {
-  border-radius: var(--public-radius) !important;
-  box-shadow: none !important;
-}
-
-.public-ui [class*="rounded-xl"]:hover,
-.public-ui [class*="rounded-lg"]:hover {
-  border-color: color-mix(in srgb, var(--public-accent) 42%, var(--public-line)) !important;
-}
-
-.public-ui article[class*="rounded"] {
-  transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
-}
-
-.public-ui article[class*="rounded"]:hover {
-  transform: translateY(-3px);
-}
-
-.public-ui input {
-  border-color: var(--public-line) !important;
-  border-radius: 8px !important;
-  color: var(--public-ink) !important;
-  background: var(--public-surface) !important;
-}
-
-.public-ui button:not(.public-nav__toggle) {
-  transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease;
-}
-
-.public-ui button:not(.public-nav__toggle):active {
-  transform: scale(0.98);
-}
-
+/* --- Public Footer: Neo-Brutalist Stamp & Grid --- */
 .public-footer {
-  border-top: 1px solid var(--public-line);
-  color: var(--public-muted);
-  background: var(--public-surface);
+  border-top: var(--nb-border);
+  background-color: var(--nb-surface);
+  margin-top: 60px;
 }
 
 .public-footer__inner {
-  width: min(1180px, calc(100% - 40px));
-  margin: 0 auto;
-  padding: 56px 0 24px;
+  width: min(100% - 32px, 1180px);
+  margin-inline: auto;
+  padding: 56px 0 32px;
 }
 
 .public-footer__grid {
   display: grid;
-  grid-template-columns: 1.6fr repeat(3, 1fr);
-  gap: 42px;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 36px;
 }
 
-.public-footer__brand > p {
-  max-width: 310px;
-  margin: 18px 0 0;
-  font-size: 12px;
-  line-height: 1.75;
+.public-footer__brand p {
+  margin-top: 14px;
+  font-size: 0.92rem;
+  line-height: 1.6;
 }
 
 .public-footer__note {
-  color: var(--public-faint) !important;
-  font-size: 11px !important;
+  margin-top: 14px;
+  display: inline-block;
+  padding: 6px 12px;
+  background-color: var(--nb-surface-alt);
+  color: var(--nb-blue-deep) !important;
+  border: var(--nb-border);
+  border-radius: var(--nb-radius);
+  box-shadow: 2px 2px 0px var(--nb-border-color);
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+
+.dark .public-footer__note {
+  background-color: #1e293b;
+  color: #93c5fd !important;
 }
 
 .public-footer__column h3 {
-  margin: 4px 0 16px;
-  color: var(--public-ink) !important;
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: 0.95rem;
+  font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 16px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--nb-border-color);
+  display: inline-block;
 }
 
 .public-footer__column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: grid;
   gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
-.public-footer__column a,
-.public-footer__external {
-  color: var(--public-muted) !important;
-  font-size: 12px;
+.public-footer__column a {
   text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--nb-muted);
+  transition: color 120ms ease, transform 120ms ease;
+  display: inline-block;
 }
 
-.public-footer__column a:hover,
-.public-footer__external:hover {
-  color: var(--public-accent) !important;
-}
-
-.public-footer__external {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.public-footer__external svg {
-  color: var(--public-accent);
-}
-
-.public-footer__support > p {
-  margin-top: 18px;
-  font-size: 11px;
-  line-height: 1.65;
+.public-footer__column a:hover {
+  color: var(--nb-blue);
+  transform: translateX(3px);
+  font-weight: 700;
 }
 
 .public-footer__bottom {
-  margin-top: 42px;
-  padding-top: 20px;
-  border-top: 1px solid var(--public-line);
-  color: var(--public-faint);
-  font-size: 11px;
-  text-align: center;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: var(--nb-border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
 }
 
-@media (max-width: 1050px) {
-  .public-nav__inner {
-    gap: 16px;
-  }
-
-  .public-nav__links {
-    gap: 8px;
-  }
-
-  .public-nav__link {
-    padding-inline: 7px;
-    font-size: 11px;
-  }
+/* --- Section Accents & Callouts --- */
+.public-ui .border-b {
+  border-bottom: var(--nb-border) !important;
 }
 
-@media (max-width: 820px) {
-  .public-nav__inner {
-    position: relative;
-    min-height: 64px;
-  }
+.public-ui .border-t {
+  border-top: var(--nb-border) !important;
+}
 
+/* Highlight tags inside sections */
+.public-ui .text-blue-700,
+.public-ui .text-blue-600,
+.public-ui .text-blue-800 {
+  color: #1e3a8a !important;
+  background-color: var(--nb-surface-alt);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1.5px solid var(--nb-border-color);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 1.5px 1.5px 0px var(--nb-border-color);
+  font-weight: 700;
+}
+
+.dark .public-ui .text-blue-700,
+.dark .public-ui .text-blue-600,
+.dark .public-ui .text-blue-800 {
+  background-color: #1e293b;
+  color: #93c5fd !important;
+  border-color: #f8fafc;
+  box-shadow: 1.5px 1.5px 0px #f8fafc;
+}
+
+/* Mobile Responsiveness for Neo-Brutalist Layout */
+@media (max-width: 900px) {
   .public-nav__toggle {
-    display: grid;
-    place-items: center;
+    display: flex;
   }
 
   .public-nav__links {
-    position: absolute;
-    top: calc(100% + 1px);
-    right: 0;
-    left: 0;
     display: none;
-    padding: 12px 20px 18px;
-    border-bottom: 1px solid var(--public-line);
-    background: var(--public-surface);
-    box-shadow: 0 16px 30px rgba(16, 29, 48, 0.08);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--nb-surface);
+    border-bottom: var(--nb-border);
+    padding: 18px 24px 24px;
+    box-shadow: 0 8px 0px rgba(0, 0, 0, 0.08);
   }
 
   .public-nav__links.is-open {
@@ -457,31 +458,24 @@
 
   .public-nav__items {
     display: grid;
-    gap: 2px;
+    gap: 8px;
   }
 
   .public-nav__link {
     display: block;
-    padding: 11px 8px;
-    border-bottom: 1px solid var(--public-line);
-    font-size: 13px;
-  }
-
-  .public-nav__link::after {
-    right: auto;
-    bottom: -1px;
-    left: 0;
-    width: 32px;
+    padding: 10px 14px;
+    border: 2px solid var(--nb-border-color);
   }
 
   .public-nav__login {
     width: 100%;
+    justify-content: center;
     margin-top: 14px;
   }
 
   .public-footer__grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 34px 24px;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px 24px;
   }
 
   .public-footer__brand {
@@ -492,38 +486,10 @@
 @media (max-width: 560px) {
   .public-nav__inner,
   .public-footer__inner {
-    width: min(100% - 28px, 1180px);
-  }
-
-  .public-brand small {
-    display: none;
-  }
-
-  .public-ui main > section:first-of-type:not(.public-footer) h1 {
-    font-size: 2.15rem !important;
+    width: min(100% - 24px, 1180px);
   }
 
   .public-footer__grid {
     grid-template-columns: 1fr;
-    gap: 28px;
-  }
-
-  .public-footer__brand {
-    grid-column: auto;
-  }
-
-  .public-footer__inner {
-    padding-top: 40px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .public-ui *,
-  .public-ui *::before,
-  .public-ui *::after {
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
   }
 }
