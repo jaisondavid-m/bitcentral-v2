@@ -319,7 +319,7 @@ export default function UISurveyModal() {
                 onChange={(e) => setFeedback(e.target.value)}
                 placeholder="Share your thoughts, suggestions, or bugs..."
                 rows={3}
-                className="w-full rounded-xl border border-zinc-900 bg-zinc-50 p-3 text-xs font-bold text-zinc-900 shadow-[2px_2px_0px_#18181b] placeholder:text-zinc-400 focus:bg-white focus:outline-none dark:border-white dark:bg-zinc-800/80 dark:text-white dark:shadow-[2px_2px_0px_#ffffff] resize-none"
+                className="w-full rounded-xl border border-zinc-900 bg-zinc-50 p-3 text-xs font-bold text-zinc-900 shadow-[2px_2px_0px_#18181b] placeholder:text-zinc-400 focus:bg-white focus:outline-none dark:border-white dark:bg-zinc-800 dark:text-white dark:placeholder:text-zinc-500 dark:focus:bg-zinc-900 dark:shadow-[2px_2px_0px_#ffffff] caret-zinc-900 dark:caret-white resize-none"
               />
             </div>
 
