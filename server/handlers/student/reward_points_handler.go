@@ -25,9 +25,9 @@ import (
 )
 
 var defaultTabs = []string{
-	"INDEX", "Details", "MTRS", "MECH", "IT", "ISE", "FD",
-	"FT", "EIE", "ECE", "EEE", "CT", "CSE", "CSD", "CSBS",
-	"CIVIL", "BT", "BIOMEDICAL", "AI&DS", "AGRI", "AIML",
+	"MTRS", "MECH", "IT", "ISE", "FD", "FT", "EIE", "ECE", "EEE",
+	"CT", "CSE", "CSD", "CSBS", "CIVIL", "BT", "BIOMEDICAL", "AI&DS",
+	"AGRI", "AIML",
 }
 
 type SheetHandler struct {
@@ -495,11 +495,20 @@ func (h *SheetHandler) fetchSheetRows(tab, rangeStr string) ([]studentmodels.Stu
 		if _, err := strconv.Atoi(slNo); err != nil {
 			continue
 		}
+		rollNo := strings.TrimSpace(safeGet(row, 2))
+		name := strings.TrimSpace(safeGet(row, 3))
+		year := normalizeYear(safeGet(row, 1))
+
+		// Discard trailing summary rows, empty rows, or invalid non-student records
+		if rollNo == "" || name == "" || year == "" {
+			continue
+		}
+
 		students = append(students, studentmodels.Student{
 			SlNo:             slNo,
 			Year:             safeGet(row, 1),
-			RollNo:           safeGet(row, 2),
-			StudentName:      safeGet(row, 3),
+			RollNo:           rollNo,
+			StudentName:      name,
 			CourseCode:       safeGet(row, 4),
 			Department:       safeGet(row, 5),
 			MentorName:       safeGet(row, 6),

@@ -67,21 +67,31 @@ func normalizeYear(y string) string {
 }
 
 func isSameDepartment(s studentmodels.Student, target *studentmodels.Student) bool {
-	if s.Tab != "" && target.Tab != "" {
-		if strings.EqualFold(strings.TrimSpace(s.Tab), strings.TrimSpace(target.Tab)) {
-			return true
-		}
+	// 1. Primary check: If both have Tab set, exact tab match
+	sTab := strings.ToUpper(strings.TrimSpace(s.Tab))
+	tTab := strings.ToUpper(strings.TrimSpace(target.Tab))
+	if sTab != "" && tTab != "" {
+		return sTab == tTab
 	}
+
+	// 2. Department exact match after normalization
 	sDept := normalize(s.Department)
 	tDept := normalize(target.Department)
-	if sDept != "" && tDept != "" {
-		if sDept == tDept || strings.Contains(sDept, tDept) || strings.Contains(tDept, sDept) {
+	if sDept != "" && tDept != "" && sDept == tDept {
+		return true
+	}
+
+	// 3. Fallback: Check dept code in roll number if available (e.g. 7376251EI115 -> EI)
+	sRoll := strings.ToUpper(strings.TrimSpace(s.RollNo))
+	tRoll := strings.ToUpper(strings.TrimSpace(target.RollNo))
+	if len(sRoll) >= 9 && len(tRoll) >= 9 && strings.HasPrefix(sRoll, "7376") && strings.HasPrefix(tRoll, "7376") {
+		sCode := sRoll[7:9]
+		tCode := tRoll[7:9]
+		if sCode == tCode {
 			return true
 		}
 	}
-	if s.CourseCode != "" && target.CourseCode != "" && strings.EqualFold(s.CourseCode, target.CourseCode) {
-		return true
-	}
+
 	return false
 }
 
@@ -114,7 +124,7 @@ func calculateRankStat(cohort []studentmodels.Student, targetScore float64, getS
 
 	avg := math.Round((sumScore/float64(total))*100) / 100
 
-	pct := (float64(total-rank+1) / float64(total)) * 100
+	pct := 100.0 - (float64(rank) / float64(total) * 100.0)
 	pct = math.Round(pct*10) / 10
 
 	return RankStat{
@@ -220,11 +230,12 @@ func (h *LeaderboardHandler) GetStudentRank(c *gin.Context) {
 	var collegeCohort []studentmodels.Student
 
 	for _, s := range all {
-		if strings.TrimSpace(s.RollNo) == "" {
+		roll := strings.TrimSpace(s.RollNo)
+		sYear := normalizeYear(s.Year)
+		if roll == "" || sYear == "" {
 			continue
 		}
 		collegeCohort = append(collegeCohort, s)
-		sYear := normalizeYear(s.Year)
 		sameDept := isSameDepartment(s, targetStudent)
 
 		if sameDept {
@@ -288,12 +299,17 @@ func (h *LeaderboardHandler) GetStudentRank(c *gin.Context) {
 		limit = len(sortedDeptYear)
 	}
 	toppers := make([]TopPerformer, 0, limit)
+	currentRank := 1
 	for i := 0; i < limit; i++ {
+		bal := parseBalance(sortedDeptYear[i].BalancePoints)
+		if i > 0 && bal < parseBalance(sortedDeptYear[i-1].BalancePoints) {
+			currentRank = i + 1
+		}
 		toppers = append(toppers, TopPerformer{
-			Rank:          i + 1,
+			Rank:          currentRank,
 			StudentName:   sortedDeptYear[i].StudentName,
 			RollNo:        sortedDeptYear[i].RollNo,
-			BalancePoints: parseBalance(sortedDeptYear[i].BalancePoints),
+			BalancePoints: bal,
 		})
 	}
 

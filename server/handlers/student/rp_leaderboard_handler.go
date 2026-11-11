@@ -68,9 +68,10 @@ func filterByYear(students []studentmodels.Student, year string) []studentmodels
 	if year == "" {
 		return students
 	}
+	targetYr := normalizeYear(year)
 	var out []studentmodels.Student
 	for _, s := range students {
-		if strings.EqualFold(s.Year, year) {
+		if normalizeYear(s.Year) == targetYr {
 			out = append(out, s)
 		}
 	}
