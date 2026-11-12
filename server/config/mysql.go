@@ -282,39 +282,23 @@ func InitMySQL() {
 		createAuditLogsTable(DBLogs)
 		createDailyActiveUserStatsTable(DBLogs)
 		createFeedbackMessagesTable(DBLogs)
-		createUISurveyFeedbackTable(DBLogs)
+		dropUISurveyFeedbackTable(DBLogs)
 		createNotificationsTables(DBLogs)
 		createAdminSentEmailsTable(DBLogs)
 		createEmailJobQueuesTables(DBLogs)
 		createLostFoundTables(DBLogs)
 	} else {
 		log.Println("ℹ️ Logs & High-Write DB schema already initialized. Skipping DDL migrations.")
-		createUISurveyFeedbackTable(DBLogs)
+		dropUISurveyFeedbackTable(DBLogs)
 	}
 }
 
-func createUISurveyFeedbackTable(db *sql.DB) {
+func dropUISurveyFeedbackTable(db *sql.DB) {
 	if db == nil {
 		return
 	}
-	query := `
-	CREATE TABLE IF NOT EXISTS ui_survey_feedback (
-		id INT AUTO_INCREMENT PRIMARY KEY,
-		user_uid VARCHAR(128) NOT NULL,
-		user_name VARCHAR(255) NOT NULL,
-		user_email VARCHAR(255) NOT NULL,
-		liked ENUM('yes', 'no') NOT NULL,
-		feedback TEXT NULL,
-		user_agent VARCHAR(512) NULL,
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		INDEX idx_ui_survey_created (created_at),
-		INDEX idx_ui_survey_liked (liked)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
-
-	if _, err := db.Exec(query); err != nil {
-		log.Printf("⚠️ Warning creating ui_survey_feedback table: %v", err)
-	} else {
-		log.Println("✅ ui_survey_feedback table ready")
+	if _, err := db.Exec("DROP TABLE IF EXISTS ui_survey_feedback;"); err != nil {
+		log.Printf("⚠️ Warning dropping ui_survey_feedback table: %v", err)
 	}
 }
 

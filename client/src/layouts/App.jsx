@@ -4,7 +4,6 @@ import { Analytics } from "@vercel/analytics/react";
 import FullScreenLoader from "@/components/common/FullScreenLoader.jsx";
 import SEO from "@/components/common/SEO.jsx";
 import PWAInstallModal from "@/components/modals/PWAInstallModal.jsx";
-import UISurveyModal from "@/components/modals/UISurveyModal.jsx";
 import NetworkStatusToast from "@/components/common/NetworkStatusToast.jsx";
 import FloatingMenu from "@/components/layout/FloatingMenu.jsx";
 import ErrorBoundary from "@/components/common/ErrorBoundary.jsx";
@@ -283,14 +282,6 @@ function App() {
                   </AdminRoute>
                 }
               />
-              <Route
-                path="/admin/survey"
-                element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }
-              />
               <Route path="/profile" element={<ProfileV2 />} />
               <Route path="/faculty-directory" element={<FacultyDirectory />} />
               <Route path="/rpsite" element={<Rpsite />} />
@@ -311,7 +302,6 @@ function App() {
       </ErrorBoundary>
       <Analytics />
       <PWAInstallModal />
-      <UISurveyModal />
       <NetworkStatusToast />
       <FloatingMenu />
     </>
