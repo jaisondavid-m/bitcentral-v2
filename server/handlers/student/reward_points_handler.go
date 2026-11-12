@@ -367,37 +367,7 @@ func isPublicPath(path string) bool {
 }
 
 func (h *SheetHandler) RequireAuth() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if utils.IsInternalServiceRequest(c) {
-			c.Set("internal_service", true)
-			c.Next()
-			return
-		}
-
-		token := utils.ExtractAuthToken(c)
-		if token != "" {
-			if claims, err := config.VerifyGoogleToken(token); err == nil && claims != nil {
-				c.Set("user", claims)
-				c.Set("email", claims.Email)
-				c.Set("uid", claims.UID)
-				c.Set("role", claims.Role)
-				c.Next()
-				return
-			}
-		}
-
-		path := c.Request.URL.Path
-		if isPublicPath(path) {
-			c.Next()
-			return
-		}
-
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"success": false,
-			"message": "Authentication required",
-		})
-		c.Abort()
-	}
+	return middleware.RequireAuth()
 }
 
 func (h *SheetHandler) getLoginURL(c *gin.Context) string {

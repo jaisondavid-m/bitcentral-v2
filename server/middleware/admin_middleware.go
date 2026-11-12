@@ -1,209 +1,96 @@
 package middleware
 
 import (
-	"net/http"
 	"strings"
 
 	"server/config"
+	"server/response"
+	"server/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
-func getToken(c *gin.Context) string {
-	authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-	if authHeader != "" {
-		if len(authHeader) > 7 && strings.EqualFold(authHeader[:7], "bearer ") {
-			return strings.TrimSpace(authHeader[7:])
-		}
-		if token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer")); token != "" && token != authHeader {
-			return token
-		}
-		return authHeader
+// validateAdminAccess checks if the token belongs to an unblocked user with admin privileges
+func validateAdminAccess(c *gin.Context) bool {
+	token := utils.ExtractAuthToken(c)
+	if token == "" {
+		response.Unauthorized(c, "Authentication token is required")
+		c.Abort()
+		return false
 	}
-	cookieNames := []string{"google_auth_token", "jwt", "token", "auth_token", "access_token"}
-	for _, name := range cookieNames {
-		if cookieVal, err := c.Cookie(name); err == nil && strings.TrimSpace(cookieVal) != "" {
-			return strings.TrimSpace(cookieVal)
+
+	claims, err := config.VerifyGoogleToken(token)
+	if err != nil || claims == nil {
+		response.Unauthorized(c, "Invalid or expired authentication token")
+		c.Abort()
+		return false
+	}
+
+	uid := strings.TrimSpace(claims.UID)
+	email := strings.ToLower(strings.TrimSpace(claims.Email))
+
+	// Strict server-side database validation: NEVER trust client claims
+	if config.DB != nil {
+		var role string
+		var blocked int
+		err := config.DB.QueryRow(`
+			SELECT COALESCE(role, 'user'), COALESCE(blocked, 0)
+			FROM users
+			WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)
+			LIMIT 1`,
+			uid, uid, email,
+		).Scan(&role, &blocked)
+
+		if err == nil {
+			if blocked != 0 {
+				response.Forbidden(c, "Account is blocked. Contact support for assistance.")
+				c.Abort()
+				return false
+			}
+
+			r := strings.ToLower(strings.TrimSpace(role))
+			if r == "admin" || r == "superadmin" || r == "super_admin" {
+				utils.SetAuthContext(c, claims, true)
+				return true
+			}
+		}
+
+		// Fallback: check admins table in DB
+		var count int
+		err = config.DB.QueryRow(`
+			SELECT COUNT(*)
+			FROM admins a
+			LEFT JOIN users u ON a.uid = u.uid
+			WHERE (a.uid = ? OR LOWER(TRIM(u.email)) = ?)
+			  AND COALESCE(u.blocked, 0) = 0`,
+			uid, email,
+		).Scan(&count)
+
+		if err == nil && count > 0 {
+			utils.SetAuthContext(c, claims, true)
+			return true
 		}
 	}
-	return ""
+
+	response.Forbidden(c, "Unauthorized: administrator privileges required")
+	c.Abort()
+	return false
 }
 
+// RequireAdmin verifies that the requesting user has valid admin rights
 func RequireAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token := getToken(c)
-		if token == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"success": false,
-				"message": "Unauthorized: Authentication token is required",
-			})
-			c.Abort()
-			return
+		if validateAdminAccess(c) {
+			c.Next()
 		}
-
-		claims, err := config.VerifyGoogleToken(token)
-		if err != nil || claims == nil {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"success": false,
-				"message": "Invalid or expired authentication token",
-			})
-			c.Abort()
-			return
-		}
-
-		uid := strings.TrimSpace(claims.UID)
-		email := strings.ToLower(strings.TrimSpace(claims.Email))
-
-		// Strict server-side database validation: NEVER trust client claims
-		if config.DB != nil {
-			var role string
-			var blocked int
-			err := config.DB.QueryRow(`
-				SELECT COALESCE(role, 'user'), COALESCE(blocked, 0)
-				FROM users
-				WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)
-				LIMIT 1`,
-				uid, uid, email,
-			).Scan(&role, &blocked)
-
-			if err == nil {
-				if blocked != 0 {
-					c.JSON(http.StatusForbidden, gin.H{
-						"success": false,
-						"message": "Account is blocked. Contact support for assistance.",
-					})
-					c.Abort()
-					return
-				}
-
-				r := strings.ToLower(strings.TrimSpace(role))
-				// If role in DB is admin or superadmin, grant access
-				if r == "admin" || r == "superadmin" || r == "super_admin" {
-					c.Set("actor_uid", uid)
-					c.Set("actor_email", email)
-					c.Set("actor_role", "admin")
-					c.Set("is_admin", true)
-					c.Set("is_super_admin", true)
-					c.Next()
-					return
-				}
-			}
-
-			// Fallback: check admins table in DB
-			var count int
-			err = config.DB.QueryRow(`
-				SELECT COUNT(*)
-				FROM admins a
-				LEFT JOIN users u ON a.uid = u.uid
-				WHERE (a.uid = ? OR LOWER(TRIM(u.email)) = ?)
-				  AND COALESCE(u.blocked, 0) = 0`,
-				uid, email,
-			).Scan(&count)
-
-			if err == nil && count > 0 {
-				c.Set("actor_uid", uid)
-				c.Set("actor_email", email)
-				c.Set("actor_role", "admin")
-				c.Set("is_admin", true)
-				c.Set("is_super_admin", true)
-				c.Next()
-				return
-			}
-		}
-
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"success": false,
-			"message": "Unauthorized admin access: insufficient privileges",
-		})
-		c.Abort()
 	}
 }
 
+// RequireSuperAdmin verifies that the requesting user has administrative privileges
 func RequireSuperAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token := getToken(c)
-		if token == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"success": false,
-				"message": "Unauthorized: Authentication token is required",
-			})
-			c.Abort()
-			return
+		if validateAdminAccess(c) {
+			c.Next()
 		}
-
-		claims, err := config.VerifyGoogleToken(token)
-		if err != nil || claims == nil {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"success": false,
-				"message": "Invalid or expired authentication token",
-			})
-			c.Abort()
-			return
-		}
-
-		uid := strings.TrimSpace(claims.UID)
-		email := strings.ToLower(strings.TrimSpace(claims.Email))
-
-		// Any admin has full administrative access (admin and superadmin treated identical)
-		if config.DB != nil {
-			var role string
-			var blocked int
-			err := config.DB.QueryRow(`
-				SELECT COALESCE(role, 'user'), COALESCE(blocked, 0)
-				FROM users
-				WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)
-				LIMIT 1`,
-				uid, uid, email,
-			).Scan(&role, &blocked)
-
-			if err == nil {
-				if blocked != 0 {
-					c.JSON(http.StatusForbidden, gin.H{
-						"success": false,
-						"message": "Account is blocked.",
-					})
-					c.Abort()
-					return
-				}
-
-				r := strings.ToLower(strings.TrimSpace(role))
-				if r == "admin" || r == "superadmin" || r == "super_admin" {
-					c.Set("actor_uid", uid)
-					c.Set("actor_email", email)
-					c.Set("actor_role", "admin")
-					c.Set("is_admin", true)
-					c.Set("is_super_admin", true)
-					c.Next()
-					return
-				}
-			}
-
-			// Fallback: check admins table in DB
-			var count int
-			err = config.DB.QueryRow(`
-				SELECT COUNT(*)
-				FROM admins a
-				LEFT JOIN users u ON a.uid = u.uid
-				WHERE (a.uid = ? OR LOWER(TRIM(u.email)) = ?)
-				  AND COALESCE(u.blocked, 0) = 0`,
-				uid, email,
-			).Scan(&count)
-
-			if err == nil && count > 0 {
-				c.Set("actor_uid", uid)
-				c.Set("actor_email", email)
-				c.Set("actor_role", "admin")
-				c.Set("is_admin", true)
-				c.Set("is_super_admin", true)
-				c.Next()
-				return
-			}
-		}
-
-		c.JSON(http.StatusForbidden, gin.H{
-			"success": false,
-			"message": "Unauthorized admin access: admin privileges required",
-		})
-		c.Abort()
 	}
 }

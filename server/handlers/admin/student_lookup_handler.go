@@ -12,6 +12,7 @@ import (
 
 	"server/config"
 	adminmodels "server/models/admin"
+	"server/response"
 	"server/utils"
 
 	"github.com/gin-gonic/gin"
@@ -34,10 +35,7 @@ func (h *StudentLookupHandler) GetRollNoByEmail(c *gin.Context) {
 		mailID = strings.TrimSpace(c.Query("email"))
 	}
 	if mailID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"error":   "Query param 'mailid' is required",
-		})
+		response.BadRequest(c, "Query param 'mailid' is required")
 		return
 	}
 
@@ -53,17 +51,11 @@ func (h *StudentLookupHandler) GetRollNoByEmail(c *gin.Context) {
 		).Scan(&rollNo)
 	}
 	if err == sql.ErrNoRows {
-		c.JSON(http.StatusNotFound, gin.H{
-			"success": false,
-			"message": "No roll number found for that mail id",
-		})
+		response.NotFound(c, "No roll number found for that mail id")
 		return
 	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"error":   "Failed to look up roll number",
-		})
+		response.InternalServerError(c, "Failed to look up roll number")
 		return
 	}
 
@@ -75,7 +67,7 @@ func (h *StudentLookupHandler) GetRollNoByEmail(c *gin.Context) {
 }
 
 func setAuthCookies(c *gin.Context, token string) {
-	maxAge := 30 * 24 * 3600 // 30 days (2592000 seconds)
+	maxAge := 30 * 24 * 3600 // 30 days
 	host := c.Request.Host
 	secure := c.Request.TLS != nil || c.GetHeader("X-Forwarded-Proto") == "https" || strings.Contains(host, "bitsathy.in")
 
@@ -89,12 +81,9 @@ func setAuthCookies(c *gin.Context, token string) {
 		domains = append(domains, envDomain)
 	}
 
-	cookieNames := []string{"google_auth_token", "jwt", "token", "auth_token"}
-
 	for _, dom := range domains {
-		for _, name := range cookieNames {
-			c.SetCookie(name, token, maxAge, "/", dom, secure, false)
-		}
+		// Single canonical HTTP-only, Secure cookie
+		c.SetCookie("auth_token", token, maxAge, "/", dom, secure, true)
 	}
 }
 
@@ -107,36 +96,23 @@ func clearAuthCookies(c *gin.Context) {
 		domains = append(domains, envDomain)
 	}
 
-	cookieNames := []string{"google_auth_token", "jwt", "token", "auth_token", "access_token", "googleToken"}
-
+	cookieNames := []string{"auth_token", "google_auth_token", "jwt", "token", "access_token", "googleToken"}
 	for _, dom := range domains {
 		for _, name := range cookieNames {
-			c.SetCookie(name, "", -1, "/", dom, secure, false)
+			c.SetCookie(name, "", -1, "/", dom, secure, true)
 		}
 	}
 }
 
 func (h *StudentLookupHandler) GetMe(c *gin.Context) {
-	token := utils.ExtractAuthToken(c)
-	if token == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"success": false,
-			"error":   "Authentication required: please sign in to access profile",
-		})
+	authenticatedUID := utils.GetUserID(c)
+	authenticatedEmail := utils.GetUserEmail(c)
+	claims, _ := utils.GetAuthClaims(c)
+
+	if authenticatedEmail == "" {
+		response.Unauthorized(c, "Authentication required: please sign in to access profile")
 		return
 	}
-
-	claims, err := config.VerifyGoogleToken(token)
-	if err != nil || claims == nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"success": false,
-			"error":   "Invalid authentication token",
-		})
-		return
-	}
-
-	authenticatedUID := strings.TrimSpace(claims.UID)
-	authenticatedEmail := strings.ToLower(strings.TrimSpace(claims.Email))
 
 	requestedEmail := strings.TrimSpace(c.Query("emailid"))
 	if requestedEmail == "" {
@@ -487,19 +463,13 @@ func (h *StudentLookupHandler) GoogleLogin(c *gin.Context) {
 	}
 
 	if tokenStr == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"error":   "Google authentication token is required",
-		})
+		response.BadRequest(c, "Google authentication token is required")
 		return
 	}
 
 	claims, err := config.VerifyGoogleToken(tokenStr)
 	if err != nil || claims == nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"success": false,
-			"error":   "Invalid Google authentication token: " + err.Error(),
-		})
+		response.Unauthorized(c, "Invalid Google authentication token")
 		return
 	}
 
@@ -550,6 +520,16 @@ func (h *StudentLookupHandler) GoogleLogin(c *gin.Context) {
 		"success": true,
 		"message": "Authentication successful",
 		"token":   appToken,
+		"data": gin.H{
+			"token": appToken,
+			"user": gin.H{
+				"google_id":    googleID,
+				"email":        email,
+				"display_name": displayName,
+				"photo_url":    photoURL,
+				"role":         userRole,
+			},
+		},
 		"user": gin.H{
 			"google_id":    googleID,
 			"email":        email,
@@ -562,8 +542,5 @@ func (h *StudentLookupHandler) GoogleLogin(c *gin.Context) {
 
 func (h *StudentLookupHandler) GoogleLogout(c *gin.Context) {
 	clearAuthCookies(c)
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "Logged out successfully",
-	})
+	response.OK(c, "Logged out successfully", nil)
 }

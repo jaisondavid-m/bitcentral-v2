@@ -143,7 +143,7 @@ func SetupRouter(
 
 	// Protected routes (Requires logged-in user)
 	api := r.Group("/")
-	api.Use(handler.RequireAuth())
+	api.Use(middleware.RequireAuth())
 	{
 		// Logout
 		api.POST("/auth/logout", studentLookupHandler.GoogleLogout)
