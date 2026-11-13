@@ -1,5 +1,5 @@
 import { isAllowedEmail } from "@/services/authRules.js";
-import { deleteCookie, isJwtValid } from "@/utils/cookieAuth.js";
+import { deleteCookie, getCookie, isJwtValid, setCookie } from "@/utils/cookieAuth.js";
 import { postGoogleAuth, postGoogleLogout } from "@/api/axios.js";
 
 const TOKEN_KEY = "auth_token";
@@ -24,12 +24,33 @@ const cleanLegacyStorage = () => {
 cleanLegacyStorage();
 
 export const getStoredToken = () => {
-  return inMemoryToken;
+  if (inMemoryToken && isJwtValid(inMemoryToken)) {
+    return inMemoryToken;
+  }
+  if (typeof window !== "undefined") {
+    const cookieToken = getCookie("token") || getCookie("auth_token");
+    if (cookieToken && isJwtValid(cookieToken)) {
+      inMemoryToken = cookieToken;
+      return cookieToken;
+    }
+  }
+  return inMemoryToken || "";
 };
 
 export const setStoredToken = (token) => {
   inMemoryToken = token || "";
   cleanLegacyStorage();
+  if (token) {
+    // Set the cookie exactly once
+    setCookie("token", token, 30);
+  } else {
+    deleteCookie("token");
+    deleteCookie("auth_token");
+    deleteCookie("jwt");
+    deleteCookie("google_auth_token");
+    deleteCookie("access_token");
+    deleteCookie("googleToken");
+  }
 };
 
 export const parseJwt = (token) => {

@@ -117,10 +117,11 @@ const toProfileStudent = (studentProfile, fallbackStudent = null) => {
 };
 
 export const StudentContext = ({ children }) => {
-  const [user, setUser] = useState(() => getCurrentUser());
-  const [student, setStudent] = useState(null);
+  const initialUser = getCurrentUser();
+  const [user, setUser] = useState(initialUser);
+  const [student, setStudent] = useState(() => (initialUser?.email ? decodeCollegeEmail(initialUser.email) : null));
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(initialUser));
   const [accessDeniedMessage, setAccessDeniedMessage] = useState("");
   const hydratedEmailRef = useRef("");
 

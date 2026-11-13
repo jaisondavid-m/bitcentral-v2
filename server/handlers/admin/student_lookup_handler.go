@@ -71,9 +71,15 @@ func setAuthCookies(c *gin.Context, token string) {
 	host := c.Request.Host
 	secure := c.Request.TLS != nil || c.GetHeader("X-Forwarded-Proto") == "https" || strings.Contains(host, "bitsathy.in")
 
+	if secure {
+		c.SetSameSite(http.SameSiteNoneMode)
+	} else {
+		c.SetSameSite(http.SameSiteLaxMode)
+	}
+
 	cookieDomain := strings.TrimSpace(os.Getenv("COOKIE_DOMAIN"))
 	// Set the cookie exactly once for the current host/domain
-	c.SetCookie("auth_token", token, maxAge, "/", cookieDomain, secure, true)
+	c.SetCookie("token", token, maxAge, "/", cookieDomain, secure, true)
 }
 
 func clearAuthCookies(c *gin.Context) {

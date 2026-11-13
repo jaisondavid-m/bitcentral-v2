@@ -24,12 +24,13 @@ export function getCookie(name) {
 export function setCookie(name, value, days = 30) {
   if (typeof document === "undefined") return;
   const maxAge = days * 24 * 60 * 60;
+  const expires = new Date(Date.now() + maxAge * 1000).toUTCString();
   const isHttps = typeof window !== "undefined" && window.location.protocol === "https:";
   const secureFlag = isHttps ? "; Secure" : "";
   const encodedVal = encodeURIComponent(value);
 
   // Set cookie once without domain duplication
-  document.cookie = `${name}=${encodedVal}; path=/; max-age=${maxAge}; SameSite=Lax${secureFlag}`;
+  document.cookie = `${name}=${encodedVal}; path=/; max-age=${maxAge}; expires=${expires}; SameSite=Lax${secureFlag}`;
 }
 
 /**
