@@ -7,7 +7,7 @@ const LEGACY_KEYS = ["google_auth_token", "jwt", "token", "access_token"];
 
 let inMemoryToken = "";
 
-// Purge any tokens from localStorage so JWT is never stored in client storage
+// Purge any tokens and retired modal keys from localStorage so client storage remains clean
 const cleanLegacyStorage = () => {
   if (typeof window === "undefined" || !window.localStorage) return;
   try {
@@ -15,6 +15,7 @@ const cleanLegacyStorage = () => {
     for (const key of LEGACY_KEYS) {
       localStorage.removeItem(key);
     }
+    localStorage.removeItem("bitcentral_pwa_install_last_shown");
   } catch {
     // ignore
   }
