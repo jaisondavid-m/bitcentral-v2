@@ -25,8 +25,6 @@ func NewTrackerUserHandler() *TrackerUserHandler {
 	}
 }
 
-
-
 var departmentMap = map[string]string{
 	"cs": "Computer Science and Engineering",
 	"ad": "Artificial Intelligence & Data Science",
@@ -517,4 +515,3 @@ func (h *TrackerUserHandler) GetTrackerUsersAdmin(c *gin.Context) {
 		"batchCounts":   batchCounts,
 	})
 }
-

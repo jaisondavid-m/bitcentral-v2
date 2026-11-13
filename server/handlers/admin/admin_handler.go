@@ -14,6 +14,7 @@ import (
 
 	"server/config"
 	adminmodels "server/models/admin"
+	"server/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -90,82 +91,82 @@ func normalizeBatchLabel(batchStr string, email string) string {
 }
 
 var deptNameMap = map[string]string{
-	"computer science and engineering":             "cs",
-	"computer science & engineering":               "cs",
-	"cse":                                          "cs",
-	"cs":                                           "cs",
-	"information technology":                       "it",
-	"it":                                           "it",
-	"electronics and communication engineering":    "ec",
-	"electronics & communication engineering":      "ec",
-	"ece":                                          "ec",
-	"ec":                                           "ec",
-	"artificial intelligence & data science":       "ad",
-	"artificial intelligence and data science":     "ad",
-	"ai & ds":                                      "ad",
-	"aids":                                         "ad",
-	"ad":                                           "ad",
+	"computer science and engineering": "cs",
+	"computer science & engineering":   "cs",
+	"cse":                              "cs",
+	"cs":                               "cs",
+	"information technology":           "it",
+	"it":                               "it",
+	"electronics and communication engineering": "ec",
+	"electronics & communication engineering":   "ec",
+	"ece":                                    "ec",
+	"ec":                                     "ec",
+	"artificial intelligence & data science": "ad",
+	"artificial intelligence and data science": "ad",
+	"ai & ds": "ad",
+	"aids":    "ad",
+	"ad":      "ad",
 	"artificial intelligence & machine learning":   "al",
 	"artificial intelligence and machine learning": "al",
-	"ai & ml":                                      "al",
-	"aiml":                                         "al",
-	"al":                                           "al",
-	"electrical and electronics engineering":       "ee",
-	"electrical & electronics engineering":         "ee",
-	"eee":                                          "ee",
-	"ee":                                           "ee",
-	"electronics and instrumentation engineering":  "ei",
-	"electronics & instrumentation engineering":    "ei",
-	"eie":                                          "ei",
-	"ei":                                           "ei",
-	"computer technology":                          "ct",
-	"ct":                                           "ct",
-	"biotechnology":                                "bt",
-	"bt":                                           "bt",
-	"computer science and business systems":        "cb",
-	"computer science & business systems":          "cb",
-	"csbs":                                         "cb",
-	"cb":                                           "cb",
-	"mechatronics":                                 "mz",
-	"mechatronics engineering":                     "mz",
-	"mte":                                          "mz",
-	"mz":                                           "mz",
-	"mechanical engineering":                       "me",
-	"mech":                                         "me",
-	"me":                                           "me",
-	"civil engineering":                            "ce",
-	"civil":                                        "ce",
-	"ce":                                           "ce",
-	"biomedical engineering":                       "bm",
-	"bme":                                          "bm",
-	"bm":                                           "bm",
-	"aeronautical engineering":                     "ae",
-	"aero":                                         "ae",
-	"ae":                                           "ae",
-	"agricultural engineering":                     "ag",
-	"agri":                                         "ag",
-	"ag":                                           "ag",
-	"fashion technology":                           "ft",
-	"ft":                                           "ft",
-	"textile department":                           "tx",
-	"textile technology":                           "tx",
-	"textile engineering":                          "tx",
-	"textile":                                      "tx",
-	"txt":                                          "tx",
-	"tx":                                           "tx",
-	"food department":                              "fd",
-	"food technology":                              "fd",
-	"food engineering":                             "fd",
-	"food":                                         "fd",
-	"fd":                                           "fd",
-	"computer design":                              "cd",
-	"computer science and design":                  "cd",
-	"computer science & design":                    "cd",
-	"csd":                                          "cd",
-	"cd":                                           "cd",
-	"information science and engineering":          "se",
-	"ise":                                          "se",
-	"se":                                           "se",
+	"ai & ml":                                "al",
+	"aiml":                                   "al",
+	"al":                                     "al",
+	"electrical and electronics engineering": "ee",
+	"electrical & electronics engineering":   "ee",
+	"eee":                                    "ee",
+	"ee":                                     "ee",
+	"electronics and instrumentation engineering": "ei",
+	"electronics & instrumentation engineering":   "ei",
+	"eie":                                   "ei",
+	"ei":                                    "ei",
+	"computer technology":                   "ct",
+	"ct":                                    "ct",
+	"biotechnology":                         "bt",
+	"bt":                                    "bt",
+	"computer science and business systems": "cb",
+	"computer science & business systems":   "cb",
+	"csbs":                                  "cb",
+	"cb":                                    "cb",
+	"mechatronics":                          "mz",
+	"mechatronics engineering":              "mz",
+	"mte":                                   "mz",
+	"mz":                                    "mz",
+	"mechanical engineering":                "me",
+	"mech":                                  "me",
+	"me":                                    "me",
+	"civil engineering":                     "ce",
+	"civil":                                 "ce",
+	"ce":                                    "ce",
+	"biomedical engineering":                "bm",
+	"bme":                                   "bm",
+	"bm":                                    "bm",
+	"aeronautical engineering":              "ae",
+	"aero":                                  "ae",
+	"ae":                                    "ae",
+	"agricultural engineering":              "ag",
+	"agri":                                  "ag",
+	"ag":                                    "ag",
+	"fashion technology":                    "ft",
+	"ft":                                    "ft",
+	"textile department":                    "tx",
+	"textile technology":                    "tx",
+	"textile engineering":                   "tx",
+	"textile":                               "tx",
+	"txt":                                   "tx",
+	"tx":                                    "tx",
+	"food department":                       "fd",
+	"food technology":                       "fd",
+	"food engineering":                      "fd",
+	"food":                                  "fd",
+	"fd":                                    "fd",
+	"computer design":                       "cd",
+	"computer science and design":           "cd",
+	"computer science & design":             "cd",
+	"csd":                                   "cd",
+	"cd":                                    "cd",
+	"information science and engineering":   "se",
+	"ise":                                   "se",
+	"se":                                    "se",
 }
 
 func normalizeDeptCode(deptStr string, email string) string {
@@ -664,8 +665,6 @@ func (h *AdminHandler) loadUserStatusMap() (map[string]userStatus, error) {
 	return result, nil
 }
 
-
-
 func (h *AdminHandler) UpdateUserBlockStatus(c *gin.Context) {
 	uid := strings.TrimSpace(c.Param("uid"))
 	if uid == "" {
@@ -730,8 +729,7 @@ func (h *AdminHandler) UpdateUserFlagStatus(c *gin.Context) {
 		return
 	}
 
-	actorUID, _ := c.Get("actor_uid")
-	actorUIDStr, _ := actorUID.(string)
+	actorUIDStr := utils.GetUserID(c)
 
 	var flaggedAt any = nil
 	flagReason := strings.TrimSpace(body.Reason)
@@ -840,7 +838,7 @@ func (h *AdminHandler) UpdateUserRole(c *gin.Context) {
 	}
 
 	if role == "admin" {
-		actorUID, _ := c.Get("actor_uid")
+		actorUID := utils.GetUserID(c)
 		_, _ = h.DB.Exec(`INSERT IGNORE INTO admins (uid, created_by) VALUES (?, ?)`, uid, actorUID)
 	} else {
 		_, _ = h.DB.Exec(`DELETE FROM admins WHERE uid = ?`, uid)

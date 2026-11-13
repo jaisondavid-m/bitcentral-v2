@@ -1,9 +1,16 @@
-import api from "./axios";
-import { auth } from "@/config/auth.js";
+import api, { normalizeApiError } from "./axios";
 import { getAuthenticatedHeaders } from "./axios.js";
 
+function normalizeAdminError(error, fallback = "An unexpected error occurred") {
+  return normalizeApiError(error, fallback);
+}
+
 async function getAdminHeaders() {
-  return getAuthenticatedHeaders();
+  try {
+    return await getAuthenticatedHeaders();
+  } catch {
+    return {};
+  }
 }
 
 export async function listAdminUsers({ page = 1, limit = 25, search = "", batch = "", department = "", status = "" } = {}) {

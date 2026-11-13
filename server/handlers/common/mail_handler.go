@@ -19,6 +19,7 @@ import (
 	"gopkg.in/gomail.v2"
 
 	"server/config"
+	"server/utils"
 )
 
 type MailHandler struct {
@@ -265,11 +266,11 @@ func (h *MailHandler) processNextQueueItem() bool {
 
 	// 1. Fetch next pending item with batch context
 	var (
-		itemID                                                 int
+		itemID                                                          int
 		batchID, recEmail, recName, recUID, recRegNo, recDept, recBatch string
-		attempts                                               int
-		subject, body, customFromName, replyTo                 string
-		isHTMLInt                                              int
+		attempts                                                        int
+		subject, body, customFromName, replyTo                          string
+		isHTMLInt                                                       int
 	)
 
 	row := h.DB.QueryRow(`
@@ -783,13 +784,8 @@ func (h *MailHandler) SendAdminEmail(c *gin.Context) {
 	}
 
 	// Sender admin info
-	actorUID, _ := c.Get("actor_uid")
-	adminUIDStr, _ := actorUID.(string)
-
-	var adminEmailStr string
-	if coreDB := config.GetCoreDB(); coreDB != nil && adminUIDStr != "" {
-		_ = coreDB.QueryRow(`SELECT email FROM users WHERE uid = ? OR google_id = ?`, adminUIDStr, adminUIDStr).Scan(&adminEmailStr)
-	}
+	adminUIDStr := utils.GetUserID(c)
+	adminEmailStr := utils.GetUserEmail(c)
 
 	// Generate batch ID
 	batchID := fmt.Sprintf("batch_%d_%s", time.Now().Unix(), generateRandomHex(4))
@@ -1229,4 +1225,3 @@ func (h *MailHandler) DeleteMailLog(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Mail log deleted successfully"})
 }
-

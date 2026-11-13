@@ -21,10 +21,14 @@ func NewNotificationHandler() *NotificationHandler {
 	return &NotificationHandler{DB: config.GetLogsDB()}
 }
 
-// Helper to extract UID and email from auth header
+// Helper to extract UID and email from context or token
 func (h *NotificationHandler) getAuthUser(c *gin.Context) (uid, email string) {
-	authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-	token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
+	uid = utils.GetUserID(c)
+	email = utils.GetUserEmail(c)
+	if uid != "" || email != "" {
+		return uid, email
+	}
+	token := utils.ExtractAuthToken(c)
 	if token == "" {
 		return "", ""
 	}
@@ -396,9 +400,9 @@ func (h *NotificationHandler) GetAdminNotifications(c *gin.Context) {
 type CreateNotificationRequest struct {
 	Title         string `json:"title" binding:"required"`
 	Message       string `json:"message" binding:"required"`
-	Type          string `json:"type"`          // "announcement", "alert", "update", "exam", "leave", "general"
-	Priority      string `json:"priority"`      // "normal", "high", "urgent"
-	TargetType    string `json:"target_type"`   // "all", "user", "batch", "dept"
+	Type          string `json:"type"`        // "announcement", "alert", "update", "exam", "leave", "general"
+	Priority      string `json:"priority"`    // "normal", "high", "urgent"
+	TargetType    string `json:"target_type"` // "all", "user", "batch", "dept"
 	TargetUserUID string `json:"target_user_uid"`
 	TargetEmail   string `json:"target_email"`
 	TargetRollNo  string `json:"target_roll_no"`

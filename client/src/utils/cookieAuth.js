@@ -10,7 +10,7 @@
 export function getCookie(name) {
   if (typeof document === "undefined") return null;
   const matches = document.cookie.match(
-    new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") + "=([^;]*)")
+    new RegExp("(?:^|; )" + name.replace(/([.$?*|{}()[\]\\/+^])/g, "\\$1") + "=([^;]*)")
   );
   return matches ? decodeURIComponent(matches[1]) : null;
 }
@@ -81,7 +81,7 @@ export function isJwtValid(token) {
       return parsed.exp > nowInSeconds;
     }
     return true;
-  } catch (err) {
+  } catch {
     return false;
   }
 }

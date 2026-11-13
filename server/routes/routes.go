@@ -250,7 +250,7 @@ func SetupRouter(
 		admin.PUT("/mess/closures/:id", messHandler.UpdateClosureAdmin)
 		admin.DELETE("/mess/closures/:id", messHandler.DeleteClosureAdmin)
 		admin.POST("/upload", uploadHandler.Upload)
-		
+
 		// Cards admin CRUD
 		admin.GET("/cards", student.GetCards)
 		admin.POST("/cards", student.CreateCard)
@@ -289,7 +289,6 @@ func SetupRouter(
 		admin.POST("/notifications", notificationHandler.CreateNotification)
 		admin.PUT("/notifications/:id", notificationHandler.UpdateNotification)
 		admin.DELETE("/notifications/:id", notificationHandler.DeleteNotification)
-
 
 	}
 

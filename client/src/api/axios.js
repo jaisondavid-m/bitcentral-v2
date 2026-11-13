@@ -1,5 +1,5 @@
 import axios from "axios";
-import { auth, getStoredToken } from "@/config/auth.js";
+import { getStoredToken } from "@/config/auth.js";
 
 export function getApiBaseUrl() {
   if (import.meta.env.VITE_API_BASE_URL) {
@@ -31,7 +31,9 @@ api.interceptors.request.use(
       if (token && !config.headers.Authorization) {
         config.headers.Authorization = `Bearer ${token}`;
       }
-    } catch (e) { }
+    } catch {
+      // ignore
+    }
     return config;
   },
   (error) => Promise.reject(error)
@@ -40,17 +42,45 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error?.response?.status === 401) {
+    const status = error?.response?.status;
+    const data = error?.response?.data;
+    const message =
+      data?.message ||
+      data?.error?.message ||
+      (typeof data?.error === "string" ? data.error : "") ||
+      error.message ||
+      "An unexpected error occurred";
+
+    const errorCode = data?.error?.code || (status ? `HTTP_${status}` : "NETWORK_ERROR");
+    const errorDetails = data?.error?.details || null;
+
+    error.normalized = {
+      success: false,
+      message,
+      error: {
+        code: errorCode,
+        details: errorDetails,
+      },
+    };
+
+    if (error.response) {
+      error.response.data = {
+        ...data,
+        success: false,
+        message,
+        error: error.normalized.error,
+      };
+    }
+
+    if (status === 401) {
       const url = error.config?.url || "";
       // Prevent loop if the auth or logout calls themselves trigger 401
       if (!url.includes("/auth/logout") && !url.includes("/auth/google")) {
         try {
           const { logout } = await import("@/config/auth.js");
           await logout();
-        } catch (e) {
-          localStorage.removeItem("google_auth_token");
-          localStorage.removeItem("jwt");
-          localStorage.removeItem("token");
+        } catch {
+          localStorage.removeItem("auth_token");
           window.dispatchEvent(new Event("auth_state_changed"));
         }
       }
@@ -58,6 +88,10 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export function normalizeApiError(error, fallback = "An unexpected error occurred") {
+  return error?.normalized?.message || error?.response?.data?.message || error?.message || fallback;
+}
 
 export async function postGoogleAuth(credential) {
   try {
@@ -101,12 +135,9 @@ export async function getAuthenticatedHeaders() {
 
 let meCache = { data: null, timestamp: 0 };
 let inFlightMePromise = null;
-let v2Cache = { data: null, timestamp: 0 };
-let inFlightV2Promise = null;
 
 export function clearProfileCache() {
   meCache = { data: null, timestamp: 0 };
-  v2Cache = { data: null, timestamp: 0 };
 }
 
 if (typeof window !== "undefined") {

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"server/config"
+	"server/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -53,7 +54,7 @@ func (h *AdminHandler) AddAdmin(c *gin.Context) {
 		return
 	}
 
-	createdBy, _ := c.Get("actor_uid")
+	createdBy := utils.GetUserID(c)
 
 	if _, err := h.DB.Exec(`INSERT IGNORE INTO admins (uid, created_by) VALUES (?, ?);`, uid, createdBy); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
@@ -86,18 +87,12 @@ func (h *AdminHandler) RemoveAdmin(c *gin.Context) {
 
 // Check if provided bearer token belongs to configured admin
 func (h *AdminHandler) CheckAdmin(c *gin.Context) {
-	authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-	token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
-	if token == "" {
-		cookieNames := []string{"google_auth_token", "jwt", "token", "auth_token", "access_token"}
-		for _, name := range cookieNames {
-			if cookieVal, err := c.Cookie(name); err == nil && strings.TrimSpace(cookieVal) != "" {
-				token = strings.TrimSpace(cookieVal)
-				break
-			}
-		}
+	if utils.IsAdmin(c) {
+		c.JSON(http.StatusOK, gin.H{"is_admin": true, "is_super": true, "role": "admin"})
+		return
 	}
 
+	token := utils.ExtractAuthToken(c)
 	if token == "" {
 		c.JSON(http.StatusOK, gin.H{"is_admin": false, "is_super": false, "role": "user"})
 		return

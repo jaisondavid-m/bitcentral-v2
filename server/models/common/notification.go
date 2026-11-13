@@ -4,9 +4,9 @@ type Notification struct {
 	ID            int    `json:"id"`
 	Title         string `json:"title"`
 	Message       string `json:"message"`
-	Type          string `json:"type"`          // "announcement", "alert", "update", "exam", "leave", "general"
-	Priority      string `json:"priority"`      // "normal", "high", "urgent"
-	TargetType    string `json:"target_type"`   // "all", "user", "batch", "dept"
+	Type          string `json:"type"`        // "announcement", "alert", "update", "exam", "leave", "general"
+	Priority      string `json:"priority"`    // "normal", "high", "urgent"
+	TargetType    string `json:"target_type"` // "all", "user", "batch", "dept"
 	TargetUserUID string `json:"target_user_uid,omitempty"`
 	TargetEmail   string `json:"target_email,omitempty"`
 	TargetRollNo  string `json:"target_roll_no,omitempty"`

@@ -192,4 +192,3 @@ func AuditLogger() gin.HandlerFunc {
 		}
 	}
 }
-

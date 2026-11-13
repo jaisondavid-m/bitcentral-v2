@@ -54,4 +54,3 @@ type HallMembersResponse struct {
 	Members           []HallMember        `json:"members"`
 	AvailableSessions []HallSessionOption `json:"available_sessions,omitempty"`
 }
-

@@ -44,16 +44,10 @@ type ConversationSummary struct {
 
 // SendMessage handles posting a new feedback message from a student
 func (h *FeedbackHandler) SendMessage(c *gin.Context) {
-	authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-	token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
-	if token == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized"})
-		return
-	}
-
-	uid, email, err := utils.UserFromToken(token)
-	if err != nil || uid == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized"})
+	uid := utils.GetUserID(c)
+	email := utils.GetUserEmail(c)
+	if uid == "" {
+		response.Unauthorized(c, "Authentication required")
 		return
 	}
 
@@ -63,7 +57,7 @@ func (h *FeedbackHandler) SendMessage(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&body); err != nil || strings.TrimSpace(body.Message) == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Message body is required"})
+		response.BadRequest(c, "Message body is required")
 		return
 	}
 
@@ -77,7 +71,7 @@ func (h *FeedbackHandler) SendMessage(c *gin.Context) {
 	}
 
 	if h.DB == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Database connection not available"})
+		response.InternalServerError(c, "Database connection not available")
 		return
 	}
 
@@ -86,7 +80,7 @@ func (h *FeedbackHandler) SendMessage(c *gin.Context) {
 
 	res, err := h.DB.Exec(query, uid, senderName, email, strings.TrimSpace(body.Message))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to save message: " + err.Error()})
+		response.InternalServerError(c, "Failed to save message")
 		return
 	}
 
@@ -110,21 +104,14 @@ func (h *FeedbackHandler) SendMessage(c *gin.Context) {
 
 // GetUserMessages returns the conversation history for the currently logged in student
 func (h *FeedbackHandler) GetUserMessages(c *gin.Context) {
-	authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-	token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer"))
-	if token == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized"})
-		return
-	}
-
-	uid, _, err := utils.UserFromToken(token)
-	if err != nil || uid == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized"})
+	uid := utils.GetUserID(c)
+	if uid == "" {
+		response.Unauthorized(c, "Authentication required")
 		return
 	}
 
 	if h.DB == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Database connection not available"})
+		response.InternalServerError(c, "Database connection not available")
 		return
 	}
 

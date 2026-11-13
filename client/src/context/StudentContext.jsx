@@ -1,5 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { auth, logout, getStoredToken, getCurrentUser } from "@/config/auth.js";
 import { getMeProfile } from "@/api/axios.js";
 
@@ -117,26 +116,7 @@ const toProfileStudent = (studentProfile, fallbackStudent = null) => {
   };
 };
 
-function getPresenceRouteLabel(pathname = "") {
-  const path = pathname.toLowerCase();
-
-  if (!path || path === "/" || path === "/home") return "Home";
-  if (path.startsWith("/dashboard") || path.startsWith("/profile")) return "Dashboard";
-  if (path.startsWith("/mess")) return "Mess Menu";
-  if (path.startsWith("/exam-hall")) return "Exam Hall";
-  if (path.startsWith("/pcdp")) return "PCDP";
-  if (path.startsWith("/rpsite")) return "RP Site";
-  if (path.startsWith("/leavedetails")) return "Leave Details";
-  if (path.startsWith("/privacy-policy")) return "Privacy Policy";
-  if (path.startsWith("/terms")) return "Terms";
-  if (path.startsWith("/login")) return "Login";
-  if (path.startsWith("/admin")) return "Admin";
-
-  return "Other";
-}
-
 export const StudentContext = ({ children }) => {
-  const location = useLocation();
   const initialToken = getStoredToken();
   const initialUser = initialToken ? getCurrentUser() : null;
 
@@ -145,66 +125,7 @@ export const StudentContext = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(Boolean(initialToken));
   const [accessDeniedMessage, setAccessDeniedMessage] = useState("");
-  const currentRouteLabel = useMemo(() => getPresenceRouteLabel(location.pathname), [location.pathname]);
   const hydratedEmailRef = useRef("");
-
-  const hydrateAuthenticatedUser = async (currentUser) => {
-    if (!currentUser?.email) {
-      setStudent(null);
-      setProfile(null);
-      hydratedEmailRef.current = "";
-      return;
-    }
-
-    if (hydratedEmailRef.current === currentUser.email) {
-      return;
-    }
-
-    hydratedEmailRef.current = currentUser.email;
-    setAccessDeniedMessage("");
-
-    const decoded = decodeCollegeEmail(currentUser.email);
-    setStudent(decoded);
-
-    try {
-      const backendProfile = await getMeProfile();
-      if (backendProfile?.email) {
-        setProfile(backendProfile);
-        setStudent((prev) => toProfileStudent(backendProfile, decoded || prev));
-        const userRole = (backendProfile.role || "").toLowerCase().trim();
-        const isAdmin = Boolean(
-          backendProfile.is_admin ||
-          userRole === "admin" ||
-          userRole === "superadmin" ||
-          userRole === "super_admin"
-        );
-        const isSuper = isAdmin;
-        const effectiveRole = isAdmin ? "admin" : (userRole || "user");
-        setUser((prev) => ({
-          ...prev,
-          role: effectiveRole,
-          isAdmin,
-          isSuper,
-        }));
-      } else {
-        setProfile(null);
-      }
-    } catch (error) {
-      const status = error?.response?.status;
-      const message = error?.response?.data?.message || error?.message || "Failed to load profile from /me";
-      if (status === 403 || error?.response?.data?.status === "blocked") {
-        setAccessDeniedMessage(message);
-        setUser(null);
-        setStudent(null);
-        setProfile(null);
-        hydratedEmailRef.current = "";
-        logout().catch(() => {});
-        return;
-      }
-      setProfile(null);
-      console.error("Failed to load profile from /me", error);
-    }
-  };
 
   useEffect(() => {
     let cancelled = false;

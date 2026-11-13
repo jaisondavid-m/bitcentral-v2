@@ -31,7 +31,6 @@ type UserWithRollNo struct {
 	RollNo string `json:"roll_no"`
 }
 
-
 type QBAnswerKey struct {
 	ID           int     `json:"id"`
 	Year         int     `json:"year"`

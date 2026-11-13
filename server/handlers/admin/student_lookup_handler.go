@@ -211,7 +211,7 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		 LIMIT 1`,
 		idQuery,
 	)
-	err = h.DB.QueryRow(queryStr, emailID, cleanEmail).Scan(
+	err := h.DB.QueryRow(queryStr, emailID, cleanEmail).Scan(
 		&user.ID,
 		&user.GoogleID,
 		&user.Email,
@@ -307,8 +307,8 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 
 	var (
 		sID, sUserID, sName, sPhone, sParentMobile, sDeptName, sDeptShortName, sGender, sResident, sBatchName, sYear string
-		sDept             int
-		hasStudentDetails bool
+		sDept                                                                                                        int
+		hasStudentDetails                                                                                            bool
 	)
 
 	if h.DB != nil {

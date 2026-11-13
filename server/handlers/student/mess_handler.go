@@ -14,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"server/config"
+	"server/utils"
 )
 
 // Meal timing windows (IST — adjust as needed)
@@ -891,9 +892,9 @@ func (h *MessHandler) CreateClosureAdmin(c *gin.Context) {
 		isActive = *input.IsActive
 	}
 
-	actorEmail := c.GetString("actor_email")
+	actorEmail := utils.GetUserEmail(c)
 	if actorEmail == "" {
-		actorEmail = c.GetString("actor_uid")
+		actorEmail = utils.GetUserID(c)
 	}
 
 	res, err := h.DB.Exec(`

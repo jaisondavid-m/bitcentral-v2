@@ -137,4 +137,3 @@ func isAllowedOriginOrReferer(origin, referer string) bool {
 	}
 	return check(origin) || check(referer)
 }
-

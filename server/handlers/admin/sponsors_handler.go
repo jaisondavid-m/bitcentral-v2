@@ -1741,7 +1741,6 @@ func (h *SponsorsHandler) GetCertificate(c *gin.Context) {
 		}
 	}
 
-
 	if matchedDonor != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success":          true,
@@ -2174,8 +2173,3 @@ func (h *SponsorsHandler) UpdateSponsorDepartmentMappingsBatch(c *gin.Context) {
 		"updated": updatedCount,
 	})
 }
-
-
-
-
-

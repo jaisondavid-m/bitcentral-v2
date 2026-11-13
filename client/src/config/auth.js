@@ -1,42 +1,38 @@
 import { isAllowedEmail } from "@/services/authRules.js";
-import { getCookie, setCookie, deleteCookie, isJwtValid } from "@/utils/cookieAuth.js";
+import { isJwtValid } from "@/utils/cookieAuth.js";
 import { postGoogleAuth, postGoogleLogout } from "@/api/axios.js";
 
-const TOKEN_KEY = "google_auth_token";
-const COOKIE_NAMES = ["google_auth_token", "jwt", "token", "auth_token", "access_token"];
-const ONE_MONTH_DAYS = 30; // 1 month cookie duration
+const TOKEN_KEY = "auth_token";
+const LEGACY_KEYS = ["google_auth_token", "jwt", "token", "access_token"];
 
 export const getStoredToken = () => {
-  for (const name of COOKIE_NAMES) {
-    const val = getCookie(name);
-    if (val && isJwtValid(val)) return val;
+  if (typeof window === "undefined") return "";
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (token && isJwtValid(token)) return token;
+
+  // Fallback check legacy keys and migrate if valid
+  for (const key of LEGACY_KEYS) {
+    const val = localStorage.getItem(key);
+    if (val && isJwtValid(val)) {
+      localStorage.setItem(TOKEN_KEY, val);
+      return val;
+    }
   }
-  const localVal =
-    localStorage.getItem(TOKEN_KEY) ||
-    localStorage.getItem("jwt") ||
-    localStorage.getItem("token") ||
-    localStorage.getItem("access_token") ||
-    "";
-  if (localVal && isJwtValid(localVal)) {
-    return localVal;
-  }
-  return localVal && localVal.split(".").length !== 3 ? localVal : "";
+  return "";
 };
 
 export const setStoredToken = (token) => {
+  if (typeof window === "undefined") return;
   if (token) {
     localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem("jwt", token);
-    localStorage.setItem("token", token);
-    for (const name of COOKIE_NAMES) {
-      setCookie(name, token, ONE_MONTH_DAYS);
+    // Clean up legacy keys
+    for (const key of LEGACY_KEYS) {
+      localStorage.removeItem(key);
     }
   } else {
     localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem("jwt");
-    localStorage.removeItem("token");
-    for (const name of COOKIE_NAMES) {
-      deleteCookie(name);
+    for (const key of LEGACY_KEYS) {
+      localStorage.removeItem(key);
     }
   }
 };
