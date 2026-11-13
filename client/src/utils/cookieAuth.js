@@ -28,12 +28,8 @@ export function setCookie(name, value, days = 30) {
   const secureFlag = isHttps ? "; Secure" : "";
   const encodedVal = encodeURIComponent(value);
 
+  // Set cookie once without domain duplication
   document.cookie = `${name}=${encodedVal}; path=/; max-age=${maxAge}; SameSite=Lax${secureFlag}`;
-
-  if (typeof window !== "undefined" && window.location?.hostname?.includes("bitsathy.in")) {
-    document.cookie = `${name}=${encodedVal}; path=/; domain=.bitsathy.in; max-age=${maxAge}; SameSite=Lax${secureFlag}`;
-    document.cookie = `${name}=${encodedVal}; path=/; domain=bitcentral.bitsathy.in; max-age=${maxAge}; SameSite=Lax${secureFlag}`;
-  }
 }
 
 /**
@@ -87,26 +83,15 @@ export function isJwtValid(token) {
 }
 
 /**
- * Checks whether any known JWT auth cookie or storage item exists and is valid.
+ * Checks whether any known JWT auth cookie exists and is valid.
  * Checks common cookie names: 'google_auth_token', 'jwt', 'token', 'auth_token', 'access_token', 'googleToken'.
  * @returns {boolean}
  */
 export function hasValidAuthCookie() {
-  const cookieNames = ["google_auth_token", "jwt", "token", "auth_token", "access_token", "googleToken"];
+  const cookieNames = ["auth_token", "google_auth_token", "jwt", "token", "access_token", "googleToken"];
   for (const name of cookieNames) {
     const cookieValue = getCookie(name);
     if (cookieValue && isJwtValid(cookieValue)) {
-      return true;
-    }
-  }
-
-  if (typeof window !== "undefined" && window.localStorage) {
-    const localVal =
-      localStorage.getItem("google_auth_token") ||
-      localStorage.getItem("jwt") ||
-      localStorage.getItem("token") ||
-      localStorage.getItem("access_token");
-    if (localVal && isJwtValid(localVal)) {
       return true;
     }
   }

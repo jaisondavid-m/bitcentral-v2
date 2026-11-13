@@ -172,30 +172,8 @@ func isValidFacultyRecord(email, phone string) bool {
 
 func (h *FacultyDirectoryHandler) GetOAuthConfig() *oauth2.Config {
 	clientID := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_ID"))
-	if clientID == "" {
-		clientID = strings.TrimSpace(os.Getenv("CLIENT_ID"))
-	}
 	clientSecret := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_SECRET"))
-	if clientSecret == "" {
-		clientSecret = strings.TrimSpace(os.Getenv("CLIENT_SECRET"))
-	}
-
-	redirectURL := strings.TrimSpace(os.Getenv("GOOGLE_CONTACTS_REDIRECT_URI"))
-	if redirectURL == "" {
-		redirectURL = strings.TrimSpace(os.Getenv("GOOGLE_DIRECTORY_REDIRECT_URI"))
-	}
-	if redirectURL == "" {
-		redirectURL = strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_REDIRECT_URI"))
-	}
-	if redirectURL == "" {
-		redirectURIS := strings.Split(os.Getenv("GOOGLE_OAUTH_REDIRECT_URIS"), ",")
-		if len(redirectURIS) > 0 && strings.TrimSpace(redirectURIS[0]) != "" {
-			redirectURL = strings.TrimSpace(redirectURIS[0])
-		}
-	}
-	if redirectURL == "" {
-		redirectURL = strings.TrimSpace(os.Getenv("REDIRECT_URL"))
-	}
+	redirectURL := strings.TrimSpace(os.Getenv("REDIRECT_URL"))
 	if redirectURL == "" {
 		redirectURL = "http://localhost:8080/auth/callback"
 	}
@@ -272,9 +250,6 @@ func (h *FacultyDirectoryHandler) SyncGoogleDirectory() {
 	// 3. Try loading token from environment first
 	if httpClient == nil {
 		envToken := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_TOKEN_JSON"))
-		if envToken == "" {
-			envToken = strings.TrimSpace(os.Getenv("TOKEN_JSON"))
-		}
 		if envToken != "" {
 			var tok oauth2.Token
 			if err := json.Unmarshal([]byte(envToken), &tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {

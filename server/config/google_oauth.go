@@ -49,9 +49,6 @@ var (
 
 func GetJWTSecret() []byte {
 	secret := strings.TrimSpace(os.Getenv("JWT_SECRET"))
-	if secret == "" {
-		secret = strings.TrimSpace(os.Getenv("SESSION_SECRET"))
-	}
 	if secret != "" {
 		return []byte(secret)
 	}
@@ -191,13 +188,7 @@ func VerifyAppJWT(tokenString string) (*GoogleUserClaims, error) {
 func InitGoogleOAuth() {
 	googleOAuthOnce.Do(func() {
 		clientID := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_ID"))
-		if clientID == "" {
-			clientID = strings.TrimSpace(os.Getenv("CLIENT_ID"))
-		}
 		clientSecret := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_SECRET"))
-		if clientSecret == "" {
-			clientSecret = strings.TrimSpace(os.Getenv("CLIENT_SECRET"))
-		}
 
 		GoogleOAuthInstance = &GoogleOAuth{
 			ClientID:     clientID,

@@ -178,8 +178,6 @@ func (h *InternalMarksHandler) fetchFromHuggingFace(rollNo string) (string, erro
 	req.Header.Set("Content-Type", "application/json")
 	if hfToken := os.Getenv("HF_TOKEN"); hfToken != "" {
 		req.Header.Set("Authorization", "Bearer "+hfToken)
-	} else if hfToken := os.Getenv("HUGGINGFACE_TOKEN"); hfToken != "" {
-		req.Header.Set("Authorization", "Bearer "+hfToken)
 	}
 
 	client := &http.Client{Timeout: 35 * time.Second}
@@ -202,8 +200,6 @@ func (h *InternalMarksHandler) fetchFromHuggingFace(rollNo string) (string, erro
 	}
 	sseReq.Header.Set("Accept", "text/event-stream")
 	if hfToken := os.Getenv("HF_TOKEN"); hfToken != "" {
-		sseReq.Header.Set("Authorization", "Bearer "+hfToken)
-	} else if hfToken := os.Getenv("HUGGINGFACE_TOKEN"); hfToken != "" {
 		sseReq.Header.Set("Authorization", "Bearer "+hfToken)
 	}
 

@@ -61,28 +61,9 @@ func NewSheetHandler() *SheetHandler {
 }
 
 func (h *SheetHandler) InitOAuth() {
-	clientID := strings.TrimSpace(os.Getenv("CLIENT_ID"))
-	if clientID == "" {
-		clientID = strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_ID"))
-	}
-	clientSecret := strings.TrimSpace(os.Getenv("CLIENT_SECRET"))
-	if clientSecret == "" {
-		clientSecret = strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_SECRET"))
-	}
+	clientID := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_ID"))
+	clientSecret := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_SECRET"))
 	redirectURL := strings.TrimSpace(os.Getenv("REDIRECT_URL"))
-	if redirectURL == "" {
-		redirectURL = strings.TrimSpace(os.Getenv("GOOGLE_CONTACTS_REDIRECT_URI"))
-	}
-	if redirectURL == "" {
-		redirectURL = strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_REDIRECT_URI"))
-	}
-	if redirectURL == "" {
-		redirectURIS := strings.Split(os.Getenv("GOOGLE_OAUTH_REDIRECT_URIS"), ",")
-		if len(redirectURIS) > 0 && strings.TrimSpace(redirectURIS[0]) != "" {
-			redirectURL = strings.TrimSpace(redirectURIS[0])
-		}
-	}
-
 	if redirectURL == "" {
 		redirectURL = "http://localhost:8080/auth/callback"
 	}
@@ -171,9 +152,6 @@ func (h *SheetHandler) LoadSavedToken() bool {
 	// 2. Try env variable (useful for cloud platforms like Render where disks are ephemeral)
 	if !loaded {
 		envToken := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_TOKEN_JSON"))
-		if envToken == "" {
-			envToken = strings.TrimSpace(os.Getenv("TOKEN_JSON"))
-		}
 		if envToken != "" {
 			if err := json.Unmarshal([]byte(envToken), &tok); err == nil && (tok.AccessToken != "" || tok.RefreshToken != "") {
 				loaded = true

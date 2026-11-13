@@ -117,13 +117,10 @@ const toProfileStudent = (studentProfile, fallbackStudent = null) => {
 };
 
 export const StudentContext = ({ children }) => {
-  const initialToken = getStoredToken();
-  const initialUser = initialToken ? getCurrentUser() : null;
-
-  const [user, setUser] = useState(initialUser);
+  const [user, setUser] = useState(() => getCurrentUser());
   const [student, setStudent] = useState(null);
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(Boolean(initialToken));
+  const [loading, setLoading] = useState(true);
   const [accessDeniedMessage, setAccessDeniedMessage] = useState("");
   const hydratedEmailRef = useRef("");
 
@@ -131,65 +128,60 @@ export const StudentContext = ({ children }) => {
     let cancelled = false;
 
     const checkAuthState = async () => {
-      const currentUser = auth.currentUser;
-      setUser(currentUser);
-
-      if (currentUser?.email || currentUser?.token) {
-        setLoading(true);
-        try {
-          const backendProfile = await getMeProfile();
-          if (backendProfile?.email && !cancelled) {
-            const userRole = (backendProfile.role || "").toLowerCase().trim();
-            const isAdmin = Boolean(
-              backendProfile.is_admin ||
-              userRole === "admin" ||
-              userRole === "superadmin" ||
-              userRole === "super_admin"
-            );
-            const isSuper = isAdmin;
-            const effectiveRole = isAdmin ? "admin" : (userRole || "user");
-            setUser((prev) => ({
-              ...prev,
-              uid: backendProfile.uid || prev?.uid,
-              email: backendProfile.email,
-              displayName: backendProfile.display_name || prev?.displayName,
-              photoURL: backendProfile.photo_url || prev?.photoURL,
-              role: effectiveRole,
-              isAdmin,
-              isSuper,
-            }));
-            setProfile(backendProfile);
-            const decoded = decodeCollegeEmail(backendProfile.email);
-            setStudent(toProfileStudent(backendProfile, decoded));
-            hydratedEmailRef.current = backendProfile.email;
-          } else if (currentUser?.email && !cancelled) {
-            const decoded = decodeCollegeEmail(currentUser.email);
-            setStudent(decoded);
-          }
-        } catch (err) {
-          const status = err?.response?.status;
-          const message = err?.response?.data?.message || err?.message || "Failed to load profile from /me";
-          if (status === 403 || err?.response?.data?.status === "blocked") {
-            setAccessDeniedMessage(message);
-            setUser(null);
-            setStudent(null);
-            setProfile(null);
-            hydratedEmailRef.current = "";
-            logout().catch(() => {});
-          } else if (currentUser?.email && !cancelled) {
-            const decoded = decodeCollegeEmail(currentUser.email);
-            setStudent(decoded);
-          }
-        } finally {
-          if (!cancelled) {
-            setLoading(false);
-          }
+      setLoading(true);
+      try {
+        const backendProfile = await getMeProfile();
+        if (backendProfile?.email && !cancelled) {
+          const userRole = (backendProfile.role || "").toLowerCase().trim();
+          const isAdmin = Boolean(
+            backendProfile.is_admin ||
+            userRole === "admin" ||
+            userRole === "superadmin" ||
+            userRole === "super_admin"
+          );
+          const isSuper = isAdmin;
+          const effectiveRole = isAdmin ? "admin" : (userRole || "user");
+          setUser({
+            uid: backendProfile.uid || backendProfile.google_id || backendProfile.email,
+            email: backendProfile.email,
+            displayName: backendProfile.display_name || backendProfile.name || backendProfile.email.split("@")[0],
+            photoURL: backendProfile.photo_url || null,
+            role: effectiveRole,
+            isAdmin,
+            isSuper,
+            getIdToken: async () => getStoredToken() || "",
+          });
+          setProfile(backendProfile);
+          const decoded = decodeCollegeEmail(backendProfile.email);
+          setStudent(toProfileStudent(backendProfile, decoded));
+          hydratedEmailRef.current = backendProfile.email;
+        } else if (!cancelled) {
+          setUser(null);
+          setStudent(null);
+          setProfile(null);
+          hydratedEmailRef.current = "";
         }
-      } else {
-        setStudent(null);
-        setProfile(null);
-        hydratedEmailRef.current = "";
-        setLoading(false);
+      } catch (err) {
+        if (cancelled) return;
+        const status = err?.response?.status;
+        const message = err?.response?.data?.message || err?.message || "Failed to load profile from /me";
+        if (status === 403 || err?.response?.data?.status === "blocked") {
+          setAccessDeniedMessage(message);
+          setUser(null);
+          setStudent(null);
+          setProfile(null);
+          hydratedEmailRef.current = "";
+          logout().catch(() => {});
+        } else {
+          setUser(null);
+          setStudent(null);
+          setProfile(null);
+          hydratedEmailRef.current = "";
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
@@ -200,12 +192,10 @@ export const StudentContext = ({ children }) => {
     };
 
     window.addEventListener("auth_state_changed", handleAuthChange);
-    window.addEventListener("storage", handleAuthChange);
 
     return () => {
       cancelled = true;
       window.removeEventListener("auth_state_changed", handleAuthChange);
-      window.removeEventListener("storage", handleAuthChange);
     };
   }, []);
 

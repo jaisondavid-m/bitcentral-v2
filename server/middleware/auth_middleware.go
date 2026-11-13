@@ -15,6 +15,7 @@ var publicPrefixes = []string{
 	"/auth/login",
 	"/auth/callback",
 	"/auth/google",
+	"/auth/logout",
 	"/faculty-directory/auth/login",
 	"/faculty-photos",
 	"/faculty/photos",

@@ -195,10 +195,6 @@ func ExtractAuthToken(c *gin.Context) string {
 // IsInternalServiceRequest checks if the request originates from a trusted internal worker
 func IsInternalServiceRequest(c *gin.Context) bool {
 	internalSecret := strings.TrimSpace(os.Getenv("INTERNAL_API_SECRET"))
-	if internalSecret == "" {
-		internalSecret = strings.TrimSpace(os.Getenv("BACKEND_AUTH_TOKEN"))
-	}
-
 	if internalSecret != "" {
 		candidate := strings.TrimSpace(c.GetHeader("X-Internal-Secret"))
 		if candidate == "" {

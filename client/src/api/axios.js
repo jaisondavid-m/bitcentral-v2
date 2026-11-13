@@ -80,7 +80,8 @@ api.interceptors.response.use(
           const { logout } = await import("@/config/auth.js");
           await logout();
         } catch {
-          localStorage.removeItem("auth_token");
+          const { setStoredToken } = await import("@/config/auth.js");
+          setStoredToken(null);
           window.dispatchEvent(new Event("auth_state_changed"));
         }
       }
@@ -124,13 +125,14 @@ export default api;
 export async function getAuthenticatedHeaders() {
   const token = getStoredToken();
 
-  if (!token) {
-    throw new Error("You must be signed in");
+  if (token) {
+    return {
+      Authorization: `Bearer ${token}`,
+    };
   }
 
-  return {
-    Authorization: `Bearer ${token}`,
-  };
+  // When token is stored as an HTTP-only cookie, credentials are included automatically via withCredentials: true
+  return {};
 }
 
 let meCache = { data: null, timestamp: 0 };

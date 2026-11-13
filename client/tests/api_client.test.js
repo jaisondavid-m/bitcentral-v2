@@ -64,3 +64,4 @@ test("Frontend error normalizer handles fallback on missing network response", (
   const fallbackMsg = normalizeApiError(emptyError, "Server is unreachable");
   assert.equal(fallbackMsg, "Server is unreachable");
 });
+

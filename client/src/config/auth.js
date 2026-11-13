@@ -1,40 +1,35 @@
 import { isAllowedEmail } from "@/services/authRules.js";
-import { isJwtValid } from "@/utils/cookieAuth.js";
+import { deleteCookie, isJwtValid } from "@/utils/cookieAuth.js";
 import { postGoogleAuth, postGoogleLogout } from "@/api/axios.js";
 
 const TOKEN_KEY = "auth_token";
 const LEGACY_KEYS = ["google_auth_token", "jwt", "token", "access_token"];
 
-export const getStoredToken = () => {
-  if (typeof window === "undefined") return "";
-  const token = localStorage.getItem(TOKEN_KEY);
-  if (token && isJwtValid(token)) return token;
+let inMemoryToken = "";
 
-  // Fallback check legacy keys and migrate if valid
-  for (const key of LEGACY_KEYS) {
-    const val = localStorage.getItem(key);
-    if (val && isJwtValid(val)) {
-      localStorage.setItem(TOKEN_KEY, val);
-      return val;
-    }
-  }
-  return "";
-};
-
-export const setStoredToken = (token) => {
-  if (typeof window === "undefined") return;
-  if (token) {
-    localStorage.setItem(TOKEN_KEY, token);
-    // Clean up legacy keys
-    for (const key of LEGACY_KEYS) {
-      localStorage.removeItem(key);
-    }
-  } else {
+// Purge any tokens from localStorage so JWT is never stored in client storage
+const cleanLegacyStorage = () => {
+  if (typeof window === "undefined" || !window.localStorage) return;
+  try {
     localStorage.removeItem(TOKEN_KEY);
     for (const key of LEGACY_KEYS) {
       localStorage.removeItem(key);
     }
+  } catch {
+    // ignore
   }
+};
+
+// Immediately clean on module load
+cleanLegacyStorage();
+
+export const getStoredToken = () => {
+  return inMemoryToken;
+};
+
+export const setStoredToken = (token) => {
+  inMemoryToken = token || "";
+  cleanLegacyStorage();
 };
 
 export const parseJwt = (token) => {
@@ -206,9 +201,13 @@ export const logout = async () => {
   try {
     await postGoogleLogout();
   } catch {
-    setStoredToken(null);
+    // ignore
   }
   setStoredToken(null);
+  cleanLegacyStorage();
+  ["auth_token", "google_auth_token", "jwt", "token", "access_token", "googleToken"].forEach((name) => {
+    deleteCookie(name);
+  });
   window.dispatchEvent(new Event("auth_state_changed"));
   if (window.google?.accounts?.id) {
     try {

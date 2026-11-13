@@ -132,15 +132,9 @@ func (h *MailHandler) getEffectiveSMTPConfig(override *CustomSMTPConfig) CustomS
 	}
 	if user := os.Getenv("SMTP_USER"); user != "" {
 		cfg.User = strings.TrimSpace(user)
-	} else if email := os.Getenv("SMTP_EMAIL"); email != "" {
-		cfg.User = strings.TrimSpace(email)
-	} else if username := os.Getenv("SMTP_USERNAME"); username != "" {
-		cfg.User = strings.TrimSpace(username)
 	}
 
 	if pass := os.Getenv("SMTP_PASSWORD"); pass != "" {
-		cfg.Pass = strings.TrimSpace(pass)
-	} else if pass := os.Getenv("SMTP_PASS"); pass != "" {
 		cfg.Pass = strings.TrimSpace(pass)
 	}
 

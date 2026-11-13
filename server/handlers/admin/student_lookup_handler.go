@@ -71,20 +71,9 @@ func setAuthCookies(c *gin.Context, token string) {
 	host := c.Request.Host
 	secure := c.Request.TLS != nil || c.GetHeader("X-Forwarded-Proto") == "https" || strings.Contains(host, "bitsathy.in")
 
-	domains := []string{""}
-	if strings.Contains(host, "bitcentral.bitsathy.in") {
-		domains = append(domains, "bitcentral.bitsathy.in", ".bitsathy.in")
-	} else if strings.Contains(host, "bitsathy.in") {
-		domains = append(domains, ".bitsathy.in")
-	}
-	if envDomain := strings.TrimSpace(os.Getenv("COOKIE_DOMAIN")); envDomain != "" {
-		domains = append(domains, envDomain)
-	}
-
-	for _, dom := range domains {
-		// Single canonical HTTP-only, Secure cookie
-		c.SetCookie("auth_token", token, maxAge, "/", dom, secure, true)
-	}
+	cookieDomain := strings.TrimSpace(os.Getenv("COOKIE_DOMAIN"))
+	// Set the cookie exactly once for the current host/domain
+	c.SetCookie("auth_token", token, maxAge, "/", cookieDomain, secure, true)
 }
 
 func clearAuthCookies(c *gin.Context) {
