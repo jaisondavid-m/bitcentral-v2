@@ -81,6 +81,8 @@ var sessionMetaList = []struct {
 	{buildSeatingData13Nov2026FN, sessionMeta{"13-11-2026", "FN", "09:00 AM – 12:00 PM", ""}},
 	{buildSeatingData13Nov2026AN, sessionMeta{"13-11-2026", "AN", "01:30 PM – 04:30 PM", ""}},
 	{buildSeatingData14Nov2026FN, sessionMeta{"14-11-2026", "FN", "09:00 AM – 12:00 PM", ""}},
+	{buildSeatingData16Nov2026FN, sessionMeta{"16-11-2026", "FN", "09:00 AM – 12:00 PM", ""}},
+	{buildSeatingData16Nov2026AN, sessionMeta{"16-11-2026", "AN", "01:30 PM – 04:30 PM", ""}},
 }
 
 var courseNameMap = map[string]string{
@@ -89,6 +91,7 @@ var courseNameMap = map[string]string{
 	"AL":      "ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING",
 	"BT":      "BIOTECHNOLOGY",
 	"CB":      "COMPUTER SCIENCE AND BUSINESS SYSTEMS",
+	"CD":      "COMPUTER SCIENCE AND DESIGN",
 	"CS":      "COMPUTER SCIENCE AND ENGINEERING",
 	"EC":      "ELECTRONICS AND COMMUNICATION ENGINEERING",
 	"EE":      "ELECTRICAL AND ELECTRONICS ENGINEERING",
@@ -96,6 +99,8 @@ var courseNameMap = map[string]string{
 	"IT":      "INFORMATION TECHNOLOGY",
 	"ME":      "MECHANICAL ENGINEERING",
 	"MZ":      "MECHATRONICS ENGINEERING",
+	"22CD007": "AGILE SOFTWARE DEVELOPMENT",
+	"22AM001": "AGILE SOFTWARE DEVELOPMENT",
 	"22HS004": "HUMAN VALUES AND ETHICS",
 	"22HS005": "SOFT SKILLS AND EFFECTIVE COMMUNICATION",
 	"22AG301": "NUMERICAL METHODS AND STATISTICS",

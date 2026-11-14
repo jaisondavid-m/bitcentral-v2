@@ -865,3 +865,385 @@ func buildSeatingData14Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 227", CourseCode: "22HS005", RegisterNos: expandRange("7376252AL167", "7376252AL191"), Time: "09:00 AM – 12:00 PM"},
 	}
 }
+
+func buildSeatingData16Nov2026FN() []studentmodels.SeatingRecord {
+	return []studentmodels.SeatingRecord{
+		// --- Hall: WW 202 ---
+		// S.No 1: B.E. CD - 22CD007 (25 candidates)
+		{HallNo: "WW 202", CourseCode: "22CD007", RegisterNos: append(expandRange("7376231CD102", "7376231CD115"), expandRange("7376231CD117", "7376231CD127")...), Time: "09:00 AM – 12:00 PM"},
+		// S.No 2: B.Tech. AL - 22AM001 (25 candidates)
+		{HallNo: "WW 202", CourseCode: "22AM001", RegisterNos: append(append([]string{
+			"7376232AL103", "7376232AL104", "7376232AL110", "7376232AL114",
+			"7376232AL116", "7376232AL117", "7376232AL119", "7376232AL120",
+			"7376232AL124", "7376232AL126", "7376232AL127", "7376232AL129",
+			"7376232AL131", "7376232AL132",
+		}, expandRange("7376232AL134", "7376232AL138")...), []string{
+			"7376232AL141", "7376232AL142", "7376232AL144", "7376232AL146",
+			"7376232AL148", "7376232AL149",
+		}...), Time: "09:00 AM – 12:00 PM"},
+
+		// --- Hall: WW 203 ---
+		// S.No 3: B.E. CD - 22CD007 (10 candidates)
+		{HallNo: "WW 203", CourseCode: "22CD007", RegisterNos: expandRange("7376231CD128", "7376231CD137"), Time: "09:00 AM – 12:00 PM"},
+		// S.No 4: B.Tech. AL - 22AM001 (15 candidates)
+		{HallNo: "WW 203", CourseCode: "22AM001", RegisterNos: append(append(expandRange("7376232AL153", "7376232AL158"), []string{
+			"7376232AL162", "7376232AL165", "7376232AL169",
+		}...), append(expandRange("7376232AL172", "7376232AL175"), []string{
+			"7376232AL177", "7376232AL178",
+		}...)...), Time: "09:00 AM – 12:00 PM"},
+
+		// --- Hall: WW 204 ---
+		// S.No 5: B.E. CD - 22CD007 (10 candidates)
+		{HallNo: "WW 204", CourseCode: "22CD007", RegisterNos: expandRange("7376231CD138", "7376231CD147"), Time: "09:00 AM – 12:00 PM"},
+		// S.No 6: B.Tech. AL - 22AM001 (15 candidates)
+		{HallNo: "WW 204", CourseCode: "22AM001", RegisterNos: append(append(append(append([]string{
+			"7376232AL179",
+		}, expandRange("7376232AL186", "7376232AL188")...), []string{
+			"7376232AL191", "7376232AL193", "7376232AL198",
+		}...), expandRange("7376232AL201", "7376232AL203")...), []string{
+			"7376232AL205", "7376232AL206", "7376232AL210", "7376232AL211", "7376232AL213",
+		}...), Time: "09:00 AM – 12:00 PM"},
+
+		// --- Hall: WW 205 ---
+		// S.No 7: B.E. CD - 22CD007 (14 candidates)
+		{HallNo: "WW 205", CourseCode: "22CD007", RegisterNos: append(append(append(expandRange("7376231CD148", "7376231CD152"), []string{"7376231CD154"}...), append(expandRange("7376231CD156", "7376231CD158"), []string{"7376231CD161", "7376231CD162"}...)...), expandRange("7376241CD501", "7376241CD503")...), Time: "09:00 AM – 12:00 PM"},
+		// S.No 8: B.Tech. AL - 22AM001 (11 candidates)
+		{HallNo: "WW 205", CourseCode: "22AM001", RegisterNos: append([]string{
+			"7376232AL215", "7376232AL217", "7376232AL220", "7376232AL221",
+		}, expandRange("7376242AL501", "7376242AL507")...), Time: "09:00 AM – 12:00 PM"},
+	}
+}
+
+func buildSeatingData16Nov2026AN() []studentmodels.SeatingRecord {
+	return []studentmodels.SeatingRecord{
+		// --- Hall: ME 102 ---
+		// S.No 1: B.E. CS - 22CS501 (25 candidates)
+		{HallNo: "ME 102", CourseCode: "22CS501", RegisterNos: expandRange("7376241CS102", "7376241CS126"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 2: B.E. EC - 22EC501 (20 candidates)
+		{HallNo: "ME 102", CourseCode: "22EC501", RegisterNos: append(append(expandRange("7376241EC103", "7376241EC110"), []string{"7376241EC112", "7376241EC113"}...), expandRange("7376241EC115", "7376241EC124")...), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: ME 107 ---
+		// S.No 3: B.E. CS - 22CS501 (25 candidates)
+		{HallNo: "ME 107", CourseCode: "22CS501", RegisterNos: expandRange("7376241CS127", "7376241CS151"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 4: B.E. EC - 22EC501 (20 candidates)
+		{HallNo: "ME 107", CourseCode: "22EC501", RegisterNos: expandRange("7376241EC125", "7376241EC144"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: ME 201 ---
+		// S.No 5: B.E. CS - 22CS501 (25 candidates)
+		{HallNo: "ME 201", CourseCode: "22CS501", RegisterNos: append(expandRange("7376241CS152", "7376241CS157"), expandRange("7376241CS159", "7376241CS177")...), Time: "01:30 PM – 04:30 PM"},
+		// S.No 6: B.E. EC - 22EC501 (20 candidates)
+		{HallNo: "ME 201", CourseCode: "22EC501", RegisterNos: expandRange("7376241EC145", "7376241EC164"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: ME 202 ---
+		// S.No 7: B.E. CS - 22CS501 (25 candidates)
+		{HallNo: "ME 202", CourseCode: "22CS501", RegisterNos: append(expandRange("7376241CS178", "7376241CS188"), expandRange("7376241CS190", "7376241CS203")...), Time: "01:30 PM – 04:30 PM"},
+		// S.No 8: B.E. EC - 22EC501 (20 candidates)
+		{HallNo: "ME 202", CourseCode: "22EC501", RegisterNos: append(expandRange("7376241EC165", "7376241EC174"), expandRange("7376241EC176", "7376241EC185")...), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: ME 203 ---
+		// S.No 9: B.E. CS - 22CS501 (25 candidates)
+		{HallNo: "ME 203", CourseCode: "22CS501", RegisterNos: expandRange("7376241CS204", "7376241CS228"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 10: B.E. EC - 22EC501 (20 candidates)
+		{HallNo: "ME 203", CourseCode: "22EC501", RegisterNos: expandRange("7376241EC186", "7376241EC205"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: ME 204 ---
+		// S.No 11: B.E. CS - 22CS501 (25 candidates)
+		{HallNo: "ME 204", CourseCode: "22CS501", RegisterNos: expandRange("7376241CS230", "7376241CS254"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 12: B.E. EC - 22EC501 (20 candidates)
+		{HallNo: "ME 204", CourseCode: "22EC501", RegisterNos: append([]string{"7376241EC206", "7376241EC207"}, expandRange("7376241EC209", "7376241EC226")...), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: ME 205 ---
+		// S.No 13: B.E. CS - 22CS501 (25 candidates)
+		{HallNo: "ME 205", CourseCode: "22CS501", RegisterNos: expandRange("7376241CS255", "7376241CS279"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 14: B.E. EC - 22EC501 (20 candidates)
+		{HallNo: "ME 205", CourseCode: "22EC501", RegisterNos: append(expandRange("7376241EC227", "7376241EC230"), expandRange("7376241EC232", "7376241EC247")...), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: ME 206 ---
+		// S.No 15: B.E. CS - 22CS501 (25 candidates)
+		{HallNo: "ME 206", CourseCode: "22CS501", RegisterNos: expandRange("7376241CS280", "7376241CS304"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 16: B.E. EC - 22EC501 (20 candidates)
+		{HallNo: "ME 206", CourseCode: "22EC501", RegisterNos: expandRange("7376241EC248", "7376241EC267"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: ME 301 ---
+		// S.No 17: B.E. CS - 22CS501 (25 candidates)
+		{HallNo: "ME 301", CourseCode: "22CS501", RegisterNos: expandRange("7376241CS305", "7376241CS329"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 18: B.E. EC - 22EC501 (20 candidates)
+		{HallNo: "ME 301", CourseCode: "22EC501", RegisterNos: expandRange("7376241EC268", "7376241EC287"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: ME 302 ---
+		// S.No 19: B.E. CS - 22CS501 (25 candidates)
+		{HallNo: "ME 302", CourseCode: "22CS501", RegisterNos: append(expandRange("7376241CS330", "7376241CS353"), "7376241CS355"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 20: B.E. EC - 22EC501 (20 candidates)
+		{HallNo: "ME 302", CourseCode: "22EC501", RegisterNos: expandRange("7376241EC288", "7376241EC307"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: ME 303 ---
+		// S.No 21: B.E. CS - 22CS501 (25 candidates)
+		{HallNo: "ME 303", CourseCode: "22CS501", RegisterNos: expandRange("7376241CS356", "7376241CS380"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 22: B.E. EC - 22EC501 (20 candidates)
+		{HallNo: "ME 303", CourseCode: "22EC501", RegisterNos: expandRange("7376241EC308", "7376241EC327"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: ME 304 ---
+		// S.No 23: B.E. CS - 22CS501 (25 candidates)
+		{HallNo: "ME 304", CourseCode: "22CS501", RegisterNos: expandRange("7376241CS381", "7376241CS405"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 24: B.E. EC - 22EC501 (20 candidates)
+		{HallNo: "ME 304", CourseCode: "22EC501", RegisterNos: expandRange("7376241EC328", "7376241EC347"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: ME 305 ---
+		// S.No 25: B.E. CS - 22CS501 (25 candidates)
+		{HallNo: "ME 305", CourseCode: "22CS501", RegisterNos: expandRange("7376241CS406", "7376241CS430"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 26: B.E. EC - 22EC501 (20 candidates)
+		{HallNo: "ME 305", CourseCode: "22EC501", RegisterNos: append(expandRange("7376241EC348", "7376241EC352"), expandRange("7376251EC501", "7376251EC515")...), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: MH 303 ---
+		// S.No 27: B.E. CS - 22CS501 (15 candidates)
+		{HallNo: "MH 303", CourseCode: "22CS501", RegisterNos: append(expandRange("7376241CS431", "7376241CS442"), expandRange("7376241CS444", "7376241CS446")...), Time: "01:30 PM – 04:30 PM"},
+		// S.No 28: B.E. EC - 22EC501 (6 candidates)
+		{HallNo: "MH 303", CourseCode: "22EC501", RegisterNos: expandRange("7376251EC516", "7376251EC521"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 29: B.Tech. AD - 22AI501 (4 candidates)
+		{HallNo: "MH 303", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD102", "7376242AD105"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: MH 305 ---
+		// S.No 30: B.E. CS - 22CS501 (15 candidates)
+		{HallNo: "MH 305", CourseCode: "22CS501", RegisterNos: expandRange("7376241CS447", "7376241CS461"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 31: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "MH 305", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD106", "7376242AD115"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: SF 001 ---
+		// S.No 32: B.E. EI - 22EI501 (16 candidates)
+		{HallNo: "SF 001", CourseCode: "22EI501", RegisterNos: append(expandRange("7376241EI147", "7376241EI160"), []string{"7376251EI501", "7376251EI502"}...), Time: "01:30 PM – 04:30 PM"},
+		// S.No 33: B.E. ME - 22ME501 (20 candidates)
+		{HallNo: "SF 001", CourseCode: "22ME501", RegisterNos: append(expandRange("7376241ME130", "7376241ME132"), expandRange("7376241ME134", "7376241ME150")...), Time: "01:30 PM – 04:30 PM"},
+		// S.No 34: B.Tech. AG - 22AG501 (4 candidates)
+		{HallNo: "SF 001", CourseCode: "22AG501", RegisterNos: expandRange("7376242AG101", "7376242AG104"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: SF 002 ---
+		// S.No 35: B.E. ME - 22ME501 (17 candidates)
+		{HallNo: "SF 002", CourseCode: "22ME501", RegisterNos: append(expandRange("7376241ME151", "7376241ME159"), expandRange("7376251ME501", "7376251ME508")...), Time: "01:30 PM – 04:30 PM"},
+		// S.No 36: B.Tech. CB - 22CB501 (3 candidates)
+		{HallNo: "SF 002", CourseCode: "22CB501", RegisterNos: expandRange("7376242CB102", "7376242CB104"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 37: B.Tech. AG - 22AG501 (20 candidates)
+		{HallNo: "SF 002", CourseCode: "22AG501", RegisterNos: expandRange("7376242AG105", "7376242AG124"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: SF 101 ---
+		// S.No 38: B.Tech. CB - 22CB501 (38 candidates)
+		{HallNo: "SF 101", CourseCode: "22CB501", RegisterNos: append([]string{"7376242CB105"}, expandRange("7376242CB107", "7376242CB143")...), Time: "01:30 PM – 04:30 PM"},
+		// S.No 39: B.Tech. AG - 22AG501 (2 candidates)
+		{HallNo: "SF 101", CourseCode: "22AG501", RegisterNos: []string{"7376252AG501", "7376252AG502"}, Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: SF 102 ---
+		// S.No 40: B.Tech. CB - 22CB501 (19 candidates)
+		{HallNo: "SF 102", CourseCode: "22CB501", RegisterNos: append(expandRange("7376242CB144", "7376242CB159"), expandRange("7376252CB501", "7376252CB503")...), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: SF B01 ---
+		// S.No 41: B.E. EI - 22EI501 (5 candidates)
+		{HallNo: "SF B01", CourseCode: "22EI501", RegisterNos: expandRange("7376241EI101", "7376241EI105"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 42: B.E. MZ - 22MC501 (15 candidates)
+		{HallNo: "SF B01", CourseCode: "22MC501", RegisterNos: append(expandRange("7376241MZ152", "7376241MZ160"), expandRange("7376251MZ501", "7376251MZ506")...), Time: "01:30 PM – 04:30 PM"},
+		// S.No 43: B.Tech. BT - 22BT501 (20 candidates)
+		{HallNo: "SF B01", CourseCode: "22BT501", RegisterNos: expandRange("7376242BT190", "7376242BT209"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: SF B02 ---
+		// S.No 44: B.E. EI - 22EI501 (20 candidates)
+		{HallNo: "SF B02", CourseCode: "22EI501", RegisterNos: expandRange("7376241EI106", "7376241EI125"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 45: B.E. ME - 22ME501 (7 candidates)
+		{HallNo: "SF B02", CourseCode: "22ME501", RegisterNos: expandRange("7376241ME102", "7376241ME108"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 46: B.Tech. BT - 22BT501 (13 candidates)
+		{HallNo: "SF B02", CourseCode: "22BT501", RegisterNos: append(append(expandRange("7376242BT210", "7376242BT218"), expandRange("7376242BT220", "7376242BT222")...), "7376252BT501"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: SF B03 ---
+		// S.No 47: B.E. EI - 22EI501 (20 candidates)
+		{HallNo: "SF B03", CourseCode: "22EI501", RegisterNos: expandRange("7376241EI127", "7376241EI146"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 48: B.E. ME - 22ME501 (20 candidates)
+		{HallNo: "SF B03", CourseCode: "22ME501", RegisterNos: append([]string{"7376241ME109"}, expandRange("7376241ME111", "7376241ME129")...), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 008 ---
+		// S.No 49: B.Tech. IT - 22IT501 (15 candidates)
+		{HallNo: "WW 008", CourseCode: "22IT501", RegisterNos: expandRange("7376242IT230", "7376242IT244"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 50: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 008", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD229", "7376242AD238"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 011 ---
+		// S.No 51: B.Tech. IT - 22IT501 (15 candidates)
+		{HallNo: "WW 011", CourseCode: "22IT501", RegisterNos: expandRange("7376242IT285", "7376242IT299"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 52: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 011", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD274", "7376242AD283"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 012 ---
+		// S.No 53: B.Tech. IT - 22IT501 (15 candidates)
+		{HallNo: "WW 012", CourseCode: "22IT501", RegisterNos: expandRange("7376242IT316", "7376242IT330"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 54: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 012", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD294", "7376242AD303"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 113 ---
+		// S.No 55: B.E. CS - 22CS501 (15 candidates)
+		{HallNo: "WW 113", CourseCode: "22CS501", RegisterNos: append(append(expandRange("7376241CS462", "7376241CS469"), expandRange("7376241CS471", "7376241CS476")...), "7376251CS501"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 56: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 113", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD116", "7376242AD125"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 114 ---
+		// S.No 57: B.E. CS - 22CS501 (15 candidates)
+		{HallNo: "WW 114", CourseCode: "22CS501", RegisterNos: append(expandRange("7376251CS502", "7376251CS513"), expandRange("7376251CS515", "7376251CS517")...), Time: "01:30 PM – 04:30 PM"},
+		// S.No 58: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 114", CourseCode: "22AI501", RegisterNos: append(expandRange("7376242AD126", "7376242AD129"), expandRange("7376242AD131", "7376242AD136")...), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 115 ---
+		// S.No 59: B.E. CS - 22CS501 (7 candidates)
+		{HallNo: "WW 115", CourseCode: "22CS501", RegisterNos: expandRange("7376251CS518", "7376251CS524"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 60: B.Tech. IT - 22IT501 (8 candidates)
+		{HallNo: "WW 115", CourseCode: "22IT501", RegisterNos: expandRange("7376242IT101", "7376242IT108"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 61: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 115", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD137", "7376242AD146"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 117 ---
+		// S.No 62: B.Tech. IT - 22IT501 (15 candidates)
+		{HallNo: "WW 117", CourseCode: "22IT501", RegisterNos: expandRange("7376242IT109", "7376242IT123"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 63: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 117", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD147", "7376242AD156"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 118 ---
+		// S.No 64: B.Tech. IT - 22IT501 (15 candidates)
+		{HallNo: "WW 118", CourseCode: "22IT501", RegisterNos: expandRange("7376242IT124", "7376242IT138"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 65: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 118", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD157", "7376242AD166"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 204 ---
+		// S.No 66: B.Tech. IT - 22IT501 (15 candidates)
+		{HallNo: "WW 204", CourseCode: "22IT501", RegisterNos: expandRange("7376242IT155", "7376242IT169"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 67: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 204", CourseCode: "22AI501", RegisterNos: append(expandRange("7376242AD178", "7376242AD186"), "7376242AD188"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 205 ---
+		// S.No 68: B.Tech. IT - 22IT501 (15 candidates)
+		{HallNo: "WW 205", CourseCode: "22IT501", RegisterNos: expandRange("7376242IT185", "7376242IT199"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 69: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 205", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD199", "7376242AD208"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 206 ---
+		// S.No 70: B.Tech. IT - 22IT501 (15 candidates)
+		{HallNo: "WW 206", CourseCode: "22IT501", RegisterNos: expandRange("7376242IT245", "7376242IT259"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 71: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 206", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD239", "7376242AD248"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 207 ---
+		// S.No 72: B.Tech. IT - 22IT501 (25 candidates)
+		{HallNo: "WW 207", CourseCode: "22IT501", RegisterNos: expandRange("7376242IT260", "7376242IT284"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 73: B.Tech. AD - 22AI501 (25 candidates)
+		{HallNo: "WW 207", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD249", "7376242AD273"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 208 ---
+		// S.No 74: B.Tech. IT - 22IT501 (15 candidates)
+		{HallNo: "WW 208", CourseCode: "22IT501", RegisterNos: append(expandRange("7376242IT300", "7376242IT303"), expandRange("7376242IT305", "7376242IT315")...), Time: "01:30 PM – 04:30 PM"},
+		// S.No 75: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 208", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD284", "7376242AD293"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 209 ---
+		// S.No 76: B.Tech. IT - 22IT501 (15 candidates)
+		{HallNo: "WW 209", CourseCode: "22IT501", RegisterNos: expandRange("7376242IT331", "7376242IT345"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 77: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 209", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD304", "7376242AD313"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 210 ---
+		// S.No 78: B.Tech. IT - 22IT501 (15 candidates)
+		{HallNo: "WW 210", CourseCode: "22IT501", RegisterNos: append(append(expandRange("7376242IT346", "7376242IT351"), expandRange("7376252IT501", "7376252IT506")...), expandRange("7376252IT508", "7376252IT510")...), Time: "01:30 PM – 04:30 PM"},
+		// S.No 79: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 210", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD314", "7376242AD323"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 211 ---
+		// S.No 80: B.Tech. IT - 22IT501 (15 candidates)
+		{HallNo: "WW 211", CourseCode: "22IT501", RegisterNos: expandRange("7376242IT139", "7376242IT153"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 81: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 211", CourseCode: "22AI501", RegisterNos: append(append(expandRange("7376242AD167", "7376242AD174"), "7376242AD176"), "7376242AD177"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 212 ---
+		// S.No 82: B.E. MZ - 22MC501 (25 candidates)
+		{HallNo: "WW 212", CourseCode: "22MC501", RegisterNos: expandRange("7376241MZ127", "7376241MZ151"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 83: B.Tech. BT - 22BT501 (25 candidates)
+		{HallNo: "WW 212", CourseCode: "22BT501", RegisterNos: expandRange("7376242BT165", "7376242BT189"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 213 ---
+		// S.No 84: B.Tech. IT - 22IT501 (15 candidates)
+		{HallNo: "WW 213", CourseCode: "22IT501", RegisterNos: expandRange("7376242IT170", "7376242IT184"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 85: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 213", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD189", "7376242AD198"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 214 ---
+		// S.No 86: B.Tech. IT - 22IT501 (15 candidates)
+		{HallNo: "WW 214", CourseCode: "22IT501", RegisterNos: expandRange("7376242IT200", "7376242IT214"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 87: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 214", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD209", "7376242AD218"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 215 ---
+		// S.No 88: B.Tech. IT - 22IT501 (15 candidates)
+		{HallNo: "WW 215", CourseCode: "22IT501", RegisterNos: expandRange("7376242IT215", "7376242IT229"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 89: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 215", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD219", "7376242AD228"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 218 ---
+		// S.No 90: B.E. EE - 22EE501 (9 candidates)
+		{HallNo: "WW 218", CourseCode: "22EE501", RegisterNos: expandRange("7376241EE101", "7376241EE109"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 91: B.Tech. IT - 22IT501 (6 candidates)
+		{HallNo: "WW 218", CourseCode: "22IT501", RegisterNos: expandRange("7376252IT511", "7376252IT516"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 92: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 218", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD324", "7376242AD333"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 219 ---
+		// S.No 93: B.E. EE - 22EE501 (15 candidates)
+		{HallNo: "WW 219", CourseCode: "22EE501", RegisterNos: append([]string{"7376241EE110", "7376241EE111"}, expandRange("7376241EE113", "7376241EE125")...), Time: "01:30 PM – 04:30 PM"},
+		// S.No 94: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 219", CourseCode: "22AI501", RegisterNos: expandRange("7376242AD334", "7376242AD343"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 220 ---
+		// S.No 95: B.E. EE - 22EE501 (10 candidates)
+		{HallNo: "WW 220", CourseCode: "22EE501", RegisterNos: expandRange("7376241EE126", "7376241EE135"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 96: B.Tech. AD - 22AI501 (10 candidates)
+		{HallNo: "WW 220", CourseCode: "22AI501", RegisterNos: append(expandRange("7376242AD344", "7376242AD346"), expandRange("7376252AD501", "7376252AD507")...), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 221 ---
+		// S.No 97: B.E. EE - 22EE501 (10 candidates)
+		{HallNo: "WW 221", CourseCode: "22EE501", RegisterNos: expandRange("7376241EE136", "7376241EE145"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 98: B.Tech. AD - 22AI501 (9 candidates)
+		{HallNo: "WW 221", CourseCode: "22AI501", RegisterNos: expandRange("7376252AD508", "7376252AD516"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 99: B.Tech. AL - 22AM501 (1 candidate)
+		{HallNo: "WW 221", CourseCode: "22AM501", RegisterNos: []string{"7376242AL101"}, Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 222 ---
+		// S.No 100: B.E. EE - 22EE501 (25 candidates)
+		{HallNo: "WW 222", CourseCode: "22EE501", RegisterNos: expandRange("7376241EE146", "7376241EE170"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 101: B.Tech. AL - 22AM501 (25 candidates)
+		{HallNo: "WW 222", CourseCode: "22AM501", RegisterNos: expandRange("7376242AL102", "7376242AL126"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 223 ---
+		// S.No 102: B.E. EE - 22EE501 (25 candidates)
+		{HallNo: "WW 223", CourseCode: "22EE501", RegisterNos: append([]string{"7376241EE171"}, expandRange("7376241EE173", "7376241EE196")...), Time: "01:30 PM – 04:30 PM"},
+		// S.No 103: B.Tech. AL - 22AM501 (25 candidates)
+		{HallNo: "WW 223", CourseCode: "22AM501", RegisterNos: expandRange("7376242AL127", "7376242AL151"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 224 ---
+		// S.No 104: B.E. EE - 22EE501 (25 candidates)
+		{HallNo: "WW 224", CourseCode: "22EE501", RegisterNos: append(expandRange("7376241EE197", "7376241EE217"), expandRange("7376251EE501", "7376251EE504")...), Time: "01:30 PM – 04:30 PM"},
+		// S.No 105: B.Tech. AL - 22AM501 (25 candidates)
+		{HallNo: "WW 224", CourseCode: "22AM501", RegisterNos: expandRange("7376242AL152", "7376242AL176"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 225 ---
+		// S.No 106: B.E. EE - 22EE501 (13 candidates)
+		{HallNo: "WW 225", CourseCode: "22EE501", RegisterNos: expandRange("7376251EE505", "7376251EE517"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 107: B.Tech. BT - 22BT501 (12 candidates)
+		{HallNo: "WW 225", CourseCode: "22BT501", RegisterNos: expandRange("7376242BT102", "7376242BT113"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 108: B.Tech. AL - 22AM501 (25 candidates)
+		{HallNo: "WW 225", CourseCode: "22AM501", RegisterNos: expandRange("7376242AL177", "7376242AL201"), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 226 ---
+		// S.No 109: B.E. MZ - 22MC501 (1 candidate)
+		{HallNo: "WW 226", CourseCode: "22MC501", RegisterNos: []string{"7376241MZ101"}, Time: "01:30 PM – 04:30 PM"},
+		// S.No 110: B.Tech. BT - 22BT501 (25 candidates)
+		{HallNo: "WW 226", CourseCode: "22BT501", RegisterNos: expandRange("7376242BT114", "7376242BT138"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 111: B.Tech. AL - 22AM501 (24 candidates)
+		{HallNo: "WW 226", CourseCode: "22AM501", RegisterNos: append(append(expandRange("7376242AL202", "7376242AL206"), expandRange("7376242AL208", "7376242AL223")...), expandRange("7376252AL501", "7376252AL503")...), Time: "01:30 PM – 04:30 PM"},
+
+		// --- Hall: WW 227 ---
+		// S.No 112: B.E. MZ - 22MC501 (25 candidates)
+		{HallNo: "WW 227", CourseCode: "22MC501", RegisterNos: expandRange("7376241MZ102", "7376241MZ126"), Time: "01:30 PM – 04:30 PM"},
+		// S.No 113: B.Tech. BT - 22BT501 (25 candidates)
+		{HallNo: "WW 227", CourseCode: "22BT501", RegisterNos: append(expandRange("7376242BT139", "7376242BT160"), expandRange("7376242BT162", "7376242BT164")...), Time: "01:30 PM – 04:30 PM"},
+	}
+}
