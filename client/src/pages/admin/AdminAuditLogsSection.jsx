@@ -222,6 +222,15 @@ export default function AdminAuditLogsSection() {
     };
   }, [activeMode, isLiveStreaming, fetchLogs]);
 
+  // Live auto-search debounce for user search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setUserGridPage(1);
+      setUserSearch(userGridSearchInput.trim());
+    }, 350);
+    return () => clearTimeout(handler);
+  }, [userGridSearchInput]);
+
   // 2. Fetch User Directory for User-Wise Mode
   const fetchAuditUsers = useCallback(async () => {
     setUsersLoading(true);
@@ -843,7 +852,7 @@ export default function AdminAuditLogsSection() {
                     type="text"
                     value={userGridSearchInput}
                     onChange={(e) => setUserGridSearchInput(e.target.value)}
-                    placeholder="Search all users by name, roll no, or UID..."
+                    placeholder="Search by name, roll no (e.g. 7376... or CS221), email, or UID..."
                     className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-9 pr-24 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-purple-500"
                   />
                   {userGridSearchInput && (

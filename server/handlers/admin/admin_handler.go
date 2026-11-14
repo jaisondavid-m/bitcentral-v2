@@ -880,13 +880,13 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 	var args []any
 
 	if userUID != "" && rollNo != "" {
-		whereClauses = append(whereClauses, "(user_uid = ? OR roll_no = ?)")
+		whereClauses = append(whereClauses, "(user_uid = ? OR LOWER(roll_no) = LOWER(?))")
 		args = append(args, userUID, rollNo)
 	} else if userUID != "" {
 		whereClauses = append(whereClauses, "user_uid = ?")
 		args = append(args, userUID)
 	} else if rollNo != "" {
-		whereClauses = append(whereClauses, "roll_no = ?")
+		whereClauses = append(whereClauses, "LOWER(roll_no) = LOWER(?)")
 		args = append(args, rollNo)
 	}
 
@@ -913,18 +913,18 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 	if search != "" {
 		tokens := strings.Fields(search)
 		for _, token := range tokens {
-			pattern := "%" + token + "%"
+			pattern := "%" + strings.ToLower(token) + "%"
 			whereClauses = append(whereClauses, `(
-				endpoint LIKE ? OR 
-				COALESCE(user_name, '') LIKE ? OR 
-				COALESCE(roll_no, '') LIKE ? OR 
-				COALESCE(user_uid, '') LIKE ? OR 
-				COALESCE(ip_address, '') LIKE ? OR 
-				method LIKE ? OR 
-				COALESCE(query, '') LIKE ? OR 
-				COALESCE(payload, '') LIKE ? OR 
-				COALESCE(response, '') LIKE ? OR 
-				COALESCE(role, '') LIKE ? OR 
+				LOWER(endpoint) LIKE ? OR 
+				LOWER(COALESCE(user_name, '')) LIKE ? OR 
+				LOWER(COALESCE(roll_no, '')) LIKE ? OR 
+				LOWER(COALESCE(user_uid, '')) LIKE ? OR 
+				LOWER(COALESCE(ip_address, '')) LIKE ? OR 
+				LOWER(method) LIKE ? OR 
+				LOWER(COALESCE(query, '')) LIKE ? OR 
+				LOWER(COALESCE(payload, '')) LIKE ? OR 
+				LOWER(COALESCE(response, '')) LIKE ? OR 
+				LOWER(COALESCE(role, '')) LIKE ? OR 
 				CAST(status_code AS CHAR) LIKE ?
 			)`)
 			for i := 0; i < 11; i++ {
@@ -1020,10 +1020,111 @@ func (h *AdminHandler) GetAuditLogUsers(c *gin.Context) {
 	var args []any
 
 	if search != "" {
-		whereSQL += " AND (user_name LIKE ? OR roll_no LIKE ? OR user_uid LIKE ?)"
-		pattern := "%" + search + "%"
-		countArgs = append(countArgs, pattern, pattern, pattern)
-		args = append(args, pattern, pattern, pattern)
+		cleanSearch := strings.ToLower(search)
+		pattern := "%" + cleanSearch + "%"
+
+		// Flexible cross-DB resolution: resolve any matching UIDs from Core DB
+		// (supports student roll number like 2025UCS1023, register number 7376..., email prefix, or student/user names)
+		var coreUIDs []string
+		if config.DB != nil {
+			// Search users table
+			uRows, err := config.DB.Query(`
+				SELECT DISTINCT COALESCE(uid, google_id)
+				FROM users
+				WHERE LOWER(display_name) LIKE ? OR LOWER(email) LIKE ? OR LOWER(uid) LIKE ?
+				LIMIT 50
+			`, pattern, pattern, pattern)
+			if err == nil {
+				for uRows.Next() {
+					var u string
+					if err := uRows.Scan(&u); err == nil && u != "" {
+						coreUIDs = append(coreUIDs, u)
+					}
+				}
+				uRows.Close()
+			}
+
+			// Search student_details table
+			sRows, err := config.DB.Query(`
+				SELECT DISTINCT email
+				FROM student_details
+				WHERE LOWER(id) LIKE ? OR LOWER(user_id) LIKE ? OR LOWER(name) LIKE ?
+				LIMIT 50
+			`, pattern, pattern, pattern)
+			if err == nil {
+				var sEmails []string
+				for sRows.Next() {
+					var em string
+					if err := sRows.Scan(&em); err == nil && em != "" {
+						sEmails = append(sEmails, strings.ToLower(strings.TrimSpace(em)))
+					}
+				}
+				sRows.Close()
+
+				for _, em := range sEmails {
+					var uid string
+					if err := config.DB.QueryRow(`SELECT COALESCE(uid, google_id) FROM users WHERE LOWER(TRIM(email)) = ? LIMIT 1`, em).Scan(&uid); err == nil && uid != "" {
+						coreUIDs = append(coreUIDs, uid)
+					}
+				}
+			}
+
+			// Also search tracker_users table
+			tRows, err := config.DB.Query(`
+				SELECT DISTINCT email
+				FROM tracker_users
+				WHERE LOWER(id) LIKE ? OR LOWER(user_id) LIKE ? OR LOWER(name) LIKE ?
+				LIMIT 50
+			`, pattern, pattern, pattern)
+			if err == nil {
+				var tEmails []string
+				for tRows.Next() {
+					var em string
+					if err := tRows.Scan(&em); err == nil && em != "" {
+						tEmails = append(tEmails, strings.ToLower(strings.TrimSpace(em)))
+					}
+				}
+				tRows.Close()
+
+				for _, em := range tEmails {
+					var uid string
+					if err := config.DB.QueryRow(`SELECT COALESCE(uid, google_id) FROM users WHERE LOWER(TRIM(email)) = ? LIMIT 1`, em).Scan(&uid); err == nil && uid != "" {
+						coreUIDs = append(coreUIDs, uid)
+					}
+				}
+			}
+		}
+
+		tokens := strings.Fields(cleanSearch)
+
+		// Build WHERE clause with case-insensitive matching
+		if len(coreUIDs) > 0 {
+			placeholders := make([]string, len(coreUIDs))
+			for i, uid := range coreUIDs {
+				placeholders[i] = "?"
+				countArgs = append(countArgs, uid)
+				args = append(args, uid)
+			}
+
+			var tokenClauses []string
+			for _, token := range tokens {
+				tokPattern := "%" + token + "%"
+				tokenClauses = append(tokenClauses, "(LOWER(user_name) LIKE ? OR LOWER(roll_no) LIKE ? OR LOWER(user_uid) LIKE ?)")
+				countArgs = append(countArgs, tokPattern, tokPattern, tokPattern)
+				args = append(args, tokPattern, tokPattern, tokPattern)
+			}
+
+			whereSQL += " AND (user_uid IN (" + strings.Join(placeholders, ",") + ") OR (" + strings.Join(tokenClauses, " AND ") + "))"
+		} else {
+			var tokenClauses []string
+			for _, token := range tokens {
+				tokPattern := "%" + token + "%"
+				tokenClauses = append(tokenClauses, "(LOWER(user_name) LIKE ? OR LOWER(roll_no) LIKE ? OR LOWER(user_uid) LIKE ?)")
+				countArgs = append(countArgs, tokPattern, tokPattern, tokPattern)
+				args = append(args, tokPattern, tokPattern, tokPattern)
+			}
+			whereSQL += " AND (" + strings.Join(tokenClauses, " AND ") + ")"
+		}
 	}
 
 	var total int
@@ -1121,8 +1222,24 @@ func (h *AdminHandler) GetAuditLogUsers(c *gin.Context) {
 							users[i].Role = meta.Role
 						}
 						if users[i].RollNo == "" && meta.Email != "" {
-							if strings.Contains(meta.Email, "@") {
-								username := strings.Split(meta.Email, "@")[0]
+							cleanEm := strings.ToLower(strings.TrimSpace(meta.Email))
+							var sRoll string
+							if err := config.DB.QueryRow(`
+								SELECT COALESCE(NULLIF(user_id, ''), id)
+								FROM student_details
+								WHERE LOWER(TRIM(email)) = ?
+								LIMIT 1
+							`, cleanEm).Scan(&sRoll); err == nil && sRoll != "" {
+								users[i].RollNo = strings.ToUpper(sRoll)
+							} else if err := config.DB.QueryRow(`
+								SELECT COALESCE(NULLIF(user_id, ''), id)
+								FROM tracker_users
+								WHERE LOWER(TRIM(email)) = ?
+								LIMIT 1
+							`, cleanEm).Scan(&sRoll); err == nil && sRoll != "" {
+								users[i].RollNo = strings.ToUpper(sRoll)
+							} else if strings.Contains(cleanEm, "@") {
+								username := strings.Split(cleanEm, "@")[0]
 								if strings.HasPrefix(username, "7376") {
 									users[i].RollNo = strings.ToUpper(username)
 								}
