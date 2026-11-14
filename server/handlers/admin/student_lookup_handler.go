@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"server/config"
+	"server/middleware"
 	adminmodels "server/models/admin"
 	"server/response"
 	"server/utils"
@@ -375,6 +376,16 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		phoneNo = tPhone
 		deptName = trackerDept
 		batchName = trackerBatch
+	}
+
+	if rollNo != "" {
+		c.Set("roll_no", rollNo)
+		middleware.CacheEmailRoll(emailID, rollNo)
+		middleware.CacheEmailRoll(cleanEmail, rollNo)
+	}
+	if registerNo != "" {
+		middleware.CacheEmailRoll(emailID, registerNo)
+		middleware.CacheEmailRoll(cleanEmail, registerNo)
 	}
 
 	if finalName == "" {

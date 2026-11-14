@@ -865,7 +865,7 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 		page = 1
 	}
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "50"))
-	if limit < 1 || limit > 100 {
+	if limit < 1 || limit > 500 {
 		limit = 50
 	}
 	offset := (page - 1) * limit
@@ -879,12 +879,13 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 	var whereClauses []string
 	var args []any
 
-	if userUID != "" {
+	if userUID != "" && rollNo != "" {
+		whereClauses = append(whereClauses, "(user_uid = ? OR roll_no = ?)")
+		args = append(args, userUID, rollNo)
+	} else if userUID != "" {
 		whereClauses = append(whereClauses, "user_uid = ?")
 		args = append(args, userUID)
-	}
-
-	if rollNo != "" {
+	} else if rollNo != "" {
 		whereClauses = append(whereClauses, "roll_no = ?")
 		args = append(args, rollNo)
 	}
@@ -897,6 +898,8 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 	if status != "" && status != "ALL" {
 		if status == "2xx" {
 			whereClauses = append(whereClauses, "status_code >= 200 AND status_code < 300")
+		} else if status == "3xx" {
+			whereClauses = append(whereClauses, "status_code >= 300 AND status_code < 400")
 		} else if status == "4xx" {
 			whereClauses = append(whereClauses, "status_code >= 400 AND status_code < 500")
 		} else if status == "5xx" {
@@ -994,18 +997,38 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 func (h *AdminHandler) GetAuditLogUsers(c *gin.Context) {
 	db := config.GetLogsDB()
 	if db == nil {
-		c.JSON(http.StatusOK, gin.H{"success": true, "users": []any{}})
+		c.JSON(http.StatusOK, gin.H{"success": true, "users": []any{}, "total": 0, "page": 1, "limit": 48})
 		return
 	}
 
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if page < 1 {
+		page = 1
+	}
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "48"))
+	if limit < 1 {
+		limit = 48
+	}
+	if limit > 1000 {
+		limit = 1000
+	}
+	offset := (page - 1) * limit
+
 	search := strings.TrimSpace(c.Query("search"))
 	whereSQL := "WHERE user_uid != '' AND user_uid IS NOT NULL"
+	var countArgs []any
 	var args []any
+
 	if search != "" {
 		whereSQL += " AND (user_name LIKE ? OR roll_no LIKE ? OR user_uid LIKE ?)"
 		pattern := "%" + search + "%"
+		countArgs = append(countArgs, pattern, pattern, pattern)
 		args = append(args, pattern, pattern, pattern)
 	}
+
+	var total int
+	countQuery := "SELECT COUNT(DISTINCT user_uid) FROM audit_logs " + whereSQL
+	_ = db.QueryRow(countQuery, countArgs...).Scan(&total)
 
 	query := `
 		SELECT user_uid,
@@ -1019,8 +1042,9 @@ func (h *AdminHandler) GetAuditLogUsers(c *gin.Context) {
 		` + whereSQL + `
 		GROUP BY user_uid
 		ORDER BY MAX(created_at) DESC
-		LIMIT 200
+		LIMIT ? OFFSET ?
 	`
+	args = append(args, limit, offset)
 
 	rows, err := db.Query(query, args...)
 	if err != nil {
@@ -1047,9 +1071,75 @@ func (h *AdminHandler) GetAuditLogUsers(c *gin.Context) {
 		}
 	}
 
+	// Enrichment from Core DB (users table) if user_name or roll_no is missing
+	if config.DB != nil && len(users) > 0 {
+		var uidsToEnrich []string
+		for _, u := range users {
+			if u.UserName == "" || u.RollNo == "" {
+				uidsToEnrich = append(uidsToEnrich, u.UserUID)
+			}
+		}
+
+		if len(uidsToEnrich) > 0 {
+			placeholders := make([]string, len(uidsToEnrich))
+			enrichArgs := make([]any, 0, len(uidsToEnrich)*2)
+			for i, uid := range uidsToEnrich {
+				placeholders[i] = "?"
+				enrichArgs = append(enrichArgs, uid)
+			}
+			for _, uid := range uidsToEnrich {
+				enrichArgs = append(enrichArgs, uid)
+			}
+
+			enrichQuery := fmt.Sprintf(`
+				SELECT COALESCE(uid, google_id), COALESCE(display_name, ''), COALESCE(email, ''), COALESCE(role, 'user')
+				FROM users
+				WHERE uid IN (%s) OR google_id IN (%s)
+			`, strings.Join(placeholders, ","), strings.Join(placeholders, ","))
+
+			if enrichRows, err := config.DB.Query(enrichQuery, enrichArgs...); err == nil {
+				defer enrichRows.Close()
+				type UserMeta struct {
+					DisplayName string
+					Email       string
+					Role        string
+				}
+				metaMap := make(map[string]UserMeta)
+				for enrichRows.Next() {
+					var uid, name, email, role string
+					if err := enrichRows.Scan(&uid, &name, &email, &role); err == nil {
+						metaMap[uid] = UserMeta{DisplayName: name, Email: email, Role: role}
+					}
+				}
+
+				for i := range users {
+					if meta, ok := metaMap[users[i].UserUID]; ok {
+						if users[i].UserName == "" && meta.DisplayName != "" {
+							users[i].UserName = meta.DisplayName
+						}
+						if users[i].Role == "" && meta.Role != "" {
+							users[i].Role = meta.Role
+						}
+						if users[i].RollNo == "" && meta.Email != "" {
+							if strings.Contains(meta.Email, "@") {
+								username := strings.Split(meta.Email, "@")[0]
+								if strings.HasPrefix(username, "7376") {
+									users[i].RollNo = strings.ToUpper(username)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"users":   users,
+		"total":   total,
+		"page":    page,
+		"limit":   limit,
 	})
 }
 

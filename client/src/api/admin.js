@@ -636,10 +636,12 @@ export async function getAdminAuditLogs({
   return response.data;
 }
 
-export async function getAdminAuditLogUsers({ search = "" } = {}) {
+export async function getAdminAuditLogUsers({ search = "", page = 1, limit = 48 } = {}) {
   const headers = await getAdminHeaders();
   const params = new URLSearchParams();
   if (search) params.set("search", search);
+  if (page) params.set("page", page);
+  if (limit) params.set("limit", limit);
 
   const response = await api.get(`/admin/audit-logs/users?${params.toString()}`, { headers });
   return response.data;

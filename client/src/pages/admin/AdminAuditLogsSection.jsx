@@ -146,8 +146,12 @@ export default function AdminAuditLogsSection() {
 
   // User-wise State
   const [auditUsers, setAuditUsers] = useState([]);
+  const [userGridTotal, setUserGridTotal] = useState(0);
+  const [userGridPage, setUserGridPage] = useState(1);
+  const [userGridLimit, setUserGridLimit] = useState(48);
   const [usersLoading, setUsersLoading] = useState(false);
   const [userSearch, setUserSearch] = useState("");
+  const [userGridSearchInput, setUserGridSearchInput] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
 
   // Selected User's Audit Logs
@@ -155,6 +159,7 @@ export default function AdminAuditLogsSection() {
   const [userLogsTotal, setUserLogsTotal] = useState(0);
   const [userLogsLoading, setUserLogsLoading] = useState(false);
   const [userPage, setUserPage] = useState(1);
+  const [userLimit, setUserLimit] = useState(50);
   const [userMethod, setUserMethod] = useState("ALL");
   const [userStatus, setUserStatus] = useState("ALL");
   const [userSearchText, setUserSearchText] = useState("");
@@ -221,16 +226,21 @@ export default function AdminAuditLogsSection() {
   const fetchAuditUsers = useCallback(async () => {
     setUsersLoading(true);
     try {
-      const res = await getAdminAuditLogUsers({ search: userSearch });
+      const res = await getAdminAuditLogUsers({
+        search: userSearch,
+        page: userGridPage,
+        limit: userGridLimit,
+      });
       if (res && res.success) {
         setAuditUsers(res.users || []);
+        setUserGridTotal(res.total || 0);
       }
     } catch (err) {
       console.error("Failed to fetch audit users:", err);
     } finally {
       setUsersLoading(false);
     }
-  }, [userSearch]);
+  }, [userSearch, userGridPage, userGridLimit]);
 
   useEffect(() => {
     if (activeMode === "user-wise" && !selectedUser) {
@@ -245,7 +255,7 @@ export default function AdminAuditLogsSection() {
     try {
       const res = await getAdminAuditLogs({
         page: userPage,
-        limit: 50,
+        limit: userLimit,
         user_uid: selectedUser.user_uid,
         roll_no: selectedUser.roll_no || "",
         search: userSearchText,
@@ -261,7 +271,7 @@ export default function AdminAuditLogsSection() {
     } finally {
       setUserLogsLoading(false);
     }
-  }, [selectedUser, userPage, userSearchText, userMethod, userStatus]);
+  }, [selectedUser, userPage, userLimit, userSearchText, userMethod, userStatus]);
 
   useEffect(() => {
     if (activeMode === "user-wise" && selectedUser) {
@@ -328,6 +338,12 @@ export default function AdminAuditLogsSection() {
     setSearch(searchInput.trim());
   };
 
+  const handleUserGridSearchSubmit = (e) => {
+    e.preventDefault();
+    setUserGridPage(1);
+    setUserSearch(userGridSearchInput.trim());
+  };
+
   const handleUserSearchSubmit = (e) => {
     e.preventDefault();
     setUserPage(1);
@@ -370,7 +386,8 @@ export default function AdminAuditLogsSection() {
   };
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
-  const userTotalPages = Math.max(1, Math.ceil(userLogsTotal / 50));
+  const userTotalPages = Math.max(1, Math.ceil(userLogsTotal / userLimit));
+  const userGridTotalPages = Math.max(1, Math.ceil(userGridTotal / userGridLimit));
 
   return (
     <div className="space-y-6">
@@ -599,6 +616,7 @@ export default function AdminAuditLogsSection() {
               >
                 <option value="ALL">All Status</option>
                 <option value="2xx">2xx Success</option>
+                <option value="3xx">3xx Redirect / Cached</option>
                 <option value="4xx">4xx Client Error</option>
                 <option value="5xx">5xx Server Error</option>
               </select>
@@ -615,6 +633,7 @@ export default function AdminAuditLogsSection() {
                 <option value={25}>25 / page</option>
                 <option value={50}>50 / page</option>
                 <option value={100}>100 / page</option>
+                <option value={200}>200 / page</option>
               </select>
 
               {/* Live Streaming Toggle */}
@@ -816,112 +835,205 @@ export default function AdminAuditLogsSection() {
           {!selectedUser ? (
             /* --- User Selection Grid --- */
             <div className="space-y-4">
-              {/* User Search & Info Bar */}
+              {/* User Search & Controls Bar */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
-                <div className="relative flex-1 max-w-md">
+                <form onSubmit={handleUserGridSearchSubmit} className="relative flex-1 max-w-md">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <input
                     type="text"
-                    value={userSearch}
-                    onChange={(e) => setUserSearch(e.target.value)}
-                    placeholder="Filter user by name, roll no, or UID..."
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-9 pr-4 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-blue-500"
+                    value={userGridSearchInput}
+                    onChange={(e) => setUserGridSearchInput(e.target.value)}
+                    placeholder="Search all users by name, roll no, or UID..."
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-9 pr-24 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-purple-500"
                   />
-                </div>
+                  {userGridSearchInput && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserGridSearchInput("");
+                        setUserSearch("");
+                        setUserGridPage(1);
+                      }}
+                      className="absolute right-20 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      title="Clear search"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-purple-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-purple-700 transition"
+                  >
+                    Search
+                  </button>
+                </form>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs text-slate-500 dark:text-slate-400">
-                    {auditUsers.length} active actors found
+                    <span className="font-semibold text-slate-900 dark:text-white">{userGridTotal.toLocaleString()}</span> total users
                   </span>
+
+                  {/* Cards per page dropdown */}
+                  <select
+                    value={userGridLimit}
+                    onChange={(e) => {
+                      setUserGridLimit(Number(e.target.value));
+                      setUserGridPage(1);
+                    }}
+                    className="rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300"
+                  >
+                    <option value={24}>24 cards / page</option>
+                    <option value={48}>48 cards / page</option>
+                    <option value={96}>96 cards / page</option>
+                    <option value={200}>200 cards / page</option>
+                  </select>
+
                   <button
                     onClick={fetchAuditUsers}
                     disabled={usersLoading}
                     className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
                   >
                     <RefreshCw className={`h-3 w-3 ${usersLoading ? "animate-spin" : ""}`} />
-                    <span>Refresh Users</span>
+                    <span>Refresh</span>
                   </button>
                 </div>
               </div>
 
               {/* Users Cards Grid */}
               {usersLoading ? (
-                <div className="py-16 text-center text-slate-400">
-                  <RefreshCw className="mx-auto h-6 w-6 animate-spin text-purple-500 mb-2" />
-                  <p className="text-xs">Loading active users from DB 3 audit stream...</p>
+                <div className="py-20 text-center text-slate-400">
+                  <RefreshCw className="mx-auto h-7 w-7 animate-spin text-purple-500 mb-2" />
+                  <p className="text-xs font-medium">Loading active users from Logs Cluster...</p>
                 </div>
               ) : auditUsers.length === 0 ? (
                 <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center dark:border-slate-800 dark:bg-slate-900/60">
                   <Users className="mx-auto h-8 w-8 text-slate-300 dark:text-slate-700 mb-2" />
-                  <p className="font-semibold text-slate-700 dark:text-slate-300">No user activity recorded yet</p>
-                  <p className="text-xs text-slate-400 mt-1">Users will appear here as they interact with the API.</p>
+                  <p className="font-semibold text-slate-700 dark:text-slate-300">No users found</p>
+                  <p className="text-xs text-slate-400 mt-1">
+                    {userSearch ? "Try adjusting your search criteria." : "Users will appear here as they interact with the API."}
+                  </p>
+                  {userSearch && (
+                    <button
+                      onClick={() => {
+                        setUserGridSearchInput("");
+                        setUserSearch("");
+                        setUserGridPage(1);
+                      }}
+                      className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-purple-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-purple-700"
+                    >
+                      Clear Search Filter
+                    </button>
+                  )}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {auditUsers.map((u) => (
-                    <div
-                      key={u.user_uid}
-                      onClick={() => {
-                        setSelectedUser(u);
-                        setUserPage(1);
-                        setUserSearchText("");
-                        setUserSearchInput("");
-                      }}
-                      className="group cursor-pointer rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition hover:border-purple-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/60 dark:hover:border-purple-800 relative overflow-hidden"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-600 text-white font-bold text-sm shadow-sm shadow-purple-500/20">
-                            {(u.user_name || u.roll_no || "U").charAt(0).toUpperCase()}
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {auditUsers.map((u) => (
+                      <div
+                        key={u.user_uid}
+                        onClick={() => {
+                          setSelectedUser(u);
+                          setUserPage(1);
+                          setUserLimit(50);
+                          setUserSearchText("");
+                          setUserSearchInput("");
+                          setUserMethod("ALL");
+                          setUserStatus("ALL");
+                        }}
+                        className="group cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 shadow-xs transition hover:border-purple-400 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/60 dark:hover:border-purple-700 relative overflow-hidden flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-start justify-between gap-2.5">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-600 text-white font-bold text-sm shadow-sm shadow-purple-500/20">
+                                {(u.user_name || u.roll_no || "U").charAt(0).toUpperCase()}
+                              </div>
+                              <div className="min-w-0">
+                                <h3 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition truncate" title={u.user_name || "Unknown User"}>
+                                  {u.user_name || "Unknown User"}
+                                </h3>
+                                <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                  {u.roll_no ? (
+                                    <span className="font-mono text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                                      {u.roll_no}
+                                    </span>
+                                  ) : (
+                                    <span className="text-[10px] text-slate-400 font-mono truncate max-w-[120px]" title={u.user_uid}>
+                                      UID: {u.user_uid.slice(0, 10)}...
+                                    </span>
+                                  )}
+                                  {u.role && (
+                                    <span className="rounded-full bg-slate-100 px-1.5 py-0.2 text-[9px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                      {u.role}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            <span className="rounded-xl bg-purple-50 px-2 py-0.5 text-[11px] font-bold text-purple-700 dark:bg-purple-950/80 dark:text-purple-300 border border-purple-200 dark:border-purple-900 shrink-0">
+                              {u.log_count} logs
+                            </span>
                           </div>
-                          <div>
-                            <h3 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition">
-                              {u.user_name || "Unknown User"}
-                            </h3>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                              {u.roll_no ? (
-                                <span className="font-mono text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                                  {u.roll_no}
-                                </span>
-                              ) : (
-                                <span className="text-[11px] text-slate-400 font-mono">UID: {u.user_uid.slice(0, 10)}...</span>
-                              )}
-                              {u.role && (
-                                <span className="rounded-full bg-slate-100 px-2 py-0.2 text-[9px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                                  {u.role}
-                                </span>
-                              )}
+
+                          <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 grid grid-cols-2 gap-2 text-[10px]">
+                            <div>
+                              <span className="text-slate-400">Last Active</span>
+                              <p className="font-medium text-slate-700 dark:text-slate-300 mt-0.5 truncate" title={formatISTDateTime(u.last_active)}>
+                                {timeAgo(u.last_active)}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-slate-400">Last Known IP</span>
+                              <p className="font-mono text-slate-700 dark:text-slate-300 mt-0.5 truncate" title={u.last_ip}>
+                                {u.last_ip || "-"}
+                              </p>
                             </div>
                           </div>
                         </div>
 
-                        <span className="rounded-xl bg-purple-50 px-2.5 py-1 text-xs font-bold text-purple-700 dark:bg-purple-950/80 dark:text-purple-300 border border-purple-200 dark:border-purple-900 shrink-0">
-                          {u.log_count} logs
-                        </span>
-                      </div>
-
-                      <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 grid grid-cols-2 gap-2 text-[11px]">
-                        <div>
-                          <span className="text-slate-400">Last Active</span>
-                          <p className="font-medium text-slate-700 dark:text-slate-300 mt-0.5">
-                            {timeAgo(u.last_active)}
-                          </p>
-                        </div>
-                        <div>
-                          <span className="text-slate-400">Last Known IP</span>
-                          <p className="font-mono text-slate-700 dark:text-slate-300 mt-0.5 truncate">
-                            {u.last_ip || "Unknown"}
-                          </p>
+                        <div className="mt-3 pt-2 border-t border-dashed border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-semibold text-purple-600 dark:text-purple-400 group-hover:translate-x-0.5 transition-transform">
+                          <span>View Logs</span>
+                          <ChevronRight className="h-4 w-4" />
                         </div>
                       </div>
+                    ))}
+                  </div>
 
-                      <div className="mt-3 flex items-center justify-between text-xs font-semibold text-purple-600 dark:text-purple-400 group-hover:translate-x-0.5 transition-transform">
-                        <span>Inspect User Trail</span>
-                        <ChevronRight className="h-4 w-4" />
-                      </div>
+                  {/* Grid Pagination Controls */}
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/60 shadow-xs">
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                      Showing <span className="font-semibold text-slate-900 dark:text-white">{(userGridPage - 1) * userGridLimit + 1}</span> to{" "}
+                      <span className="font-semibold text-slate-900 dark:text-white">{Math.min(userGridPage * userGridLimit, userGridTotal)}</span> of{" "}
+                      <span className="font-semibold text-slate-900 dark:text-white">{userGridTotal.toLocaleString()}</span> active users
+                      {userGridTotalPages > 1 && ` · Page ${userGridPage} of ${userGridTotalPages}`}
                     </div>
-                  ))}
-                </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setUserGridPage((p) => Math.max(1, p - 1))}
+                        disabled={userGridPage <= 1 || usersLoading}
+                        className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                      >
+                        <ChevronLeft className="h-3.5 w-3.5" />
+                        <span>Previous</span>
+                      </button>
+
+                      <span className="text-xs font-semibold px-2 text-slate-700 dark:text-slate-300">
+                        {userGridPage} / {userGridTotalPages}
+                      </span>
+
+                      <button
+                        onClick={() => setUserGridPage((p) => Math.min(userGridTotalPages, p + 1))}
+                        disabled={userGridPage >= userGridTotalPages || usersLoading}
+                        className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                      >
+                        <span>Next</span>
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           ) : (
@@ -960,14 +1072,14 @@ export default function AdminAuditLogsSection() {
                             Roll: {selectedUser.roll_no}
                           </span>
                         )}
-                        <span className="font-mono text-[11px]">UID: {selectedUser.user_uid}</span>
+                        <span className="font-mono text-[11px]" title={selectedUser.user_uid}>UID: {selectedUser.user_uid}</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
                     <div className="text-right">
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400">Total User Actions</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400">Recorded User Actions</span>
                       <p className="text-base font-bold text-purple-600 dark:text-purple-400">
                         {userLogsTotal.toLocaleString()} requests
                       </p>
@@ -975,9 +1087,10 @@ export default function AdminAuditLogsSection() {
 
                     <button
                       onClick={() => setSelectedUser(null)}
-                      className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
                     >
-                      Change User
+                      <ArrowLeft className="h-3.5 w-3.5" />
+                      <span>Back to All Users</span>
                     </button>
                   </div>
                 </div>
@@ -991,7 +1104,7 @@ export default function AdminAuditLogsSection() {
                     type="text"
                     value={userSearchInput}
                     onChange={(e) => setUserSearchInput(e.target.value)}
-                    placeholder="Search anything: endpoint, query, payload, response..."
+                    placeholder="Search user logs: endpoint, query, payload, response..."
                     className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-9 pr-24 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-purple-500"
                   />
                   {userSearchInput && (
@@ -1016,7 +1129,7 @@ export default function AdminAuditLogsSection() {
                   </button>
                 </form>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <select
                     value={userMethod}
                     onChange={(e) => {
@@ -1030,6 +1143,7 @@ export default function AdminAuditLogsSection() {
                     <option value="POST">POST</option>
                     <option value="PUT">PUT</option>
                     <option value="DELETE">DELETE</option>
+                    <option value="PATCH">PATCH</option>
                   </select>
 
                   <select
@@ -1042,8 +1156,23 @@ export default function AdminAuditLogsSection() {
                   >
                     <option value="ALL">All Status</option>
                     <option value="2xx">2xx Success</option>
-                    <option value="4xx">4xx Error</option>
-                    <option value="5xx">5xx Error</option>
+                    <option value="3xx">3xx Redirect</option>
+                    <option value="4xx">4xx Client Error</option>
+                    <option value="5xx">5xx Server Error</option>
+                  </select>
+
+                  {/* Limit per page */}
+                  <select
+                    value={userLimit}
+                    onChange={(e) => {
+                      setUserLimit(Number(e.target.value));
+                      setUserPage(1);
+                    }}
+                    className="rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-xs font-medium text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300"
+                  >
+                    <option value={25}>25 / page</option>
+                    <option value={50}>50 / page</option>
+                    <option value={100}>100 / page</option>
                   </select>
 
                   <button
@@ -1083,7 +1212,8 @@ export default function AdminAuditLogsSection() {
                         <tr>
                           <td colSpan={6} className="py-12 text-center text-slate-400">
                             <ShieldCheck className="mx-auto h-8 w-8 text-slate-300 dark:text-slate-700 mb-2" />
-                            <p className="font-medium text-slate-600 dark:text-slate-300">No logs for this user</p>
+                            <p className="font-medium text-slate-600 dark:text-slate-300">No logs found for this user</p>
+                            <p className="text-xs text-slate-400 mt-1">Try clearing filters or search query.</p>
                           </td>
                         </tr>
                       ) : (
