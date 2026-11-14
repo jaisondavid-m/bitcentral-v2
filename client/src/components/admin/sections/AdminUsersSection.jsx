@@ -31,9 +31,9 @@ import {
   isSeenToday,
   formatLastSeen,
   formatBlockedAt,
-} from "../utils/adminUtils.js";
-import AdminBanner from "../components/AdminBanner.jsx";
-import AdminConfirmModal from "../components/AdminConfirmModal.jsx";
+} from "@/utils/adminUtils.js";
+import AdminBanner from "@/components/admin/AdminBanner.jsx";
+import AdminConfirmModal from "@/components/admin/AdminConfirmModal.jsx";
 
 /* -- Mobile User Card -- */
 function UserCard({

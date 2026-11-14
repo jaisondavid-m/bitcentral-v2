@@ -10,8 +10,8 @@ import {
   User,
 } from "lucide-react";
 import { listTrackerUsers } from "@/api/admin.js";
-import { normalizeError } from "../utils/adminUtils.js";
-import AdminBanner from "../components/AdminBanner.jsx";
+import { normalizeError } from "@/utils/adminUtils.js";
+import AdminBanner from "@/components/admin/AdminBanner.jsx";
 
 /* -- Mobile Cards View for User Directory -- */
 function TrackerUserMobileView({ users, onSelectUser }) {

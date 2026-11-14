@@ -1,21 +1,21 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { checkAdmin } from "@/api/admin.js";
-import { getAdminTabFromPath } from "./components/adminConstants.js";
-import AdminLayout from "./components/AdminLayout.jsx";
-import AdminOverviewGrid from "./components/AdminOverviewGrid.jsx";
+import { getAdminTabFromPath } from "@/components/admin/adminConstants.js";
+import AdminLayout from "@/components/admin/AdminLayout.jsx";
+import AdminOverviewGrid from "@/components/admin/AdminOverviewGrid.jsx";
 
-// Modular Admin Section Components
-import AdminUsersSection from "./sections/AdminUsersSection.jsx";
-import AdminUserDirectorySection from "./sections/AdminUserDirectorySection.jsx";
-import AdminCardsSection from "./sections/AdminCardsSection.jsx";
-import AdminMessSection from "./sections/AdminMessSection.jsx";
-import AdminSponsorsSection from "./sections/AdminSponsorsSection.jsx";
-import AdminLeavesSection from "./AdminLeavesSection.jsx";
-import AdminNotificationsSection from "./AdminNotificationsSection.jsx";
-import AdminFeedbackPageWrapper from "./AdminFeedbackPage.jsx";
-import AdminMailSender from "./AdminMailSender.jsx";
-import AdminAuditLogsSection from "./AdminAuditLogsSection.jsx";
+// Modular Admin Section Components from @/components/admin/sections/
+import AdminUsersSection from "@/components/admin/sections/AdminUsersSection.jsx";
+import AdminUserDirectorySection from "@/components/admin/sections/AdminUserDirectorySection.jsx";
+import AdminCardsSection from "@/components/admin/sections/AdminCardsSection.jsx";
+import AdminMessSection from "@/components/admin/sections/AdminMessSection.jsx";
+import AdminSponsorsSection from "@/components/admin/sections/AdminSponsorsSection.jsx";
+import AdminLeavesSection from "@/components/admin/sections/AdminLeavesSection.jsx";
+import AdminNotificationsSection from "@/components/admin/sections/AdminNotificationsSection.jsx";
+import AdminFeedbackSection from "@/components/admin/sections/AdminFeedbackSection.jsx";
+import AdminMailSenderSection from "@/components/admin/sections/AdminMailSenderSection.jsx";
+import AdminAuditLogsSection from "@/components/admin/sections/AdminAuditLogsSection.jsx";
 
 /**
  * AdminDashboard - Central dispatcher for all administrative tools in BitCentral.
@@ -80,9 +80,9 @@ function AdminDashboard({ initialTab } = {}) {
       ) : activeTab === "notifications" ? (
         <AdminNotificationsSection />
       ) : activeTab === "feedback" ? (
-        <AdminFeedbackPageWrapper />
+        <AdminFeedbackSection />
       ) : activeTab === "mail" || activeTab === "mail-sender" ? (
-        <AdminMailSender />
+        <AdminMailSenderSection />
       ) : activeTab === "user-directory" ? (
         <AdminUserDirectorySection />
       ) : activeTab === "audit-logs" ? (

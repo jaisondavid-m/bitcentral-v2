@@ -25,9 +25,9 @@ import {
   deleteMessClosure,
 } from "@/api/admin.js";
 import { MealCard } from "@/components/cards/MealCard.jsx";
-import { normalizeError, todayIST, downloadMessTemplate } from "../utils/adminUtils.js";
-import AdminBanner from "../components/AdminBanner.jsx";
-import AdminConfirmModal from "../components/AdminConfirmModal.jsx";
+import { normalizeError, todayIST, downloadMessTemplate } from "@/utils/adminUtils.js";
+import AdminBanner from "@/components/admin/AdminBanner.jsx";
+import AdminConfirmModal from "@/components/admin/AdminConfirmModal.jsx";
 
 export default function AdminMessSection() {
   const [activeSubTab, setActiveSubTab] = useState("menu"); // "menu" | "closures"

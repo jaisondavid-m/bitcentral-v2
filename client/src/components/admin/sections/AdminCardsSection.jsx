@@ -24,9 +24,9 @@ import {
   reorderAdminCards,
   bulkUploadCards,
 } from "@/api/admin.js";
-import { normalizeError, fileToDataURL } from "../utils/adminUtils.js";
-import AdminBanner from "../components/AdminBanner.jsx";
-import AdminConfirmModal from "../components/AdminConfirmModal.jsx";
+import { normalizeError, fileToDataURL } from "@/utils/adminUtils.js";
+import AdminBanner from "@/components/admin/AdminBanner.jsx";
+import AdminConfirmModal from "@/components/admin/AdminConfirmModal.jsx";
 
 const CARD_CSV_TEMPLATE = `name,card_order,link,app_route,btntext,keywords,img,click_count
 "Exam Hall Finder",1,"","/exam-hall","Find Now","hall, venue, finder, exam, sem","/CardImgs/hallfinder.png",0

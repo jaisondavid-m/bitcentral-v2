@@ -29,8 +29,8 @@ import {
   updateSponsorDepartmentMappingsBatch,
   updateSponsorTransactionOverride,
 } from "@/api/admin.js";
-import { normalizeError } from "../utils/adminUtils.js";
-import AdminBanner from "../components/AdminBanner.jsx";
+import { normalizeError } from "@/utils/adminUtils.js";
+import AdminBanner from "@/components/admin/AdminBanner.jsx";
 
 export default function AdminSponsorsSection() {
   const [activeSubTab, setActiveSubTab] = useState("leaderboard"); // "leaderboard" | "departments" | "transactions"
