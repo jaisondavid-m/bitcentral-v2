@@ -83,6 +83,9 @@ var sessionMetaList = []struct {
 	{buildSeatingData14Nov2026FN, sessionMeta{"14-11-2026", "FN", "09:00 AM – 12:00 PM", ""}},
 	{buildSeatingData16Nov2026FN, sessionMeta{"16-11-2026", "FN", "09:00 AM – 12:00 PM", ""}},
 	{buildSeatingData16Nov2026AN, sessionMeta{"16-11-2026", "AN", "01:30 PM – 04:30 PM", ""}},
+	{buildSeatingData17Nov2026FN, sessionMeta{"17-11-2026", "FN", "09:00 AM – 12:00 PM", ""}},
+	{buildSeatingData18Nov2026FN, sessionMeta{"18-11-2026", "FN", "09:00 AM – 12:00 PM", ""}},
+	{buildSeatingData18Nov2026AN, sessionMeta{"18-11-2026", "AN", "01:30 PM – 04:30 PM", ""}},
 }
 
 var courseNameMap = map[string]string{
