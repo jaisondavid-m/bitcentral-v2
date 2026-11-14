@@ -402,18 +402,18 @@ export default function AdminLeavesSection() {
       )}
 
       {/* Header section */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-5 border-b border-slate-200 dark:border-slate-800">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-5 border-b border-zinc-900 dark:border-white">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-rose-600 text-white shadow-sm">
-              <CalendarDays className="h-5 w-5" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-900 bg-blue-50 text-blue-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
+              <CalendarDays className="h-5 w-5 stroke-[2.2]" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            <h1 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">
               Leave & Holiday Management
             </h1>
           </div>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Configure college holidays, student General Permission (GP), half-day (FN/AN) sessions, and remarks saved directly to MySQL database.
+          <p className="mt-1 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+            Configure college holidays, student General Permission (GP), half-day (FN/AN) sessions, and remarks.
           </p>
         </div>
 
@@ -421,26 +421,26 @@ export default function AdminLeavesSection() {
           <button
             onClick={fetchLeaves}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 shadow-xs"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-900 bg-white px-3.5 py-2 text-xs font-black text-zinc-800 shadow-[2px_2px_0px_#18181b] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:bg-zinc-800 dark:text-zinc-100 dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer"
             title="Reload from DB"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-blue-600" : ""}`} />
+            <RefreshCw className={`h-3.5 w-3.5 stroke-[2.2] ${loading ? "animate-spin text-blue-600" : ""}`} />
             <span>Refresh</span>
           </button>
 
           <button
             onClick={() => setResetModalOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-amber-200 bg-amber-50/80 px-3.5 py-2 text-xs font-semibold text-amber-800 transition hover:bg-amber-100 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300 shadow-xs"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-900 bg-amber-50 px-3.5 py-2 text-xs font-black text-amber-900 shadow-[2px_2px_0px_#18181b] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:bg-amber-950/60 dark:text-amber-200 dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer"
           >
-            <Sparkles className="h-3.5 w-3.5 text-amber-600" />
+            <Sparkles className="h-3.5 w-3.5 text-amber-600 stroke-[2.2]" />
             <span>Seed Default 2026-27</span>
           </button>
 
           <button
             onClick={handleOpenCreate}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-xs font-bold text-white transition hover:from-blue-700 hover:to-indigo-700 shadow-sm shadow-blue-500/20"
+            className="inline-flex items-center gap-2 rounded-lg border border-zinc-900 bg-blue-600 px-4 py-2 text-xs font-black text-white shadow-[2px_2px_0px_#18181b] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-4 w-4 stroke-[2.5]" />
             <span>Add Leave Schedule</span>
           </button>
         </div>
@@ -448,77 +448,77 @@ export default function AdminLeavesSection() {
 
       {/* KPI Stats Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/80">
+        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Leaves</span>
-            <Calendar className="h-4 w-4 text-blue-500" />
+            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Total Leaves</span>
+            <Calendar className="h-4 w-4 text-blue-500 stroke-[2.2]" />
           </div>
-          <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">{stats.total}</p>
-          <p className="text-[11px] text-slate-400">Database records</p>
+          <p className="mt-2 text-2xl font-black text-zinc-900 dark:text-zinc-50">{stats.total}</p>
+          <p className="text-[11px] font-medium text-zinc-400">Database records</p>
         </div>
 
-        <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/50 p-4 shadow-xs dark:border-emerald-900/40 dark:bg-emerald-950/20">
+        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">Ongoing</span>
-            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Ongoing</span>
+            <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse border border-zinc-900 dark:border-white" />
           </div>
-          <p className="mt-2 text-2xl font-bold text-emerald-900 dark:text-emerald-200">{stats.current}</p>
-          <p className="text-[11px] text-emerald-600/80 dark:text-emerald-400/80">Active right now</p>
+          <p className="mt-2 text-2xl font-black text-emerald-600 dark:text-emerald-400">{stats.current}</p>
+          <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">Active right now</p>
         </div>
 
-        <div className="rounded-2xl border border-blue-200/80 bg-blue-50/50 p-4 shadow-xs dark:border-blue-900/40 dark:bg-blue-950/20">
+        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-blue-700 dark:text-blue-400">Upcoming</span>
-            <Clock className="h-4 w-4 text-blue-500" />
+            <span className="text-xs font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider">Upcoming</span>
+            <Clock className="h-4 w-4 text-blue-500 stroke-[2.2]" />
           </div>
-          <p className="mt-2 text-2xl font-bold text-blue-900 dark:text-blue-200">{stats.upcoming}</p>
-          <p className="text-[11px] text-blue-600/80 dark:text-blue-400/80">Scheduled next</p>
+          <p className="mt-2 text-2xl font-black text-blue-600 dark:text-blue-400">{stats.upcoming}</p>
+          <p className="text-[11px] font-bold text-blue-600 dark:text-blue-400">Scheduled next</p>
         </div>
 
-        <div className="rounded-2xl border border-amber-200/80 bg-amber-50/50 p-4 shadow-xs dark:border-amber-900/40 dark:bg-amber-950/20">
+        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-amber-700 dark:text-amber-400">Half-Day (FN/AN)</span>
-            <Sun className="h-4 w-4 text-amber-500" />
+            <span className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">Half-Day</span>
+            <Sun className="h-4 w-4 text-amber-500 stroke-[2.2]" />
           </div>
-          <p className="mt-2 text-2xl font-bold text-amber-900 dark:text-amber-200">{stats.halfDayCount}</p>
-          <p className="text-[11px] text-amber-600/80 dark:text-amber-400/80">Session configured</p>
+          <p className="mt-2 text-2xl font-black text-amber-600 dark:text-amber-400">{stats.halfDayCount}</p>
+          <p className="text-[11px] font-bold text-amber-600 dark:text-amber-400">FN/AN session</p>
         </div>
 
-        <div className="rounded-2xl border border-purple-200/80 bg-purple-50/50 p-4 shadow-xs dark:border-purple-900/40 dark:bg-purple-950/20">
+        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-purple-700 dark:text-purple-400">General Permission</span>
-            <Tag className="h-4 w-4 text-purple-500" />
+            <span className="text-xs font-bold text-purple-700 dark:text-purple-400 uppercase tracking-wider">GP</span>
+            <Tag className="h-4 w-4 text-purple-500 stroke-[2.2]" />
           </div>
-          <p className="mt-2 text-2xl font-bold text-purple-900 dark:text-purple-200">{stats.gpCount}</p>
-          <p className="text-[11px] text-purple-600/80 dark:text-purple-400/80">College GP</p>
+          <p className="mt-2 text-2xl font-black text-purple-600 dark:text-purple-400">{stats.gpCount}</p>
+          <p className="text-[11px] font-bold text-purple-600 dark:text-purple-400">General Permission</p>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/40">
+        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Past Leaves</span>
-            <CalendarRange className="h-4 w-4 text-slate-400" />
+            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Past</span>
+            <CalendarRange className="h-4 w-4 text-zinc-400 stroke-[2.2]" />
           </div>
-          <p className="mt-2 text-2xl font-bold text-slate-700 dark:text-slate-300">{stats.past}</p>
-          <p className="text-[11px] text-slate-400">Finished leaves</p>
+          <p className="mt-2 text-2xl font-black text-zinc-700 dark:text-zinc-300">{stats.past}</p>
+          <p className="text-[11px] font-medium text-zinc-400">Finished</p>
         </div>
       </div>
 
       {/* Filter and Search Toolbar */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-zinc-900 bg-white p-3.5 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
         {/* Search */}
         <div className="relative flex-1 min-w-[240px]">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 stroke-[2.2]" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search leaves by name, date (YYYY-MM-DD), type..."
-            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-9 pr-8 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-800/60 dark:text-white dark:placeholder:text-slate-500"
+            className="w-full rounded-lg border border-zinc-900 bg-zinc-50 pl-9 pr-8 py-2 text-xs font-bold text-zinc-900 placeholder:text-zinc-400 focus:outline-none dark:border-white dark:bg-zinc-900 dark:text-zinc-50"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -537,10 +537,10 @@ export default function AdminLeavesSection() {
             <button
               key={tab.key}
               onClick={() => setStatusFilter(tab.key)}
-              className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition ${
+              className={`rounded-lg border px-3 py-1.5 text-xs font-black transition-all cursor-pointer ${
                 statusFilter === tab.key
-                  ? "bg-blue-600 text-white shadow-xs"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200/80 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                  ? "border-zinc-900 bg-blue-600 text-white shadow-[2px_2px_0px_#18181b] dark:border-white dark:shadow-[2px_2px_0px_#ffffff]"
+                  : "border-zinc-300 bg-zinc-50 text-zinc-700 hover:border-zinc-900 hover:bg-white dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-white dark:hover:bg-zinc-700"
               }`}
             >
               {tab.label}
@@ -553,7 +553,7 @@ export default function AdminLeavesSection() {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 focus:border-blue-500 focus:outline-none dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300"
+            className="rounded-lg border border-zinc-900 bg-white px-3 py-1.5 text-xs font-black text-zinc-800 shadow-[1px_1px_0px_#18181b] dark:border-white dark:bg-zinc-900 dark:text-zinc-200 dark:shadow-[1px_1px_0px_#ffffff]"
           >
             <option value="all">All Categories</option>
             <option value="GP">General Permission (GP)</option>

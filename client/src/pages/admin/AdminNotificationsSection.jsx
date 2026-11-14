@@ -309,17 +309,17 @@ export default function AdminNotificationsSection() {
       )}
 
       {/* Header section */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-5 border-b border-slate-200 dark:border-slate-800">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-5 border-b border-zinc-900 dark:border-white">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 text-white shadow-sm">
-              <BellRing className="h-5 w-5" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-900 bg-blue-50 text-blue-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
+              <BellRing className="h-5 w-5 stroke-[2.2]" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            <h1 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">
               In-Site Notifications & Broadcasts
             </h1>
           </div>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-sm font-medium text-zinc-600 dark:text-zinc-400">
             Dispatch real-time notification alerts to all users or target specific students, batches, and departments.
           </p>
         </div>
@@ -328,18 +328,18 @@ export default function AdminNotificationsSection() {
           <button
             onClick={fetchNotifications}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 shadow-xs"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-900 bg-white px-3.5 py-2 text-xs font-black text-zinc-800 shadow-[2px_2px_0px_#18181b] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:bg-zinc-800 dark:text-zinc-100 dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer"
             title="Reload from DB"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-blue-600" : ""}`} />
+            <RefreshCw className={`h-3.5 w-3.5 stroke-[2.2] ${loading ? "animate-spin text-blue-600" : ""}`} />
             <span>Refresh</span>
           </button>
 
           <button
             onClick={handleOpenCreate}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-xs font-bold text-white transition hover:from-blue-700 hover:to-indigo-700 shadow-sm shadow-blue-500/20"
+            className="inline-flex items-center gap-2 rounded-lg border border-zinc-900 bg-blue-600 px-4 py-2 text-xs font-black text-white shadow-[2px_2px_0px_#18181b] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer"
           >
-            <Send className="h-4 w-4" />
+            <Send className="h-4 w-4 stroke-[2.2]" />
             <span>Send New Notification</span>
           </button>
         </div>
@@ -347,68 +347,68 @@ export default function AdminNotificationsSection() {
 
       {/* KPI Stats Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/80">
+        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Sent</span>
-            <Bell className="h-4 w-4 text-blue-500" />
+            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Total Sent</span>
+            <Bell className="h-4 w-4 text-blue-500 stroke-[2.2]" />
           </div>
-          <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">{stats.total_notifications}</p>
-          <p className="text-[11px] text-slate-400">All dispatches</p>
+          <p className="mt-2 text-2xl font-black text-zinc-900 dark:text-zinc-50">{stats.total_notifications}</p>
+          <p className="text-[11px] font-medium text-zinc-400">All dispatches</p>
         </div>
 
-        <div className="rounded-2xl border border-amber-200/80 bg-amber-50/50 p-4 shadow-xs dark:border-amber-900/40 dark:bg-amber-950/20">
+        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-amber-700 dark:text-amber-400">Campus Broadcasts</span>
-            <Users className="h-4 w-4 text-amber-500" />
+            <span className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">Campus Broadcasts</span>
+            <Users className="h-4 w-4 text-amber-500 stroke-[2.2]" />
           </div>
-          <p className="mt-2 text-2xl font-bold text-amber-900 dark:text-amber-200">{stats.broadcast_count}</p>
-          <p className="text-[11px] text-amber-600/80 dark:text-amber-400/80">Sent to all users</p>
+          <p className="mt-2 text-2xl font-black text-amber-600 dark:text-amber-400">{stats.broadcast_count}</p>
+          <p className="text-[11px] font-bold text-amber-600 dark:text-amber-400">Sent to all users</p>
         </div>
 
-        <div className="rounded-2xl border border-purple-200/80 bg-purple-50/50 p-4 shadow-xs dark:border-purple-900/40 dark:bg-purple-950/20">
+        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-purple-700 dark:text-purple-400">Targeted Messages</span>
-            <User className="h-4 w-4 text-purple-500" />
+            <span className="text-xs font-bold text-purple-700 dark:text-purple-400 uppercase tracking-wider">Targeted</span>
+            <User className="h-4 w-4 text-purple-500 stroke-[2.2]" />
           </div>
-          <p className="mt-2 text-2xl font-bold text-purple-900 dark:text-purple-200">{stats.targeted_count}</p>
-          <p className="text-[11px] text-purple-600/80 dark:text-purple-400/80">Direct or batch/dept</p>
+          <p className="mt-2 text-2xl font-black text-purple-600 dark:text-purple-400">{stats.targeted_count}</p>
+          <p className="text-[11px] font-bold text-purple-600 dark:text-purple-400">Direct or batch/dept</p>
         </div>
 
-        <div className="rounded-2xl border border-rose-200/80 bg-rose-50/50 p-4 shadow-xs dark:border-rose-900/40 dark:bg-rose-950/20">
+        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-rose-700 dark:text-rose-400">Active Alerts</span>
-            <AlertTriangle className="h-4 w-4 text-rose-500" />
+            <span className="text-xs font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider">Active Alerts</span>
+            <AlertTriangle className="h-4 w-4 text-rose-500 stroke-[2.2]" />
           </div>
-          <p className="mt-2 text-2xl font-bold text-rose-900 dark:text-rose-200">{stats.active_alerts}</p>
-          <p className="text-[11px] text-rose-600/80 dark:text-rose-400/80">High priority notices</p>
+          <p className="mt-2 text-2xl font-black text-rose-600 dark:text-rose-400">{stats.active_alerts}</p>
+          <p className="text-[11px] font-bold text-rose-600 dark:text-rose-400">High priority notices</p>
         </div>
 
-        <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/50 p-4 shadow-xs dark:border-emerald-900/40 dark:bg-emerald-950/20">
+        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">Total Reads</span>
-            <CheckCircle className="h-4 w-4 text-emerald-500" />
+            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Total Reads</span>
+            <CheckCircle className="h-4 w-4 text-emerald-500 stroke-[2.2]" />
           </div>
-          <p className="mt-2 text-2xl font-bold text-emerald-900 dark:text-emerald-200">{stats.total_reads}</p>
-          <p className="text-[11px] text-emerald-600/80 dark:text-emerald-400/80">User read receipts</p>
+          <p className="mt-2 text-2xl font-black text-emerald-600 dark:text-emerald-400">{stats.total_reads}</p>
+          <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">User receipts</p>
         </div>
       </div>
 
       {/* Filter Toolbar */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-zinc-900 bg-white p-3.5 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
         {/* Search */}
         <div className="relative flex-1 min-w-[240px]">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 stroke-[2.2]" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by title, message, email, roll no..."
-            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-9 pr-8 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/10 dark:border-slate-800 dark:bg-slate-800/60 dark:text-white dark:placeholder:text-slate-500"
+            className="w-full rounded-lg border border-zinc-900 bg-zinc-50 pl-9 pr-8 py-2 text-xs font-bold text-zinc-900 placeholder:text-zinc-400 focus:outline-none dark:border-white dark:bg-zinc-900 dark:text-zinc-50"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -426,10 +426,10 @@ export default function AdminNotificationsSection() {
             <button
               key={tab.key}
               onClick={() => setTargetFilter(tab.key)}
-              className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition ${
+              className={`rounded-lg border px-3 py-1.5 text-xs font-black transition-all cursor-pointer ${
                 targetFilter === tab.key
-                  ? "bg-blue-600 text-white shadow-xs"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200/80 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                  ? "border-zinc-900 bg-blue-600 text-white shadow-[2px_2px_0px_#18181b] dark:border-white dark:shadow-[2px_2px_0px_#ffffff]"
+                  : "border-zinc-300 bg-zinc-50 text-zinc-700 hover:border-zinc-900 hover:bg-white dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-white dark:hover:bg-zinc-700"
               }`}
             >
               {tab.label}
@@ -442,7 +442,7 @@ export default function AdminNotificationsSection() {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 focus:border-blue-500 focus:outline-none dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300"
+            className="rounded-lg border border-zinc-900 bg-white px-3 py-1.5 text-xs font-black text-zinc-800 shadow-[1px_1px_0px_#18181b] dark:border-white dark:bg-zinc-900 dark:text-zinc-200 dark:shadow-[1px_1px_0px_#ffffff]"
           >
             <option value="all">All Types</option>
             {NOTIFICATION_TYPES.map((t) => (
@@ -455,7 +455,7 @@ export default function AdminNotificationsSection() {
       </div>
 
       {/* Notifications Table */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900">
+      <div className="overflow-hidden rounded-xl border border-zinc-900 bg-white shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
         {loading ? (
           <div className="flex flex-col items-center justify-center p-12 text-center">
             <Loader className="h-8 w-8 animate-spin text-blue-600" />

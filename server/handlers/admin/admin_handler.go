@@ -1026,19 +1026,30 @@ func (h *AdminHandler) GetAuditLogUsers(c *gin.Context) {
 		// Flexible cross-DB resolution: resolve any matching UIDs from Core DB
 		// (supports student roll number like 2025UCS1023, register number 7376..., email prefix, or student/user names)
 		var coreUIDs []string
+		uidSet := make(map[string]bool)
+		addUID := func(val string) {
+			val = strings.TrimSpace(val)
+			if val != "" && !uidSet[val] {
+				uidSet[val] = true
+				coreUIDs = append(coreUIDs, val)
+			}
+		}
+
 		if config.DB != nil {
 			// Search users table
 			uRows, err := config.DB.Query(`
-				SELECT DISTINCT COALESCE(uid, google_id)
+				SELECT DISTINCT COALESCE(uid, ''), COALESCE(google_id, ''), COALESCE(email, '')
 				FROM users
-				WHERE LOWER(display_name) LIKE ? OR LOWER(email) LIKE ? OR LOWER(uid) LIKE ?
-				LIMIT 50
-			`, pattern, pattern, pattern)
+				WHERE LOWER(display_name) LIKE ? OR LOWER(email) LIKE ? OR LOWER(uid) LIKE ? OR LOWER(google_id) LIKE ?
+				LIMIT 100
+			`, pattern, pattern, pattern, pattern)
 			if err == nil {
 				for uRows.Next() {
-					var u string
-					if err := uRows.Scan(&u); err == nil && u != "" {
-						coreUIDs = append(coreUIDs, u)
+					var u, g, e string
+					if err := uRows.Scan(&u, &g, &e); err == nil {
+						addUID(u)
+						addUID(g)
+						addUID(e)
 					}
 				}
 				uRows.Close()
@@ -1048,9 +1059,9 @@ func (h *AdminHandler) GetAuditLogUsers(c *gin.Context) {
 			sRows, err := config.DB.Query(`
 				SELECT DISTINCT email
 				FROM student_details
-				WHERE LOWER(id) LIKE ? OR LOWER(user_id) LIKE ? OR LOWER(name) LIKE ?
-				LIMIT 50
-			`, pattern, pattern, pattern)
+				WHERE LOWER(id) LIKE ? OR LOWER(user_id) LIKE ? OR LOWER(name) LIKE ? OR LOWER(email) LIKE ?
+				LIMIT 100
+			`, pattern, pattern, pattern, pattern)
 			if err == nil {
 				var sEmails []string
 				for sRows.Next() {
@@ -1062,9 +1073,12 @@ func (h *AdminHandler) GetAuditLogUsers(c *gin.Context) {
 				sRows.Close()
 
 				for _, em := range sEmails {
-					var uid string
-					if err := config.DB.QueryRow(`SELECT COALESCE(uid, google_id) FROM users WHERE LOWER(TRIM(email)) = ? LIMIT 1`, em).Scan(&uid); err == nil && uid != "" {
-						coreUIDs = append(coreUIDs, uid)
+					addUID(em)
+					var u, g, e string
+					if err := config.DB.QueryRow(`SELECT COALESCE(uid, ''), COALESCE(google_id, ''), COALESCE(email, '') FROM users WHERE LOWER(TRIM(email)) = ? LIMIT 1`, em).Scan(&u, &g, &e); err == nil {
+						addUID(u)
+						addUID(g)
+						addUID(e)
 					}
 				}
 			}
@@ -1073,9 +1087,9 @@ func (h *AdminHandler) GetAuditLogUsers(c *gin.Context) {
 			tRows, err := config.DB.Query(`
 				SELECT DISTINCT email
 				FROM tracker_users
-				WHERE LOWER(id) LIKE ? OR LOWER(user_id) LIKE ? OR LOWER(name) LIKE ?
-				LIMIT 50
-			`, pattern, pattern, pattern)
+				WHERE LOWER(id) LIKE ? OR LOWER(user_id) LIKE ? OR LOWER(name) LIKE ? OR LOWER(email) LIKE ?
+				LIMIT 100
+			`, pattern, pattern, pattern, pattern)
 			if err == nil {
 				var tEmails []string
 				for tRows.Next() {
@@ -1087,9 +1101,12 @@ func (h *AdminHandler) GetAuditLogUsers(c *gin.Context) {
 				tRows.Close()
 
 				for _, em := range tEmails {
-					var uid string
-					if err := config.DB.QueryRow(`SELECT COALESCE(uid, google_id) FROM users WHERE LOWER(TRIM(email)) = ? LIMIT 1`, em).Scan(&uid); err == nil && uid != "" {
-						coreUIDs = append(coreUIDs, uid)
+					addUID(em)
+					var u, g, e string
+					if err := config.DB.QueryRow(`SELECT COALESCE(uid, ''), COALESCE(google_id, ''), COALESCE(email, '') FROM users WHERE LOWER(TRIM(email)) = ? LIMIT 1`, em).Scan(&u, &g, &e); err == nil {
+						addUID(u)
+						addUID(g)
+						addUID(e)
 					}
 				}
 			}

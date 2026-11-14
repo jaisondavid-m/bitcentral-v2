@@ -146,23 +146,23 @@ export default function AdminFeedbackPage() {
   const totalUnread = conversations.reduce((acc, c) => acc + (c.unread_count || 0), 0);
 
   return (
-    <div className="h-[calc(100vh-7rem)] min-h-[520px] max-h-[850px] w-full rounded-2xl border border-slate-200/80 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900 flex flex-col overflow-hidden">
+    <div className="h-[calc(100vh-10rem)] min-h-[540px] max-h-[850px] w-full rounded-xl border border-zinc-900 bg-white shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff] flex flex-col overflow-hidden">
       {/* Header Bar */}
-      <div className="border-b border-slate-200/80 bg-slate-50/80 px-4 py-3 sm:px-5 dark:border-slate-800 dark:bg-slate-900/90 flex items-center justify-between shrink-0">
+      <div className="border-b border-zinc-900 bg-zinc-100 px-4 py-3 sm:px-5 dark:border-white dark:bg-zinc-800 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-blue-500/10 p-2 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 border border-blue-500/20">
-            <MessageSquare className="h-5 w-5" />
+          <div className="rounded-lg border border-zinc-900 bg-blue-50 p-2 text-blue-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
+            <MessageSquare className="h-5 w-5 stroke-[2.2]" />
           </div>
           <div>
-            <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <h2 className="text-base sm:text-lg font-black text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
               <span>User Feedback & Support Chats</span>
               {totalUnread > 0 && (
-                <span className="rounded-full bg-rose-500 px-2 py-0.5 text-[11px] font-bold text-white animate-pulse">
+                <span className="rounded-md border border-zinc-900 bg-rose-500 px-2 py-0.5 text-[10px] font-black text-white shadow-[1px_1px_0px_#18181b] animate-pulse">
                   {totalUnread} New
                 </span>
               )}
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
               Direct communication line with BIT-CENTRAL students & users
             </p>
           </div>
@@ -173,9 +173,9 @@ export default function AdminFeedbackPage() {
             setLoadingConvs(true);
             fetchConversations();
           }}
-          className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-900 bg-white px-3 py-1.5 text-xs font-black text-zinc-800 shadow-[2px_2px_0px_#18181b] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:bg-zinc-800 dark:text-zinc-100 dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer"
         >
-          <RefreshCw className={`h-3.5 w-3.5 ${loadingConvs ? "animate-spin" : ""}`} />
+          <RefreshCw className={`h-3.5 w-3.5 stroke-[2.2] ${loadingConvs ? "animate-spin" : ""}`} />
           <span>Refresh</span>
         </button>
       </div>
@@ -184,20 +184,20 @@ export default function AdminFeedbackPage() {
       <div className="flex-1 grid grid-cols-1 md:grid-cols-12 min-h-0 overflow-hidden">
         {/* Left Column: Conversations List */}
         <div
-          className={`md:col-span-4 lg:col-span-4 border-r border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900/60 flex flex-col h-full overflow-hidden ${
+          className={`md:col-span-4 lg:col-span-4 border-r border-zinc-900 bg-white dark:border-white dark:bg-[#111827] flex flex-col h-full overflow-hidden ${
             selectedUser ? "hidden md:flex" : "flex"
           }`}
         >
           {/* Search Box */}
-          <div className="p-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
+          <div className="p-3 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
             <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400 stroke-[2.2]" />
               <input
                 type="text"
                 placeholder="Search students or messages..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl bg-slate-50 border border-slate-200/80 pl-9 pr-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 dark:bg-slate-950 dark:border-slate-800 dark:text-white dark:placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-blue-500/40"
+                className="w-full rounded-lg border border-zinc-900 bg-zinc-50 pl-9 pr-3.5 py-2 text-xs font-bold text-zinc-900 placeholder-zinc-400 dark:border-white dark:bg-zinc-900 dark:text-zinc-50 focus:outline-none"
               />
             </div>
           </div>
@@ -388,27 +388,27 @@ export default function AdminFeedbackPage() {
                   e.preventDefault();
                   handleSendReply();
                 }}
-                className="p-3 border-t border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900 flex items-center gap-2 shrink-0"
+                className="p-3 border-t border-zinc-900 bg-zinc-50 dark:border-white dark:bg-zinc-800 flex items-center gap-2 shrink-0"
               >
                 <input
                   type="text"
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
                   placeholder="Type admin response (e.g. Updated and fixed the issue!)..."
-                  className="flex-1 rounded-xl bg-slate-50 border border-slate-200/80 px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 dark:bg-slate-950 dark:border-slate-800 dark:text-white dark:placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-blue-500/40"
+                  className="flex-1 rounded-lg border border-zinc-900 bg-white px-4 py-2 text-xs font-bold text-zinc-900 placeholder-zinc-400 dark:border-white dark:bg-zinc-900 dark:text-zinc-50 focus:outline-none"
                   disabled={sending}
                 />
                 <button
                   type="submit"
                   disabled={!replyText.trim() || sending}
-                  className="rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  className="rounded-lg border border-zinc-900 bg-blue-600 px-4 py-2 text-xs font-black text-white shadow-[2px_2px_0px_#18181b] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 disabled:opacity-50 dark:border-white dark:shadow-[2px_2px_0px_#ffffff] transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   {sending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <>
                       <span>Send</span>
-                      <Send className="h-3.5 w-3.5" />
+                      <Send className="h-3.5 w-3.5 stroke-[2.2]" />
                     </>
                   )}
                 </button>

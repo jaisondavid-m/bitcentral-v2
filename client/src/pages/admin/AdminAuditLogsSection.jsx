@@ -401,33 +401,33 @@ export default function AdminAuditLogsSection() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 dark:border-slate-800">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-zinc-900 pb-5 dark:border-white">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            <h1 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">
               Audit Logs & Security Trail
             </h1>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+            <span className="inline-flex items-center gap-1.5 rounded-md border border-zinc-900 bg-emerald-50 px-2.5 py-0.5 text-xs font-black text-emerald-800 shadow-[1px_1px_0px_#18181b] dark:border-white dark:bg-emerald-950/80 dark:text-emerald-300 dark:shadow-[1px_1px_0px_#ffffff]">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
               DB 3 Active
             </span>
           </div>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-sm font-medium text-zinc-600 dark:text-zinc-400">
             Real-time API audit trail and per-user activity recorded asynchronously in the Logs Cluster.
           </p>
         </div>
 
         {/* Mode Switcher Tabs */}
-        <div className="flex items-center gap-1.5 rounded-2xl bg-slate-100 p-1 dark:bg-slate-800/80 shrink-0">
+        <div className="flex items-center gap-1.5 rounded-lg border border-zinc-900 bg-zinc-100 p-1 dark:border-white dark:bg-zinc-800 shadow-[2px_2px_0px_#18181b] dark:shadow-[2px_2px_0px_#ffffff] shrink-0">
           <button
             onClick={() => {
               setActiveMode("streaming");
               setSelectedUser(null);
             }}
-            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition ${
+            className={`inline-flex items-center gap-2 rounded-md px-3.5 py-1.5 text-xs font-black transition-all ${
               activeMode === "streaming"
-                ? "bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"
-                : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                ? "border border-zinc-900 bg-white text-zinc-900 shadow-[2px_2px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:text-white dark:shadow-[2px_2px_0px_#ffffff]"
+                : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
             }`}
           >
             <Radio className={`h-3.5 w-3.5 ${isLiveStreaming ? "text-rose-500 animate-pulse" : "text-blue-500"}`} />
@@ -439,13 +439,13 @@ export default function AdminAuditLogsSection() {
               setActiveMode("user-wise");
               setSelectedUser(null);
             }}
-            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition ${
+            className={`inline-flex items-center gap-2 rounded-md px-3.5 py-1.5 text-xs font-black transition-all ${
               activeMode === "user-wise"
-                ? "bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"
-                : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                ? "border border-zinc-900 bg-white text-zinc-900 shadow-[2px_2px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:text-white dark:shadow-[2px_2px_0px_#ffffff]"
+                : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
             }`}
           >
-            <Users className="h-3.5 w-3.5 text-purple-500" />
+            <Users className="h-3.5 w-3.5 text-blue-500" />
             <span>User-Wise Logs</span>
           </button>
 
@@ -454,13 +454,13 @@ export default function AdminAuditLogsSection() {
               setActiveMode("api-usage");
               setSelectedUser(null);
             }}
-            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition ${
+            className={`inline-flex items-center gap-2 rounded-md px-3.5 py-1.5 text-xs font-black transition-all ${
               activeMode === "api-usage"
-                ? "bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"
-                : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                ? "border border-zinc-900 bg-white text-zinc-900 shadow-[2px_2px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:text-white dark:shadow-[2px_2px_0px_#ffffff]"
+                : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
             }`}
           >
-            <BarChart3 className="h-3.5 w-3.5 text-amber-500" />
+            <BarChart3 className="h-3.5 w-3.5 text-emerald-500" />
             <span>API Usage</span>
           </button>
         </div>
@@ -468,56 +468,56 @@ export default function AdminAuditLogsSection() {
 
       {/* Metric Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
+        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
               {activeMode === "api-usage" ? "Total API Invocations" : "Total Recorded Logs"}
             </span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
-              <Activity className="h-4 w-4" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-900 bg-blue-50 text-blue-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
+              <Activity className="h-4 w-4 stroke-[2.2]" />
             </div>
           </div>
-          <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+          <p className="mt-2 text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">
             {activeMode === "api-usage" ? apiUsageTotalCalls.toLocaleString() : total.toLocaleString()}
           </p>
-          <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
             {activeMode === "api-usage" ? "Total calls recorded in DB 3" : "Global requests in DB 3"}
           </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
+        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
               {activeMode === "api-usage" ? "Tracked Endpoints" : "Database Engine"}
             </span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
-              {activeMode === "api-usage" ? <BarChart3 className="h-4 w-4" /> : <Database className="h-4 w-4" />}
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-900 bg-emerald-50 text-emerald-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-emerald-400 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
+              {activeMode === "api-usage" ? <BarChart3 className="h-4 w-4 stroke-[2.2]" /> : <Database className="h-4 w-4 stroke-[2.2]" />}
             </div>
           </div>
-          <p className="mt-2 text-lg font-bold text-slate-900 dark:text-white truncate">
+          <p className="mt-2 text-lg font-black text-zinc-900 dark:text-zinc-50 truncate">
             {activeMode === "api-usage" ? `${apiUsageUniqueCount} Unique Routes` : "DB 3: Logs Cluster"}
           </p>
-          <p className="mt-1 text-[11px] text-emerald-600 dark:text-emerald-400">
-            {activeMode === "api-usage" ? "Actively monitored in DB 3" : "Zero impact on Core & Academic DBs"}
+          <p className="mt-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+            {activeMode === "api-usage" ? "Actively monitored in DB 3" : "Zero impact on Core DB"}
           </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
+        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
               {activeMode === "api-usage" ? "Top Endpoint" : "Active Viewing Mode"}
             </span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-900 bg-purple-50 text-purple-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-purple-400 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
               {activeMode === "streaming" ? (
-                <Radio className="h-4 w-4" />
+                <Radio className="h-4 w-4 stroke-[2.2]" />
               ) : activeMode === "user-wise" ? (
-                <Users className="h-4 w-4" />
+                <Users className="h-4 w-4 stroke-[2.2]" />
               ) : (
-                <TrendingUp className="h-4 w-4" />
+                <TrendingUp className="h-4 w-4 stroke-[2.2]" />
               )}
             </div>
           </div>
-          <p className="mt-2 text-lg font-bold text-slate-900 dark:text-white truncate font-mono text-sm">
+          <p className="mt-2 text-lg font-black text-zinc-900 dark:text-zinc-50 truncate font-mono text-sm">
             {activeMode === "api-usage"
               ? sortedEndpoints[0]?.endpoint || "None"
               : activeMode === "streaming"
@@ -526,7 +526,7 @@ export default function AdminAuditLogsSection() {
               ? selectedUser.user_name || "User Logs"
               : "User Cards Grid"}
           </p>
-          <p className="mt-1 text-[11px] text-purple-600 dark:text-purple-400 truncate">
+          <p className="mt-1 text-[11px] font-medium text-purple-600 dark:text-purple-400 truncate">
             {activeMode === "api-usage"
               ? `${sortedEndpoints[0]?.call_count.toLocaleString() || 0} calls (${
                   sortedEndpoints[0]?.percentage ? sortedEndpoints[0].percentage.toFixed(1) : 0
@@ -537,19 +537,19 @@ export default function AdminAuditLogsSection() {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
+        <div className="rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
               {activeMode === "api-usage" ? "Service Storage" : "Payload Redaction"}
             </span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400">
-              {activeMode === "api-usage" ? <Database className="h-4 w-4" /> : <ShieldAlert className="h-4 w-4" />}
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-900 bg-amber-50 text-amber-600 shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:text-amber-400 dark:shadow-[1.5px_1.5px_0px_#ffffff]">
+              {activeMode === "api-usage" ? <Database className="h-4 w-4 stroke-[2.2]" /> : <ShieldAlert className="h-4 w-4 stroke-[2.2]" />}
             </div>
           </div>
-          <p className="mt-2 text-lg font-bold text-slate-900 dark:text-white">
+          <p className="mt-2 text-lg font-black text-zinc-900 dark:text-zinc-50">
             {activeMode === "api-usage" ? "DB 3 Free Engine" : "Auto-Sanitized"}
           </p>
-          <p className="mt-1 text-[11px] text-amber-600 dark:text-amber-400">
+          <p className="mt-1 text-[11px] font-bold text-amber-600 dark:text-amber-400">
             {activeMode === "api-usage" ? "High-write isolated cluster" : "Passwords & tokens masked"}
           </p>
         </div>
@@ -845,15 +845,15 @@ export default function AdminAuditLogsSection() {
             /* --- User Selection Grid --- */
             <div className="space-y-4">
               {/* User Search & Controls Bar */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900/60">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
                 <form onSubmit={handleUserGridSearchSubmit} className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 stroke-[2.2]" />
                   <input
                     type="text"
                     value={userGridSearchInput}
                     onChange={(e) => setUserGridSearchInput(e.target.value)}
                     placeholder="Search by name, roll no (e.g. 7376... or CS221), email, or UID..."
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-9 pr-24 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-purple-500"
+                    className="w-full rounded-lg border border-zinc-900 bg-zinc-50 pl-9 pr-24 py-2 text-xs font-bold text-zinc-900 placeholder:text-zinc-400 focus:outline-none dark:border-white dark:bg-zinc-900 dark:text-zinc-50"
                   />
                   {userGridSearchInput && (
                     <button
@@ -863,7 +863,7 @@ export default function AdminAuditLogsSection() {
                         setUserSearch("");
                         setUserGridPage(1);
                       }}
-                      className="absolute right-20 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      className="absolute right-20 top-1/2 -translate-y-1/2 p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
                       title="Clear search"
                     >
                       <X className="h-3.5 w-3.5" />
@@ -871,15 +871,15 @@ export default function AdminAuditLogsSection() {
                   )}
                   <button
                     type="submit"
-                    className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-purple-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-purple-700 transition"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-md border border-zinc-900 bg-blue-600 px-2.5 py-1 text-[11px] font-black text-white hover:bg-blue-700 dark:border-white transition-all cursor-pointer"
                   >
                     Search
                   </button>
                 </form>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs text-slate-500 dark:text-slate-400">
-                    <span className="font-semibold text-slate-900 dark:text-white">{userGridTotal.toLocaleString()}</span> total users
+                  <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">
+                    <span className="font-black text-zinc-900 dark:text-zinc-100">{userGridTotal.toLocaleString()}</span> users
                   </span>
 
                   {/* Cards per page dropdown */}
@@ -889,7 +889,7 @@ export default function AdminAuditLogsSection() {
                       setUserGridLimit(Number(e.target.value));
                       setUserGridPage(1);
                     }}
-                    className="rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300"
+                    className="rounded-lg border border-zinc-900 bg-white px-2.5 py-1.5 text-xs font-bold text-zinc-800 shadow-[1px_1px_0px_#18181b] dark:border-white dark:bg-zinc-900 dark:text-zinc-200 dark:shadow-[1px_1px_0px_#ffffff]"
                   >
                     <option value={24}>24 cards / page</option>
                     <option value={48}>48 cards / page</option>
@@ -900,9 +900,9 @@ export default function AdminAuditLogsSection() {
                   <button
                     onClick={fetchAuditUsers}
                     disabled={usersLoading}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-900 bg-white px-3 py-1.5 text-xs font-black text-zinc-800 shadow-[2px_2px_0px_#18181b] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:bg-zinc-800 dark:text-zinc-100 dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer"
                   >
-                    <RefreshCw className={`h-3 w-3 ${usersLoading ? "animate-spin" : ""}`} />
+                    <RefreshCw className={`h-3 w-3 stroke-[2.2] ${usersLoading ? "animate-spin" : ""}`} />
                     <span>Refresh</span>
                   </button>
                 </div>
@@ -910,16 +910,16 @@ export default function AdminAuditLogsSection() {
 
               {/* Users Cards Grid */}
               {usersLoading ? (
-                <div className="py-20 text-center text-slate-400">
-                  <RefreshCw className="mx-auto h-7 w-7 animate-spin text-purple-500 mb-2" />
-                  <p className="text-xs font-medium">Loading active users from Logs Cluster...</p>
+                <div className="py-20 text-center text-zinc-400">
+                  <RefreshCw className="mx-auto h-7 w-7 animate-spin text-blue-600 mb-2 stroke-[2.2]" />
+                  <p className="text-xs font-bold">Loading active users from Logs Cluster...</p>
                 </div>
               ) : auditUsers.length === 0 ? (
-                <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center dark:border-slate-800 dark:bg-slate-900/60">
-                  <Users className="mx-auto h-8 w-8 text-slate-300 dark:text-slate-700 mb-2" />
-                  <p className="font-semibold text-slate-700 dark:text-slate-300">No users found</p>
-                  <p className="text-xs text-slate-400 mt-1">
-                    {userSearch ? "Try adjusting your search criteria." : "Users will appear here as they interact with the API."}
+                <div className="rounded-xl border border-zinc-900 bg-white p-12 text-center dark:border-white dark:bg-[#111827] shadow-[3px_3px_0px_#18181b] dark:shadow-[3px_3px_0px_#ffffff]">
+                  <Users className="mx-auto h-8 w-8 text-zinc-400 mb-2 stroke-[2.2]" />
+                  <p className="font-black text-zinc-900 dark:text-zinc-100">No users found</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                    {userSearch ? "Try adjusting your search query." : "Users will appear here as they interact with the API."}
                   </p>
                   {userSearch && (
                     <button
@@ -928,7 +928,7 @@ export default function AdminAuditLogsSection() {
                         setUserSearch("");
                         setUserGridPage(1);
                       }}
-                      className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-purple-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-purple-700"
+                      className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-zinc-900 bg-blue-600 px-3 py-1.5 text-xs font-bold text-white shadow-[2px_2px_0px_#18181b] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:shadow-[2px_2px_0px_#ffffff] cursor-pointer"
                     >
                       Clear Search Filter
                     </button>
@@ -949,30 +949,30 @@ export default function AdminAuditLogsSection() {
                           setUserMethod("ALL");
                           setUserStatus("ALL");
                         }}
-                        className="group cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 shadow-xs transition hover:border-purple-400 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/60 dark:hover:border-purple-700 relative overflow-hidden flex flex-col justify-between"
+                        className="group cursor-pointer rounded-xl border border-zinc-900 bg-white p-4 shadow-[3px_3px_0px_#18181b] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff] transition-all flex flex-col justify-between"
                       >
                         <div>
                           <div className="flex items-start justify-between gap-2.5">
                             <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-600 text-white font-bold text-sm shadow-sm shadow-purple-500/20">
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-zinc-900 bg-blue-600 text-white font-black text-sm shadow-[1.5px_1.5px_0px_#18181b] dark:border-white dark:shadow-[1.5px_1.5px_0px_#ffffff]">
                                 {(u.user_name || u.roll_no || "U").charAt(0).toUpperCase()}
                               </div>
                               <div className="min-w-0">
-                                <h3 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition truncate" title={u.user_name || "Unknown User"}>
+                                <h3 className="text-sm font-black text-zinc-900 dark:text-zinc-50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate" title={u.user_name || "Unknown User"}>
                                   {u.user_name || "Unknown User"}
                                 </h3>
                                 <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                                   {u.roll_no ? (
-                                    <span className="font-mono text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                                    <span className="font-mono text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
                                       {u.roll_no}
                                     </span>
                                   ) : (
-                                    <span className="text-[10px] text-slate-400 font-mono truncate max-w-[120px]" title={u.user_uid}>
+                                    <span className="text-[10px] text-zinc-400 font-mono truncate max-w-[120px]" title={u.user_uid}>
                                       UID: {u.user_uid.slice(0, 10)}...
                                     </span>
                                   )}
                                   {u.role && (
-                                    <span className="rounded-full bg-slate-100 px-1.5 py-0.2 text-[9px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                    <span className="rounded-md border border-zinc-900 bg-zinc-100 px-1.5 py-0.2 text-[9px] font-black uppercase text-zinc-800 dark:border-white dark:bg-zinc-800 dark:text-zinc-200">
                                       {u.role}
                                     </span>
                                   )}
@@ -980,28 +980,28 @@ export default function AdminAuditLogsSection() {
                               </div>
                             </div>
 
-                            <span className="rounded-xl bg-purple-50 px-2 py-0.5 text-[11px] font-bold text-purple-700 dark:bg-purple-950/80 dark:text-purple-300 border border-purple-200 dark:border-purple-900 shrink-0">
+                            <span className="rounded-md border border-zinc-900 bg-blue-50 px-2 py-0.5 text-xs font-black text-blue-700 shadow-[1px_1px_0px_#18181b] dark:border-white dark:bg-blue-950/80 dark:text-blue-300 dark:shadow-[1px_1px_0px_#ffffff] shrink-0">
                               {u.log_count} logs
                             </span>
                           </div>
 
-                          <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 grid grid-cols-2 gap-2 text-[10px]">
+                          <div className="mt-3 pt-2.5 border-t border-zinc-200 dark:border-zinc-800 grid grid-cols-2 gap-2 text-[10px]">
                             <div>
-                              <span className="text-slate-400">Last Active</span>
-                              <p className="font-medium text-slate-700 dark:text-slate-300 mt-0.5 truncate" title={formatISTDateTime(u.last_active)}>
+                              <span className="text-zinc-500 font-bold uppercase text-[9px] dark:text-zinc-400">Last Active</span>
+                              <p className="font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 truncate" title={formatISTDateTime(u.last_active)}>
                                 {timeAgo(u.last_active)}
                               </p>
                             </div>
                             <div>
-                              <span className="text-slate-400">Last Known IP</span>
-                              <p className="font-mono text-slate-700 dark:text-slate-300 mt-0.5 truncate" title={u.last_ip}>
+                              <span className="text-zinc-500 font-bold uppercase text-[9px] dark:text-zinc-400">Last Known IP</span>
+                              <p className="font-mono font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 truncate" title={u.last_ip}>
                                 {u.last_ip || "-"}
                               </p>
                             </div>
                           </div>
                         </div>
 
-                        <div className="mt-3 pt-2 border-t border-dashed border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-semibold text-purple-600 dark:text-purple-400 group-hover:translate-x-0.5 transition-transform">
+                        <div className="mt-3 pt-2 border-t border-dashed border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-xs font-black text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform">
                           <span>View Logs</span>
                           <ChevronRight className="h-4 w-4" />
                         </div>
@@ -1010,11 +1010,11 @@ export default function AdminAuditLogsSection() {
                   </div>
 
                   {/* Grid Pagination Controls */}
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/60 shadow-xs">
-                    <div className="text-xs text-slate-500 dark:text-slate-400">
-                      Showing <span className="font-semibold text-slate-900 dark:text-white">{(userGridPage - 1) * userGridLimit + 1}</span> to{" "}
-                      <span className="font-semibold text-slate-900 dark:text-white">{Math.min(userGridPage * userGridLimit, userGridTotal)}</span> of{" "}
-                      <span className="font-semibold text-slate-900 dark:text-white">{userGridTotal.toLocaleString()}</span> active users
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-zinc-900 bg-white p-4 dark:border-white dark:bg-[#111827] shadow-[3px_3px_0px_#18181b] dark:shadow-[3px_3px_0px_#ffffff]">
+                    <div className="text-xs font-bold text-zinc-600 dark:text-zinc-400">
+                      Showing <span className="font-black text-zinc-900 dark:text-zinc-50">{(userGridPage - 1) * userGridLimit + 1}</span> to{" "}
+                      <span className="font-black text-zinc-900 dark:text-zinc-50">{Math.min(userGridPage * userGridLimit, userGridTotal)}</span> of{" "}
+                      <span className="font-black text-zinc-900 dark:text-zinc-50">{userGridTotal.toLocaleString()}</span> active users
                       {userGridTotalPages > 1 && ` · Page ${userGridPage} of ${userGridTotalPages}`}
                     </div>
 
@@ -1022,20 +1022,20 @@ export default function AdminAuditLogsSection() {
                       <button
                         onClick={() => setUserGridPage((p) => Math.max(1, p - 1))}
                         disabled={userGridPage <= 1 || usersLoading}
-                        className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                        className="inline-flex items-center gap-1 rounded-lg border border-zinc-900 bg-white px-3 py-1.5 text-xs font-bold text-zinc-800 shadow-[1.5px_1.5px_0px_#18181b] hover:-translate-x-0.5 hover:-translate-y-0.5 disabled:opacity-40 disabled:hover:translate-x-0 dark:border-white dark:bg-zinc-800 dark:text-zinc-100 dark:shadow-[1.5px_1.5px_0px_#ffffff] cursor-pointer"
                       >
                         <ChevronLeft className="h-3.5 w-3.5" />
                         <span>Previous</span>
                       </button>
 
-                      <span className="text-xs font-semibold px-2 text-slate-700 dark:text-slate-300">
+                      <span className="text-xs font-black px-2 text-zinc-900 dark:text-zinc-100">
                         {userGridPage} / {userGridTotalPages}
                       </span>
 
                       <button
                         onClick={() => setUserGridPage((p) => Math.min(userGridTotalPages, p + 1))}
                         disabled={userGridPage >= userGridTotalPages || usersLoading}
-                        className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                        className="inline-flex items-center gap-1 rounded-lg border border-zinc-900 bg-white px-3 py-1.5 text-xs font-bold text-zinc-800 shadow-[1.5px_1.5px_0px_#18181b] hover:-translate-x-0.5 hover:-translate-y-0.5 disabled:opacity-40 disabled:hover:translate-x-0 dark:border-white dark:bg-zinc-800 dark:text-zinc-100 dark:shadow-[1.5px_1.5px_0px_#ffffff] cursor-pointer"
                       >
                         <span>Next</span>
                         <ChevronRight className="h-3.5 w-3.5" />
@@ -1049,35 +1049,35 @@ export default function AdminAuditLogsSection() {
             /* --- Dedicated Single User Audit Logs --- */
             <div className="space-y-4">
               {/* User Profile Header Card */}
-              <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-transparent p-5 dark:border-slate-800">
+              <div className="rounded-xl border border-zinc-900 bg-white p-5 shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[3px_3px_0px_#ffffff]">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="flex items-center gap-3.5">
                     <button
                       onClick={() => setSelectedUser(null)}
-                      className="rounded-xl border border-slate-200 bg-white p-2 text-slate-700 shadow-2xs hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                      className="rounded-lg border border-zinc-900 bg-white p-2 text-zinc-800 shadow-[2px_2px_0px_#18181b] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:bg-zinc-800 dark:text-zinc-100 dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer"
                       title="Back to All Users"
                     >
                       <ArrowLeft className="h-4 w-4" />
                     </button>
 
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-600 text-white font-bold text-base shadow-sm">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-zinc-900 bg-blue-600 text-white font-black text-lg shadow-[2px_2px_0px_#18181b] dark:border-white dark:shadow-[2px_2px_0px_#ffffff]">
                       {(selectedUser.user_name || selectedUser.roll_no || "U").charAt(0).toUpperCase()}
                     </div>
 
                     <div>
                       <div className="flex items-center gap-2">
-                        <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                        <h2 className="text-lg font-black text-zinc-900 dark:text-zinc-50">
                           {selectedUser.user_name || "User Logs"}
                         </h2>
                         {selectedUser.role && (
-                          <span className="rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-bold text-purple-700 dark:bg-purple-950 dark:text-purple-300">
+                          <span className="rounded-md border border-zinc-900 bg-blue-50 px-2 py-0.5 text-[10px] font-black uppercase text-blue-700 shadow-[1px_1px_0px_#18181b] dark:border-white dark:bg-blue-950 dark:text-blue-300 dark:shadow-[1px_1px_0px_#ffffff]">
                             {selectedUser.role}
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      <div className="flex items-center gap-3 text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 font-bold">
                         {selectedUser.roll_no && (
-                          <span className="font-mono font-medium text-slate-700 dark:text-slate-300">
+                          <span className="font-mono text-zinc-800 dark:text-zinc-200">
                             Roll: {selectedUser.roll_no}
                           </span>
                         )}
@@ -1088,15 +1088,15 @@ export default function AdminAuditLogsSection() {
 
                   <div className="flex items-center gap-3">
                     <div className="text-right">
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400">Recorded User Actions</span>
-                      <p className="text-base font-bold text-purple-600 dark:text-purple-400">
+                      <span className="text-[11px] font-bold uppercase text-zinc-500 dark:text-zinc-400">Recorded User Actions</span>
+                      <p className="text-base font-black text-blue-600 dark:text-blue-400">
                         {userLogsTotal.toLocaleString()} requests
                       </p>
                     </div>
 
                     <button
                       onClick={() => setSelectedUser(null)}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-900 bg-white px-3 py-2 text-xs font-black text-zinc-800 shadow-[2px_2px_0px_#18181b] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:border-white dark:bg-zinc-800 dark:text-zinc-100 dark:shadow-[2px_2px_0px_#ffffff] transition-all cursor-pointer"
                     >
                       <ArrowLeft className="h-3.5 w-3.5" />
                       <span>Back to All Users</span>
