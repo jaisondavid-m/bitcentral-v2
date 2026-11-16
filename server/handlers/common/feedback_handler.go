@@ -155,15 +155,25 @@ func (h *FeedbackHandler) GetAdminConversations(c *gin.Context) {
 
 	query := `
 		SELECT 
-			user_uid,
-			COALESCE((SELECT sender_name FROM feedback_messages WHERE user_uid = f.user_uid AND sender_type = 'user' ORDER BY created_at DESC LIMIT 1), 'Student') as user_name,
-			COALESCE((SELECT sender_email FROM feedback_messages WHERE user_uid = f.user_uid AND sender_type = 'user' ORDER BY created_at DESC LIMIT 1), '') as user_email,
-			COALESCE((SELECT message FROM feedback_messages WHERE user_uid = f.user_uid ORDER BY created_at DESC LIMIT 1), '') as last_message,
-			MAX(created_at) as last_activity,
-			SUM(CASE WHEN is_read_by_admin = 0 AND sender_type = 'user' THEN 1 ELSE 0 END) as unread_count
-		FROM feedback_messages f
-		GROUP BY user_uid
-		ORDER BY last_activity DESC`
+			stats.user_uid,
+			COALESCE(um.sender_name, 'Student') as user_name,
+			COALESCE(um.sender_email, '') as user_email,
+			COALESCE(lm.message, '') as last_message,
+			stats.last_activity,
+			stats.unread_count
+		FROM (
+			SELECT 
+				user_uid,
+				MAX(id) as last_msg_id,
+				MAX(CASE WHEN sender_type = 'user' THEN id END) as last_user_msg_id,
+				MAX(created_at) as last_activity,
+				COALESCE(SUM(CASE WHEN is_read_by_admin = 0 AND sender_type = 'user' THEN 1 ELSE 0 END), 0) as unread_count
+			FROM feedback_messages
+			GROUP BY user_uid
+		) stats
+		LEFT JOIN feedback_messages lm ON lm.id = stats.last_msg_id
+		LEFT JOIN feedback_messages um ON um.id = stats.last_user_msg_id
+		ORDER BY stats.last_activity DESC`
 
 	rows, err := h.DB.Query(query)
 	if err != nil {

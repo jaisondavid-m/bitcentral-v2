@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -15,12 +16,37 @@ import (
 
 type LeaveHandler struct{}
 
+var (
+	leavesCacheMu  sync.RWMutex
+	leavesCache    []studentmodels.Holiday
+	leavesCacheExp time.Time
+)
+
+func InvalidateLeavesCache() {
+	leavesCacheMu.Lock()
+	leavesCache = nil
+	leavesCacheMu.Unlock()
+}
+
 func NewLeaveHandler() *LeaveHandler {
 	return &LeaveHandler{}
 }
 
 // GetAllLeaves retrieves all leaves/holidays from database, ordered by from_date ascending
 func (h *LeaveHandler) GetAllLeaves(c *gin.Context) {
+	leavesCacheMu.RLock()
+	if leavesCache != nil && time.Now().Before(leavesCacheExp) {
+		cached := leavesCache
+		leavesCacheMu.RUnlock()
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"count":   len(cached),
+			"data":    cached,
+		})
+		return
+	}
+	leavesCacheMu.RUnlock()
+
 	if config.GetAcademicDB() == nil {
 		h.fallbackLeaves(c)
 		return
@@ -91,6 +117,11 @@ func (h *LeaveHandler) GetAllLeaves(c *gin.Context) {
 		h.fallbackLeaves(c)
 		return
 	}
+
+	leavesCacheMu.Lock()
+	leavesCache = leaves
+	leavesCacheExp = time.Now().Add(5 * time.Minute)
+	leavesCacheMu.Unlock()
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -216,6 +247,7 @@ func (h *LeaveHandler) CreateLeave(c *gin.Context) {
 	}
 
 	insertedID, _ := res.LastInsertId()
+	InvalidateLeavesCache()
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -312,6 +344,7 @@ func (h *LeaveHandler) UpdateLeave(c *gin.Context) {
 		}
 	}
 
+	InvalidateLeavesCache()
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Leave updated successfully",
@@ -345,6 +378,7 @@ func (h *LeaveHandler) DeleteLeave(c *gin.Context) {
 		return
 	}
 
+	InvalidateLeavesCache()
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Leave deleted successfully",
@@ -418,6 +452,7 @@ func (h *LeaveHandler) BatchCreateLeaves(c *gin.Context) {
 		}
 	}
 
+	InvalidateLeavesCache()
 	c.JSON(http.StatusOK, gin.H{
 		"success":  true,
 		"message":  fmt.Sprintf("Successfully added %d leave records", insertedCount),
@@ -472,6 +507,7 @@ func (h *LeaveHandler) ResetToDefaultLeaves(c *gin.Context) {
 		_, _ = stmt.Exec(hol.Name, fromDate, hol.ToDate, dayName, fromHalfDay, hol.ToHalfDay, leaveType, hol.Remarks)
 	}
 
+	InvalidateLeavesCache()
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Reset and seeded default college leaves successfully",

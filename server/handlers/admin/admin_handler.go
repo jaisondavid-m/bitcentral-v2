@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"server/config"
@@ -21,6 +22,110 @@ import (
 
 type AdminHandler struct {
 	DB *sql.DB
+}
+
+type trackerProfile struct {
+	Name       string
+	RegisterNo string
+	UserID     string
+	Department string
+	Batch      string
+	Phone      string
+}
+
+var (
+	trackerCacheMu  sync.RWMutex
+	trackerCache    map[string]trackerProfile
+	trackerCacheExp time.Time
+
+	adminUIDCacheMu  sync.RWMutex
+	adminUIDCache    map[string]bool
+	adminUIDCacheExp time.Time
+)
+
+func getCachedAdminUIDs(db *sql.DB) map[string]bool {
+	adminUIDCacheMu.RLock()
+	if adminUIDCache != nil && time.Now().Before(adminUIDCacheExp) {
+		m := adminUIDCache
+		adminUIDCacheMu.RUnlock()
+		return m
+	}
+	adminUIDCacheMu.RUnlock()
+
+	adminUIDCacheMu.Lock()
+	defer adminUIDCacheMu.Unlock()
+	if adminUIDCache != nil && time.Now().Before(adminUIDCacheExp) {
+		return adminUIDCache
+	}
+
+	res := make(map[string]bool)
+	if db != nil {
+		rows, err := db.Query(`SELECT uid FROM admins`)
+		if err == nil {
+			defer rows.Close()
+			for rows.Next() {
+				var uid string
+				if err := rows.Scan(&uid); err == nil {
+					res[uid] = true
+				}
+			}
+		}
+	}
+	adminUIDCache = res
+	adminUIDCacheExp = time.Now().Add(5 * time.Minute)
+	return res
+}
+
+func InvalidateAdminUIDCache() {
+	adminUIDCacheMu.Lock()
+	adminUIDCache = nil
+	adminUIDCacheMu.Unlock()
+}
+
+func getCachedTrackerMap(db *sql.DB) map[string]trackerProfile {
+	trackerCacheMu.RLock()
+	if trackerCache != nil && time.Now().Before(trackerCacheExp) {
+		m := trackerCache
+		trackerCacheMu.RUnlock()
+		return m
+	}
+	trackerCacheMu.RUnlock()
+
+	trackerCacheMu.Lock()
+	defer trackerCacheMu.Unlock()
+	if trackerCache != nil && time.Now().Before(trackerCacheExp) {
+		return trackerCache
+	}
+
+	res := make(map[string]trackerProfile)
+	if db != nil {
+		tRows, err := db.Query(`SELECT LOWER(TRIM(COALESCE(email, ''))), COALESCE(user_id, ''), COALESCE(id, ''), COALESCE(name, ''), COALESCE(department, ''), COALESCE(batch, ''), COALESCE(phone, '') FROM tracker_users WHERE email != ''`)
+		if err == nil {
+			defer tRows.Close()
+			for tRows.Next() {
+				var email, regNo, uID, name, dept, bStr, phone string
+				if err := tRows.Scan(&email, &regNo, &uID, &name, &dept, &bStr, &phone); err == nil && email != "" {
+					res[email] = trackerProfile{
+						Name:       name,
+						RegisterNo: regNo,
+						UserID:     uID,
+						Department: dept,
+						Batch:      bStr,
+						Phone:      phone,
+					}
+				}
+			}
+		}
+	}
+	trackerCache = res
+	trackerCacheExp = time.Now().Add(5 * time.Minute)
+	return res
+}
+
+func InvalidateTrackerCache() {
+	trackerCacheMu.Lock()
+	trackerCache = nil
+	trackerCacheMu.Unlock()
 }
 
 func NewAdminHandler() *AdminHandler {
@@ -273,12 +378,7 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 		_ = h.syncUsersToDB()
 	}
 
-	var hasIDCol bool
-	if h.DB != nil {
-		var cnt int
-		_ = h.DB.QueryRow(`SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'id'`).Scan(&cnt)
-		hasIDCol = cnt > 0
-	}
+	hasIDCol := config.UsersTableHasID(h.DB)
 
 	idQuery := "0 AS id"
 	idOrder := "creation_time DESC"
@@ -304,46 +404,8 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 	}
 	defer rows.Close()
 
-	adminRows, err := h.DB.Query(`SELECT uid FROM admins`)
-	adminByUID := make(map[string]bool)
-	if err == nil {
-		defer adminRows.Close()
-		for adminRows.Next() {
-			var uid string
-			if err := adminRows.Scan(&uid); err == nil {
-				adminByUID[uid] = true
-			}
-		}
-	}
-
-	type trackerProfile struct {
-		Name       string
-		RegisterNo string
-		UserID     string
-		Department string
-		Batch      string
-		Phone      string
-	}
-	trackerMap := make(map[string]trackerProfile)
-	if h.DB != nil {
-		tRows, err := h.DB.Query(`SELECT LOWER(TRIM(COALESCE(email, ''))), COALESCE(user_id, ''), COALESCE(id, ''), COALESCE(name, ''), COALESCE(department, ''), COALESCE(batch, ''), COALESCE(phone, '') FROM tracker_users WHERE email != ''`)
-		if err == nil {
-			defer tRows.Close()
-			for tRows.Next() {
-				var email, regNo, uID, name, dept, bStr, phone string
-				if err := tRows.Scan(&email, &regNo, &uID, &name, &dept, &bStr, &phone); err == nil && email != "" {
-					trackerMap[email] = trackerProfile{
-						Name:       name,
-						RegisterNo: regNo,
-						UserID:     uID,
-						Department: dept,
-						Batch:      bStr,
-						Phone:      phone,
-					}
-				}
-			}
-		}
-	}
+	adminByUID := getCachedAdminUIDs(h.DB)
+	trackerMap := getCachedTrackerMap(h.DB)
 
 	var allUsers []adminmodels.User
 	batchCounts := map[string]int{
@@ -776,6 +838,7 @@ func (h *AdminHandler) DeleteUser(c *gin.Context) {
 
 	_, _ = h.DB.Exec("DELETE FROM users WHERE CAST(id AS CHAR) = ? OR google_id = ? OR uid = ?", uid, uid, uid)
 	_, _ = h.DB.Exec("DELETE FROM admins WHERE uid = ?", uid)
+	InvalidateAdminUIDCache()
 
 	c.JSON(http.StatusOK, gin.H{"success": true})
 }
@@ -792,15 +855,42 @@ func (h *AdminHandler) DeleteUsersBatch(c *gin.Context) {
 		return
 	}
 
+	tx, err := h.DB.Begin()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	defer tx.Rollback()
+
+	stmtUser, err := tx.Prepare("DELETE FROM users WHERE CAST(id AS CHAR) = ? OR google_id = ? OR uid = ?")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	defer stmtUser.Close()
+
+	stmtAdmin, err := tx.Prepare("DELETE FROM admins WHERE uid = ?")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	defer stmtAdmin.Close()
+
 	deletedCount := 0
 	for _, uid := range req.UIDs {
 		if uid == "" {
 			continue
 		}
-		_, _ = h.DB.Exec("DELETE FROM users WHERE CAST(id AS CHAR) = ? OR google_id = ? OR uid = ?", uid, uid, uid)
-		_, _ = h.DB.Exec("DELETE FROM admins WHERE uid = ?", uid)
+		_, _ = stmtUser.Exec(uid, uid, uid)
+		_, _ = stmtAdmin.Exec(uid)
 		deletedCount++
 	}
+
+	if err := tx.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	InvalidateAdminUIDCache()
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -831,7 +921,8 @@ func (h *AdminHandler) UpdateUserRole(c *gin.Context) {
 		role = "user"
 	}
 
-	_, err := h.DB.Exec(`UPDATE users SET role = ? WHERE CAST(id AS CHAR) = ? OR google_id = ? OR uid = ? OR LOWER(TRIM(email)) = LOWER(TRIM(?))`, role, uid, uid, uid, uid)
+	cleanEmail := strings.ToLower(uid)
+	_, err := h.DB.Exec(`UPDATE users SET role = ? WHERE CAST(id AS CHAR) = ? OR google_id = ? OR uid = ? OR email = ?`, role, uid, uid, uid, cleanEmail)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "error": err.Error()})
 		return
@@ -843,6 +934,7 @@ func (h *AdminHandler) UpdateUserRole(c *gin.Context) {
 	} else {
 		_, _ = h.DB.Exec(`DELETE FROM admins WHERE uid = ?`, uid)
 	}
+	InvalidateAdminUIDCache()
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,

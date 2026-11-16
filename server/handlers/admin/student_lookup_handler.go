@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"server/config"
@@ -22,6 +23,10 @@ import (
 type StudentLookupHandler struct {
 	DB *sql.DB
 }
+
+var (
+	lastSeenMeCache sync.Map // map[string]time.Time
+)
 
 func NewStudentLookupHandler() *StudentLookupHandler {
 	return &StudentLookupHandler{DB: config.DB}
@@ -40,15 +45,16 @@ func (h *StudentLookupHandler) GetRollNoByEmail(c *gin.Context) {
 		return
 	}
 
+	cleanMail := strings.ToLower(mailID)
 	var rollNo string
 	err := h.DB.QueryRow(
-		`SELECT COALESCE(NULLIF(id, ''), COALESCE(user_id, '')) FROM student_details WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
-		mailID,
+		`SELECT COALESCE(NULLIF(id, ''), COALESCE(user_id, '')) FROM student_details WHERE email = ? LIMIT 1`,
+		cleanMail,
 	).Scan(&rollNo)
 	if (err != nil && errors.Is(err, sql.ErrNoRows)) || rollNo == "" {
 		err = h.DB.QueryRow(
-			`SELECT COALESCE(user_id, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) AND COALESCE(user_id, '') != '' LIMIT 1`,
-			mailID,
+			`SELECT COALESCE(user_id, '') FROM tracker_users WHERE email = ? AND COALESCE(user_id, '') != '' LIMIT 1`,
+			cleanMail,
 		).Scan(&rollNo)
 	}
 	if err == sql.ErrNoRows {
@@ -186,12 +192,7 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		}
 	}
 
-	var hasIDCol bool
-	if h.DB != nil {
-		var cnt int
-		_ = h.DB.QueryRow(`SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'id'`).Scan(&cnt)
-		hasIDCol = cnt > 0
-	}
+	hasIDCol := config.UsersTableHasID(h.DB)
 
 	idQuery := "0 AS id"
 	if hasIDCol {
@@ -203,11 +204,11 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 	queryStr := fmt.Sprintf(
 		`SELECT %s, COALESCE(google_id, COALESCE(uid, '')), COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(creation_time, ''), COALESCE(last_sign_in_time, ''), COALESCE(last_seen_at, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%%Y-%%m-%%dT%%H:%%i:%%sZ'), ''), COALESCE(role, 'user')
 		 FROM users
-		 WHERE email = ? OR LOWER(TRIM(email)) = ?
+		 WHERE email = ? OR google_id = ? OR uid = ?
 		 LIMIT 1`,
 		idQuery,
 	)
-	err := h.DB.QueryRow(queryStr, emailID, cleanEmail).Scan(
+	err := h.DB.QueryRow(queryStr, cleanEmail, emailID, emailID).Scan(
 		&user.ID,
 		&user.GoogleID,
 		&user.Email,
@@ -248,10 +249,10 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		)
 		queryStr2 := fmt.Sprintf(
 			`SELECT %s, COALESCE(google_id, COALESCE(uid, '')), COALESCE(email, ''), COALESCE(display_name, ''), COALESCE(photo_url, ''), COALESCE(creation_time, ''), COALESCE(last_sign_in_time, ''), COALESCE(last_seen_at, ''), COALESCE(blocked, 0), COALESCE(DATE_FORMAT(blocked_at, '%%Y-%%m-%%dT%%H:%%i:%%sZ'), ''), COALESCE(role, 'user')
-			 FROM users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
+			 FROM users WHERE email = ? LIMIT 1`,
 			idQuery,
 		)
-		_ = h.DB.QueryRow(queryStr2, emailID).Scan(&user.ID, &user.GoogleID, &user.Email, &user.DisplayName, &user.PhotoURL, &user.CreationTime, &user.LastSignInTime, &user.LastSeenAt, &user.IsBlocked, &user.BlockedAt, &user.Role)
+		_ = h.DB.QueryRow(queryStr2, cleanEmail).Scan(&user.ID, &user.GoogleID, &user.Email, &user.DisplayName, &user.PhotoURL, &user.CreationTime, &user.LastSignInTime, &user.LastSeenAt, &user.IsBlocked, &user.BlockedAt, &user.Role)
 		user.UID = user.GoogleID
 	} else if err != nil {
 		log.Printf("❌ GetMe DB query error for %s: %v", emailID, err)
@@ -267,7 +268,7 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		if claims.UID != "" && user.GoogleID != claims.UID {
 			oldUID := user.GoogleID
 			newUID := claims.UID
-			_, _ = h.DB.Exec(`UPDATE users SET google_id = ?, uid = ? WHERE LOWER(TRIM(email)) = LOWER(TRIM(?))`, newUID, newUID, emailID)
+			_, _ = h.DB.Exec(`UPDATE users SET google_id = ?, uid = ? WHERE email = ?`, newUID, newUID, cleanEmail)
 			_, _ = h.DB.Exec(`UPDATE admins SET uid = ? WHERE uid = ?`, newUID, oldUID)
 			if logsDB := config.GetLogsDB(); logsDB != nil {
 				_, _ = logsDB.Exec(`UPDATE feedback_messages SET user_uid = ? WHERE user_uid = ?`, newUID, oldUID)
@@ -276,19 +277,29 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 			user.UID = newUID
 		}
 		if claims.Name != "" && user.DisplayName == "" {
-			_, _ = h.DB.Exec(`UPDATE users SET display_name = ? WHERE LOWER(TRIM(email)) = LOWER(TRIM(?))`, claims.Name, emailID)
+			_, _ = h.DB.Exec(`UPDATE users SET display_name = ? WHERE email = ?`, claims.Name, cleanEmail)
 			user.DisplayName = claims.Name
 		}
 		if claims.Picture != "" && user.PhotoURL == "" {
-			_, _ = h.DB.Exec(`UPDATE users SET photo_url = ? WHERE LOWER(TRIM(email)) = LOWER(TRIM(?))`, claims.Picture, emailID)
+			_, _ = h.DB.Exec(`UPDATE users SET photo_url = ? WHERE email = ?`, claims.Picture, cleanEmail)
 			user.PhotoURL = claims.Picture
 		}
 	}
 
-	// Update last_seen_at timestamp on every /me call
-	nowSeen := time.Now().Format("2006-01-02 15:04:05")
-	if h.DB != nil {
-		_, _ = h.DB.Exec(`UPDATE users SET last_seen_at = ? WHERE email = ? OR LOWER(TRIM(email)) = ?`, nowSeen, emailID, cleanEmail)
+	// Update last_seen_at timestamp (throttled to once per 10 minutes to save DB writes)
+	now := time.Now()
+	shouldUpdateSeen := true
+	if val, ok := lastSeenMeCache.Load(cleanEmail); ok {
+		if lastT, ok := val.(time.Time); ok && now.Sub(lastT) < 10*time.Minute {
+			shouldUpdateSeen = false
+		}
+	}
+	if shouldUpdateSeen && h.DB != nil {
+		lastSeenMeCache.Store(cleanEmail, now)
+		nowSeen := now.Format("2006-01-02 15:04:05")
+		go func(targetEmail, seenTime string) {
+			_, _ = h.DB.Exec(`UPDATE users SET last_seen_at = ? WHERE email = ?`, seenTime, targetEmail)
+		}(cleanEmail, nowSeen)
 		user.LastSeenAt = nowSeen
 	}
 
@@ -395,8 +406,8 @@ func (h *StudentLookupHandler) GetMe(c *gin.Context) {
 		user.DisplayName = finalName
 	}
 
-	// Synchronize admin status from admins table
-	if h.DB != nil {
+	// Synchronize admin status from admins table if not already admin
+	if h.DB != nil && user.Role != "admin" && user.Role != "superadmin" && user.Role != "super_admin" {
 		var inAdmins int
 		_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins WHERE uid = ? OR uid = ?`, user.UID, user.GoogleID).Scan(&inAdmins)
 		if inAdmins > 0 {

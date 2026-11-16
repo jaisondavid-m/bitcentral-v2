@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -44,6 +46,26 @@ func GetLogsDB() *sql.DB {
 		return DBLogs
 	}
 	return DB
+}
+
+var (
+	usersHasIDOnce sync.Once
+	usersHasIDVal  bool = true
+)
+
+// UsersTableHasID returns whether the users table has an 'id' column, cached after first check
+func UsersTableHasID(db *sql.DB) bool {
+	if db == nil {
+		return true
+	}
+	usersHasIDOnce.Do(func() {
+		var cnt int
+		err := db.QueryRow(`SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'id'`).Scan(&cnt)
+		if err == nil {
+			usersHasIDVal = cnt > 0
+		}
+	})
+	return usersHasIDVal
 }
 
 type dbConnConfig struct {
@@ -118,8 +140,20 @@ func connectDatabase(cfg dbConnConfig) (*sql.DB, error) {
 	}
 
 	// Serverless & TiDB connection pool tuning
-	db.SetMaxOpenConns(15)
-	db.SetMaxIdleConns(5)
+	maxOpen := 25
+	if v := os.Getenv("MYSQL_MAX_OPEN_CONNS"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n > 0 {
+			maxOpen = n
+		}
+	}
+	maxIdle := 10
+	if v := os.Getenv("MYSQL_MAX_IDLE_CONNS"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n > 0 {
+			maxIdle = n
+		}
+	}
+	db.SetMaxOpenConns(maxOpen)
+	db.SetMaxIdleConns(maxIdle)
 	db.SetConnMaxLifetime(10 * time.Minute)
 	db.SetConnMaxIdleTime(2 * time.Minute)
 
@@ -429,6 +463,17 @@ func createUsersTable(db *sql.DB) {
 	// 4. Ensure unique index on google_id
 	if _, err := db.Exec(`ALTER TABLE users ADD UNIQUE INDEX idx_google_id (google_id)`); err != nil {
 		log.Printf("ℹ️ idx_google_id index status: %v", err)
+	}
+
+	// 5. Ensure indexes on frequently filtered/joined columns: email, uid, role
+	if _, err := db.Exec(`ALTER TABLE users ADD INDEX idx_users_email (email)`); err != nil {
+		log.Printf("ℹ️ idx_users_email index status: %v", err)
+	}
+	if _, err := db.Exec(`ALTER TABLE users ADD INDEX idx_users_uid (uid)`); err != nil {
+		log.Printf("ℹ️ idx_users_uid index status: %v", err)
+	}
+	if _, err := db.Exec(`ALTER TABLE users ADD INDEX idx_users_role (role)`); err != nil {
+		log.Printf("ℹ️ idx_users_role index status: %v", err)
 	}
 
 	if _, err := db.Exec(`ALTER TABLE users ADD COLUMN last_seen_at VARCHAR(64) NULL`); err != nil {

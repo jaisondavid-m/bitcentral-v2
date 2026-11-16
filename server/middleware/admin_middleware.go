@@ -33,13 +33,18 @@ func validateAdminAccess(c *gin.Context) bool {
 	if config.DB != nil {
 		var role string
 		var blocked int
+		var inAdmins bool
 		err := config.DB.QueryRow(`
-			SELECT COALESCE(role, 'user'), COALESCE(blocked, 0)
-			FROM users
-			WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)
+			SELECT 
+				COALESCE(u.role, 'user'), 
+				COALESCE(u.blocked, 0),
+				(a.uid IS NOT NULL)
+			FROM users u
+			LEFT JOIN admins a ON (a.uid = u.uid OR a.uid = u.google_id)
+			WHERE (u.google_id != '' AND u.google_id = ?) OR (u.uid != '' AND u.uid = ?) OR (u.email != '' AND u.email = ?)
 			LIMIT 1`,
 			uid, uid, email,
-		).Scan(&role, &blocked)
+		).Scan(&role, &blocked, &inAdmins)
 
 		if err == nil {
 			if blocked != 0 {
@@ -49,19 +54,19 @@ func validateAdminAccess(c *gin.Context) bool {
 			}
 
 			r := strings.ToLower(strings.TrimSpace(role))
-			if r == "admin" || r == "superadmin" || r == "super_admin" {
+			if r == "admin" || r == "superadmin" || r == "super_admin" || inAdmins {
 				utils.SetAuthContext(c, claims, true)
 				return true
 			}
 		}
 
-		// Fallback: check admins table in DB
+		// Fallback: check admins table in DB directly if user record wasn't found in users table
 		var count int
 		err = config.DB.QueryRow(`
 			SELECT COUNT(*)
 			FROM admins a
 			LEFT JOIN users u ON a.uid = u.uid
-			WHERE (a.uid = ? OR LOWER(TRIM(u.email)) = ?)
+			WHERE (a.uid = ? OR u.email = ?)
 			  AND COALESCE(u.blocked, 0) = 0`,
 			uid, email,
 		).Scan(&count)

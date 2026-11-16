@@ -126,7 +126,7 @@ func (h *TrackerUserHandler) GetProfileV2(c *gin.Context) {
 	isAdmin := false
 	if h.DB != nil {
 		var role string
-		err := h.DB.QueryRow(`SELECT role FROM users WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND LOWER(TRIM(email)) = ?)`, authenticatedUID, authenticatedUID, authenticatedEmail).Scan(&role)
+		err := h.DB.QueryRow(`SELECT role FROM users WHERE (google_id != '' AND google_id = ?) OR (uid != '' AND uid = ?) OR (email != '' AND email = ?)`, authenticatedUID, authenticatedUID, authenticatedEmail).Scan(&role)
 		if err == nil {
 			r := strings.ToLower(strings.TrimSpace(role))
 			if r == "admin" || r == "superadmin" || r == "super_admin" {
@@ -143,7 +143,7 @@ func (h *TrackerUserHandler) GetProfileV2(c *gin.Context) {
 		}
 		if !isAdmin && authenticatedEmail != "" {
 			var count int
-			_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins a JOIN users u ON a.uid = u.uid WHERE LOWER(TRIM(u.email)) = ?`, authenticatedEmail).Scan(&count)
+			_ = h.DB.QueryRow(`SELECT COUNT(*) FROM admins a JOIN users u ON a.uid = u.uid WHERE u.email = ?`, authenticatedEmail).Scan(&count)
 			if count > 0 {
 				isAdmin = true
 			}
@@ -229,6 +229,7 @@ func (h *TrackerUserHandler) GetProfileV2(c *gin.Context) {
 	}
 
 	// 4. Fetch from tracker_users table
+	cleanTarget := strings.ToLower(strings.TrimSpace(targetIdentifier))
 	trackerQuery := `
 		SELECT 
 			COALESCE(id, ''), 
@@ -239,21 +240,21 @@ func (h *TrackerUserHandler) GetProfileV2(c *gin.Context) {
 			COALESCE(phone, ''), 
 			COALESCE(department, '')
 		FROM tracker_users
-		WHERE LOWER(TRIM(email)) = LOWER(TRIM(?))
-		   OR LOWER(TRIM(user_id)) = LOWER(TRIM(?))
-		   OR LOWER(TRIM(id)) = LOWER(TRIM(?))
+		WHERE email = ?
+		   OR user_id = ?
+		   OR id = ?
 		LIMIT 1
 	`
 
 	var tID, tUserID, tName, tEmail, tBatch, tPhone, tDept string
-	trackerErr := h.DB.QueryRow(trackerQuery, targetIdentifier, targetIdentifier, targetIdentifier).Scan(
+	trackerErr := h.DB.QueryRow(trackerQuery, cleanTarget, targetIdentifier, targetIdentifier).Scan(
 		&tID, &tUserID, &tName, &tEmail, &tBatch, &tPhone, &tDept,
 	)
 
 	// 5. Fetch from users table using email, uid, or google_id
-	searchEmail := targetIdentifier
+	searchEmail := cleanTarget
 	if tEmail != "" {
-		searchEmail = tEmail
+		searchEmail = strings.ToLower(strings.TrimSpace(tEmail))
 	}
 
 	var userUID, uEmail, displayName, photoURL, creationTime, lastSignInTime string
@@ -266,9 +267,9 @@ func (h *TrackerUserHandler) GetProfileV2(c *gin.Context) {
 			COALESCE(creation_time, ''), 
 			COALESCE(last_sign_in_time, '')
 		FROM users
-		WHERE LOWER(TRIM(email)) = LOWER(TRIM(?))
-		   OR LOWER(TRIM(uid)) = LOWER(TRIM(?))
-		   OR LOWER(TRIM(google_id)) = LOWER(TRIM(?))
+		WHERE email = ?
+		   OR uid = ?
+		   OR google_id = ?
 		LIMIT 1
 	`
 	_ = h.DB.QueryRow(userQuery, searchEmail, targetIdentifier, targetIdentifier).Scan(
@@ -281,7 +282,7 @@ func (h *TrackerUserHandler) GetProfileV2(c *gin.Context) {
 		rollNo = tUserID
 	} else {
 		_ = h.DB.QueryRow(
-			`SELECT COALESCE(user_id, '') FROM tracker_users WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1`,
+			`SELECT COALESCE(user_id, '') FROM tracker_users WHERE email = ? LIMIT 1`,
 			searchEmail,
 		).Scan(&rollNo)
 	}

@@ -396,6 +396,7 @@ func (h *FacultyDirectoryHandler) SyncGoogleDirectory() {
 		}
 	}
 
+	invalidateFacultyDeptsCache()
 	log.Printf("✅ Google Contacts/Directory full sync completed. Processed records: %d", syncedCount)
 }
 
@@ -562,6 +563,71 @@ func (h *FacultyDirectoryHandler) ServeFacultyPhoto(c *gin.Context) {
 	c.File(path)
 }
 
+var (
+	facDeptsCacheMu  sync.RWMutex
+	facDeptsCache    map[string][]gin.H
+	facDeptsCacheExp map[string]time.Time
+)
+
+func getCachedFacultyDepartments(db *sql.DB, tableName string) []gin.H {
+	facDeptsCacheMu.RLock()
+	if facDeptsCache != nil {
+		if depts, ok := facDeptsCache[tableName]; ok {
+			if exp, ok2 := facDeptsCacheExp[tableName]; ok2 && time.Now().Before(exp) {
+				facDeptsCacheMu.RUnlock()
+				return depts
+			}
+		}
+	}
+	facDeptsCacheMu.RUnlock()
+
+	facDeptsCacheMu.Lock()
+	defer facDeptsCacheMu.Unlock()
+	if facDeptsCache == nil {
+		facDeptsCache = make(map[string][]gin.H)
+		facDeptsCacheExp = make(map[string]time.Time)
+	} else if depts, ok := facDeptsCache[tableName]; ok {
+		if exp, ok2 := facDeptsCacheExp[tableName]; ok2 && time.Now().Before(exp) {
+			return depts
+		}
+	}
+
+	departments := make([]gin.H, 0)
+	if db != nil {
+		deptRows, deptErr := db.Query(fmt.Sprintf(`
+			SELECT COALESCE(NULLIF(TRIM(department), ''), 'Faculty & Staff') AS dept_name, COUNT(*) AS count
+			FROM %s
+			WHERE department IS NOT NULL AND department != ''
+			  AND phone_number IS NOT NULL AND phone_number != 0 AND TRIM(CAST(phone_number AS CHAR)) != ''
+			GROUP BY dept_name
+			ORDER BY dept_name ASC
+		`, tableName))
+		if deptErr == nil {
+			defer deptRows.Close()
+			for deptRows.Next() {
+				var name string
+				var count int
+				if err := deptRows.Scan(&name, &count); err == nil {
+					departments = append(departments, gin.H{
+						"name":  name,
+						"count": count,
+					})
+				}
+			}
+		}
+	}
+	facDeptsCache[tableName] = departments
+	facDeptsCacheExp[tableName] = time.Now().Add(10 * time.Minute)
+	return departments
+}
+
+func invalidateFacultyDeptsCache() {
+	facDeptsCacheMu.Lock()
+	facDeptsCache = nil
+	facDeptsCacheExp = nil
+	facDeptsCacheMu.Unlock()
+}
+
 func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 	if c.Query("sync") == "true" || c.Query("force_sync") == "true" || c.Query("refresh") == "true" {
 		h.SyncGoogleDirectory()
@@ -647,29 +713,8 @@ func (h *FacultyDirectoryHandler) GetFacultyDirectory(c *gin.Context) {
 			totalPages = 0
 		}
 
-		// Fetch department names & counts for filter dropdown (only members with phone)
-		deptRows, deptErr := h.DB.Query(fmt.Sprintf(`
-			SELECT COALESCE(NULLIF(TRIM(department), ''), 'Faculty & Staff') AS dept_name, COUNT(*) AS count
-			FROM %s
-			WHERE department IS NOT NULL AND department != ''
-			  AND phone_number IS NOT NULL AND phone_number != 0 AND TRIM(CAST(phone_number AS CHAR)) != ''
-			GROUP BY dept_name
-			ORDER BY dept_name ASC
-		`, tableName))
-		departments := make([]gin.H, 0)
-		if deptErr == nil {
-			defer deptRows.Close()
-			for deptRows.Next() {
-				var name string
-				var count int
-				if err := deptRows.Scan(&name, &count); err == nil {
-					departments = append(departments, gin.H{
-						"name":  name,
-						"count": count,
-					})
-				}
-			}
-		}
+		// Fetch department names & counts for filter dropdown (cached for 10 minutes to save DB queries)
+		departments := getCachedFacultyDepartments(h.DB, tableName)
 
 		// Prepare server baseURL for photo links
 		scheme := "http"
