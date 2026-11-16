@@ -16,6 +16,7 @@ import AdminNotificationsSection from "@/components/admin/sections/AdminNotifica
 import AdminFeedbackSection from "@/components/admin/sections/AdminFeedbackSection.jsx";
 import AdminMailSenderSection from "@/components/admin/sections/AdminMailSenderSection.jsx";
 import AdminAuditLogsSection from "@/components/admin/sections/AdminAuditLogsSection.jsx";
+import AdminAnalyticsSection from "@/components/admin/sections/AdminAnalyticsSection.jsx";
 
 /**
  * AdminDashboard - Central dispatcher for all administrative tools in BitCentral.
@@ -69,6 +70,8 @@ function AdminDashboard({ initialTab } = {}) {
     <AdminLayout activeTab={activeTab} isSuper={isSuper}>
       {activeTab === "overview" ? (
         <AdminOverviewGrid isSuper={isSuper} />
+      ) : activeTab === "analytics" ? (
+        <AdminAnalyticsSection />
       ) : activeTab === "sponsors" ? (
         <AdminSponsorsSection />
       ) : activeTab === "cards" ? (
@@ -95,6 +98,10 @@ function AdminDashboard({ initialTab } = {}) {
 }
 
 /* -- Route Wrapper Exports for Direct Page Mounts --------------------------- */
+export function AdminAnalyticsPage() {
+  return <AdminDashboard initialTab="analytics" />;
+}
+
 export function AdminAuditLogsPage() {
   return <AdminDashboard initialTab="audit-logs" />;
 }

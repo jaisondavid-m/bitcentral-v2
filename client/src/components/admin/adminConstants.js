@@ -1,4 +1,5 @@
 import {
+  TrendingUp,
   Users,
   Contact,
   LayoutGrid,
@@ -14,6 +15,15 @@ export const CURRENT_YEAR = new Date().getFullYear();
 export const YEAR_OPTIONS = Array.from({ length: 6 }, (_, i) => CURRENT_YEAR - i);
 
 export const ADMIN_TABS = [
+  {
+    key: "analytics",
+    label: "Analytics & Growth",
+    href: "/admin/analytics",
+    icon: TrendingUp,
+    color: "emerald",
+    badge: "Market & 6K",
+    description: "Executive trade-market usage graph, DAU sparklines, all-time high user records, and 6K milestone analytics.",
+  },
   {
     key: "users",
     label: "Users",
@@ -108,6 +118,7 @@ export const ADMIN_TABS = [
 
 export function getAdminTabFromPath(pathname) {
   if (pathname === "/admin" || pathname === "/admin/") return "overview";
+  if (pathname.startsWith("/admin/analytics")) return "analytics";
   if (pathname.startsWith("/admin/audit-logs")) return "audit-logs";
   if (pathname.startsWith("/admin/user-directory")) return "user-directory";
   if (pathname.startsWith("/admin/sponsors")) return "sponsors";

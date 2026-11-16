@@ -658,4 +658,14 @@ export async function getAdminAuditAPIUsage({ search = "", method = "", timefram
   return response.data;
 }
 
+export async function getAdminAnalytics({ timeframe = "24h" } = {}) {
+  const headers = await getAdminHeaders();
+  const params = new URLSearchParams();
+  if (timeframe) params.set("timeframe", timeframe);
+
+  const response = await api.get(`/admin/analytics?${params.toString()}`, { headers });
+  return response.data;
+}
+
+
 

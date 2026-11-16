@@ -202,6 +202,14 @@ function App() {
                 }
               />
               <Route
+                path="/admin/analytics"
+                element={
+                  <AdminRoute>
+                    <AdminDashboard />
+                  </AdminRoute>
+                }
+              />
+              <Route
                 path="/admin/users"
                 element={
                   <AdminRoute>
