@@ -9,10 +9,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   RefreshCw,
-  Share2,
-  Check,
   Calendar,
-  Sparkles,
   BarChart2,
   Maximize2,
   Minimize2,
@@ -49,12 +46,11 @@ function generateSmoothPath(points) {
 }
 
 export default function AdminAnalyticsSection() {
-  const [timeframe, setTimeframe] = useState("growth");
+  const [timeframe, setTimeframe] = useState("24h");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const [hoverPos, setHoverPos] = useState({ x: 0, y: 0 });
-  const [copied, setCopied] = useState(false);
   const [cleanView, setCleanView] = useState(false);
 
   const svgRef = useRef(null);
@@ -176,17 +172,6 @@ export default function AdminAnalyticsSection() {
     setHoveredPoint(null);
   };
 
-  // Pre-formatted LinkedIn milestone text
-  const handleCopyLinkedIn = () => {
-    const totalCount = data?.total_users || 6000;
-    const peakDau = data?.peak_daily_users || 480;
-    const postText = `🚀 Milestone Unlocked: ${formatNumber(totalCount)}+ Users on BitCentral! 🎓⚡\n\nThrilled to share that BitCentral has officially crossed the ${formatNumber(totalCount)}+ active user milestone across Engineering, Technology & Management departments!\n\nKey Platform Metrics:\n📊 Total Registered Learners & Staff: ${formatNumber(totalCount)}+\n🔥 Peak Daily Active Users (ATH): ${formatNumber(peakDau)}\n⚡ Daily Campus Engagements & Real-Time Academic Logs\n\nBuilding tools that empower students and make campus navigation effortless has been an incredible experience. Grateful to everyone in our community who trusts and uses BitCentral every day!\n\n#CampusTech #BitCentral #Milestone #StudentInnovation #BuildInPublic #6KUsers`;
-
-    navigator.clipboard.writeText(postText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
-  };
-
   // Summary figures
   const totalUsers = data?.total_users || 6000;
   const activeToday = data?.active_today || 1;
@@ -231,13 +216,11 @@ export default function AdminAnalyticsSection() {
             {/* Timeframe Pill Buttons */}
             <div className="inline-flex rounded-lg border border-zinc-900 bg-zinc-100 p-1 shadow-[2px_2px_0px_#18181b] dark:border-white dark:bg-zinc-800 dark:shadow-[2px_2px_0px_#ffffff]">
               {[
-                { id: "growth", label: "6K GROWTH", icon: Sparkles },
-                { id: "24h", label: "24H", icon: null },
-                { id: "7d", label: "7D", icon: null },
-                { id: "30d", label: "30D", icon: null },
+                { id: "24h", label: "24H" },
+                { id: "7d", label: "7D" },
+                { id: "30d", label: "30D" },
               ].map((tab) => {
                 const active = timeframe === tab.id;
-                const Icon = tab.icon;
                 return (
                   <button
                     key={tab.id}
@@ -248,31 +231,11 @@ export default function AdminAnalyticsSection() {
                         : "text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
                     }`}
                   >
-                    {Icon && <Icon className="h-3 w-3" />}
                     <span>{tab.label}</span>
                   </button>
                 );
               })}
             </div>
-
-            {/* LinkedIn Copy Snippet Button */}
-            <button
-              onClick={handleCopyLinkedIn}
-              className="flex items-center gap-1.5 rounded-lg border border-zinc-900 bg-blue-600 px-3 py-1.5 text-xs font-black text-white shadow-[2px_2px_0px_#18181b] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_#18181b] dark:border-white dark:bg-blue-600 dark:shadow-[2px_2px_0px_#ffffff]"
-              title="Copy verified metrics draft for your LinkedIn post"
-            >
-              {copied ? (
-                <>
-                  <Check className="h-3.5 w-3.5 stroke-[3]" />
-                  <span>Copied for LinkedIn!</span>
-                </>
-              ) : (
-                <>
-                  <Share2 className="h-3.5 w-3.5 stroke-[2.5]" />
-                  <span>LinkedIn Post Draft</span>
-                </>
-              )}
-            </button>
 
             {/* Clean Screenshot Mode Toggle */}
             <button
@@ -688,48 +651,6 @@ export default function AdminAnalyticsSection() {
             </span>
           </div>
         </div>
-      </div>
-
-      {/* Celebrating 6K Milestone LinkedIn Banner (Screenshot-Ready) */}
-      <div className="flex flex-col items-center justify-between gap-3 rounded-xl border border-zinc-900 bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-600 p-4 text-white shadow-[3px_3px_0px_#18181b] sm:flex-row dark:border-white dark:shadow-[3px_3px_0px_#ffffff]">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white bg-white/20 shadow-[1.5px_1.5px_0px_#ffffff] backdrop-blur-sm">
-            <Award className="h-6 w-6 stroke-[2.5]" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black uppercase tracking-wider text-amber-200">
-                OFFICIAL MILESTONE ANNOUNCEMENT
-              </span>
-              <span className="rounded bg-black/30 px-1.5 py-0.2 font-mono text-[10px] font-bold text-white">
-                6,000+ USERS
-              </span>
-            </div>
-            <p className="text-sm font-black leading-tight sm:text-base">
-              BitCentral Platform Crosses 6,000+ Verified Campus Users!
-            </p>
-            <p className="text-xs font-medium text-white/90">
-              Powering daily attendance, timetables, mess menus, notices, and student portals.
-            </p>
-          </div>
-        </div>
-
-        <button
-          onClick={handleCopyLinkedIn}
-          className="shrink-0 flex items-center gap-2 rounded-lg border border-zinc-900 bg-white px-4 py-2 text-xs font-black text-zinc-900 shadow-[2px_2px_0px_#18181b] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_#18181b]"
-        >
-          {copied ? (
-            <>
-              <Check className="h-4 w-4 text-emerald-600 stroke-[3]" />
-              <span>LinkedIn Text Copied!</span>
-            </>
-          ) : (
-            <>
-              <Share2 className="h-4 w-4 text-blue-600 stroke-[2.5]" />
-              <span>Copy LinkedIn Post</span>
-            </>
-          )}
-        </button>
       </div>
     </div>
   );
