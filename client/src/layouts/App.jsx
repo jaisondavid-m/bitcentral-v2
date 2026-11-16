@@ -1,6 +1,5 @@
 import React, { Suspense } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
-import { Analytics } from "@vercel/analytics/react";
 import FullScreenLoader from "@/components/common/FullScreenLoader.jsx";
 import SEO from "@/components/common/SEO.jsx";
 import NetworkStatusToast from "@/components/common/NetworkStatusToast.jsx";
@@ -307,7 +306,6 @@ function App() {
           </div>
         </Suspense>
       </ErrorBoundary>
-      <Analytics />
       <NetworkStatusToast />
       <FloatingMenu />
     </>

@@ -5,7 +5,7 @@
  * Security: Strictly bypasses all API, Auth, Admin, and Payment transactions.
  */
 
-const VERSION = "bitcentral-v2.1.0";
+const VERSION = "bitcentral-v2.1.1";
 const CACHE_STATIC = `${VERSION}-static`;
 const CACHE_DYNAMIC = `${VERSION}-dynamic`;
 const CACHE_IMAGES = `${VERSION}-images`;
@@ -117,6 +117,25 @@ const OFFLINE_HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
+function isValidStaticResponse(request, response) {
+  if (!response || !response.ok) {
+    return false;
+  }
+
+  const contentType = response.headers.get("content-type") || "";
+  const pathname = new URL(request.url).pathname;
+
+  if (pathname.endsWith(".js")) {
+    return contentType.includes("javascript");
+  }
+
+  if (pathname.endsWith(".css")) {
+    return contentType.includes("text/css");
+  }
+
+  return true;
+}
+
 // 1. Install event: Pre-cache core shell
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -222,20 +241,25 @@ self.addEventListener("fetch", (event) => {
   if (isStaticAsset) {
     event.respondWith(
       caches.match(request).then((cachedResponse) => {
+        const validCachedResponse = isValidStaticResponse(request, cachedResponse)
+          ? cachedResponse
+          : null;
         const fetchPromise = fetch(request)
           .then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
+            if (isValidStaticResponse(request, networkResponse)) {
               const clone = networkResponse.clone();
               const targetCache = url.pathname.match(/\.(png|jpg|jpeg|webp|svg|ico)$/i)
                 ? CACHE_IMAGES
                 : CACHE_DYNAMIC;
               caches.open(targetCache).then((cache) => cache.put(request, clone));
             }
-            return networkResponse;
+            return isValidStaticResponse(request, networkResponse)
+              ? networkResponse
+              : validCachedResponse || networkResponse;
           })
-          .catch(() => cachedResponse);
+          .catch(() => validCachedResponse);
 
-        return cachedResponse || fetchPromise;
+        return validCachedResponse || fetchPromise;
       })
     );
     return;
