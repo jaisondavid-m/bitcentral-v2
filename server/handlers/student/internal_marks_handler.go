@@ -27,6 +27,17 @@ type InternalMarksCacheEntry struct {
 	ExpiresAt time.Time `json:"expires_at"`
 }
 
+type negativeCacheEntry struct {
+	errMsg    string
+	expiresAt time.Time
+}
+
+type flightCall struct {
+	wg  sync.WaitGroup
+	val string
+	err error
+}
+
 type GradioJoinPayload struct {
 	Data        []interface{} `json:"data"`
 	EventData   interface{}   `json:"event_data"`
@@ -45,8 +56,16 @@ type GradioSSEEvent struct {
 }
 
 const (
-	InternalMarksCacheDuration = 6 * time.Hour
-	GradioSpaceHost            = "https://praneshjs-rewardpointssite.hf.space"
+	// Cache full marks for 48 hours to minimize load on Hugging Face Space
+	InternalMarksCacheDuration = 48 * time.Hour
+	// If the cache only has IP-1 but lacks IP-2, still keep it for 12 hours (avoiding 30-min polling stampedes)
+	InternalMarksIncompleteDuration = 12 * time.Hour
+	// Cooldown interval to prevent spamming forced refreshes (?refresh=true)
+	InternalMarksMinRefreshInterval = 15 * time.Minute
+	// Negative cache duration for failed requests / non-existent students
+	InternalMarksNegativeCacheDuration = 15 * time.Minute
+	// Host of the Hugging Face Gradio Space
+	GradioSpaceHost = "https://praneshjs-rewardpointssite.hf.space"
 )
 
 var istLocation = time.FixedZone("IST", 5*3600+30*60)
@@ -56,16 +75,19 @@ func formatIST(t time.Time) string {
 }
 
 type InternalMarksHandler struct {
-	mu           sync.RWMutex
-	memoryCache  map[string]InternalMarksCacheEntry
-	inFlightMu   sync.Mutex
-	inFlightReqs map[string]chan struct{}
+	mu            sync.RWMutex
+	memoryCache   map[string]InternalMarksCacheEntry
+	negativeMu    sync.RWMutex
+	negativeCache map[string]negativeCacheEntry
+	flightMu      sync.Mutex
+	flightCalls   map[string]*flightCall
 }
 
 func NewInternalMarksHandler() *InternalMarksHandler {
 	h := &InternalMarksHandler{
-		memoryCache:  make(map[string]InternalMarksCacheEntry),
-		inFlightReqs: make(map[string]chan struct{}),
+		memoryCache:   make(map[string]InternalMarksCacheEntry),
+		negativeCache: make(map[string]negativeCacheEntry),
+		flightCalls:   make(map[string]*flightCall),
 	}
 	h.initDBTable()
 	return h
@@ -100,8 +122,8 @@ func (h *InternalMarksHandler) getFromMemory(rollNo string) (InternalMarksCacheE
 	if time.Now().After(entry.ExpiresAt) {
 		return InternalMarksCacheEntry{}, false
 	}
-	// If the cache only has IP-1 but lacks IP-2, expire it so fresh complete marks can be fetched
-	if !strings.Contains(entry.RawData, "IP-2") && time.Since(entry.CachedAt) > 30*time.Minute {
+	// If the cache only has IP-1 but lacks IP-2, expire after InternalMarksIncompleteDuration (12h)
+	if !strings.Contains(entry.RawData, "IP-2") && time.Since(entry.CachedAt) > InternalMarksIncompleteDuration {
 		return InternalMarksCacheEntry{}, false
 	}
 	return entry, true
@@ -111,6 +133,29 @@ func (h *InternalMarksHandler) saveToMemory(entry InternalMarksCacheEntry) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	h.memoryCache[entry.RollNo] = entry
+}
+
+func (h *InternalMarksHandler) getNegativeCache(rollNo string) (string, bool) {
+	h.negativeMu.RLock()
+	defer h.negativeMu.RUnlock()
+
+	entry, ok := h.negativeCache[rollNo]
+	if !ok {
+		return "", false
+	}
+	if time.Now().After(entry.expiresAt) {
+		return "", false
+	}
+	return entry.errMsg, true
+}
+
+func (h *InternalMarksHandler) setNegativeCache(rollNo string, errMsg string) {
+	h.negativeMu.Lock()
+	defer h.negativeMu.Unlock()
+	h.negativeCache[rollNo] = negativeCacheEntry{
+		errMsg:    errMsg,
+		expiresAt: time.Now().Add(InternalMarksNegativeCacheDuration),
+	}
 }
 
 func (h *InternalMarksHandler) getFromDB(rollNo string) (InternalMarksCacheEntry, bool) {
@@ -124,8 +169,8 @@ func (h *InternalMarksHandler) getFromDB(rollNo string) (InternalMarksCacheEntry
 	if err != nil {
 		return InternalMarksCacheEntry{}, false
 	}
-	// If the cache only has IP-1 but lacks IP-2, expire it so fresh complete marks can be fetched
-	if !strings.Contains(entry.RawData, "IP-2") && time.Since(entry.CachedAt) > 30*time.Minute {
+	// If the cache only has IP-1 but lacks IP-2, check incomplete duration
+	if !strings.Contains(entry.RawData, "IP-2") && time.Since(entry.CachedAt) > InternalMarksIncompleteDuration {
 		return InternalMarksCacheEntry{}, false
 	}
 	// Sync back to in-memory cache
@@ -241,6 +286,30 @@ func (h *InternalMarksHandler) fetchFromHuggingFace(rollNo string) (string, erro
 	return "", fmt.Errorf("gradio stream completed without output")
 }
 
+// Single-flight deduplication: ensures multiple concurrent queries for the same roll number only result in 1 call to Hugging Face
+func (h *InternalMarksHandler) fetchWithSingleFlight(rollNo string) (string, error) {
+	h.flightMu.Lock()
+	if c, ok := h.flightCalls[rollNo]; ok {
+		h.flightMu.Unlock()
+		c.wg.Wait()
+		return c.val, c.err
+	}
+
+	c := new(flightCall)
+	c.wg.Add(1)
+	h.flightCalls[rollNo] = c
+	h.flightMu.Unlock()
+
+	c.val, c.err = h.fetchFromHuggingFace(rollNo)
+	c.wg.Done()
+
+	h.flightMu.Lock()
+	delete(h.flightCalls, rollNo)
+	h.flightMu.Unlock()
+
+	return c.val, c.err
+}
+
 // GetInternalMarksConversion handles GET /internal-marks/conversion?roll_no=...
 func (h *InternalMarksHandler) GetInternalMarksConversion(c *gin.Context) {
 	rollNo := strings.TrimSpace(c.Query("roll_no"))
@@ -258,69 +327,61 @@ func (h *InternalMarksHandler) GetInternalMarksConversion(c *gin.Context) {
 	normRoll := strings.ToUpper(strings.ReplaceAll(rollNo, " ", ""))
 	forceRefresh := c.Query("refresh") == "true"
 
-	if !forceRefresh {
-		// 1. Check in-memory cache (fastest)
-		if entry, found := h.getFromMemory(normRoll); found {
+	// 1. Check negative cache first (to prevent spamming failing roll numbers)
+	if errMsg, isCachedErr := h.getNegativeCache(normRoll); isCachedErr && !forceRefresh {
+		c.Header("X-Cache", "NEGATIVE_HIT")
+		c.JSON(http.StatusBadGateway, gin.H{
+			"success": false,
+			"error":   fmt.Sprintf("Hugging Face error (cooldown active): %s", errMsg),
+			"cached":  true,
+		})
+		return
+	}
+
+	// 2. Check existing cache (Memory first, then DB)
+	existingEntry, hasExisting := h.getFromMemory(normRoll)
+	if !hasExisting {
+		existingEntry, hasExisting = h.getFromDB(normRoll)
+	}
+
+	if hasExisting {
+		if !forceRefresh {
+			// Normal cache hit
+			c.Header("Cache-Control", "public, max-age=1800, stale-while-revalidate=3600")
+			c.Header("X-Cache", "HIT")
 			c.JSON(http.StatusOK, gin.H{
 				"success":    true,
 				"roll_no":    normRoll,
-				"raw":        entry.RawData,
+				"raw":        existingEntry.RawData,
 				"cached":     true,
-				"cached_at":  formatIST(entry.CachedAt),
-				"expires_at": formatIST(entry.ExpiresAt),
+				"cached_at":  formatIST(existingEntry.CachedAt),
+				"expires_at": formatIST(existingEntry.ExpiresAt),
 			})
 			return
 		}
 
-		// 2. Check DB cache
-		if entry, found := h.getFromDB(normRoll); found {
+		// forceRefresh is requested: Enforce cooldown rate-limit (15 min)
+		if time.Since(existingEntry.CachedAt) < InternalMarksMinRefreshInterval {
+			c.Header("Cache-Control", "public, max-age=300")
+			c.Header("X-Cache", "HIT_COOLDOWN")
 			c.JSON(http.StatusOK, gin.H{
 				"success":    true,
 				"roll_no":    normRoll,
-				"raw":        entry.RawData,
+				"raw":        existingEntry.RawData,
 				"cached":     true,
-				"cached_at":  formatIST(entry.CachedAt),
-				"expires_at": formatIST(entry.ExpiresAt),
+				"cached_at":  formatIST(existingEntry.CachedAt),
+				"expires_at": formatIST(existingEntry.ExpiresAt),
+				"notice":     "Data was updated recently. Refresh cooldown active (15 minutes).",
 			})
 			return
 		}
 	}
 
-	// 3. Prevent duplicate concurrent in-flight requests for the same roll number (Single-flight protection)
-	h.inFlightMu.Lock()
-	ch, inFlight := h.inFlightReqs[normRoll]
-	if inFlight {
-		h.inFlightMu.Unlock()
-		// Wait for the in-flight request to finish
-		<-ch
-		// Check cache again
-		if entry, found := h.getFromMemory(normRoll); found {
-			c.JSON(http.StatusOK, gin.H{
-				"success":    true,
-				"roll_no":    normRoll,
-				"raw":        entry.RawData,
-				"cached":     true,
-				"cached_at":  formatIST(entry.CachedAt),
-				"expires_at": formatIST(entry.ExpiresAt),
-			})
-			return
-		}
-	} else {
-		ch = make(chan struct{})
-		h.inFlightReqs[normRoll] = ch
-		h.inFlightMu.Unlock()
-		defer func() {
-			h.inFlightMu.Lock()
-			delete(h.inFlightReqs, normRoll)
-			close(ch)
-			h.inFlightMu.Unlock()
-		}()
-	}
-
-	// 4. Fetch from Hugging Face Gradio API
-	rawData, err := h.fetchFromHuggingFace(normRoll)
+	// 3. Fetch from Hugging Face with single-flight deduplication
+	rawData, err := h.fetchWithSingleFlight(normRoll)
 	if err != nil {
 		log.Printf("❌ Failed to fetch internal marks from HF for %s: %v", normRoll, err)
+		h.setNegativeCache(normRoll, err.Error())
 		c.JSON(http.StatusBadGateway, gin.H{
 			"success": false,
 			"error":   fmt.Sprintf("Failed to fetch conversion from Hugging Face: %v", err),
@@ -329,7 +390,11 @@ func (h *InternalMarksHandler) GetInternalMarksConversion(c *gin.Context) {
 	}
 
 	now := time.Now()
-	expiresAt := now.Add(InternalMarksCacheDuration)
+	ttl := InternalMarksCacheDuration
+	if !strings.Contains(rawData, "IP-2") {
+		ttl = InternalMarksIncompleteDuration
+	}
+	expiresAt := now.Add(ttl)
 
 	entry := InternalMarksCacheEntry{
 		RollNo:    normRoll,
@@ -338,10 +403,12 @@ func (h *InternalMarksHandler) GetInternalMarksConversion(c *gin.Context) {
 		ExpiresAt: expiresAt,
 	}
 
-	// 5. Store in 48-hour cache (Memory + DB)
+	// 4. Store in memory and persist in DB
 	h.saveToMemory(entry)
 	go h.saveToDB(entry)
 
+	c.Header("Cache-Control", "public, max-age=1800, stale-while-revalidate=3600")
+	c.Header("X-Cache", "MISS")
 	c.JSON(http.StatusOK, gin.H{
 		"success":    true,
 		"roll_no":    normRoll,
