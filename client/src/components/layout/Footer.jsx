@@ -64,7 +64,7 @@ export default function Footer() {
             </a>
             <span className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-900 bg-white px-2.5 py-1 text-xs font-bold text-zinc-900 shadow-[2px_2px_0px_#18181b] dark:border-white dark:bg-zinc-900 dark:text-white dark:shadow-[2px_2px_0px_#ffffff]">
               <Phone className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-              +91 98437 77817
+              +91 
             </span>
           </div>
         </div>

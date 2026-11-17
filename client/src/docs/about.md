@@ -42,5 +42,5 @@ Hi, I'm **Jaison David M**, a 1st-year CSE student at Bannari Amman Institute of
 Have questions or feedback? Feel free to reach out.
 
 - **Email:** [developer@bitsathy.in](mailto:developer@bitsathy.in)
-- **Phone:** [+91 98437 77817](tel:+919843777817)
+- **Phone:** [+91 ](tel:+91)
 - **Feedback Form:** [Submit your feedback](https://forms.gle/LSMMFVBHSPUvPKKK9)

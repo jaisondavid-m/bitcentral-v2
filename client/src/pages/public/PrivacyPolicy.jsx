@@ -93,8 +93,8 @@ function PrivacyPolicy() {
                 developer@bitsathy.in
               </a>{" "}
               or call{" "}
-              <a className="font-black text-blue-600 hover:underline dark:text-blue-400" href="tel:+919843777817">
-                +91 98437 77817
+              <a className="font-black text-blue-600 hover:underline dark:text-blue-400" href="tel:+91">
+                +91 
               </a>.
             </p>
           </section>

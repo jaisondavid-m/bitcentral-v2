@@ -8,7 +8,7 @@ const developerLinks = [
   { label: "GitHub", href: "https://github.com/jaisondavid-m", icon: Github },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/jaison-david-m-a14072360/", icon: Linkedin },
   { label: "Email", href: "mailto:developer@bitsathy.in", icon: Mail },
-  { label: "Phone", href: "tel:+919843777817", icon: Phone },
+  { label: "Phone", href: "tel:+91", icon: Phone },
 ];
 
 export default function Developer() {
