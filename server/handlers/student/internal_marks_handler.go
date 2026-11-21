@@ -1,6 +1,7 @@
 package student
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -182,8 +183,54 @@ type internalSubjectPair struct {
 	MaxMarks float64
 }
 
-// buildInternalMarksIndex fetches the Google Sheet via Sheets API using view-only account credentials
+// parseInternalMarksFromCSV reads and parses a local CSV file
+func parseInternalMarksFromCSV(filePath string) (map[string]StudentInternalMarks, error) {
+	f, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	reader := csv.NewReader(f)
+	reader.FieldsPerRecord = -1
+	reader.LazyQuotes = true
+	records, err := reader.ReadAll()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read CSV %s: %w", filePath, err)
+	}
+
+	values := make([][]interface{}, len(records))
+	for i, row := range records {
+		rowIface := make([]interface{}, len(row))
+		for j, cell := range row {
+			rowIface[j] = cell
+		}
+		values[i] = rowIface
+	}
+	return parseInternalMarksValues(values)
+}
+
+// buildInternalMarksIndex fetches the Google Sheet via Sheets API, or loads a local CSV
 func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInternalMarks, error) {
+	// 1. Try local CSV file first if present
+	csvCandidates := []string{
+		"data/internal_marks.csv",
+		"server/data/internal_marks.csv",
+		"../server/data/internal_marks.csv",
+		"internal_marks.csv",
+	}
+	for _, p := range csvCandidates {
+		if st, err := os.Stat(p); err == nil && !st.IsDir() {
+			log.Printf("📄 Found local internal marks CSV at %s, parsing...", p)
+			idx, err := parseInternalMarksFromCSV(p)
+			if err == nil && len(idx) > 0 {
+				log.Printf("✅ Loaded %d students from %s", len(idx), p)
+				return idx, nil
+			}
+			log.Printf("⚠️ Error parsing %s: %v", p, err)
+		}
+	}
+
 	rawEnv := os.Getenv("INTERNAL_MARKS_SHEET")
 	if rawEnv == "" {
 		rawEnv = os.Getenv("INTERNAL_MARKS_SHEET_ID")
@@ -192,11 +239,11 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 		rawEnv = os.Getenv("Internal_Marks_sheet")
 	}
 	if rawEnv == "" {
-		return nil, fmt.Errorf("INTERNAL_MARKS_SHEET is not set in server/.env")
+		return nil, fmt.Errorf("INTERNAL_MARKS_SHEET is not set in server/.env, and server/data/internal_marks.csv was not found")
 	}
 
 	if strings.Contains(rawEnv, "2PACX-") || strings.Contains(rawEnv, "/d/e/") {
-		return nil, fmt.Errorf("INTERNAL_MARKS_SHEET in server/.env is set to a web-published link (2PACX-...). Google Sheets API requires the Google Sheet ID (e.g. 1iPxhqWG... or https://docs.google.com/spreadsheets/d/<ID>/edit), exactly like RP_Detailed_sheet. Please copy the Spreadsheet ID and update INTERNAL_MARKS_SHEET.")
+		return nil, fmt.Errorf("Web-published links (2PACX-...) cannot be read by Google Sheets API without browser cookies. Please download the CSV from your browser and place it in server/data/internal_marks.csv, OR import it to your Google Drive and set the new Sheet ID.")
 	}
 
 	spreadsheetID := cleanSpreadsheetID(rawEnv)
@@ -251,9 +298,12 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 		return nil, fmt.Errorf("failed to fetch values for tab %s: %w", tabName, err)
 	}
 
-	values := vr.Values
+	return parseInternalMarksValues(vr.Values)
+}
+
+func parseInternalMarksValues(values [][]interface{}) (map[string]StudentInternalMarks, error) {
 	if len(values) < 3 {
-		return nil, fmt.Errorf("sheet %s has insufficient rows (got %d)", spreadsheetID, len(values))
+		return nil, fmt.Errorf("data has insufficient rows (got %d)", len(values))
 	}
 
 	// 3. Detect column positions dynamically from header rows
