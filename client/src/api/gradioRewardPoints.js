@@ -280,6 +280,16 @@ function setLocalCachedData(rollNo, rawData) {
   }
 }
 
+function parseLocalCache(raw) {
+  if (!raw) return null;
+  try {
+    if (raw.startsWith("{") && raw.includes('"subjects"')) {
+      return JSON.parse(raw);
+    }
+  } catch {}
+  return parseInternalMarksSummary(raw);
+}
+
 export async function fetchInternalMarkConversion(rollNo, forceRefresh = false) {
   if (!rollNo) {
     throw new Error("Roll number is required");
@@ -292,11 +302,11 @@ export async function fetchInternalMarkConversion(rollNo, forceRefresh = false) 
   if (localCached?.raw) {
     // If not forcing refresh, immediately return cached result without hitting network
     if (!forceRefresh) {
-      return parseInternalMarksSummary(localCached.raw);
+      return parseLocalCache(localCached.raw);
     }
     // If forcing refresh, enforce client cooldown (3 min) to prevent rapid-fire clicks
     if (Date.now() - localCached.timestamp < CLIENT_MIN_REFRESH_INTERVAL_MS) {
-      return parseInternalMarksSummary(localCached.raw);
+      return parseLocalCache(localCached.raw);
     }
   }
 
@@ -306,9 +316,52 @@ export async function fetchInternalMarkConversion(rollNo, forceRefresh = false) 
     const res = await api.get(
       `/internal-marks/conversion?roll_no=${encodeURIComponent(cleanRollNo)}${refreshParam}`
     );
-    if (res.data?.success && res.data?.raw) {
-      setLocalCachedData(cleanRollNo, res.data.raw);
-      return parseInternalMarksSummary(res.data.raw);
+    if (res.data?.success) {
+      if (res.data.subjects && Array.isArray(res.data.subjects)) {
+        const subjects = res.data.subjects.map((s) => ({
+          code: s.code,
+          category: s.category || "Theory Subjects",
+          internalMarks: { Total: String(s.mark) },
+          rewardPoints: {},
+          totalMarks: s.mark,
+          maxMarks: s.max_marks || 30,
+        }));
+        const maxMarks =
+          res.data.overall?.max_marks ||
+          subjects.reduce((sum, s) => sum + (s.maxMarks || 30), 0);
+        const earnedMarks =
+          res.data.overall?.total_internal_marks !== undefined
+            ? res.data.overall.total_internal_marks
+            : subjects.reduce((sum, s) => sum + s.totalMarks, 0);
+
+        const parsed = {
+          title: "Internal Marks Summary",
+          subjects,
+          overall: {
+            totalSubjects: String(res.data.overall?.total_subjects || subjects.length),
+            totalInternalMarks: String(earnedMarks),
+            maxMarks,
+            percentage:
+              res.data.overall?.percentage ||
+              (maxMarks > 0 ? Math.round((earnedMarks / maxMarks) * 1000) / 10 : 0),
+            breakdown: [],
+            rewardPointsBreakdown: { category: "", periods: {} },
+            internalMarksBreakdown: { category: "", periods: {} },
+          },
+          studentName: res.data.student_name,
+          department: res.data.department,
+          year: res.data.year,
+          degree: res.data.degree,
+          raw: res.data.raw || "",
+        };
+        setLocalCachedData(cleanRollNo, JSON.stringify(parsed));
+        return parsed;
+      }
+
+      if (res.data?.raw) {
+        setLocalCachedData(cleanRollNo, res.data.raw);
+        return parseInternalMarksSummary(res.data.raw);
+      }
     }
   } catch (err) {
     console.warn("Backend internal marks cache route failed, evaluating fallback:", err);
@@ -333,7 +386,7 @@ export async function fetchInternalMarkConversion(rollNo, forceRefresh = false) 
   } catch (directErr) {
     // If we have stale local cached data, prefer returning that over a failure
     if (localCached?.raw) {
-      return parseInternalMarksSummary(localCached.raw);
+      return parseLocalCache(localCached.raw);
     }
     throw directErr;
   }

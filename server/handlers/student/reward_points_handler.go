@@ -276,6 +276,12 @@ func (h *SheetHandler) getSheetsService() *sheets.Service {
 	return h.sheetsSvc
 }
 
+func (h *SheetHandler) GetSheetsService() *sheets.Service {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	return h.sheetsSvc
+}
+
 func (h *SheetHandler) HandleLogin(c *gin.Context) {
 	if h.oauthConfig == nil {
 		h.InitOAuth()

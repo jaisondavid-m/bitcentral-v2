@@ -295,7 +295,7 @@ func buildSeatingData11Nov2026AN() []studentmodels.SeatingRecord {
 
 // ============================================================================
 // 13-11-2026 FORENOON SESSION (FN: 09:00 AM – 12:00 PM) - Total: 56 Students
-// ============================================================================
+// ==========A==================================================================
 func buildSeatingData13Nov2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
 		// --------------------------------------------------------------------

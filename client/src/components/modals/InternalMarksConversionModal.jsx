@@ -38,12 +38,16 @@ export default function InternalMarksConversionModal({
   const rollNo = String(
     student?.roll_no || student?.user_id || student?.reg_no || data?.roll_no || ""
   ).trim();
-  const studentName = student?.student_name || "Student";
-  const subjects = data?.subjects || [];
+  const studentName = student?.student_name || data?.studentName || "Student";
+  const subjects = (data?.subjects || []).filter((s) => s && s.code);
   const hasParsedSubjects = subjects.length > 0;
   const overall = data?.overall || null;
-  const totalEarnedMarks = parseFloat(overall?.totalInternalMarks) || 0;
-  const maxPossibleMarks = subjects.length * 30;
+  const totalEarnedMarks =
+    parseFloat(overall?.totalInternalMarks || overall?.total_internal_marks) || 0;
+  const maxPossibleMarks =
+    overall?.maxMarks ||
+    overall?.max_marks ||
+    subjects.reduce((sum, s) => sum + (s.maxMarks || s.max_marks || 30), 0);
 
   return (
     <div
@@ -156,21 +160,23 @@ export default function InternalMarksConversionModal({
               <div className="flex items-center justify-between px-1 pb-1">
                 <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                   <BookOpen className="h-3.5 w-3.5 text-indigo-500" />
-                  <span>Theory Subjects ({subjects.length})</span>
+                  <span>Evaluated Subjects ({subjects.length})</span>
                 </h4>
                 {totalEarnedMarks > 0 && (
                   <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                    Total: {formatScore(totalEarnedMarks)} / {maxPossibleMarks}
+                    Total: {formatScore(totalEarnedMarks)} / {formatScore(maxPossibleMarks)}
                   </span>
                 )}
               </div>
 
               {subjects.map((sub, idx) => {
                 const subjectTotalMarks =
-                  sub.totalMarks ||
-                  parseFloat(sub.internalMarks?.Total || sub.internalMarks?.total || "0") ||
-                  0;
-                const isSubjectFullMarks = subjectTotalMarks >= 30;
+                  sub.totalMarks !== undefined
+                    ? sub.totalMarks
+                    : parseFloat(sub.internalMarks?.Total || sub.internalMarks?.total || "0") ||
+                      0;
+                const subjectMaxMarks = sub.maxMarks || sub.max_marks || 30;
+                const isSubjectFullMarks = subjectTotalMarks >= subjectMaxMarks;
 
                 // Extract period keys (IP-1, IP-2) excluding 'Total'
                 const periodKeys = Array.from(
@@ -195,9 +201,16 @@ export default function InternalMarksConversionModal({
                         <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-600 dark:text-slate-400 font-mono shrink-0">
                           #{idx + 1}
                         </span>
-                        <span className="font-mono font-bold text-sm text-slate-900 dark:text-white tracking-wide">
-                          {sub.code}
-                        </span>
+                        <div className="flex flex-col min-w-0">
+                          <span className="font-mono font-bold text-sm text-slate-900 dark:text-white tracking-wide truncate">
+                            {sub.code}
+                          </span>
+                          {sub.category && (
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
+                              {sub.category}
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-1 font-mono shrink-0">
@@ -210,12 +223,12 @@ export default function InternalMarksConversionModal({
                         >
                           {formatScore(subjectTotalMarks)}
                         </span>
-                        <span className="text-xs text-slate-400">/ 30 marks</span>
+                        <span className="text-xs text-slate-400">/ {formatScore(subjectMaxMarks)} marks</span>
                       </div>
                     </div>
 
-                    {/* Breakdown: Clean inline pill for IP-1 and IP-2 */}
-                    {periodKeys.length > 0 && (
+                    {/* Breakdown: Clean inline pill for IP-1 and IP-2 or single mark display */}
+                    {periodKeys.length > 0 ? (
                       <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
                         {periodKeys.map((pKey) => {
                           const rpVal = sub.rewardPoints?.[pKey] || "0";
@@ -242,6 +255,15 @@ export default function InternalMarksConversionModal({
                           );
                         })}
                       </div>
+                    ) : (
+                      <div className="flex items-center justify-between pt-1.5 border-t border-slate-100 dark:border-slate-800/80 text-xs font-mono">
+                        <span className="text-slate-500 dark:text-slate-400 text-[11px]">
+                          {sub.category || "Theory Subject"}
+                        </span>
+                        <span className="font-bold text-emerald-600 dark:text-emerald-400 text-[11.5px]">
+                          Score: {formatScore(subjectTotalMarks)} / {formatScore(subjectMaxMarks)}
+                        </span>
+                      </div>
                     )}
                   </div>
                 );
@@ -253,7 +275,9 @@ export default function InternalMarksConversionModal({
         {/* Modal Footer */}
         <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 px-5 sm:px-6 py-3.5 shrink-0 bg-slate-50/70 dark:bg-slate-900/60 text-xs text-slate-500 dark:text-slate-400">
           <span className="font-mono">
-            {subjects.length > 0 ? `${subjects.length} subjects evaluated` : "Innovative Practice"}
+            {subjects.length > 0
+              ? `${subjects.length} subjects evaluated · Max: ${formatScore(maxPossibleMarks)}`
+              : "Internal Marks"}
           </span>
 
           <button

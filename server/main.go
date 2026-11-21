@@ -51,7 +51,7 @@ func main() {
 	facultyDirectoryHandler := admin.NewFacultyDirectoryHandler(sheetHandler)
 	mailHandler := common.NewMailHandler()
 	mailHandler.StartQueueWorker()
-	internalMarksHandler := student.NewInternalMarksHandler()
+	internalMarksHandler := student.NewInternalMarksHandler(sheetHandler)
 	notificationHandler := common.NewNotificationHandler()
 
 	r := routes.SetupRouter(
