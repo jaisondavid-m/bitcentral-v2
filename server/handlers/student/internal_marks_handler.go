@@ -1,14 +1,8 @@
 package student
 
 import (
-	"bufio"
-	"bytes"
-	"crypto/rand"
-	"encoding/csv"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"math"
 	"net/http"
@@ -24,42 +18,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type InternalMarksCacheEntry struct {
-	RollNo    string    `json:"roll_no"`
-	RawData   string    `json:"raw_data"`
-	CachedAt  time.Time `json:"cached_at"`
-	ExpiresAt time.Time `json:"expires_at"`
-}
-
-type negativeCacheEntry struct {
-	errMsg    string
-	expiresAt time.Time
-}
-
-type flightCall struct {
-	wg  sync.WaitGroup
-	val string
-	err error
-}
-
-type GradioJoinPayload struct {
-	Data        []interface{} `json:"data"`
-	EventData   interface{}   `json:"event_data"`
-	FnIndex     int           `json:"fn_index"`
-	TriggerID   interface{}   `json:"trigger_id"`
-	SessionHash string        `json:"session_hash"`
-}
-
-type GradioSSEEvent struct {
-	Msg    string `json:"msg"`
-	Output struct {
-		Data []interface{} `json:"data"`
-	} `json:"output"`
-	Success bool   `json:"success"`
-	Error   string `json:"error"`
-}
-
-// Structured models for Google Sheet Internal Marks
+// InternalSubjectMark represents an individual evaluated subject
 type InternalSubjectMark struct {
 	Code     string  `json:"code"`
 	Category string  `json:"category"`
@@ -67,6 +26,7 @@ type InternalSubjectMark struct {
 	MaxMarks float64 `json:"max_marks"`
 }
 
+// InternalMarksOverall represents overall internal evaluation summary
 type InternalMarksOverall struct {
 	TotalSubjects      int     `json:"total_subjects"`
 	TotalInternalMarks float64 `json:"total_internal_marks"`
@@ -74,6 +34,7 @@ type InternalMarksOverall struct {
 	Percentage         float64 `json:"percentage"`
 }
 
+// StudentInternalMarks represents all internal marks for a single student
 type StudentInternalMarks struct {
 	RollNo      string                `json:"roll_no"`
 	StudentName string                `json:"student_name"`
@@ -85,13 +46,16 @@ type StudentInternalMarks struct {
 	RawData     string                `json:"raw_data"`
 }
 
+type InternalMarksCacheEntry struct {
+	RollNo    string    `json:"roll_no"`
+	RawData   string    `json:"raw_data"`
+	CachedAt  time.Time `json:"cached_at"`
+	ExpiresAt time.Time `json:"expires_at"`
+}
+
 const (
-	InternalMarksCacheDuration         = 48 * time.Hour
-	InternalMarksIncompleteDuration    = 12 * time.Hour
-	InternalMarksMinRefreshInterval    = 5 * time.Minute
-	InternalMarksNegativeCacheDuration = 5 * time.Minute
-	InternalMarksSheetCacheDuration    = 15 * time.Minute
-	GradioSpaceHost                    = "https://praneshjs-rewardpointssite.hf.space"
+	InternalMarksCacheDuration      = 48 * time.Hour
+	InternalMarksSheetCacheDuration = 10 * time.Minute
 )
 
 var istLocation = time.FixedZone("IST", 5*3600+30*60)
@@ -102,27 +66,18 @@ func formatIST(t time.Time) string {
 
 type InternalMarksHandler struct {
 	sheetHandler  *SheetHandler
-	mu            sync.RWMutex
-	memoryCache   map[string]InternalMarksCacheEntry
-	negativeMu    sync.RWMutex
-	negativeCache map[string]negativeCacheEntry
-	flightMu      sync.Mutex
-	flightCalls   map[string]*flightCall
-
-	// In-memory cache for full sheet index
 	sheetMu       sync.RWMutex
 	sheetCache    map[string]StudentInternalMarks
 	sheetExpiry   time.Time
 	sheetBuilding sync.Mutex
+
+	dbCacheMu sync.RWMutex
 }
 
 func NewInternalMarksHandler(sheetHandler *SheetHandler) *InternalMarksHandler {
 	h := &InternalMarksHandler{
-		sheetHandler:  sheetHandler,
-		memoryCache:   make(map[string]InternalMarksCacheEntry),
-		negativeCache: make(map[string]negativeCacheEntry),
-		flightCalls:   make(map[string]*flightCall),
-		sheetCache:    make(map[string]StudentInternalMarks),
+		sheetHandler: sheetHandler,
+		sheetCache:   make(map[string]StudentInternalMarks),
 	}
 	h.initDBTable()
 	return h
@@ -146,107 +101,64 @@ func (h *InternalMarksHandler) initDBTable() {
 	}
 }
 
-func (h *InternalMarksHandler) getFromMemory(rollNo string) (InternalMarksCacheEntry, bool) {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
-
-	entry, ok := h.memoryCache[rollNo]
-	if !ok {
-		return InternalMarksCacheEntry{}, false
-	}
-	if time.Now().After(entry.ExpiresAt) {
-		return InternalMarksCacheEntry{}, false
-	}
-	return entry, true
-}
-
-func (h *InternalMarksHandler) saveToMemory(entry InternalMarksCacheEntry) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-	h.memoryCache[entry.RollNo] = entry
-}
-
-func (h *InternalMarksHandler) getNegativeCache(rollNo string) (string, bool) {
-	h.negativeMu.RLock()
-	defer h.negativeMu.RUnlock()
-
-	entry, ok := h.negativeCache[rollNo]
-	if !ok {
-		return "", false
-	}
-	if time.Now().After(entry.expiresAt) {
-		return "", false
-	}
-	return entry.errMsg, true
-}
-
-func (h *InternalMarksHandler) setNegativeCache(rollNo string, errMsg string) {
-	h.negativeMu.Lock()
-	defer h.negativeMu.Unlock()
-	h.negativeCache[rollNo] = negativeCacheEntry{
-		errMsg:    errMsg,
-		expiresAt: time.Now().Add(InternalMarksNegativeCacheDuration),
-	}
-}
-
-func (h *InternalMarksHandler) getFromDB(rollNo string) (InternalMarksCacheEntry, bool) {
+func (h *InternalMarksHandler) getFromDB(rollNo string) (StudentInternalMarks, bool) {
 	if config.DB == nil {
-		return InternalMarksCacheEntry{}, false
+		return StudentInternalMarks{}, false
 	}
 
-	query := `SELECT roll_no, raw_data, cached_at, expires_at FROM internal_marks_cache WHERE roll_no = ? AND expires_at > NOW() LIMIT 1`
-	var entry InternalMarksCacheEntry
-	err := config.DB.QueryRow(query, rollNo).Scan(&entry.RollNo, &entry.RawData, &entry.CachedAt, &entry.ExpiresAt)
+	query := `SELECT raw_data FROM internal_marks_cache WHERE roll_no = ? AND expires_at > NOW() LIMIT 1`
+	var rawData string
+	err := config.DB.QueryRow(query, rollNo).Scan(&rawData)
 	if err != nil {
-		return InternalMarksCacheEntry{}, false
+		return StudentInternalMarks{}, false
 	}
-	h.saveToMemory(entry)
-	return entry, true
+
+	var data StudentInternalMarks
+	if err := json.Unmarshal([]byte(rawData), &data); err != nil {
+		return StudentInternalMarks{}, false
+	}
+	return data, true
 }
 
-func (h *InternalMarksHandler) saveToDB(entry InternalMarksCacheEntry) {
+func (h *InternalMarksHandler) saveToDB(student StudentInternalMarks) {
 	if config.DB == nil {
+		return
+	}
+
+	payload, err := json.Marshal(student)
+	if err != nil {
 		return
 	}
 
 	query := `
 	INSERT INTO internal_marks_cache (roll_no, raw_data, cached_at, expires_at)
-	VALUES (?, ?, ?, ?)
+	VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 48 HOUR))
 	ON DUPLICATE KEY UPDATE
 		raw_data = VALUES(raw_data),
-		cached_at = VALUES(cached_at),
-		expires_at = VALUES(expires_at)
+		cached_at = NOW(),
+		expires_at = DATE_ADD(NOW(), INTERVAL 48 HOUR)
 	`
-	if _, err := config.DB.Exec(query, entry.RollNo, entry.RawData, entry.CachedAt, entry.ExpiresAt); err != nil {
-		log.Printf("⚠️ Failed to persist internal marks cache for %s in DB: %v", entry.RollNo, err)
+	if _, err := config.DB.Exec(query, student.RollNo, string(payload)); err != nil {
+		log.Printf("⚠️ Failed to persist internal marks for %s in DB: %v", student.RollNo, err)
 	}
 }
 
-// extractSpreadsheetID extracts the 44-character spreadsheet ID from URLs or raw IDs
-func extractSpreadsheetID(val string) string {
+// cleanSpreadsheetID handles raw IDs or full URLs if entered in .env
+func cleanSpreadsheetID(val string) string {
 	val = strings.TrimSpace(val)
 	val = strings.Trim(val, `"'`)
 	if val == "" {
 		return ""
 	}
 
-	if strings.Contains(val, "/d/e/") {
-		// Published URL, return as-is for HTTP fetcher
-		return val
-	}
-
 	if strings.Contains(val, "/d/") {
 		parts := strings.Split(val, "/d/")
 		if len(parts) > 1 {
 			idPart := parts[1]
-			if idx := strings.Index(idPart, "/"); idx != -1 {
-				idPart = idPart[:idx]
-			}
-			if idx := strings.Index(idPart, "?"); idx != -1 {
-				idPart = idPart[:idx]
-			}
-			if idx := strings.Index(idPart, "#"); idx != -1 {
-				idPart = idPart[:idx]
+			for _, delim := range []string{"/", "?", "#"} {
+				if idx := strings.Index(idPart, delim); idx != -1 {
+					idPart = idPart[:idx]
+				}
 			}
 			return strings.TrimSpace(idPart)
 		}
@@ -259,117 +171,79 @@ func extractSpreadsheetID(val string) string {
 	return val
 }
 
-type subjectColPair struct {
+type internalSubjectPair struct {
 	CodeCol  int
 	MarkCol  int
 	Category string
 	MaxMarks float64
 }
 
-// buildInternalMarksIndex fetches the Google Sheet (via Sheets API or CSV) and parses all students
+// buildInternalMarksIndex fetches the Google Sheet via Sheets API using view-only account credentials
 func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInternalMarks, error) {
-	sheetConfig := strings.TrimSpace(os.Getenv("INTERNAL_MARKS_SHEET"))
-	if sheetConfig == "" {
-		sheetConfig = strings.TrimSpace(os.Getenv("INTERNAL_MARKS_SHEET_ID"))
+	spreadsheetID := cleanSpreadsheetID(os.Getenv("INTERNAL_MARKS_SHEET"))
+	if spreadsheetID == "" {
+		spreadsheetID = cleanSpreadsheetID(os.Getenv("INTERNAL_MARKS_SHEET_ID"))
 	}
-	if sheetConfig == "" {
-		sheetConfig = strings.TrimSpace(os.Getenv("Internal_Marks_sheet"))
+	if spreadsheetID == "" {
+		spreadsheetID = cleanSpreadsheetID(os.Getenv("Internal_Marks_sheet"))
 	}
-	if sheetConfig == "" {
-		return nil, fmt.Errorf("INTERNAL_MARKS_SHEET is not set in environment or .env file")
-	}
-
-	var rows [][]string
-
-	// Case 1: If it's a URL (http/https), try fetching as CSV
-	if strings.HasPrefix(sheetConfig, "http://") || strings.HasPrefix(sheetConfig, "https://") {
-		csvURL := sheetConfig
-		if strings.Contains(sheetConfig, "/pubhtml") {
-			csvURL = strings.Replace(sheetConfig, "/pubhtml", "/pub?output=csv", 1)
-		} else if strings.Contains(sheetConfig, "/pub") && !strings.Contains(sheetConfig, "output=csv") {
-			if strings.Contains(sheetConfig, "?") {
-				csvURL = sheetConfig + "&output=csv"
-			} else {
-				csvURL = sheetConfig + "?output=csv"
-			}
-		}
-
-		client := &http.Client{Timeout: 30 * time.Second}
-		req, err := http.NewRequest("GET", csvURL, nil)
-		if err == nil {
-			req.Header.Set("User-Agent", "Mozilla/5.0")
-			resp, err := client.Do(req)
-			if err == nil && resp.StatusCode == http.StatusOK {
-				defer resp.Body.Close()
-				r := csv.NewReader(resp.Body)
-				r.LazyQuotes = true
-				r.FieldsPerRecord = -1
-				if csvRows, err := r.ReadAll(); err == nil && len(csvRows) > 2 {
-					rows = csvRows
-				}
-			}
-		}
+	if spreadsheetID == "" {
+		return nil, fmt.Errorf("INTERNAL_MARKS_SHEET is not set in server/.env")
 	}
 
-	// Case 2: Use Google Sheets API via SheetHandler (view-only Google account)
-	if len(rows) == 0 && h.sheetHandler != nil {
-		spreadsheetID := extractSpreadsheetID(sheetConfig)
-		if strings.HasPrefix(spreadsheetID, "http") {
-			return nil, fmt.Errorf("could not access published URL and no standard Google Sheet ID provided: %s", sheetConfig)
-		}
+	if h.sheetHandler == nil {
+		return nil, fmt.Errorf("SheetHandler not initialized on server")
+	}
 
-		svc := h.sheetHandler.GetSheetsService()
-		if svc == nil {
-			h.sheetHandler.LoadSavedToken()
-			svc = h.sheetHandler.GetSheetsService()
-		}
-		if svc == nil {
-			return nil, fmt.Errorf("Google Sheets service not initialized. Check OAuth token/credentials")
-		}
+	svc := h.sheetHandler.GetSheetsService()
+	if svc == nil {
+		h.sheetHandler.LoadSavedToken()
+		svc = h.sheetHandler.GetSheetsService()
+	}
+	if svc == nil {
+		return nil, fmt.Errorf("Google Sheets service not initialized. Check server token")
+	}
 
-		// Look for target tab by gid or name
-		meta, err := svc.Spreadsheets.Get(spreadsheetID).Do()
-		var tabName string
-		targetGid := int64(1533805453) // default gid from user's URL if present
+	// 1. Inspect sheets metadata to find the matching tab
+	meta, err := svc.Spreadsheets.Get(spreadsheetID).Do()
+	if err != nil {
+		return nil, fmt.Errorf("failed to access internal marks spreadsheet (%s): %w", spreadsheetID, err)
+	}
 
-		if err == nil && meta != nil && len(meta.Sheets) > 0 {
-			for _, s := range meta.Sheets {
-				if s.Properties != nil && s.Properties.SheetId == targetGid {
-					tabName = s.Properties.Title
-					break
-				}
-			}
-			if tabName == "" {
-				tabName = meta.Sheets[0].Properties.Title
+	var tabName string
+	targetGid := int64(1533805453) // gid from user sheet URL if present
+
+	if meta != nil && len(meta.Sheets) > 0 {
+		for _, s := range meta.Sheets {
+			if s.Properties != nil && s.Properties.SheetId == targetGid {
+				tabName = s.Properties.Title
+				break
 			}
 		}
 		if tabName == "" {
-			tabName = "Sheet1"
-		}
-
-		readRange := fmt.Sprintf("'%s'!A1:AD", tabName)
-		vr, err := svc.Spreadsheets.Values.Get(spreadsheetID, readRange).Do()
-		if err != nil {
-			vr, err = svc.Spreadsheets.Values.Get(spreadsheetID, "A1:AD").Do()
-		}
-		if err != nil {
-			return nil, fmt.Errorf("failed to fetch sheet values for %s: %w", spreadsheetID, err)
-		}
-
-		for _, row := range vr.Values {
-			var rStr []string
-			for _, cell := range row {
-				rStr = append(rStr, fmt.Sprintf("%v", cell))
-			}
-			rows = append(rows, rStr)
+			tabName = meta.Sheets[0].Properties.Title
 		}
 	}
-
-	if len(rows) < 3 {
-		return nil, fmt.Errorf("insufficient data rows fetched from sheet: got %d rows", len(rows))
+	if tabName == "" {
+		tabName = "Sheet1"
 	}
 
-	// Detect Column Headers and Subject Pairs dynamically
+	// 2. Fetch full table values (A to AD columns)
+	readRange := fmt.Sprintf("'%s'!A1:AD", tabName)
+	vr, err := svc.Spreadsheets.Values.Get(spreadsheetID, readRange).Do()
+	if err != nil {
+		vr, err = svc.Spreadsheets.Values.Get(spreadsheetID, "A1:AD").Do()
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch values for tab %s: %w", tabName, err)
+	}
+
+	values := vr.Values
+	if len(values) < 3 {
+		return nil, fmt.Errorf("sheet %s has insufficient rows (got %d)", spreadsheetID, len(values))
+	}
+
+	// 3. Detect column positions dynamically from header rows
 	rollNoCol := 1
 	nameCol := 2
 	degreeCol := 3
@@ -377,10 +251,10 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 	deptCol := 5
 
 	headerRowIdx := 1
-	for rIdx := 0; rIdx < int(math.Min(float64(len(rows)), 4)); rIdx++ {
-		row := rows[rIdx]
+	for rIdx := 0; rIdx < int(math.Min(float64(len(values)), 4)); rIdx++ {
+		row := values[rIdx]
 		for cIdx, cell := range row {
-			cLower := strings.ToLower(strings.TrimSpace(cell))
+			cLower := strings.ToLower(strings.TrimSpace(fmt.Sprintf("%v", cell)))
 			if strings.Contains(cLower, "roll") && strings.Contains(cLower, "no") {
 				rollNoCol = cIdx
 				headerRowIdx = rIdx
@@ -396,10 +270,10 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 		}
 	}
 
-	// Detect Subject Pairs
-	var pairs []subjectColPair
+	// 4. Detect Subject Pairs across Theory, Lab, and Honor/Minor subjects
+	var pairs []internalSubjectPair
 	maxCols := 0
-	for _, r := range rows[:int(math.Min(float64(len(rows)), 5))] {
+	for _, r := range values[:int(math.Min(float64(len(values)), 5))] {
 		if len(r) > maxCols {
 			maxCols = len(r)
 		}
@@ -407,9 +281,9 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 
 	for c := 6; c < maxCols-1; c++ {
 		var headerText string
-		for rIdx := 0; rIdx <= int(math.Min(float64(len(rows)-1), 3)); rIdx++ {
-			if c < len(rows[rIdx]) {
-				headerText += " " + rows[rIdx][c]
+		for rIdx := 0; rIdx <= int(math.Min(float64(len(values)-1), 3)); rIdx++ {
+			if c < len(values[rIdx]) {
+				headerText += " " + fmt.Sprintf("%v", values[rIdx][c])
 			}
 		}
 
@@ -423,9 +297,9 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 			strings.Contains(headerUpper, "MINOR")
 
 		nextHeader := ""
-		for rIdx := 0; rIdx <= int(math.Min(float64(len(rows)-1), 3)); rIdx++ {
-			if c+1 < len(rows[rIdx]) {
-				nextHeader += " " + rows[rIdx][c+1]
+		for rIdx := 0; rIdx <= int(math.Min(float64(len(values)-1), 3)); rIdx++ {
+			if c+1 < len(values[rIdx]) {
+				nextHeader += " " + fmt.Sprintf("%v", values[rIdx][c+1])
 			}
 		}
 		isNextMarkCol := strings.Contains(strings.ToUpper(nextHeader), "INTERNAL MARK") ||
@@ -439,17 +313,17 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 				cat = "Honor / Minor Subjects"
 			}
 
-			pairs = append(pairs, subjectColPair{
+			pairs = append(pairs, internalSubjectPair{
 				CodeCol:  c,
 				MarkCol:  c + 1,
 				Category: cat,
 				MaxMarks: 30.0,
 			})
-			c++ // skip mark col
+			c++
 		}
 	}
 
-	// Fallback to standard columns if dynamic detection found fewer than 2 pairs
+	// Fallback to standard sheet columns if dynamic detection found none
 	if len(pairs) == 0 {
 		defaultSpecs := []struct {
 			codeCol int
@@ -470,7 +344,7 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 		}
 		for _, ds := range defaultSpecs {
 			if ds.markCol < maxCols {
-				pairs = append(pairs, subjectColPair{
+				pairs = append(pairs, internalSubjectPair{
 					CodeCol:  ds.codeCol,
 					MarkCol:  ds.markCol,
 					Category: ds.cat,
@@ -480,21 +354,21 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 		}
 	}
 
-	// Check for a MAX marks row in rows 1 to 4
-	for rIdx := headerRowIdx; rIdx < int(math.Min(float64(len(rows)), 5)); rIdx++ {
+	// 5. Detect MAX row if present in rows 1 to 4
+	for rIdx := headerRowIdx; rIdx < int(math.Min(float64(len(values)), 5)); rIdx++ {
 		firstCol := ""
-		if len(rows[rIdx]) > 0 {
-			firstCol = strings.ToUpper(strings.TrimSpace(rows[rIdx][0]))
+		if len(values[rIdx]) > 0 {
+			firstCol = strings.ToUpper(strings.TrimSpace(fmt.Sprintf("%v", values[rIdx][0])))
 		}
 		secondCol := ""
-		if len(rows[rIdx]) > 1 {
-			secondCol = strings.ToUpper(strings.TrimSpace(rows[rIdx][1]))
+		if len(values[rIdx]) > 1 {
+			secondCol = strings.ToUpper(strings.TrimSpace(fmt.Sprintf("%v", values[rIdx][1])))
 		}
 
 		if strings.Contains(firstCol, "MAX") || strings.Contains(secondCol, "MAX") {
 			for i := range pairs {
-				if pairs[i].MarkCol < len(rows[rIdx]) {
-					valStr := strings.TrimSpace(rows[rIdx][pairs[i].MarkCol])
+				if pairs[i].MarkCol < len(values[rIdx]) {
+					valStr := strings.TrimSpace(fmt.Sprintf("%v", values[rIdx][pairs[i].MarkCol]))
 					if m, err := strconv.ParseFloat(valStr, 64); err == nil && m > 0 {
 						pairs[i].MaxMarks = m
 					}
@@ -504,19 +378,18 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 		}
 	}
 
-	// Parse all student records
+	// 6. Parse all student rows into an in-memory index
 	index := make(map[string]StudentInternalMarks)
 
-	for rIdx := headerRowIdx + 1; rIdx < len(rows); rIdx++ {
-		row := rows[rIdx]
+	for rIdx := headerRowIdx + 1; rIdx < len(values); rIdx++ {
+		row := values[rIdx]
 		if len(row) <= rollNoCol {
 			continue
 		}
 
-		rawRoll := strings.TrimSpace(row[rollNoCol])
+		rawRoll := strings.TrimSpace(fmt.Sprintf("%v", row[rollNoCol]))
 		normRoll := normalizeRollNo(rawRoll)
 
-		// Skip empty, header-like, or non-student rows
 		if normRoll == "" || normRoll == "MAX" || len(normRoll) < 5 ||
 			strings.HasPrefix(normRoll, "SL") || strings.HasPrefix(normRoll, "ROLL") {
 			continue
@@ -524,32 +397,31 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 
 		name := ""
 		if nameCol < len(row) {
-			name = strings.TrimSpace(row[nameCol])
+			name = strings.TrimSpace(fmt.Sprintf("%v", row[nameCol]))
 		}
 		degree := ""
 		if degreeCol < len(row) {
-			degree = strings.TrimSpace(row[degreeCol])
+			degree = strings.TrimSpace(fmt.Sprintf("%v", row[degreeCol]))
 		}
 		year := ""
 		if yearCol < len(row) {
-			year = strings.TrimSpace(row[yearCol])
+			year = strings.TrimSpace(fmt.Sprintf("%v", row[yearCol]))
 		}
 		dept := ""
 		if deptCol < len(row) {
-			dept = strings.TrimSpace(row[deptCol])
+			dept = strings.TrimSpace(fmt.Sprintf("%v", row[deptCol]))
 		}
 
-		// Extract ONLY available subjects
+		// Only include available enrolled subjects
 		var subjects []InternalSubjectMark
 		for _, pair := range pairs {
 			if pair.CodeCol >= len(row) || pair.MarkCol >= len(row) {
 				continue
 			}
 
-			code := strings.TrimSpace(row[pair.CodeCol])
-			markStr := strings.TrimSpace(row[pair.MarkCol])
+			code := strings.TrimSpace(fmt.Sprintf("%v", row[pair.CodeCol]))
+			markStr := strings.TrimSpace(fmt.Sprintf("%v", row[pair.MarkCol]))
 
-			// Skip if no subject code is enrolled
 			if code == "" || code == "-" || strings.EqualFold(code, "NIL") || strings.EqualFold(code, "NA") {
 				continue
 			}
@@ -590,7 +462,7 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 			Percentage:         pct,
 		}
 
-		// Build formatted rawData string for frontend compatibility
+		// Formatted raw string for backward compatibility
 		var b strings.Builder
 		grouped := make(map[string][]InternalSubjectMark)
 		var catOrder []string
@@ -635,7 +507,7 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 		}
 	}
 
-	log.Printf("✅ Successfully built internal marks index: %d students parsed", len(index))
+	log.Printf("✅ Internal marks Google Sheet parsed successfully: %d students indexed", len(index))
 	return index, nil
 }
 
@@ -651,7 +523,7 @@ func (h *InternalMarksHandler) getOrRefreshSheetIndex(forceRefresh bool) (map[st
 	h.sheetBuilding.Lock()
 	defer h.sheetBuilding.Unlock()
 
-	// Double-check after acquiring lock
+	// Double-check lock condition
 	h.sheetMu.RLock()
 	if !forceRefresh && len(h.sheetCache) > 0 && time.Now().Before(h.sheetExpiry) {
 		cache := h.sheetCache
@@ -673,119 +545,6 @@ func (h *InternalMarksHandler) getOrRefreshSheetIndex(forceRefresh bool) (map[st
 	return index, nil
 }
 
-// Fetch from Hugging Face Gradio Space (fallback)
-func (h *InternalMarksHandler) fetchFromHuggingFace(rollNo string) (string, error) {
-	b := make([]byte, 8)
-	_, _ = rand.Read(b)
-	sessionHash := hex.EncodeToString(b)
-
-	joinPayload := GradioJoinPayload{
-		Data:        []interface{}{rollNo},
-		EventData:   nil,
-		FnIndex:     4,
-		TriggerID:   nil,
-		SessionHash: sessionHash,
-	}
-
-	bodyBytes, err := json.Marshal(joinPayload)
-	if err != nil {
-		return "", err
-	}
-
-	joinURL := GradioSpaceHost + "/gradio_api/queue/join?"
-	req, err := http.NewRequest("POST", joinURL, bytes.NewBuffer(bodyBytes))
-	if err != nil {
-		return "", err
-	}
-	req.Header.Set("Content-Type", "application/json")
-	if hfToken := os.Getenv("HF_TOKEN"); hfToken != "" {
-		req.Header.Set("Authorization", "Bearer "+hfToken)
-	}
-
-	client := &http.Client{Timeout: 35 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("gradio queue join request failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
-		return "", fmt.Errorf("gradio returned status %d: %s", resp.StatusCode, string(respBody))
-	}
-
-	dataURL := fmt.Sprintf("%s/gradio_api/queue/data?session_hash=%s", GradioSpaceHost, sessionHash)
-	sseReq, err := http.NewRequest("GET", dataURL, nil)
-	if err != nil {
-		return "", err
-	}
-	sseReq.Header.Set("Accept", "text/event-stream")
-	if hfToken := os.Getenv("HF_TOKEN"); hfToken != "" {
-		sseReq.Header.Set("Authorization", "Bearer "+hfToken)
-	}
-
-	sseClient := &http.Client{Timeout: 50 * time.Second}
-	sseResp, err := sseClient.Do(sseReq)
-	if err != nil {
-		return "", fmt.Errorf("gradio sse stream connection failed: %w", err)
-	}
-	defer sseResp.Body.Close()
-
-	scanner := bufio.NewScanner(sseResp.Body)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if !strings.HasPrefix(line, "data:") {
-			continue
-		}
-		dataJson := strings.TrimSpace(strings.TrimPrefix(line, "data:"))
-		var event GradioSSEEvent
-		if err := json.Unmarshal([]byte(dataJson), &event); err != nil {
-			continue
-		}
-
-		if event.Msg == "process_completed" {
-			if len(event.Output.Data) > 0 {
-				if str, ok := event.Output.Data[0].(string); ok {
-					return str, nil
-				}
-				marshaled, _ := json.Marshal(event.Output.Data[0])
-				return string(marshaled), nil
-			}
-			return "", fmt.Errorf("gradio returned empty output")
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return "", fmt.Errorf("error reading gradio stream: %w", err)
-	}
-
-	return "", fmt.Errorf("gradio stream completed without output")
-}
-
-// Single-flight deduplication for HF fallback
-func (h *InternalMarksHandler) fetchWithSingleFlight(rollNo string) (string, error) {
-	h.flightMu.Lock()
-	if c, ok := h.flightCalls[rollNo]; ok {
-		h.flightMu.Unlock()
-		c.wg.Wait()
-		return c.val, c.err
-	}
-
-	c := new(flightCall)
-	c.wg.Add(1)
-	h.flightCalls[rollNo] = c
-	h.flightMu.Unlock()
-
-	c.val, c.err = h.fetchFromHuggingFace(rollNo)
-	c.wg.Done()
-
-	h.flightMu.Lock()
-	delete(h.flightCalls, rollNo)
-	h.flightMu.Unlock()
-
-	return c.val, c.err
-}
-
 // GetInternalMarksConversion handles GET /internal-marks/conversion?roll_no=...
 func (h *InternalMarksHandler) GetInternalMarksConversion(c *gin.Context) {
 	rollNo := strings.TrimSpace(c.Query("roll_no"))
@@ -803,21 +562,14 @@ func (h *InternalMarksHandler) GetInternalMarksConversion(c *gin.Context) {
 	normRoll := normalizeRollNo(rollNo)
 	forceRefresh := c.Query("refresh") == "true"
 
-	// 1. Try Google Sheet index first
+	// 1. Fetch from Google Sheet index (same view-only account as RP sheets)
 	sheetIndex, sheetErr := h.getOrRefreshSheetIndex(forceRefresh)
 	if sheetErr == nil && sheetIndex != nil {
 		if studentData, found := sheetIndex[normRoll]; found {
 			now := time.Now()
 			expiresAt := now.Add(InternalMarksCacheDuration)
 
-			entry := InternalMarksCacheEntry{
-				RollNo:    normRoll,
-				RawData:   studentData.RawData,
-				CachedAt:  now,
-				ExpiresAt: expiresAt,
-			}
-			h.saveToMemory(entry)
-			go h.saveToDB(entry)
+			go h.saveToDB(studentData)
 
 			c.Header("Cache-Control", "public, max-age=1800, stale-while-revalidate=3600")
 			c.Header("X-Cache", "SHEET_HIT")
@@ -837,93 +589,40 @@ func (h *InternalMarksHandler) GetInternalMarksConversion(c *gin.Context) {
 			})
 			return
 		}
-	} else if sheetErr != nil {
-		log.Printf("⚠️ Note: Google Sheets internal marks error: %v. Checking cache / fallback.", sheetErr)
-	}
 
-	// 2. Check existing cache (Memory first, then DB)
-	existingEntry, hasExisting := h.getFromMemory(normRoll)
-	if !hasExisting {
-		existingEntry, hasExisting = h.getFromDB(normRoll)
-	}
-
-	if hasExisting {
-		if !forceRefresh {
-			c.Header("Cache-Control", "public, max-age=1800, stale-while-revalidate=3600")
-			c.Header("X-Cache", "HIT")
-			c.JSON(http.StatusOK, gin.H{
-				"success":    true,
-				"roll_no":    normRoll,
-				"raw":        existingEntry.RawData,
-				"cached":     true,
-				"cached_at":  formatIST(existingEntry.CachedAt),
-				"expires_at": formatIST(existingEntry.ExpiresAt),
-			})
-			return
-		}
-
-		if time.Since(existingEntry.CachedAt) < InternalMarksMinRefreshInterval {
-			c.Header("Cache-Control", "public, max-age=300")
-			c.Header("X-Cache", "HIT_COOLDOWN")
-			c.JSON(http.StatusOK, gin.H{
-				"success":    true,
-				"roll_no":    normRoll,
-				"raw":        existingEntry.RawData,
-				"cached":     true,
-				"cached_at":  formatIST(existingEntry.CachedAt),
-				"expires_at": formatIST(existingEntry.ExpiresAt),
-				"notice":     "Data was updated recently. Refresh cooldown active (5 minutes).",
-			})
-			return
-		}
-	}
-
-	// 3. Fallback: If student was not found in sheet but sheet index is loaded, return 404
-	if sheetErr == nil && sheetIndex != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"success": false,
-			"error":   fmt.Sprintf("No internal marks record found for roll number %s in the spreadsheet.", normRoll),
+			"error":   fmt.Sprintf("No internal marks record found for roll number %s in the Google Sheet.", normRoll),
 		})
 		return
 	}
 
-	// 4. Hugging Face fallback if sheet is not configured
-	rawData, err := h.fetchWithSingleFlight(normRoll)
-	if err != nil {
-		log.Printf("❌ Failed to fetch internal marks from HF for %s: %v", normRoll, err)
-		h.setNegativeCache(normRoll, err.Error())
-		c.JSON(http.StatusBadGateway, gin.H{
-			"success": false,
-			"error":   fmt.Sprintf("Failed to fetch internal marks from sheet and fallback: %v", err),
+	// 2. Fallback to DB cache if sheet is temporarily unreachable
+	if dbStudent, foundInDB := h.getFromDB(normRoll); foundInDB {
+		now := time.Now()
+		expiresAt := now.Add(InternalMarksCacheDuration)
+		c.Header("Cache-Control", "public, max-age=300")
+		c.Header("X-Cache", "DB_FALLBACK")
+		c.JSON(http.StatusOK, gin.H{
+			"success":      true,
+			"roll_no":      normRoll,
+			"student_name": dbStudent.StudentName,
+			"department":   dbStudent.Department,
+			"year":         dbStudent.Year,
+			"degree":       dbStudent.Degree,
+			"subjects":     dbStudent.Subjects,
+			"overall":      dbStudent.Overall,
+			"raw":          dbStudent.RawData,
+			"cached":       true,
+			"cached_at":    formatIST(now),
+			"expires_at":   formatIST(expiresAt),
 		})
 		return
 	}
 
-	now := time.Now()
-	ttl := InternalMarksCacheDuration
-	if !strings.Contains(rawData, "IP-2") {
-		ttl = InternalMarksIncompleteDuration
-	}
-	expiresAt := now.Add(ttl)
-
-	entry := InternalMarksCacheEntry{
-		RollNo:    normRoll,
-		RawData:   rawData,
-		CachedAt:  now,
-		ExpiresAt: expiresAt,
-	}
-
-	h.saveToMemory(entry)
-	go h.saveToDB(entry)
-
-	c.Header("Cache-Control", "public, max-age=1800, stale-while-revalidate=3600")
-	c.Header("X-Cache", "MISS")
-	c.JSON(http.StatusOK, gin.H{
-		"success":    true,
-		"roll_no":    normRoll,
-		"raw":        rawData,
-		"cached":     false,
-		"cached_at":  formatIST(now),
-		"expires_at": formatIST(expiresAt),
+	log.Printf("❌ Failed to fetch internal marks: %v", sheetErr)
+	c.JSON(http.StatusBadGateway, gin.H{
+		"success": false,
+		"error":   fmt.Sprintf("Failed to fetch internal marks from Google Sheet: %v", sheetErr),
 	})
 }
