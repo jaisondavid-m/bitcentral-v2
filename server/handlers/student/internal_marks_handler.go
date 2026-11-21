@@ -151,6 +151,10 @@ func cleanSpreadsheetID(val string) string {
 		return ""
 	}
 
+	if strings.Contains(val, "2PACX-") || strings.Contains(val, "/d/e/") {
+		return ""
+	}
+
 	if strings.Contains(val, "/d/") {
 		parts := strings.Split(val, "/d/")
 		if len(parts) > 1 {
@@ -180,15 +184,24 @@ type internalSubjectPair struct {
 
 // buildInternalMarksIndex fetches the Google Sheet via Sheets API using view-only account credentials
 func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInternalMarks, error) {
-	spreadsheetID := cleanSpreadsheetID(os.Getenv("INTERNAL_MARKS_SHEET"))
-	if spreadsheetID == "" {
-		spreadsheetID = cleanSpreadsheetID(os.Getenv("INTERNAL_MARKS_SHEET_ID"))
+	rawEnv := os.Getenv("INTERNAL_MARKS_SHEET")
+	if rawEnv == "" {
+		rawEnv = os.Getenv("INTERNAL_MARKS_SHEET_ID")
 	}
-	if spreadsheetID == "" {
-		spreadsheetID = cleanSpreadsheetID(os.Getenv("Internal_Marks_sheet"))
+	if rawEnv == "" {
+		rawEnv = os.Getenv("Internal_Marks_sheet")
 	}
-	if spreadsheetID == "" {
+	if rawEnv == "" {
 		return nil, fmt.Errorf("INTERNAL_MARKS_SHEET is not set in server/.env")
+	}
+
+	if strings.Contains(rawEnv, "2PACX-") || strings.Contains(rawEnv, "/d/e/") {
+		return nil, fmt.Errorf("INTERNAL_MARKS_SHEET in server/.env is set to a web-published link (2PACX-...). Google Sheets API requires the Google Sheet ID (e.g. 1iPxhqWG... or https://docs.google.com/spreadsheets/d/<ID>/edit), exactly like RP_Detailed_sheet. Please copy the Spreadsheet ID and update INTERNAL_MARKS_SHEET.")
+	}
+
+	spreadsheetID := cleanSpreadsheetID(rawEnv)
+	if spreadsheetID == "" {
+		return nil, fmt.Errorf("invalid spreadsheet ID in INTERNAL_MARKS_SHEET: %s", rawEnv)
 	}
 
 	if h.sheetHandler == nil {

@@ -245,9 +245,9 @@ export function parseInternalMarksSummary(text) {
   return result;
 }
 
-const CLIENT_CACHE_PREFIX = "bitcentral_im_cache_";
+const CLIENT_CACHE_PREFIX = "bitcentral_im_v3_";
 const CLIENT_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours client-side cache
-const CLIENT_MIN_REFRESH_INTERVAL_MS = 3 * 60 * 1000; // 3 minutes debounce for manual refresh
+const CLIENT_MIN_REFRESH_INTERVAL_MS = 30 * 1000; // 30 seconds debounce for manual refresh
 
 function getLocalCachedData(rollNo) {
   try {
@@ -284,10 +284,17 @@ function parseLocalCache(raw) {
   if (!raw) return null;
   try {
     if (raw.startsWith("{") && raw.includes('"subjects"')) {
-      return JSON.parse(raw);
+      const obj = JSON.parse(raw);
+      if (Array.isArray(obj?.subjects) && obj.subjects.length > 0) {
+        return obj;
+      }
     }
   } catch {}
-  return parseInternalMarksSummary(raw);
+  const summary = parseInternalMarksSummary(raw);
+  if (Array.isArray(summary?.subjects) && summary.subjects.length > 0) {
+    return summary;
+  }
+  return null;
 }
 
 export async function fetchInternalMarkConversion(rollNo, forceRefresh = false) {
@@ -297,20 +304,18 @@ export async function fetchInternalMarkConversion(rollNo, forceRefresh = false) 
 
   const cleanRollNo = String(rollNo).trim().toUpperCase();
 
-  // 1. Check local persistent cache
-  const localCached = getLocalCachedData(cleanRollNo);
-  if (localCached?.raw) {
-    // If not forcing refresh, immediately return cached result without hitting network
-    if (!forceRefresh) {
-      return parseLocalCache(localCached.raw);
-    }
-    // If forcing refresh, enforce client cooldown (3 min) to prevent rapid-fire clicks
-    if (Date.now() - localCached.timestamp < CLIENT_MIN_REFRESH_INTERVAL_MS) {
-      return parseLocalCache(localCached.raw);
+  // 1. Check local persistent cache only if not forcing refresh
+  if (!forceRefresh) {
+    const localCached = getLocalCachedData(cleanRollNo);
+    if (localCached?.raw) {
+      const parsed = parseLocalCache(localCached.raw);
+      if (parsed && Array.isArray(parsed.subjects) && parsed.subjects.length > 0) {
+        return parsed;
+      }
     }
   }
 
-  // 2. Fetch through the server backend with server-side caching & single-flight
+  // 2. Fetch through the server backend with Google Sheets view-only access
   try {
     const refreshParam = forceRefresh ? "&refresh=true" : "";
     const res = await api.get(
@@ -354,41 +359,28 @@ export async function fetchInternalMarkConversion(rollNo, forceRefresh = false) 
           degree: res.data.degree,
           raw: res.data.raw || "",
         };
-        setLocalCachedData(cleanRollNo, JSON.stringify(parsed));
+        if (subjects.length > 0) {
+          setLocalCachedData(cleanRollNo, JSON.stringify(parsed));
+        }
         return parsed;
       }
 
       if (res.data?.raw) {
-        setLocalCachedData(cleanRollNo, res.data.raw);
-        return parseInternalMarksSummary(res.data.raw);
+        const parsed = parseInternalMarksSummary(res.data.raw);
+        if (parsed?.subjects?.length > 0) {
+          setLocalCachedData(cleanRollNo, res.data.raw);
+        }
+        return parsed;
       }
     }
+    throw new Error(res.data?.error || "No internal marks found for this student.");
   } catch (err) {
-    console.warn("Backend internal marks cache route failed, evaluating fallback:", err);
-    // If the server explicitly rejected with a 4xx client error, don't hammer Gradio
-    if (err?.response?.status && err.response.status >= 400 && err.response.status < 500) {
-      throw new Error(err.response.data?.error || "Invalid request for internal marks.");
-    }
-  }
-
-  // 3. Fallback to direct Gradio client only if network/server is completely down
-  try {
-    const client = await getGradioClient();
-    const result = await client.predict("/extract_subjects_and_marks_for_gradio", {
-      roll_no: cleanRollNo,
-    });
-
-    const rawData = Array.isArray(result?.data) ? result.data[0] : result?.data;
-    if (rawData) {
-      setLocalCachedData(cleanRollNo, rawData);
-    }
-    return parseInternalMarksSummary(rawData);
-  } catch (directErr) {
-    // If we have stale local cached data, prefer returning that over a failure
-    if (localCached?.raw) {
-      return parseLocalCache(localCached.raw);
-    }
-    throw directErr;
+    const errorMsg =
+      err?.response?.data?.error ||
+      err?.response?.data?.message ||
+      err?.message ||
+      "Failed to fetch internal marks from server.";
+    throw new Error(errorMsg);
   }
 }
 

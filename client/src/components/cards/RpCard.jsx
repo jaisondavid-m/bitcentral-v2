@@ -150,15 +150,20 @@ export default function RpCard({ student }) {
     setInternalError("");
 
     if (!forceRefresh && internalCache.current.has(rollNo)) {
-      setInternalData(internalCache.current.get(rollNo));
-      setInternalLoading(false);
-      return;
+      const cached = internalCache.current.get(rollNo);
+      if (cached && Array.isArray(cached.subjects) && cached.subjects.length > 0) {
+        setInternalData(cached);
+        setInternalLoading(false);
+        return;
+      }
     }
 
     setInternalLoading(true);
     try {
       const parsedData = await fetchInternalMarkConversion(rollNo, forceRefresh);
-      internalCache.current.set(rollNo, parsedData);
+      if (parsedData && Array.isArray(parsedData.subjects) && parsedData.subjects.length > 0) {
+        internalCache.current.set(rollNo, parsedData);
+      }
       setInternalData(parsedData);
     } catch (err) {
       setInternalError(
