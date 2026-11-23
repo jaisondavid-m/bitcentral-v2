@@ -245,7 +245,7 @@ export function parseInternalMarksSummary(text) {
   return result;
 }
 
-const CLIENT_CACHE_PREFIX = "bitcentral_im_v3_";
+const CLIENT_CACHE_PREFIX = "bitcentral_im_v4_";
 const CLIENT_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours client-side cache
 const CLIENT_MIN_REFRESH_INTERVAL_MS = 30 * 1000; // 30 seconds debounce for manual refresh
 
@@ -323,14 +323,31 @@ export async function fetchInternalMarkConversion(rollNo, forceRefresh = false) 
     );
     if (res.data?.success) {
       if (res.data.subjects && Array.isArray(res.data.subjects)) {
-        const subjects = res.data.subjects.map((s) => ({
-          code: s.code,
-          category: s.category || "Theory Subjects",
-          internalMarks: { Total: String(s.mark) },
-          rewardPoints: {},
-          totalMarks: s.mark,
-          maxMarks: s.max_marks || 30,
-        }));
+        const subjects = res.data.subjects.map((s) => {
+          const rewardPoints = {};
+          if (s.ip1_points !== undefined && s.ip1_points !== null) rewardPoints["IP-1"] = String(s.ip1_points);
+          if (s.ip2_points !== undefined && s.ip2_points !== null) rewardPoints["IP-2"] = String(s.ip2_points);
+          rewardPoints["Total"] = String(s.total_points || ((s.ip1_points || 0) + (s.ip2_points || 0)));
+
+          const internalMarks = {};
+          if (s.ip1_marks !== undefined && s.ip1_marks !== null) internalMarks["IP-1"] = String(s.ip1_marks);
+          if (s.ip2_marks !== undefined && s.ip2_marks !== null) internalMarks["IP-2"] = String(s.ip2_marks);
+          internalMarks["Total"] = String(s.mark);
+
+          return {
+            code: s.code,
+            category: s.category || "Theory Subjects",
+            internalMarks,
+            rewardPoints,
+            ip1Points: s.ip1_points || 0,
+            ip2Points: s.ip2_points || 0,
+            totalPoints: s.total_points || 0,
+            ip1Marks: s.ip1_marks || 0,
+            ip2Marks: s.ip2_marks || 0,
+            totalMarks: s.mark,
+            maxMarks: s.max_marks || 30,
+          };
+        });
         const maxMarks =
           res.data.overall?.max_marks ||
           subjects.reduce((sum, s) => sum + (s.maxMarks || 30), 0);
@@ -345,6 +362,7 @@ export async function fetchInternalMarkConversion(rollNo, forceRefresh = false) 
           overall: {
             totalSubjects: String(res.data.overall?.total_subjects || subjects.length),
             totalInternalMarks: String(earnedMarks),
+            totalRewardPoints: String(res.data.overall?.total_reward_points || 0),
             maxMarks,
             percentage:
               res.data.overall?.percentage ||

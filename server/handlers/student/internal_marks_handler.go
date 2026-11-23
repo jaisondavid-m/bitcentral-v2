@@ -21,16 +21,22 @@ import (
 
 // InternalSubjectMark represents an individual evaluated subject
 type InternalSubjectMark struct {
-	Code     string  `json:"code"`
-	Category string  `json:"category"`
-	Mark     float64 `json:"mark"`
-	MaxMarks float64 `json:"max_marks"`
+	Code        string  `json:"code"`
+	Category    string  `json:"category"`
+	Mark        float64 `json:"mark"`
+	MaxMarks    float64 `json:"max_marks"`
+	IP1Points   float64 `json:"ip1_points"`
+	IP2Points   float64 `json:"ip2_points"`
+	IP1Marks    float64 `json:"ip1_marks"`
+	IP2Marks    float64 `json:"ip2_marks"`
+	TotalPoints float64 `json:"total_points"`
 }
 
 // InternalMarksOverall represents overall internal evaluation summary
 type InternalMarksOverall struct {
 	TotalSubjects      int     `json:"total_subjects"`
 	TotalInternalMarks float64 `json:"total_internal_marks"`
+	TotalRewardPoints  float64 `json:"total_reward_points"`
 	MaxMarks           float64 `json:"max_marks"`
 	Percentage         float64 `json:"percentage"`
 }
@@ -56,7 +62,7 @@ type InternalMarksCacheEntry struct {
 
 const (
 	InternalMarksCacheDuration      = 48 * time.Hour
-	InternalMarksSheetCacheDuration = 10 * time.Minute
+	InternalMarksSheetCacheDuration = 12 * time.Hour
 )
 
 var istLocation = time.FixedZone("IST", 5*3600+30*60)
@@ -176,12 +182,8 @@ func cleanSpreadsheetID(val string) string {
 	return val
 }
 
-type internalSubjectPair struct {
-	CodeCol  int
-	MarkCol  int
-	Category string
-	MaxMarks float64
-}
+const DefaultInternalMarksSheetID = "1gHiOy41cpyg8dZxDWu-MsF8o0abLbL8MHbVK-GkMjqw"
+const InternalMarksSheetTab = "Studentwise Reward Points"
 
 // parseInternalMarksFromCSV reads and parses a local CSV file
 func parseInternalMarksFromCSV(filePath string) (map[string]StudentInternalMarks, error) {
@@ -207,7 +209,7 @@ func parseInternalMarksFromCSV(filePath string) (map[string]StudentInternalMarks
 		}
 		values[i] = rowIface
 	}
-	return parseInternalMarksValues(values)
+	return parseStudentwiseSheetValues(values)
 }
 
 // buildInternalMarksIndex fetches the Google Sheet via Sheets API, or loads a local CSV
@@ -238,17 +240,10 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 	if rawEnv == "" {
 		rawEnv = os.Getenv("Internal_Marks_sheet")
 	}
-	if rawEnv == "" {
-		return nil, fmt.Errorf("INTERNAL_MARKS_SHEET is not set in server/.env, and server/data/internal_marks.csv was not found")
-	}
-
-	if strings.Contains(rawEnv, "2PACX-") || strings.Contains(rawEnv, "/d/e/") {
-		return nil, fmt.Errorf("Web-published links (2PACX-...) cannot be read by Google Sheets API without browser cookies. Please download the CSV from your browser and place it in server/data/internal_marks.csv, OR import it to your Google Drive and set the new Sheet ID.")
-	}
 
 	spreadsheetID := cleanSpreadsheetID(rawEnv)
 	if spreadsheetID == "" {
-		return nil, fmt.Errorf("invalid spreadsheet ID in INTERNAL_MARKS_SHEET: %s", rawEnv)
+		spreadsheetID = DefaultInternalMarksSheetID
 	}
 
 	if h.sheetHandler == nil {
@@ -264,315 +259,358 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 		return nil, fmt.Errorf("Google Sheets service not initialized. Check server token")
 	}
 
-	// 1. Inspect sheets metadata to find the matching tab
-	meta, err := svc.Spreadsheets.Get(spreadsheetID).Do()
+	// Columns A to CR (indices 0 to 97) contain Roll No, Student Name, TS1-9, LS1-2, IP1/IP2 points & marks
+	readRange := fmt.Sprintf("'%s'!A1:CV", InternalMarksSheetTab)
+	vr, err := svc.Spreadsheets.Values.Get(spreadsheetID, readRange).Do()
 	if err != nil {
-		return nil, fmt.Errorf("failed to access internal marks spreadsheet (%s): %w", spreadsheetID, err)
+		vr, err = svc.Spreadsheets.Values.Get(spreadsheetID, fmt.Sprintf("%s!A1:CV", InternalMarksSheetTab)).Do()
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch values for tab %s from %s: %w", InternalMarksSheetTab, spreadsheetID, err)
 	}
 
-	var tabName string
-	targetGid := int64(1533805453) // gid from user sheet URL if present
+	return parseStudentwiseSheetValues(vr.Values)
+}
 
-	if meta != nil && len(meta.Sheets) > 0 {
-		for _, s := range meta.Sheets {
-			if s.Properties != nil && s.Properties.SheetId == targetGid {
-				tabName = s.Properties.Title
+// parseStudentwiseSheetValues extracts subjects, reward points, and marks using the exact logic from extract_subjects_and_marks_for_gradio
+func parseStudentwiseSheetValues(values [][]interface{}) (map[string]StudentInternalMarks, error) {
+	if len(values) < 2 {
+		return nil, fmt.Errorf("sheet has insufficient rows (got %d)", len(values))
+	}
+
+	headers := values[0]
+	headerMap := make(map[string]int, len(headers))
+	for i, h := range headers {
+		name := strings.TrimSpace(fmt.Sprintf("%v", h))
+		if name != "" {
+			headerMap[name] = i
+		}
+	}
+
+	rollCol, hasRoll := headerMap["Roll No."]
+	if !hasRoll {
+		for name, idx := range headerMap {
+			if strings.Contains(strings.ToLower(name), "roll") && strings.Contains(strings.ToLower(name), "no") {
+				rollCol = idx
+				hasRoll = true
 				break
 			}
 		}
-		if tabName == "" {
-			tabName = meta.Sheets[0].Properties.Title
-		}
 	}
-	if tabName == "" {
-		tabName = "Sheet1"
+	if !hasRoll {
+		rollCol = 1
 	}
 
-	// 2. Fetch full table values (A to AD columns)
-	readRange := fmt.Sprintf("'%s'!A1:AD", tabName)
-	vr, err := svc.Spreadsheets.Values.Get(spreadsheetID, readRange).Do()
-	if err != nil {
-		vr, err = svc.Spreadsheets.Values.Get(spreadsheetID, "A1:AD").Do()
-	}
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch values for tab %s: %w", tabName, err)
-	}
+	nameCol := headerMap["Student Name"]
+	courseCol := headerMap["Course Code"]
+	yearCol := headerMap["Year"]
+	deptCol := headerMap["Department"]
 
-	return parseInternalMarksValues(vr.Values)
-}
-
-func parseInternalMarksValues(values [][]interface{}) (map[string]StudentInternalMarks, error) {
-	if len(values) < 3 {
-		return nil, fmt.Errorf("data has insufficient rows (got %d)", len(values))
+	getVal := func(row []interface{}, colName string) string {
+		idx, ok := headerMap[colName]
+		if !ok || idx >= len(row) {
+			return ""
+		}
+		return strings.TrimSpace(fmt.Sprintf("%v", row[idx]))
 	}
 
-	// 3. Detect column positions dynamically from header rows
-	rollNoCol := 1
-	nameCol := 2
-	degreeCol := 3
-	yearCol := 4
-	deptCol := 5
-
-	headerRowIdx := 1
-	for rIdx := 0; rIdx < int(math.Min(float64(len(values)), 4)); rIdx++ {
-		row := values[rIdx]
-		for cIdx, cell := range row {
-			cLower := strings.ToLower(strings.TrimSpace(fmt.Sprintf("%v", cell)))
-			if strings.Contains(cLower, "roll") && strings.Contains(cLower, "no") {
-				rollNoCol = cIdx
-				headerRowIdx = rIdx
-			} else if strings.Contains(cLower, "student") && strings.Contains(cLower, "name") {
-				nameCol = cIdx
-			} else if strings.Contains(cLower, "department") {
-				deptCol = cIdx
-			} else if cLower == "year" {
-				yearCol = cIdx
-			} else if strings.Contains(cLower, "course") && strings.Contains(cLower, "code") && cIdx < 6 {
-				degreeCol = cIdx
-			}
+	getNum := func(row []interface{}, colName string) float64 {
+		s := getVal(row, colName)
+		if s == "" {
+			return 0
 		}
+		s = strings.ReplaceAll(s, ",", "")
+		v, err := strconv.ParseFloat(s, 64)
+		if err != nil {
+			return 0
+		}
+		return v
 	}
 
-	// 4. Detect Subject Pairs across Theory, Lab, and Honor/Minor subjects
-	var pairs []internalSubjectPair
-	maxCols := 0
-	for _, r := range values[:int(math.Min(float64(len(values)), 5))] {
-		if len(r) > maxCols {
-			maxCols = len(r)
-		}
-	}
-
-	for c := 6; c < maxCols-1; c++ {
-		var headerText string
-		for rIdx := 0; rIdx <= int(math.Min(float64(len(values)-1), 3)); rIdx++ {
-			if c < len(values[rIdx]) {
-				headerText += " " + fmt.Sprintf("%v", values[rIdx][c])
-			}
-		}
-
-		headerUpper := strings.ToUpper(headerText)
-		isSubjectCodeCol := strings.Contains(headerUpper, "SUBJECT CODE") ||
-			strings.Contains(headerUpper, "COURSE CODE") ||
-			strings.Contains(headerUpper, "THEORY SUBJECT") ||
-			strings.Contains(headerUpper, "LAB. SUBJECT") ||
-			strings.Contains(headerUpper, "LAB SUBJECT") ||
-			strings.Contains(headerUpper, "HONOR") ||
-			strings.Contains(headerUpper, "MINOR")
-
-		nextHeader := ""
-		for rIdx := 0; rIdx <= int(math.Min(float64(len(values)-1), 3)); rIdx++ {
-			if c+1 < len(values[rIdx]) {
-				nextHeader += " " + fmt.Sprintf("%v", values[rIdx][c+1])
-			}
-		}
-		isNextMarkCol := strings.Contains(strings.ToUpper(nextHeader), "INTERNAL MARK") ||
-			strings.Contains(strings.ToUpper(nextHeader), "MARK")
-
-		if isSubjectCodeCol && isNextMarkCol {
-			cat := "Theory Subjects"
-			if strings.Contains(headerUpper, "LAB") {
-				cat = "Lab Subjects"
-			} else if strings.Contains(headerUpper, "HONOR") || strings.Contains(headerUpper, "MINOR") {
-				cat = "Honor / Minor Subjects"
-			}
-
-			pairs = append(pairs, internalSubjectPair{
-				CodeCol:  c,
-				MarkCol:  c + 1,
-				Category: cat,
-				MaxMarks: 30.0,
-			})
-			c++
-		}
-	}
-
-	// Fallback to standard sheet columns if dynamic detection found none
-	if len(pairs) == 0 {
-		defaultSpecs := []struct {
-			codeCol int
-			markCol int
-			cat     string
-		}{
-			{8, 9, "Theory Subjects"},
-			{10, 11, "Theory Subjects"},
-			{12, 13, "Theory Subjects"},
-			{14, 15, "Theory Subjects"},
-			{16, 17, "Theory Subjects"},
-			{18, 19, "Theory Subjects"},
-			{20, 21, "Theory Subjects"},
-			{22, 23, "Lab Subjects"},
-			{24, 25, "Lab Subjects"},
-			{26, 27, "Honor / Minor Subjects"},
-			{28, 29, "Honor / Minor Subjects"},
-		}
-		for _, ds := range defaultSpecs {
-			if ds.markCol < maxCols {
-				pairs = append(pairs, internalSubjectPair{
-					CodeCol:  ds.codeCol,
-					MarkCol:  ds.markCol,
-					Category: ds.cat,
-					MaxMarks: 30.0,
-				})
-			}
-		}
-	}
-
-	// 5. Detect MAX row if present in rows 1 to 4
-	for rIdx := headerRowIdx; rIdx < int(math.Min(float64(len(values)), 5)); rIdx++ {
-		firstCol := ""
-		if len(values[rIdx]) > 0 {
-			firstCol = strings.ToUpper(strings.TrimSpace(fmt.Sprintf("%v", values[rIdx][0])))
-		}
-		secondCol := ""
-		if len(values[rIdx]) > 1 {
-			secondCol = strings.ToUpper(strings.TrimSpace(fmt.Sprintf("%v", values[rIdx][1])))
-		}
-
-		if strings.Contains(firstCol, "MAX") || strings.Contains(secondCol, "MAX") {
-			for i := range pairs {
-				if pairs[i].MarkCol < len(values[rIdx]) {
-					valStr := strings.TrimSpace(fmt.Sprintf("%v", values[rIdx][pairs[i].MarkCol]))
-					if m, err := strconv.ParseFloat(valStr, 64); err == nil && m > 0 {
-						pairs[i].MaxMarks = m
-					}
-				}
-			}
-			break
-		}
-	}
-
-	// 6. Parse all student rows into an in-memory index
 	index := make(map[string]StudentInternalMarks)
 
-	for rIdx := headerRowIdx + 1; rIdx < len(values); rIdx++ {
+	// Rows start from index 1 (skipping header row 0)
+	for rIdx := 1; rIdx < len(values); rIdx++ {
 		row := values[rIdx]
-		if len(row) <= rollNoCol {
+		if len(row) <= rollCol {
 			continue
 		}
 
-		rawRoll := strings.TrimSpace(fmt.Sprintf("%v", row[rollNoCol]))
+		rawRoll := strings.TrimSpace(fmt.Sprintf("%v", row[rollCol]))
 		normRoll := normalizeRollNo(rawRoll)
 
-		if normRoll == "" || normRoll == "MAX" || len(normRoll) < 5 ||
+		// Search first 5 columns if roll column did not yield a valid student roll number
+		if normRoll == "" || len(normRoll) < 5 || strings.Contains(strings.ToUpper(rawRoll), "HIDDEN") {
+			for c := 0; c < int(math.Min(float64(len(row)), 5)); c++ {
+				cand := normalizeRollNo(fmt.Sprintf("%v", row[c]))
+				if len(cand) >= 10 && (strings.HasPrefix(cand, "7376") || strings.HasPrefix(cand, "2025")) {
+					normRoll = cand
+					break
+				}
+			}
+		}
+
+		if normRoll == "" || len(normRoll) < 5 || strings.Contains(normRoll, "HIDDEN") ||
 			strings.HasPrefix(normRoll, "SL") || strings.HasPrefix(normRoll, "ROLL") {
 			continue
 		}
 
-		name := ""
-		if nameCol < len(row) {
-			name = strings.TrimSpace(fmt.Sprintf("%v", row[nameCol]))
+		studentName := getVal(row, "Student Name")
+		if studentName == "" && nameCol < len(row) {
+			studentName = strings.TrimSpace(fmt.Sprintf("%v", row[nameCol]))
 		}
-		degree := ""
-		if degreeCol < len(row) {
-			degree = strings.TrimSpace(fmt.Sprintf("%v", row[degreeCol]))
+		if studentName == "" {
+			studentName = "Unknown"
 		}
-		year := ""
-		if yearCol < len(row) {
+
+		courseCode := getVal(row, "Course Code")
+		if courseCode == "" && courseCol < len(row) {
+			courseCode = strings.TrimSpace(fmt.Sprintf("%v", row[courseCol]))
+		}
+
+		year := getVal(row, "Year")
+		if year == "" && yearCol < len(row) {
 			year = strings.TrimSpace(fmt.Sprintf("%v", row[yearCol]))
 		}
-		dept := ""
-		if deptCol < len(row) {
-			dept = strings.TrimSpace(fmt.Sprintf("%v", row[deptCol]))
+
+		department := getVal(row, "Department")
+		if department == "" && deptCol < len(row) {
+			department = strings.TrimSpace(fmt.Sprintf("%v", row[deptCol]))
 		}
 
-		// Only include available enrolled subjects
-		var subjects []InternalSubjectMark
-		for _, pair := range pairs {
-			if pair.CodeCol >= len(row) || pair.MarkCol >= len(row) {
-				continue
+		// 1. Collect Theory Subjects (TS1 to TS9)
+		var theorySubjects []InternalSubjectMark
+		var totalTheoryIP1Points, totalTheoryIP2Points float64
+		var totalTheoryIP1Marks, totalTheoryIP2Marks float64
+
+		for i := 1; i <= 9; i++ {
+			code := getVal(row, fmt.Sprintf("TS%d", i))
+			if code != "" {
+				ip1Points := getNum(row, fmt.Sprintf("IP1TS%dR", i))
+				ip2Points := getNum(row, fmt.Sprintf("IP2TS%dR", i))
+				ip1Marks := getNum(row, fmt.Sprintf("IP1TS%dM", i))
+				ip2Marks := getNum(row, fmt.Sprintf("IP2TS%dM", i))
+				totPoints := math.Round((ip1Points+ip2Points)*100) / 100
+				totMarks := math.Round((ip1Marks+ip2Marks)*100) / 100
+
+				totalTheoryIP1Points += ip1Points
+				totalTheoryIP2Points += ip2Points
+				totalTheoryIP1Marks += ip1Marks
+				totalTheoryIP2Marks += ip2Marks
+
+				theorySubjects = append(theorySubjects, InternalSubjectMark{
+					Code:        code,
+					Category:    "Theory Subjects",
+					Mark:        totMarks,
+					MaxMarks:    30.0,
+					IP1Points:   ip1Points,
+					IP2Points:   ip2Points,
+					IP1Marks:    ip1Marks,
+					IP2Marks:    ip2Marks,
+					TotalPoints: totPoints,
+				})
 			}
+		}
 
-			code := strings.TrimSpace(fmt.Sprintf("%v", row[pair.CodeCol]))
-			markStr := strings.TrimSpace(fmt.Sprintf("%v", row[pair.MarkCol]))
+		// 2. Collect Lab Subjects (LS1 to LS2)
+		var labSubjects []InternalSubjectMark
+		var totalLabIP1Points, totalLabIP2Points float64
+		var totalLabIP1Marks, totalLabIP2Marks float64
 
-			if code == "" || code == "-" || strings.EqualFold(code, "NIL") || strings.EqualFold(code, "NA") {
-				continue
+		for i := 1; i <= 2; i++ {
+			code := getVal(row, fmt.Sprintf("LS%d", i))
+			if code != "" {
+				ip1Points := getNum(row, fmt.Sprintf("IP1LS%dR", i))
+				ip2Points := getNum(row, fmt.Sprintf("IP2LS%dR", i))
+				ip1Marks := getNum(row, fmt.Sprintf("IP1LS%dM", i))
+				ip2Marks := getNum(row, fmt.Sprintf("IP2LS%dM", i))
+				totPoints := math.Round((ip1Points+ip2Points)*100) / 100
+				totMarks := math.Round((ip1Marks+ip2Marks)*100) / 100
+
+				totalLabIP1Points += ip1Points
+				totalLabIP2Points += ip2Points
+				totalLabIP1Marks += ip1Marks
+				totalLabIP2Marks += ip2Marks
+
+				labSubjects = append(labSubjects, InternalSubjectMark{
+					Code:        code,
+					Category:    "Lab Subjects",
+					Mark:        totMarks,
+					MaxMarks:    30.0,
+					IP1Points:   ip1Points,
+					IP2Points:   ip2Points,
+					IP1Marks:    ip1Marks,
+					IP2Marks:    ip2Marks,
+					TotalPoints: totPoints,
+				})
 			}
-
-			mark, _ := strconv.ParseFloat(markStr, 64)
-			maxM := pair.MaxMarks
-			if maxM <= 0 {
-				maxM = 30.0
-			}
-
-			subjects = append(subjects, InternalSubjectMark{
-				Code:     code,
-				Category: pair.Category,
-				Mark:     mark,
-				MaxMarks: maxM,
-			})
 		}
 
-		if len(subjects) == 0 {
-			continue
-		}
+		allSubjects := append(theorySubjects, labSubjects...)
+		totalSubjects := len(allSubjects)
+		grandTotalPoints := totalTheoryIP1Points + totalTheoryIP2Points + totalLabIP1Points + totalLabIP2Points
+		grandTotalMarks := totalTheoryIP1Marks + totalTheoryIP2Marks + totalLabIP1Marks + totalLabIP2Marks
 
-		var totalEarned float64
-		var totalMax float64
-		for _, s := range subjects {
-			totalEarned += s.Mark
-			totalMax += s.MaxMarks
-		}
+		maxMarksPossible := float64(totalSubjects) * 30.0
 		var pct float64
-		if totalMax > 0 {
-			pct = math.Round((totalEarned/totalMax)*1000) / 10
+		if maxMarksPossible > 0 {
+			pct = math.Round((grandTotalMarks/maxMarksPossible)*1000) / 10
 		}
 
 		overall := InternalMarksOverall{
-			TotalSubjects:      len(subjects),
-			TotalInternalMarks: math.Round(totalEarned*100) / 100,
-			MaxMarks:           math.Round(totalMax*100) / 100,
+			TotalSubjects:      totalSubjects,
+			TotalInternalMarks: math.Round(grandTotalMarks*100) / 100,
+			TotalRewardPoints:  math.Round(grandTotalPoints*100) / 100,
+			MaxMarks:           maxMarksPossible,
 			Percentage:         pct,
 		}
 
-		// Formatted raw string for backward compatibility
+		// Build output text string formatted identically to Python extract_subjects_and_marks_for_gradio
 		var b strings.Builder
-		grouped := make(map[string][]InternalSubjectMark)
-		var catOrder []string
-		for _, s := range subjects {
-			if len(grouped[s.Category]) == 0 {
-				catOrder = append(catOrder, s.Category)
+		b.WriteString("\n🏆 INNOVATIVE PRACTICE (IP) SUMMARY\n")
+		b.WriteString(strings.Repeat("=", 80) + "\n")
+
+		if len(theorySubjects) > 0 {
+			b.WriteString(fmt.Sprintf("\n📚 THEORY SUBJECTS (%d subjects)\n", len(theorySubjects)))
+			b.WriteString(strings.Repeat("-", 50) + "\n")
+			for _, s := range theorySubjects {
+				b.WriteString(fmt.Sprintf("\n🔹 %s\n", s.Code))
+				if s.IP1Points > 0 || s.IP2Points > 0 {
+					pLine := "  Reward Points: "
+					if s.IP1Points > 0 {
+						pLine += fmt.Sprintf("IP-1: %.2f", s.IP1Points)
+					}
+					if s.IP2Points > 0 {
+						if s.IP1Points > 0 {
+							pLine += fmt.Sprintf(" | IP-2: %.2f", s.IP2Points)
+						} else {
+							pLine += fmt.Sprintf("IP-2: %.2f", s.IP2Points)
+						}
+					}
+					pLine += fmt.Sprintf(" | Total: %.2f\n", s.TotalPoints)
+					b.WriteString(pLine)
+				}
+				if s.IP1Marks > 0 || s.IP2Marks > 0 {
+					mLine := "  Internal Marks: "
+					if s.IP1Marks > 0 {
+						mLine += fmt.Sprintf("IP-1: %.2f", s.IP1Marks)
+					}
+					if s.IP2Marks > 0 {
+						if s.IP1Marks > 0 {
+							mLine += fmt.Sprintf(" | IP-2: %.2f", s.IP2Marks)
+						} else {
+							mLine += fmt.Sprintf("IP-2: %.2f", s.IP2Marks)
+						}
+					}
+					mLine += fmt.Sprintf(" | Total: %.2f\n", s.Mark)
+					b.WriteString(mLine)
+				}
 			}
-			grouped[s.Category] = append(grouped[s.Category], s)
 		}
 
-		for _, cat := range catOrder {
-			subs := grouped[cat]
-			icon := "📚"
-			if strings.Contains(strings.ToLower(cat), "lab") {
-				icon = "🔬"
-			} else if strings.Contains(strings.ToLower(cat), "honor") || strings.Contains(strings.ToLower(cat), "minor") {
-				icon = "🎖️"
+		if len(labSubjects) > 0 {
+			b.WriteString(fmt.Sprintf("\n🧪 LAB SUBJECTS (%d subjects)\n", len(labSubjects)))
+			b.WriteString(strings.Repeat("-", 50) + "\n")
+			for _, s := range labSubjects {
+				b.WriteString(fmt.Sprintf("\n🔹 %s\n", s.Code))
+				if s.IP1Points > 0 || s.IP2Points > 0 {
+					pLine := "  Reward Points: "
+					if s.IP1Points > 0 {
+						pLine += fmt.Sprintf("IP-1: %.2f", s.IP1Points)
+					}
+					if s.IP2Points > 0 {
+						if s.IP1Points > 0 {
+							pLine += fmt.Sprintf(" | IP-2: %.2f", s.IP2Points)
+						} else {
+							pLine += fmt.Sprintf("IP-2: %.2f", s.IP2Points)
+						}
+					}
+					pLine += fmt.Sprintf(" | Total: %.2f\n", s.TotalPoints)
+					b.WriteString(pLine)
+				}
+				if s.IP1Marks > 0 || s.IP2Marks > 0 {
+					mLine := "  Internal Marks: "
+					if s.IP1Marks > 0 {
+						mLine += fmt.Sprintf("IP-1: %.2f", s.IP1Marks)
+					}
+					if s.IP2Marks > 0 {
+						if s.IP1Marks > 0 {
+							mLine += fmt.Sprintf(" | IP-2: %.2f", s.IP2Marks)
+						} else {
+							mLine += fmt.Sprintf("IP-2: %.2f", s.IP2Marks)
+						}
+					}
+					mLine += fmt.Sprintf(" | Total: %.2f\n", s.Mark)
+					b.WriteString(mLine)
+				}
 			}
-			b.WriteString(fmt.Sprintf("%s %s (%d subjects)\n", icon, strings.ToUpper(cat), len(subs)))
-			for _, s := range subs {
-				b.WriteString(fmt.Sprintf("🔹 %s\n", s.Code))
-				b.WriteString(fmt.Sprintf("Internal Marks: Total: %.2f\n", s.Mark))
-			}
-			b.WriteString("\n")
 		}
 
-		b.WriteString("🎯 OVERALL SUMMARY\n")
-		b.WriteString(fmt.Sprintf("TOTAL SUBJECTS: %d\n", overall.TotalSubjects))
-		b.WriteString(fmt.Sprintf("TOTAL INTERNAL MARKS: %.2f\n", overall.TotalInternalMarks))
+		b.WriteString("\n" + strings.Repeat("=", 80) + "\n")
+		b.WriteString("📊 OVERALL SUMMARY\n")
+		b.WriteString(strings.Repeat("=", 80) + "\n")
 
-		rawData := b.String()
+		b.WriteString("\n🏅 REWARD POINTS BREAKDOWN:\n")
+		if len(theorySubjects) > 0 {
+			b.WriteString(fmt.Sprintf("  Theory Subjects: %.2f points\n", totalTheoryIP1Points+totalTheoryIP2Points))
+			if totalTheoryIP1Points > 0 {
+				b.WriteString(fmt.Sprintf("    ➤ IP-1: %.2f\n", totalTheoryIP1Points))
+			}
+			if totalTheoryIP2Points > 0 {
+				b.WriteString(fmt.Sprintf("    ➤ IP-2: %.2f\n", totalTheoryIP2Points))
+			}
+		}
+		if len(labSubjects) > 0 {
+			b.WriteString(fmt.Sprintf("  Lab Subjects: %.2f points\n", totalLabIP1Points+totalLabIP2Points))
+			if totalLabIP1Points > 0 {
+				b.WriteString(fmt.Sprintf("    ➤ IP-1: %.2f\n", totalLabIP1Points))
+			}
+			if totalLabIP2Points > 0 {
+				b.WriteString(fmt.Sprintf("    ➤ IP-2: %.2f\n", totalLabIP2Points))
+			}
+		}
+		b.WriteString(fmt.Sprintf("\n🎯 TOTAL REWARD POINTS: %.2f\n", grandTotalPoints))
+
+		b.WriteString("\n📝 INTERNAL MARKS BREAKDOWN:\n")
+		if len(theorySubjects) > 0 {
+			b.WriteString(fmt.Sprintf("  Theory Subjects: %.2f marks\n", totalTheoryIP1Marks+totalTheoryIP2Marks))
+			if totalTheoryIP1Marks > 0 {
+				b.WriteString(fmt.Sprintf("    ➤ IP-1: %.2f\n", totalTheoryIP1Marks))
+			}
+			if totalTheoryIP2Marks > 0 {
+				b.WriteString(fmt.Sprintf("    ➤ IP-2: %.2f\n", totalTheoryIP2Marks))
+			}
+		}
+		if len(labSubjects) > 0 {
+			b.WriteString(fmt.Sprintf("  Lab Subjects: %.2f marks\n", totalLabIP1Marks+totalLabIP2Marks))
+			if totalLabIP1Marks > 0 {
+				b.WriteString(fmt.Sprintf("    ➤ IP-1: %.2f\n", totalLabIP1Marks))
+			}
+			if totalLabIP2Marks > 0 {
+				b.WriteString(fmt.Sprintf("    ➤ IP-2: %.2f\n", totalLabIP2Marks))
+			}
+		}
+		b.WriteString(fmt.Sprintf("\n📊 TOTAL INTERNAL MARKS: %.2f\n", grandTotalMarks))
+		b.WriteString(fmt.Sprintf("\n📚 TOTAL SUBJECTS: %d\n", totalSubjects))
+		b.WriteString("\n" + strings.Repeat("=", 80) + "\n")
 
 		index[normRoll] = StudentInternalMarks{
 			RollNo:      normRoll,
-			StudentName: name,
-			Degree:      degree,
+			StudentName: studentName,
+			Degree:      courseCode,
 			Year:        year,
-			Department:  dept,
-			Subjects:    subjects,
+			Department:  department,
+			Subjects:    allSubjects,
 			Overall:     overall,
-			RawData:     rawData,
+			RawData:     b.String(),
 		}
 	}
 
-	log.Printf("✅ Internal marks Google Sheet parsed successfully: %d students indexed", len(index))
+	log.Printf("✅ Internal marks parsed successfully: %d students indexed", len(index))
 	return index, nil
 }
+
+
 
 func (h *InternalMarksHandler) getOrRefreshSheetIndex(forceRefresh bool) (map[string]StudentInternalMarks, error) {
 	h.sheetMu.RLock()
