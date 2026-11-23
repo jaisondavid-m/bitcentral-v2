@@ -120,6 +120,11 @@ func (h *InternalMarksHandler) getFromDB(rollNo string) (StudentInternalMarks, b
 		return StudentInternalMarks{}, false
 	}
 
+	// Reject stale cache entries that lack IP period marks
+	if !strings.Contains(rawData, "ip1_marks") {
+		return StudentInternalMarks{}, false
+	}
+
 	var data StudentInternalMarks
 	if err := json.Unmarshal([]byte(rawData), &data); err != nil {
 		return StudentInternalMarks{}, false
@@ -248,6 +253,10 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 
 	if h.sheetHandler == nil {
 		return nil, fmt.Errorf("SheetHandler not initialized on server")
+	}
+
+	if h.sheetHandler.GetOAuthConfig() == nil {
+		h.sheetHandler.InitOAuth()
 	}
 
 	svc := h.sheetHandler.GetSheetsService()

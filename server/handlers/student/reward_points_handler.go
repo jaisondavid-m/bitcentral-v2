@@ -54,15 +54,24 @@ type sheetRangeCacheEntry struct {
 const sheetRangeCacheTTL = 2 * time.Minute
 
 func NewSheetHandler() *SheetHandler {
-	return &SheetHandler{
+	h := &SheetHandler{
 		tabs:       defaultTabs,
 		rangeCache: make(map[string]sheetRangeCacheEntry),
 	}
+	h.InitOAuth()
+	h.LoadSavedToken()
+	return h
 }
 
 func (h *SheetHandler) InitOAuth() {
 	clientID := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_ID"))
+	if clientID == "" {
+		clientID = strings.TrimSpace(os.Getenv("CLIENT_ID"))
+	}
 	clientSecret := strings.TrimSpace(os.Getenv("GOOGLE_OAUTH_CLIENT_SECRET"))
+	if clientSecret == "" {
+		clientSecret = strings.TrimSpace(os.Getenv("CLIENT_SECRET"))
+	}
 	redirectURL := strings.TrimSpace(os.Getenv("REDIRECT_URL"))
 	if redirectURL == "" {
 		redirectURL = "http://localhost:8080/auth/callback"

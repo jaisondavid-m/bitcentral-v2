@@ -179,12 +179,19 @@ export default function InternalMarksConversionModal({
                 const isSubjectFullMarks = subjectTotalMarks >= subjectMaxMarks;
 
                 // Extract period keys (IP-1, IP-2) excluding 'Total'
-                const periodKeys = Array.from(
+                let periodKeys = Array.from(
                   new Set([
                     ...Object.keys(sub.rewardPoints || {}),
                     ...Object.keys(sub.internalMarks || {}),
                   ])
                 ).filter((k) => k.toLowerCase() !== "total");
+
+                if (
+                  periodKeys.length === 0 &&
+                  (sub.ip1Marks > 0 || sub.ip2Marks > 0 || sub.ip1Points > 0 || sub.ip2Points > 0)
+                ) {
+                  periodKeys = ["IP-1", "IP-2"];
+                }
 
                 return (
                   <div
@@ -231,8 +238,22 @@ export default function InternalMarksConversionModal({
                     {periodKeys.length > 0 ? (
                       <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
                         {periodKeys.map((pKey) => {
-                          const rpVal = sub.rewardPoints?.[pKey] || "0";
-                          const imVal = sub.internalMarks?.[pKey] || "0";
+                          const rpVal =
+                            sub.rewardPoints?.[pKey] !== undefined && sub.rewardPoints?.[pKey] !== null
+                              ? sub.rewardPoints[pKey]
+                              : pKey === "IP-1"
+                              ? sub.ip1Points
+                              : pKey === "IP-2"
+                              ? sub.ip2Points
+                              : "0";
+                          const imVal =
+                            sub.internalMarks?.[pKey] !== undefined && sub.internalMarks?.[pKey] !== null
+                              ? sub.internalMarks[pKey]
+                              : pKey === "IP-1"
+                              ? sub.ip1Marks
+                              : pKey === "IP-2"
+                              ? sub.ip2Marks
+                              : "0";
 
                           return (
                             <div

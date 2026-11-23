@@ -245,7 +245,7 @@ export function parseInternalMarksSummary(text) {
   return result;
 }
 
-const CLIENT_CACHE_PREFIX = "bitcentral_im_v4_";
+const CLIENT_CACHE_PREFIX = "bitcentral_im_v5_";
 const CLIENT_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours client-side cache
 const CLIENT_MIN_REFRESH_INTERVAL_MS = 30 * 1000; // 30 seconds debounce for manual refresh
 
@@ -322,34 +322,60 @@ export async function fetchInternalMarkConversion(rollNo, forceRefresh = false) 
       `/internal-marks/conversion?roll_no=${encodeURIComponent(cleanRollNo)}${refreshParam}`
     );
     if (res.data?.success) {
+      const rawParsed = res.data?.raw ? parseInternalMarksSummary(res.data.raw) : null;
+      const rawMap = new Map((rawParsed?.subjects || []).map((s) => [s.code?.toUpperCase(), s]));
+
       if (res.data.subjects && Array.isArray(res.data.subjects)) {
         const subjects = res.data.subjects.map((s) => {
+          const rawSub = rawMap.get(s.code?.toUpperCase());
+
+          const ip1_points = s.ip1_points || rawSub?.ip1Points || 0;
+          const ip2_points = s.ip2_points || rawSub?.ip2Points || 0;
+          const total_points = s.total_points || rawSub?.totalPoints || (ip1_points + ip2_points);
+
+          const ip1_marks = s.ip1_marks || rawSub?.ip1Marks || 0;
+          const ip2_marks = s.ip2_marks || rawSub?.ip2Marks || 0;
+          const total_marks = s.mark || rawSub?.totalMarks || (ip1_marks + ip2_marks);
+
           const rewardPoints = {};
-          if (s.ip1_points !== undefined && s.ip1_points !== null) rewardPoints["IP-1"] = String(s.ip1_points);
-          if (s.ip2_points !== undefined && s.ip2_points !== null) rewardPoints["IP-2"] = String(s.ip2_points);
-          rewardPoints["Total"] = String(s.total_points || ((s.ip1_points || 0) + (s.ip2_points || 0)));
+          if (ip1_points > 0 || ip2_points > 0 || (rawSub?.rewardPoints && Object.keys(rawSub.rewardPoints).length > 0)) {
+            if (rawSub?.rewardPoints) {
+              Object.assign(rewardPoints, rawSub.rewardPoints);
+            }
+            if (ip1_points > 0) rewardPoints["IP-1"] = String(ip1_points);
+            if (ip2_points > 0) rewardPoints["IP-2"] = String(ip2_points);
+            rewardPoints["Total"] = String(total_points);
+          }
 
           const internalMarks = {};
-          if (s.ip1_marks !== undefined && s.ip1_marks !== null) internalMarks["IP-1"] = String(s.ip1_marks);
-          if (s.ip2_marks !== undefined && s.ip2_marks !== null) internalMarks["IP-2"] = String(s.ip2_marks);
-          internalMarks["Total"] = String(s.mark);
+          if (ip1_marks > 0 || ip2_marks > 0 || (rawSub?.internalMarks && Object.keys(rawSub.internalMarks).length > 0)) {
+            if (rawSub?.internalMarks) {
+              Object.assign(internalMarks, rawSub.internalMarks);
+            }
+            if (ip1_marks > 0) internalMarks["IP-1"] = String(ip1_marks);
+            if (ip2_marks > 0) internalMarks["IP-2"] = String(ip2_marks);
+            internalMarks["Total"] = String(total_marks);
+          } else {
+            internalMarks["Total"] = String(total_marks);
+          }
 
           return {
             code: s.code,
-            category: s.category || "Theory Subjects",
+            category: s.category || rawSub?.category || "Theory Subjects",
             internalMarks,
             rewardPoints,
-            ip1Points: s.ip1_points || 0,
-            ip2Points: s.ip2_points || 0,
-            totalPoints: s.total_points || 0,
-            ip1Marks: s.ip1_marks || 0,
-            ip2Marks: s.ip2_marks || 0,
-            totalMarks: s.mark,
-            maxMarks: s.max_marks || 30,
+            ip1Points: ip1_points,
+            ip2Points: ip2_points,
+            totalPoints: total_points,
+            ip1Marks: ip1_marks,
+            ip2Marks: ip2_marks,
+            totalMarks: total_marks,
+            maxMarks: s.max_marks || rawSub?.maxMarks || 30,
           };
         });
         const maxMarks =
           res.data.overall?.max_marks ||
+          rawParsed?.overall?.maxMarks ||
           subjects.reduce((sum, s) => sum + (s.maxMarks || 30), 0);
         const earnedMarks =
           res.data.overall?.total_internal_marks !== undefined
@@ -362,19 +388,21 @@ export async function fetchInternalMarkConversion(rollNo, forceRefresh = false) 
           overall: {
             totalSubjects: String(res.data.overall?.total_subjects || subjects.length),
             totalInternalMarks: String(earnedMarks),
-            totalRewardPoints: String(res.data.overall?.total_reward_points || 0),
+            totalRewardPoints: String(
+              res.data.overall?.total_reward_points || rawParsed?.overall?.totalRewardPoints || 0
+            ),
             maxMarks,
             percentage:
               res.data.overall?.percentage ||
               (maxMarks > 0 ? Math.round((earnedMarks / maxMarks) * 1000) / 10 : 0),
-            breakdown: [],
-            rewardPointsBreakdown: { category: "", periods: {} },
-            internalMarksBreakdown: { category: "", periods: {} },
+            breakdown: rawParsed?.overall?.breakdown || [],
+            rewardPointsBreakdown: rawParsed?.overall?.rewardPointsBreakdown || { category: "", periods: {} },
+            internalMarksBreakdown: rawParsed?.overall?.internalMarksBreakdown || { category: "", periods: {} },
           },
-          studentName: res.data.student_name,
-          department: res.data.department,
-          year: res.data.year,
-          degree: res.data.degree,
+          studentName: res.data.student_name || rawParsed?.studentName,
+          department: res.data.department || rawParsed?.department,
+          year: res.data.year || rawParsed?.year,
+          degree: res.data.degree || rawParsed?.degree,
           raw: res.data.raw || "",
         };
         if (subjects.length > 0) {
@@ -383,12 +411,13 @@ export async function fetchInternalMarkConversion(rollNo, forceRefresh = false) 
         return parsed;
       }
 
-      if (res.data?.raw) {
-        const parsed = parseInternalMarksSummary(res.data.raw);
-        if (parsed?.subjects?.length > 0) {
-          setLocalCachedData(cleanRollNo, res.data.raw);
-        }
-        return parsed;
+      if (rawParsed && rawParsed.subjects && rawParsed.subjects.length > 0) {
+        rawParsed.studentName = res.data.student_name || rawParsed.studentName;
+        rawParsed.department = res.data.department || rawParsed.department;
+        rawParsed.year = res.data.year || rawParsed.year;
+        rawParsed.degree = res.data.degree || rawParsed.degree;
+        setLocalCachedData(cleanRollNo, JSON.stringify(rawParsed));
+        return rawParsed;
       }
     }
     throw new Error(res.data?.error || "No internal marks found for this student.");
