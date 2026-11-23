@@ -206,6 +206,10 @@ func parseInternalMarksFromCSV(filePath string) (map[string]StudentInternalMarks
 		return nil, fmt.Errorf("failed to read CSV %s: %w", filePath, err)
 	}
 
+	return ParseStudentwiseSheetValues(recordsToInterface(records))
+}
+
+func recordsToInterface(records [][]string) [][]interface{} {
 	values := make([][]interface{}, len(records))
 	for i, row := range records {
 		rowIface := make([]interface{}, len(row))
@@ -214,7 +218,7 @@ func parseInternalMarksFromCSV(filePath string) (map[string]StudentInternalMarks
 		}
 		values[i] = rowIface
 	}
-	return parseStudentwiseSheetValues(values)
+	return values
 }
 
 // buildInternalMarksIndex fetches the Google Sheet via Sheets API, or loads a local CSV
@@ -278,11 +282,11 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 		return nil, fmt.Errorf("failed to fetch values for tab %s from %s: %w", InternalMarksSheetTab, spreadsheetID, err)
 	}
 
-	return parseStudentwiseSheetValues(vr.Values)
+	return ParseStudentwiseSheetValues(vr.Values)
 }
 
-// parseStudentwiseSheetValues extracts subjects, reward points, and marks using the exact logic from extract_subjects_and_marks_for_gradio
-func parseStudentwiseSheetValues(values [][]interface{}) (map[string]StudentInternalMarks, error) {
+// ParseStudentwiseSheetValues extracts subjects, reward points, and marks using the exact logic from extract_subjects_and_marks_for_gradio
+func ParseStudentwiseSheetValues(values [][]interface{}) (map[string]StudentInternalMarks, error) {
 	if len(values) < 2 {
 		return nil, fmt.Errorf("sheet has insufficient rows (got %d)", len(values))
 	}

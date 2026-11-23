@@ -138,7 +138,9 @@ export default function InternalMarksConversionModal({
                 <AlertCircle className="h-4 w-4 text-rose-600 dark:text-rose-400" />
                 <span>Failed to fetch internal mark conversion</span>
               </div>
-              <p className="text-[11px] leading-relaxed opacity-90">{error}</p>
+              <p className="text-[11px] leading-relaxed opacity-90">
+                {typeof error === "string" ? error : error?.message || error?.details || JSON.stringify(error)}
+              </p>
               {onRefresh && (
                 <button
                   type="button"
@@ -186,10 +188,7 @@ export default function InternalMarksConversionModal({
                   ])
                 ).filter((k) => k.toLowerCase() !== "total");
 
-                if (
-                  periodKeys.length === 0 &&
-                  (sub.ip1Marks > 0 || sub.ip2Marks > 0 || sub.ip1Points > 0 || sub.ip2Points > 0)
-                ) {
+                if (periodKeys.length === 0) {
                   periodKeys = ["IP-1", "IP-2"];
                 }
 
@@ -239,21 +238,17 @@ export default function InternalMarksConversionModal({
                       <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
                         {periodKeys.map((pKey) => {
                           const rpVal =
-                            sub.rewardPoints?.[pKey] !== undefined && sub.rewardPoints?.[pKey] !== null
-                              ? sub.rewardPoints[pKey]
-                              : pKey === "IP-1"
-                              ? sub.ip1Points
+                            pKey === "IP-1"
+                              ? (sub.ip1Points ?? sub.ip1_points ?? sub.rewardPoints?.["IP-1"] ?? "0")
                               : pKey === "IP-2"
-                              ? sub.ip2Points
-                              : "0";
+                              ? (sub.ip2Points ?? sub.ip2_points ?? sub.rewardPoints?.["IP-2"] ?? "0")
+                              : (sub.rewardPoints?.[pKey] ?? "0");
                           const imVal =
-                            sub.internalMarks?.[pKey] !== undefined && sub.internalMarks?.[pKey] !== null
-                              ? sub.internalMarks[pKey]
-                              : pKey === "IP-1"
-                              ? sub.ip1Marks
+                            pKey === "IP-1"
+                              ? (sub.ip1Marks ?? sub.ip1_marks ?? sub.internalMarks?.["IP-1"] ?? "0")
                               : pKey === "IP-2"
-                              ? sub.ip2Marks
-                              : "0";
+                              ? (sub.ip2Marks ?? sub.ip2_marks ?? sub.internalMarks?.["IP-2"] ?? "0")
+                              : (sub.internalMarks?.[pKey] ?? "0");
 
                           return (
                             <div

@@ -245,9 +245,102 @@ export function parseInternalMarksSummary(text) {
   return result;
 }
 
-const CLIENT_CACHE_PREFIX = "bitcentral_im_v5_";
+const CLIENT_CACHE_PREFIX = "bitcentral_im_v6_";
 const CLIENT_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours client-side cache
 const CLIENT_MIN_REFRESH_INTERVAL_MS = 30 * 1000; // 30 seconds debounce for manual refresh
+
+export function normalizeSubject(s, rawSub = null) {
+  const ip1_points =
+    s.ip1_points !== undefined && s.ip1_points !== null
+      ? Number(s.ip1_points)
+      : s.ip1Points !== undefined && s.ip1Points !== null
+      ? Number(s.ip1Points)
+      : rawSub?.ip1Points !== undefined
+      ? Number(rawSub.ip1Points)
+      : 0;
+
+  const ip2_points =
+    s.ip2_points !== undefined && s.ip2_points !== null
+      ? Number(s.ip2_points)
+      : s.ip2Points !== undefined && s.ip2Points !== null
+      ? Number(s.ip2Points)
+      : rawSub?.ip2Points !== undefined
+      ? Number(rawSub.ip2Points)
+      : 0;
+
+  const total_points =
+    s.total_points !== undefined && s.total_points !== null
+      ? Number(s.total_points)
+      : s.totalPoints !== undefined && s.totalPoints !== null
+      ? Number(s.totalPoints)
+      : rawSub?.totalPoints !== undefined
+      ? Number(rawSub.totalPoints)
+      : (ip1_points + ip2_points);
+
+  const ip1_marks =
+    s.ip1_marks !== undefined && s.ip1_marks !== null
+      ? Number(s.ip1_marks)
+      : s.ip1Marks !== undefined && s.ip1Marks !== null
+      ? Number(s.ip1Marks)
+      : rawSub?.ip1Marks !== undefined
+      ? Number(rawSub.ip1Marks)
+      : 0;
+
+  const ip2_marks =
+    s.ip2_marks !== undefined && s.ip2_marks !== null
+      ? Number(s.ip2_marks)
+      : s.ip2Marks !== undefined && s.ip2Marks !== null
+      ? Number(s.ip2Marks)
+      : rawSub?.ip2Marks !== undefined
+      ? Number(rawSub.ip2Marks)
+      : 0;
+
+  const total_marks =
+    s.mark !== undefined && s.mark !== null
+      ? Number(s.mark)
+      : s.totalMarks !== undefined && s.totalMarks !== null
+      ? Number(s.totalMarks)
+      : rawSub?.totalMarks !== undefined
+      ? Number(rawSub.totalMarks)
+      : (ip1_marks + ip2_marks);
+
+  const rewardPoints = {
+    "IP-1": String(ip1_points),
+    "IP-2": String(ip2_points),
+    "Total": String(total_points),
+    ...(rawSub?.rewardPoints || {}),
+    ...(s.rewardPoints || {}),
+  };
+
+  const internalMarks = {
+    "IP-1": String(ip1_marks),
+    "IP-2": String(ip2_marks),
+    "Total": String(total_marks),
+    ...(rawSub?.internalMarks || {}),
+    ...(s.internalMarks || {}),
+  };
+
+  return {
+    code: s.code,
+    category: s.category || rawSub?.category || "Theory Subjects",
+    rewardPoints,
+    internalMarks,
+    ip1Points: ip1_points,
+    ip1_points,
+    ip2Points: ip2_points,
+    ip2_points,
+    totalPoints: total_points,
+    total_points,
+    ip1Marks: ip1_marks,
+    ip1_marks,
+    ip2Marks: ip2_marks,
+    ip2_marks,
+    totalMarks: total_marks,
+    mark: total_marks,
+    maxMarks: s.maxMarks || s.max_marks || rawSub?.maxMarks || 30,
+    max_marks: s.max_marks || s.maxMarks || rawSub?.maxMarks || 30,
+  };
+}
 
 function getLocalCachedData(rollNo) {
   try {
@@ -286,12 +379,14 @@ function parseLocalCache(raw) {
     if (raw.startsWith("{") && raw.includes('"subjects"')) {
       const obj = JSON.parse(raw);
       if (Array.isArray(obj?.subjects) && obj.subjects.length > 0) {
+        obj.subjects = obj.subjects.map((sub) => normalizeSubject(sub));
         return obj;
       }
     }
   } catch {}
   const summary = parseInternalMarksSummary(raw);
   if (Array.isArray(summary?.subjects) && summary.subjects.length > 0) {
+    summary.subjects = summary.subjects.map((sub) => normalizeSubject(sub));
     return summary;
   }
   return null;
@@ -328,50 +423,7 @@ export async function fetchInternalMarkConversion(rollNo, forceRefresh = false) 
       if (res.data.subjects && Array.isArray(res.data.subjects)) {
         const subjects = res.data.subjects.map((s) => {
           const rawSub = rawMap.get(s.code?.toUpperCase());
-
-          const ip1_points = s.ip1_points || rawSub?.ip1Points || 0;
-          const ip2_points = s.ip2_points || rawSub?.ip2Points || 0;
-          const total_points = s.total_points || rawSub?.totalPoints || (ip1_points + ip2_points);
-
-          const ip1_marks = s.ip1_marks || rawSub?.ip1Marks || 0;
-          const ip2_marks = s.ip2_marks || rawSub?.ip2Marks || 0;
-          const total_marks = s.mark || rawSub?.totalMarks || (ip1_marks + ip2_marks);
-
-          const rewardPoints = {};
-          if (ip1_points > 0 || ip2_points > 0 || (rawSub?.rewardPoints && Object.keys(rawSub.rewardPoints).length > 0)) {
-            if (rawSub?.rewardPoints) {
-              Object.assign(rewardPoints, rawSub.rewardPoints);
-            }
-            if (ip1_points > 0) rewardPoints["IP-1"] = String(ip1_points);
-            if (ip2_points > 0) rewardPoints["IP-2"] = String(ip2_points);
-            rewardPoints["Total"] = String(total_points);
-          }
-
-          const internalMarks = {};
-          if (ip1_marks > 0 || ip2_marks > 0 || (rawSub?.internalMarks && Object.keys(rawSub.internalMarks).length > 0)) {
-            if (rawSub?.internalMarks) {
-              Object.assign(internalMarks, rawSub.internalMarks);
-            }
-            if (ip1_marks > 0) internalMarks["IP-1"] = String(ip1_marks);
-            if (ip2_marks > 0) internalMarks["IP-2"] = String(ip2_marks);
-            internalMarks["Total"] = String(total_marks);
-          } else {
-            internalMarks["Total"] = String(total_marks);
-          }
-
-          return {
-            code: s.code,
-            category: s.category || rawSub?.category || "Theory Subjects",
-            internalMarks,
-            rewardPoints,
-            ip1Points: ip1_points,
-            ip2Points: ip2_points,
-            totalPoints: total_points,
-            ip1Marks: ip1_marks,
-            ip2Marks: ip2_marks,
-            totalMarks: total_marks,
-            maxMarks: s.max_marks || rawSub?.maxMarks || 30,
-          };
+          return normalizeSubject(s, rawSub);
         });
         const maxMarks =
           res.data.overall?.max_marks ||

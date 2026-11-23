@@ -21,6 +21,24 @@ const Meta = (props) => {
   );
 };
 
+const extractErrorMessage = (err, fallback = "An error occurred.") => {
+  if (!err) return fallback;
+  if (typeof err === "string") return err;
+  const dataErr = err?.response?.data?.error;
+  if (typeof dataErr === "string") return dataErr;
+  if (dataErr && typeof dataErr === "object") {
+    if (typeof dataErr.message === "string") return dataErr.message;
+    if (typeof dataErr.details === "string") return dataErr.details;
+    try {
+      return JSON.stringify(dataErr);
+    } catch {}
+  }
+  const dataMsg = err?.response?.data?.message;
+  if (typeof dataMsg === "string") return dataMsg;
+  if (typeof err.message === "string") return err.message;
+  return fallback;
+};
+
 export default function RpCard({ student }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -139,7 +157,7 @@ export default function RpCard({ student }) {
       setTotalCount(total);
       setCurrentPage(pageNumber);
     } catch (err) {
-      setError(err?.response?.data?.error || err?.response?.data?.message || err?.message || "Failed to load points.");
+      setError(extractErrorMessage(err, "Failed to load points."));
     } finally {
       setLoading(false);
     }
@@ -167,7 +185,7 @@ export default function RpCard({ student }) {
       setInternalData(parsedData);
     } catch (err) {
       setInternalError(
-        err?.message || "Failed to fetch internal mark conversion. Please try again."
+        extractErrorMessage(err, "Failed to fetch internal mark conversion. Please try again.")
       );
     } finally {
       setInternalLoading(false);
@@ -197,10 +215,7 @@ export default function RpCard({ student }) {
       setRankData(data);
     } catch (err) {
       setRankError(
-        err?.response?.data?.error ||
-          err?.response?.data?.message ||
-          err?.message ||
-          "Failed to calculate student rank. Please try again."
+        extractErrorMessage(err, "Failed to calculate student rank. Please try again.")
       );
     } finally {
       setRankLoading(false);
@@ -361,7 +376,7 @@ export default function RpCard({ student }) {
                 </div>
               ) : error ? (
                 <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-400">
-                  {error}
+                  {typeof error === "string" ? error : error?.message || error?.details || JSON.stringify(error)}
                 </div>
               ) : points.length === 0 ? (
                 <div className="flex flex-col items-center justify-center gap-2 py-20 text-slate-500 dark:text-slate-600">

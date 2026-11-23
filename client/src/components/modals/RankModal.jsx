@@ -193,7 +193,7 @@ export default function RankModal({
                 <h4 className="text-sm font-semibold">Unable to calculate ranks</h4>
               </div>
               <p className="text-xs leading-relaxed text-red-600 dark:text-red-400">
-                {error}
+                {typeof error === "string" ? error : error?.message || error?.details || JSON.stringify(error)}
               </p>
               {onRefresh && (
                 <button

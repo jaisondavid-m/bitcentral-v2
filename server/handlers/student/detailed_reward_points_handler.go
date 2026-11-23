@@ -58,6 +58,10 @@ func (h *SheetHandler) buildRewardsIndexForSheet(spreadsheetID string) (map[stri
 		return make(map[string][]RewardActivity), nil
 	}
 	svc := h.getSheetsService()
+	if svc == nil {
+		h.LoadSavedToken()
+		svc = h.getSheetsService()
+	}
 
 	if svc == nil {
 		return nil, fmt.Errorf("sheets service not initialized")
@@ -116,8 +120,8 @@ func (h *SheetHandler) buildRewardsIndex() (map[string][]RewardActivity, error) 
 		var err2 error
 		index2, err2 = h.buildRewardsIndexForSheet(spreadsheetID2)
 		if err2 != nil {
-			log.Printf("Error: failed to build index for sheet 2 (%s): %v", spreadsheetID2, err2)
-			return nil, fmt.Errorf("failed to build index for sheet 2: %w", err2)
+			log.Printf("⚠️ Warning: failed to build index for sheet 2 (%s): %v. Continuing with sheet 1.", spreadsheetID2, err2)
+			index2 = make(map[string][]RewardActivity)
 		}
 	} else {
 		index2 = make(map[string][]RewardActivity)
