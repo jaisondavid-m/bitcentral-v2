@@ -43,11 +43,8 @@ export default function InternalMarksConversionModal({
   const hasParsedSubjects = subjects.length > 0;
   const overall = data?.overall || null;
   const totalEarnedMarks =
-    parseFloat(overall?.totalInternalMarks || overall?.total_internal_marks) || 0;
-  const maxPossibleMarks =
-    overall?.maxMarks ||
-    overall?.max_marks ||
-    subjects.reduce((sum, s) => sum + (s.maxMarks || s.max_marks || 30), 0);
+    parseFloat(overall?.totalInternalMarks || overall?.total_internal_marks) ||
+    subjects.reduce((sum, s) => sum + (s.totalMarks || s.mark || 0), 0);
 
   return (
     <div
@@ -166,7 +163,7 @@ export default function InternalMarksConversionModal({
                 </h4>
                 {totalEarnedMarks > 0 && (
                   <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                    Total: {formatScore(totalEarnedMarks)} / {formatScore(maxPossibleMarks)}
+                    Total: {formatScore(totalEarnedMarks)} marks
                   </span>
                 )}
               </div>
@@ -177,8 +174,6 @@ export default function InternalMarksConversionModal({
                     ? sub.totalMarks
                     : parseFloat(sub.internalMarks?.Total || sub.internalMarks?.total || "0") ||
                       0;
-                const subjectMaxMarks = sub.maxMarks || sub.max_marks || 30;
-                const isSubjectFullMarks = subjectTotalMarks >= subjectMaxMarks;
 
                 // Extract period keys (IP-1, IP-2) excluding 'Total'
                 let periodKeys = Array.from(
@@ -201,7 +196,7 @@ export default function InternalMarksConversionModal({
                       transition flex flex-col gap-2.5
                     "
                   >
-                    {/* Top Row: Subject Code & Total Score */}
+                    {/* Top Row: Subject Code & Given Internal Mark */}
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-600 dark:text-slate-400 font-mono shrink-0">
@@ -220,20 +215,14 @@ export default function InternalMarksConversionModal({
                       </div>
 
                       <div className="flex items-center gap-1 font-mono shrink-0">
-                        <span
-                          className={`text-sm font-bold ${
-                            isSubjectFullMarks
-                              ? "text-emerald-600 dark:text-emerald-400"
-                              : "text-indigo-600 dark:text-indigo-400"
-                          }`}
-                        >
+                        <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
                           {formatScore(subjectTotalMarks)}
                         </span>
-                        <span className="text-xs text-slate-400">/ {formatScore(subjectMaxMarks)} marks</span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500">marks</span>
                       </div>
                     </div>
 
-                    {/* Breakdown: Clean inline pill for IP-1 and IP-2 or single mark display */}
+                    {/* Breakdown: Clean inline pill for IP-1 and IP-2 showing redeemed points and given mark */}
                     {periodKeys.length > 0 ? (
                       <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
                         {periodKeys.map((pKey) => {
@@ -265,7 +254,7 @@ export default function InternalMarksConversionModal({
                               </div>
 
                               <span className="font-bold text-emerald-600 dark:text-emerald-400 text-[11.5px] shrink-0">
-                                {formatScore(imVal)}/15
+                                {formatScore(imVal)} marks
                               </span>
                             </div>
                           );
@@ -277,7 +266,7 @@ export default function InternalMarksConversionModal({
                           {sub.category || "Theory Subject"}
                         </span>
                         <span className="font-bold text-emerald-600 dark:text-emerald-400 text-[11.5px]">
-                          Score: {formatScore(subjectTotalMarks)} / {formatScore(subjectMaxMarks)}
+                          {formatScore(subjectTotalMarks)} marks
                         </span>
                       </div>
                     )}
@@ -292,7 +281,7 @@ export default function InternalMarksConversionModal({
         <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 px-5 sm:px-6 py-3.5 shrink-0 bg-slate-50/70 dark:bg-slate-900/60 text-xs text-slate-500 dark:text-slate-400">
           <span className="font-mono">
             {subjects.length > 0
-              ? `${subjects.length} subjects evaluated · Max: ${formatScore(maxPossibleMarks)}`
+              ? `${subjects.length} subjects evaluated`
               : "Internal Marks"}
           </span>
 
