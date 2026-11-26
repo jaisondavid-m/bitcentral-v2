@@ -621,6 +621,8 @@ export async function getAdminAuditLogs({
   status = "",
   user_uid = "",
   roll_no = "",
+  exclude_user = "",
+  exclude_actor = "",
 } = {}) {
   const headers = await getAdminHeaders();
   const params = new URLSearchParams();
@@ -631,6 +633,11 @@ export async function getAdminAuditLogs({
   if (status) params.set("status", status);
   if (user_uid) params.set("user_uid", user_uid);
   if (roll_no) params.set("roll_no", roll_no);
+  const exclude = exclude_user || exclude_actor;
+  if (exclude) {
+    params.set("exclude_user", exclude);
+    params.set("exclude_actor", exclude);
+  }
 
   const response = await api.get(`/admin/audit-logs?${params.toString()}`, { headers });
   return response.data;

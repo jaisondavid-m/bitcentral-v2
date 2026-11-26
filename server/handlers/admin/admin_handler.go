@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -968,6 +969,13 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 	userUID := strings.TrimSpace(c.Query("user_uid"))
 	rollNo := strings.TrimSpace(c.Query("roll_no"))
 
+	excludeActor := strings.TrimSpace(c.Query("exclude_actor"))
+	if excludeActor == "" {
+		excludeActor = strings.TrimSpace(c.Query("exclude_user"))
+	}
+	excludeEndpoint := strings.TrimSpace(c.Query("exclude_endpoint"))
+	excludeMethod := strings.ToUpper(strings.TrimSpace(c.Query("exclude_method")))
+
 	var whereClauses []string
 	var args []any
 
@@ -980,6 +988,40 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 	} else if rollNo != "" {
 		whereClauses = append(whereClauses, "LOWER(roll_no) = LOWER(?)")
 		args = append(args, rollNo)
+	}
+
+	// Anti-filter for actors (user_name, roll_no, user_uid)
+	if excludeActor != "" {
+		actors := strings.Split(excludeActor, ",")
+		for _, act := range actors {
+			act = strings.TrimSpace(act)
+			if act != "" {
+				p := "%" + strings.ToLower(act) + "%"
+				whereClauses = append(whereClauses, `(
+					LOWER(COALESCE(user_name, '')) NOT LIKE ? AND 
+					LOWER(COALESCE(roll_no, '')) NOT LIKE ? AND 
+					LOWER(COALESCE(user_uid, '')) NOT LIKE ?
+				)`)
+				args = append(args, p, p, p)
+			}
+		}
+	}
+
+	// Anti-filter for endpoint
+	if excludeEndpoint != "" {
+		for _, ep := range strings.Split(excludeEndpoint, ",") {
+			ep = strings.TrimSpace(ep)
+			if ep != "" {
+				whereClauses = append(whereClauses, "LOWER(endpoint) NOT LIKE ?")
+				args = append(args, "%"+strings.ToLower(ep)+"%")
+			}
+		}
+	}
+
+	// Anti-filter for HTTP method
+	if excludeMethod != "" && excludeMethod != "NONE" && excludeMethod != "ALL" {
+		whereClauses = append(whereClauses, "method != ?")
+		args = append(args, excludeMethod)
 	}
 
 	if method != "" && method != "ALL" {
@@ -1005,22 +1047,87 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 	if search != "" {
 		tokens := strings.Fields(search)
 		for _, token := range tokens {
-			pattern := "%" + strings.ToLower(token) + "%"
-			whereClauses = append(whereClauses, `(
-				LOWER(endpoint) LIKE ? OR 
-				LOWER(COALESCE(user_name, '')) LIKE ? OR 
-				LOWER(COALESCE(roll_no, '')) LIKE ? OR 
-				LOWER(COALESCE(user_uid, '')) LIKE ? OR 
-				LOWER(COALESCE(ip_address, '')) LIKE ? OR 
-				LOWER(method) LIKE ? OR 
-				LOWER(COALESCE(query, '')) LIKE ? OR 
-				LOWER(COALESCE(payload, '')) LIKE ? OR 
-				LOWER(COALESCE(response, '')) LIKE ? OR 
-				LOWER(COALESCE(role, '')) LIKE ? OR 
-				CAST(status_code AS CHAR) LIKE ?
-			)`)
-			for i := 0; i < 11; i++ {
-				args = append(args, pattern)
+			isAnti := false
+			rawToken := token
+			if strings.HasPrefix(rawToken, "-") && len(rawToken) > 1 {
+				isAnti = true
+				rawToken = strings.TrimPrefix(rawToken, "-")
+			} else if strings.HasPrefix(rawToken, "!") && len(rawToken) > 1 {
+				isAnti = true
+				rawToken = strings.TrimPrefix(rawToken, "!")
+			}
+
+			lowerToken := strings.ToLower(rawToken)
+
+			// Specific actor anti-filter in search: -actor:... or actor:...
+			if strings.HasPrefix(lowerToken, "actor:") || strings.HasPrefix(lowerToken, "user:") {
+				val := strings.TrimPrefix(strings.TrimPrefix(lowerToken, "actor:"), "user:")
+				p := "%" + val + "%"
+				if isAnti {
+					whereClauses = append(whereClauses, `(
+						LOWER(COALESCE(user_name, '')) NOT LIKE ? AND 
+						LOWER(COALESCE(roll_no, '')) NOT LIKE ? AND 
+						LOWER(COALESCE(user_uid, '')) NOT LIKE ?
+					)`)
+					args = append(args, p, p, p)
+				} else {
+					whereClauses = append(whereClauses, `(
+						LOWER(COALESCE(user_name, '')) LIKE ? OR 
+						LOWER(COALESCE(roll_no, '')) LIKE ? OR 
+						LOWER(COALESCE(user_uid, '')) LIKE ?
+					)`)
+					args = append(args, p, p, p)
+				}
+				continue
+			}
+
+			// Specific endpoint anti-filter in search: -endpoint:... or endpoint:...
+			if strings.HasPrefix(lowerToken, "endpoint:") {
+				val := strings.TrimPrefix(lowerToken, "endpoint:")
+				p := "%" + val + "%"
+				if isAnti {
+					whereClauses = append(whereClauses, "LOWER(endpoint) NOT LIKE ?")
+				} else {
+					whereClauses = append(whereClauses, "LOWER(endpoint) LIKE ?")
+				}
+				args = append(args, p)
+				continue
+			}
+
+			p := "%" + lowerToken + "%"
+			if isAnti {
+				// Anti-search: row must NOT match this token in any identifier field
+				whereClauses = append(whereClauses, `(
+					LOWER(endpoint) NOT LIKE ? AND 
+					LOWER(COALESCE(user_name, '')) NOT LIKE ? AND 
+					LOWER(COALESCE(roll_no, '')) NOT LIKE ? AND 
+					LOWER(COALESCE(user_uid, '')) NOT LIKE ? AND 
+					LOWER(COALESCE(ip_address, '')) NOT LIKE ? AND 
+					LOWER(method) NOT LIKE ? AND 
+					LOWER(COALESCE(query, '')) NOT LIKE ? AND 
+					LOWER(COALESCE(role, '')) NOT LIKE ? AND 
+					CAST(status_code AS CHAR) NOT LIKE ?
+				)`)
+				for i := 0; i < 9; i++ {
+					args = append(args, p)
+				}
+			} else {
+				// Positive search: matches any of the fields (excluding response LONGTEXT for fast search)
+				whereClauses = append(whereClauses, `(
+					LOWER(endpoint) LIKE ? OR 
+					LOWER(COALESCE(user_name, '')) LIKE ? OR 
+					LOWER(COALESCE(roll_no, '')) LIKE ? OR 
+					LOWER(COALESCE(user_uid, '')) LIKE ? OR 
+					LOWER(COALESCE(ip_address, '')) LIKE ? OR 
+					LOWER(method) LIKE ? OR 
+					LOWER(COALESCE(query, '')) LIKE ? OR 
+					LOWER(COALESCE(payload, '')) LIKE ? OR 
+					LOWER(COALESCE(role, '')) LIKE ? OR 
+					CAST(status_code AS CHAR) LIKE ?
+				)`)
+				for i := 0; i < 10; i++ {
+					args = append(args, p)
+				}
 			}
 		}
 	}
@@ -1030,10 +1137,6 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 		whereSQL = " WHERE " + strings.Join(whereClauses, " AND ")
 	}
 
-	var total int
-	countQuery := "SELECT COUNT(*) FROM audit_logs" + whereSQL
-	_ = db.QueryRow(countQuery, args...).Scan(&total)
-
 	selectQuery := `
 		SELECT id, method, endpoint, COALESCE(query, ''), COALESCE(payload, ''), COALESCE(response, ''), ip_address,
 		       COALESCE(user_uid, ''), COALESCE(user_name, ''), COALESCE(roll_no, ''), COALESCE(role, ''),
@@ -1041,7 +1144,8 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 		FROM audit_logs
 	` + whereSQL + " ORDER BY id DESC LIMIT ? OFFSET ?"
 
-	selectArgs := append(args, limit, offset)
+	// Query limit + 1 so we know with 100% certainty if a next page exists
+	selectArgs := append(args, limit+1, offset)
 	rows, err := db.Query(selectQuery, selectArgs...)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -1065,23 +1169,47 @@ func (h *AdminHandler) GetAuditLogs(c *gin.Context) {
 		CreatedAt  string `json:"created_at"`
 	}
 
-	logs := make([]AuditEntry, 0)
+	rawLogs := make([]AuditEntry, 0)
 	for rows.Next() {
 		var entry AuditEntry
 		if err := rows.Scan(
 			&entry.ID, &entry.Method, &entry.Endpoint, &entry.Query, &entry.Payload, &entry.Response, &entry.IPAddress,
 			&entry.UserUID, &entry.UserName, &entry.RollNo, &entry.Role, &entry.StatusCode, &entry.CreatedAt,
 		); err == nil {
-			logs = append(logs, entry)
+			rawLogs = append(rawLogs, entry)
+		}
+	}
+
+	hasMore := len(rawLogs) > limit
+	logs := rawLogs
+	if hasMore {
+		logs = rawLogs[:limit]
+	}
+
+	var total int
+	// Attempt fast count with 2.5s context timeout
+	countCtx, cancel := context.WithTimeout(c.Request.Context(), 2500*time.Millisecond)
+	defer cancel()
+
+	countQuery := "SELECT COUNT(*) FROM audit_logs" + whereSQL
+	countErr := db.QueryRowContext(countCtx, countQuery, args...).Scan(&total)
+
+	// If count timed out or failed or returned 0 while rows were found, estimate safely
+	if countErr != nil || (total == 0 && len(logs) > 0) {
+		if hasMore {
+			total = offset + len(logs) + 1
+		} else {
+			total = offset + len(logs)
 		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"logs":    logs,
-		"total":   total,
-		"page":    page,
-		"limit":   limit,
+		"success":  true,
+		"logs":     logs,
+		"total":    total,
+		"has_more": hasMore,
+		"page":     page,
+		"limit":    limit,
 	})
 }
 

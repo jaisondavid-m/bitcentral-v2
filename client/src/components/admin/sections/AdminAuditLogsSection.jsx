@@ -15,6 +15,8 @@ import {
   Filter,
   User,
   Users,
+  UserX,
+  Ban,
   Clock,
   Globe,
   Code2,
@@ -144,6 +146,11 @@ export default function AdminAuditLogsSection() {
   const [method, setMethod] = useState("ALL");
   const [status, setStatus] = useState("ALL");
 
+  // Anti-Filter / Exclude Actor State
+  const [excludeActor, setExcludeActor] = useState("");
+  const [excludeActorInput, setExcludeActorInput] = useState("");
+  const [hasMore, setHasMore] = useState(false);
+
   // User-wise State
   const [auditUsers, setAuditUsers] = useState([]);
   const [userGridTotal, setUserGridTotal] = useState(0);
@@ -158,6 +165,7 @@ export default function AdminAuditLogsSection() {
   const [userLogs, setUserLogs] = useState([]);
   const [userLogsTotal, setUserLogsTotal] = useState(0);
   const [userLogsLoading, setUserLogsLoading] = useState(false);
+  const [userLogsHasMore, setUserLogsHasMore] = useState(false);
   const [userPage, setUserPage] = useState(1);
   const [userLimit, setUserLimit] = useState(50);
   const [userMethod, setUserMethod] = useState("ALL");
@@ -169,6 +177,34 @@ export default function AdminAuditLogsSection() {
   const [selectedLog, setSelectedLog] = useState(null);
   const [copiedPayload, setCopiedPayload] = useState(false);
   const [copiedResponse, setCopiedResponse] = useState(false);
+
+  // Anti-filter Handlers
+  const handleExcludeActor = (actorIdentifier) => {
+    if (!actorIdentifier) return;
+    const clean = String(actorIdentifier).trim();
+    if (!clean) return;
+    const currentList = excludeActor ? excludeActor.split(",").map((s) => s.trim()).filter(Boolean) : [];
+    if (!currentList.includes(clean)) {
+      const updated = [...currentList, clean].join(", ");
+      setExcludeActor(updated);
+      setExcludeActorInput(updated);
+      setPage(1);
+    }
+  };
+
+  const handleRemoveExcludedActor = (actorToRemove) => {
+    const currentList = excludeActor ? excludeActor.split(",").map((s) => s.trim()).filter(Boolean) : [];
+    const updated = currentList.filter((a) => a !== actorToRemove).join(", ");
+    setExcludeActor(updated);
+    setExcludeActorInput(updated);
+    setPage(1);
+  };
+
+  const handleClearExcludedActors = () => {
+    setExcludeActor("");
+    setExcludeActorInput("");
+    setPage(1);
+  };
 
   // 1. Fetch Global Streaming Logs
   const fetchLogs = useCallback(
@@ -184,11 +220,13 @@ export default function AdminAuditLogsSection() {
           search,
           method: method === "ALL" ? "" : method,
           status: status === "ALL" ? "" : status,
+          exclude_actor: excludeActor,
         });
 
         if (res && res.success) {
           setLogs(res.logs || []);
           setTotal(res.total || 0);
+          setHasMore(!!res.has_more);
         } else {
           setError(res?.error || "Failed to load audit logs from DB 3.");
         }
@@ -199,7 +237,7 @@ export default function AdminAuditLogsSection() {
         setRefreshing(false);
       }
     },
-    [page, limit, search, method, status]
+    [page, limit, search, method, status, excludeActor]
   );
 
   useEffect(() => {
@@ -274,6 +312,7 @@ export default function AdminAuditLogsSection() {
       if (res && res.success) {
         setUserLogs(res.logs || []);
         setUserLogsTotal(res.total || 0);
+        setUserLogsHasMore(!!res.has_more);
       }
     } catch (err) {
       console.error("Failed to fetch user logs:", err);
@@ -568,7 +607,7 @@ export default function AdminAuditLogsSection() {
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search anything: endpoint, status, method, user, payload, response..."
+                placeholder="Search anything (supports -term to exclude, e.g. -7376... or -actor:name)..."
                 className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-9 pr-24 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-blue-500"
               />
               {searchInput && (
@@ -590,6 +629,45 @@ export default function AdminAuditLogsSection() {
                 className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-blue-700 transition"
               >
                 Search
+              </button>
+            </form>
+
+            {/* Anti-Filter (Exclude Actor) Input */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setPage(1);
+                setExcludeActor(excludeActorInput.trim());
+              }}
+              className="relative flex-1 sm:max-w-xs"
+            >
+              <UserX className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-rose-500" />
+              <input
+                type="text"
+                value={excludeActorInput}
+                onChange={(e) => setExcludeActorInput(e.target.value)}
+                placeholder="Anti-filter actor (e.g. roll, name)..."
+                className="w-full rounded-xl border border-rose-200 bg-rose-50/20 pl-9 pr-16 py-2 text-xs text-slate-900 placeholder:text-rose-400 focus:border-rose-500 focus:bg-white focus:outline-none dark:border-rose-900/60 dark:bg-rose-950/20 dark:text-white dark:focus:border-rose-500"
+              />
+              {excludeActorInput && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setExcludeActorInput("");
+                    setExcludeActor("");
+                    setPage(1);
+                  }}
+                  className="absolute right-12 top-1/2 -translate-y-1/2 p-0.5 text-rose-400 hover:text-rose-600 dark:hover:text-rose-200"
+                  title="Clear anti-filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+              <button
+                type="submit"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-rose-600 px-2 py-0.5 text-[10px] font-semibold text-white hover:bg-rose-700 transition cursor-pointer"
+              >
+                Exclude
               </button>
             </form>
 
@@ -679,6 +757,43 @@ export default function AdminAuditLogsSection() {
             </div>
           </div>
 
+          {/* Active Anti-Filter Chips */}
+          {excludeActor && (
+            <div className="flex flex-wrap items-center gap-1.5 px-1 py-0.5">
+              <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                <UserX className="h-3.5 w-3.5" />
+                Anti-Filtered Actors:
+              </span>
+              {excludeActor
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean)
+                .map((act) => (
+                  <span
+                    key={act}
+                    className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2 py-0.5 text-[11px] font-mono font-semibold text-rose-700 border border-rose-200 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800"
+                  >
+                    <span>🚫 {act}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveExcludedActor(act)}
+                      className="hover:text-rose-900 dark:hover:text-white ml-0.5 cursor-pointer"
+                      title={`Remove anti-filter for ${act}`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              <button
+                type="button"
+                onClick={handleClearExcludedActors}
+                className="text-[11px] font-semibold text-slate-500 hover:text-rose-600 underline dark:text-slate-400 dark:hover:text-rose-400 cursor-pointer ml-1"
+              >
+                Clear all
+              </button>
+            </div>
+          )}
+
           {error && (
             <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/50 dark:text-rose-300">
               {error}
@@ -762,18 +877,31 @@ export default function AdminAuditLogsSection() {
 
                         <td className="py-3 px-4 whitespace-nowrap">
                           {log.user_name || log.roll_no ? (
-                            <div>
-                              <div className="font-medium text-slate-900 dark:text-white flex items-center gap-1.5">
-                                <span>{log.user_name || "User"}</span>
-                                {log.role && (
-                                  <span className="rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.2 text-[9px] font-semibold text-slate-600 dark:text-slate-300">
-                                    {log.role}
-                                  </span>
+                            <div className="flex items-center justify-between gap-2 group/actor">
+                              <div>
+                                <div className="font-medium text-slate-900 dark:text-white flex items-center gap-1.5">
+                                  <span>{log.user_name || "User"}</span>
+                                  {log.role && (
+                                    <span className="rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.2 text-[9px] font-semibold text-slate-600 dark:text-slate-300">
+                                      {log.role}
+                                    </span>
+                                  )}
+                                </div>
+                                {log.roll_no && (
+                                  <div className="text-[10px] text-slate-400 font-mono">{log.roll_no}</div>
                                 )}
                               </div>
-                              {log.roll_no && (
-                                <div className="text-[10px] text-slate-400 font-mono">{log.roll_no}</div>
-                              )}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleExcludeActor(log.roll_no || log.user_name || log.user_uid);
+                                }}
+                                className="opacity-0 group-hover/actor:opacity-100 p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/60 rounded-md transition cursor-pointer"
+                                title={`Anti-filter: Exclude ${log.user_name || log.roll_no}`}
+                              >
+                                <UserX className="h-3.5 w-3.5" />
+                              </button>
                             </div>
                           ) : (
                             <span className="text-slate-400 italic text-[11px]">Anonymous</span>
@@ -803,29 +931,44 @@ export default function AdminAuditLogsSection() {
             {/* Pagination */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-t border-slate-200 p-4 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40">
               <div className="text-xs text-slate-500 dark:text-slate-400">
-                Showing <span className="font-semibold text-slate-900 dark:text-white">{logs.length}</span> of{" "}
-                <span className="font-semibold text-slate-900 dark:text-white">{total.toLocaleString()}</span> entries
-                {totalPages > 1 && ` · Page ${page} of ${totalPages}`}
+                Showing{" "}
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  {logs.length > 0 ? (page - 1) * limit + 1 : 0}
+                </span>{" "}
+                to{" "}
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  {(page - 1) * limit + logs.length}
+                </span>{" "}
+                of{" "}
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  {total > 0 && !hasMore && total <= (page - 1) * limit + logs.length
+                    ? total.toLocaleString()
+                    : total > (page - 1) * limit + logs.length
+                    ? total.toLocaleString()
+                    : `${(page - 1) * limit + logs.length}+`}
+                </span>{" "}
+                entries
+                {` · Page ${page}${totalPages > 1 && total > (page - 1) * limit + logs.length ? ` of ${totalPages}` : ""}`}
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1 || loading}
-                  className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                  className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 cursor-pointer disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" />
                   <span>Previous</span>
                 </button>
 
                 <span className="text-xs font-semibold px-2 text-slate-700 dark:text-slate-300">
-                  {page} / {totalPages}
+                  {page} {totalPages > 1 && total > (page - 1) * limit + logs.length ? `/ ${totalPages}` : ""}
                 </span>
 
                 <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page >= totalPages || loading}
-                  className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={(!hasMore && page >= totalPages && logs.length < limit) || loading || logs.length === 0}
+                  className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 cursor-pointer disabled:cursor-not-allowed"
                 >
                   <span>Next</span>
                   <ChevronRight className="h-3.5 w-3.5" />

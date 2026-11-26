@@ -17,6 +17,7 @@ import (
 	"server/config"
 
 	"github.com/gin-gonic/gin"
+	"google.golang.org/api/sheets/v4"
 )
 
 // InternalSubjectMark represents an individual evaluated subject
@@ -120,13 +121,11 @@ func (h *InternalMarksHandler) getFromDB(rollNo string) (StudentInternalMarks, b
 		return StudentInternalMarks{}, false
 	}
 
-	// Reject stale cache entries that lack IP period marks
-	if !strings.Contains(rawData, "ip1_marks") {
-		return StudentInternalMarks{}, false
-	}
-
 	var data StudentInternalMarks
 	if err := json.Unmarshal([]byte(rawData), &data); err != nil {
+		return StudentInternalMarks{}, false
+	}
+	if len(data.Subjects) == 0 {
 		return StudentInternalMarks{}, false
 	}
 	return data, true
@@ -272,14 +271,38 @@ func (h *InternalMarksHandler) buildInternalMarksIndex() (map[string]StudentInte
 		return nil, fmt.Errorf("Google Sheets service not initialized. Check server token")
 	}
 
-	// Columns A to CR (indices 0 to 97) contain Roll No, Student Name, TS1-9, LS1-2, IP1/IP2 points & marks
-	readRange := fmt.Sprintf("'%s'!A1:CV", InternalMarksSheetTab)
-	vr, err := svc.Spreadsheets.Values.Get(spreadsheetID, readRange).Do()
-	if err != nil {
-		vr, err = svc.Spreadsheets.Values.Get(spreadsheetID, fmt.Sprintf("%s!A1:CV", InternalMarksSheetTab)).Do()
+	tabCandidates := []string{
+		InternalMarksSheetTab,
+		"STUDENT DATABASE REDEMPTION",
+		"Student Database Redemption",
+		"Studentwise Reward Points",
 	}
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch values for tab %s from %s: %w", InternalMarksSheetTab, spreadsheetID, err)
+
+	var vr *sheets.ValueRange
+	var lastErr error
+	for _, tab := range tabCandidates {
+		readRange := fmt.Sprintf("'%s'!A1:CV", tab)
+		res, err := svc.Spreadsheets.Values.Get(spreadsheetID, readRange).Do()
+		if err == nil && res != nil && len(res.Values) > 1 {
+			vr = res
+			break
+		}
+		if err != nil {
+			lastErr = err
+		}
+	}
+
+	if vr == nil {
+		meta, err := svc.Spreadsheets.Get(spreadsheetID).Do()
+		if err == nil && len(meta.Sheets) > 0 {
+			firstTab := meta.Sheets[0].Properties.Title
+			readRange := fmt.Sprintf("'%s'!A1:CV", firstTab)
+			vr, lastErr = svc.Spreadsheets.Values.Get(spreadsheetID, readRange).Do()
+		}
+	}
+
+	if vr == nil || len(vr.Values) < 2 {
+		return nil, fmt.Errorf("failed to fetch internal marks from %s: %w", spreadsheetID, lastErr)
 	}
 
 	return ParseStudentwiseSheetValues(vr.Values)
@@ -342,8 +365,68 @@ func ParseStudentwiseSheetValues(values [][]interface{}) (map[string]StudentInte
 
 	index := make(map[string]StudentInternalMarks)
 
-	// Rows start from index 1 (skipping header row 0)
-	for rIdx := 1; rIdx < len(values); rIdx++ {
+	_, hasTS := headerMap["TS1"]
+	type subColPair struct {
+		category string
+		codeCol  int
+		markCol  int
+	}
+	var pairs []subColPair
+	startRow := 1
+
+	if !hasTS {
+		headerRow1 := values[0]
+		var headerRow2 []interface{}
+		if len(values) > 1 {
+			headerRow2 = values[1]
+			for _, cell := range headerRow2 {
+				str := strings.ToUpper(strings.TrimSpace(fmt.Sprintf("%v", cell)))
+				if strings.Contains(str, "SUBJECT CODE") || strings.Contains(str, "INTERNAL MARK") {
+					startRow = 2
+					break
+				}
+			}
+		}
+
+		currentCategory := "Theory Subjects"
+		for c := 0; c < len(headerRow1); c++ {
+			h1 := strings.ToUpper(strings.TrimSpace(fmt.Sprintf("%v", headerRow1[c])))
+			if strings.Contains(h1, "LAB") {
+				currentCategory = "Lab Subjects"
+			} else if strings.Contains(h1, "THEORY") {
+				currentCategory = "Theory Subjects"
+			}
+
+			if startRow == 2 && c < len(headerRow2) {
+				h2 := strings.ToUpper(strings.TrimSpace(fmt.Sprintf("%v", headerRow2[c])))
+				if (strings.Contains(h2, "SUBJECT") && strings.Contains(h2, "CODE")) ||
+					(strings.Contains(h2, "CODE") && !strings.Contains(h2, "COURSE")) {
+					markCol := c + 1
+					if markCol < len(headerRow2) {
+						pairs = append(pairs, subColPair{
+							category: currentCategory,
+							codeCol:  c,
+							markCol:  markCol,
+						})
+					}
+				}
+			} else if startRow == 1 {
+				if strings.Contains(h1, "SUBJECT") && strings.Contains(h1, "CODE") {
+					markCol := c + 1
+					if markCol < len(headerRow1) {
+						pairs = append(pairs, subColPair{
+							category: currentCategory,
+							codeCol:  c,
+							markCol:  markCol,
+						})
+					}
+				}
+			}
+		}
+	}
+
+	// Rows start from index startRow (skipping header rows)
+	for rIdx := startRow; rIdx < len(values); rIdx++ {
 		row := values[rIdx]
 		if len(row) <= rollCol {
 			continue
@@ -391,71 +474,96 @@ func ParseStudentwiseSheetValues(values [][]interface{}) (map[string]StudentInte
 			department = strings.TrimSpace(fmt.Sprintf("%v", row[deptCol]))
 		}
 
-		// 1. Collect Theory Subjects (TS1 to TS9)
 		var theorySubjects []InternalSubjectMark
+		var labSubjects []InternalSubjectMark
 		var totalTheoryIP1Points, totalTheoryIP2Points float64
 		var totalTheoryIP1Marks, totalTheoryIP2Marks float64
-
-		for i := 1; i <= 9; i++ {
-			code := getVal(row, fmt.Sprintf("TS%d", i))
-			if code != "" {
-				ip1Points := getNum(row, fmt.Sprintf("IP1TS%dR", i))
-				ip2Points := getNum(row, fmt.Sprintf("IP2TS%dR", i))
-				ip1Marks := getNum(row, fmt.Sprintf("IP1TS%dM", i))
-				ip2Marks := getNum(row, fmt.Sprintf("IP2TS%dM", i))
-				totPoints := math.Round((ip1Points+ip2Points)*100) / 100
-				totMarks := math.Round((ip1Marks+ip2Marks)*100) / 100
-
-				totalTheoryIP1Points += ip1Points
-				totalTheoryIP2Points += ip2Points
-				totalTheoryIP1Marks += ip1Marks
-				totalTheoryIP2Marks += ip2Marks
-
-				theorySubjects = append(theorySubjects, InternalSubjectMark{
-					Code:        code,
-					Category:    "Theory Subjects",
-					Mark:        totMarks,
-					MaxMarks:    30.0,
-					IP1Points:   ip1Points,
-					IP2Points:   ip2Points,
-					IP1Marks:    ip1Marks,
-					IP2Marks:    ip2Marks,
-					TotalPoints: totPoints,
-				})
-			}
-		}
-
-		// 2. Collect Lab Subjects (LS1 to LS2)
-		var labSubjects []InternalSubjectMark
 		var totalLabIP1Points, totalLabIP2Points float64
 		var totalLabIP1Marks, totalLabIP2Marks float64
 
-		for i := 1; i <= 2; i++ {
-			code := getVal(row, fmt.Sprintf("LS%d", i))
-			if code != "" {
-				ip1Points := getNum(row, fmt.Sprintf("IP1LS%dR", i))
-				ip2Points := getNum(row, fmt.Sprintf("IP2LS%dR", i))
-				ip1Marks := getNum(row, fmt.Sprintf("IP1LS%dM", i))
-				ip2Marks := getNum(row, fmt.Sprintf("IP2LS%dM", i))
-				totPoints := math.Round((ip1Points+ip2Points)*100) / 100
-				totMarks := math.Round((ip1Marks+ip2Marks)*100) / 100
+		if hasTS {
+			// Format A: TS1-9, LS1-2 with IP1/IP2 reward points & marks
+			for i := 1; i <= 9; i++ {
+				code := getVal(row, fmt.Sprintf("TS%d", i))
+				if code != "" {
+					ip1Points := getNum(row, fmt.Sprintf("IP1TS%dR", i))
+					ip2Points := getNum(row, fmt.Sprintf("IP2TS%dR", i))
+					ip1Marks := getNum(row, fmt.Sprintf("IP1TS%dM", i))
+					ip2Marks := getNum(row, fmt.Sprintf("IP2TS%dM", i))
+					totPoints := math.Round((ip1Points+ip2Points)*100) / 100
+					totMarks := math.Round((ip1Marks+ip2Marks)*100) / 100
 
-				totalLabIP1Points += ip1Points
-				totalLabIP2Points += ip2Points
-				totalLabIP1Marks += ip1Marks
-				totalLabIP2Marks += ip2Marks
+					totalTheoryIP1Points += ip1Points
+					totalTheoryIP2Points += ip2Points
+					totalTheoryIP1Marks += ip1Marks
+					totalTheoryIP2Marks += ip2Marks
 
-				labSubjects = append(labSubjects, InternalSubjectMark{
-					Code:        code,
-					Category:    "Lab Subjects",
-					Mark:        totMarks,
-					MaxMarks:    30.0,
-					IP1Points:   ip1Points,
-					IP2Points:   ip2Points,
-					IP1Marks:    ip1Marks,
-					IP2Marks:    ip2Marks,
-					TotalPoints: totPoints,
-				})
+					theorySubjects = append(theorySubjects, InternalSubjectMark{
+						Code:        code,
+						Category:    "Theory Subjects",
+						Mark:        totMarks,
+						MaxMarks:    30.0,
+						IP1Points:   ip1Points,
+						IP2Points:   ip2Points,
+						IP1Marks:    ip1Marks,
+						IP2Marks:    ip2Marks,
+						TotalPoints: totPoints,
+					})
+				}
+			}
+
+			for i := 1; i <= 2; i++ {
+				code := getVal(row, fmt.Sprintf("LS%d", i))
+				if code != "" {
+					ip1Points := getNum(row, fmt.Sprintf("IP1LS%dR", i))
+					ip2Points := getNum(row, fmt.Sprintf("IP2LS%dR", i))
+					ip1Marks := getNum(row, fmt.Sprintf("IP1LS%dM", i))
+					ip2Marks := getNum(row, fmt.Sprintf("IP2LS%dM", i))
+					totPoints := math.Round((ip1Points+ip2Points)*100) / 100
+					totMarks := math.Round((ip1Marks+ip2Marks)*100) / 100
+
+					totalLabIP1Points += ip1Points
+					totalLabIP2Points += ip2Points
+					totalLabIP1Marks += ip1Marks
+					totalLabIP2Marks += ip2Marks
+
+					labSubjects = append(labSubjects, InternalSubjectMark{
+						Code:        code,
+						Category:    "Lab Subjects",
+						Mark:        totMarks,
+						MaxMarks:    30.0,
+						IP1Points:   ip1Points,
+						IP2Points:   ip2Points,
+						IP1Marks:    ip1Marks,
+						IP2Marks:    ip2Marks,
+						TotalPoints: totPoints,
+					})
+				}
+			}
+		} else {
+			// Format B: Direct (Subject Code, Internal Mark) pairs from Sheet
+			for _, pair := range pairs {
+				if pair.codeCol < len(row) && pair.markCol < len(row) {
+					code := strings.TrimSpace(fmt.Sprintf("%v", row[pair.codeCol]))
+					if code != "" && !strings.Contains(strings.ToUpper(code), "CODE") && len(code) >= 3 {
+						markStr := strings.TrimSpace(fmt.Sprintf("%v", row[pair.markCol]))
+						markStr = strings.ReplaceAll(markStr, ",", "")
+						mark, _ := strconv.ParseFloat(markStr, 64)
+						s := InternalSubjectMark{
+							Code:     code,
+							Category: pair.category,
+							Mark:     mark,
+							MaxMarks: 30.0,
+						}
+						if pair.category == "Lab Subjects" {
+							labSubjects = append(labSubjects, s)
+							totalLabIP1Marks += mark
+						} else {
+							theorySubjects = append(theorySubjects, s)
+							totalTheoryIP1Marks += mark
+						}
+					}
+				}
 			}
 		}
 
@@ -478,9 +586,13 @@ func ParseStudentwiseSheetValues(values [][]interface{}) (map[string]StudentInte
 			Percentage:         pct,
 		}
 
-		// Build output text string formatted identically to Python extract_subjects_and_marks_for_gradio
+		// Build output text string formatted cleanly for internal marks and IP summary
 		var b strings.Builder
-		b.WriteString("\n🏆 INNOVATIVE PRACTICE (IP) SUMMARY\n")
+		if grandTotalPoints > 0 {
+			b.WriteString("\n🏆 INNOVATIVE PRACTICE (IP) SUMMARY\n")
+		} else {
+			b.WriteString("\n🏆 INTERNAL MARKS SUMMARY\n")
+		}
 		b.WriteString(strings.Repeat("=", 80) + "\n")
 
 		if len(theorySubjects) > 0 {
@@ -505,18 +617,16 @@ func ParseStudentwiseSheetValues(values [][]interface{}) (map[string]StudentInte
 				}
 				if s.IP1Marks > 0 || s.IP2Marks > 0 {
 					mLine := "  Internal Marks: "
-					if s.IP1Marks > 0 {
-						mLine += fmt.Sprintf("IP-1: %.2f", s.IP1Marks)
+					if s.IP1Marks > 0 && s.IP2Marks > 0 {
+						mLine += fmt.Sprintf("IP-1: %.2f | IP-2: %.2f | Total: %.2f\n", s.IP1Marks, s.IP2Marks, s.Mark)
+					} else if s.IP1Marks > 0 && s.IP1Points > 0 {
+						mLine += fmt.Sprintf("IP-1: %.2f | Total: %.2f\n", s.IP1Marks, s.Mark)
+					} else {
+						mLine += fmt.Sprintf("Total: %.2f\n", s.Mark)
 					}
-					if s.IP2Marks > 0 {
-						if s.IP1Marks > 0 {
-							mLine += fmt.Sprintf(" | IP-2: %.2f", s.IP2Marks)
-						} else {
-							mLine += fmt.Sprintf("IP-2: %.2f", s.IP2Marks)
-						}
-					}
-					mLine += fmt.Sprintf(" | Total: %.2f\n", s.Mark)
 					b.WriteString(mLine)
+				} else if s.Mark > 0 {
+					b.WriteString(fmt.Sprintf("  Internal Mark: %.2f\n", s.Mark))
 				}
 			}
 		}
@@ -543,18 +653,16 @@ func ParseStudentwiseSheetValues(values [][]interface{}) (map[string]StudentInte
 				}
 				if s.IP1Marks > 0 || s.IP2Marks > 0 {
 					mLine := "  Internal Marks: "
-					if s.IP1Marks > 0 {
-						mLine += fmt.Sprintf("IP-1: %.2f", s.IP1Marks)
+					if s.IP1Marks > 0 && s.IP2Marks > 0 {
+						mLine += fmt.Sprintf("IP-1: %.2f | IP-2: %.2f | Total: %.2f\n", s.IP1Marks, s.IP2Marks, s.Mark)
+					} else if s.IP1Marks > 0 && s.IP1Points > 0 {
+						mLine += fmt.Sprintf("IP-1: %.2f | Total: %.2f\n", s.IP1Marks, s.Mark)
+					} else {
+						mLine += fmt.Sprintf("Total: %.2f\n", s.Mark)
 					}
-					if s.IP2Marks > 0 {
-						if s.IP1Marks > 0 {
-							mLine += fmt.Sprintf(" | IP-2: %.2f", s.IP2Marks)
-						} else {
-							mLine += fmt.Sprintf("IP-2: %.2f", s.IP2Marks)
-						}
-					}
-					mLine += fmt.Sprintf(" | Total: %.2f\n", s.Mark)
 					b.WriteString(mLine)
+				} else if s.Mark > 0 {
+					b.WriteString(fmt.Sprintf("  Internal Mark: %.2f\n", s.Mark))
 				}
 			}
 		}
@@ -563,45 +671,23 @@ func ParseStudentwiseSheetValues(values [][]interface{}) (map[string]StudentInte
 		b.WriteString("📊 OVERALL SUMMARY\n")
 		b.WriteString(strings.Repeat("=", 80) + "\n")
 
-		b.WriteString("\n🏅 REWARD POINTS BREAKDOWN:\n")
-		if len(theorySubjects) > 0 {
-			b.WriteString(fmt.Sprintf("  Theory Subjects: %.2f points\n", totalTheoryIP1Points+totalTheoryIP2Points))
-			if totalTheoryIP1Points > 0 {
-				b.WriteString(fmt.Sprintf("    ➤ IP-1: %.2f\n", totalTheoryIP1Points))
+		if grandTotalPoints > 0 {
+			b.WriteString("\n🏅 REWARD POINTS BREAKDOWN:\n")
+			if len(theorySubjects) > 0 {
+				b.WriteString(fmt.Sprintf("  Theory Subjects: %.2f points\n", totalTheoryIP1Points+totalTheoryIP2Points))
 			}
-			if totalTheoryIP2Points > 0 {
-				b.WriteString(fmt.Sprintf("    ➤ IP-2: %.2f\n", totalTheoryIP2Points))
+			if len(labSubjects) > 0 {
+				b.WriteString(fmt.Sprintf("  Lab Subjects: %.2f points\n", totalLabIP1Points+totalLabIP2Points))
 			}
+			b.WriteString(fmt.Sprintf("\n🎯 TOTAL REWARD POINTS: %.2f\n", grandTotalPoints))
 		}
-		if len(labSubjects) > 0 {
-			b.WriteString(fmt.Sprintf("  Lab Subjects: %.2f points\n", totalLabIP1Points+totalLabIP2Points))
-			if totalLabIP1Points > 0 {
-				b.WriteString(fmt.Sprintf("    ➤ IP-1: %.2f\n", totalLabIP1Points))
-			}
-			if totalLabIP2Points > 0 {
-				b.WriteString(fmt.Sprintf("    ➤ IP-2: %.2f\n", totalLabIP2Points))
-			}
-		}
-		b.WriteString(fmt.Sprintf("\n🎯 TOTAL REWARD POINTS: %.2f\n", grandTotalPoints))
 
 		b.WriteString("\n📝 INTERNAL MARKS BREAKDOWN:\n")
 		if len(theorySubjects) > 0 {
 			b.WriteString(fmt.Sprintf("  Theory Subjects: %.2f marks\n", totalTheoryIP1Marks+totalTheoryIP2Marks))
-			if totalTheoryIP1Marks > 0 {
-				b.WriteString(fmt.Sprintf("    ➤ IP-1: %.2f\n", totalTheoryIP1Marks))
-			}
-			if totalTheoryIP2Marks > 0 {
-				b.WriteString(fmt.Sprintf("    ➤ IP-2: %.2f\n", totalTheoryIP2Marks))
-			}
 		}
 		if len(labSubjects) > 0 {
 			b.WriteString(fmt.Sprintf("  Lab Subjects: %.2f marks\n", totalLabIP1Marks+totalLabIP2Marks))
-			if totalLabIP1Marks > 0 {
-				b.WriteString(fmt.Sprintf("    ➤ IP-1: %.2f\n", totalLabIP1Marks))
-			}
-			if totalLabIP2Marks > 0 {
-				b.WriteString(fmt.Sprintf("    ➤ IP-2: %.2f\n", totalLabIP2Marks))
-			}
 		}
 		b.WriteString(fmt.Sprintf("\n📊 TOTAL INTERNAL MARKS: %.2f\n", grandTotalMarks))
 		b.WriteString(fmt.Sprintf("\n📚 TOTAL SUBJECTS: %d\n", totalSubjects))

@@ -46,6 +46,19 @@ export default function InternalMarksConversionModal({
     parseFloat(overall?.totalInternalMarks || overall?.total_internal_marks) ||
     subjects.reduce((sum, s) => sum + (s.totalMarks || s.mark || 0), 0);
 
+  // Check if any subject actually has IP redemption / breakdown data
+  const hasAnyIPData = subjects.some(
+    (s) =>
+      (s.ip1Points && s.ip1Points > 0) ||
+      (s.ip2Points && s.ip2Points > 0) ||
+      (s.ip1Marks && s.ip1Marks > 0) ||
+      (s.ip2Marks && s.ip2Marks > 0) ||
+      (s.ip1_points && s.ip1_points > 0) ||
+      (s.ip2_points && s.ip2_points > 0) ||
+      (s.ip1_marks && s.ip1_marks > 0) ||
+      (s.ip2_marks && s.ip2_marks > 0)
+  );
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-950/75 backdrop-blur-xs p-0 sm:p-4"
@@ -68,10 +81,10 @@ export default function InternalMarksConversionModal({
             </div>
             <div className="min-w-0">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate flex items-center gap-2">
-                <span>Internal Mark Conversion</span>
+                <span>{hasAnyIPData ? "Internal Mark Conversion" : "Internal Marks"}</span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 dark:bg-indigo-950/80 px-2 py-0.5 text-[10px] font-semibold text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60">
                   <Sparkles className="h-3 w-3" />
-                  IP
+                  {hasAnyIPData ? "IP" : "Marks"}
                 </span>
               </h3>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
@@ -175,17 +188,43 @@ export default function InternalMarksConversionModal({
                     : parseFloat(sub.internalMarks?.Total || sub.internalMarks?.total || "0") ||
                       0;
 
-                // Extract period keys (IP-1, IP-2) excluding 'Total'
-                let periodKeys = Array.from(
+                // Find valid period keys (IP-1, IP-2, etc.) that actually contain non-zero points or marks
+                const rawKeys = Array.from(
                   new Set([
                     ...Object.keys(sub.rewardPoints || {}),
                     ...Object.keys(sub.internalMarks || {}),
+                    ...(sub.ip1Points > 0 || sub.ip1Marks > 0 || sub.ip1_points > 0 || sub.ip1_marks > 0 ? ["IP-1"] : []),
+                    ...(sub.ip2Points > 0 || sub.ip2Marks > 0 || sub.ip2_points > 0 || sub.ip2_marks > 0 ? ["IP-2"] : []),
                   ])
                 ).filter((k) => k.toLowerCase() !== "total");
 
-                if (periodKeys.length === 0) {
-                  periodKeys = ["IP-1", "IP-2"];
-                }
+                const activePeriods = rawKeys
+                  .map((pKey) => {
+                    const rawRp =
+                      pKey === "IP-1"
+                        ? (sub.ip1Points ?? sub.ip1_points ?? sub.rewardPoints?.["IP-1"])
+                        : pKey === "IP-2"
+                        ? (sub.ip2Points ?? sub.ip2_points ?? sub.rewardPoints?.["IP-2"])
+                        : sub.rewardPoints?.[pKey];
+
+                    const rawIm =
+                      pKey === "IP-1"
+                        ? (sub.ip1Marks ?? sub.ip1_marks ?? sub.internalMarks?.["IP-1"])
+                        : pKey === "IP-2"
+                        ? (sub.ip2Marks ?? sub.ip2_marks ?? sub.internalMarks?.["IP-2"])
+                        : sub.internalMarks?.[pKey];
+
+                    const rpNum = parseFloat(String(rawRp ?? "0").replace(/[^0-9.-]/g, "")) || 0;
+                    const imNum = parseFloat(String(rawIm ?? "0").replace(/[^0-9.-]/g, "")) || 0;
+
+                    return {
+                      key: pKey,
+                      rpNum,
+                      imNum,
+                      hasData: rpNum > 0 || imNum > 0,
+                    };
+                  })
+                  .filter((p) => p.hasData);
 
                 return (
                   <div
@@ -222,52 +261,30 @@ export default function InternalMarksConversionModal({
                       </div>
                     </div>
 
-                    {/* Breakdown: Clean inline pill for IP-1 and IP-2 showing redeemed points and given mark */}
-                    {periodKeys.length > 0 ? (
-                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                        {periodKeys.map((pKey) => {
-                          const rpVal =
-                            pKey === "IP-1"
-                              ? (sub.ip1Points ?? sub.ip1_points ?? sub.rewardPoints?.["IP-1"] ?? "0")
-                              : pKey === "IP-2"
-                              ? (sub.ip2Points ?? sub.ip2_points ?? sub.rewardPoints?.["IP-2"] ?? "0")
-                              : (sub.rewardPoints?.[pKey] ?? "0");
-                          const imVal =
-                            pKey === "IP-1"
-                              ? (sub.ip1Marks ?? sub.ip1_marks ?? sub.internalMarks?.["IP-1"] ?? "0")
-                              : pKey === "IP-2"
-                              ? (sub.ip2Marks ?? sub.ip2_marks ?? sub.internalMarks?.["IP-2"] ?? "0")
-                              : (sub.internalMarks?.[pKey] ?? "0");
-
-                          return (
-                            <div
-                              key={pKey}
-                              className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-800/70 text-xs font-mono"
-                            >
-                              <div className="flex items-center gap-1.5 min-w-0">
-                                <span className="font-bold text-indigo-600 dark:text-indigo-400 text-[11px]">
-                                  {pKey}:
-                                </span>
-                                <span className="text-slate-500 dark:text-slate-400 text-[11px] truncate">
-                                  {formatScore(rpVal)} RP
-                                </span>
-                              </div>
-
-                              <span className="font-bold text-emerald-600 dark:text-emerald-400 text-[11.5px] shrink-0">
-                                {formatScore(imVal)} marks
+                    {/* Breakdown: Show ONLY active periods that actually have redeemed points or marks */}
+                    {activePeriods.length > 0 && (
+                      <div className={`grid gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 ${activePeriods.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
+                        {activePeriods.map((period) => (
+                          <div
+                            key={period.key}
+                            className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-800/70 text-xs font-mono"
+                          >
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="font-bold text-indigo-600 dark:text-indigo-400 text-[11px]">
+                                {period.key}:
                               </span>
+                              {period.rpNum > 0 && (
+                                <span className="text-slate-500 dark:text-slate-400 text-[11px] truncate">
+                                  {formatScore(period.rpNum)} RP
+                                </span>
+                              )}
                             </div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between pt-1.5 border-t border-slate-100 dark:border-slate-800/80 text-xs font-mono">
-                        <span className="text-slate-500 dark:text-slate-400 text-[11px]">
-                          {sub.category || "Theory Subject"}
-                        </span>
-                        <span className="font-bold text-emerald-600 dark:text-emerald-400 text-[11.5px]">
-                          {formatScore(subjectTotalMarks)} marks
-                        </span>
+
+                            <span className="font-bold text-emerald-600 dark:text-emerald-400 text-[11.5px] shrink-0">
+                              {formatScore(period.imNum)} marks
+                            </span>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>

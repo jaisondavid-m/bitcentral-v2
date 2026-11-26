@@ -305,20 +305,20 @@ export function normalizeSubject(s, rawSub = null) {
       : (ip1_marks + ip2_marks);
 
   const rewardPoints = {
-    "IP-1": String(ip1_points),
-    "IP-2": String(ip2_points),
-    "Total": String(total_points),
     ...(rawSub?.rewardPoints || {}),
     ...(s.rewardPoints || {}),
   };
+  if (ip1_points > 0) rewardPoints["IP-1"] = String(ip1_points);
+  if (ip2_points > 0) rewardPoints["IP-2"] = String(ip2_points);
+  if (total_points > 0) rewardPoints["Total"] = String(total_points);
 
   const internalMarks = {
-    "IP-1": String(ip1_marks),
-    "IP-2": String(ip2_marks),
-    "Total": String(total_marks),
     ...(rawSub?.internalMarks || {}),
     ...(s.internalMarks || {}),
   };
+  if (ip1_marks > 0) internalMarks["IP-1"] = String(ip1_marks);
+  if (ip2_marks > 0) internalMarks["IP-2"] = String(ip2_marks);
+  if (total_marks > 0) internalMarks["Total"] = String(total_marks);
 
   return {
     code: s.code,
