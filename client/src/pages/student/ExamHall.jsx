@@ -10,6 +10,18 @@ import api from "@/api/axios.js";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+export function formatExamTime(t) {
+  if (!t) return "";
+  const times = t.match(/\b\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)\b/gi);
+  if (times && times.length >= 2) {
+    return `${times[0].toUpperCase()} : ${times[1].toUpperCase()}`;
+  }
+  return t
+    .replace(/\s*\?\s*/g, " : ")
+    .replace(/\s*[–—]\s*/g, " : ")
+    .replace(/\s*-\s*/g, " : ");
+}
+
 function fmt(dateStr) {
   const [d, m, y] = dateStr.split("-");
   const date = new Date(`${y}-${m}-${d}`);
@@ -207,9 +219,9 @@ async function generatePDF(registerNo, sessions) {
         const blStart = y + (RH - blBlockH) / 2 + lineH * 0.7;
         doc.text(blSlice, C[3].x + 2, blStart, { lineHeightFactor: 1.45 });
 
-        const tp = s.time.split("–");
-        const start = (tp[0] || s.time).trim();
-        const end = tp[1] ? ("– " + tp[1].trim()) : "";
+        const times = (s.time || "").match(/\b\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)\b/gi);
+        const start = times && times[0] ? times[0].toUpperCase() : (s.time || "").trim();
+        const end = times && times[1] ? (": " + times[1].toUpperCase()) : "";
         if (end) {
           doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); T(IK);
           doc.text(start, C[4].x + 2, y + RH / 2 - 0.5);
@@ -460,7 +472,7 @@ function ExamCard({ session: s, searchedRegNo }) {
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
             <Clock className="h-3 w-3 shrink-0 text-blue-200 dark:text-blue-800" />
-            <span className="text-[11px] text-blue-500 dark:text-blue-400">{s.time}</span>
+            <span className="text-[11px] text-blue-500 dark:text-blue-400">{formatExamTime(s.time)}</span>
           </div>
           {countdown && (
             <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold shrink-0
@@ -509,28 +521,8 @@ const ExamHall = () => {
 
   const hasAppliedDefaultRegisterNo = useRef(false);
 
-  useEffect(() => {
-    if (hasAppliedDefaultRegisterNo.current) return;
-    const defaultRollNo =
-      profile?.register_no ||
-      profile?.registerNo ||
-      student?.register_no ||
-      student?.registerNo ||
-      profile?.roll_no ||
-      profile?.rollNo ||
-      student?.roll_no ||
-      student?.rollNo ||
-      "7376251CS221";
-
-    if (defaultRollNo) {
-      setRegisterNo(defaultRollNo);
-      hasAppliedDefaultRegisterNo.current = true;
-    }
-  }, [profile, student]);
-
-  const handleSearch = (e) => {
-    if (e) e.preventDefault();
-    const query = registerNo.trim();
+  const executeSearch = (queryVal) => {
+    const query = (queryVal || "").trim();
     if (!query) return;
 
     setLoading(true);
@@ -560,6 +552,31 @@ const ExamHall = () => {
         }
       })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    if (hasAppliedDefaultRegisterNo.current) return;
+    const defaultRollNo =
+      profile?.register_no ||
+      profile?.registerNo ||
+      student?.register_no ||
+      student?.registerNo ||
+      profile?.roll_no ||
+      profile?.rollNo ||
+      student?.roll_no ||
+      student?.rollNo ||
+      "7376251CS221";
+
+    if (defaultRollNo) {
+      setRegisterNo(defaultRollNo);
+      hasAppliedDefaultRegisterNo.current = true;
+      executeSearch(defaultRollNo);
+    }
+  }, [profile, student]);
+
+  const handleSearch = (e) => {
+    if (e) e.preventDefault();
+    executeSearch(registerNo);
   };
 
   const handleDownloadPdf = async () => {
@@ -616,41 +633,51 @@ const ExamHall = () => {
                       Exam Hall Schedule
                     </h1>
                   </div>
-                  <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-0.5">
-                    Manual Search
+                  <p className="mt-0.5 font-mono text-sm font-bold text-blue-600 dark:text-blue-400">
+                    {searchedRegNo || registerNo || "Manual Search"}
                   </p>
                 </div>
               </div>
 
-              <button
-                onClick={() => navigate("/exam-hall")}
-                className="inline-flex items-center gap-1 rounded-xl border border-zinc-900 bg-white px-3.5 py-1.5 text-xs font-black text-blue-600 shadow-[2px_2px_0px_#18181b] hover:bg-blue-50 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[2px_2px_0px_#ffffff] transition-all shrink-0"
-              >
-                <ArrowLeft className="h-3.5 w-3.5" />
-                Auto Search
-              </button>
+              <div className="flex items-center gap-2">
+                {sessions && sessions.length > 0 && (
+                  <button
+                    onClick={handleDownloadPdf}
+                    disabled={pdfLoading}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-900 bg-emerald-50 px-3 py-1.5 text-xs font-black text-emerald-700 shadow-[2px_2px_0px_#18181b] hover:bg-emerald-100 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer dark:border-white dark:bg-zinc-800 dark:text-emerald-400 dark:shadow-[2px_2px_0px_#ffffff] transition-all"
+                    title="Download Exam Hall Ticket PDF"
+                  >
+                    {pdfLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileDown className="h-3.5 w-3.5" />}
+                    <span>PDF</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => navigate("/exam-hall")}
+                  className="rounded-xl border border-zinc-900 bg-white px-3.5 py-1.5 text-xs font-black text-blue-600 shadow-[2px_2px_0px_#18181b] hover:bg-blue-50 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[2px_2px_0px_#ffffff] transition-all shrink-0"
+                >
+                  ← Auto Search
+                </button>
+              </div>
             </div>
           </div>
 
           {/* ── Search Input Card ── */}
-          <form onSubmit={handleSearch} className="rounded-2xl border border-zinc-900 bg-white p-5 shadow-[4px_4px_0px_#18181b] dark:border-white dark:bg-[#111827] dark:shadow-[4px_4px_0px_#ffffff]">
-            <div className="mb-4">
-              <label className="mb-1.5 block text-xs font-black uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                Register number
-              </label>
+          <form onSubmit={handleSearch} className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-500" />
               <input
                 type="text"
                 value={registerNo}
-                onChange={(e) => setRegisterNo(e.target.value)}
-                placeholder="e.g. 7376251CS221"
-                className="w-full rounded-xl border border-zinc-900 bg-white px-3.5 py-2.5 text-sm font-bold text-zinc-900 shadow-[2px_2px_0px_#18181b] placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-white dark:bg-zinc-900 dark:text-white dark:placeholder:text-zinc-600 dark:shadow-[2px_2px_0px_#ffffff]"
+                onChange={(e) => setRegisterNo(e.target.value.toUpperCase())}
+                placeholder="Enter register number (e.g. 7376251CS221)"
+                className="w-full rounded-xl border border-zinc-900 bg-white pl-10 pr-4 py-2.5 text-sm font-mono font-bold text-zinc-900 shadow-[2px_2px_0px_#18181b] placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-white dark:bg-[#111827] dark:text-white dark:placeholder:text-zinc-500 dark:shadow-[2px_2px_0px_#ffffff] transition-all"
               />
             </div>
 
             <button
               type="submit"
               disabled={!registerNo.trim() || loading}
-              className={`w-full rounded-xl border border-zinc-900 py-2.5 text-sm font-black transition-all cursor-pointer flex items-center justify-center gap-2 dark:border-white ${
+              className={`rounded-xl border border-zinc-900 px-5 py-2.5 text-sm font-black transition-all cursor-pointer flex items-center justify-center gap-2 dark:border-white shrink-0 ${
                 !registerNo.trim() || loading
                   ? "cursor-not-allowed bg-blue-200 text-blue-500 opacity-60 dark:bg-zinc-800 dark:text-zinc-500"
                   : "bg-blue-600 text-white shadow-[2px_2px_0px_#18181b] hover:bg-blue-700 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 dark:shadow-[2px_2px_0px_#ffffff]"
@@ -659,12 +686,12 @@ const ExamHall = () => {
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin text-white" />
-                  Searching schedule...
+                  <span>Searching...</span>
                 </>
               ) : (
                 <>
                   <Search className="h-4 w-4" />
-                  Search hall
+                  <span>Search</span>
                 </>
               )}
             </button>
@@ -705,7 +732,7 @@ const ExamHall = () => {
           {/* ── Idle hint ── */}
           {!sessions && !loading && !error && !noExams && (
             <p className="py-2 text-center text-xs text-slate-400 dark:text-slate-600">
-              Enter your details above and search
+              Enter your register number above to search exam schedule
             </p>
           )}
 
@@ -718,11 +745,11 @@ const ExamHall = () => {
                   const dt = fmt(date);
                   return (
                     <div key={date} className="space-y-2.5">
-                      <div className="flex items-center gap-3">
+                      <div className="mb-2.5 flex items-center gap-3">
                         <span className="whitespace-nowrap text-[11px] font-bold uppercase tracking-widest text-blue-400 dark:text-blue-600">
                           {dt.weekday}, {dt.day} {dt.month} {dt.year}
                         </span>
-                        <div className="h-px w-full bg-blue-100 dark:bg-blue-900/30" />
+                        <div className="h-px flex-1 bg-blue-100 dark:bg-blue-900/30" />
                       </div>
 
                       <div className="space-y-2.5">

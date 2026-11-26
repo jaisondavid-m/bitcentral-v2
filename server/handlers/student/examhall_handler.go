@@ -87,6 +87,13 @@ func hallBlock(hallNo string) *string {
 	return &label
 }
 
+func normalizeExamTime(t string) string {
+	t = strings.ReplaceAll(t, " ? ", " : ")
+	t = strings.ReplaceAll(t, " – ", " : ")
+	t = strings.ReplaceAll(t, " - ", " : ")
+	return t
+}
+
 func (h *ExamHallHandler) GetAllHallsByRegNo(c *gin.Context) {
 	registerNo := c.Query("registerNo")
 
@@ -108,9 +115,10 @@ func (h *ExamHallHandler) GetAllHallsByRegNo(c *gin.Context) {
 		return
 	}
 
-	// Attach block label to every session
+	// Attach block label to every session and normalize time display
 	for i := range sessions {
 		sessions[i].Block = hallBlock(sessions[i].HallNo)
+		sessions[i].Time = normalizeExamTime(sessions[i].Time)
 	}
 
 	c.JSON(http.StatusOK, gin.H{

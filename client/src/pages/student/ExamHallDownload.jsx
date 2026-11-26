@@ -10,15 +10,30 @@ import api from "@/api/axios.js";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+export function formatExamTime(t) {
+  if (!t) return "";
+  const times = t.match(/\b\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)\b/gi);
+  if (times && times.length >= 2) {
+    return `${times[0].toUpperCase()} : ${times[1].toUpperCase()}`;
+  }
+  return t
+    .replace(/\s*\?\s*/g, " : ")
+    .replace(/\s*[–—]\s*/g, " : ")
+    .replace(/\s*-\s*/g, " : ");
+}
+
 function examEndTime(dateStr, timeStr) {
+  if (!dateStr || !timeStr) return null;
   const [dd, mm, yy] = dateStr.split("-");
-  const endPart = (timeStr.split("–")[1] ?? timeStr.split("-")[1] ?? "").trim();
-  const [timePart, meridiem] = endPart.split(" ");
+  const times = timeStr.match(/\b\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)\b/gi);
+  if (!times || times.length === 0) return null;
+  const endPart = times[1] || times[0];
+  const [timePart, meridiem] = endPart.split(/\s+/);
   if (!timePart || !meridiem) return null;
   const [hh, min] = timePart.split(":").map(Number);
   let h = hh;
-  if (meridiem === "PM" && hh !== 12) h = hh + 12;
-  if (meridiem === "AM" && hh === 12) h = 0;
+  if (meridiem.toUpperCase() === "PM" && hh !== 12) h = hh + 12;
+  if (meridiem.toUpperCase() === "AM" && hh === 12) h = 0;
   return new Date(`${yy}-${mm}-${dd}T${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}:00`);
 }
 function isExamOver(s) { const e = examEndTime(s.date, s.time); return e ? e < new Date() : false; }
@@ -243,9 +258,9 @@ async function generatePDF(registerNo, sessions) {
         doc.text(blSlice, C[3].x + 2, blStart, { lineHeightFactor: 1.45 });
 
         // ── TIME — start on top half, end on bottom half, centred ────────────
-        const tp = s.time.split("–");
-        const start = (tp[0] || s.time).trim();
-        const end = tp[1] ? ("– " + tp[1].trim()) : "";
+        const times = (s.time || "").match(/\b\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)\b/gi);
+        const start = times && times[0] ? times[0].toUpperCase() : (s.time || "").trim();
+        const end = times && times[1] ? (": " + times[1].toUpperCase()) : "";
         if (end) {
           doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); T(IK);
           doc.text(start, C[4].x + 2, y + RH / 2 - 0.5);
@@ -521,7 +536,7 @@ function ExamCard({ session: s, registerNo }) {
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
             <Clock className="h-3 w-3 shrink-0 text-blue-200 dark:text-blue-800" />
-            <span className="text-[11px] text-blue-500 dark:text-blue-400">{s.time}</span>
+            <span className="text-[11px] text-blue-500 dark:text-blue-400">{formatExamTime(s.time)}</span>
           </div>
           {countdown && (
             <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold shrink-0
@@ -613,6 +628,18 @@ export default function ExamHallDownload() {
       .finally(() => setLoading(false));
   }, [profile, student]);
 
+  const handleDownloadPdf = async () => {
+    if (!sessions || !registerNo) return;
+    setPdfLoading(true);
+    try {
+      await generatePDF(registerNo, sessions);
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
   const sorted = sessions
     ? [...sessions].sort((a, b) => {
       const ms = d => { const [dd, mm, yy] = d.split("-"); return new Date(`${yy}-${mm}-${dd}`).getTime(); };
@@ -662,12 +689,25 @@ export default function ExamHallDownload() {
                 </div>
               </div>
 
-              <button
-                onClick={() => navigate("/exam-hall-manual")}
-                className="rounded-xl border border-zinc-900 bg-white px-3.5 py-1.5 text-xs font-black text-blue-600 shadow-[2px_2px_0px_#18181b] hover:bg-blue-50 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[2px_2px_0px_#ffffff] transition-all shrink-0"
-              >
-                Manual Search
-              </button>
+              <div className="flex items-center gap-2">
+                {sessions && sessions.length > 0 && (
+                  <button
+                    onClick={handleDownloadPdf}
+                    disabled={pdfLoading}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-900 bg-emerald-50 px-3 py-1.5 text-xs font-black text-emerald-700 shadow-[2px_2px_0px_#18181b] hover:bg-emerald-100 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer dark:border-white dark:bg-zinc-800 dark:text-emerald-400 dark:shadow-[2px_2px_0px_#ffffff] transition-all"
+                    title="Download Exam Hall Ticket PDF"
+                  >
+                    {pdfLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileDown className="h-3.5 w-3.5" />}
+                    <span>PDF</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => navigate("/exam-hall-manual")}
+                  className="rounded-xl border border-zinc-900 bg-white px-3.5 py-1.5 text-xs font-black text-blue-600 shadow-[2px_2px_0px_#18181b] hover:bg-blue-50 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer dark:border-white dark:bg-zinc-800 dark:text-blue-400 dark:shadow-[2px_2px_0px_#ffffff] transition-all shrink-0"
+                >
+                  Manual Search
+                </button>
+              </div>
             </div>
           </div>
 

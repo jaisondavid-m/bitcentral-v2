@@ -38,6 +38,14 @@ function formatDisplayDate(dateStr) {
   });
 }
 
+function formatExamTime(t) {
+  if (!t) return "";
+  return t
+    .replace(/\s*\?\s*/g, " : ")
+    .replace(/\s*[–—]\s*/g, " : ")
+    .replace(/\s*-\s*/g, " : ");
+}
+
 const ExamHallMembers = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -253,7 +261,7 @@ const ExamHallMembers = () => {
                       {hallData.time && (
                         <span className="inline-flex items-center gap-1 font-mono font-medium text-slate-600 dark:text-slate-400">
                           <Clock className="h-3.5 w-3.5 text-blue-500" />
-                          {hallData.time}
+                          {formatExamTime(hallData.time)}
                         </span>
                       )}
                     </div>

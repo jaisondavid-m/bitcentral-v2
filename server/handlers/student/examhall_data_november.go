@@ -1,4 +1,4 @@
-package student
+﻿package student
 
 import (
 	studentmodels "server/models/student"
@@ -2001,7 +2001,7 @@ func buildSeatingData18Nov2026AN() []studentmodels.SeatingRecord {
 }
 
 // ============================================================================
-// 21-11-2026 AFTERNOON SESSION (AN: 01:30 PM ? 04:30 PM) - Total: 165 Students
+// 21-11-2026 AFTERNOON SESSION (AN: 01:30 PM : 04:30 PM) - Total: 165 Students
 // ============================================================================
 func buildSeatingData21Nov2026AN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -2011,134 +2011,134 @@ func buildSeatingData21Nov2026AN() []studentmodels.SeatingRecord {
 		// Course: 22CH103* (2 candidates)
 		{HallNo: "WW 202", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376231CS190", "7376231CS259",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS029 (1 candidates)
 		{HallNo: "WW 202", CourseCode: "22CS029", RegisterNos: []string{
 			"7376231CS173",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (2 candidates)
 		{HallNo: "WW 202", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376231EC283", "7376231EC334",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (1 candidates)
 		{HallNo: "WW 202", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376231EE111",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (1 candidates)
 		{HallNo: "WW 202", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376231BM148",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (1 candidates)
 		{HallNo: "WW 202", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376231SE153",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (1 candidates)
 		{HallNo: "WW 202", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376231CD143",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (5 candidates)
 		{HallNo: "WW 202", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376231MZ106", "7376231MZ107", "7376231MZ111", "7376231MZ113", "7376231MZ135",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT603* (11 candidates)
 		{HallNo: "WW 202", CourseCode: "22BT603*", RegisterNos: []string{
 			"7376232BT115", "7376232BT120", "7376232BT126", "7376232BT134", "7376232BT142", "7376232BT148",
 			"7376232BT163", "7376232BT182", "7376232BT200", "7376232BT202", "7376232BT209",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB014 (6 candidates)
 		{HallNo: "WW 202", CourseCode: "22CB014", RegisterNos: []string{
 			"7376232CB106", "7376232CB111", "7376232CB123", "7376232CB133", "7376232CB162", "7376242CB502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI601* (7 candidates)
 		{HallNo: "WW 202", CourseCode: "22AI601*", RegisterNos: []string{
 			"7376232AD131", "7376232AD136", "7376232AD175", "7376232AD214", "7376232AD250", "7376242AD505",
 			"7376242AD509",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (2 candidates)
 		{HallNo: "WW 202", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376232AD122", "7376232AD170",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (1 candidates)
 		{HallNo: "WW 202", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376232AG151",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (9 candidates)
 		{HallNo: "WW 202", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376241CS118", "7376241CS143", "7376241CS185", "7376241CS257", "7376241CS272", "7376241CS297",
 			"7376241CS323", "7376241CS332", "7376241CS395",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 203
 		// --------------------------------------------------------------------
 		// Course: 22CS029 (4 candidates)
 		{HallNo: "WW 203", CourseCode: "22CS029", RegisterNos: []string{
 			"7376231CS240", "7376231CS244", "7376231CS325", "7376241CS513",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OPH05 (1 candidates)
 		{HallNo: "WW 203", CourseCode: "22OPH05", RegisterNos: []string{
 			"7376231CS346",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22FD603* (2 candidates)
 		{HallNo: "WW 203", CourseCode: "22FD603*", RegisterNos: []string{
 			"7376232FD114", "7376232FD137",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM601* (3 candidates)
 		{HallNo: "WW 203", CourseCode: "22AM601*", RegisterNos: []string{
 			"7376232AL116", "7376232AL142", "7376232AL153",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (2 candidates)
 		{HallNo: "WW 203", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376241CS455", "7376241CS474",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (6 candidates)
 		{HallNo: "WW 203", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376241EC137", "7376241EC201", "7376241EC256", "7376241EC282", "7376241EC321", "7376241EC333",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (4 candidates)
 		{HallNo: "WW 203", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376241EE132", "7376241EE147", "7376241EE188", "7376241EE193",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (1 candidates)
 		{HallNo: "WW 203", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376241EI119",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (2 candidates)
 		{HallNo: "WW 203", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376241MZ124", "7376241MZ139",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 204
 		// --------------------------------------------------------------------
 		// Course: 22BM602* (1 candidates)
 		{HallNo: "WW 204", CourseCode: "22BM602*", RegisterNos: []string{
 			"7376231BM107",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OPH05 (1 candidates)
 		{HallNo: "WW 204", CourseCode: "22OPH05", RegisterNos: []string{
 			"7376231SE103",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CT025* (1 candidates)
 		{HallNo: "WW 204", CourseCode: "22CT025*", RegisterNos: []string{
 			"7376232CT122",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (1 candidates)
 		{HallNo: "WW 204", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376241MZ143",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (5 candidates)
 		{HallNo: "WW 204", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376242IT108", "7376242IT110", "7376242IT141", "7376242IT146", "7376242IT164",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (8 candidates)
 		{HallNo: "WW 204", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376242AD137", "7376242AD183", "7376242AD189", "7376242AD202", "7376242AD218", "7376242AD291",
 			"7376242AD308", "7376242AD320",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (8 candidates)
 		{HallNo: "WW 204", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376242AL104", "7376242AL109", "7376242AL144", "7376242AL157", "7376242AL169", "7376242AL176",
 			"7376242AL197", "7376242AL207",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 205
 		// --------------------------------------------------------------------
@@ -2146,65 +2146,65 @@ func buildSeatingData21Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 205", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376242IT184", "7376242IT188", "7376242IT214", "7376242IT227", "7376242IT257", "7376242IT318",
 			"7376242IT338",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (12 candidates)
 		{HallNo: "WW 205", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376251CS163", "7376251CS166", "7376251CS193", "7376251CS200", "7376251CS224", "7376251CS260",
 			"7376251CS268", "7376251CS336", "7376251CS352", "7376251CS387", "7376251CS467", "7376251CS479",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (6 candidates)
 		{HallNo: "WW 205", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376251EC141", "7376251EC186", "7376251EC205", "7376251EC213", "7376251EC215", "7376251EC289",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 206
 		// --------------------------------------------------------------------
 		// Course: 22CH103* (5 candidates)
 		{HallNo: "WW 206", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376251EE112", "7376251EE138", "7376251EE144", "7376251EE152", "7376251EE154",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (1 candidates)
 		{HallNo: "WW 206", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376251EI134",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (2 candidates)
 		{HallNo: "WW 206", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376251MZ104", "7376251MZ105",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (10 candidates)
 		{HallNo: "WW 206", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376252AD129", "7376252AD137", "7376252AD193", "7376252AD200", "7376252AD214", "7376252AD222",
 			"7376252AD300", "7376252AD315", "7376252AD326", "7376252AD331",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (4 candidates)
 		{HallNo: "WW 206", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376252AL112", "7376252AL122", "7376252AL162", "7376252AL189",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (3 candidates)
 		{HallNo: "WW 206", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376252AG117", "7376252AG119", "7376252AG127",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 207
 		// --------------------------------------------------------------------
 		// Course: 22CH103* (2 candidates)
 		{HallNo: "WW 207", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376252BT120", "7376252BT143",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (11 candidates)
 		{HallNo: "WW 207", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376252IT122", "7376252IT197", "7376252IT202", "7376252IT250", "7376252IT253", "7376252IT256",
 			"7376252IT297", "7376252IT312", "7376252IT326", "7376252IT331", "7376252IT376",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CH103* (2 candidates)
 		{HallNo: "WW 207", CourseCode: "22CH103*", RegisterNos: []string{
 			"7376252AL208", "7376252AL231",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 	}
 }
 
 // ============================================================================
-// 23-11-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 1224 Students
+// 23-11-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 1224 Students
 // ============================================================================
 func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -2217,7 +2217,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC130", "7376231EC131", "7376231EC132", "7376231EC101", "7376231EC103", "7376231EC104",
 			"7376231EC106", "7376231EC115", "7376231EC116", "7376231EC118", "7376231EC119", "7376231EC121",
 			"7376231EC123", "7376231EC126",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI040 (25 candidates)
 		{HallNo: "ME 201", CourseCode: "22AI040", RegisterNos: []string{
 			"7376232AD101", "7376232AD102", "7376232AD103", "7376232AD104", "7376232AD105", "7376232AD106",
@@ -2225,7 +2225,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD114", "7376232AD115", "7376232AD116", "7376232AD117", "7376232AD118", "7376232AD119",
 			"7376232AD120", "7376232AD121", "7376232AD122", "7376232AD123", "7376232AD124", "7376232AD125",
 			"7376232AD126",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 202
 		// --------------------------------------------------------------------
@@ -2235,7 +2235,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC152", "7376231EC153", "7376231EC159", "7376231EC160", "7376231EC161", "7376231EC162",
 			"7376231EC163", "7376231EC164", "7376231EC165", "7376231EC134", "7376231EC135", "7376231EC145",
 			"7376231EC147", "7376231EC167",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI040 (25 candidates)
 		{HallNo: "ME 202", CourseCode: "22AI040", RegisterNos: []string{
 			"7376232AD127", "7376232AD128", "7376232AD129", "7376232AD131", "7376232AD132", "7376232AD133",
@@ -2243,7 +2243,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD140", "7376232AD141", "7376232AD142", "7376232AD144", "7376232AD145", "7376232AD146",
 			"7376232AD147", "7376232AD148", "7376232AD149", "7376232AD150", "7376232AD151", "7376232AD152",
 			"7376232AD153",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 203
 		// --------------------------------------------------------------------
@@ -2253,7 +2253,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC179", "7376231EC180", "7376231EC181", "7376231EC182", "7376231EC183", "7376231EC185",
 			"7376231EC186", "7376231EC187", "7376231EC169", "7376231EC191", "7376231EC193", "7376231EC194",
 			"7376231EC196", "7376231EC198",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI040 (25 candidates)
 		{HallNo: "ME 203", CourseCode: "22AI040", RegisterNos: []string{
 			"7376232AD156", "7376232AD157", "7376232AD158", "7376232AD159", "7376232AD160", "7376232AD161",
@@ -2261,7 +2261,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD169", "7376232AD170", "7376232AD171", "7376232AD172", "7376232AD173", "7376232AD174",
 			"7376232AD175", "7376232AD176", "7376232AD177", "7376232AD154", "7376232AD179", "7376232AD181",
 			"7376232AD182",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 204
 		// --------------------------------------------------------------------
@@ -2271,7 +2271,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC225", "7376231EC228", "7376231EC229", "7376231EC230", "7376231EC231", "7376231EC199",
 			"7376231EC202", "7376231EC210", "7376231EC211", "7376231EC214", "7376231EC216", "7376231EC217",
 			"7376231EC219", "7376231EC220",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI040 (25 candidates)
 		{HallNo: "ME 204", CourseCode: "22AI040", RegisterNos: []string{
 			"7376232AD183", "7376232AD184", "7376232AD185", "7376232AD186", "7376232AD187", "7376232AD188",
@@ -2279,7 +2279,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD196", "7376232AD197", "7376232AD198", "7376232AD199", "7376232AD200", "7376232AD201",
 			"7376232AD202", "7376232AD203", "7376232AD204", "7376232AD205", "7376232AD206", "7376232AD207",
 			"7376232AD208",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 205
 		// --------------------------------------------------------------------
@@ -2289,7 +2289,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC250", "7376231EC251", "7376231EC252", "7376231EC257", "7376231EC258", "7376231EC259",
 			"7376231EC261", "7376231EC262", "7376231EC263", "7376231EC238", "7376231EC239", "7376231EC241",
 			"7376231EC243", "7376231EC244",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI040 (25 candidates)
 		{HallNo: "ME 205", CourseCode: "22AI040", RegisterNos: []string{
 			"7376232AD209", "7376232AD210", "7376232AD211", "7376232AD212", "7376232AD213", "7376232AD214",
@@ -2297,7 +2297,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD221", "7376232AD222", "7376232AD224", "7376232AD225", "7376232AD226", "7376232AD227",
 			"7376232AD229", "7376232AD230", "7376232AD231", "7376232AD232", "7376232AD233", "7376232AD234",
 			"7376232AD235",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 206
 		// --------------------------------------------------------------------
@@ -2307,7 +2307,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC274", "7376231EC275", "7376231EC276", "7376231EC277", "7376231EC278", "7376231EC279",
 			"7376231EC281", "7376231EC282", "7376231EC283", "7376231EC287", "7376231EC288", "7376231EC289",
 			"7376231EC265", "7376231EC285",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI040 (25 candidates)
 		{HallNo: "ME 206", CourseCode: "22AI040", RegisterNos: []string{
 			"7376232AD236", "7376232AD237", "7376232AD238", "7376232AD239", "7376232AD240", "7376232AD242",
@@ -2315,7 +2315,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD249", "7376232AD250", "7376232AD251", "7376232AD254", "7376232AD255", "7376232AD256",
 			"7376232AD257", "7376232AD258", "7376232AD259", "7376232AD260", "7376232AD261", "7376232AD262",
 			"7376232AD263",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 301
 		// --------------------------------------------------------------------
@@ -2325,7 +2325,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC298", "7376231EC299", "7376231EC311", "7376231EC312", "7376231EC313", "7376231EC314",
 			"7376231EC315", "7376231EC316", "7376231EC317", "7376231EC302", "7376231EC303", "7376231EC305",
 			"7376231EC308", "7376231EC309",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI040 (25 candidates)
 		{HallNo: "ME 301", CourseCode: "22AI040", RegisterNos: []string{
 			"7376232AD264", "7376232AD265", "7376232AD266", "7376232AD267", "7376232AD268", "7376232AD269",
@@ -2333,7 +2333,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD276", "7376232AD277", "7376232AD281", "7376232AD282", "7376232AD283", "7376232AD284",
 			"7376232AD285", "7376232AD286", "7376242AD501", "7376242AD502", "7376242AD503", "7376242AD504",
 			"7376232AD279",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 008
 		// --------------------------------------------------------------------
@@ -2341,16 +2341,16 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 008", CourseCode: "22EC048", RegisterNos: []string{
 			"7376231EC321", "7376231EC322", "7376231EC323", "7376231EC324", "7376231EC325", "7376231EC326",
 			"7376231EC327", "7376231EC328", "7376231EC329", "7376231EC319",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI040 (6 candidates)
 		{HallNo: "WW 008", CourseCode: "22AI040", RegisterNos: []string{
 			"7376242AD505", "7376242AD506", "7376242AD507", "7376242AD508", "7376242AD509", "7376242AD510",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM015 (9 candidates)
 		{HallNo: "WW 008", CourseCode: "22AM015", RegisterNos: []string{
 			"7376232AL102", "7376232AL103", "7376232AL104", "7376232AL105", "7376232AL106", "7376232AL107",
 			"7376232AL108", "7376232AL109", "7376232AL110",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 011
 		// --------------------------------------------------------------------
@@ -2358,13 +2358,13 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 011", CourseCode: "22EC048", RegisterNos: []string{
 			"7376231EC330", "7376231EC331", "7376231EC332", "7376231EC333", "7376231EC334", "7376241EC502",
 			"7376241EC503", "7376241EC504", "7376241EC505", "7376241EC508",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM015 (15 candidates)
 		{HallNo: "WW 011", CourseCode: "22AM015", RegisterNos: []string{
 			"7376232AL116", "7376232AL117", "7376232AL118", "7376232AL119", "7376232AL124", "7376232AL125",
 			"7376232AL126", "7376232AL127", "7376232AL128", "7376232AL129", "7376232AL130", "7376232AL111",
 			"7376232AL113", "7376232AL121", "7376232AL122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 012
 		// --------------------------------------------------------------------
@@ -2372,13 +2372,13 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 012", CourseCode: "22EC048", RegisterNos: []string{
 			"7376241EC509", "7376241EC510", "7376241EC511", "7376241EC512", "7376241EC513", "7376241EC514",
 			"7376241EC518", "7376241EC519", "7376241EC520", "7376241EC516",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM015 (15 candidates)
 		{HallNo: "WW 012", CourseCode: "22AM015", RegisterNos: []string{
 			"7376232AL131", "7376232AL132", "7376232AL133", "7376232AL134", "7376232AL144", "7376232AL145",
 			"7376232AL146", "7376232AL147", "7376232AL148", "7376232AL149", "7376232AL136", "7376232AL138",
 			"7376232AL139", "7376232AL141", "7376232AL142",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 113
 		// --------------------------------------------------------------------
@@ -2386,17 +2386,17 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 113", CourseCode: "22CS022", RegisterNos: []string{
 			"7376231CS102", "7376231CS106", "7376231CS111", "7376231CS114", "7376231CS116", "7376231CS125",
 			"7376231CS126", "7376231CS128",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC048 (2 candidates)
 		{HallNo: "WW 113", CourseCode: "22EC048", RegisterNos: []string{
 			"7376241EC521", "7376241EC522",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM015 (15 candidates)
 		{HallNo: "WW 113", CourseCode: "22AM015", RegisterNos: []string{
 			"7376232AL152", "7376232AL153", "7376232AL154", "7376232AL155", "7376232AL156", "7376232AL157",
 			"7376232AL158", "7376232AL159", "7376232AL160", "7376232AL164", "7376232AL165", "7376232AL166",
 			"7376232AL167", "7376232AL168", "7376232AL162",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 114
 		// --------------------------------------------------------------------
@@ -2404,13 +2404,13 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 114", CourseCode: "22CS022", RegisterNos: []string{
 			"7376231CS155", "7376231CS156", "7376231CS157", "7376231CS158", "7376231CS138", "7376231CS139",
 			"7376231CS146", "7376231CS147", "7376231CS149", "7376231CS151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM015 (15 candidates)
 		{HallNo: "WW 114", CourseCode: "22AM015", RegisterNos: []string{
 			"7376232AL171", "7376232AL172", "7376232AL173", "7376232AL174", "7376232AL176", "7376232AL177",
 			"7376232AL178", "7376232AL179", "7376232AL180", "7376232AL182", "7376232AL183", "7376232AL184",
 			"7376232AL185", "7376232AL186", "7376232AL187",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 115
 		// --------------------------------------------------------------------
@@ -2418,13 +2418,13 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 115", CourseCode: "22CS022", RegisterNos: []string{
 			"7376231CS159", "7376231CS162", "7376231CS165", "7376231CS166", "7376231CS168", "7376231CS175",
 			"7376231CS177", "7376231CS185", "7376231CS187", "7376231CS197",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM015 (15 candidates)
 		{HallNo: "WW 115", CourseCode: "22AM015", RegisterNos: []string{
 			"7376232AL188", "7376232AL189", "7376232AL190", "7376232AL191", "7376232AL196", "7376232AL197",
 			"7376232AL198", "7376232AL199", "7376232AL200", "7376232AL203", "7376232AL204", "7376232AL205",
 			"7376232AL206", "7376232AL193", "7376232AL211",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 117
 		// --------------------------------------------------------------------
@@ -2432,13 +2432,13 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 117", CourseCode: "22CS022", RegisterNos: []string{
 			"7376231CS200", "7376231CS209", "7376231CS211", "7376231CS219", "7376231CS224", "7376231CS225",
 			"7376231CS229", "7376231CS230", "7376231CS232", "7376231CS237",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM015 (15 candidates)
 		{HallNo: "WW 117", CourseCode: "22AM015", RegisterNos: []string{
 			"7376232AL212", "7376232AL213", "7376232AL214", "7376232AL215", "7376232AL217", "7376232AL218",
 			"7376232AL219", "7376232AL220", "7376232AL221", "7376242AL501", "7376242AL502", "7376242AL503",
 			"7376242AL504", "7376242AL505", "7376242AL506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 118
 		// --------------------------------------------------------------------
@@ -2446,17 +2446,17 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 118", CourseCode: "22CS022", RegisterNos: []string{
 			"7376231CS238", "7376231CS240", "7376231CS243", "7376231CS246", "7376231CS248", "7376231CS250",
 			"7376231CS251", "7376231CS258", "7376231CS261", "7376231CS263",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT021 (14 candidates)
 		{HallNo: "WW 118", CourseCode: "22IT021", RegisterNos: []string{
 			"7376232IT111", "7376232IT112", "7376232IT113", "7376232IT123", "7376232IT124", "7376232IT125",
 			"7376232IT103", "7376232IT105", "7376232IT108", "7376232IT109", "7376232IT118", "7376232IT120",
 			"7376232IT121", "7376232IT132",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM015 (1 candidates)
 		{HallNo: "WW 118", CourseCode: "22AM015", RegisterNos: []string{
 			"7376242AL507",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 202
 		// --------------------------------------------------------------------
@@ -2467,7 +2467,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS291", "7376231CS293", "7376231CS296", "7376231CS297", "7376231CS300", "7376231CS313",
 			"7376231CS315", "7376231CS317", "7376231CS318", "7376231CS331", "7376231CS337", "7376231CS339",
 			"7376231CS341",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT021 (25 candidates)
 		{HallNo: "WW 202", CourseCode: "22IT021", RegisterNos: []string{
 			"7376232IT147", "7376232IT148", "7376232IT149", "7376232IT162", "7376232IT163", "7376232IT164",
@@ -2475,7 +2475,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT190", "7376232IT191", "7376232IT192", "7376232IT135", "7376232IT138", "7376232IT139",
 			"7376232IT152", "7376232IT156", "7376232IT160", "7376232IT171", "7376232IT172", "7376232IT174",
 			"7376232IT181",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 203
 		// --------------------------------------------------------------------
@@ -2483,31 +2483,31 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 203", CourseCode: "22CS022", RegisterNos: []string{
 			"7376231CS342", "7376231CS346", "7376231CS347", "7376231CS350", "7376231CS352", "7376241CS501",
 			"7376241CS503", "7376241CS505", "7376241CS506", "7376241CS508",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT021 (15 candidates)
 		{HallNo: "WW 203", CourseCode: "22IT021", RegisterNos: []string{
 			"7376232IT223", "7376232IT224", "7376232IT225", "7376232IT193", "7376232IT201", "7376232IT206",
 			"7376232IT208", "7376232IT211", "7376232IT215", "7376232IT228", "7376232IT229", "7376232IT231",
 			"7376232IT235", "7376232IT240", "7376232IT241",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 204
 		// --------------------------------------------------------------------
 		// Course: 22CS021 (2 candidates)
 		{HallNo: "WW 204", CourseCode: "22CS021", RegisterNos: []string{
 			"7376231CS103", "7376231CS104",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS022 (8 candidates)
 		{HallNo: "WW 204", CourseCode: "22CS022", RegisterNos: []string{
 			"7376241CS509", "7376241CS510", "7376241CS511", "7376241CS512", "7376241CS513", "7376241CS514",
 			"7376241CS515", "7376241CS518",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT021 (15 candidates)
 		{HallNo: "WW 204", CourseCode: "22IT021", RegisterNos: []string{
 			"7376232IT255", "7376232IT256", "7376232IT257", "7376232IT258", "7376232IT259", "7376232IT260",
 			"7376232IT261", "7376232IT262", "7376232IT263", "7376232IT247", "7376232IT250", "7376232IT252",
 			"7376232IT265", "7376232IT267", "7376232IT268",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 205
 		// --------------------------------------------------------------------
@@ -2515,13 +2515,13 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 205", CourseCode: "22CS021", RegisterNos: []string{
 			"7376231CS117", "7376231CS118", "7376231CS119", "7376231CS120", "7376231CS121", "7376231CS122",
 			"7376231CS123", "7376231CS109", "7376231CS110", "7376231CS115",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT021 (15 candidates)
 		{HallNo: "WW 205", CourseCode: "22IT021", RegisterNos: []string{
 			"7376242IT501", "7376242IT502", "7376242IT503", "7376242IT504", "7376242IT507", "7376242IT508",
 			"7376242IT509", "7376242IT510", "7376232IT270", "7376232IT271", "7376232IT274", "7376232IT280",
 			"7376232IT281", "7376232IT283", "7376232IT284",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 206
 		// --------------------------------------------------------------------
@@ -2529,17 +2529,17 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 206", CourseCode: "22CS021", RegisterNos: []string{
 			"7376231CS124", "7376231CS127", "7376231CS129", "7376231CS131", "7376231CS136", "7376231CS142",
 			"7376231CS144", "7376231CS145", "7376231CS160", "7376231CS164",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT003 (14 candidates)
 		{HallNo: "WW 206", CourseCode: "22BT003", RegisterNos: []string{
 			"7376232BT113", "7376232BT114", "7376232BT115", "7376232BT129", "7376232BT130", "7376232BT131",
 			"7376232BT132", "7376232BT101", "7376232BT103", "7376232BT104", "7376232BT107", "7376232BT117",
 			"7376232BT118", "7376232BT120",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT021 (1 candidates)
 		{HallNo: "WW 206", CourseCode: "22IT021", RegisterNos: []string{
 			"7376242IT511",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 207
 		// --------------------------------------------------------------------
@@ -2550,7 +2550,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS178", "7376231CS181", "7376231CS182", "7376231CS192", "7376231CS205", "7376231CS206",
 			"7376231CS208", "7376231CS210", "7376231CS215", "7376231CS221", "7376231CS228", "7376231CS235",
 			"7376231CS239",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT003 (25 candidates)
 		{HallNo: "WW 207", CourseCode: "22BT003", RegisterNos: []string{
 			"7376232BT135", "7376232BT136", "7376232BT137", "7376232BT138", "7376232BT139", "7376232BT146",
@@ -2558,7 +2558,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232BT155", "7376232BT156", "7376232BT157", "7376232BT161", "7376232BT162", "7376232BT163",
 			"7376232BT164", "7376232BT165", "7376232BT166", "7376232BT141", "7376232BT142", "7376232BT144",
 			"7376232BT159",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 208
 		// --------------------------------------------------------------------
@@ -2566,13 +2566,13 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 208", CourseCode: "22CS021", RegisterNos: []string{
 			"7376231CS244", "7376231CS252", "7376231CS255", "7376231CS257", "7376231CS259", "7376231CS264",
 			"7376231CS266", "7376231CS267", "7376231CS269", "7376231CS278",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT003 (15 candidates)
 		{HallNo: "WW 208", CourseCode: "22BT003", RegisterNos: []string{
 			"7376232BT173", "7376232BT174", "7376232BT175", "7376232BT176", "7376232BT177", "7376232BT179",
 			"7376232BT180", "7376232BT181", "7376232BT182", "7376232BT183", "7376232BT168", "7376232BT169",
 			"7376232BT171", "7376232BT189", "7376232BT190",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 209
 		// --------------------------------------------------------------------
@@ -2580,13 +2580,13 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 209", CourseCode: "22CS021", RegisterNos: []string{
 			"7376231CS280", "7376231CS282", "7376231CS284", "7376231CS285", "7376231CS290", "7376231CS292",
 			"7376231CS294", "7376231CS295", "7376231CS299", "7376231CS308",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT003 (15 candidates)
 		{HallNo: "WW 209", CourseCode: "22BT003", RegisterNos: []string{
 			"7376232BT194", "7376232BT195", "7376232BT196", "7376232BT197", "7376232BT200", "7376232BT201",
 			"7376232BT202", "7376232BT203", "7376232BT204", "7376232BT205", "7376232BT206", "7376232BT191",
 			"7376232BT208", "7376232BT212", "7376232BT213",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 210
 		// --------------------------------------------------------------------
@@ -2594,35 +2594,35 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 210", CourseCode: "22CS021", RegisterNos: []string{
 			"7376231CS312", "7376231CS320", "7376231CS321", "7376231CS323", "7376231CS330", "7376231CS334",
 			"7376231CS338", "7376231CS340", "7376231CS343", "7376231CS344",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC010 (13 candidates)
 		{HallNo: "WW 210", CourseCode: "22MC010", RegisterNos: []string{
 			"7376231MZ102", "7376231MZ103", "7376231MZ104", "7376231MZ105", "7376231MZ106", "7376231MZ107",
 			"7376231MZ108", "7376231MZ110", "7376231MZ111", "7376231MZ112", "7376231MZ113", "7376231MZ116",
 			"7376231MZ118",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT003 (2 candidates)
 		{HallNo: "WW 210", CourseCode: "22BT003", RegisterNos: []string{
 			"7376232BT214", "7376232BT215",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 211
 		// --------------------------------------------------------------------
 		// Course: 22CS021 (3 candidates)
 		{HallNo: "WW 211", CourseCode: "22CS021", RegisterNos: []string{
 			"7376231CS353", "7376231CS354", "7376241CS519",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC010 (15 candidates)
 		{HallNo: "WW 211", CourseCode: "22MC010", RegisterNos: []string{
 			"7376231MZ121", "7376231MZ122", "7376231MZ123", "7376231MZ124", "7376231MZ125", "7376231MZ126",
 			"7376231MZ127", "7376231MZ128", "7376231MZ132", "7376231MZ133", "7376231MZ134", "7376231MZ135",
 			"7376231MZ136", "7376231MZ119", "7376231MZ130",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG045 (7 candidates)
 		{HallNo: "WW 211", CourseCode: "22AG045", RegisterNos: []string{
 			"7376232AG102", "7376232AG103", "7376232AG104", "7376232AG105", "7376232AG106", "7376232AG107",
 			"7376232AG108",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 212
 		// --------------------------------------------------------------------
@@ -2632,11 +2632,11 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231MZ147", "7376231MZ148", "7376231MZ149", "7376231MZ150", "7376231MZ151", "7376231MZ152",
 			"7376231MZ153", "7376231MZ154", "7376241MZ501", "7376241MZ502", "7376241MZ503", "7376241MZ504",
 			"7376241MZ505", "7376241MZ506", "7376231MZ137", "7376231MZ138", "7376231MZ158",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT021 (2 candidates)
 		{HallNo: "WW 212", CourseCode: "22CT021", RegisterNos: []string{
 			"7376232CT101", "7376232CT102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG045 (25 candidates)
 		{HallNo: "WW 212", CourseCode: "22AG045", RegisterNos: []string{
 			"7376232AG111", "7376232AG112", "7376232AG113", "7376232AG114", "7376232AG115", "7376232AG116",
@@ -2644,7 +2644,7 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AG123", "7376232AG124", "7376232AG125", "7376232AG126", "7376232AG131", "7376232AG132",
 			"7376232AG133", "7376232AG137", "7376232AG138", "7376232AG139", "7376232AG109", "7376232AG128",
 			"7376232AG129",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 213
 		// --------------------------------------------------------------------
@@ -2653,30 +2653,30 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232CT103", "7376232CT104", "7376232CT105", "7376232CT106", "7376232CT107", "7376232CT111",
 			"7376232CT112", "7376232CT113", "7376232CT115", "7376232CT116", "7376232CT117", "7376232CT109",
 			"7376232CT119", "7376232CT121", "7376232CT122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG045 (10 candidates)
 		{HallNo: "WW 213", CourseCode: "22AG045", RegisterNos: []string{
 			"7376232AG140", "7376232AG141", "7376232AG142", "7376232AG143", "7376232AG144", "7376232AG145",
 			"7376232AG147", "7376232AG148", "7376232AG149", "7376232AG150",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 214
 		// --------------------------------------------------------------------
 		// Course: 22EI038 (2 candidates)
 		{HallNo: "WW 214", CourseCode: "22EI038", RegisterNos: []string{
 			"7376231EI101", "7376231EI102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT021 (15 candidates)
 		{HallNo: "WW 214", CourseCode: "22CT021", RegisterNos: []string{
 			"7376232CT125", "7376232CT126", "7376232CT127", "7376232CT128", "7376232CT129", "7376232CT130",
 			"7376232CT131", "7376232CT134", "7376232CT135", "7376232CT136", "7376232CT139", "7376232CT140",
 			"7376232CT141", "7376232CT142", "7376232CT123",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG045 (8 candidates)
 		{HallNo: "WW 214", CourseCode: "22AG045", RegisterNos: []string{
 			"7376232AG151", "7376232AG152", "7376232AG153", "7376232AG154", "7376242AG501", "7376242AG502",
 			"7376242AG503", "7376242AG504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 215
 		// --------------------------------------------------------------------
@@ -2684,13 +2684,13 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 215", CourseCode: "22EI038", RegisterNos: []string{
 			"7376231EI110", "7376231EI111", "7376231EI112", "7376231EI113", "7376231EI103", "7376231EI104",
 			"7376231EI106", "7376231EI108", "7376231EI116", "7376231EI117",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT021 (15 candidates)
 		{HallNo: "WW 215", CourseCode: "22CT021", RegisterNos: []string{
 			"7376232CT143", "7376232CT144", "7376232CT145", "7376232CT155", "7376232CT156", "7376232CT157",
 			"7376232CT158", "7376232CT159", "7376232CT160", "7376232CT161", "7376232CT162", "7376232CT147",
 			"7376232CT148", "7376232CT152", "7376232CT153",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 218
 		// --------------------------------------------------------------------
@@ -2698,16 +2698,16 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 218", CourseCode: "22EI038", RegisterNos: []string{
 			"7376231EI118", "7376231EI119", "7376231EI120", "7376231EI121", "7376231EI122", "7376231EI123",
 			"7376231EI124", "7376231EI125", "7376231EI126", "7376231EI128",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME041 (12 candidates)
 		{HallNo: "WW 218", CourseCode: "22ME041", RegisterNos: []string{
 			"7376231ME103", "7376231ME104", "7376231ME105", "7376231ME122", "7376231ME123", "7376231ME124",
 			"7376231ME110", "7376231ME111", "7376231ME114", "7376231ME116", "7376231ME127", "7376231ME128",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT021 (3 candidates)
 		{HallNo: "WW 218", CourseCode: "22CT021", RegisterNos: []string{
 			"7376242CT501", "7376242CT502", "7376242CT503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 219
 		// --------------------------------------------------------------------
@@ -2715,13 +2715,13 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 219", CourseCode: "22EI038", RegisterNos: []string{
 			"7376231EI130", "7376231EI131", "7376231EI132", "7376231EI133", "7376231EI134", "7376231EI135",
 			"7376231EI136", "7376231EI138", "7376231EI139", "7376231EI141",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME041 (15 candidates)
 		{HallNo: "WW 219", CourseCode: "22ME041", RegisterNos: []string{
 			"7376231ME145", "7376231ME146", "7376231ME147", "7376231ME148", "7376231ME149", "7376231ME150",
 			"7376231ME130", "7376231ME132", "7376231ME133", "7376231ME136", "7376231ME137", "7376231ME139",
 			"7376231ME140", "7376231ME142", "7376231ME143",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 222
 		// --------------------------------------------------------------------
@@ -2729,24 +2729,24 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 222", CourseCode: "22EE008", RegisterNos: []string{
 			"7376231EE121", "7376231EE122", "7376231EE123", "7376231EE104", "7376231EE106", "7376231EE111",
 			"7376231EE113", "7376231EE114", "7376231EE116", "7376231EE118", "7376231EE119",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI038 (14 candidates)
 		{HallNo: "WW 222", CourseCode: "22EI038", RegisterNos: []string{
 			"7376231EI151", "7376231EI152", "7376231EI153", "7376231EI143", "7376231EI144", "7376231EI146",
 			"7376231EI147", "7376231EI149", "7376231EI156", "7376231EI158", "7376231EI159", "7376241EI501",
 			"7376241EI503", "7376241EI504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME041 (11 candidates)
 		{HallNo: "WW 222", CourseCode: "22ME041", RegisterNos: []string{
 			"7376231ME153", "7376231ME154", "7376231ME155", "7376231ME156", "7376231ME157", "7376231ME158",
 			"7376231ME151", "7376231ME160", "7376231ME161", "7376241ME501", "7376241ME505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD017 (14 candidates)
 		{HallNo: "WW 222", CourseCode: "22FD017", RegisterNos: []string{
 			"7376232FD105", "7376232FD106", "7376232FD107", "7376232FD108", "7376232FD109", "7376232FD110",
 			"7376232FD111", "7376232FD112", "7376232FD116", "7376232FD117", "7376232FD118", "7376232FD102",
 			"7376232FD103", "7376232FD114",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 223
 		// --------------------------------------------------------------------
@@ -2756,22 +2756,22 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376241EE504", "7376241EE505", "7376241EE506", "7376231EE124", "7376231EE125", "7376231EE128",
 			"7376231EE130", "7376231EE133", "7376231EE134", "7376231EE138", "7376231EE141", "7376231EE143",
 			"7376231EE145", "7376231EE154", "7376231EE156", "7376241EE501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM028 (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22BM028", RegisterNos: []string{
 			"7376231BM101", "7376231BM102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD017 (23 candidates)
 		{HallNo: "WW 223", CourseCode: "22FD017", RegisterNos: []string{
 			"7376232FD127", "7376232FD128", "7376232FD129", "7376232FD130", "7376232FD131", "7376232FD132",
 			"7376232FD133", "7376232FD135", "7376232FD136", "7376232FD137", "7376232FD138", "7376232FD144",
 			"7376232FD145", "7376232FD146", "7376232FD148", "7376232FD149", "7376232FD150", "7376232FD119",
 			"7376232FD122", "7376232FD123", "7376232FD125", "7376232FD140", "7376232FD152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB015 (3 candidates)
 		{HallNo: "WW 223", CourseCode: "22CB015", RegisterNos: []string{
 			"7376232CB106", "7376232CB107", "7376232CB110",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 224
 		// --------------------------------------------------------------------
@@ -2782,89 +2782,89 @@ func buildSeatingData23Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231BM115", "7376231BM117", "7376231BM118", "7376231BM120", "7376231BM121", "7376231BM128",
 			"7376231BM131", "7376231BM133", "7376231BM135", "7376231BM145", "7376231BM146", "7376231BM149",
 			"7376231BM150",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT032 (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22IT032", RegisterNos: []string{
 			"7376232IT101", "7376232IT102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB015 (23 candidates)
 		{HallNo: "WW 224", CourseCode: "22CB015", RegisterNos: []string{
 			"7376232CB130", "7376232CB131", "7376232CB132", "7376232CB111", "7376232CB114", "7376232CB117",
 			"7376232CB120", "7376232CB121", "7376232CB123", "7376232CB125", "7376232CB128", "7376232CB134",
 			"7376232CB135", "7376232CB141", "7376232CB145", "7376232CB147", "7376232CB154", "7376232CB157",
 			"7376232CB160", "7376232CB162", "7376232CB163", "7376242CB502", "7376242CB503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 225
 		// --------------------------------------------------------------------
 		// Course: 22CE031 (5 candidates)
 		{HallNo: "WW 225", CourseCode: "22CE031", RegisterNos: []string{
 			"7376231CE104", "7376231CE105", "7376231CE108", "7376231CE111", "7376231CE117",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC056 (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22EC056", RegisterNos: []string{
 			"7376231EC117", "7376231EC154", "7376231EC166",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM028 (1 candidates)
 		{HallNo: "WW 225", CourseCode: "22BM028", RegisterNos: []string{
 			"7376231BM151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IS015 (21 candidates)
 		{HallNo: "WW 225", CourseCode: "22IS015", RegisterNos: []string{
 			"7376231SE122", "7376231SE123", "7376231SE124", "7376231SE130", "7376231SE131", "7376231SE132",
 			"7376231SE103", "7376231SE109", "7376231SE113", "7376231SE115", "7376231SE119", "7376231SE120",
 			"7376231SE127", "7376231SE128", "7376231SE139", "7376231SE141", "7376231SE148", "7376231SE150",
 			"7376231SE152", "7376231SE153", "7376241SE501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT032 (20 candidates)
 		{HallNo: "WW 225", CourseCode: "22IT032", RegisterNos: []string{
 			"7376232IT104", "7376232IT115", "7376232IT122", "7376232IT127", "7376232IT140", "7376232IT144",
 			"7376232IT145", "7376232IT169", "7376232IT176", "7376232IT188", "7376232IT204", "7376232IT209",
 			"7376232IT213", "7376232IT216", "7376232IT220", "7376232IT230", "7376232IT237", "7376232IT243",
 			"7376232IT248", "7376232IT278",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 226
 		// --------------------------------------------------------------------
 		// Course: 22CE031 (6 candidates)
 		{HallNo: "WW 226", CourseCode: "22CE031", RegisterNos: []string{
 			"7376231CE118", "7376231CE120", "7376231CE123", "7376241CE501", "7376241CE502", "7376241CE504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC005 (9 candidates)
 		{HallNo: "WW 226", CourseCode: "22EC005", RegisterNos: []string{
 			"7376231EC113", "7376231EC122", "7376231EC242", "7376231EC253", "7376231EC255", "7376231EC256",
 			"7376231EC304", "7376241EC515", "7376241EC517",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC056 (13 candidates)
 		{HallNo: "WW 226", CourseCode: "22EC056", RegisterNos: []string{
 			"7376231EC170", "7376231EC171", "7376231EC203", "7376231EC205", "7376231EC209", "7376231EC212",
 			"7376231EC237", "7376231EC272", "7376231EC280", "7376231EC291", "7376231EC306", "7376231EC310",
 			"7376231EC320",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE029 (2 candidates)
 		{HallNo: "WW 226", CourseCode: "22EE029", RegisterNos: []string{
 			"7376231EE107", "7376231EE115",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE052 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22EE052", RegisterNos: []string{
 			"7376231EE153",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI052 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22EI052", RegisterNos: []string{
 			"7376231EI148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 227
 		// --------------------------------------------------------------------
 		// Course: 22BT003 (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22BT003", RegisterNos: []string{
 			"7376242BT170", "7376242BT214",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
 
 // ============================================================================
-// 23-11-2026 AFTERNOON SESSION (AN: 01:30 PM ? 04:30 PM) - Total: 1887 Students
+// 23-11-2026 AFTERNOON SESSION (AN: 01:30 PM : 04:30 PM) - Total: 1887 Students
 // ============================================================================
 func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -2878,14 +2878,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS114", "7376241CS115", "7376241CS116", "7376241CS117", "7376241CS118", "7376241CS119",
 			"7376241CS120", "7376241CS121", "7376241CS122", "7376241CS123", "7376241CS124", "7376241CS125",
 			"7376241CS126",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC504 (20 candidates)
 		{HallNo: "ME 102", CourseCode: "22EC504", RegisterNos: []string{
 			"7376241EC103", "7376241EC104", "7376241EC105", "7376241EC106", "7376241EC107", "7376241EC108",
 			"7376241EC109", "7376241EC110", "7376241EC115", "7376241EC116", "7376241EC117", "7376241EC118",
 			"7376241EC119", "7376241EC120", "7376241EC121", "7376241EC122", "7376241EC123", "7376241EC124",
 			"7376241EC112", "7376241EC113",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 107
 		// --------------------------------------------------------------------
@@ -2896,14 +2896,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS139", "7376241CS140", "7376241CS141", "7376241CS142", "7376241CS143", "7376241CS144",
 			"7376241CS145", "7376241CS146", "7376241CS147", "7376241CS148", "7376241CS149", "7376241CS150",
 			"7376241CS151",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC504 (20 candidates)
 		{HallNo: "ME 107", CourseCode: "22EC504", RegisterNos: []string{
 			"7376241EC125", "7376241EC126", "7376241EC127", "7376241EC128", "7376241EC129", "7376241EC130",
 			"7376241EC131", "7376241EC132", "7376241EC133", "7376241EC134", "7376241EC135", "7376241EC136",
 			"7376241EC137", "7376241EC138", "7376241EC139", "7376241EC140", "7376241EC141", "7376241EC142",
 			"7376241EC143", "7376241EC144",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 108
 		// --------------------------------------------------------------------
@@ -2914,14 +2914,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS165", "7376241CS166", "7376241CS167", "7376241CS168", "7376241CS169", "7376241CS170",
 			"7376241CS171", "7376241CS172", "7376241CS173", "7376241CS174", "7376241CS175", "7376241CS176",
 			"7376241CS177",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC504 (20 candidates)
 		{HallNo: "ME 108", CourseCode: "22EC504", RegisterNos: []string{
 			"7376241EC145", "7376241EC146", "7376241EC147", "7376241EC148", "7376241EC149", "7376241EC150",
 			"7376241EC151", "7376241EC152", "7376241EC153", "7376241EC154", "7376241EC155", "7376241EC156",
 			"7376241EC157", "7376241EC158", "7376241EC159", "7376241EC160", "7376241EC161", "7376241EC162",
 			"7376241EC163", "7376241EC164",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 201
 		// --------------------------------------------------------------------
@@ -2932,14 +2932,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS191", "7376241CS192", "7376241CS193", "7376241CS194", "7376241CS195", "7376241CS196",
 			"7376241CS197", "7376241CS198", "7376241CS199", "7376241CS200", "7376241CS201", "7376241CS202",
 			"7376241CS203",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC504 (20 candidates)
 		{HallNo: "ME 201", CourseCode: "22EC504", RegisterNos: []string{
 			"7376241EC165", "7376241EC166", "7376241EC167", "7376241EC168", "7376241EC169", "7376241EC170",
 			"7376241EC171", "7376241EC172", "7376241EC173", "7376241EC174", "7376241EC176", "7376241EC177",
 			"7376241EC178", "7376241EC179", "7376241EC180", "7376241EC181", "7376241EC182", "7376241EC183",
 			"7376241EC184", "7376241EC185",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 202
 		// --------------------------------------------------------------------
@@ -2950,14 +2950,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS216", "7376241CS217", "7376241CS218", "7376241CS219", "7376241CS220", "7376241CS221",
 			"7376241CS222", "7376241CS223", "7376241CS224", "7376241CS225", "7376241CS226", "7376241CS227",
 			"7376241CS228",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC504 (20 candidates)
 		{HallNo: "ME 202", CourseCode: "22EC504", RegisterNos: []string{
 			"7376241EC186", "7376241EC187", "7376241EC188", "7376241EC189", "7376241EC190", "7376241EC191",
 			"7376241EC192", "7376241EC193", "7376241EC194", "7376241EC195", "7376241EC196", "7376241EC197",
 			"7376241EC198", "7376241EC199", "7376241EC200", "7376241EC201", "7376241EC202", "7376241EC203",
 			"7376241EC204", "7376241EC205",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 203
 		// --------------------------------------------------------------------
@@ -2968,14 +2968,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS242", "7376241CS243", "7376241CS244", "7376241CS245", "7376241CS246", "7376241CS247",
 			"7376241CS248", "7376241CS249", "7376241CS250", "7376241CS251", "7376241CS252", "7376241CS253",
 			"7376241CS254",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC504 (20 candidates)
 		{HallNo: "ME 203", CourseCode: "22EC504", RegisterNos: []string{
 			"7376241EC209", "7376241EC210", "7376241EC211", "7376241EC212", "7376241EC213", "7376241EC214",
 			"7376241EC215", "7376241EC216", "7376241EC217", "7376241EC218", "7376241EC219", "7376241EC220",
 			"7376241EC221", "7376241EC222", "7376241EC223", "7376241EC224", "7376241EC225", "7376241EC226",
 			"7376241EC206", "7376241EC207",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 204
 		// --------------------------------------------------------------------
@@ -2986,14 +2986,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS267", "7376241CS268", "7376241CS269", "7376241CS270", "7376241CS271", "7376241CS272",
 			"7376241CS273", "7376241CS274", "7376241CS275", "7376241CS276", "7376241CS277", "7376241CS278",
 			"7376241CS279",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC504 (20 candidates)
 		{HallNo: "ME 204", CourseCode: "22EC504", RegisterNos: []string{
 			"7376241EC227", "7376241EC228", "7376241EC229", "7376241EC230", "7376241EC232", "7376241EC233",
 			"7376241EC234", "7376241EC235", "7376241EC236", "7376241EC237", "7376241EC238", "7376241EC239",
 			"7376241EC240", "7376241EC241", "7376241EC242", "7376241EC243", "7376241EC244", "7376241EC245",
 			"7376241EC246", "7376241EC247",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 205
 		// --------------------------------------------------------------------
@@ -3004,14 +3004,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS292", "7376241CS293", "7376241CS294", "7376241CS295", "7376241CS296", "7376241CS297",
 			"7376241CS298", "7376241CS299", "7376241CS300", "7376241CS301", "7376241CS302", "7376241CS303",
 			"7376241CS304",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC504 (20 candidates)
 		{HallNo: "ME 205", CourseCode: "22EC504", RegisterNos: []string{
 			"7376241EC248", "7376241EC249", "7376241EC250", "7376241EC251", "7376241EC252", "7376241EC253",
 			"7376241EC254", "7376241EC255", "7376241EC256", "7376241EC257", "7376241EC258", "7376241EC259",
 			"7376241EC260", "7376241EC261", "7376241EC262", "7376241EC263", "7376241EC264", "7376241EC265",
 			"7376241EC266", "7376241EC267",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 206
 		// --------------------------------------------------------------------
@@ -3022,14 +3022,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS317", "7376241CS318", "7376241CS319", "7376241CS320", "7376241CS321", "7376241CS322",
 			"7376241CS323", "7376241CS324", "7376241CS325", "7376241CS326", "7376241CS327", "7376241CS328",
 			"7376241CS329",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC504 (20 candidates)
 		{HallNo: "ME 206", CourseCode: "22EC504", RegisterNos: []string{
 			"7376241EC268", "7376241EC269", "7376241EC270", "7376241EC271", "7376241EC272", "7376241EC273",
 			"7376241EC274", "7376241EC275", "7376241EC276", "7376241EC277", "7376241EC278", "7376241EC279",
 			"7376241EC280", "7376241EC281", "7376241EC282", "7376241EC283", "7376241EC284", "7376241EC285",
 			"7376241EC286", "7376241EC287",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 301
 		// --------------------------------------------------------------------
@@ -3040,14 +3040,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS342", "7376241CS343", "7376241CS344", "7376241CS345", "7376241CS346", "7376241CS347",
 			"7376241CS348", "7376241CS349", "7376241CS350", "7376241CS351", "7376241CS352", "7376241CS353",
 			"7376241CS355",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC504 (20 candidates)
 		{HallNo: "ME 301", CourseCode: "22EC504", RegisterNos: []string{
 			"7376241EC288", "7376241EC289", "7376241EC290", "7376241EC291", "7376241EC292", "7376241EC293",
 			"7376241EC294", "7376241EC295", "7376241EC296", "7376241EC297", "7376241EC298", "7376241EC299",
 			"7376241EC300", "7376241EC301", "7376241EC302", "7376241EC303", "7376241EC304", "7376241EC305",
 			"7376241EC306", "7376241EC307",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 302
 		// --------------------------------------------------------------------
@@ -3058,14 +3058,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS368", "7376241CS369", "7376241CS370", "7376241CS371", "7376241CS372", "7376241CS373",
 			"7376241CS374", "7376241CS375", "7376241CS376", "7376241CS377", "7376241CS378", "7376241CS379",
 			"7376241CS380",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC504 (20 candidates)
 		{HallNo: "ME 302", CourseCode: "22EC504", RegisterNos: []string{
 			"7376241EC308", "7376241EC309", "7376241EC310", "7376241EC311", "7376241EC312", "7376241EC313",
 			"7376241EC314", "7376241EC315", "7376241EC316", "7376241EC317", "7376241EC318", "7376241EC319",
 			"7376241EC320", "7376241EC321", "7376241EC322", "7376241EC323", "7376241EC324", "7376241EC325",
 			"7376241EC326", "7376241EC327",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 303
 		// --------------------------------------------------------------------
@@ -3076,14 +3076,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS393", "7376241CS394", "7376241CS395", "7376241CS396", "7376241CS397", "7376241CS398",
 			"7376241CS399", "7376241CS400", "7376241CS401", "7376241CS402", "7376241CS403", "7376241CS404",
 			"7376241CS405",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC504 (20 candidates)
 		{HallNo: "ME 303", CourseCode: "22EC504", RegisterNos: []string{
 			"7376241EC328", "7376241EC329", "7376241EC330", "7376241EC331", "7376241EC332", "7376241EC333",
 			"7376241EC334", "7376241EC335", "7376241EC336", "7376241EC337", "7376241EC338", "7376241EC339",
 			"7376241EC340", "7376241EC341", "7376241EC342", "7376241EC343", "7376241EC344", "7376241EC345",
 			"7376241EC346", "7376241EC347",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 304
 		// --------------------------------------------------------------------
@@ -3094,14 +3094,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS418", "7376241CS419", "7376241CS420", "7376241CS421", "7376241CS422", "7376241CS423",
 			"7376241CS424", "7376241CS425", "7376241CS426", "7376241CS427", "7376241CS428", "7376241CS429",
 			"7376241CS430",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC504 (20 candidates)
 		{HallNo: "ME 304", CourseCode: "22EC504", RegisterNos: []string{
 			"7376241EC348", "7376241EC349", "7376241EC350", "7376241EC351", "7376241EC352", "7376251EC501",
 			"7376251EC502", "7376251EC503", "7376251EC504", "7376251EC505", "7376251EC506", "7376251EC507",
 			"7376251EC508", "7376251EC509", "7376251EC510", "7376251EC511", "7376251EC512", "7376251EC513",
 			"7376251EC514", "7376251EC515",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 305
 		// --------------------------------------------------------------------
@@ -3112,17 +3112,17 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS444", "7376241CS445", "7376241CS446", "7376241CS447", "7376241CS448", "7376241CS449",
 			"7376241CS450", "7376241CS451", "7376241CS452", "7376241CS453", "7376241CS454", "7376241CS455",
 			"7376241CS456",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC504 (6 candidates)
 		{HallNo: "ME 305", CourseCode: "22EC504", RegisterNos: []string{
 			"7376251EC516", "7376251EC517", "7376251EC518", "7376251EC519", "7376251EC520", "7376251EC521",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT504 (14 candidates)
 		{HallNo: "ME 305", CourseCode: "22IT504", RegisterNos: []string{
 			"7376242IT101", "7376242IT102", "7376242IT103", "7376242IT104", "7376242IT105", "7376242IT106",
 			"7376242IT107", "7376242IT108", "7376242IT109", "7376242IT110", "7376242IT111", "7376242IT112",
 			"7376242IT113", "7376242IT114",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 306
 		// --------------------------------------------------------------------
@@ -3133,14 +3133,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS469", "7376241CS470", "7376241CS471", "7376241CS472", "7376241CS473", "7376241CS474",
 			"7376241CS475", "7376241CS476", "7376251CS501", "7376251CS502", "7376251CS503", "7376251CS504",
 			"7376251CS505",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT504 (20 candidates)
 		{HallNo: "ME 306", CourseCode: "22IT504", RegisterNos: []string{
 			"7376242IT115", "7376242IT116", "7376242IT117", "7376242IT118", "7376242IT119", "7376242IT120",
 			"7376242IT121", "7376242IT122", "7376242IT123", "7376242IT124", "7376242IT125", "7376242IT126",
 			"7376242IT127", "7376242IT128", "7376242IT129", "7376242IT130", "7376242IT131", "7376242IT132",
 			"7376242IT133", "7376242IT134",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF 001
 		// --------------------------------------------------------------------
@@ -3149,18 +3149,18 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376251CS506", "7376251CS507", "7376251CS508", "7376251CS509", "7376251CS510", "7376251CS511",
 			"7376251CS512", "7376251CS513", "7376251CS515", "7376251CS516", "7376251CS517", "7376251CS518",
 			"7376251CS519", "7376251CS520", "7376251CS521", "7376251CS522", "7376251CS523", "7376251CS524",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT504 (20 candidates)
 		{HallNo: "SF 001", CourseCode: "22IT504", RegisterNos: []string{
 			"7376242IT135", "7376242IT136", "7376242IT137", "7376242IT138", "7376242IT139", "7376242IT140",
 			"7376242IT141", "7376242IT142", "7376242IT143", "7376242IT144", "7376242IT145", "7376242IT146",
 			"7376242IT147", "7376242IT148", "7376242IT149", "7376242IT150", "7376242IT151", "7376242IT152",
 			"7376242IT153", "7376242IT155",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (2 candidates)
 		{HallNo: "SF 001", CourseCode: "22AI504", RegisterNos: []string{
 			"7376242AD102", "7376242AD103",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF 002
 		// --------------------------------------------------------------------
@@ -3170,14 +3170,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT162", "7376242IT163", "7376242IT164", "7376242IT165", "7376242IT166", "7376242IT167",
 			"7376242IT168", "7376242IT169", "7376242IT170", "7376242IT171", "7376242IT172", "7376242IT173",
 			"7376242IT174", "7376242IT175",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (20 candidates)
 		{HallNo: "SF 002", CourseCode: "22AI504", RegisterNos: []string{
 			"7376242AD104", "7376242AD105", "7376242AD106", "7376242AD107", "7376242AD108", "7376242AD109",
 			"7376242AD110", "7376242AD111", "7376242AD112", "7376242AD113", "7376242AD114", "7376242AD115",
 			"7376242AD116", "7376242AD117", "7376242AD118", "7376242AD119", "7376242AD120", "7376242AD121",
 			"7376242AD122", "7376242AD123",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF 101
 		// --------------------------------------------------------------------
@@ -3187,14 +3187,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT182", "7376242IT183", "7376242IT184", "7376242IT185", "7376242IT186", "7376242IT187",
 			"7376242IT188", "7376242IT189", "7376242IT190", "7376242IT191", "7376242IT192", "7376242IT193",
 			"7376242IT194", "7376242IT195",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (20 candidates)
 		{HallNo: "SF 101", CourseCode: "22AI504", RegisterNos: []string{
 			"7376242AD124", "7376242AD125", "7376242AD126", "7376242AD127", "7376242AD128", "7376242AD129",
 			"7376242AD131", "7376242AD132", "7376242AD133", "7376242AD134", "7376242AD135", "7376242AD136",
 			"7376242AD137", "7376242AD138", "7376242AD139", "7376242AD140", "7376242AD141", "7376242AD142",
 			"7376242AD143", "7376242AD144",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF 102
 		// --------------------------------------------------------------------
@@ -3204,14 +3204,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT202", "7376242IT203", "7376242IT204", "7376242IT205", "7376242IT206", "7376242IT207",
 			"7376242IT208", "7376242IT209", "7376242IT210", "7376242IT211", "7376242IT212", "7376242IT213",
 			"7376242IT214", "7376242IT215",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (20 candidates)
 		{HallNo: "SF 102", CourseCode: "22AI504", RegisterNos: []string{
 			"7376242AD145", "7376242AD146", "7376242AD147", "7376242AD148", "7376242AD149", "7376242AD150",
 			"7376242AD151", "7376242AD152", "7376242AD153", "7376242AD154", "7376242AD155", "7376242AD156",
 			"7376242AD157", "7376242AD158", "7376242AD159", "7376242AD160", "7376242AD161", "7376242AD162",
 			"7376242AD163", "7376242AD164",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF 103
 		// --------------------------------------------------------------------
@@ -3221,14 +3221,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT222", "7376242IT223", "7376242IT224", "7376242IT225", "7376242IT226", "7376242IT227",
 			"7376242IT228", "7376242IT229", "7376242IT230", "7376242IT231", "7376242IT232", "7376242IT233",
 			"7376242IT234", "7376242IT235",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (20 candidates)
 		{HallNo: "SF 103", CourseCode: "22AI504", RegisterNos: []string{
 			"7376242AD165", "7376242AD166", "7376242AD167", "7376242AD168", "7376242AD169", "7376242AD170",
 			"7376242AD171", "7376242AD172", "7376242AD173", "7376242AD174", "7376242AD176", "7376242AD177",
 			"7376242AD178", "7376242AD179", "7376242AD180", "7376242AD181", "7376242AD182", "7376242AD183",
 			"7376242AD184", "7376242AD185",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF B01
 		// --------------------------------------------------------------------
@@ -3238,14 +3238,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT242", "7376242IT243", "7376242IT244", "7376242IT245", "7376242IT246", "7376242IT247",
 			"7376242IT248", "7376242IT249", "7376242IT250", "7376242IT251", "7376242IT252", "7376242IT253",
 			"7376242IT254", "7376242IT255",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (20 candidates)
 		{HallNo: "SF B01", CourseCode: "22AI504", RegisterNos: []string{
 			"7376242AD188", "7376242AD189", "7376242AD190", "7376242AD191", "7376242AD192", "7376242AD193",
 			"7376242AD194", "7376242AD195", "7376242AD196", "7376242AD197", "7376242AD198", "7376242AD199",
 			"7376242AD200", "7376242AD201", "7376242AD202", "7376242AD203", "7376242AD204", "7376242AD205",
 			"7376242AD206", "7376242AD186",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF B02
 		// --------------------------------------------------------------------
@@ -3255,14 +3255,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT262", "7376242IT263", "7376242IT264", "7376242IT265", "7376242IT266", "7376242IT267",
 			"7376242IT268", "7376242IT269", "7376242IT270", "7376242IT271", "7376242IT272", "7376242IT273",
 			"7376242IT274", "7376242IT275",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (20 candidates)
 		{HallNo: "SF B02", CourseCode: "22AI504", RegisterNos: []string{
 			"7376242AD207", "7376242AD208", "7376242AD209", "7376242AD210", "7376242AD211", "7376242AD212",
 			"7376242AD213", "7376242AD214", "7376242AD215", "7376242AD216", "7376242AD217", "7376242AD218",
 			"7376242AD219", "7376242AD220", "7376242AD221", "7376242AD222", "7376242AD223", "7376242AD224",
 			"7376242AD225", "7376242AD226",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF B03
 		// --------------------------------------------------------------------
@@ -3272,14 +3272,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT282", "7376242IT283", "7376242IT284", "7376242IT285", "7376242IT286", "7376242IT287",
 			"7376242IT288", "7376242IT289", "7376242IT290", "7376242IT291", "7376242IT292", "7376242IT293",
 			"7376242IT294", "7376242IT295",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (20 candidates)
 		{HallNo: "SF B03", CourseCode: "22AI504", RegisterNos: []string{
 			"7376242AD227", "7376242AD228", "7376242AD229", "7376242AD230", "7376242AD231", "7376242AD232",
 			"7376242AD233", "7376242AD234", "7376242AD235", "7376242AD236", "7376242AD237", "7376242AD238",
 			"7376242AD239", "7376242AD240", "7376242AD241", "7376242AD242", "7376242AD243", "7376242AD244",
 			"7376242AD245", "7376242AD246",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 008
 		// --------------------------------------------------------------------
@@ -3287,13 +3287,13 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 008", CourseCode: "22IT504", RegisterNos: []string{
 			"7376242IT296", "7376242IT297", "7376242IT298", "7376242IT299", "7376242IT300", "7376242IT301",
 			"7376242IT302", "7376242IT303", "7376242IT305", "7376242IT306",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (15 candidates)
 		{HallNo: "WW 008", CourseCode: "22AI504", RegisterNos: []string{
 			"7376242AD247", "7376242AD248", "7376242AD249", "7376242AD250", "7376242AD251", "7376242AD252",
 			"7376242AD253", "7376242AD254", "7376242AD255", "7376242AD256", "7376242AD257", "7376242AD258",
 			"7376242AD259", "7376242AD260", "7376242AD261",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 011
 		// --------------------------------------------------------------------
@@ -3301,13 +3301,13 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 011", CourseCode: "22IT504", RegisterNos: []string{
 			"7376242IT307", "7376242IT308", "7376242IT309", "7376242IT310", "7376242IT311", "7376242IT312",
 			"7376242IT313", "7376242IT314", "7376242IT315", "7376242IT316",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (15 candidates)
 		{HallNo: "WW 011", CourseCode: "22AI504", RegisterNos: []string{
 			"7376242AD262", "7376242AD263", "7376242AD264", "7376242AD265", "7376242AD266", "7376242AD267",
 			"7376242AD268", "7376242AD269", "7376242AD270", "7376242AD271", "7376242AD272", "7376242AD273",
 			"7376242AD274", "7376242AD275", "7376242AD276",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 012
 		// --------------------------------------------------------------------
@@ -3315,13 +3315,13 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 012", CourseCode: "22IT504", RegisterNos: []string{
 			"7376242IT317", "7376242IT318", "7376242IT319", "7376242IT320", "7376242IT321", "7376242IT322",
 			"7376242IT323", "7376242IT324", "7376242IT325", "7376242IT326",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (15 candidates)
 		{HallNo: "WW 012", CourseCode: "22AI504", RegisterNos: []string{
 			"7376242AD277", "7376242AD278", "7376242AD279", "7376242AD280", "7376242AD281", "7376242AD282",
 			"7376242AD283", "7376242AD284", "7376242AD285", "7376242AD286", "7376242AD287", "7376242AD288",
 			"7376242AD289", "7376242AD290", "7376242AD291",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 113
 		// --------------------------------------------------------------------
@@ -3329,13 +3329,13 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 113", CourseCode: "22IT504", RegisterNos: []string{
 			"7376242IT327", "7376242IT328", "7376242IT329", "7376242IT330", "7376242IT331", "7376242IT332",
 			"7376242IT333", "7376242IT334", "7376242IT335", "7376242IT336",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (15 candidates)
 		{HallNo: "WW 113", CourseCode: "22AI504", RegisterNos: []string{
 			"7376242AD292", "7376242AD293", "7376242AD294", "7376242AD295", "7376242AD296", "7376242AD297",
 			"7376242AD298", "7376242AD299", "7376242AD300", "7376242AD301", "7376242AD302", "7376242AD303",
 			"7376242AD304", "7376242AD305", "7376242AD306",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 114
 		// --------------------------------------------------------------------
@@ -3343,13 +3343,13 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 114", CourseCode: "22IT504", RegisterNos: []string{
 			"7376242IT337", "7376242IT338", "7376242IT339", "7376242IT340", "7376242IT341", "7376242IT342",
 			"7376242IT343", "7376242IT344", "7376242IT345", "7376242IT346",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (15 candidates)
 		{HallNo: "WW 114", CourseCode: "22AI504", RegisterNos: []string{
 			"7376242AD307", "7376242AD308", "7376242AD309", "7376242AD310", "7376242AD311", "7376242AD312",
 			"7376242AD313", "7376242AD314", "7376242AD315", "7376242AD316", "7376242AD317", "7376242AD318",
 			"7376242AD319", "7376242AD320", "7376242AD321",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 115
 		// --------------------------------------------------------------------
@@ -3357,13 +3357,13 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 115", CourseCode: "22IT504", RegisterNos: []string{
 			"7376242IT347", "7376242IT348", "7376242IT349", "7376242IT350", "7376242IT351", "7376252IT501",
 			"7376252IT502", "7376252IT503", "7376252IT504", "7376252IT505",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (15 candidates)
 		{HallNo: "WW 115", CourseCode: "22AI504", RegisterNos: []string{
 			"7376242AD322", "7376242AD323", "7376242AD324", "7376242AD325", "7376242AD326", "7376242AD327",
 			"7376242AD328", "7376242AD329", "7376242AD330", "7376242AD331", "7376242AD332", "7376242AD333",
 			"7376242AD334", "7376242AD335", "7376242AD336",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 117
 		// --------------------------------------------------------------------
@@ -3371,13 +3371,13 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 117", CourseCode: "22IT504", RegisterNos: []string{
 			"7376252IT508", "7376252IT509", "7376252IT510", "7376252IT511", "7376252IT512", "7376252IT513",
 			"7376252IT514", "7376252IT515", "7376252IT516", "7376252IT506",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (15 candidates)
 		{HallNo: "WW 117", CourseCode: "22AI504", RegisterNos: []string{
 			"7376242AD337", "7376242AD338", "7376242AD339", "7376242AD340", "7376242AD341", "7376242AD342",
 			"7376242AD343", "7376242AD344", "7376242AD345", "7376242AD346", "7376252AD501", "7376252AD502",
 			"7376252AD503", "7376252AD504", "7376252AD505",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 118
 		// --------------------------------------------------------------------
@@ -3385,16 +3385,16 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 118", CourseCode: "22EE504", RegisterNos: []string{
 			"7376241EE101", "7376241EE102", "7376241EE103", "7376241EE104", "7376241EE105", "7376241EE106",
 			"7376241EE107", "7376241EE108", "7376241EE109", "7376241EE110",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504 (11 candidates)
 		{HallNo: "WW 118", CourseCode: "22AI504", RegisterNos: []string{
 			"7376252AD506", "7376252AD507", "7376252AD508", "7376252AD509", "7376252AD510", "7376252AD511",
 			"7376252AD512", "7376252AD513", "7376252AD514", "7376252AD515", "7376252AD516",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM504 (4 candidates)
 		{HallNo: "WW 118", CourseCode: "22AM504", RegisterNos: []string{
 			"7376242AL101", "7376242AL102", "7376242AL103", "7376242AL104",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 202
 		// --------------------------------------------------------------------
@@ -3405,7 +3405,7 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EE125", "7376241EE126", "7376241EE127", "7376241EE128", "7376241EE129", "7376241EE130",
 			"7376241EE131", "7376241EE132", "7376241EE133", "7376241EE134", "7376241EE135", "7376241EE136",
 			"7376241EE111",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM504 (25 candidates)
 		{HallNo: "WW 202", CourseCode: "22AM504", RegisterNos: []string{
 			"7376242AL105", "7376242AL106", "7376242AL107", "7376242AL108", "7376242AL109", "7376242AL110",
@@ -3413,7 +3413,7 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AL117", "7376242AL118", "7376242AL119", "7376242AL120", "7376242AL121", "7376242AL122",
 			"7376242AL123", "7376242AL124", "7376242AL125", "7376242AL126", "7376242AL127", "7376242AL128",
 			"7376242AL129",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 203
 		// --------------------------------------------------------------------
@@ -3421,13 +3421,13 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 203", CourseCode: "22EE504", RegisterNos: []string{
 			"7376241EE137", "7376241EE138", "7376241EE139", "7376241EE140", "7376241EE141", "7376241EE142",
 			"7376241EE143", "7376241EE144", "7376241EE145", "7376241EE146",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM504 (15 candidates)
 		{HallNo: "WW 203", CourseCode: "22AM504", RegisterNos: []string{
 			"7376242AL130", "7376242AL131", "7376242AL132", "7376242AL133", "7376242AL134", "7376242AL135",
 			"7376242AL136", "7376242AL137", "7376242AL138", "7376242AL139", "7376242AL140", "7376242AL141",
 			"7376242AL142", "7376242AL143", "7376242AL144",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 204
 		// --------------------------------------------------------------------
@@ -3435,13 +3435,13 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 204", CourseCode: "22EE504", RegisterNos: []string{
 			"7376241EE147", "7376241EE148", "7376241EE149", "7376241EE150", "7376241EE151", "7376241EE152",
 			"7376241EE153", "7376241EE154", "7376241EE155", "7376241EE156",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM504 (15 candidates)
 		{HallNo: "WW 204", CourseCode: "22AM504", RegisterNos: []string{
 			"7376242AL145", "7376242AL146", "7376242AL147", "7376242AL148", "7376242AL149", "7376242AL150",
 			"7376242AL151", "7376242AL152", "7376242AL153", "7376242AL154", "7376242AL155", "7376242AL156",
 			"7376242AL157", "7376242AL158", "7376242AL159",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 205
 		// --------------------------------------------------------------------
@@ -3449,13 +3449,13 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 205", CourseCode: "22EE504", RegisterNos: []string{
 			"7376241EE157", "7376241EE158", "7376241EE159", "7376241EE160", "7376241EE161", "7376241EE162",
 			"7376241EE163", "7376241EE164", "7376241EE165", "7376241EE166",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM504 (15 candidates)
 		{HallNo: "WW 205", CourseCode: "22AM504", RegisterNos: []string{
 			"7376242AL160", "7376242AL161", "7376242AL162", "7376242AL163", "7376242AL164", "7376242AL165",
 			"7376242AL166", "7376242AL167", "7376242AL168", "7376242AL169", "7376242AL170", "7376242AL171",
 			"7376242AL172", "7376242AL173", "7376242AL174",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 206
 		// --------------------------------------------------------------------
@@ -3463,13 +3463,13 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 206", CourseCode: "22EE504", RegisterNos: []string{
 			"7376241EE167", "7376241EE168", "7376241EE169", "7376241EE170", "7376241EE171", "7376241EE173",
 			"7376241EE174", "7376241EE175", "7376241EE176", "7376241EE177",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM504 (15 candidates)
 		{HallNo: "WW 206", CourseCode: "22AM504", RegisterNos: []string{
 			"7376242AL175", "7376242AL176", "7376242AL177", "7376242AL178", "7376242AL179", "7376242AL180",
 			"7376242AL181", "7376242AL182", "7376242AL183", "7376242AL184", "7376242AL185", "7376242AL186",
 			"7376242AL187", "7376242AL188", "7376242AL189",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 207
 		// --------------------------------------------------------------------
@@ -3480,7 +3480,7 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EE190", "7376241EE191", "7376241EE192", "7376241EE193", "7376241EE194", "7376241EE195",
 			"7376241EE196", "7376241EE197", "7376241EE198", "7376241EE199", "7376241EE200", "7376241EE201",
 			"7376241EE202",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM504 (25 candidates)
 		{HallNo: "WW 207", CourseCode: "22AM504", RegisterNos: []string{
 			"7376242AL190", "7376242AL191", "7376242AL192", "7376242AL193", "7376242AL194", "7376242AL195",
@@ -3488,7 +3488,7 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AL202", "7376242AL203", "7376242AL204", "7376242AL205", "7376242AL206", "7376242AL208",
 			"7376242AL209", "7376242AL210", "7376242AL211", "7376242AL212", "7376242AL213", "7376242AL214",
 			"7376242AL215",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 208
 		// --------------------------------------------------------------------
@@ -3496,16 +3496,16 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 208", CourseCode: "22EE504", RegisterNos: []string{
 			"7376241EE203", "7376241EE204", "7376241EE205", "7376241EE206", "7376241EE207", "7376241EE208",
 			"7376241EE209", "7376241EE210", "7376241EE211", "7376241EE212",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT504 (4 candidates)
 		{HallNo: "WW 208", CourseCode: "22BT504", RegisterNos: []string{
 			"7376242BT102", "7376242BT103", "7376242BT104", "7376242BT105",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM504 (11 candidates)
 		{HallNo: "WW 208", CourseCode: "22AM504", RegisterNos: []string{
 			"7376242AL216", "7376242AL217", "7376242AL218", "7376242AL219", "7376242AL220", "7376242AL221",
 			"7376242AL222", "7376242AL223", "7376252AL501", "7376252AL502", "7376252AL503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 209
 		// --------------------------------------------------------------------
@@ -3513,13 +3513,13 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 209", CourseCode: "22EE504", RegisterNos: []string{
 			"7376241EE213", "7376241EE214", "7376241EE215", "7376241EE216", "7376241EE217", "7376251EE501",
 			"7376251EE502", "7376251EE503", "7376251EE504", "7376251EE505",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT504 (15 candidates)
 		{HallNo: "WW 209", CourseCode: "22BT504", RegisterNos: []string{
 			"7376242BT106", "7376242BT107", "7376242BT108", "7376242BT109", "7376242BT110", "7376242BT111",
 			"7376242BT112", "7376242BT113", "7376242BT114", "7376242BT115", "7376242BT116", "7376242BT117",
 			"7376242BT118", "7376242BT119", "7376242BT120",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 210
 		// --------------------------------------------------------------------
@@ -3527,31 +3527,31 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 210", CourseCode: "22EE504", RegisterNos: []string{
 			"7376251EE506", "7376251EE507", "7376251EE508", "7376251EE509", "7376251EE510", "7376251EE511",
 			"7376251EE512", "7376251EE513", "7376251EE514", "7376251EE515",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT504 (15 candidates)
 		{HallNo: "WW 210", CourseCode: "22BT504", RegisterNos: []string{
 			"7376242BT121", "7376242BT122", "7376242BT123", "7376242BT124", "7376242BT125", "7376242BT126",
 			"7376242BT127", "7376242BT128", "7376242BT129", "7376242BT130", "7376242BT131", "7376242BT132",
 			"7376242BT133", "7376242BT134", "7376242BT135",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 211
 		// --------------------------------------------------------------------
 		// Course: 22EE504 (2 candidates)
 		{HallNo: "WW 211", CourseCode: "22EE504", RegisterNos: []string{
 			"7376251EE516", "7376251EE517",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC504 (8 candidates)
 		{HallNo: "WW 211", CourseCode: "22MC504", RegisterNos: []string{
 			"7376241MZ101", "7376241MZ102", "7376241MZ103", "7376241MZ104", "7376241MZ105", "7376241MZ106",
 			"7376241MZ107", "7376241MZ108",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT504 (15 candidates)
 		{HallNo: "WW 211", CourseCode: "22BT504", RegisterNos: []string{
 			"7376242BT136", "7376242BT137", "7376242BT138", "7376242BT139", "7376242BT140", "7376242BT141",
 			"7376242BT142", "7376242BT143", "7376242BT144", "7376242BT145", "7376242BT146", "7376242BT147",
 			"7376242BT148", "7376242BT149", "7376242BT150",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 212
 		// --------------------------------------------------------------------
@@ -3562,7 +3562,7 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241MZ121", "7376241MZ122", "7376241MZ123", "7376241MZ124", "7376241MZ125", "7376241MZ126",
 			"7376241MZ127", "7376241MZ128", "7376241MZ129", "7376241MZ130", "7376241MZ131", "7376241MZ132",
 			"7376241MZ133",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT504 (25 candidates)
 		{HallNo: "WW 212", CourseCode: "22BT504", RegisterNos: []string{
 			"7376242BT151", "7376242BT152", "7376242BT153", "7376242BT154", "7376242BT155", "7376242BT156",
@@ -3570,7 +3570,7 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242BT164", "7376242BT165", "7376242BT166", "7376242BT167", "7376242BT168", "7376242BT169",
 			"7376242BT170", "7376242BT171", "7376242BT172", "7376242BT173", "7376242BT174", "7376242BT175",
 			"7376242BT176",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 213
 		// --------------------------------------------------------------------
@@ -3578,13 +3578,13 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 213", CourseCode: "22MC504", RegisterNos: []string{
 			"7376241MZ134", "7376241MZ135", "7376241MZ136", "7376241MZ137", "7376241MZ138", "7376241MZ139",
 			"7376241MZ140", "7376241MZ141", "7376241MZ142", "7376241MZ143",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT504 (15 candidates)
 		{HallNo: "WW 213", CourseCode: "22BT504", RegisterNos: []string{
 			"7376242BT177", "7376242BT178", "7376242BT179", "7376242BT180", "7376242BT181", "7376242BT182",
 			"7376242BT183", "7376242BT184", "7376242BT185", "7376242BT186", "7376242BT187", "7376242BT188",
 			"7376242BT189", "7376242BT190", "7376242BT191",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 214
 		// --------------------------------------------------------------------
@@ -3592,13 +3592,13 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 214", CourseCode: "22MC504", RegisterNos: []string{
 			"7376241MZ144", "7376241MZ145", "7376241MZ146", "7376241MZ147", "7376241MZ148", "7376241MZ149",
 			"7376241MZ150", "7376241MZ151", "7376241MZ152", "7376241MZ153",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT504 (15 candidates)
 		{HallNo: "WW 214", CourseCode: "22BT504", RegisterNos: []string{
 			"7376242BT192", "7376242BT193", "7376242BT194", "7376242BT195", "7376242BT196", "7376242BT197",
 			"7376242BT198", "7376242BT199", "7376242BT200", "7376242BT201", "7376242BT202", "7376242BT203",
 			"7376242BT204", "7376242BT205", "7376242BT206",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 215
 		// --------------------------------------------------------------------
@@ -3606,13 +3606,13 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 215", CourseCode: "22MC504", RegisterNos: []string{
 			"7376241MZ154", "7376241MZ155", "7376241MZ156", "7376241MZ157", "7376241MZ158", "7376241MZ159",
 			"7376241MZ160", "7376251MZ501", "7376251MZ502", "7376251MZ503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT504 (15 candidates)
 		{HallNo: "WW 215", CourseCode: "22BT504", RegisterNos: []string{
 			"7376242BT207", "7376242BT208", "7376242BT209", "7376242BT210", "7376242BT211", "7376242BT212",
 			"7376242BT213", "7376242BT214", "7376242BT215", "7376242BT216", "7376242BT217", "7376242BT218",
 			"7376242BT220", "7376242BT221", "7376242BT222",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 218
 		// --------------------------------------------------------------------
@@ -3620,21 +3620,21 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 218", CourseCode: "22EI504", RegisterNos: []string{
 			"7376241EI101", "7376241EI102", "7376241EI103", "7376241EI104", "7376241EI105", "7376241EI106",
 			"7376241EI107",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22ME504 (14 candidates)
 		{HallNo: "WW 218", CourseCode: "22ME504", RegisterNos: []string{
 			"7376241ME102", "7376241ME103", "7376241ME104", "7376241ME105", "7376241ME106", "7376241ME107",
 			"7376241ME108", "7376241ME109", "7376241ME111", "7376241ME112", "7376241ME113", "7376241ME114",
 			"7376241ME115", "7376241ME116",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC504 (3 candidates)
 		{HallNo: "WW 218", CourseCode: "22MC504", RegisterNos: []string{
 			"7376251MZ504", "7376251MZ505", "7376251MZ506",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT504 (1 candidates)
 		{HallNo: "WW 218", CourseCode: "22BT504", RegisterNos: []string{
 			"7376252BT501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 222
 		// --------------------------------------------------------------------
@@ -3645,7 +3645,7 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EI120", "7376241EI121", "7376241EI122", "7376241EI123", "7376241EI124", "7376241EI125",
 			"7376241EI127", "7376241EI128", "7376241EI129", "7376241EI130", "7376241EI131", "7376241EI132",
 			"7376241EI133",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22ME504 (25 candidates)
 		{HallNo: "WW 222", CourseCode: "22ME504", RegisterNos: []string{
 			"7376241ME117", "7376241ME118", "7376241ME119", "7376241ME120", "7376241ME121", "7376241ME122",
@@ -3653,7 +3653,7 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241ME129", "7376241ME130", "7376241ME131", "7376241ME132", "7376241ME134", "7376241ME135",
 			"7376241ME136", "7376241ME137", "7376241ME138", "7376241ME139", "7376241ME140", "7376241ME141",
 			"7376241ME142",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 223
 		// --------------------------------------------------------------------
@@ -3664,7 +3664,7 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EI146", "7376241EI147", "7376241EI148", "7376241EI149", "7376241EI150", "7376241EI151",
 			"7376241EI152", "7376241EI153", "7376241EI154", "7376241EI155", "7376241EI156", "7376241EI157",
 			"7376241EI158",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22ME504 (25 candidates)
 		{HallNo: "WW 223", CourseCode: "22ME504", RegisterNos: []string{
 			"7376241ME143", "7376241ME144", "7376241ME145", "7376241ME146", "7376241ME147", "7376241ME148",
@@ -3672,14 +3672,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241ME155", "7376241ME156", "7376241ME157", "7376241ME158", "7376241ME159", "7376251ME501",
 			"7376251ME502", "7376251ME503", "7376251ME504", "7376251ME505", "7376251ME506", "7376251ME507",
 			"7376251ME508",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 224
 		// --------------------------------------------------------------------
 		// Course: 22EI504 (4 candidates)
 		{HallNo: "WW 224", CourseCode: "22EI504", RegisterNos: []string{
 			"7376241EI159", "7376241EI160", "7376251EI501", "7376251EI502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB504 (25 candidates)
 		{HallNo: "WW 224", CourseCode: "22CB504", RegisterNos: []string{
 			"7376242CB102", "7376242CB103", "7376242CB104", "7376242CB105", "7376242CB107", "7376242CB108",
@@ -3687,14 +3687,14 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242CB115", "7376242CB116", "7376242CB117", "7376242CB118", "7376242CB119", "7376242CB120",
 			"7376242CB121", "7376242CB122", "7376242CB123", "7376242CB124", "7376242CB125", "7376242CB126",
 			"7376242CB127",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG504 (21 candidates)
 		{HallNo: "WW 224", CourseCode: "22AG504", RegisterNos: []string{
 			"7376242AG101", "7376242AG102", "7376242AG103", "7376242AG104", "7376242AG105", "7376242AG106",
 			"7376242AG107", "7376242AG108", "7376242AG109", "7376242AG110", "7376242AG111", "7376242AG112",
 			"7376242AG113", "7376242AG114", "7376242AG115", "7376242AG116", "7376242AG117", "7376242AG118",
 			"7376242AG119", "7376242AG120", "7376242AG121",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 225
 		// --------------------------------------------------------------------
@@ -3706,92 +3706,92 @@ func buildSeatingData23Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242CB146", "7376242CB147", "7376242CB148", "7376242CB149", "7376242CB150", "7376242CB151",
 			"7376242CB152", "7376242CB153", "7376242CB154", "7376242CB155", "7376242CB156", "7376242CB157",
 			"7376242CB158", "7376242CB159", "7376252CB501", "7376252CB502", "7376252CB503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG504 (5 candidates)
 		{HallNo: "WW 225", CourseCode: "22AG504", RegisterNos: []string{
 			"7376242AG122", "7376242AG123", "7376242AG124", "7376252AG501", "7376252AG502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 226
 		// --------------------------------------------------------------------
 		// Course: 22CE504 (4 candidates)
 		{HallNo: "WW 226", CourseCode: "22CE504", RegisterNos: []string{
 			"7376231CE117", "7376231CE120", "7376231CE122", "7376241CE501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS504* (8 candidates)
 		{HallNo: "WW 226", CourseCode: "22CS504*", RegisterNos: []string{
 			"7376231CS102", "7376231CS139", "7376231CS190", "7376231CS230", "7376231CS235", "7376231CS244",
 			"7376231CS259", "7376231CS282",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC504* (6 candidates)
 		{HallNo: "WW 226", CourseCode: "22EC504*", RegisterNos: []string{
 			"7376231EC101", "7376231EC283", "7376231EC305", "7376231EC331", "7376231EC334", "7376241EC516",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE504 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22EE504", RegisterNos: []string{
 			"7376231EE111",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EI504 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22EI504", RegisterNos: []string{
 			"7376231EI156",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BM504 (4 candidates)
 		{HallNo: "WW 226", CourseCode: "22BM504", RegisterNos: []string{
 			"7376231BM107", "7376231BM132", "7376231BM137", "7376231BM148",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IS504 (2 candidates)
 		{HallNo: "WW 226", CourseCode: "22IS504", RegisterNos: []string{
 			"7376231SE103", "7376231SE128",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CD504* (3 candidates)
 		{HallNo: "WW 226", CourseCode: "22CD504*", RegisterNos: []string{
 			"7376231CD143", "7376241CD501", "7376241CD502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC504 (9 candidates)
 		{HallNo: "WW 226", CourseCode: "22MC504", RegisterNos: []string{
 			"7376231MZ106", "7376231MZ107", "7376231MZ111", "7376231MZ113", "7376231MZ114", "7376231MZ135",
 			"7376231MZ145", "7376231MZ154", "7376241MZ501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT504* (2 candidates)
 		{HallNo: "WW 226", CourseCode: "22BT504*", RegisterNos: []string{
 			"7376232BT115", "7376232BT142",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB504 (4 candidates)
 		{HallNo: "WW 226", CourseCode: "22CB504", RegisterNos: []string{
 			"7376232CB111", "7376232CB123", "7376232CB133", "7376242CB502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CT504* (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22CT504*", RegisterNos: []string{
 			"7376232CT122",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI504* (2 candidates)
 		{HallNo: "WW 226", CourseCode: "22AI504*", RegisterNos: []string{
 			"7376232AD228", "7376232AD250",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM504* (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22AM504*", RegisterNos: []string{
 			"7376242AL501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG504* (2 candidates)
 		{HallNo: "WW 226", CourseCode: "22AG504*", RegisterNos: []string{
 			"7376232AG129", "7376232AG151",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 227
 		// --------------------------------------------------------------------
 		// Course: 22EE504 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22EE504", RegisterNos: []string{
 			"7376231EE115",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22ME504* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22ME504*", RegisterNos: []string{
 			"7376231ME130",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 	}
 }
 
 // ============================================================================
-// 24-11-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 1976 Students
+// 24-11-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 1976 Students
 // ============================================================================
 func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -3805,14 +3805,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS113", "7376251CS114", "7376251CS115", "7376251CS116", "7376251CS117", "7376251CS118",
 			"7376251CS119", "7376251CS120", "7376251CS121", "7376251CS122", "7376251CS123", "7376251CS124",
 			"7376251CS125",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (20 candidates)
 		{HallNo: "ME 102", CourseCode: "22AI303", RegisterNos: []string{
 			"7376252AD101", "7376252AD102", "7376252AD103", "7376252AD104", "7376252AD105", "7376252AD106",
 			"7376252AD107", "7376252AD108", "7376252AD109", "7376252AD110", "7376252AD111", "7376252AD112",
 			"7376252AD113", "7376252AD114", "7376252AD115", "7376252AD116", "7376252AD117", "7376252AD118",
 			"7376252AD119", "7376252AD120",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 107
 		// --------------------------------------------------------------------
@@ -3823,14 +3823,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS139", "7376251CS140", "7376251CS141", "7376251CS142", "7376251CS143", "7376251CS144",
 			"7376251CS145", "7376251CS146", "7376251CS147", "7376251CS148", "7376251CS149", "7376251CS150",
 			"7376251CS151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (20 candidates)
 		{HallNo: "ME 107", CourseCode: "22AI303", RegisterNos: []string{
 			"7376252AD121", "7376252AD122", "7376252AD123", "7376252AD124", "7376252AD125", "7376252AD126",
 			"7376252AD127", "7376252AD128", "7376252AD129", "7376252AD130", "7376252AD131", "7376252AD132",
 			"7376252AD133", "7376252AD134", "7376252AD135", "7376252AD136", "7376252AD137", "7376252AD138",
 			"7376252AD139", "7376252AD140",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 108
 		// --------------------------------------------------------------------
@@ -3841,14 +3841,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS164", "7376251CS165", "7376251CS166", "7376251CS167", "7376251CS168", "7376251CS170",
 			"7376251CS171", "7376251CS172", "7376251CS173", "7376251CS174", "7376251CS175", "7376251CS176",
 			"7376251CS177",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (20 candidates)
 		{HallNo: "ME 108", CourseCode: "22AI303", RegisterNos: []string{
 			"7376252AD141", "7376252AD142", "7376252AD143", "7376252AD144", "7376252AD145", "7376252AD146",
 			"7376252AD147", "7376252AD148", "7376252AD149", "7376252AD150", "7376252AD151", "7376252AD152",
 			"7376252AD153", "7376252AD154", "7376252AD155", "7376252AD156", "7376252AD157", "7376252AD158",
 			"7376252AD159", "7376252AD160",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 201
 		// --------------------------------------------------------------------
@@ -3859,14 +3859,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS190", "7376251CS191", "7376251CS192", "7376251CS193", "7376251CS194", "7376251CS195",
 			"7376251CS196", "7376251CS197", "7376251CS198", "7376251CS199", "7376251CS200", "7376251CS201",
 			"7376251CS202",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (20 candidates)
 		{HallNo: "ME 201", CourseCode: "22AI303", RegisterNos: []string{
 			"7376252AD161", "7376252AD162", "7376252AD163", "7376252AD164", "7376252AD165", "7376252AD166",
 			"7376252AD167", "7376252AD168", "7376252AD169", "7376252AD170", "7376252AD171", "7376252AD172",
 			"7376252AD173", "7376252AD174", "7376252AD175", "7376252AD176", "7376252AD177", "7376252AD178",
 			"7376252AD179", "7376252AD180",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 202
 		// --------------------------------------------------------------------
@@ -3877,14 +3877,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS215", "7376251CS216", "7376251CS217", "7376251CS218", "7376251CS219", "7376251CS220",
 			"7376251CS221", "7376251CS222", "7376251CS223", "7376251CS224", "7376251CS225", "7376251CS226",
 			"7376251CS227",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (20 candidates)
 		{HallNo: "ME 202", CourseCode: "22AI303", RegisterNos: []string{
 			"7376252AD181", "7376252AD182", "7376252AD183", "7376252AD184", "7376252AD185", "7376252AD186",
 			"7376252AD187", "7376252AD188", "7376252AD189", "7376252AD190", "7376252AD191", "7376252AD192",
 			"7376252AD193", "7376252AD194", "7376252AD195", "7376252AD196", "7376252AD197", "7376252AD198",
 			"7376252AD199", "7376252AD200",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 203
 		// --------------------------------------------------------------------
@@ -3895,14 +3895,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS242", "7376251CS243", "7376251CS244", "7376251CS245", "7376251CS246", "7376251CS247",
 			"7376251CS248", "7376251CS249", "7376251CS250", "7376251CS251", "7376251CS252", "7376251CS253",
 			"7376251CS228",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (20 candidates)
 		{HallNo: "ME 203", CourseCode: "22AI303", RegisterNos: []string{
 			"7376252AD201", "7376252AD202", "7376252AD203", "7376252AD204", "7376252AD205", "7376252AD206",
 			"7376252AD207", "7376252AD208", "7376252AD209", "7376252AD210", "7376252AD211", "7376252AD212",
 			"7376252AD213", "7376252AD214", "7376252AD215", "7376252AD216", "7376252AD217", "7376252AD218",
 			"7376252AD219", "7376252AD220",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 204
 		// --------------------------------------------------------------------
@@ -3913,14 +3913,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS266", "7376251CS267", "7376251CS268", "7376251CS269", "7376251CS270", "7376251CS271",
 			"7376251CS272", "7376251CS273", "7376251CS274", "7376251CS275", "7376251CS276", "7376251CS277",
 			"7376251CS278",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (20 candidates)
 		{HallNo: "ME 204", CourseCode: "22AI303", RegisterNos: []string{
 			"7376252AD221", "7376252AD222", "7376252AD223", "7376252AD224", "7376252AD225", "7376252AD226",
 			"7376252AD227", "7376252AD228", "7376252AD229", "7376252AD230", "7376252AD231", "7376252AD232",
 			"7376252AD233", "7376252AD234", "7376252AD235", "7376252AD236", "7376252AD237", "7376252AD238",
 			"7376252AD239", "7376252AD240",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 205
 		// --------------------------------------------------------------------
@@ -3931,14 +3931,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS291", "7376251CS292", "7376251CS293", "7376251CS294", "7376251CS295", "7376251CS296",
 			"7376251CS297", "7376251CS298", "7376251CS299", "7376251CS300", "7376251CS301", "7376251CS302",
 			"7376251CS303",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (20 candidates)
 		{HallNo: "ME 205", CourseCode: "22AI303", RegisterNos: []string{
 			"7376252AD241", "7376252AD242", "7376252AD243", "7376252AD244", "7376252AD245", "7376252AD246",
 			"7376252AD247", "7376252AD248", "7376252AD249", "7376252AD250", "7376252AD251", "7376252AD252",
 			"7376252AD253", "7376252AD254", "7376252AD255", "7376252AD256", "7376252AD257", "7376252AD258",
 			"7376252AD259", "7376252AD260",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 206
 		// --------------------------------------------------------------------
@@ -3949,14 +3949,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS316", "7376251CS317", "7376251CS318", "7376251CS319", "7376251CS320", "7376251CS321",
 			"7376251CS322", "7376251CS323", "7376251CS324", "7376251CS325", "7376251CS326", "7376251CS327",
 			"7376251CS328",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (20 candidates)
 		{HallNo: "ME 206", CourseCode: "22AI303", RegisterNos: []string{
 			"7376252AD261", "7376252AD262", "7376252AD263", "7376252AD264", "7376252AD265", "7376252AD266",
 			"7376252AD267", "7376252AD268", "7376252AD269", "7376252AD270", "7376252AD271", "7376252AD272",
 			"7376252AD273", "7376252AD274", "7376252AD275", "7376252AD276", "7376252AD277", "7376252AD278",
 			"7376252AD279", "7376252AD280",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 301
 		// --------------------------------------------------------------------
@@ -3967,14 +3967,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS341", "7376251CS342", "7376251CS343", "7376251CS344", "7376251CS345", "7376251CS346",
 			"7376251CS347", "7376251CS348", "7376251CS349", "7376251CS350", "7376251CS351", "7376251CS352",
 			"7376251CS353",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (20 candidates)
 		{HallNo: "ME 301", CourseCode: "22AI303", RegisterNos: []string{
 			"7376252AD281", "7376252AD282", "7376252AD283", "7376252AD284", "7376252AD285", "7376252AD286",
 			"7376252AD287", "7376252AD288", "7376252AD289", "7376252AD290", "7376252AD291", "7376252AD292",
 			"7376252AD293", "7376252AD294", "7376252AD295", "7376252AD296", "7376252AD297", "7376252AD298",
 			"7376252AD299", "7376252AD300",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 302
 		// --------------------------------------------------------------------
@@ -3985,14 +3985,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS366", "7376251CS367", "7376251CS368", "7376251CS369", "7376251CS370", "7376251CS371",
 			"7376251CS373", "7376251CS374", "7376251CS375", "7376251CS376", "7376251CS377", "7376251CS378",
 			"7376251CS379",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (20 candidates)
 		{HallNo: "ME 302", CourseCode: "22AI303", RegisterNos: []string{
 			"7376252AD301", "7376252AD302", "7376252AD303", "7376252AD304", "7376252AD305", "7376252AD306",
 			"7376252AD307", "7376252AD308", "7376252AD309", "7376252AD310", "7376252AD311", "7376252AD312",
 			"7376252AD313", "7376252AD314", "7376252AD315", "7376252AD316", "7376252AD317", "7376252AD318",
 			"7376252AD319", "7376252AD320",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 303
 		// --------------------------------------------------------------------
@@ -4003,14 +4003,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS392", "7376251CS393", "7376251CS394", "7376251CS395", "7376251CS396", "7376251CS397",
 			"7376251CS398", "7376251CS399", "7376251CS400", "7376251CS401", "7376251CS402", "7376251CS403",
 			"7376251CS404",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (20 candidates)
 		{HallNo: "ME 303", CourseCode: "22AI303", RegisterNos: []string{
 			"7376252AD321", "7376252AD322", "7376252AD323", "7376252AD324", "7376252AD325", "7376252AD326",
 			"7376252AD327", "7376252AD328", "7376252AD329", "7376252AD330", "7376252AD331", "7376252AD332",
 			"7376252AD333", "7376252AD334", "7376252AD335", "7376252AD336", "7376252AD337", "7376252AD338",
 			"7376252AD339", "7376252AD340",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 304
 		// --------------------------------------------------------------------
@@ -4021,14 +4021,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS417", "7376251CS418", "7376251CS419", "7376251CS420", "7376251CS421", "7376251CS422",
 			"7376251CS423", "7376251CS424", "7376251CS425", "7376251CS426", "7376251CS427", "7376251CS428",
 			"7376251CS429",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (20 candidates)
 		{HallNo: "ME 304", CourseCode: "22AI303", RegisterNos: []string{
 			"7376252AD341", "7376252AD342", "7376252AD343", "7376252AD344", "7376252AD345", "7376252AD346",
 			"7376252AD347", "7376252AD348", "7376252AD349", "7376252AD350", "7376252AD351", "7376252AD352",
 			"7376252AD353", "7376252AD354", "7376252AD355", "7376252AD356", "7376252AD357", "7376252AD358",
 			"7376252AD359", "7376252AD360",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 305
 		// --------------------------------------------------------------------
@@ -4039,14 +4039,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS442", "7376251CS443", "7376251CS444", "7376251CS445", "7376251CS446", "7376251CS447",
 			"7376251CS448", "7376251CS449", "7376251CS450", "7376251CS451", "7376251CS452", "7376251CS453",
 			"7376251CS454",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (20 candidates)
 		{HallNo: "ME 305", CourseCode: "22AI303", RegisterNos: []string{
 			"7376252AD361", "7376252AD362", "7376252AD363", "7376252AD364", "7376252AD365", "7376252AD366",
 			"7376252AD367", "7376252AD368", "7376252AD369", "7376252AD370", "7376252AD371", "7376252AD372",
 			"7376252AD373", "7376252AD374", "7376252AD375", "7376252AD376", "7376252AD377", "7376252AD378",
 			"7376252AD379", "7376252AD380",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 306
 		// --------------------------------------------------------------------
@@ -4057,14 +4057,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS467", "7376251CS468", "7376251CS469", "7376251CS470", "7376251CS471", "7376251CS472",
 			"7376251CS473", "7376251CS474", "7376251CS475", "7376251CS476", "7376251CS477", "7376251CS478",
 			"7376251CS479",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (20 candidates)
 		{HallNo: "ME 306", CourseCode: "22AI303", RegisterNos: []string{
 			"7376262AD501", "7376262AD502", "7376262AD503", "7376262AD504", "7376262AD505", "7376262AD506",
 			"7376262AD507", "7376262AD508", "7376262AD509", "7376262AD510", "7376262AD511", "7376262AD512",
 			"7376262AD513", "7376262AD514", "7376262AD515", "7376262AD516", "7376262AD517", "7376262AD518",
 			"7376262AD519", "7376252AD381",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 001
 		// --------------------------------------------------------------------
@@ -4074,37 +4074,37 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376261CS507", "7376261CS508", "7376261CS509", "7376261CS510", "7376261CS511", "7376261CS512",
 			"7376261CS513", "7376261CS514", "7376261CS516", "7376261CS517", "7376261CS518", "7376261CS519",
 			"7376261CS520", "7376261CS521",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (17 candidates)
 		{HallNo: "SF 001", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT102", "7376252IT103", "7376252IT104", "7376252IT105", "7376252IT106", "7376252IT107",
 			"7376252IT108", "7376252IT109", "7376252IT110", "7376252IT111", "7376252IT112", "7376252IT113",
 			"7376252IT114", "7376252IT115", "7376252IT116", "7376252IT117", "7376252IT118",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (3 candidates)
 		{HallNo: "SF 001", CourseCode: "22AI303", RegisterNos: []string{
 			"7376262AD520", "7376262AD521", "7376262AD522",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 002
 		// --------------------------------------------------------------------
 		// Course: 22CS303 (3 candidates)
 		{HallNo: "SF 002", CourseCode: "22CS303", RegisterNos: []string{
 			"7376261CS522", "7376261CS523", "7376261CS524",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC303 (17 candidates)
 		{HallNo: "SF 002", CourseCode: "22EC303", RegisterNos: []string{
 			"7376251EC101", "7376251EC102", "7376251EC103", "7376251EC104", "7376251EC105", "7376251EC106",
 			"7376251EC107", "7376251EC108", "7376251EC109", "7376251EC110", "7376251EC111", "7376251EC112",
 			"7376251EC113", "7376251EC114", "7376251EC115", "7376251EC116", "7376251EC117",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (20 candidates)
 		{HallNo: "SF 002", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT119", "7376252IT120", "7376252IT121", "7376252IT122", "7376252IT123", "7376252IT124",
 			"7376252IT125", "7376252IT126", "7376252IT127", "7376252IT128", "7376252IT129", "7376252IT130",
 			"7376252IT131", "7376252IT132", "7376252IT133", "7376252IT134", "7376252IT135", "7376252IT136",
 			"7376252IT137", "7376252IT138",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 101
 		// --------------------------------------------------------------------
@@ -4114,14 +4114,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC124", "7376251EC125", "7376251EC126", "7376251EC127", "7376251EC128", "7376251EC129",
 			"7376251EC130", "7376251EC131", "7376251EC132", "7376251EC133", "7376251EC134", "7376251EC135",
 			"7376251EC136", "7376251EC137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (20 candidates)
 		{HallNo: "SF 101", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT139", "7376252IT140", "7376252IT141", "7376252IT142", "7376252IT143", "7376252IT144",
 			"7376252IT145", "7376252IT146", "7376252IT147", "7376252IT148", "7376252IT149", "7376252IT150",
 			"7376252IT151", "7376252IT152", "7376252IT153", "7376252IT154", "7376252IT155", "7376252IT156",
 			"7376252IT157", "7376252IT158",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 102
 		// --------------------------------------------------------------------
@@ -4131,14 +4131,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC144", "7376251EC145", "7376251EC146", "7376251EC147", "7376251EC148", "7376251EC149",
 			"7376251EC150", "7376251EC151", "7376251EC152", "7376251EC153", "7376251EC154", "7376251EC155",
 			"7376251EC156", "7376251EC157",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (20 candidates)
 		{HallNo: "SF 102", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT159", "7376252IT160", "7376252IT161", "7376252IT162", "7376252IT163", "7376252IT164",
 			"7376252IT165", "7376252IT166", "7376252IT167", "7376252IT168", "7376252IT169", "7376252IT170",
 			"7376252IT171", "7376252IT172", "7376252IT173", "7376252IT174", "7376252IT175", "7376252IT176",
 			"7376252IT177", "7376252IT178",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 103
 		// --------------------------------------------------------------------
@@ -4148,14 +4148,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC164", "7376251EC165", "7376251EC166", "7376251EC167", "7376251EC168", "7376251EC169",
 			"7376251EC170", "7376251EC171", "7376251EC172", "7376251EC173", "7376251EC174", "7376251EC175",
 			"7376251EC176", "7376251EC177",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (20 candidates)
 		{HallNo: "SF 103", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT179", "7376252IT180", "7376252IT181", "7376252IT182", "7376252IT183", "7376252IT184",
 			"7376252IT185", "7376252IT186", "7376252IT187", "7376252IT188", "7376252IT189", "7376252IT190",
 			"7376252IT191", "7376252IT192", "7376252IT193", "7376252IT194", "7376252IT195", "7376252IT196",
 			"7376252IT197", "7376252IT198",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B01
 		// --------------------------------------------------------------------
@@ -4165,14 +4165,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC184", "7376251EC185", "7376251EC186", "7376251EC187", "7376251EC188", "7376251EC189",
 			"7376251EC190", "7376251EC191", "7376251EC192", "7376251EC193", "7376251EC194", "7376251EC195",
 			"7376251EC196", "7376251EC197",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (20 candidates)
 		{HallNo: "SF B01", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT199", "7376252IT200", "7376252IT201", "7376252IT202", "7376252IT203", "7376252IT204",
 			"7376252IT205", "7376252IT206", "7376252IT207", "7376252IT208", "7376252IT209", "7376252IT210",
 			"7376252IT211", "7376252IT212", "7376252IT213", "7376252IT214", "7376252IT215", "7376252IT216",
 			"7376252IT217", "7376252IT218",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B02
 		// --------------------------------------------------------------------
@@ -4182,14 +4182,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC204", "7376251EC205", "7376251EC206", "7376251EC207", "7376251EC208", "7376251EC209",
 			"7376251EC210", "7376251EC211", "7376251EC212", "7376251EC213", "7376251EC214", "7376251EC215",
 			"7376251EC216", "7376251EC217",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (20 candidates)
 		{HallNo: "SF B02", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT219", "7376252IT220", "7376252IT221", "7376252IT222", "7376252IT223", "7376252IT224",
 			"7376252IT225", "7376252IT226", "7376252IT227", "7376252IT228", "7376252IT229", "7376252IT230",
 			"7376252IT231", "7376252IT232", "7376252IT233", "7376252IT234", "7376252IT235", "7376252IT236",
 			"7376252IT237", "7376252IT238",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B03
 		// --------------------------------------------------------------------
@@ -4199,14 +4199,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC224", "7376251EC225", "7376251EC226", "7376251EC227", "7376251EC228", "7376251EC229",
 			"7376251EC230", "7376251EC231", "7376251EC232", "7376251EC233", "7376251EC234", "7376251EC235",
 			"7376251EC236", "7376251EC237",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (20 candidates)
 		{HallNo: "SF B03", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT239", "7376252IT240", "7376252IT241", "7376252IT242", "7376252IT243", "7376252IT244",
 			"7376252IT245", "7376252IT246", "7376252IT247", "7376252IT248", "7376252IT249", "7376252IT250",
 			"7376252IT251", "7376252IT252", "7376252IT253", "7376252IT254", "7376252IT255", "7376252IT256",
 			"7376252IT257", "7376252IT258",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 008
 		// --------------------------------------------------------------------
@@ -4215,12 +4215,12 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC238", "7376251EC239", "7376251EC240", "7376251EC241", "7376251EC242", "7376251EC243",
 			"7376251EC244", "7376251EC245", "7376251EC246", "7376251EC247", "7376251EC248", "7376251EC249",
 			"7376251EC250", "7376251EC251", "7376251EC252",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (10 candidates)
 		{HallNo: "WW 008", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT259", "7376252IT260", "7376252IT261", "7376252IT262", "7376252IT263", "7376252IT264",
 			"7376252IT265", "7376252IT266", "7376252IT267", "7376252IT268",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 011
 		// --------------------------------------------------------------------
@@ -4229,12 +4229,12 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC253", "7376251EC254", "7376251EC255", "7376251EC256", "7376251EC257", "7376251EC258",
 			"7376251EC259", "7376251EC260", "7376251EC261", "7376251EC262", "7376251EC263", "7376251EC264",
 			"7376251EC265", "7376251EC266", "7376251EC267",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (10 candidates)
 		{HallNo: "WW 011", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT269", "7376252IT270", "7376252IT271", "7376252IT272", "7376252IT273", "7376252IT274",
 			"7376252IT275", "7376252IT276", "7376252IT277", "7376252IT278",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 012
 		// --------------------------------------------------------------------
@@ -4243,12 +4243,12 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC271", "7376251EC272", "7376251EC273", "7376251EC274", "7376251EC275", "7376251EC276",
 			"7376251EC277", "7376251EC278", "7376251EC279", "7376251EC280", "7376251EC281", "7376251EC282",
 			"7376251EC283", "7376251EC268", "7376251EC269",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (10 candidates)
 		{HallNo: "WW 012", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT279", "7376252IT280", "7376252IT281", "7376252IT282", "7376252IT283", "7376252IT284",
 			"7376252IT285", "7376252IT286", "7376252IT287", "7376252IT288",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 113
 		// --------------------------------------------------------------------
@@ -4257,12 +4257,12 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC284", "7376251EC285", "7376251EC286", "7376251EC287", "7376251EC288", "7376251EC289",
 			"7376251EC290", "7376251EC291", "7376251EC292", "7376251EC293", "7376251EC294", "7376251EC295",
 			"7376251EC296", "7376251EC297", "7376251EC298",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (10 candidates)
 		{HallNo: "WW 113", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT289", "7376252IT290", "7376252IT291", "7376252IT292", "7376252IT293", "7376252IT294",
 			"7376252IT295", "7376252IT296", "7376252IT297", "7376252IT298",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 114
 		// --------------------------------------------------------------------
@@ -4271,12 +4271,12 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC299", "7376251EC300", "7376251EC301", "7376251EC302", "7376251EC303", "7376251EC304",
 			"7376251EC305", "7376251EC306", "7376251EC307", "7376251EC308", "7376251EC309", "7376251EC310",
 			"7376251EC311", "7376251EC312", "7376251EC313",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (10 candidates)
 		{HallNo: "WW 114", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT299", "7376252IT300", "7376252IT301", "7376252IT302", "7376252IT303", "7376252IT304",
 			"7376252IT305", "7376252IT306", "7376252IT307", "7376252IT308",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 115
 		// --------------------------------------------------------------------
@@ -4285,12 +4285,12 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC314", "7376251EC315", "7376251EC316", "7376251EC317", "7376251EC318", "7376251EC319",
 			"7376251EC320", "7376251EC321", "7376251EC322", "7376251EC323", "7376251EC324", "7376251EC325",
 			"7376251EC326", "7376251EC327", "7376251EC328",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (10 candidates)
 		{HallNo: "WW 115", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT309", "7376252IT310", "7376252IT311", "7376252IT312", "7376252IT313", "7376252IT314",
 			"7376252IT315", "7376252IT316", "7376252IT317", "7376252IT318",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 117
 		// --------------------------------------------------------------------
@@ -4299,12 +4299,12 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC329", "7376251EC330", "7376251EC331", "7376251EC332", "7376251EC333", "7376251EC334",
 			"7376251EC335", "7376251EC336", "7376251EC337", "7376251EC338", "7376251EC339", "7376251EC340",
 			"7376251EC341", "7376251EC342", "7376251EC343",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (10 candidates)
 		{HallNo: "WW 117", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT319", "7376252IT320", "7376252IT321", "7376252IT322", "7376252IT323", "7376252IT324",
 			"7376252IT325", "7376252IT326", "7376252IT327", "7376252IT328",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 118
 		// --------------------------------------------------------------------
@@ -4313,12 +4313,12 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC344", "7376251EC345", "7376251EC346", "7376251EC347", "7376251EC348", "7376251EC349",
 			"7376251EC350", "7376251EC351", "7376251EC352", "7376261EC502", "7376261EC503", "7376261EC504",
 			"7376261EC505", "7376261EC506", "7376261EC507",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (10 candidates)
 		{HallNo: "WW 118", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT329", "7376252IT330", "7376252IT331", "7376252IT332", "7376252IT333", "7376252IT334",
 			"7376252IT335", "7376252IT336", "7376252IT338", "7376252IT339",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 202
 		// --------------------------------------------------------------------
@@ -4327,7 +4327,7 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376261EC508", "7376261EC509", "7376261EC510", "7376261EC511", "7376261EC512", "7376261EC513",
 			"7376261EC514", "7376261EC515", "7376261EC516", "7376261EC517", "7376261EC518", "7376261EC519",
 			"7376261EC520",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (25 candidates)
 		{HallNo: "WW 202", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT340", "7376252IT341", "7376252IT342", "7376252IT343", "7376252IT344", "7376252IT345",
@@ -4335,12 +4335,12 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376252IT352", "7376252IT353", "7376252IT354", "7376252IT355", "7376252IT356", "7376252IT357",
 			"7376252IT358", "7376252IT359", "7376252IT360", "7376252IT361", "7376252IT362", "7376252IT363",
 			"7376252IT364",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM303 (12 candidates)
 		{HallNo: "WW 202", CourseCode: "22AM303", RegisterNos: []string{
 			"7376252AL101", "7376252AL102", "7376252AL103", "7376252AL104", "7376252AL105", "7376252AL106",
 			"7376252AL107", "7376252AL108", "7376252AL109", "7376252AL110", "7376252AL111", "7376252AL112",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 203
 		// --------------------------------------------------------------------
@@ -4348,13 +4348,13 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 203", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT365", "7376252IT366", "7376252IT367", "7376252IT368", "7376252IT369", "7376252IT370",
 			"7376252IT371", "7376252IT372", "7376252IT373", "7376252IT374",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM303 (15 candidates)
 		{HallNo: "WW 203", CourseCode: "22AM303", RegisterNos: []string{
 			"7376252AL113", "7376252AL114", "7376252AL115", "7376252AL116", "7376252AL117", "7376252AL118",
 			"7376252AL119", "7376252AL120", "7376252AL121", "7376252AL122", "7376252AL123", "7376252AL124",
 			"7376252AL125", "7376252AL126", "7376252AL127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 204
 		// --------------------------------------------------------------------
@@ -4362,13 +4362,13 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 204", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT375", "7376252IT376", "7376252IT377", "7376252IT378", "7376252IT379", "7376252IT380",
 			"7376252IT381", "7376252IT382", "7376252IT383", "7376252IT384",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM303 (15 candidates)
 		{HallNo: "WW 204", CourseCode: "22AM303", RegisterNos: []string{
 			"7376252AL128", "7376252AL129", "7376252AL130", "7376252AL131", "7376252AL132", "7376252AL133",
 			"7376252AL134", "7376252AL135", "7376252AL136", "7376252AL137", "7376252AL138", "7376252AL139",
 			"7376252AL140", "7376252AL141", "7376252AL142",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 205
 		// --------------------------------------------------------------------
@@ -4376,31 +4376,31 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 205", CourseCode: "22IT303", RegisterNos: []string{
 			"7376252IT385", "7376252IT386", "7376252IT387", "7376252IT388", "7376262IT502", "7376262IT503",
 			"7376262IT504", "7376262IT505", "7376262IT506", "7376262IT507",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM303 (15 candidates)
 		{HallNo: "WW 205", CourseCode: "22AM303", RegisterNos: []string{
 			"7376252AL143", "7376252AL144", "7376252AL145", "7376252AL146", "7376252AL147", "7376252AL148",
 			"7376252AL149", "7376252AL150", "7376252AL151", "7376252AL152", "7376252AL153", "7376252AL154",
 			"7376252AL155", "7376252AL156", "7376252AL157",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 206
 		// --------------------------------------------------------------------
 		// Course: 22BT303 (1 candidates)
 		{HallNo: "WW 206", CourseCode: "22BT303", RegisterNos: []string{
 			"7376252BT102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (9 candidates)
 		{HallNo: "WW 206", CourseCode: "22IT303", RegisterNos: []string{
 			"7376262IT508", "7376262IT509", "7376262IT510", "7376262IT511", "7376262IT512", "7376262IT513",
 			"7376262IT514", "7376262IT515", "7376262IT516",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM303 (15 candidates)
 		{HallNo: "WW 206", CourseCode: "22AM303", RegisterNos: []string{
 			"7376252AL158", "7376252AL159", "7376252AL160", "7376252AL161", "7376252AL162", "7376252AL163",
 			"7376252AL164", "7376252AL165", "7376252AL166", "7376252AL167", "7376252AL168", "7376252AL169",
 			"7376252AL170", "7376252AL171", "7376252AL172",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 207
 		// --------------------------------------------------------------------
@@ -4411,7 +4411,7 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376252BT115", "7376252BT116", "7376252BT117", "7376252BT118", "7376252BT119", "7376252BT120",
 			"7376252BT121", "7376252BT122", "7376252BT123", "7376252BT124", "7376252BT125", "7376252BT126",
 			"7376252BT127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM303 (25 candidates)
 		{HallNo: "WW 207", CourseCode: "22AM303", RegisterNos: []string{
 			"7376252AL173", "7376252AL174", "7376252AL175", "7376252AL176", "7376252AL177", "7376252AL178",
@@ -4419,7 +4419,7 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376252AL185", "7376252AL186", "7376252AL187", "7376252AL188", "7376252AL189", "7376252AL190",
 			"7376252AL191", "7376252AL192", "7376252AL193", "7376252AL194", "7376252AL195", "7376252AL196",
 			"7376252AL197",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 208
 		// --------------------------------------------------------------------
@@ -4427,13 +4427,13 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 208", CourseCode: "22BT303", RegisterNos: []string{
 			"7376252BT128", "7376252BT129", "7376252BT130", "7376252BT131", "7376252BT132", "7376252BT133",
 			"7376252BT134", "7376252BT135", "7376252BT136", "7376252BT137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM303 (15 candidates)
 		{HallNo: "WW 208", CourseCode: "22AM303", RegisterNos: []string{
 			"7376252AL198", "7376252AL199", "7376252AL200", "7376252AL201", "7376252AL202", "7376252AL203",
 			"7376252AL204", "7376252AL205", "7376252AL206", "7376252AL207", "7376252AL208", "7376252AL209",
 			"7376252AL210", "7376252AL211", "7376252AL212",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 209
 		// --------------------------------------------------------------------
@@ -4441,13 +4441,13 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 209", CourseCode: "22BT303", RegisterNos: []string{
 			"7376252BT138", "7376252BT139", "7376252BT140", "7376252BT141", "7376252BT142", "7376252BT143",
 			"7376252BT144", "7376252BT145", "7376252BT146", "7376252BT147",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM303 (15 candidates)
 		{HallNo: "WW 209", CourseCode: "22AM303", RegisterNos: []string{
 			"7376252AL213", "7376252AL214", "7376252AL215", "7376252AL216", "7376252AL217", "7376252AL218",
 			"7376252AL219", "7376252AL220", "7376252AL221", "7376252AL222", "7376252AL223", "7376252AL224",
 			"7376252AL225", "7376252AL226", "7376252AL227",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 210
 		// --------------------------------------------------------------------
@@ -4455,31 +4455,31 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 210", CourseCode: "22BT303", RegisterNos: []string{
 			"7376252BT148", "7376252BT149", "7376252BT150", "7376252BT151", "7376252BT152", "7376252BT153",
 			"7376252BT155", "7376252BT156", "7376252BT157", "7376252BT158",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM303 (15 candidates)
 		{HallNo: "WW 210", CourseCode: "22AM303", RegisterNos: []string{
 			"7376252AL228", "7376252AL229", "7376252AL230", "7376252AL231", "7376252AL232", "7376252AL233",
 			"7376252AL234", "7376252AL235", "7376252AL236", "7376252AL237", "7376252AL238", "7376252AL239",
 			"7376252AL240", "7376252AL241", "7376252AL242",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 211
 		// --------------------------------------------------------------------
 		// Course: 22EE303 (2 candidates)
 		{HallNo: "WW 211", CourseCode: "22EE303", RegisterNos: []string{
 			"7376251EE102", "7376251EE103",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT303 (10 candidates)
 		{HallNo: "WW 211", CourseCode: "22BT303", RegisterNos: []string{
 			"7376252BT159", "7376252BT160", "7376252BT161", "7376252BT162", "7376252BT163", "7376252BT164",
 			"7376252BT165", "7376252BT166", "7376252BT167", "7376252BT168",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM303 (13 candidates)
 		{HallNo: "WW 211", CourseCode: "22AM303", RegisterNos: []string{
 			"7376252AL243", "7376252AL244", "7376252AL245", "7376252AL246", "7376262AL501", "7376262AL502",
 			"7376262AL503", "7376262AL504", "7376262AL505", "7376262AL506", "7376262AL507", "7376262AL508",
 			"7376262AL509",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 212
 		// --------------------------------------------------------------------
@@ -4490,7 +4490,7 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EE117", "7376251EE118", "7376251EE119", "7376251EE120", "7376251EE121", "7376251EE122",
 			"7376251EE123", "7376251EE124", "7376251EE125", "7376251EE126", "7376251EE127", "7376251EE128",
 			"7376251EE129",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT303 (25 candidates)
 		{HallNo: "WW 212", CourseCode: "22BT303", RegisterNos: []string{
 			"7376252BT169", "7376252BT170", "7376252BT171", "7376252BT172", "7376252BT173", "7376252BT174",
@@ -4498,7 +4498,7 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376252BT181", "7376252BT182", "7376252BT183", "7376252BT184", "7376252BT185", "7376252BT186",
 			"7376252BT187", "7376252BT188", "7376252BT189", "7376252BT191", "7376252BT192", "7376252BT193",
 			"7376252BT194",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 213
 		// --------------------------------------------------------------------
@@ -4507,12 +4507,12 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EE130", "7376251EE131", "7376251EE132", "7376251EE133", "7376251EE134", "7376251EE135",
 			"7376251EE136", "7376251EE137", "7376251EE138", "7376251EE139", "7376251EE140", "7376251EE141",
 			"7376251EE142", "7376251EE143", "7376251EE144",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT303 (10 candidates)
 		{HallNo: "WW 213", CourseCode: "22BT303", RegisterNos: []string{
 			"7376252BT195", "7376252BT196", "7376252BT197", "7376252BT199", "7376252BT200", "7376252BT201",
 			"7376252BT202", "7376252BT203", "7376252BT204", "7376252BT205",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 214
 		// --------------------------------------------------------------------
@@ -4521,12 +4521,12 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EE145", "7376251EE146", "7376251EE147", "7376251EE148", "7376251EE149", "7376251EE150",
 			"7376251EE151", "7376251EE152", "7376251EE153", "7376251EE154", "7376251EE155", "7376251EE156",
 			"7376251EE157", "7376251EE158", "7376251EE159",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT303 (10 candidates)
 		{HallNo: "WW 214", CourseCode: "22BT303", RegisterNos: []string{
 			"7376252BT206", "7376252BT207", "7376252BT208", "7376252BT209", "7376252BT210", "7376252BT211",
 			"7376252BT212", "7376252BT213", "7376252BT214", "7376252BT215",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 215
 		// --------------------------------------------------------------------
@@ -4535,16 +4535,16 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EE160", "7376251EE161", "7376251EE162", "7376251EE163", "7376251EE164", "7376251EE165",
 			"7376251EE166", "7376251EE167", "7376251EE168", "7376251EE169", "7376251EE170", "7376251EE171",
 			"7376251EE172", "7376251EE173", "7376251EE174",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC303 (1 candidates)
 		{HallNo: "WW 215", CourseCode: "22MC303", RegisterNos: []string{
 			"7376251MZ101",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT303 (9 candidates)
 		{HallNo: "WW 215", CourseCode: "22BT303", RegisterNos: []string{
 			"7376252BT216", "7376252BT217", "7376252BT218", "7376252BT219", "7376252BT220", "7376252BT221",
 			"7376252BT222", "7376252BT223", "7376252BT224",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 216
 		// --------------------------------------------------------------------
@@ -4552,12 +4552,12 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 216", CourseCode: "22EE303", RegisterNos: []string{
 			"7376251EE175", "7376251EE176", "7376251EE177", "7376251EE178", "7376251EE179", "7376251EE180",
 			"7376251EE181", "7376251EE182", "7376251EE183", "7376251EE184",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC303 (10 candidates)
 		{HallNo: "WW 216", CourseCode: "22MC303", RegisterNos: []string{
 			"7376251MZ102", "7376251MZ103", "7376251MZ104", "7376251MZ105", "7376251MZ106", "7376251MZ107",
 			"7376251MZ108", "7376251MZ109", "7376251MZ110", "7376251MZ111",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 218
 		// --------------------------------------------------------------------
@@ -4566,12 +4566,12 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EE185", "7376251EE186", "7376251EE187", "7376251EE188", "7376251EE189", "7376251EE190",
 			"7376251EE191", "7376251EE192", "7376251EE193", "7376251EE194", "7376251EE195", "7376251EE196",
 			"7376251EE197", "7376251EE198", "7376251EE199",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC303 (10 candidates)
 		{HallNo: "WW 218", CourseCode: "22MC303", RegisterNos: []string{
 			"7376251MZ112", "7376251MZ113", "7376251MZ114", "7376251MZ115", "7376251MZ116", "7376251MZ117",
 			"7376251MZ118", "7376251MZ119", "7376251MZ120", "7376251MZ121",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 219
 		// --------------------------------------------------------------------
@@ -4580,12 +4580,12 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EE200", "7376251EE201", "7376251EE202", "7376251EE203", "7376251EE204", "7376251EE205",
 			"7376261EE502", "7376261EE503", "7376261EE504", "7376261EE505", "7376261EE506", "7376261EE507",
 			"7376261EE508", "7376261EE509", "7376261EE510",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC303 (10 candidates)
 		{HallNo: "WW 219", CourseCode: "22MC303", RegisterNos: []string{
 			"7376251MZ122", "7376251MZ123", "7376251MZ124", "7376251MZ125", "7376251MZ126", "7376251MZ127",
 			"7376251MZ128", "7376251MZ129", "7376251MZ130", "7376251MZ131",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 222
 		// --------------------------------------------------------------------
@@ -4593,13 +4593,13 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 222", CourseCode: "22EE303", RegisterNos: []string{
 			"7376261EE511", "7376261EE512", "7376261EE513", "7376261EE514", "7376261EE515", "7376261EE516",
 			"7376261EE517", "7376261EE518",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI303 (17 candidates)
 		{HallNo: "WW 222", CourseCode: "22EI303", RegisterNos: []string{
 			"7376251EI101", "7376251EI102", "7376251EI103", "7376251EI104", "7376251EI105", "7376251EI106",
 			"7376251EI107", "7376251EI108", "7376251EI109", "7376251EI110", "7376251EI111", "7376251EI112",
 			"7376251EI113", "7376251EI114", "7376251EI115", "7376251EI116", "7376251EI117",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC303 (25 candidates)
 		{HallNo: "WW 222", CourseCode: "22MC303", RegisterNos: []string{
 			"7376251MZ132", "7376251MZ133", "7376251MZ134", "7376251MZ135", "7376251MZ136", "7376251MZ137",
@@ -4607,7 +4607,7 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251MZ144", "7376251MZ145", "7376251MZ146", "7376251MZ147", "7376251MZ148", "7376251MZ149",
 			"7376251MZ150", "7376251MZ151", "7376251MZ152", "7376251MZ153", "7376251MZ154", "7376251MZ155",
 			"7376251MZ156",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 223
 		// --------------------------------------------------------------------
@@ -4618,18 +4618,18 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EI130", "7376251EI131", "7376251EI132", "7376251EI133", "7376251EI135", "7376251EI136",
 			"7376251EI137", "7376251EI138", "7376251EI139", "7376251EI140", "7376251EI141", "7376251EI142",
 			"7376251EI143",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME303 (15 candidates)
 		{HallNo: "WW 223", CourseCode: "22ME303", RegisterNos: []string{
 			"7376251ME102", "7376251ME103", "7376251ME104", "7376251ME105", "7376251ME106", "7376251ME107",
 			"7376251ME108", "7376251ME109", "7376251ME110", "7376251ME111", "7376251ME112", "7376251ME113",
 			"7376251ME114", "7376251ME115", "7376251ME116",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC303 (10 candidates)
 		{HallNo: "WW 223", CourseCode: "22MC303", RegisterNos: []string{
 			"7376251MZ157", "7376251MZ158", "7376251MZ159", "7376251MZ160", "7376251MZ161", "7376251MZ162",
 			"7376261MZ502", "7376261MZ503", "7376261MZ504", "7376261MZ505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 224
 		// --------------------------------------------------------------------
@@ -4639,7 +4639,7 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EI150", "7376251EI151", "7376251EI152", "7376251EI153", "7376251EI154", "7376251EI155",
 			"7376251EI156", "7376251EI157", "7376251EI158", "7376251EI159", "7376251EI160", "7376251EI161",
 			"7376261EI501", "7376261EI502", "7376261EI503", "7376261EI504", "7376261EI505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME303 (25 candidates)
 		{HallNo: "WW 224", CourseCode: "22ME303", RegisterNos: []string{
 			"7376251ME117", "7376251ME118", "7376251ME119", "7376251ME120", "7376251ME121", "7376251ME122",
@@ -4647,11 +4647,11 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251ME129", "7376251ME130", "7376251ME131", "7376251ME132", "7376251ME133", "7376251ME134",
 			"7376251ME135", "7376251ME136", "7376251ME137", "7376251ME138", "7376251ME139", "7376251ME140",
 			"7376251ME141",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG303 (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22AG303", RegisterNos: []string{
 			"7376252AG101", "7376252AG102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 225
 		// --------------------------------------------------------------------
@@ -4662,14 +4662,14 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251ME154", "7376251ME155", "7376251ME156", "7376251ME157", "7376251ME158", "7376251ME159",
 			"7376251ME160", "7376261ME504", "7376261ME505", "7376261ME506", "7376261ME507", "7376261ME501",
 			"7376261ME502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG303 (24 candidates)
 		{HallNo: "WW 225", CourseCode: "22AG303", RegisterNos: []string{
 			"7376252AG103", "7376252AG104", "7376252AG105", "7376252AG106", "7376252AG107", "7376252AG108",
 			"7376252AG109", "7376252AG110", "7376252AG111", "7376252AG112", "7376252AG113", "7376252AG115",
 			"7376252AG116", "7376252AG117", "7376252AG118", "7376252AG119", "7376252AG120", "7376252AG121",
 			"7376252AG122", "7376252AG123", "7376252AG124", "7376252AG125", "7376252AG126", "7376252AG127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 226
 		// --------------------------------------------------------------------
@@ -4677,113 +4677,113 @@ func buildSeatingData24Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 226", CourseCode: "22EC303*", RegisterNos: []string{
 			"7376231EC101", "7376231EC110", "7376231EC112", "7376231EC283", "7376231EC297", "7376231EC305",
 			"7376231EC331", "7376231EC334",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE303 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22EE303", RegisterNos: []string{
 			"7376231EE115",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC303* (6 candidates)
 		{HallNo: "WW 226", CourseCode: "22MC303*", RegisterNos: []string{
 			"7376231MZ106", "7376231MZ107", "7376231MZ111", "7376231MZ113", "7376231MZ135", "7376241MZ501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22AI303", RegisterNos: []string{
 			"7376232AD250",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC303* (15 candidates)
 		{HallNo: "WW 226", CourseCode: "22EC303*", RegisterNos: []string{
 			"7376241EC137", "7376241EC138", "7376241EC145", "7376241EC201", "7376241EC243", "7376241EC256",
 			"7376241EC271", "7376241EC302", "7376241EC312", "7376241EC333", "7376251EC509", "7376251EC511",
 			"7376251EC517", "7376251EC518", "7376251EC521",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE303 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22EE303", RegisterNos: []string{
 			"7376241EE130",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC303* (7 candidates)
 		{HallNo: "WW 226", CourseCode: "22MC303*", RegisterNos: []string{
 			"7376241MZ112", "7376241MZ124", "7376241MZ127", "7376241MZ139", "7376241MZ143", "7376251MZ504",
 			"7376251MZ506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22IT303", RegisterNos: []string{
 			"7376242IT146",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI303 (10 candidates)
 		{HallNo: "WW 226", CourseCode: "22AI303", RegisterNos: []string{
 			"7376242AD137", "7376242AD189", "7376242AD190", "7376242AD218", "7376242AD291", "7376242AD301",
 			"7376242AD320", "7376242AD326", "7376252AD510", "7376252AD515",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 227
 		// --------------------------------------------------------------------
 		// Course: 22CE303* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22CE303*", RegisterNos: []string{
 			"7376241CE501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS303 (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22CS303", RegisterNos: []string{
 			"7376231CS244", "7376231CS259",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI303* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22EI303*", RegisterNos: []string{
 			"7376231EI159",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME303 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22ME303", RegisterNos: []string{
 			"7376231ME149",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM303* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22BM303*", RegisterNos: []string{
 			"7376231BM107",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD303 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22CD303", RegisterNos: []string{
 			"7376241CD501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT303 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22CT303", RegisterNos: []string{
 			"7376232CT122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG303 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22AG303", RegisterNos: []string{
 			"7376232AG151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS303 (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22CS303", RegisterNos: []string{
 			"7376241CS230", "7376241CS395", "7376251CS512",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE303 (9 candidates)
 		{HallNo: "WW 227", CourseCode: "22EE303", RegisterNos: []string{
 			"7376241EE132", "7376241EE146", "7376241EE147", "7376241EE157", "7376241EE193", "7376251EE502",
 			"7376251EE506", "7376251EE510", "7376251EE514",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI303* (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22EI303*", RegisterNos: []string{
 			"7376241EI104", "7376251EI501", "7376251EI502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT303 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22BT303", RegisterNos: []string{
 			"7376242BT156",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT303 (9 candidates)
 		{HallNo: "WW 227", CourseCode: "22IT303", RegisterNos: []string{
 			"7376242IT184", "7376242IT188", "7376242IT214", "7376242IT227", "7376252IT502", "7376252IT504",
 			"7376252IT508", "7376252IT511", "7376252IT512",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB303* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22CB303*", RegisterNos: []string{
 			"7376242CB119",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM303 (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22AM303", RegisterNos: []string{
 			"7376242AL169", "7376242AL207",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
 
 // ============================================================================
-// 24-11-2026 AFTERNOON SESSION (AN: 01:30 PM ? 04:30 PM) - Total: 301 Students
+// 24-11-2026 AFTERNOON SESSION (AN: 01:30 PM : 04:30 PM) - Total: 301 Students
 // ============================================================================
 func buildSeatingData24Nov2026AN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -4794,24 +4794,24 @@ func buildSeatingData24Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 202", CourseCode: "22CS401", RegisterNos: []string{
 			"7376231CS102", "7376231CS103", "7376231CS173", "7376231CS190", "7376231CS206", "7376231CS235",
 			"7376231CS240", "7376231CS244", "7376231CS259", "7376231CS292",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC401 (11 candidates)
 		{HallNo: "WW 202", CourseCode: "22EC401", RegisterNos: []string{
 			"7376231EC110", "7376231EC112", "7376231EC121", "7376231EC196", "7376231EC243", "7376231EC283",
 			"7376231EC297", "7376231EC305", "7376231EC318", "7376231EC331", "7376231EC334",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS401 (15 candidates)
 		{HallNo: "WW 202", CourseCode: "22CS401", RegisterNos: []string{
 			"7376241CS129", "7376241CS144", "7376241CS150", "7376241CS151", "7376241CS157", "7376241CS159",
 			"7376241CS171", "7376241CS190", "7376241CS210", "7376241CS220", "7376241CS230", "7376241CS257",
 			"7376241CS272", "7376241CS279", "7376241CS288",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC401 (14 candidates)
 		{HallNo: "WW 202", CourseCode: "22EC401", RegisterNos: []string{
 			"7376241EC124", "7376241EC129", "7376241EC133", "7376241EC137", "7376241EC138", "7376241EC139",
 			"7376241EC142", "7376241EC144", "7376241EC147", "7376241EC152", "7376241EC157", "7376241EC159",
 			"7376241EC160", "7376241EC170",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 203
 		// --------------------------------------------------------------------
@@ -4819,229 +4819,229 @@ func buildSeatingData24Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 203", CourseCode: "22CS401", RegisterNos: []string{
 			"7376241CS297", "7376241CS307", "7376241CS308", "7376241CS318", "7376241CS320", "7376241CS323",
 			"7376241CS395", "7376241CS406", "7376241CS409", "7376241CS410",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC401 (15 candidates)
 		{HallNo: "WW 203", CourseCode: "22EC401", RegisterNos: []string{
 			"7376241EC192", "7376241EC201", "7376241EC209", "7376241EC243", "7376241EC246", "7376241EC256",
 			"7376241EC271", "7376241EC273", "7376241EC278", "7376241EC279", "7376241EC280", "7376241EC282",
 			"7376241EC284", "7376241EC287", "7376241EC300",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 204
 		// --------------------------------------------------------------------
 		// Course: 22CS401 (2 candidates)
 		{HallNo: "WW 204", CourseCode: "22CS401", RegisterNos: []string{
 			"7376241CS506", "7376241CS517",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC401 (3 candidates)
 		{HallNo: "WW 204", CourseCode: "22EC401", RegisterNos: []string{
 			"7376241EC511", "7376241EC513", "7376241EC516",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS401 (8 candidates)
 		{HallNo: "WW 204", CourseCode: "22CS401", RegisterNos: []string{
 			"7376241CS425", "7376241CS468", "7376241CS473", "7376241CS474", "7376251CS501", "7376251CS503",
 			"7376251CS505", "7376251CS508",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC401 (12 candidates)
 		{HallNo: "WW 204", CourseCode: "22EC401", RegisterNos: []string{
 			"7376241EC312", "7376241EC328", "7376241EC333", "7376241EC334", "7376251EC506", "7376251EC507",
 			"7376251EC508", "7376251EC509", "7376251EC511", "7376251EC513", "7376251EC515", "7376251EC516",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 205
 		// --------------------------------------------------------------------
 		// Course: 22IT401 (2 candidates)
 		{HallNo: "WW 205", CourseCode: "22IT401", RegisterNos: []string{
 			"7376232IT152", "7376232IT274",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI401 (5 candidates)
 		{HallNo: "WW 205", CourseCode: "22AI401", RegisterNos: []string{
 			"7376232AD115", "7376232AD122", "7376232AD136", "7376232AD158", "7376232AD174",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS401 (5 candidates)
 		{HallNo: "WW 205", CourseCode: "22CS401", RegisterNos: []string{
 			"7376251CS509", "7376251CS510", "7376251CS512", "7376251CS518", "7376251CS521",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC401 (4 candidates)
 		{HallNo: "WW 205", CourseCode: "22EC401", RegisterNos: []string{
 			"7376251EC517", "7376251EC518", "7376251EC519", "7376251EC520",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT401 (9 candidates)
 		{HallNo: "WW 205", CourseCode: "22IT401", RegisterNos: []string{
 			"7376242IT108", "7376242IT110", "7376242IT123", "7376242IT129", "7376242IT141", "7376242IT146",
 			"7376242IT155", "7376242IT161", "7376242IT164",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 206
 		// --------------------------------------------------------------------
 		// Course: 22AI401 (4 candidates)
 		{HallNo: "WW 206", CourseCode: "22AI401", RegisterNos: []string{
 			"7376232AD184", "7376232AD250", "7376232AD258", "7376232AD277",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT401 (15 candidates)
 		{HallNo: "WW 206", CourseCode: "22IT401", RegisterNos: []string{
 			"7376242IT168", "7376242IT184", "7376242IT188", "7376242IT201", "7376242IT204", "7376242IT209",
 			"7376242IT214", "7376242IT217", "7376242IT226", "7376242IT227", "7376242IT250", "7376242IT257",
 			"7376242IT273", "7376242IT287", "7376242IT292",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI401 (6 candidates)
 		{HallNo: "WW 206", CourseCode: "22AI401", RegisterNos: []string{
 			"7376242AD107", "7376242AD137", "7376242AD146", "7376242AD189", "7376242AD201", "7376242AD202",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 207
 		// --------------------------------------------------------------------
 		// Course: 22IT401 (2 candidates)
 		{HallNo: "WW 207", CourseCode: "22IT401", RegisterNos: []string{
 			"7376242IT502", "7376242IT509",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI401 (5 candidates)
 		{HallNo: "WW 207", CourseCode: "22AI401", RegisterNos: []string{
 			"7376242AD502", "7376242AD505", "7376242AD506", "7376242AD509", "7376242AD510",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT401 (18 candidates)
 		{HallNo: "WW 207", CourseCode: "22IT401", RegisterNos: []string{
 			"7376242IT303", "7376242IT318", "7376242IT336", "7376242IT337", "7376242IT341", "7376242IT348",
 			"7376252IT501", "7376252IT502", "7376252IT503", "7376252IT504", "7376252IT505", "7376252IT506",
 			"7376252IT508", "7376252IT509", "7376252IT511", "7376252IT512", "7376252IT513", "7376252IT515",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI401 (20 candidates)
 		{HallNo: "WW 207", CourseCode: "22AI401", RegisterNos: []string{
 			"7376242AD216", "7376242AD218", "7376242AD236", "7376242AD241", "7376242AD291", "7376242AD301",
 			"7376242AD308", "7376242AD311", "7376242AD320", "7376242AD326", "7376242AD335", "7376242AD341",
 			"7376252AD501", "7376252AD502", "7376252AD503", "7376252AD505", "7376252AD506", "7376252AD508",
 			"7376252AD509", "7376252AD510",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM401 (5 candidates)
 		{HallNo: "WW 207", CourseCode: "22AM401", RegisterNos: []string{
 			"7376242AL104", "7376242AL109", "7376242AL110", "7376242AL114", "7376242AL128",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 208
 		// --------------------------------------------------------------------
 		// Course: 22AM401 (1 candidates)
 		{HallNo: "WW 208", CourseCode: "22AM401", RegisterNos: []string{
 			"7376242AL502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE403* (6 candidates)
 		{HallNo: "WW 208", CourseCode: "22EE403*", RegisterNos: []string{
 			"7376241EE115", "7376241EE130", "7376241EE145", "7376241EE146", "7376241EE147", "7376241EE157",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI401 (4 candidates)
 		{HallNo: "WW 208", CourseCode: "22AI401", RegisterNos: []string{
 			"7376252AD511", "7376252AD512", "7376252AD513", "7376252AD515",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM401 (14 candidates)
 		{HallNo: "WW 208", CourseCode: "22AM401", RegisterNos: []string{
 			"7376242AL144", "7376242AL156", "7376242AL157", "7376242AL169", "7376242AL176", "7376242AL182",
 			"7376242AL190", "7376242AL193", "7376242AL197", "7376242AL202", "7376242AL208", "7376242AL213",
 			"7376252AL502", "7376252AL503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 209
 		// --------------------------------------------------------------------
 		// Course: 22MC013 (1 candidates)
 		{HallNo: "WW 209", CourseCode: "22MC013", RegisterNos: []string{
 			"7376231MZ111",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE403* (10 candidates)
 		{HallNo: "WW 209", CourseCode: "22EE403*", RegisterNos: []string{
 			"7376241EE193", "7376251EE502", "7376251EE504", "7376251EE506", "7376251EE507", "7376251EE510",
 			"7376251EE512", "7376251EE514", "7376251EE515", "7376251EE517",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22ME403* (9 candidates)
 		{HallNo: "WW 209", CourseCode: "22ME403*", RegisterNos: []string{
 			"7376241ME104", "7376241ME111", "7376241ME123", "7376241ME127", "7376241ME146", "7376241ME154",
 			"7376241ME155", "7376251ME503", "7376251ME508",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC013 (5 candidates)
 		{HallNo: "WW 209", CourseCode: "22MC013", RegisterNos: []string{
 			"7376241MZ104", "7376241MZ120", "7376241MZ121", "7376241MZ124", "7376241MZ127",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 210
 		// --------------------------------------------------------------------
 		// Course: 22EI403* (1 candidates)
 		{HallNo: "WW 210", CourseCode: "22EI403*", RegisterNos: []string{
 			"7376231EI159",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BM005 (5 candidates)
 		{HallNo: "WW 210", CourseCode: "22BM005", RegisterNos: []string{
 			"7376231BM102", "7376231BM107", "7376231BM113", "7376231BM127", "7376231BM148",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CD401 (1 candidates)
 		{HallNo: "WW 210", CourseCode: "22CD401", RegisterNos: []string{
 			"7376231CD111",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT602* (7 candidates)
 		{HallNo: "WW 210", CourseCode: "22BT602*", RegisterNos: []string{
 			"7376232BT115", "7376232BT134", "7376232BT142", "7376232BT148", "7376232BT182", "7376232BT189",
 			"7376232BT191",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB102 (1 candidates)
 		{HallNo: "WW 210", CourseCode: "22CB102", RegisterNos: []string{
 			"7376232CB106",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EI403* (4 candidates)
 		{HallNo: "WW 210", CourseCode: "22EI403*", RegisterNos: []string{
 			"7376241EI119", "7376241EI142", "7376251EI501", "7376251EI502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC013 (2 candidates)
 		{HallNo: "WW 210", CourseCode: "22MC013", RegisterNos: []string{
 			"7376241MZ129", "7376241MZ139",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB102 (4 candidates)
 		{HallNo: "WW 210", CourseCode: "22CB102", RegisterNos: []string{
 			"7376242CB116", "7376242CB118", "7376242CB119", "7376242CB154",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 212
 		// --------------------------------------------------------------------
 		// Course: 22CE013 (3 candidates)
 		{HallNo: "WW 212", CourseCode: "22CE013", RegisterNos: []string{
 			"7376231CE117", "7376231CE120", "7376241CE501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE020 (1 candidates)
 		{HallNo: "WW 212", CourseCode: "22EE020", RegisterNos: []string{
 			"7376231EE111",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IS401 (4 candidates)
 		{HallNo: "WW 212", CourseCode: "22IS401", RegisterNos: []string{
 			"7376231SE103", "7376231SE137", "7376231SE153", "7376241SE501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CD401 (3 candidates)
 		{HallNo: "WW 212", CourseCode: "22CD401", RegisterNos: []string{
 			"7376231CD143", "7376241CD501", "7376241CD502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC011 (3 candidates)
 		{HallNo: "WW 212", CourseCode: "22MC011", RegisterNos: []string{
 			"7376231MZ106", "7376231MZ107", "7376231MZ148",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22FD009 (2 candidates)
 		{HallNo: "WW 212", CourseCode: "22FD009", RegisterNos: []string{
 			"7376232FD132", "7376232FD137",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB601* (3 candidates)
 		{HallNo: "WW 212", CourseCode: "22CB601*", RegisterNos: []string{
 			"7376232CB111", "7376232CB123", "7376232CB133",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CT401 (4 candidates)
 		{HallNo: "WW 212", CourseCode: "22CT401", RegisterNos: []string{
 			"7376232CT102", "7376232CT117", "7376232CT122", "7376242CT503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG403* (1 candidates)
 		{HallNo: "WW 212", CourseCode: "22AG403*", RegisterNos: []string{
 			"7376232AG151",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG403* (2 candidates)
 		{HallNo: "WW 212", CourseCode: "22AG403*", RegisterNos: []string{
 			"7376242AG117", "7376242AG120",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 	}
 }
 
 // ============================================================================
-// 25-11-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 1241 Students
+// 25-11-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 1241 Students
 // ============================================================================
 func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -5055,14 +5055,14 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS131", "7376231CS135", "7376231CS136", "7376231CS137", "7376231CS138", "7376231CS139",
 			"7376231CS109", "7376231CS111", "7376231CS113", "7376231CS119", "7376231CS121", "7376231CS123",
 			"7376231CS142",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI039 (20 candidates)
 		{HallNo: "ME 107", CourseCode: "22AI039", RegisterNos: []string{
 			"7376232AD112", "7376232AD113", "7376232AD114", "7376232AD115", "7376232AD116", "7376232AD117",
 			"7376232AD118", "7376232AD119", "7376232AD120", "7376232AD125", "7376232AD126", "7376232AD127",
 			"7376232AD102", "7376232AD103", "7376232AD106", "7376232AD110", "7376232AD122", "7376232AD129",
 			"7376232AD130", "7376232AD133",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5073,14 +5073,14 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS175", "7376231CS176", "7376231CS177", "7376231CS178", "7376231CS144", "7376231CS145",
 			"7376231CS153", "7376231CS165", "7376231CS166", "7376231CS168", "7376231CS169", "7376231CS171",
 			"7376231CS180",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI039 (20 candidates)
 		{HallNo: "ME 201", CourseCode: "22AI039", RegisterNos: []string{
 			"7376232AD134", "7376232AD135", "7376232AD136", "7376232AD137", "7376232AD138", "7376232AD139",
 			"7376232AD143", "7376232AD144", "7376232AD145", "7376232AD146", "7376232AD148", "7376232AD149",
 			"7376232AD150", "7376232AD158", "7376232AD159", "7376232AD160", "7376232AD141", "7376232AD152",
 			"7376232AD156", "7376232AD163",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5091,14 +5091,14 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS203", "7376231CS204", "7376231CS205", "7376231CS206", "7376231CS207", "7376231CS211",
 			"7376231CS212", "7376231CS213", "7376231CS191", "7376231CS200", "7376231CS209", "7376231CS216",
 			"7376231CS217",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI039 (20 candidates)
 		{HallNo: "ME 202", CourseCode: "22AI039", RegisterNos: []string{
 			"7376232AD165", "7376232AD166", "7376232AD167", "7376232AD170", "7376232AD171", "7376232AD172",
 			"7376232AD173", "7376232AD174", "7376232AD175", "7376232AD176", "7376232AD177", "7376232AD190",
 			"7376232AD191", "7376232AD192", "7376232AD184", "7376232AD187", "7376232AD188", "7376232AD195",
 			"7376232AD196", "7376232AD198",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5109,14 +5109,14 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS241", "7376231CS245", "7376231CS246", "7376231CS247", "7376231CS248", "7376231CS250",
 			"7376231CS251", "7376231CS252", "7376231CS218", "7376231CS219", "7376231CS232", "7376231CS233",
 			"7376231CS243",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI039 (20 candidates)
 		{HallNo: "ME 203", CourseCode: "22AI039", RegisterNos: []string{
 			"7376232AD209", "7376232AD210", "7376232AD211", "7376232AD215", "7376232AD216", "7376232AD217",
 			"7376232AD218", "7376232AD219", "7376232AD225", "7376232AD226", "7376232AD227", "7376232AD199",
 			"7376232AD201", "7376232AD204", "7376232AD207", "7376232AD213", "7376232AD221", "7376232AD222",
 			"7376232AD229", "7376232AD230",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5127,14 +5127,14 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS276", "7376231CS277", "7376231CS282", "7376231CS283", "7376231CS284", "7376231CS285",
 			"7376231CS286", "7376231CS287", "7376231CS253", "7376231CS256", "7376231CS279", "7376231CS289",
 			"7376231CS291",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI039 (20 candidates)
 		{HallNo: "ME 204", CourseCode: "22AI039", RegisterNos: []string{
 			"7376232AD231", "7376232AD232", "7376232AD233", "7376232AD238", "7376232AD239", "7376232AD240",
 			"7376232AD255", "7376232AD256", "7376232AD257", "7376232AD258", "7376232AD263", "7376232AD264",
 			"7376232AD265", "7376232AD235", "7376232AD242", "7376232AD243", "7376232AD247", "7376232AD248",
 			"7376232AD250", "7376232AD251",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5145,14 +5145,14 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS308", "7376231CS309", "7376231CS310", "7376231CS311", "7376231CS312", "7376231CS313",
 			"7376231CS315", "7376231CS316", "7376231CS317", "7376231CS318", "7376231CS293", "7376231CS294",
 			"7376231CS320",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI039 (20 candidates)
 		{HallNo: "ME 205", CourseCode: "22AI039", RegisterNos: []string{
 			"7376232AD266", "7376232AD267", "7376232AD268", "7376232AD269", "7376232AD281", "7376232AD282",
 			"7376232AD283", "7376232AD284", "7376232AD285", "7376232AD286", "7376242AD505", "7376242AD506",
 			"7376242AD507", "7376232AD271", "7376232AD273", "7376232AD274", "7376232AD277", "7376232AD279",
 			"7376242AD502", "7376242AD503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 008 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5161,16 +5161,16 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS323", "7376231CS324", "7376231CS325", "7376231CS326", "7376231CS328", "7376231CS329",
 			"7376231CS330", "7376231CS331", "7376231CS332", "7376231CS333", "7376231CS335", "7376231CS337",
 			"7376231CS339", "7376231CS341", "7376231CS343",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC026 (8 candidates)
 		{HallNo: "WW 008", CourseCode: "22EC026", RegisterNos: []string{
 			"7376231EC107", "7376231EC108", "7376231EC109", "7376231EC110", "7376231EC102", "7376231EC104",
 			"7376231EC105", "7376231EC114",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI039 (2 candidates)
 		{HallNo: "WW 008", CourseCode: "22AI039", RegisterNos: []string{
 			"7376242AD509", "7376242AD510",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 011 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5179,12 +5179,12 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS349", "7376231CS350", "7376231CS351", "7376231CS352", "7376231CS353", "7376231CS354",
 			"7376241CS501", "7376241CS502", "7376241CS503", "7376241CS504", "7376241CS505", "7376241CS506",
 			"7376231CS344", "7376231CS346", "7376231CS347",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC026 (10 candidates)
 		{HallNo: "WW 011", CourseCode: "22EC026", RegisterNos: []string{
 			"7376231EC119", "7376231EC120", "7376231EC121", "7376231EC115", "7376231EC116", "7376231EC123",
 			"7376231EC124", "7376231EC127", "7376231EC132", "7376231EC136",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 012 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5192,16 +5192,16 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 012", CourseCode: "22CS012", RegisterNos: []string{
 			"7376241CS507", "7376241CS508", "7376241CS509", "7376241CS510", "7376241CS511", "7376241CS512",
 			"7376241CS514", "7376241CS515", "7376241CS516", "7376241CS518", "7376241CS519",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC026 (10 candidates)
 		{HallNo: "WW 012", CourseCode: "22EC026", RegisterNos: []string{
 			"7376231EC137", "7376231EC138", "7376231EC140", "7376231EC142", "7376231EC143", "7376231EC146",
 			"7376231EC148", "7376231EC153", "7376231EC155", "7376231EC159",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM018 (4 candidates)
 		{HallNo: "WW 012", CourseCode: "22AM018", RegisterNos: []string{
 			"7376232AL102", "7376232AL104", "7376232AL105", "7376232AL108",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 113 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5209,13 +5209,13 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 113", CourseCode: "22EC026", RegisterNos: []string{
 			"7376231EC165", "7376231EC167", "7376231EC168", "7376231EC172", "7376231EC176", "7376231EC177",
 			"7376231EC179", "7376231EC180", "7376231EC187", "7376231EC193",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM018 (15 candidates)
 		{HallNo: "WW 113", CourseCode: "22AM018", RegisterNos: []string{
 			"7376232AL109", "7376232AL110", "7376232AL111", "7376232AL118", "7376232AL119", "7376232AL120",
 			"7376232AL129", "7376232AL130", "7376232AL131", "7376232AL132", "7376232AL133", "7376232AL113",
 			"7376232AL124", "7376232AL125", "7376232AL127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 114 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5223,13 +5223,13 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 114", CourseCode: "22EC026", RegisterNos: []string{
 			"7376231EC216", "7376231EC217", "7376231EC218", "7376231EC196", "7376231EC208", "7376231EC211",
 			"7376231EC214", "7376231EC228", "7376231EC229", "7376231EC231",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM018 (15 candidates)
 		{HallNo: "WW 114", CourseCode: "22AM018", RegisterNos: []string{
 			"7376232AL134", "7376232AL135", "7376232AL136", "7376232AL138", "7376232AL139", "7376232AL141",
 			"7376232AL147", "7376232AL148", "7376232AL153", "7376232AL154", "7376232AL157", "7376232AL159",
 			"7376232AL160", "7376232AL162", "7376232AL163",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 115 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5237,13 +5237,13 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 115", CourseCode: "22EC026", RegisterNos: []string{
 			"7376231EC243", "7376231EC244", "7376231EC245", "7376231EC247", "7376231EC248", "7376231EC249",
 			"7376231EC233", "7376231EC239", "7376231EC240", "7376231EC251",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM018 (15 candidates)
 		{HallNo: "WW 115", CourseCode: "22AM018", RegisterNos: []string{
 			"7376232AL165", "7376232AL166", "7376232AL167", "7376232AL168", "7376232AL171", "7376232AL172",
 			"7376232AL173", "7376232AL174", "7376232AL175", "7376232AL177", "7376232AL179", "7376232AL180",
 			"7376232AL182", "7376232AL183", "7376232AL185",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 117 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5251,13 +5251,13 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 117", CourseCode: "22EC026", RegisterNos: []string{
 			"7376231EC265", "7376231EC266", "7376231EC267", "7376231EC252", "7376231EC254", "7376231EC262",
 			"7376231EC275", "7376231EC277", "7376231EC282", "7376231EC285",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM018 (15 candidates)
 		{HallNo: "WW 117", CourseCode: "22AM018", RegisterNos: []string{
 			"7376232AL186", "7376232AL187", "7376232AL188", "7376232AL189", "7376232AL190", "7376232AL193",
 			"7376232AL196", "7376232AL197", "7376232AL199", "7376232AL200", "7376232AL202", "7376232AL203",
 			"7376232AL205", "7376232AL208", "7376232AL211",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 118 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5265,16 +5265,16 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 118", CourseCode: "22EC026", RegisterNos: []string{
 			"7376231EC287", "7376231EC288", "7376231EC289", "7376231EC290", "7376231EC292", "7376231EC295",
 			"7376231EC297", "7376231EC301", "7376231EC302", "7376231EC307",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT012 (4 candidates)
 		{HallNo: "WW 118", CourseCode: "22IT012", RegisterNos: []string{
 			"7376232IT101", "7376232IT104", "7376232IT105", "7376232IT107",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM018 (11 candidates)
 		{HallNo: "WW 118", CourseCode: "22AM018", RegisterNos: []string{
 			"7376242AL501", "7376242AL502", "7376242AL503", "7376242AL504", "7376242AL505", "7376232AL212",
 			"7376232AL213", "7376232AL216", "7376232AL219", "7376232AL220", "7376242AL507",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5285,7 +5285,7 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376241EC508", "7376241EC509", "7376241EC510", "7376241EC511", "7376241EC512", "7376241EC513",
 			"7376241EC514", "7376231EC309", "7376231EC318", "7376231EC319", "7376231EC331", "7376241EC501",
 			"7376241EC504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT012 (25 candidates)
 		{HallNo: "WW 202", CourseCode: "22IT012", RegisterNos: []string{
 			"7376232IT110", "7376232IT111", "7376232IT113", "7376232IT116", "7376232IT118", "7376232IT121",
@@ -5293,25 +5293,25 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT140", "7376232IT143", "7376232IT144", "7376232IT146", "7376232IT147", "7376232IT153",
 			"7376232IT156", "7376232IT161", "7376232IT170", "7376232IT171", "7376232IT177", "7376232IT186",
 			"7376232IT188",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EC026 (3 candidates)
 		{HallNo: "WW 203", CourseCode: "22EC026", RegisterNos: []string{
 			"7376241EC516", "7376241EC520", "7376241EC521",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT012 (15 candidates)
 		{HallNo: "WW 203", CourseCode: "22IT012", RegisterNos: []string{
 			"7376232IT209", "7376232IT210", "7376232IT211", "7376232IT192", "7376232IT194", "7376232IT202",
 			"7376232IT204", "7376232IT217", "7376232IT221", "7376232IT223", "7376232IT231", "7376232IT234",
 			"7376232IT236", "7376232IT238", "7376232IT239",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT038 (7 candidates)
 		{HallNo: "WW 203", CourseCode: "22IT038", RegisterNos: []string{
 			"7376232IT103", "7376232IT106", "7376232IT108", "7376232IT115", "7376232IT120", "7376232IT126",
 			"7376232IT134",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5320,29 +5320,29 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT255", "7376232IT256", "7376232IT257", "7376232IT277", "7376232IT278", "7376232IT279",
 			"7376232IT243", "7376232IT244", "7376232IT247", "7376232IT252", "7376232IT260", "7376232IT263",
 			"7376232IT265", "7376232IT271", "7376232IT273",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT038 (10 candidates)
 		{HallNo: "WW 204", CourseCode: "22IT038", RegisterNos: []string{
 			"7376232IT135", "7376232IT137", "7376232IT148", "7376232IT149", "7376232IT160", "7376232IT162",
 			"7376232IT163", "7376232IT165", "7376232IT167", "7376232IT169",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22MC009 (6 candidates)
 		{HallNo: "WW 205", CourseCode: "22MC009", RegisterNos: []string{
 			"7376231MZ102", "7376231MZ103", "7376231MZ104", "7376231MZ105", "7376231MZ106", "7376231MZ107",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT012 (9 candidates)
 		{HallNo: "WW 205", CourseCode: "22IT012", RegisterNos: []string{
 			"7376232IT283", "7376232IT284", "7376232IT285", "7376232IT286", "7376232IT281", "7376242IT501",
 			"7376242IT503", "7376242IT507", "7376242IT508",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT038 (10 candidates)
 		{HallNo: "WW 205", CourseCode: "22IT038", RegisterNos: []string{
 			"7376232IT172", "7376232IT174", "7376232IT179", "7376232IT183", "7376232IT184", "7376232IT190",
 			"7376232IT191", "7376232IT193", "7376232IT199", "7376232IT201",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5351,12 +5351,12 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231MZ110", "7376231MZ111", "7376231MZ112", "7376231MZ113", "7376231MZ114", "7376231MZ115",
 			"7376231MZ116", "7376231MZ117", "7376231MZ118", "7376231MZ119", "7376231MZ120", "7376231MZ121",
 			"7376231MZ122", "7376231MZ123", "7376231MZ108",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT038 (10 candidates)
 		{HallNo: "WW 206", CourseCode: "22IT038", RegisterNos: []string{
 			"7376232IT205", "7376232IT206", "7376232IT208", "7376232IT212", "7376232IT215", "7376232IT216",
 			"7376232IT218", "7376232IT220", "7376232IT224", "7376232IT228",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 207 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5367,7 +5367,7 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231MZ136", "7376231MZ137", "7376231MZ138", "7376231MZ139", "7376231MZ140", "7376231MZ141",
 			"7376231MZ142", "7376231MZ143", "7376231MZ144", "7376231MZ145", "7376231MZ146", "7376231MZ147",
 			"7376231MZ148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT038 (25 candidates)
 		{HallNo: "WW 207", CourseCode: "22IT038", RegisterNos: []string{
 			"7376232IT240", "7376232IT241", "7376232IT242", "7376232IT266", "7376232IT267", "7376232IT268",
@@ -5375,7 +5375,7 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT250", "7376232IT251", "7376232IT254", "7376232IT258", "7376232IT259", "7376232IT261",
 			"7376232IT262", "7376232IT270", "7376232IT274", "7376232IT276", "7376232IT280", "7376242IT502",
 			"7376242IT504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 208 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5383,17 +5383,17 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 208", CourseCode: "22EE005", RegisterNos: []string{
 			"7376231EE102", "7376231EE103", "7376231EE104", "7376231EE105", "7376231EE106", "7376231EE108",
 			"7376231EE110", "7376231EE111",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC009 (15 candidates)
 		{HallNo: "WW 208", CourseCode: "22MC009", RegisterNos: []string{
 			"7376231MZ149", "7376231MZ150", "7376231MZ151", "7376231MZ152", "7376231MZ153", "7376231MZ154",
 			"7376231MZ155", "7376231MZ156", "7376231MZ157", "7376231MZ158", "7376241MZ501", "7376241MZ502",
 			"7376241MZ503", "7376241MZ504", "7376241MZ505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT038 (2 candidates)
 		{HallNo: "WW 208", CourseCode: "22IT038", RegisterNos: []string{
 			"7376242IT509", "7376242IT510",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 209 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5401,17 +5401,17 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 209", CourseCode: "22EE005", RegisterNos: []string{
 			"7376231EE112", "7376231EE113", "7376231EE114", "7376231EE116", "7376231EE117", "7376231EE118",
 			"7376231EE119", "7376231EE120", "7376231EE121", "7376231EE122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI019 (14 candidates)
 		{HallNo: "WW 209", CourseCode: "22EI019", RegisterNos: []string{
 			"7376231EI101", "7376231EI102", "7376231EI103", "7376231EI104", "7376231EI108", "7376231EI109",
 			"7376231EI110", "7376231EI111", "7376231EI112", "7376231EI113", "7376231EI115", "7376231EI116",
 			"7376231EI117", "7376231EI106",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC009 (1 candidates)
 		{HallNo: "WW 209", CourseCode: "22MC009", RegisterNos: []string{
 			"7376241MZ506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 210 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5419,13 +5419,13 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 210", CourseCode: "22EE005", RegisterNos: []string{
 			"7376231EE123", "7376231EE124", "7376231EE125", "7376231EE126", "7376231EE127", "7376231EE128",
 			"7376231EE129", "7376231EE130", "7376231EE131", "7376231EE133",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI019 (15 candidates)
 		{HallNo: "WW 210", CourseCode: "22EI019", RegisterNos: []string{
 			"7376231EI118", "7376231EI119", "7376231EI120", "7376231EI121", "7376231EI122", "7376231EI123",
 			"7376231EI124", "7376231EI125", "7376231EI126", "7376231EI128", "7376231EI129", "7376231EI130",
 			"7376231EI131", "7376231EI132", "7376231EI133",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 211 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5433,13 +5433,13 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 211", CourseCode: "22EE005", RegisterNos: []string{
 			"7376231EE134", "7376231EE135", "7376231EE136", "7376231EE143", "7376231EE144", "7376231EE145",
 			"7376231EE146", "7376231EE147", "7376231EE138", "7376231EE141",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI019 (15 candidates)
 		{HallNo: "WW 211", CourseCode: "22EI019", RegisterNos: []string{
 			"7376231EI134", "7376231EI135", "7376231EI136", "7376231EI143", "7376231EI144", "7376231EI145",
 			"7376231EI146", "7376231EI147", "7376231EI149", "7376231EI150", "7376231EI151", "7376231EI152",
 			"7376231EI138", "7376231EI139", "7376231EI141",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 212 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5448,23 +5448,23 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS101", "7376231CS102", "7376231CS103", "7376231CS107", "7376231CS110", "7376231CS112",
 			"7376231CS114", "7376231CS120", "7376231CS122", "7376231CS124", "7376231CS132", "7376231CS133",
 			"7376231CS141", "7376231CS147", "7376231CS159", "7376231CS164",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE005 (18 candidates)
 		{HallNo: "WW 212", CourseCode: "22EE005", RegisterNos: []string{
 			"7376231EE148", "7376231EE149", "7376231EE150", "7376231EE151", "7376231EE154", "7376231EE155",
 			"7376231EE156", "7376231EE157", "7376231EE158", "7376231EE159", "7376231EE160", "7376231EE161",
 			"7376241EE501", "7376241EE502", "7376241EE503", "7376241EE504", "7376241EE505", "7376241EE506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI019 (9 candidates)
 		{HallNo: "WW 212", CourseCode: "22EI019", RegisterNos: []string{
 			"7376231EI155", "7376231EI156", "7376231EI157", "7376231EI158", "7376231EI159", "7376231EI153",
 			"7376241EI501", "7376241EI503", "7376241EI504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME014 (7 candidates)
 		{HallNo: "WW 212", CourseCode: "22ME014", RegisterNos: []string{
 			"7376231ME104", "7376231ME105", "7376231ME106", "7376231ME107", "7376231ME108", "7376231ME101",
 			"7376231ME102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 213 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5473,12 +5473,12 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS188", "7376231CS189", "7376231CS190", "7376231CS234", "7376231CS235", "7376231CS236",
 			"7376231CS170", "7376231CS172", "7376231CS173", "7376231CS192", "7376231CS193", "7376231CS214",
 			"7376231CS215", "7376231CS221", "7376231CS231",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME014 (10 candidates)
 		{HallNo: "WW 213", CourseCode: "22ME014", RegisterNos: []string{
 			"7376231ME113", "7376231ME114", "7376231ME115", "7376231ME116", "7376231ME117", "7376231ME111",
 			"7376231ME121", "7376231ME122", "7376231ME124", "7376231ME126",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 214 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5487,29 +5487,29 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS244", "7376231CS254", "7376231CS255", "7376231CS257", "7376231CS259", "7376231CS267",
 			"7376231CS271", "7376231CS272", "7376231CS278", "7376231CS280", "7376231CS281", "7376231CS290",
 			"7376231CS292", "7376231CS295", "7376231CS319",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME014 (10 candidates)
 		{HallNo: "WW 214", CourseCode: "22ME014", RegisterNos: []string{
 			"7376231ME127", "7376231ME128", "7376231ME129", "7376231ME130", "7376231ME132", "7376231ME134",
 			"7376231ME135", "7376231ME138", "7376231ME140", "7376231ME141",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 215 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CS020 (6 candidates)
 		{HallNo: "WW 215", CourseCode: "22CS020", RegisterNos: []string{
 			"7376231CS321", "7376231CS334", "7376231CS338", "7376231CS340", "7376231CS342", "7376241CS513",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME014 (10 candidates)
 		{HallNo: "WW 215", CourseCode: "22ME014", RegisterNos: []string{
 			"7376231ME142", "7376231ME143", "7376231ME144", "7376231ME148", "7376231ME149", "7376231ME150",
 			"7376231ME151", "7376231ME152", "7376231ME153", "7376231ME146",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD012 (9 candidates)
 		{HallNo: "WW 215", CourseCode: "22CD012", RegisterNos: []string{
 			"7376231CD103", "7376231CD104", "7376231CD105", "7376231CD106", "7376231CD107", "7376231CD108",
 			"7376231CD110", "7376231CD111", "7376231CD112",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 218 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5517,17 +5517,17 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 218", CourseCode: "22ME014", RegisterNos: []string{
 			"7376231ME155", "7376231ME156", "7376231ME157", "7376231ME158", "7376231ME160", "7376231ME161",
 			"7376241ME501", "7376241ME503", "7376241ME505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD012 (15 candidates)
 		{HallNo: "WW 218", CourseCode: "22CD012", RegisterNos: []string{
 			"7376231CD113", "7376231CD114", "7376231CD115", "7376231CD118", "7376231CD119", "7376231CD120",
 			"7376231CD122", "7376231CD123", "7376231CD124", "7376231CD125", "7376231CD129", "7376231CD130",
 			"7376231CD131", "7376231CD132", "7376231CD127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT012 (1 candidates)
 		{HallNo: "WW 218", CourseCode: "22CT012", RegisterNos: []string{
 			"7376232CT101",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 219 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5536,26 +5536,26 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CD136", "7376231CD137", "7376231CD138", "7376231CD147", "7376231CD148", "7376231CD149",
 			"7376231CD150", "7376231CD133", "7376231CD134", "7376231CD140", "7376231CD141", "7376231CD144",
 			"7376231CD145", "7376231CD154", "7376231CD157",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT012 (10 candidates)
 		{HallNo: "WW 219", CourseCode: "22CT012", RegisterNos: []string{
 			"7376232CT102", "7376232CT103", "7376232CT104", "7376232CT105", "7376232CT106", "7376232CT107",
 			"7376232CT110", "7376232CT112", "7376232CT116", "7376232CT117",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 222 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CD012 (6 candidates)
 		{HallNo: "WW 222", CourseCode: "22CD012", RegisterNos: []string{
 			"7376231CD160", "7376231CD161", "7376231CD162", "7376241CD501", "7376241CD502", "7376241CD503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB027 (19 candidates)
 		{HallNo: "WW 222", CourseCode: "22CB027", RegisterNos: []string{
 			"7376232CB114", "7376232CB115", "7376232CB116", "7376232CB117", "7376232CB118", "7376232CB120",
 			"7376232CB121", "7376232CB122", "7376232CB123", "7376232CB124", "7376232CB125", "7376232CB102",
 			"7376232CB103", "7376232CB105", "7376232CB108", "7376232CB109", "7376232CB112", "7376232CB129",
 			"7376232CB130",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT012 (25 candidates)
 		{HallNo: "WW 222", CourseCode: "22CT012", RegisterNos: []string{
 			"7376232CT125", "7376232CT126", "7376232CT127", "7376232CT128", "7376232CT129", "7376232CT130",
@@ -5563,7 +5563,7 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232CT155", "7376232CT156", "7376232CT157", "7376232CT160", "7376232CT161", "7376232CT162",
 			"7376232CT122", "7376232CT134", "7376232CT135", "7376232CT138", "7376232CT139", "7376232CT146",
 			"7376232CT152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5571,24 +5571,24 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 223", CourseCode: "22BM007", RegisterNos: []string{
 			"7376231BM103", "7376231BM104", "7376231BM105", "7376231BM101", "7376231BM107", "7376231BM109",
 			"7376231BM110",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB027 (18 candidates)
 		{HallNo: "WW 223", CourseCode: "22CB027", RegisterNos: []string{
 			"7376232CB133", "7376232CB134", "7376232CB135", "7376232CB146", "7376232CB147", "7376232CB148",
 			"7376232CB131", "7376232CB141", "7376232CB143", "7376232CB144", "7376232CB151", "7376232CB154",
 			"7376232CB157", "7376232CB160", "7376232CB162", "7376232CB163", "7376242CB502", "7376242CB503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT012 (3 candidates)
 		{HallNo: "WW 223", CourseCode: "22CT012", RegisterNos: []string{
 			"7376242CT501", "7376242CT502", "7376242CT503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG010 (22 candidates)
 		{HallNo: "WW 223", CourseCode: "22AG010", RegisterNos: []string{
 			"7376232AG105", "7376232AG106", "7376232AG107", "7376232AG114", "7376232AG115", "7376232AG116",
 			"7376232AG117", "7376232AG118", "7376232AG119", "7376232AG131", "7376232AG132", "7376232AG133",
 			"7376232AG103", "7376232AG109", "7376232AG111", "7376232AG112", "7376232AG121", "7376232AG124",
 			"7376232AG125", "7376232AG128", "7376232AG129", "7376232AG138",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5596,7 +5596,7 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 224", CourseCode: "22EC027", RegisterNos: []string{
 			"7376231EC101", "7376231EC106", "7376231EC112", "7376231EC133", "7376231EC157", "7376231EC174",
 			"7376231EC175", "7376231EC178", "7376231EC183", "7376231EC184", "7376231EC186", "7376231EC188",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM007 (25 candidates)
 		{HallNo: "WW 224", CourseCode: "22BM007", RegisterNos: []string{
 			"7376231BM113", "7376231BM114", "7376231BM115", "7376231BM117", "7376231BM118", "7376231BM119",
@@ -5604,42 +5604,42 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231BM137", "7376231BM138", "7376231BM139", "7376231BM140", "7376231BM141", "7376231BM142",
 			"7376231BM144", "7376231BM145", "7376231BM146", "7376231BM111", "7376231BM121", "7376231BM124",
 			"7376231BM126",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG010 (13 candidates)
 		{HallNo: "WW 224", CourseCode: "22AG010", RegisterNos: []string{
 			"7376232AG147", "7376232AG148", "7376232AG149", "7376232AG150", "7376232AG151", "7376232AG152",
 			"7376232AG153", "7376242AG501", "7376242AG502", "7376242AG503", "7376242AG504", "7376232AG143",
 			"7376232AG145",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 225 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CE035 (6 candidates)
 		{HallNo: "WW 225", CourseCode: "22CE035", RegisterNos: []string{
 			"7376231CE107", "7376231CE108", "7376231CE109", "7376231CE101", "7376231CE103", "7376231CE105",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC027 (19 candidates)
 		{HallNo: "WW 225", CourseCode: "22EC027", RegisterNos: []string{
 			"7376231EC221", "7376231EC222", "7376231EC223", "7376231EC332", "7376231EC333", "7376231EC334",
 			"7376231EC192", "7376231EC226", "7376231EC227", "7376231EC232", "7376231EC271", "7376231EC278",
 			"7376231EC279", "7376231EC283", "7376231EC298", "7376231EC300", "7376231EC303", "7376231EC305",
 			"7376231EC311",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM007 (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22BM007", RegisterNos: []string{
 			"7376231BM147", "7376231BM148", "7376231BM149",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD014 (2 candidates)
 		{HallNo: "WW 225", CourseCode: "22FD014", RegisterNos: []string{
 			"7376232FD102", "7376232FD105",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FT006 (20 candidates)
 		{HallNo: "WW 225", CourseCode: "22FT006", RegisterNos: []string{
 			"7376232FT101", "7376232FT102", "7376232FT103", "7376232FT104", "7376232FT105", "7376232FT106",
 			"7376232FT108", "7376232FT109", "7376232FT110", "7376232FT111", "7376232FT112", "7376232FT113",
 			"7376232FT114", "7376232FT115", "7376232FT116", "7376232FT117", "7376232FT118", "7376232FT119",
 			"7376232FT120", "7376242FT501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 226 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5647,68 +5647,68 @@ func buildSeatingData25Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 226", CourseCode: "22CE035", RegisterNos: []string{
 			"7376231CE110", "7376231CE111", "7376231CE112", "7376231CE113", "7376231CE114", "7376231CE117",
 			"7376231CE119", "7376231CE120", "7376231CE126", "7376241CE501", "7376241CE502", "7376241CE504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC055 (13 candidates)
 		{HallNo: "WW 226", CourseCode: "22EC055", RegisterNos: []string{
 			"7376231EC117", "7376231EC154", "7376231EC166", "7376231EC170", "7376231EC171", "7376231EC205",
 			"7376231EC209", "7376231EC212", "7376231EC237", "7376231EC272", "7376231EC280", "7376231EC291",
 			"7376231EC306",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IS024 (9 candidates)
 		{HallNo: "WW 226", CourseCode: "22IS024", RegisterNos: []string{
 			"7376231SE103", "7376231SE105", "7376231SE107", "7376231SE108", "7376231SE111", "7376231SE112",
 			"7376231SE121", "7376231SE122", "7376231SE130",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD014 (16 candidates)
 		{HallNo: "WW 226", CourseCode: "22FD014", RegisterNos: []string{
 			"7376232FD107", "7376232FD108", "7376232FD109", "7376232FD110", "7376232FD111", "7376232FD135",
 			"7376232FD136", "7376232FD137", "7376232FD114", "7376232FD122", "7376232FD123", "7376232FD129",
 			"7376232FD132", "7376232FD148", "7376232FD149", "7376232FD152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 227 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EC055 (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22EC055", RegisterNos: []string{
 			"7376231EC310", "7376231EC320",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC057 (9 candidates)
 		{HallNo: "WW 227", CourseCode: "22EC057", RegisterNos: []string{
 			"7376231EC113", "7376231EC122", "7376231EC242", "7376231EC253", "7376231EC255", "7376231EC256",
 			"7376231EC304", "7376241EC515", "7376241EC517",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE051 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22EE051", RegisterNos: []string{
 			"7376231EE153",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE053 (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22EE053", RegisterNos: []string{
 			"7376231EE107", "7376231EE115",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI051 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22EI051", RegisterNos: []string{
 			"7376231EI148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IS024 (6 candidates)
 		{HallNo: "WW 227", CourseCode: "22IS024", RegisterNos: []string{
 			"7376231SE134", "7376231SE137", "7376231SE139", "7376231SE146", "7376231SE150", "7376231SE153",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT014 (13 candidates)
 		{HallNo: "WW 227", CourseCode: "22BT014", RegisterNos: []string{
 			"7376232BT107", "7376232BT132", "7376232BT136", "7376232BT141", "7376232BT142", "7376232BT147",
 			"7376232BT168", "7376232BT176", "7376232BT191", "7376232BT200", "7376232BT202", "7376232BT213",
 			"7376232BT215",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT045 (12 candidates)
 		{HallNo: "WW 227", CourseCode: "22BT045", RegisterNos: []string{
 			"7376232BT108", "7376232BT115", "7376232BT116", "7376232BT118", "7376232BT124", "7376232BT137",
 			"7376232BT151", "7376232BT157", "7376232BT173", "7376232BT179", "7376232BT190", "7376232BT212",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
 
 // ============================================================================
-// 25-11-2026 AFTERNOON SESSION (AN: 01:30 PM ? 04:30 PM) - Total: 1841 Students
+// 25-11-2026 AFTERNOON SESSION (AN: 01:30 PM : 04:30 PM) - Total: 1841 Students
 // ============================================================================
 func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -5721,7 +5721,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT110", "7376242IT111", "7376242IT112", "7376242IT113", "7376242IT116", "7376242IT117",
 			"7376242IT118", "7376242IT119", "7376242IT120", "7376242IT121", "7376242IT127", "7376242IT128",
 			"7376242IT129", "7376242IT125",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI028 (25 candidates)
 		{HallNo: "ME 102", CourseCode: "22AI028", RegisterNos: []string{
 			"7376242AD102", "7376242AD103", "7376242AD104", "7376242AD105", "7376242AD106", "7376242AD107",
@@ -5729,7 +5729,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AD114", "7376242AD115", "7376242AD116", "7376242AD117", "7376242AD118", "7376242AD119",
 			"7376242AD120", "7376242AD121", "7376242AD122", "7376242AD124", "7376242AD125", "7376242AD126",
 			"7376242AD128",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 107 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5739,7 +5739,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT137", "7376242IT138", "7376242IT139", "7376242IT140", "7376242IT147", "7376242IT148",
 			"7376242IT149", "7376242IT150", "7376242IT151", "7376242IT152", "7376242IT142", "7376242IT144",
 			"7376242IT155", "7376242IT160",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI028 (25 candidates)
 		{HallNo: "ME 107", CourseCode: "22AI028", RegisterNos: []string{
 			"7376242AD131", "7376242AD132", "7376242AD133", "7376242AD134", "7376242AD135", "7376242AD136",
@@ -5747,7 +5747,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AD144", "7376242AD145", "7376242AD146", "7376242AD147", "7376242AD148", "7376242AD149",
 			"7376242AD150", "7376242AD151", "7376242AD152", "7376242AD153", "7376242AD154", "7376242AD155",
 			"7376242AD129",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 108 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5757,7 +5757,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT172", "7376242IT173", "7376242IT196", "7376242IT197", "7376242IT198", "7376242IT161",
 			"7376242IT162", "7376242IT164", "7376242IT178", "7376242IT187", "7376242IT189", "7376242IT192",
 			"7376242IT194", "7376242IT200",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI028 (25 candidates)
 		{HallNo: "ME 108", CourseCode: "22AI028", RegisterNos: []string{
 			"7376242AD156", "7376242AD157", "7376242AD158", "7376242AD159", "7376242AD160", "7376242AD161",
@@ -5765,7 +5765,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AD168", "7376242AD169", "7376242AD171", "7376242AD172", "7376242AD173", "7376242AD174",
 			"7376242AD178", "7376242AD179", "7376242AD180", "7376242AD181", "7376242AD182", "7376242AD183",
 			"7376242AD176",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5775,7 +5775,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT216", "7376242IT217", "7376242IT219", "7376242IT220", "7376242IT221", "7376242IT222",
 			"7376242IT224", "7376242IT225", "7376242IT226", "7376242IT227", "7376242IT201", "7376242IT203",
 			"7376242IT204", "7376242IT213",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI028 (25 candidates)
 		{HallNo: "ME 201", CourseCode: "22AI028", RegisterNos: []string{
 			"7376242AD184", "7376242AD185", "7376242AD186", "7376242AD188", "7376242AD189", "7376242AD190",
@@ -5783,7 +5783,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AD197", "7376242AD198", "7376242AD199", "7376242AD200", "7376242AD201", "7376242AD203",
 			"7376242AD204", "7376242AD205", "7376242AD206", "7376242AD207", "7376242AD208", "7376242AD210",
 			"7376242AD211",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5793,7 +5793,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT239", "7376242IT240", "7376242IT241", "7376242IT242", "7376242IT243", "7376242IT244",
 			"7376242IT245", "7376242IT250", "7376242IT251", "7376242IT252", "7376242IT253", "7376242IT254",
 			"7376242IT256", "7376242IT257",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI028 (25 candidates)
 		{HallNo: "ME 202", CourseCode: "22AI028", RegisterNos: []string{
 			"7376242AD212", "7376242AD213", "7376242AD214", "7376242AD215", "7376242AD216", "7376242AD217",
@@ -5801,7 +5801,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AD224", "7376242AD225", "7376242AD227", "7376242AD228", "7376242AD229", "7376242AD230",
 			"7376242AD231", "7376242AD232", "7376242AD233", "7376242AD234", "7376242AD235", "7376242AD236",
 			"7376242AD237",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5811,7 +5811,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT280", "7376242IT281", "7376242IT282", "7376242IT283", "7376242IT284", "7376242IT260",
 			"7376242IT261", "7376242IT271", "7376242IT272", "7376242IT275", "7376242IT276", "7376242IT278",
 			"7376242IT287", "7376242IT288",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI028 (25 candidates)
 		{HallNo: "ME 203", CourseCode: "22AI028", RegisterNos: []string{
 			"7376242AD238", "7376242AD239", "7376242AD240", "7376242AD241", "7376242AD243", "7376242AD244",
@@ -5819,7 +5819,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AD251", "7376242AD252", "7376242AD253", "7376242AD254", "7376242AD255", "7376242AD256",
 			"7376242AD257", "7376242AD258", "7376242AD259", "7376242AD260", "7376242AD261", "7376242AD262",
 			"7376242AD264",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5829,7 +5829,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT315", "7376242IT316", "7376242IT317", "7376242IT318", "7376242IT319", "7376242IT320",
 			"7376242IT321", "7376242IT322", "7376242IT323", "7376242IT289", "7376242IT293", "7376242IT294",
 			"7376242IT310", "7376242IT311",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI028 (25 candidates)
 		{HallNo: "ME 204", CourseCode: "22AI028", RegisterNos: []string{
 			"7376242AD265", "7376242AD266", "7376242AD267", "7376242AD268", "7376242AD269", "7376242AD271",
@@ -5837,7 +5837,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AD278", "7376242AD279", "7376242AD280", "7376242AD281", "7376242AD282", "7376242AD283",
 			"7376242AD284", "7376242AD285", "7376242AD286", "7376242AD287", "7376242AD288", "7376242AD289",
 			"7376242AD290",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5847,7 +5847,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT330", "7376242IT331", "7376242IT332", "7376242IT333", "7376242IT334", "7376242IT337",
 			"7376242IT338", "7376242IT339", "7376242IT340", "7376242IT341", "7376242IT342", "7376242IT343",
 			"7376242IT344", "7376242IT346",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI028 (25 candidates)
 		{HallNo: "ME 205", CourseCode: "22AI028", RegisterNos: []string{
 			"7376242AD291", "7376242AD292", "7376242AD293", "7376242AD294", "7376242AD295", "7376242AD296",
@@ -5855,20 +5855,20 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AD303", "7376242AD304", "7376242AD305", "7376242AD306", "7376242AD307", "7376242AD308",
 			"7376242AD309", "7376242AD310", "7376242AD314", "7376242AD315", "7376242AD316", "7376242AD317",
 			"7376242AD312",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EC002 (4 candidates)
 		{HallNo: "ME 206", CourseCode: "22EC002", RegisterNos: []string{
 			"7376241EC103", "7376241EC104", "7376241EC105", "7376241EC106",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT025 (16 candidates)
 		{HallNo: "ME 206", CourseCode: "22IT025", RegisterNos: []string{
 			"7376242IT348", "7376242IT349", "7376242IT350", "7376252IT501", "7376252IT502", "7376252IT503",
 			"7376252IT504", "7376252IT505", "7376252IT511", "7376252IT512", "7376252IT513", "7376252IT514",
 			"7376252IT515", "7376252IT516", "7376252IT508", "7376252IT509",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI028 (25 candidates)
 		{HallNo: "ME 206", CourseCode: "22AI028", RegisterNos: []string{
 			"7376242AD318", "7376242AD319", "7376242AD320", "7376242AD321", "7376242AD323", "7376242AD324",
@@ -5876,7 +5876,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AD331", "7376242AD332", "7376242AD333", "7376242AD334", "7376242AD335", "7376242AD336",
 			"7376242AD337", "7376242AD338", "7376242AD339", "7376242AD340", "7376242AD341", "7376242AD342",
 			"7376242AD343",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 301 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5884,20 +5884,20 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "ME 301", CourseCode: "22CS001*", RegisterNos: []string{
 			"7376241CS107", "7376241CS108", "7376241CS111", "7376241CS113", "7376241CS117", "7376241CS120",
 			"7376241CS122", "7376241CS123", "7376241CS125", "7376241CS126",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC002 (20 candidates)
 		{HallNo: "ME 301", CourseCode: "22EC002", RegisterNos: []string{
 			"7376241EC121", "7376241EC122", "7376241EC123", "7376241EC124", "7376241EC130", "7376241EC131",
 			"7376241EC132", "7376241EC107", "7376241EC108", "7376241EC110", "7376241EC113", "7376241EC116",
 			"7376241EC126", "7376241EC127", "7376241EC134", "7376241EC137", "7376241EC139", "7376241EC140",
 			"7376241EC142", "7376241EC143",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI028 (15 candidates)
 		{HallNo: "ME 301", CourseCode: "22AI028", RegisterNos: []string{
 			"7376242AD344", "7376242AD345", "7376242AD346", "7376252AD504", "7376252AD505", "7376252AD506",
 			"7376252AD507", "7376252AD508", "7376252AD511", "7376252AD512", "7376252AD513", "7376252AD514",
 			"7376252AD515", "7376252AD516", "7376252AD502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 302 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5908,14 +5908,14 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS143", "7376241CS145", "7376241CS146", "7376241CS148", "7376241CS150", "7376241CS154",
 			"7376241CS163", "7376241CS169", "7376241CS173", "7376241CS184", "7376241CS186", "7376241CS190",
 			"7376241CS191",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC002 (20 candidates)
 		{HallNo: "ME 302", CourseCode: "22EC002", RegisterNos: []string{
 			"7376241EC148", "7376241EC149", "7376241EC150", "7376241EC152", "7376241EC153", "7376241EC154",
 			"7376241EC156", "7376241EC157", "7376241EC158", "7376241EC160", "7376241EC161", "7376241EC162",
 			"7376241EC144", "7376241EC145", "7376241EC164", "7376241EC165", "7376241EC167", "7376241EC168",
 			"7376241EC170", "7376241EC172",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 303 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5926,14 +5926,14 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS195", "7376241CS202", "7376241CS204", "7376241CS205", "7376241CS211", "7376241CS213",
 			"7376241CS216", "7376241CS219", "7376241CS220", "7376241CS238", "7376241CS240", "7376241CS247",
 			"7376241CS258",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC002 (20 candidates)
 		{HallNo: "ME 303", CourseCode: "22EC002", RegisterNos: []string{
 			"7376241EC177", "7376241EC178", "7376241EC179", "7376241EC180", "7376241EC181", "7376241EC182",
 			"7376241EC183", "7376241EC184", "7376241EC185", "7376241EC186", "7376241EC190", "7376241EC191",
 			"7376241EC192", "7376241EC193", "7376241EC194", "7376241EC195", "7376241EC196", "7376241EC173",
 			"7376241EC174", "7376241EC188",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 304 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5944,14 +5944,14 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS281", "7376241CS286", "7376241CS290", "7376241CS291", "7376241CS296", "7376241CS297",
 			"7376241CS300", "7376241CS301", "7376241CS305", "7376241CS309", "7376241CS317", "7376241CS319",
 			"7376241CS328",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC002 (20 candidates)
 		{HallNo: "ME 304", CourseCode: "22EC002", RegisterNos: []string{
 			"7376241EC197", "7376241EC198", "7376241EC199", "7376241EC200", "7376241EC201", "7376241EC203",
 			"7376241EC204", "7376241EC205", "7376241EC206", "7376241EC207", "7376241EC222", "7376241EC223",
 			"7376241EC224", "7376241EC225", "7376241EC226", "7376241EC210", "7376241EC211", "7376241EC213",
 			"7376241EC214", "7376241EC220",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 305 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5962,14 +5962,14 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS348", "7376241CS353", "7376241CS362", "7376241CS363", "7376241CS369", "7376241CS375",
 			"7376241CS378", "7376241CS387", "7376241CS389", "7376241CS396", "7376241CS397", "7376241CS401",
 			"7376241CS403",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC002 (20 candidates)
 		{HallNo: "ME 305", CourseCode: "22EC002", RegisterNos: []string{
 			"7376241EC232", "7376241EC233", "7376241EC234", "7376241EC235", "7376241EC236", "7376241EC237",
 			"7376241EC238", "7376241EC244", "7376241EC245", "7376241EC246", "7376241EC247", "7376241EC249",
 			"7376241EC250", "7376241EC251", "7376241EC252", "7376241EC253", "7376241EC227", "7376241EC229",
 			"7376241EC240", "7376241EC242",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 306 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5980,14 +5980,14 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS452", "7376241CS453", "7376241CS425", "7376241CS427", "7376241CS429", "7376241CS430",
 			"7376241CS438", "7376241CS439", "7376241CS441", "7376241CS442", "7376241CS445", "7376241CS456",
 			"7376241CS457",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC002 (20 candidates)
 		{HallNo: "ME 306", CourseCode: "22EC002", RegisterNos: []string{
 			"7376241EC255", "7376241EC256", "7376241EC258", "7376241EC259", "7376241EC262", "7376241EC264",
 			"7376241EC265", "7376241EC269", "7376241EC270", "7376241EC272", "7376241EC274", "7376241EC275",
 			"7376241EC277", "7376241EC279", "7376241EC281", "7376241EC283", "7376241EC284", "7376241EC288",
 			"7376241EC290", "7376241EC295",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF 001 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -5997,18 +5997,18 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS469", "7376241CS471", "7376241CS472", "7376241CS473", "7376241CS474", "7376251CS506",
 			"7376251CS507", "7376251CS508", "7376241CS458", "7376251CS504", "7376251CS511", "7376251CS513",
 			"7376251CS516",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC002 (20 candidates)
 		{HallNo: "SF 001", CourseCode: "22EC002", RegisterNos: []string{
 			"7376241EC304", "7376241EC305", "7376241EC306", "7376241EC308", "7376241EC309", "7376241EC310",
 			"7376241EC311", "7376241EC312", "7376241EC313", "7376241EC315", "7376241EC316", "7376241EC317",
 			"7376241EC296", "7376241EC298", "7376241EC299", "7376241EC301", "7376241EC319", "7376241EC320",
 			"7376241EC326", "7376241EC327",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE019 (1 candidates)
 		{HallNo: "SF 001", CourseCode: "22EE019", RegisterNos: []string{
 			"7376241EE101",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF 002 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6018,14 +6018,14 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376251EC508", "7376251EC509", "7376251EC510", "7376251EC511", "7376251EC512", "7376241EC331",
 			"7376241EC332", "7376241EC334", "7376241EC343", "7376241EC344", "7376241EC347", "7376241EC348",
 			"7376241EC351", "7376241EC352",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE019 (20 candidates)
 		{HallNo: "SF 002", CourseCode: "22EE019", RegisterNos: []string{
 			"7376241EE102", "7376241EE103", "7376241EE104", "7376241EE105", "7376241EE106", "7376241EE107",
 			"7376241EE108", "7376241EE109", "7376241EE110", "7376241EE111", "7376241EE113", "7376241EE114",
 			"7376241EE115", "7376241EE116", "7376241EE117", "7376241EE118", "7376241EE119", "7376241EE120",
 			"7376241EE121", "7376241EE122",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF 101 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6034,18 +6034,18 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS114", "7376241CS115", "7376241CS116", "7376241CS159", "7376241CS160", "7376241CS161",
 			"7376241CS162", "7376241CS110", "7376241CS121", "7376241CS124", "7376241CS133", "7376241CS136",
 			"7376241CS141", "7376241CS149", "7376241CS152",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC002 (5 candidates)
 		{HallNo: "SF 101", CourseCode: "22EC002", RegisterNos: []string{
 			"7376251EC513", "7376251EC514", "7376251EC516", "7376251EC519", "7376251EC520",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE019 (20 candidates)
 		{HallNo: "SF 101", CourseCode: "22EE019", RegisterNos: []string{
 			"7376241EE123", "7376241EE124", "7376241EE125", "7376241EE126", "7376241EE127", "7376241EE128",
 			"7376241EE129", "7376241EE130", "7376241EE131", "7376241EE132", "7376241EE133", "7376241EE134",
 			"7376241EE135", "7376241EE136", "7376241EE137", "7376241EE138", "7376241EE139", "7376241EE140",
 			"7376241EE141", "7376241EE142",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF B01 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6055,14 +6055,14 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS199", "7376241CS200", "7376241CS170", "7376241CS171", "7376241CS175", "7376241CS182",
 			"7376241CS185", "7376241CS187", "7376241CS188", "7376241CS206", "7376241CS207", "7376241CS209",
 			"7376241CS210", "7376241CS217",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE019 (20 candidates)
 		{HallNo: "SF B01", CourseCode: "22EE019", RegisterNos: []string{
 			"7376241EE143", "7376241EE144", "7376241EE145", "7376241EE146", "7376241EE147", "7376241EE148",
 			"7376241EE149", "7376241EE150", "7376241EE151", "7376241EE152", "7376241EE153", "7376241EE154",
 			"7376241EE155", "7376241EE156", "7376241EE157", "7376241EE158", "7376241EE159", "7376241EE160",
 			"7376241EE161", "7376241EE162",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF B02 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6072,14 +6072,14 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS248", "7376241CS249", "7376241CS250", "7376241CS251", "7376241CS252", "7376241CS253",
 			"7376241CS254", "7376241CS255", "7376241CS221", "7376241CS227", "7376241CS230", "7376241CS237",
 			"7376241CS239", "7376241CS265",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE019 (20 candidates)
 		{HallNo: "SF B02", CourseCode: "22EE019", RegisterNos: []string{
 			"7376241EE163", "7376241EE164", "7376241EE165", "7376241EE166", "7376241EE167", "7376241EE168",
 			"7376241EE169", "7376241EE170", "7376241EE171", "7376241EE173", "7376241EE174", "7376241EE175",
 			"7376241EE176", "7376241EE177", "7376241EE178", "7376241EE179", "7376241EE180", "7376241EE181",
 			"7376241EE182", "7376241EE183",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF B03 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6089,14 +6089,14 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS285", "7376241CS287", "7376241CS288", "7376241CS294", "7376241CS295", "7376241CS298",
 			"7376241CS303", "7376241CS306", "7376241CS318", "7376241CS320", "7376241CS321", "7376241CS324",
 			"7376241CS330", "7376241CS334",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE019 (20 candidates)
 		{HallNo: "SF B03", CourseCode: "22EE019", RegisterNos: []string{
 			"7376241EE184", "7376241EE185", "7376241EE186", "7376241EE187", "7376241EE188", "7376241EE189",
 			"7376241EE190", "7376241EE191", "7376241EE192", "7376241EE193", "7376241EE194", "7376241EE195",
 			"7376241EE196", "7376241EE197", "7376241EE198", "7376241EE199", "7376241EE200", "7376241EE201",
 			"7376241EE202", "7376241EE203",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 008 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6104,13 +6104,13 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 008", CourseCode: "22CS025", RegisterNos: []string{
 			"7376241CS335", "7376241CS344", "7376241CS346", "7376241CS347", "7376241CS349", "7376241CS356",
 			"7376241CS360", "7376241CS361", "7376241CS366", "7376241CS367",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE019 (15 candidates)
 		{HallNo: "WW 008", CourseCode: "22EE019", RegisterNos: []string{
 			"7376241EE204", "7376241EE205", "7376241EE206", "7376241EE207", "7376241EE208", "7376241EE209",
 			"7376241EE210", "7376241EE211", "7376241EE212", "7376241EE213", "7376241EE214", "7376241EE215",
 			"7376241EE216", "7376241EE217", "7376251EE501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 011 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6118,13 +6118,13 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 011", CourseCode: "22CS025", RegisterNos: []string{
 			"7376241CS379", "7376241CS380", "7376241CS381", "7376241CS384", "7376241CS385", "7376241CS386",
 			"7376241CS368", "7376241CS372", "7376241CS374", "7376241CS376",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE019 (15 candidates)
 		{HallNo: "WW 011", CourseCode: "22EE019", RegisterNos: []string{
 			"7376251EE502", "7376251EE503", "7376251EE504", "7376251EE505", "7376251EE506", "7376251EE507",
 			"7376251EE508", "7376251EE509", "7376251EE510", "7376251EE511", "7376251EE512", "7376251EE513",
 			"7376251EE514", "7376251EE515", "7376251EE516",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 012 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6133,16 +6133,16 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS102", "7376241CS103", "7376241CS104", "7376241CS105", "7376241CS106", "7376241CS109",
 			"7376241CS112", "7376241CS118", "7376241CS119", "7376241CS131", "7376241CS137", "7376241CS138",
 			"7376241CS140", "7376241CS144",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS025 (10 candidates)
 		{HallNo: "WW 012", CourseCode: "22CS025", RegisterNos: []string{
 			"7376241CS390", "7376241CS391", "7376241CS392", "7376241CS393", "7376241CS388", "7376241CS395",
 			"7376241CS399", "7376241CS402", "7376241CS404", "7376241CS405",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE019 (1 candidates)
 		{HallNo: "WW 012", CourseCode: "22EE019", RegisterNos: []string{
 			"7376251EE517",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 113 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6151,12 +6151,12 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS155", "7376241CS156", "7376241CS157", "7376241CS147", "7376241CS151", "7376241CS153",
 			"7376241CS164", "7376241CS165", "7376241CS172", "7376241CS174", "7376241CS176", "7376241CS177",
 			"7376241CS181", "7376241CS183", "7376241CS192",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS025 (10 candidates)
 		{HallNo: "WW 113", CourseCode: "22CS025", RegisterNos: []string{
 			"7376241CS408", "7376241CS409", "7376241CS410", "7376241CS411", "7376241CS413", "7376241CS414",
 			"7376241CS422", "7376241CS424", "7376241CS444", "7376241CS454",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 114 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6165,12 +6165,12 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS268", "7376241CS269", "7376241CS270", "7376241CS271", "7376241CS193", "7376241CS201",
 			"7376241CS203", "7376241CS208", "7376241CS212", "7376241CS214", "7376241CS215", "7376241CS218",
 			"7376241CS228", "7376241CS256", "7376241CS257",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS025 (10 candidates)
 		{HallNo: "WW 114", CourseCode: "22CS025", RegisterNos: []string{
 			"7376241CS455", "7376241CS459", "7376241CS460", "7376241CS462", "7376241CS470", "7376241CS476",
 			"7376251CS501", "7376251CS503", "7376251CS505", "7376251CS509",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 115 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6179,15 +6179,15 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS278", "7376241CS279", "7376241CS280", "7376241CS282", "7376241CS283", "7376241CS284",
 			"7376241CS275", "7376241CS276", "7376241CS289", "7376241CS292", "7376241CS293", "7376241CS299",
 			"7376241CS302", "7376241CS304", "7376241CS307",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS025 (6 candidates)
 		{HallNo: "WW 115", CourseCode: "22CS025", RegisterNos: []string{
 			"7376251CS517", "7376251CS518", "7376251CS519", "7376251CS510", "7376251CS521", "7376251CS524",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM026 (4 candidates)
 		{HallNo: "WW 115", CourseCode: "22AM026", RegisterNos: []string{
 			"7376242AL101", "7376242AL102", "7376242AL103", "7376242AL104",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 117 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6196,12 +6196,12 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS325", "7376241CS326", "7376241CS327", "7376241CS350", "7376241CS351", "7376241CS352",
 			"7376241CS308", "7376241CS310", "7376241CS322", "7376241CS323", "7376241CS332", "7376241CS339",
 			"7376241CS340", "7376241CS342", "7376241CS345",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM026 (10 candidates)
 		{HallNo: "WW 117", CourseCode: "22AM026", RegisterNos: []string{
 			"7376242AL107", "7376242AL108", "7376242AL109", "7376242AL110", "7376242AL105", "7376242AL112",
 			"7376242AL113", "7376242AL115", "7376242AL117", "7376242AL118",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 118 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6210,12 +6210,12 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS357", "7376241CS358", "7376241CS359", "7376241CS355", "7376241CS364", "7376241CS365",
 			"7376241CS370", "7376241CS371", "7376241CS373", "7376241CS377", "7376241CS382", "7376241CS383",
 			"7376241CS394", "7376241CS398", "7376241CS400",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM026 (10 candidates)
 		{HallNo: "WW 118", CourseCode: "22AM026", RegisterNos: []string{
 			"7376242AL119", "7376242AL120", "7376242AL121", "7376242AL122", "7376242AL123", "7376242AL124",
 			"7376242AL125", "7376242AL126", "7376242AL127", "7376242AL129",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6225,11 +6225,11 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS431", "7376241CS437", "7376241CS440", "7376241CS446", "7376241CS447", "7376241CS461",
 			"7376241CS475", "7376251CS502", "7376251CS512", "7376251CS515", "7376251CS520", "7376251CS522",
 			"7376251CS523",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT002 (6 candidates)
 		{HallNo: "WW 202", CourseCode: "22BT002", RegisterNos: []string{
 			"7376242BT102", "7376242BT103", "7376242BT104", "7376242BT105", "7376242BT106", "7376242BT108",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM026 (25 candidates)
 		{HallNo: "WW 202", CourseCode: "22AM026", RegisterNos: []string{
 			"7376242AL132", "7376242AL133", "7376242AL134", "7376242AL136", "7376242AL137", "7376242AL138",
@@ -6237,7 +6237,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AL147", "7376242AL148", "7376242AL149", "7376242AL150", "7376242AL151", "7376242AL152",
 			"7376242AL153", "7376242AL159", "7376242AL160", "7376242AL161", "7376242AL162", "7376242AL155",
 			"7376242AL156",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6246,12 +6246,12 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242BT109", "7376242BT110", "7376242BT111", "7376242BT112", "7376242BT113", "7376242BT114",
 			"7376242BT115", "7376242BT116", "7376242BT117", "7376242BT121", "7376242BT122", "7376242BT123",
 			"7376242BT124", "7376242BT126", "7376242BT127",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM026 (10 candidates)
 		{HallNo: "WW 203", CourseCode: "22AM026", RegisterNos: []string{
 			"7376242AL163", "7376242AL164", "7376242AL165", "7376242AL166", "7376242AL167", "7376242AL168",
 			"7376242AL169", "7376242AL170", "7376242AL171", "7376242AL172",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6260,12 +6260,12 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242BT132", "7376242BT133", "7376242BT134", "7376242BT135", "7376242BT136", "7376242BT137",
 			"7376242BT139", "7376242BT140", "7376242BT141", "7376242BT142", "7376242BT143", "7376242BT144",
 			"7376242BT145", "7376242BT128", "7376242BT130",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM026 (10 candidates)
 		{HallNo: "WW 204", CourseCode: "22AM026", RegisterNos: []string{
 			"7376242AL173", "7376242AL174", "7376242AL175", "7376242AL176", "7376242AL177", "7376242AL178",
 			"7376242AL179", "7376242AL180", "7376242AL181", "7376242AL182",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6274,12 +6274,12 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242BT146", "7376242BT147", "7376242BT148", "7376242BT149", "7376242BT152", "7376242BT153",
 			"7376242BT154", "7376242BT155", "7376242BT156", "7376242BT157", "7376242BT158", "7376242BT159",
 			"7376242BT160", "7376242BT162", "7376242BT163",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM026 (10 candidates)
 		{HallNo: "WW 205", CourseCode: "22AM026", RegisterNos: []string{
 			"7376242AL183", "7376242AL184", "7376242AL185", "7376242AL186", "7376242AL187", "7376242AL189",
 			"7376242AL190", "7376242AL191", "7376242AL192", "7376242AL193",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6288,12 +6288,12 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242BT164", "7376242BT165", "7376242BT166", "7376242BT167", "7376242BT168", "7376242BT169",
 			"7376242BT170", "7376242BT171", "7376242BT172", "7376242BT173", "7376242BT174", "7376242BT175",
 			"7376242BT176", "7376242BT177", "7376242BT178",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM026 (10 candidates)
 		{HallNo: "WW 206", CourseCode: "22AM026", RegisterNos: []string{
 			"7376242AL196", "7376242AL197", "7376242AL198", "7376242AL199", "7376242AL200", "7376242AL202",
 			"7376242AL203", "7376242AL205", "7376242AL206", "7376242AL208",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 207 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6301,7 +6301,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 207", CourseCode: "22EC037", RegisterNos: []string{
 			"7376241EC117", "7376241EC118", "7376241EC119", "7376241EC120", "7376241EC109", "7376241EC112",
 			"7376241EC115", "7376241EC125",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT002 (25 candidates)
 		{HallNo: "WW 207", CourseCode: "22BT002", RegisterNos: []string{
 			"7376242BT181", "7376242BT182", "7376242BT183", "7376242BT185", "7376242BT186", "7376242BT187",
@@ -6309,13 +6309,13 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242BT198", "7376242BT199", "7376242BT200", "7376242BT202", "7376242BT203", "7376242BT204",
 			"7376242BT205", "7376242BT179", "7376242BT192", "7376242BT193", "7376242BT207", "7376242BT209",
 			"7376242BT210",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM026 (17 candidates)
 		{HallNo: "WW 207", CourseCode: "22AM026", RegisterNos: []string{
 			"7376242AL209", "7376242AL210", "7376242AL211", "7376242AL212", "7376242AL213", "7376242AL214",
 			"7376242AL215", "7376242AL216", "7376242AL217", "7376242AL218", "7376242AL219", "7376242AL220",
 			"7376252AL501", "7376252AL502", "7376252AL503", "7376242AL222", "7376242AL223",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 208 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6323,17 +6323,17 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 208", CourseCode: "22EC037", RegisterNos: []string{
 			"7376241EC128", "7376241EC129", "7376241EC133", "7376241EC135", "7376241EC136", "7376241EC138",
 			"7376241EC141", "7376241EC146", "7376241EC147", "7376241EC151",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT002 (8 candidates)
 		{HallNo: "WW 208", CourseCode: "22BT002", RegisterNos: []string{
 			"7376242BT215", "7376242BT216", "7376242BT217", "7376242BT218", "7376242BT211", "7376242BT213",
 			"7376242BT221", "7376252BT501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT010* (7 candidates)
 		{HallNo: "WW 208", CourseCode: "22IT010*", RegisterNos: []string{
 			"7376242IT106", "7376242IT107", "7376242IT108", "7376242IT114", "7376242IT115", "7376242IT122",
 			"7376242IT123",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 209 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6341,13 +6341,13 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 209", CourseCode: "22EC037", RegisterNos: []string{
 			"7376241EC155", "7376241EC159", "7376241EC163", "7376241EC166", "7376241EC169", "7376241EC171",
 			"7376241EC176", "7376241EC187", "7376241EC189", "7376241EC202",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT010* (15 candidates)
 		{HallNo: "WW 209", CourseCode: "22IT010*", RegisterNos: []string{
 			"7376242IT156", "7376242IT157", "7376242IT158", "7376242IT159", "7376242IT124", "7376242IT126",
 			"7376242IT136", "7376242IT141", "7376242IT143", "7376242IT145", "7376242IT146", "7376242IT153",
 			"7376242IT163", "7376242IT165", "7376242IT174",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 210 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6355,13 +6355,13 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 210", CourseCode: "22EC037", RegisterNos: []string{
 			"7376241EC215", "7376241EC216", "7376241EC217", "7376241EC218", "7376241EC219", "7376241EC209",
 			"7376241EC212", "7376241EC221", "7376241EC228", "7376241EC230",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT010* (15 candidates)
 		{HallNo: "WW 210", CourseCode: "22IT010*", RegisterNos: []string{
 			"7376242IT175", "7376242IT176", "7376242IT177", "7376242IT179", "7376242IT180", "7376242IT181",
 			"7376242IT182", "7376242IT183", "7376242IT184", "7376242IT185", "7376242IT186", "7376242IT188",
 			"7376242IT190", "7376242IT191", "7376242IT193",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 211 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6369,13 +6369,13 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 211", CourseCode: "22EC037", RegisterNos: []string{
 			"7376241EC239", "7376241EC241", "7376241EC243", "7376241EC248", "7376241EC254", "7376241EC257",
 			"7376241EC260", "7376241EC261", "7376241EC263", "7376241EC266",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT010* (15 candidates)
 		{HallNo: "WW 211", CourseCode: "22IT010*", RegisterNos: []string{
 			"7376242IT236", "7376242IT237", "7376242IT238", "7376242IT195", "7376242IT199", "7376242IT202",
 			"7376242IT205", "7376242IT206", "7376242IT212", "7376242IT214", "7376242IT218", "7376242IT223",
 			"7376242IT231", "7376242IT232", "7376242IT246",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 212 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6386,7 +6386,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EC278", "7376241EC280", "7376241EC282", "7376241EC289", "7376241EC297", "7376241EC300",
 			"7376241EC302", "7376241EC303", "7376241EC307", "7376241EC314", "7376241EC318", "7376241EC321",
 			"7376241EC322",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT010* (25 candidates)
 		{HallNo: "WW 212", CourseCode: "22IT010*", RegisterNos: []string{
 			"7376242IT247", "7376242IT248", "7376242IT249", "7376242IT290", "7376242IT291", "7376242IT292",
@@ -6394,7 +6394,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT259", "7376242IT262", "7376242IT269", "7376242IT270", "7376242IT273", "7376242IT274",
 			"7376242IT277", "7376242IT279", "7376242IT285", "7376242IT286", "7376242IT295", "7376242IT305",
 			"7376242IT306",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 213 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6402,16 +6402,16 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 213", CourseCode: "22EC037", RegisterNos: []string{
 			"7376241EC323", "7376241EC324", "7376241EC325", "7376241EC328", "7376241EC329", "7376241EC330",
 			"7376241EC335", "7376241EC336", "7376241EC337", "7376241EC333",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC015 (4 candidates)
 		{HallNo: "WW 213", CourseCode: "22MC015", RegisterNos: []string{
 			"7376241MZ101", "7376241MZ102", "7376241MZ103", "7376241MZ104",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT010* (11 candidates)
 		{HallNo: "WW 213", CourseCode: "22IT010*", RegisterNos: []string{
 			"7376242IT307", "7376242IT308", "7376242IT309", "7376242IT312", "7376242IT335", "7376242IT336",
 			"7376242IT345", "7376242IT347", "7376242IT351", "7376252IT506", "7376252IT510",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 214 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6419,30 +6419,30 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 214", CourseCode: "22EC037", RegisterNos: []string{
 			"7376241EC338", "7376241EC339", "7376241EC340", "7376241EC341", "7376241EC342", "7376241EC345",
 			"7376241EC346", "7376241EC349", "7376241EC350", "7376251EC506",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC015 (15 candidates)
 		{HallNo: "WW 214", CourseCode: "22MC015", RegisterNos: []string{
 			"7376241MZ105", "7376241MZ106", "7376241MZ107", "7376241MZ108", "7376241MZ109", "7376241MZ110",
 			"7376241MZ111", "7376241MZ112", "7376241MZ113", "7376241MZ114", "7376241MZ115", "7376241MZ116",
 			"7376241MZ117", "7376241MZ118", "7376241MZ119",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 215 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EC037 (4 candidates)
 		{HallNo: "WW 215", CourseCode: "22EC037", RegisterNos: []string{
 			"7376251EC515", "7376251EC517", "7376251EC518", "7376251EC521",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EI015 (6 candidates)
 		{HallNo: "WW 215", CourseCode: "22EI015", RegisterNos: []string{
 			"7376241EI101", "7376241EI102", "7376241EI103", "7376241EI104", "7376241EI105", "7376241EI106",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC015 (15 candidates)
 		{HallNo: "WW 215", CourseCode: "22MC015", RegisterNos: []string{
 			"7376241MZ120", "7376241MZ121", "7376241MZ122", "7376241MZ123", "7376241MZ124", "7376241MZ125",
 			"7376241MZ126", "7376241MZ127", "7376241MZ128", "7376241MZ129", "7376241MZ130", "7376241MZ131",
 			"7376241MZ132", "7376241MZ133", "7376241MZ134",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 218 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6450,13 +6450,13 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 218", CourseCode: "22EI015", RegisterNos: []string{
 			"7376241EI107", "7376241EI108", "7376241EI109", "7376241EI110", "7376241EI111", "7376241EI112",
 			"7376241EI113", "7376241EI114", "7376241EI115", "7376241EI116",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC015 (15 candidates)
 		{HallNo: "WW 218", CourseCode: "22MC015", RegisterNos: []string{
 			"7376241MZ135", "7376241MZ136", "7376241MZ137", "7376241MZ138", "7376241MZ139", "7376241MZ140",
 			"7376241MZ141", "7376241MZ142", "7376241MZ143", "7376241MZ144", "7376241MZ145", "7376241MZ146",
 			"7376241MZ147", "7376241MZ148", "7376241MZ149",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 219 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6464,13 +6464,13 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 219", CourseCode: "22EI015", RegisterNos: []string{
 			"7376241EI117", "7376241EI118", "7376241EI119", "7376241EI120", "7376241EI121", "7376241EI122",
 			"7376241EI123", "7376241EI124", "7376241EI125", "7376241EI127",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC015 (15 candidates)
 		{HallNo: "WW 219", CourseCode: "22MC015", RegisterNos: []string{
 			"7376241MZ150", "7376241MZ151", "7376241MZ152", "7376241MZ153", "7376241MZ154", "7376241MZ155",
 			"7376241MZ156", "7376241MZ157", "7376241MZ158", "7376241MZ159", "7376241MZ160", "7376251MZ501",
 			"7376251MZ502", "7376251MZ503", "7376251MZ504",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 222 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6481,18 +6481,18 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EI140", "7376241EI141", "7376241EI142", "7376241EI143", "7376241EI144", "7376241EI145",
 			"7376241EI146", "7376241EI147", "7376241EI148", "7376241EI149", "7376241EI150", "7376241EI151",
 			"7376241EI152",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC015 (2 candidates)
 		{HallNo: "WW 222", CourseCode: "22MC015", RegisterNos: []string{
 			"7376251MZ505", "7376251MZ506",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB012 (23 candidates)
 		{HallNo: "WW 222", CourseCode: "22CB012", RegisterNos: []string{
 			"7376242CB102", "7376242CB103", "7376242CB104", "7376242CB105", "7376242CB107", "7376242CB108",
 			"7376242CB109", "7376242CB110", "7376242CB111", "7376242CB112", "7376242CB113", "7376242CB114",
 			"7376242CB115", "7376242CB116", "7376242CB117", "7376242CB118", "7376242CB119", "7376242CB120",
 			"7376242CB121", "7376242CB122", "7376242CB123", "7376242CB124", "7376242CB125",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6500,13 +6500,13 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 223", CourseCode: "22EI015", RegisterNos: []string{
 			"7376241EI153", "7376241EI154", "7376241EI155", "7376241EI156", "7376241EI157", "7376241EI158",
 			"7376241EI159", "7376241EI160", "7376251EI501", "7376251EI502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22ME012 (15 candidates)
 		{HallNo: "WW 223", CourseCode: "22ME012", RegisterNos: []string{
 			"7376241ME110", "7376241ME111", "7376241ME112", "7376241ME114", "7376241ME115", "7376241ME116",
 			"7376241ME117", "7376241ME123", "7376241ME124", "7376241ME125", "7376241ME102", "7376241ME104",
 			"7376241ME107", "7376241ME120", "7376241ME121",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB012 (25 candidates)
 		{HallNo: "WW 223", CourseCode: "22CB012", RegisterNos: []string{
 			"7376242CB126", "7376242CB127", "7376242CB128", "7376242CB129", "7376242CB130", "7376242CB131",
@@ -6514,7 +6514,7 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242CB138", "7376242CB139", "7376242CB140", "7376242CB141", "7376242CB142", "7376242CB143",
 			"7376242CB144", "7376242CB145", "7376242CB146", "7376242CB147", "7376242CB148", "7376242CB149",
 			"7376242CB150",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6525,18 +6525,18 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241ME146", "7376241ME147", "7376241ME148", "7376241ME149", "7376241ME150", "7376241ME151",
 			"7376241ME152", "7376241ME132", "7376241ME141", "7376241ME142", "7376241ME154", "7376241ME156",
 			"7376241ME157",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB012 (12 candidates)
 		{HallNo: "WW 224", CourseCode: "22CB012", RegisterNos: []string{
 			"7376242CB151", "7376242CB152", "7376242CB153", "7376242CB154", "7376242CB155", "7376242CB156",
 			"7376242CB157", "7376242CB158", "7376242CB159", "7376252CB501", "7376252CB502", "7376252CB503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG026 (13 candidates)
 		{HallNo: "WW 224", CourseCode: "22AG026", RegisterNos: []string{
 			"7376242AG101", "7376242AG102", "7376242AG103", "7376242AG104", "7376242AG105", "7376242AG106",
 			"7376242AG107", "7376242AG108", "7376242AG109", "7376242AG110", "7376242AG111", "7376242AG112",
 			"7376242AG113",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 225 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6544,24 +6544,24 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 225", CourseCode: "22ME012", RegisterNos: []string{
 			"7376251ME501", "7376251ME502", "7376251ME503", "7376251ME504", "7376251ME505", "7376251ME506",
 			"7376251ME507", "7376251ME508", "7376241ME159",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI019 (16 candidates)
 		{HallNo: "WW 225", CourseCode: "22AI019", RegisterNos: []string{
 			"7376242AD123", "7376242AD127", "7376242AD137", "7376242AD170", "7376242AD175", "7376242AD177",
 			"7376242AD202", "7376242AD209", "7376242AD226", "7376242AD242", "7376242AD263", "7376242AD270",
 			"7376242AD311", "7376242AD313", "7376242AD322", "7376252AD501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM019 (12 candidates)
 		{HallNo: "WW 225", CourseCode: "22AM019", RegisterNos: []string{
 			"7376242AL106", "7376242AL111", "7376242AL114", "7376242AL116", "7376242AL128", "7376242AL130",
 			"7376242AL131", "7376242AL135", "7376242AL139", "7376242AL145", "7376242AL154", "7376242AL157",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG026 (13 candidates)
 		{HallNo: "WW 225", CourseCode: "22AG026", RegisterNos: []string{
 			"7376242AG114", "7376242AG115", "7376242AG116", "7376242AG117", "7376242AG118", "7376242AG119",
 			"7376242AG120", "7376242AG121", "7376242AG122", "7376242AG123", "7376242AG124", "7376252AG501",
 			"7376252AG502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 226 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6570,65 +6570,65 @@ func buildSeatingData25Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241ME103", "7376241ME105", "7376241ME106", "7376241ME108", "7376241ME109", "7376241ME113",
 			"7376241ME118", "7376241ME119", "7376241ME122", "7376241ME131", "7376241ME139", "7376241ME140",
 			"7376241ME143", "7376241ME153", "7376241ME155", "7376241ME158",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI019 (3 candidates)
 		{HallNo: "WW 226", CourseCode: "22AI019", RegisterNos: []string{
 			"7376252AD503", "7376252AD509", "7376252AD510",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM019 (7 candidates)
 		{HallNo: "WW 226", CourseCode: "22AM019", RegisterNos: []string{
 			"7376242AL158", "7376242AL188", "7376242AL194", "7376242AL195", "7376242AL201", "7376242AL204",
 			"7376242AL221",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 227 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EC002 (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22EC002", RegisterNos: []string{
 			"7376231EC110", "7376241EC516", "7376241EC521",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC037 (8 candidates)
 		{HallNo: "WW 227", CourseCode: "22EC037", RegisterNos: []string{
 			"7376231EC101", "7376231EC196", "7376231EC222", "7376231EC283", "7376231EC297", "7376231EC331",
 			"7376231EC334", "7376241EC513",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE019 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22EE019", RegisterNos: []string{
 			"7376231EE115",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22ME012 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22ME012", RegisterNos: []string{
 			"7376231ME130",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC015 (4 candidates)
 		{HallNo: "WW 227", CourseCode: "22MC015", RegisterNos: []string{
 			"7376231MZ106", "7376231MZ111", "7376231MZ145", "7376241MZ501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT002 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22BT002", RegisterNos: []string{
 			"7376232BT142",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT031 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22IT031", RegisterNos: []string{
 			"7376242IT502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI019 (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22AI019", RegisterNos: []string{
 			"7376232AD184", "7376232AD282", "7376242AD510",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM026 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22AM026", RegisterNos: []string{
 			"7376242AL501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG026 (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22AG026", RegisterNos: []string{
 			"7376232AG129", "7376232AG151",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 	}
 }
 
 // ============================================================================
-// 26-11-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 1985 Students
+// 26-11-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 1985 Students
 // ============================================================================
 func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -6642,14 +6642,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS113", "7376251CS114", "7376251CS115", "7376251CS116", "7376251CS117", "7376251CS118",
 			"7376251CS119", "7376251CS120", "7376251CS121", "7376251CS122", "7376251CS123", "7376251CS124",
 			"7376251CS125",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (20 candidates)
 		{HallNo: "ME 102", CourseCode: "22AI304", RegisterNos: []string{
 			"7376252AD101", "7376252AD102", "7376252AD103", "7376252AD104", "7376252AD105", "7376252AD106",
 			"7376252AD107", "7376252AD108", "7376252AD109", "7376252AD110", "7376252AD111", "7376252AD112",
 			"7376252AD113", "7376252AD114", "7376252AD115", "7376252AD116", "7376252AD117", "7376252AD118",
 			"7376252AD119", "7376252AD120",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 107 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6660,14 +6660,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS139", "7376251CS140", "7376251CS141", "7376251CS142", "7376251CS143", "7376251CS144",
 			"7376251CS145", "7376251CS146", "7376251CS147", "7376251CS148", "7376251CS149", "7376251CS150",
 			"7376251CS151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (20 candidates)
 		{HallNo: "ME 107", CourseCode: "22AI304", RegisterNos: []string{
 			"7376252AD121", "7376252AD122", "7376252AD123", "7376252AD124", "7376252AD125", "7376252AD126",
 			"7376252AD127", "7376252AD128", "7376252AD129", "7376252AD130", "7376252AD131", "7376252AD132",
 			"7376252AD133", "7376252AD134", "7376252AD135", "7376252AD136", "7376252AD137", "7376252AD138",
 			"7376252AD139", "7376252AD140",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 108 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6678,14 +6678,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS164", "7376251CS165", "7376251CS166", "7376251CS167", "7376251CS168", "7376251CS170",
 			"7376251CS171", "7376251CS172", "7376251CS173", "7376251CS174", "7376251CS175", "7376251CS176",
 			"7376251CS177",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (20 candidates)
 		{HallNo: "ME 108", CourseCode: "22AI304", RegisterNos: []string{
 			"7376252AD141", "7376252AD142", "7376252AD143", "7376252AD144", "7376252AD145", "7376252AD146",
 			"7376252AD147", "7376252AD148", "7376252AD149", "7376252AD150", "7376252AD151", "7376252AD152",
 			"7376252AD153", "7376252AD154", "7376252AD155", "7376252AD156", "7376252AD157", "7376252AD158",
 			"7376252AD159", "7376252AD160",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6696,14 +6696,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS190", "7376251CS191", "7376251CS192", "7376251CS193", "7376251CS194", "7376251CS195",
 			"7376251CS196", "7376251CS197", "7376251CS198", "7376251CS199", "7376251CS200", "7376251CS201",
 			"7376251CS202",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (20 candidates)
 		{HallNo: "ME 201", CourseCode: "22AI304", RegisterNos: []string{
 			"7376252AD161", "7376252AD162", "7376252AD163", "7376252AD164", "7376252AD165", "7376252AD166",
 			"7376252AD167", "7376252AD168", "7376252AD169", "7376252AD170", "7376252AD171", "7376252AD172",
 			"7376252AD173", "7376252AD174", "7376252AD175", "7376252AD176", "7376252AD177", "7376252AD178",
 			"7376252AD179", "7376252AD180",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6714,14 +6714,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS215", "7376251CS216", "7376251CS217", "7376251CS218", "7376251CS219", "7376251CS220",
 			"7376251CS221", "7376251CS222", "7376251CS223", "7376251CS224", "7376251CS225", "7376251CS226",
 			"7376251CS227",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (20 candidates)
 		{HallNo: "ME 202", CourseCode: "22AI304", RegisterNos: []string{
 			"7376252AD181", "7376252AD182", "7376252AD183", "7376252AD184", "7376252AD185", "7376252AD186",
 			"7376252AD187", "7376252AD188", "7376252AD189", "7376252AD190", "7376252AD191", "7376252AD192",
 			"7376252AD193", "7376252AD194", "7376252AD195", "7376252AD196", "7376252AD197", "7376252AD198",
 			"7376252AD199", "7376252AD200",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6732,14 +6732,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS242", "7376251CS243", "7376251CS244", "7376251CS245", "7376251CS246", "7376251CS247",
 			"7376251CS248", "7376251CS249", "7376251CS250", "7376251CS251", "7376251CS252", "7376251CS253",
 			"7376251CS228",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (20 candidates)
 		{HallNo: "ME 203", CourseCode: "22AI304", RegisterNos: []string{
 			"7376252AD201", "7376252AD202", "7376252AD203", "7376252AD204", "7376252AD205", "7376252AD206",
 			"7376252AD207", "7376252AD208", "7376252AD209", "7376252AD210", "7376252AD211", "7376252AD212",
 			"7376252AD213", "7376252AD214", "7376252AD215", "7376252AD216", "7376252AD217", "7376252AD218",
 			"7376252AD219", "7376252AD220",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6750,14 +6750,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS266", "7376251CS267", "7376251CS268", "7376251CS269", "7376251CS270", "7376251CS271",
 			"7376251CS272", "7376251CS273", "7376251CS274", "7376251CS275", "7376251CS276", "7376251CS277",
 			"7376251CS278",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (20 candidates)
 		{HallNo: "ME 204", CourseCode: "22AI304", RegisterNos: []string{
 			"7376252AD221", "7376252AD222", "7376252AD223", "7376252AD224", "7376252AD225", "7376252AD226",
 			"7376252AD227", "7376252AD228", "7376252AD229", "7376252AD230", "7376252AD231", "7376252AD232",
 			"7376252AD233", "7376252AD234", "7376252AD235", "7376252AD236", "7376252AD237", "7376252AD238",
 			"7376252AD239", "7376252AD240",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6768,14 +6768,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS291", "7376251CS292", "7376251CS293", "7376251CS294", "7376251CS295", "7376251CS296",
 			"7376251CS297", "7376251CS298", "7376251CS299", "7376251CS300", "7376251CS301", "7376251CS302",
 			"7376251CS303",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (20 candidates)
 		{HallNo: "ME 205", CourseCode: "22AI304", RegisterNos: []string{
 			"7376252AD241", "7376252AD242", "7376252AD243", "7376252AD244", "7376252AD245", "7376252AD246",
 			"7376252AD247", "7376252AD248", "7376252AD249", "7376252AD250", "7376252AD251", "7376252AD252",
 			"7376252AD253", "7376252AD254", "7376252AD255", "7376252AD256", "7376252AD257", "7376252AD258",
 			"7376252AD259", "7376252AD260",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6786,14 +6786,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS316", "7376251CS317", "7376251CS318", "7376251CS319", "7376251CS320", "7376251CS321",
 			"7376251CS322", "7376251CS323", "7376251CS324", "7376251CS325", "7376251CS326", "7376251CS327",
 			"7376251CS328",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (20 candidates)
 		{HallNo: "ME 206", CourseCode: "22AI304", RegisterNos: []string{
 			"7376252AD261", "7376252AD262", "7376252AD263", "7376252AD264", "7376252AD265", "7376252AD266",
 			"7376252AD267", "7376252AD268", "7376252AD269", "7376252AD270", "7376252AD271", "7376252AD272",
 			"7376252AD273", "7376252AD274", "7376252AD275", "7376252AD276", "7376252AD277", "7376252AD278",
 			"7376252AD279", "7376252AD280",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 301 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6804,14 +6804,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS341", "7376251CS342", "7376251CS343", "7376251CS344", "7376251CS345", "7376251CS346",
 			"7376251CS347", "7376251CS348", "7376251CS349", "7376251CS350", "7376251CS351", "7376251CS352",
 			"7376251CS353",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (20 candidates)
 		{HallNo: "ME 301", CourseCode: "22AI304", RegisterNos: []string{
 			"7376252AD281", "7376252AD282", "7376252AD283", "7376252AD284", "7376252AD285", "7376252AD286",
 			"7376252AD287", "7376252AD288", "7376252AD289", "7376252AD290", "7376252AD291", "7376252AD292",
 			"7376252AD293", "7376252AD294", "7376252AD295", "7376252AD296", "7376252AD297", "7376252AD298",
 			"7376252AD299", "7376252AD300",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 302 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6822,14 +6822,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS366", "7376251CS367", "7376251CS368", "7376251CS369", "7376251CS370", "7376251CS371",
 			"7376251CS373", "7376251CS374", "7376251CS375", "7376251CS376", "7376251CS377", "7376251CS378",
 			"7376251CS379",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (20 candidates)
 		{HallNo: "ME 302", CourseCode: "22AI304", RegisterNos: []string{
 			"7376252AD301", "7376252AD302", "7376252AD303", "7376252AD304", "7376252AD305", "7376252AD306",
 			"7376252AD307", "7376252AD308", "7376252AD309", "7376252AD310", "7376252AD311", "7376252AD312",
 			"7376252AD313", "7376252AD314", "7376252AD315", "7376252AD316", "7376252AD317", "7376252AD318",
 			"7376252AD319", "7376252AD320",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 303 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6840,14 +6840,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS392", "7376251CS393", "7376251CS394", "7376251CS395", "7376251CS396", "7376251CS397",
 			"7376251CS398", "7376251CS399", "7376251CS400", "7376251CS401", "7376251CS402", "7376251CS403",
 			"7376251CS404",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (20 candidates)
 		{HallNo: "ME 303", CourseCode: "22AI304", RegisterNos: []string{
 			"7376252AD321", "7376252AD322", "7376252AD323", "7376252AD324", "7376252AD325", "7376252AD326",
 			"7376252AD327", "7376252AD328", "7376252AD329", "7376252AD330", "7376252AD331", "7376252AD332",
 			"7376252AD333", "7376252AD334", "7376252AD335", "7376252AD336", "7376252AD337", "7376252AD338",
 			"7376252AD339", "7376252AD340",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 304 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6858,14 +6858,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS417", "7376251CS418", "7376251CS419", "7376251CS420", "7376251CS421", "7376251CS422",
 			"7376251CS423", "7376251CS424", "7376251CS425", "7376251CS426", "7376251CS427", "7376251CS428",
 			"7376251CS429",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (20 candidates)
 		{HallNo: "ME 304", CourseCode: "22AI304", RegisterNos: []string{
 			"7376252AD341", "7376252AD342", "7376252AD343", "7376252AD344", "7376252AD345", "7376252AD346",
 			"7376252AD347", "7376252AD348", "7376252AD349", "7376252AD350", "7376252AD351", "7376252AD352",
 			"7376252AD353", "7376252AD354", "7376252AD355", "7376252AD356", "7376252AD357", "7376252AD358",
 			"7376252AD359", "7376252AD360",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 305 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6876,14 +6876,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS442", "7376251CS443", "7376251CS444", "7376251CS445", "7376251CS446", "7376251CS447",
 			"7376251CS448", "7376251CS449", "7376251CS450", "7376251CS451", "7376251CS452", "7376251CS453",
 			"7376251CS454",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (20 candidates)
 		{HallNo: "ME 305", CourseCode: "22AI304", RegisterNos: []string{
 			"7376252AD361", "7376252AD362", "7376252AD363", "7376252AD364", "7376252AD365", "7376252AD366",
 			"7376252AD367", "7376252AD368", "7376252AD369", "7376252AD370", "7376252AD371", "7376252AD372",
 			"7376252AD373", "7376252AD374", "7376252AD375", "7376252AD376", "7376252AD377", "7376252AD378",
 			"7376252AD379", "7376252AD380",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 306 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6894,14 +6894,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS467", "7376251CS468", "7376251CS469", "7376251CS470", "7376251CS471", "7376251CS472",
 			"7376251CS473", "7376251CS474", "7376251CS475", "7376251CS476", "7376251CS477", "7376251CS478",
 			"7376251CS479",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (20 candidates)
 		{HallNo: "ME 306", CourseCode: "22AI304", RegisterNos: []string{
 			"7376262AD501", "7376262AD502", "7376262AD503", "7376262AD504", "7376262AD505", "7376262AD506",
 			"7376262AD507", "7376262AD508", "7376262AD509", "7376262AD510", "7376262AD511", "7376262AD512",
 			"7376262AD513", "7376262AD514", "7376262AD515", "7376262AD516", "7376262AD517", "7376262AD518",
 			"7376262AD519", "7376252AD381",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 001 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6911,37 +6911,37 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376261CS507", "7376261CS508", "7376261CS509", "7376261CS510", "7376261CS511", "7376261CS512",
 			"7376261CS513", "7376261CS514", "7376261CS516", "7376261CS517", "7376261CS518", "7376261CS519",
 			"7376261CS520", "7376261CS521",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (17 candidates)
 		{HallNo: "SF 001", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT102", "7376252IT103", "7376252IT104", "7376252IT105", "7376252IT106", "7376252IT107",
 			"7376252IT108", "7376252IT109", "7376252IT110", "7376252IT111", "7376252IT112", "7376252IT113",
 			"7376252IT114", "7376252IT115", "7376252IT116", "7376252IT117", "7376252IT118",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304 (3 candidates)
 		{HallNo: "SF 001", CourseCode: "22AI304", RegisterNos: []string{
 			"7376262AD520", "7376262AD521", "7376262AD522",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 002 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CS304 (3 candidates)
 		{HallNo: "SF 002", CourseCode: "22CS304", RegisterNos: []string{
 			"7376261CS522", "7376261CS523", "7376261CS524",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC304 (17 candidates)
 		{HallNo: "SF 002", CourseCode: "22EC304", RegisterNos: []string{
 			"7376251EC101", "7376251EC102", "7376251EC103", "7376251EC104", "7376251EC105", "7376251EC106",
 			"7376251EC107", "7376251EC108", "7376251EC109", "7376251EC110", "7376251EC111", "7376251EC112",
 			"7376251EC113", "7376251EC114", "7376251EC115", "7376251EC116", "7376251EC117",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (20 candidates)
 		{HallNo: "SF 002", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT119", "7376252IT120", "7376252IT121", "7376252IT122", "7376252IT123", "7376252IT124",
 			"7376252IT125", "7376252IT126", "7376252IT127", "7376252IT128", "7376252IT129", "7376252IT130",
 			"7376252IT131", "7376252IT132", "7376252IT133", "7376252IT134", "7376252IT135", "7376252IT136",
 			"7376252IT137", "7376252IT138",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 101 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6951,14 +6951,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC124", "7376251EC125", "7376251EC126", "7376251EC127", "7376251EC128", "7376251EC129",
 			"7376251EC130", "7376251EC131", "7376251EC132", "7376251EC133", "7376251EC134", "7376251EC135",
 			"7376251EC136", "7376251EC137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (20 candidates)
 		{HallNo: "SF 101", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT139", "7376252IT140", "7376252IT141", "7376252IT142", "7376252IT143", "7376252IT144",
 			"7376252IT145", "7376252IT146", "7376252IT147", "7376252IT148", "7376252IT149", "7376252IT150",
 			"7376252IT151", "7376252IT152", "7376252IT153", "7376252IT154", "7376252IT155", "7376252IT156",
 			"7376252IT157", "7376252IT158",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 102 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6968,14 +6968,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC144", "7376251EC145", "7376251EC146", "7376251EC147", "7376251EC148", "7376251EC149",
 			"7376251EC150", "7376251EC151", "7376251EC152", "7376251EC153", "7376251EC154", "7376251EC155",
 			"7376251EC156", "7376251EC157",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (20 candidates)
 		{HallNo: "SF 102", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT159", "7376252IT160", "7376252IT161", "7376252IT162", "7376252IT163", "7376252IT164",
 			"7376252IT165", "7376252IT166", "7376252IT167", "7376252IT168", "7376252IT169", "7376252IT170",
 			"7376252IT171", "7376252IT172", "7376252IT173", "7376252IT174", "7376252IT175", "7376252IT176",
 			"7376252IT177", "7376252IT178",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 103 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -6985,14 +6985,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC164", "7376251EC165", "7376251EC166", "7376251EC167", "7376251EC168", "7376251EC169",
 			"7376251EC170", "7376251EC171", "7376251EC172", "7376251EC173", "7376251EC174", "7376251EC175",
 			"7376251EC176", "7376251EC177",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (20 candidates)
 		{HallNo: "SF 103", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT179", "7376252IT180", "7376252IT181", "7376252IT182", "7376252IT183", "7376252IT184",
 			"7376252IT185", "7376252IT186", "7376252IT187", "7376252IT188", "7376252IT189", "7376252IT190",
 			"7376252IT191", "7376252IT192", "7376252IT193", "7376252IT194", "7376252IT195", "7376252IT196",
 			"7376252IT197", "7376252IT198",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7002,14 +7002,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC184", "7376251EC185", "7376251EC186", "7376251EC187", "7376251EC188", "7376251EC189",
 			"7376251EC190", "7376251EC191", "7376251EC192", "7376251EC193", "7376251EC194", "7376251EC195",
 			"7376251EC196", "7376251EC197",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (20 candidates)
 		{HallNo: "SF 201", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT199", "7376252IT200", "7376252IT201", "7376252IT202", "7376252IT203", "7376252IT204",
 			"7376252IT205", "7376252IT206", "7376252IT207", "7376252IT208", "7376252IT209", "7376252IT210",
 			"7376252IT211", "7376252IT212", "7376252IT213", "7376252IT214", "7376252IT215", "7376252IT216",
 			"7376252IT217", "7376252IT218",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B01 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7019,14 +7019,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC204", "7376251EC205", "7376251EC206", "7376251EC207", "7376251EC208", "7376251EC209",
 			"7376251EC210", "7376251EC211", "7376251EC212", "7376251EC213", "7376251EC214", "7376251EC215",
 			"7376251EC216", "7376251EC217",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (20 candidates)
 		{HallNo: "SF B01", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT219", "7376252IT220", "7376252IT221", "7376252IT222", "7376252IT223", "7376252IT224",
 			"7376252IT225", "7376252IT226", "7376252IT227", "7376252IT228", "7376252IT229", "7376252IT230",
 			"7376252IT231", "7376252IT232", "7376252IT233", "7376252IT234", "7376252IT235", "7376252IT236",
 			"7376252IT237", "7376252IT238",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B02 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7036,14 +7036,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC224", "7376251EC225", "7376251EC226", "7376251EC227", "7376251EC228", "7376251EC229",
 			"7376251EC230", "7376251EC231", "7376251EC232", "7376251EC233", "7376251EC234", "7376251EC235",
 			"7376251EC236", "7376251EC237",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (20 candidates)
 		{HallNo: "SF B02", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT239", "7376252IT240", "7376252IT241", "7376252IT242", "7376252IT243", "7376252IT244",
 			"7376252IT245", "7376252IT246", "7376252IT247", "7376252IT248", "7376252IT249", "7376252IT250",
 			"7376252IT251", "7376252IT252", "7376252IT253", "7376252IT254", "7376252IT255", "7376252IT256",
 			"7376252IT257", "7376252IT258",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B03 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7053,14 +7053,14 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC244", "7376251EC245", "7376251EC246", "7376251EC247", "7376251EC248", "7376251EC249",
 			"7376251EC250", "7376251EC251", "7376251EC252", "7376251EC253", "7376251EC254", "7376251EC255",
 			"7376251EC256", "7376251EC257",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (20 candidates)
 		{HallNo: "SF B03", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT259", "7376252IT260", "7376252IT261", "7376252IT262", "7376252IT263", "7376252IT264",
 			"7376252IT265", "7376252IT266", "7376252IT267", "7376252IT268", "7376252IT269", "7376252IT270",
 			"7376252IT271", "7376252IT272", "7376252IT273", "7376252IT274", "7376252IT275", "7376252IT276",
 			"7376252IT277", "7376252IT278",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 008 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7069,12 +7069,12 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC258", "7376251EC259", "7376251EC260", "7376251EC261", "7376251EC262", "7376251EC263",
 			"7376251EC264", "7376251EC265", "7376251EC266", "7376251EC267", "7376251EC268", "7376251EC269",
 			"7376251EC271", "7376251EC272", "7376251EC273",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (10 candidates)
 		{HallNo: "WW 008", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT279", "7376252IT280", "7376252IT281", "7376252IT282", "7376252IT283", "7376252IT284",
 			"7376252IT285", "7376252IT286", "7376252IT287", "7376252IT288",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 011 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7083,12 +7083,12 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC274", "7376251EC275", "7376251EC276", "7376251EC277", "7376251EC278", "7376251EC279",
 			"7376251EC280", "7376251EC281", "7376251EC282", "7376251EC283", "7376251EC284", "7376251EC285",
 			"7376251EC286", "7376251EC287", "7376251EC288",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (10 candidates)
 		{HallNo: "WW 011", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT289", "7376252IT290", "7376252IT291", "7376252IT292", "7376252IT293", "7376252IT294",
 			"7376252IT295", "7376252IT296", "7376252IT297", "7376252IT298",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 012 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7097,12 +7097,12 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC289", "7376251EC290", "7376251EC291", "7376251EC292", "7376251EC293", "7376251EC294",
 			"7376251EC295", "7376251EC296", "7376251EC297", "7376251EC298", "7376251EC299", "7376251EC300",
 			"7376251EC301", "7376251EC302", "7376251EC303",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (10 candidates)
 		{HallNo: "WW 012", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT299", "7376252IT300", "7376252IT301", "7376252IT302", "7376252IT303", "7376252IT304",
 			"7376252IT305", "7376252IT306", "7376252IT307", "7376252IT308",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 113 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7111,12 +7111,12 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC304", "7376251EC305", "7376251EC306", "7376251EC307", "7376251EC308", "7376251EC309",
 			"7376251EC310", "7376251EC311", "7376251EC312", "7376251EC313", "7376251EC314", "7376251EC315",
 			"7376251EC316", "7376251EC317", "7376251EC318",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (10 candidates)
 		{HallNo: "WW 113", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT309", "7376252IT310", "7376252IT311", "7376252IT312", "7376252IT313", "7376252IT314",
 			"7376252IT315", "7376252IT316", "7376252IT317", "7376252IT318",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 114 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7125,12 +7125,12 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC319", "7376251EC320", "7376251EC321", "7376251EC322", "7376251EC323", "7376251EC324",
 			"7376251EC325", "7376251EC326", "7376251EC327", "7376251EC328", "7376251EC329", "7376251EC330",
 			"7376251EC331", "7376251EC332", "7376251EC333",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (10 candidates)
 		{HallNo: "WW 114", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT319", "7376252IT320", "7376252IT321", "7376252IT322", "7376252IT323", "7376252IT324",
 			"7376252IT325", "7376252IT326", "7376252IT327", "7376252IT328",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 115 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7139,12 +7139,12 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC334", "7376251EC335", "7376251EC336", "7376251EC337", "7376251EC338", "7376251EC339",
 			"7376251EC340", "7376251EC341", "7376251EC342", "7376251EC343", "7376251EC344", "7376251EC345",
 			"7376251EC346", "7376251EC347", "7376251EC348",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (10 candidates)
 		{HallNo: "WW 115", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT329", "7376252IT330", "7376252IT331", "7376252IT332", "7376252IT333", "7376252IT334",
 			"7376252IT335", "7376252IT336", "7376252IT338", "7376252IT339",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 117 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7153,12 +7153,12 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC349", "7376251EC350", "7376251EC351", "7376251EC352", "7376261EC502", "7376261EC503",
 			"7376261EC504", "7376261EC505", "7376261EC506", "7376261EC507", "7376261EC508", "7376261EC509",
 			"7376261EC510", "7376261EC511", "7376261EC512",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (10 candidates)
 		{HallNo: "WW 117", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT340", "7376252IT341", "7376252IT342", "7376252IT343", "7376252IT344", "7376252IT345",
 			"7376252IT346", "7376252IT347", "7376252IT348", "7376252IT349",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 118 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7166,17 +7166,17 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 118", CourseCode: "22EC304", RegisterNos: []string{
 			"7376261EC513", "7376261EC514", "7376261EC515", "7376261EC516", "7376261EC517", "7376261EC518",
 			"7376261EC519", "7376261EC520",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (10 candidates)
 		{HallNo: "WW 118", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT350", "7376252IT351", "7376252IT352", "7376252IT353", "7376252IT354", "7376252IT355",
 			"7376252IT356", "7376252IT357", "7376252IT358", "7376252IT359",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM304 (7 candidates)
 		{HallNo: "WW 118", CourseCode: "22AM304", RegisterNos: []string{
 			"7376252AL101", "7376252AL102", "7376252AL103", "7376252AL104", "7376252AL105", "7376252AL106",
 			"7376252AL107",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7187,7 +7187,7 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376252IT372", "7376252IT373", "7376252IT374", "7376252IT375", "7376252IT376", "7376252IT377",
 			"7376252IT378", "7376252IT379", "7376252IT380", "7376252IT381", "7376252IT382", "7376252IT383",
 			"7376252IT384",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM304 (25 candidates)
 		{HallNo: "WW 202", CourseCode: "22AM304", RegisterNos: []string{
 			"7376252AL108", "7376252AL109", "7376252AL110", "7376252AL111", "7376252AL112", "7376252AL113",
@@ -7195,7 +7195,7 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376252AL120", "7376252AL121", "7376252AL122", "7376252AL123", "7376252AL124", "7376252AL125",
 			"7376252AL126", "7376252AL127", "7376252AL128", "7376252AL129", "7376252AL130", "7376252AL131",
 			"7376252AL132",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7203,31 +7203,31 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 203", CourseCode: "22IT304", RegisterNos: []string{
 			"7376252IT385", "7376252IT386", "7376252IT387", "7376252IT388", "7376262IT502", "7376262IT503",
 			"7376262IT504", "7376262IT505", "7376262IT506", "7376262IT507",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM304 (15 candidates)
 		{HallNo: "WW 203", CourseCode: "22AM304", RegisterNos: []string{
 			"7376252AL133", "7376252AL134", "7376252AL135", "7376252AL136", "7376252AL137", "7376252AL138",
 			"7376252AL139", "7376252AL140", "7376252AL141", "7376252AL142", "7376252AL143", "7376252AL144",
 			"7376252AL145", "7376252AL146", "7376252AL147",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EE304 (1 candidates)
 		{HallNo: "WW 204", CourseCode: "22EE304", RegisterNos: []string{
 			"7376251EE102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304 (9 candidates)
 		{HallNo: "WW 204", CourseCode: "22IT304", RegisterNos: []string{
 			"7376262IT508", "7376262IT509", "7376262IT510", "7376262IT511", "7376262IT512", "7376262IT513",
 			"7376262IT514", "7376262IT515", "7376262IT516",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM304 (15 candidates)
 		{HallNo: "WW 204", CourseCode: "22AM304", RegisterNos: []string{
 			"7376252AL148", "7376252AL149", "7376252AL150", "7376252AL151", "7376252AL152", "7376252AL153",
 			"7376252AL154", "7376252AL155", "7376252AL156", "7376252AL157", "7376252AL158", "7376252AL159",
 			"7376252AL160", "7376252AL161", "7376252AL162",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7235,13 +7235,13 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 205", CourseCode: "22EE304", RegisterNos: []string{
 			"7376251EE103", "7376251EE104", "7376251EE105", "7376251EE106", "7376251EE107", "7376251EE108",
 			"7376251EE109", "7376251EE110", "7376251EE111", "7376251EE112",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM304 (15 candidates)
 		{HallNo: "WW 205", CourseCode: "22AM304", RegisterNos: []string{
 			"7376252AL163", "7376252AL164", "7376252AL165", "7376252AL166", "7376252AL167", "7376252AL168",
 			"7376252AL169", "7376252AL170", "7376252AL171", "7376252AL172", "7376252AL173", "7376252AL174",
 			"7376252AL175", "7376252AL176", "7376252AL177",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7249,13 +7249,13 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 206", CourseCode: "22EE304", RegisterNos: []string{
 			"7376251EE113", "7376251EE114", "7376251EE115", "7376251EE116", "7376251EE117", "7376251EE118",
 			"7376251EE119", "7376251EE120", "7376251EE121", "7376251EE122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM304 (15 candidates)
 		{HallNo: "WW 206", CourseCode: "22AM304", RegisterNos: []string{
 			"7376252AL178", "7376252AL179", "7376252AL180", "7376252AL181", "7376252AL182", "7376252AL183",
 			"7376252AL184", "7376252AL185", "7376252AL186", "7376252AL187", "7376252AL188", "7376252AL189",
 			"7376252AL190", "7376252AL191", "7376252AL192",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 207 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7266,7 +7266,7 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EE135", "7376251EE136", "7376251EE137", "7376251EE138", "7376251EE139", "7376251EE140",
 			"7376251EE141", "7376251EE142", "7376251EE143", "7376251EE144", "7376251EE145", "7376251EE146",
 			"7376251EE147",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM304 (25 candidates)
 		{HallNo: "WW 207", CourseCode: "22AM304", RegisterNos: []string{
 			"7376252AL193", "7376252AL194", "7376252AL195", "7376252AL196", "7376252AL197", "7376252AL198",
@@ -7274,7 +7274,7 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376252AL205", "7376252AL206", "7376252AL207", "7376252AL208", "7376252AL209", "7376252AL210",
 			"7376252AL211", "7376252AL212", "7376252AL213", "7376252AL214", "7376252AL215", "7376252AL216",
 			"7376252AL217",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 208 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7282,13 +7282,13 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 208", CourseCode: "22EE304", RegisterNos: []string{
 			"7376251EE148", "7376251EE149", "7376251EE150", "7376251EE151", "7376251EE152", "7376251EE153",
 			"7376251EE154", "7376251EE155", "7376251EE156", "7376251EE157",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM304 (15 candidates)
 		{HallNo: "WW 208", CourseCode: "22AM304", RegisterNos: []string{
 			"7376252AL218", "7376252AL219", "7376252AL220", "7376252AL221", "7376252AL222", "7376252AL223",
 			"7376252AL224", "7376252AL225", "7376252AL226", "7376252AL227", "7376252AL228", "7376252AL229",
 			"7376252AL230", "7376252AL231", "7376252AL232",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 209 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7296,13 +7296,13 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 209", CourseCode: "22EE304", RegisterNos: []string{
 			"7376251EE158", "7376251EE159", "7376251EE160", "7376251EE161", "7376251EE162", "7376251EE163",
 			"7376251EE164", "7376251EE165", "7376251EE166", "7376251EE167",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM304 (15 candidates)
 		{HallNo: "WW 209", CourseCode: "22AM304", RegisterNos: []string{
 			"7376252AL233", "7376252AL234", "7376252AL235", "7376252AL236", "7376252AL237", "7376252AL238",
 			"7376252AL239", "7376252AL240", "7376252AL241", "7376252AL242", "7376252AL243", "7376252AL244",
 			"7376252AL245", "7376252AL246", "7376262AL501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 210 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7310,17 +7310,17 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 210", CourseCode: "22EE304", RegisterNos: []string{
 			"7376251EE168", "7376251EE169", "7376251EE170", "7376251EE171", "7376251EE172", "7376251EE173",
 			"7376251EE174", "7376251EE175", "7376251EE176", "7376251EE177",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT304 (7 candidates)
 		{HallNo: "WW 210", CourseCode: "22BT304", RegisterNos: []string{
 			"7376252BT102", "7376252BT103", "7376252BT104", "7376252BT105", "7376252BT106", "7376252BT107",
 			"7376252BT108",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM304 (8 candidates)
 		{HallNo: "WW 210", CourseCode: "22AM304", RegisterNos: []string{
 			"7376262AL502", "7376262AL503", "7376262AL504", "7376262AL505", "7376262AL506", "7376262AL507",
 			"7376262AL508", "7376262AL509",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 211 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7328,13 +7328,13 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 211", CourseCode: "22EE304", RegisterNos: []string{
 			"7376251EE178", "7376251EE179", "7376251EE180", "7376251EE181", "7376251EE182", "7376251EE183",
 			"7376251EE184", "7376251EE185", "7376251EE186", "7376251EE187",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT304 (15 candidates)
 		{HallNo: "WW 211", CourseCode: "22BT304", RegisterNos: []string{
 			"7376252BT109", "7376252BT110", "7376252BT111", "7376252BT112", "7376252BT113", "7376252BT114",
 			"7376252BT115", "7376252BT116", "7376252BT117", "7376252BT118", "7376252BT119", "7376252BT120",
 			"7376252BT121", "7376252BT122", "7376252BT123",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 212 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7345,7 +7345,7 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EE200", "7376251EE201", "7376251EE202", "7376251EE203", "7376251EE204", "7376251EE205",
 			"7376261EE502", "7376261EE503", "7376261EE504", "7376261EE505", "7376261EE506", "7376261EE507",
 			"7376261EE508",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT304 (25 candidates)
 		{HallNo: "WW 212", CourseCode: "22BT304", RegisterNos: []string{
 			"7376252BT124", "7376252BT125", "7376252BT126", "7376252BT127", "7376252BT128", "7376252BT129",
@@ -7353,7 +7353,7 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376252BT136", "7376252BT137", "7376252BT138", "7376252BT139", "7376252BT140", "7376252BT141",
 			"7376252BT142", "7376252BT143", "7376252BT144", "7376252BT145", "7376252BT146", "7376252BT147",
 			"7376252BT148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 213 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7361,13 +7361,13 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 213", CourseCode: "22EE304", RegisterNos: []string{
 			"7376261EE509", "7376261EE510", "7376261EE511", "7376261EE512", "7376261EE513", "7376261EE514",
 			"7376261EE515", "7376261EE516", "7376261EE517", "7376261EE518",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT304 (15 candidates)
 		{HallNo: "WW 213", CourseCode: "22BT304", RegisterNos: []string{
 			"7376252BT149", "7376252BT150", "7376252BT151", "7376252BT152", "7376252BT153", "7376252BT155",
 			"7376252BT156", "7376252BT157", "7376252BT158", "7376252BT159", "7376252BT160", "7376252BT161",
 			"7376252BT162", "7376252BT163", "7376252BT164",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 214 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7375,13 +7375,13 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 214", CourseCode: "22MC304", RegisterNos: []string{
 			"7376251MZ101", "7376251MZ102", "7376251MZ103", "7376251MZ104", "7376251MZ105", "7376251MZ106",
 			"7376251MZ107", "7376251MZ108", "7376251MZ109", "7376251MZ110",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT304 (15 candidates)
 		{HallNo: "WW 214", CourseCode: "22BT304", RegisterNos: []string{
 			"7376252BT165", "7376252BT166", "7376252BT167", "7376252BT168", "7376252BT169", "7376252BT170",
 			"7376252BT171", "7376252BT172", "7376252BT173", "7376252BT174", "7376252BT175", "7376252BT176",
 			"7376252BT177", "7376252BT178", "7376252BT179",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 215 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7389,13 +7389,13 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 215", CourseCode: "22MC304", RegisterNos: []string{
 			"7376251MZ111", "7376251MZ112", "7376251MZ113", "7376251MZ114", "7376251MZ115", "7376251MZ116",
 			"7376251MZ117", "7376251MZ118", "7376251MZ119", "7376251MZ120",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT304 (15 candidates)
 		{HallNo: "WW 215", CourseCode: "22BT304", RegisterNos: []string{
 			"7376252BT180", "7376252BT181", "7376252BT182", "7376252BT183", "7376252BT184", "7376252BT185",
 			"7376252BT186", "7376252BT187", "7376252BT188", "7376252BT189", "7376252BT191", "7376252BT192",
 			"7376252BT193", "7376252BT194", "7376252BT195",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 218 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7403,31 +7403,31 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 218", CourseCode: "22MC304", RegisterNos: []string{
 			"7376251MZ121", "7376251MZ122", "7376251MZ123", "7376251MZ124", "7376251MZ125", "7376251MZ126",
 			"7376251MZ127", "7376251MZ128", "7376251MZ129", "7376251MZ130",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT304 (15 candidates)
 		{HallNo: "WW 218", CourseCode: "22BT304", RegisterNos: []string{
 			"7376252BT199", "7376252BT200", "7376252BT201", "7376252BT202", "7376252BT203", "7376252BT204",
 			"7376252BT205", "7376252BT206", "7376252BT207", "7376252BT208", "7376252BT209", "7376252BT210",
 			"7376252BT211", "7376252BT196", "7376252BT197",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 219 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EI304 (2 candidates)
 		{HallNo: "WW 219", CourseCode: "22EI304", RegisterNos: []string{
 			"7376251EI101", "7376251EI102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC304 (10 candidates)
 		{HallNo: "WW 219", CourseCode: "22MC304", RegisterNos: []string{
 			"7376251MZ131", "7376251MZ132", "7376251MZ133", "7376251MZ134", "7376251MZ135", "7376251MZ136",
 			"7376251MZ137", "7376251MZ138", "7376251MZ139", "7376251MZ140",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT304 (13 candidates)
 		{HallNo: "WW 219", CourseCode: "22BT304", RegisterNos: []string{
 			"7376252BT212", "7376252BT213", "7376252BT214", "7376252BT215", "7376252BT216", "7376252BT217",
 			"7376252BT218", "7376252BT219", "7376252BT220", "7376252BT221", "7376252BT222", "7376252BT223",
 			"7376252BT224",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 222 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7438,7 +7438,7 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EI115", "7376251EI116", "7376251EI117", "7376251EI118", "7376251EI119", "7376251EI120",
 			"7376251EI121", "7376251EI122", "7376251EI123", "7376251EI124", "7376251EI125", "7376251EI126",
 			"7376251EI127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC304 (25 candidates)
 		{HallNo: "WW 222", CourseCode: "22MC304", RegisterNos: []string{
 			"7376251MZ141", "7376251MZ142", "7376251MZ143", "7376251MZ144", "7376251MZ145", "7376251MZ146",
@@ -7446,7 +7446,7 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251MZ153", "7376251MZ154", "7376251MZ155", "7376251MZ156", "7376251MZ157", "7376251MZ158",
 			"7376251MZ159", "7376251MZ160", "7376251MZ161", "7376251MZ162", "7376261MZ502", "7376261MZ503",
 			"7376261MZ504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7457,18 +7457,18 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EI141", "7376251EI142", "7376251EI143", "7376251EI144", "7376251EI145", "7376251EI146",
 			"7376251EI147", "7376251EI148", "7376251EI149", "7376251EI150", "7376251EI151", "7376251EI152",
 			"7376251EI153",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME304 (24 candidates)
 		{HallNo: "WW 223", CourseCode: "22ME304", RegisterNos: []string{
 			"7376251ME102", "7376251ME103", "7376251ME104", "7376251ME105", "7376251ME106", "7376251ME107",
 			"7376251ME108", "7376251ME109", "7376251ME110", "7376251ME111", "7376251ME112", "7376251ME113",
 			"7376251ME114", "7376251ME115", "7376251ME116", "7376251ME117", "7376251ME118", "7376251ME119",
 			"7376251ME120", "7376251ME121", "7376251ME122", "7376251ME123", "7376251ME124", "7376251ME125",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC304 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22MC304", RegisterNos: []string{
 			"7376261MZ505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7477,7 +7477,7 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EI154", "7376251EI155", "7376251EI156", "7376251EI157", "7376251EI158", "7376251EI159",
 			"7376251EI160", "7376251EI161", "7376261EI501", "7376261EI502", "7376261EI503", "7376261EI504",
 			"7376261EI505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME304 (25 candidates)
 		{HallNo: "WW 224", CourseCode: "22ME304", RegisterNos: []string{
 			"7376251ME126", "7376251ME127", "7376251ME128", "7376251ME129", "7376251ME130", "7376251ME131",
@@ -7485,12 +7485,12 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251ME138", "7376251ME139", "7376251ME140", "7376251ME141", "7376251ME142", "7376251ME143",
 			"7376251ME144", "7376251ME145", "7376251ME146", "7376251ME147", "7376251ME148", "7376251ME149",
 			"7376251ME150",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG304 (12 candidates)
 		{HallNo: "WW 224", CourseCode: "22AG304", RegisterNos: []string{
 			"7376252AG101", "7376252AG102", "7376252AG103", "7376252AG104", "7376252AG105", "7376252AG106",
 			"7376252AG107", "7376252AG108", "7376252AG109", "7376252AG110", "7376252AG111", "7376252AG112",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 225 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7499,125 +7499,125 @@ func buildSeatingData26Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251ME151", "7376251ME152", "7376251ME153", "7376251ME154", "7376251ME155", "7376251ME156",
 			"7376251ME157", "7376251ME158", "7376251ME159", "7376251ME160", "7376261ME504", "7376261ME505",
 			"7376261ME506", "7376261ME507", "7376261ME501", "7376261ME502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG304 (14 candidates)
 		{HallNo: "WW 225", CourseCode: "22AG304", RegisterNos: []string{
 			"7376252AG115", "7376252AG116", "7376252AG117", "7376252AG118", "7376252AG119", "7376252AG120",
 			"7376252AG121", "7376252AG122", "7376252AG123", "7376252AG124", "7376252AG125", "7376252AG126",
 			"7376252AG127", "7376252AG113",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 226 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CS304* (4 candidates)
 		{HallNo: "WW 226", CourseCode: "22CS304*", RegisterNos: []string{
 			"7376231CS102", "7376231CS103", "7376231CS190", "7376231CS235",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC304* (9 candidates)
 		{HallNo: "WW 226", CourseCode: "22EC304*", RegisterNos: []string{
 			"7376231EC101", "7376231EC112", "7376231EC121", "7376231EC283", "7376231EC297", "7376231EC305",
 			"7376231EC331", "7376231EC334", "7376241EC513",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304* (2 candidates)
 		{HallNo: "WW 226", CourseCode: "22IT304*", RegisterNos: []string{
 			"7376232IT118", "7376232IT152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC304* (16 candidates)
 		{HallNo: "WW 226", CourseCode: "22EC304*", RegisterNos: []string{
 			"7376241EC133", "7376241EC137", "7376241EC144", "7376241EC147", "7376241EC151", "7376241EC160",
 			"7376241EC246", "7376241EC256", "7376241EC271", "7376241EC284", "7376241EC312", "7376241EC328",
 			"7376241EC334", "7376251EC506", "7376251EC507", "7376251EC509",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE304* (11 candidates)
 		{HallNo: "WW 226", CourseCode: "22EE304*", RegisterNos: []string{
 			"7376241EE130", "7376241EE146", "7376241EE147", "7376241EE157", "7376241EE190", "7376241EE193",
 			"7376251EE502", "7376251EE504", "7376251EE506", "7376251EE507", "7376251EE510",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT304* (8 candidates)
 		{HallNo: "WW 226", CourseCode: "22IT304*", RegisterNos: []string{
 			"7376242IT164", "7376242IT184", "7376242IT214", "7376242IT227", "7376242IT287", "7376252IT506",
 			"7376252IT511", "7376252IT513",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 227 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CE304* (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22CE304*", RegisterNos: []string{
 			"7376231CE120", "7376241CE501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS304* (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22CS304*", RegisterNos: []string{
 			"7376231CS244", "7376231CS259",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM304* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22BM304*", RegisterNos: []string{
 			"7376231BM107",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD304* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22CD304*", RegisterNos: []string{
 			"7376241CD501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC304* (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22MC304*", RegisterNos: []string{
 			"7376231MZ106", "7376231MZ111", "7376231MZ135",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB304* (4 candidates)
 		{HallNo: "WW 227", CourseCode: "22CB304*", RegisterNos: []string{
 			"7376232CB111", "7376232CB123", "7376232CB133", "7376242CB502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22AI304*", RegisterNos: []string{
 			"7376232AD250",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG304* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22AG304*", RegisterNos: []string{
 			"7376232AG151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS304* (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22CS304*", RegisterNos: []string{
 			"7376241CS395", "7376251CS522",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC304* (4 candidates)
 		{HallNo: "WW 227", CourseCode: "22EC304*", RegisterNos: []string{
 			"7376251EC511", "7376251EC513", "7376251EC516", "7376251EC519",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI304* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22EI304*", RegisterNos: []string{
 			"7376241EI104",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME304* (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22ME304*", RegisterNos: []string{
 			"7376241ME102", "7376241ME127", "7376251ME503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC304* (4 candidates)
 		{HallNo: "WW 227", CourseCode: "22MC304*", RegisterNos: []string{
 			"7376241MZ124", "7376241MZ127", "7376241MZ143", "7376251MZ504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT304* (5 candidates)
 		{HallNo: "WW 227", CourseCode: "22BT304*", RegisterNos: []string{
 			"7376242BT120", "7376242BT138", "7376242BT151", "7376242BT156", "7376252BT501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB304* (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22CB304*", RegisterNos: []string{
 			"7376242CB116", "7376242CB119",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI304* (6 candidates)
 		{HallNo: "WW 227", CourseCode: "22AI304*", RegisterNos: []string{
 			"7376242AD137", "7376242AD189", "7376242AD190", "7376242AD320", "7376252AD502", "7376252AD510",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM304* (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22AM304*", RegisterNos: []string{
 			"7376242AL157", "7376242AL207",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG304* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22AG304*", RegisterNos: []string{
 			"7376252AG502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
 
 // ============================================================================
-// 26-11-2026 AFTERNOON SESSION (AN: 01:30 PM ? 04:30 PM) - Total: 65 Students
+// 26-11-2026 AFTERNOON SESSION (AN: 01:30 PM : 04:30 PM) - Total: 65 Students
 // ============================================================================
 func buildSeatingData26Nov2026AN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -7630,7 +7630,7 @@ func buildSeatingData26Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242BT131", "7376242BT138", "7376242BT150", "7376242BT151", "7376242BT180", "7376242BT184",
 			"7376242BT191", "7376242BT194", "7376242BT201", "7376242BT206", "7376242BT208", "7376242BT212",
 			"7376242BT214", "7376242BT220", "7376242BT222",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7639,76 +7639,76 @@ func buildSeatingData26Nov2026AN() []studentmodels.SeatingRecord {
 			"7376231CS102", "7376231CS173", "7376231CS190", "7376231CS235", "7376231CS244", "7376231CS259",
 			"7376231CS263", "7376231CS292", "7376231CS311", "7376231CS325", "7376241CS504", "7376241CS511",
 			"7376241CS516",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC004 (10 candidates)
 		{HallNo: "WW 204", CourseCode: "22EC004", RegisterNos: []string{
 			"7376231EC121", "7376231EC131", "7376231EC330", "7376231EC331", "7376231EC333", "7376231EC334",
 			"7376241EC506", "7376241EC513", "7376241EC515", "7376241EC516",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS006 (1 candidates)
 		{HallNo: "WW 204", CourseCode: "22HS006", RegisterNos: []string{
 			"7376231EC283",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS006 (1 candidates)
 		{HallNo: "WW 204", CourseCode: "22HS006", RegisterNos: []string{
 			"7376241CD501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EC004 (1 candidates)
 		{HallNo: "WW 205", CourseCode: "22EC004", RegisterNos: []string{
 			"7376241EC521",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT010 (3 candidates)
 		{HallNo: "WW 205", CourseCode: "22BT010", RegisterNos: []string{
 			"7376232BT115", "7376232BT120", "7376232BT142",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT603* (3 candidates)
 		{HallNo: "WW 205", CourseCode: "22IT603*", RegisterNos: []string{
 			"7376232IT118", "7376232IT152", "7376232IT228",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB602 (2 candidates)
 		{HallNo: "WW 205", CourseCode: "22CB602", RegisterNos: []string{
 			"7376232CB123", "7376232CB133",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CT603* (1 candidates)
 		{HallNo: "WW 205", CourseCode: "22CT603*", RegisterNos: []string{
 			"7376232CT122",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS006 (1 candidates)
 		{HallNo: "WW 205", CourseCode: "22HS006", RegisterNos: []string{
 			"7376241CS474",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS006 (1 candidates)
 		{HallNo: "WW 205", CourseCode: "22HS006", RegisterNos: []string{
 			"7376242IT184",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS006 (2 candidates)
 		{HallNo: "WW 205", CourseCode: "22HS006", RegisterNos: []string{
 			"7376242AD189", "7376242AD218",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS006 (1 candidates)
 		{HallNo: "WW 205", CourseCode: "22HS006", RegisterNos: []string{
 			"7376242AL207",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS006 (2 candidates)
 		{HallNo: "WW 205", CourseCode: "22HS006", RegisterNos: []string{
 			"7376251CS298", "7376251CS467",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS006 (1 candidates)
 		{HallNo: "WW 205", CourseCode: "22HS006", RegisterNos: []string{
 			"7376251EC248",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS006 (1 candidates)
 		{HallNo: "WW 205", CourseCode: "22HS006", RegisterNos: []string{
 			"7376252IT250",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 	}
 }
 
 // ============================================================================
-// 27-11-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 1869 Students
+// 27-11-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 1869 Students
 // ============================================================================
 func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -7722,14 +7722,14 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS113", "7376231CS114", "7376231CS115", "7376231CS116", "7376231CS117", "7376231CS118",
 			"7376231CS119", "7376231CS120", "7376231CS121", "7376231CS122", "7376231CS123", "7376231CS124",
 			"7376231CS125",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC701 (20 candidates)
 		{HallNo: "ME 102", CourseCode: "22EC701", RegisterNos: []string{
 			"7376231EC101", "7376231EC102", "7376231EC103", "7376231EC104", "7376231EC105", "7376231EC106",
 			"7376231EC107", "7376231EC108", "7376231EC109", "7376231EC110", "7376231EC111", "7376231EC112",
 			"7376231EC113", "7376231EC114", "7376231EC115", "7376231EC116", "7376231EC117", "7376231EC118",
 			"7376231EC119", "7376231EC120",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 107 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7740,14 +7740,14 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS138", "7376231CS139", "7376231CS140", "7376231CS141", "7376231CS142", "7376231CS143",
 			"7376231CS144", "7376231CS145", "7376231CS146", "7376231CS147", "7376231CS148", "7376231CS149",
 			"7376231CS150",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC701 (20 candidates)
 		{HallNo: "ME 107", CourseCode: "22EC701", RegisterNos: []string{
 			"7376231EC121", "7376231EC122", "7376231EC123", "7376231EC124", "7376231EC125", "7376231EC126",
 			"7376231EC127", "7376231EC128", "7376231EC129", "7376231EC130", "7376231EC131", "7376231EC132",
 			"7376231EC133", "7376231EC134", "7376231EC135", "7376231EC136", "7376231EC137", "7376231EC138",
 			"7376231EC139", "7376231EC140",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 108 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7758,14 +7758,14 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS163", "7376231CS164", "7376231CS165", "7376231CS166", "7376231CS168", "7376231CS169",
 			"7376231CS170", "7376231CS171", "7376231CS172", "7376231CS173", "7376231CS174", "7376231CS175",
 			"7376231CS176",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC701 (20 candidates)
 		{HallNo: "ME 108", CourseCode: "22EC701", RegisterNos: []string{
 			"7376231EC141", "7376231EC142", "7376231EC143", "7376231EC144", "7376231EC145", "7376231EC146",
 			"7376231EC147", "7376231EC148", "7376231EC149", "7376231EC150", "7376231EC151", "7376231EC152",
 			"7376231EC153", "7376231EC154", "7376231EC155", "7376231EC156", "7376231EC157", "7376231EC158",
 			"7376231EC159", "7376231EC160",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7776,14 +7776,14 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS189", "7376231CS190", "7376231CS191", "7376231CS192", "7376231CS193", "7376231CS194",
 			"7376231CS195", "7376231CS196", "7376231CS197", "7376231CS198", "7376231CS199", "7376231CS200",
 			"7376231CS201",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC701 (20 candidates)
 		{HallNo: "ME 201", CourseCode: "22EC701", RegisterNos: []string{
 			"7376231EC161", "7376231EC162", "7376231EC163", "7376231EC164", "7376231EC165", "7376231EC166",
 			"7376231EC167", "7376231EC168", "7376231EC169", "7376231EC170", "7376231EC171", "7376231EC172",
 			"7376231EC173", "7376231EC174", "7376231EC175", "7376231EC176", "7376231EC177", "7376231EC178",
 			"7376231EC179", "7376231EC180",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7794,14 +7794,14 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS214", "7376231CS215", "7376231CS216", "7376231CS217", "7376231CS218", "7376231CS219",
 			"7376231CS220", "7376231CS221", "7376231CS222", "7376231CS223", "7376231CS224", "7376231CS225",
 			"7376231CS226",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC701 (20 candidates)
 		{HallNo: "ME 202", CourseCode: "22EC701", RegisterNos: []string{
 			"7376231EC181", "7376231EC182", "7376231EC183", "7376231EC184", "7376231EC185", "7376231EC186",
 			"7376231EC187", "7376231EC188", "7376231EC189", "7376231EC190", "7376231EC191", "7376231EC192",
 			"7376231EC193", "7376231EC194", "7376231EC195", "7376231EC196", "7376231EC197", "7376231EC198",
 			"7376231EC199", "7376231EC200",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7812,14 +7812,14 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS239", "7376231CS240", "7376231CS241", "7376231CS242", "7376231CS243", "7376231CS244",
 			"7376231CS245", "7376231CS246", "7376231CS247", "7376231CS248", "7376231CS249", "7376231CS250",
 			"7376231CS251",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC701 (20 candidates)
 		{HallNo: "ME 203", CourseCode: "22EC701", RegisterNos: []string{
 			"7376231EC201", "7376231EC202", "7376231EC203", "7376231EC204", "7376231EC205", "7376231EC206",
 			"7376231EC207", "7376231EC208", "7376231EC209", "7376231EC210", "7376231EC211", "7376231EC212",
 			"7376231EC213", "7376231EC214", "7376231EC215", "7376231EC216", "7376231EC217", "7376231EC218",
 			"7376231EC219", "7376231EC220",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7830,14 +7830,14 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS264", "7376231CS265", "7376231CS266", "7376231CS267", "7376231CS268", "7376231CS269",
 			"7376231CS270", "7376231CS271", "7376231CS272", "7376231CS273", "7376231CS274", "7376231CS275",
 			"7376231CS276",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC701 (20 candidates)
 		{HallNo: "ME 204", CourseCode: "22EC701", RegisterNos: []string{
 			"7376231EC221", "7376231EC222", "7376231EC223", "7376231EC224", "7376231EC225", "7376231EC226",
 			"7376231EC227", "7376231EC228", "7376231EC229", "7376231EC230", "7376231EC231", "7376231EC232",
 			"7376231EC233", "7376231EC234", "7376231EC235", "7376231EC236", "7376231EC237", "7376231EC238",
 			"7376231EC239", "7376231EC240",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7848,14 +7848,14 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS290", "7376231CS291", "7376231CS292", "7376231CS293", "7376231CS294", "7376231CS295",
 			"7376231CS296", "7376231CS297", "7376231CS298", "7376231CS299", "7376231CS300", "7376231CS301",
 			"7376231CS302",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC701 (20 candidates)
 		{HallNo: "ME 205", CourseCode: "22EC701", RegisterNos: []string{
 			"7376231EC241", "7376231EC242", "7376231EC243", "7376231EC244", "7376231EC245", "7376231EC246",
 			"7376231EC247", "7376231EC248", "7376231EC249", "7376231EC250", "7376231EC251", "7376231EC252",
 			"7376231EC253", "7376231EC254", "7376231EC255", "7376231EC256", "7376231EC257", "7376231EC258",
 			"7376231EC259", "7376231EC260",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7866,14 +7866,14 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS315", "7376231CS316", "7376231CS317", "7376231CS318", "7376231CS319", "7376231CS320",
 			"7376231CS321", "7376231CS323", "7376231CS324", "7376231CS325", "7376231CS326", "7376231CS328",
 			"7376231CS329",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC701 (20 candidates)
 		{HallNo: "ME 206", CourseCode: "22EC701", RegisterNos: []string{
 			"7376231EC261", "7376231EC262", "7376231EC263", "7376231EC264", "7376231EC265", "7376231EC266",
 			"7376231EC267", "7376231EC268", "7376231EC269", "7376231EC270", "7376231EC271", "7376231EC272",
 			"7376231EC273", "7376231EC274", "7376231EC275", "7376231EC276", "7376231EC277", "7376231EC278",
 			"7376231EC279", "7376231EC280",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 301 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7884,14 +7884,14 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS342", "7376231CS343", "7376231CS344", "7376231CS345", "7376231CS346", "7376231CS347",
 			"7376231CS348", "7376231CS349", "7376231CS350", "7376231CS351", "7376231CS352", "7376231CS353",
 			"7376231CS354",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC701 (20 candidates)
 		{HallNo: "ME 301", CourseCode: "22EC701", RegisterNos: []string{
 			"7376231EC281", "7376231EC282", "7376231EC283", "7376231EC284", "7376231EC285", "7376231EC286",
 			"7376231EC287", "7376231EC288", "7376231EC289", "7376231EC290", "7376231EC291", "7376231EC292",
 			"7376231EC293", "7376231EC294", "7376231EC295", "7376231EC296", "7376231EC297", "7376231EC298",
 			"7376231EC299", "7376231EC300",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 302 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7900,19 +7900,19 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376241CS501", "7376241CS502", "7376241CS503", "7376241CS504", "7376241CS505", "7376241CS506",
 			"7376241CS507", "7376241CS508", "7376241CS509", "7376241CS510", "7376241CS511", "7376241CS512",
 			"7376241CS513", "7376241CS514", "7376241CS515", "7376241CS516", "7376241CS518", "7376241CS519",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC701 (20 candidates)
 		{HallNo: "ME 302", CourseCode: "22EC701", RegisterNos: []string{
 			"7376231EC301", "7376231EC302", "7376231EC303", "7376231EC304", "7376231EC305", "7376231EC306",
 			"7376231EC307", "7376231EC308", "7376231EC309", "7376231EC310", "7376231EC311", "7376231EC312",
 			"7376231EC313", "7376231EC314", "7376231EC315", "7376231EC316", "7376231EC317", "7376231EC318",
 			"7376231EC319", "7376231EC320",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI701 (7 candidates)
 		{HallNo: "ME 302", CourseCode: "22AI701", RegisterNos: []string{
 			"7376232AD101", "7376232AD102", "7376232AD103", "7376232AD104", "7376232AD105", "7376232AD106",
 			"7376232AD107",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 303 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7922,7 +7922,7 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC327", "7376231EC328", "7376231EC329", "7376231EC330", "7376231EC331", "7376231EC332",
 			"7376231EC333", "7376231EC334", "7376241EC501", "7376241EC502", "7376241EC503", "7376241EC504",
 			"7376241EC505", "7376241EC506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI701 (25 candidates)
 		{HallNo: "ME 303", CourseCode: "22AI701", RegisterNos: []string{
 			"7376232AD108", "7376232AD109", "7376232AD110", "7376232AD111", "7376232AD112", "7376232AD113",
@@ -7930,7 +7930,7 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD120", "7376232AD121", "7376232AD122", "7376232AD123", "7376232AD124", "7376232AD125",
 			"7376232AD126", "7376232AD127", "7376232AD128", "7376232AD129", "7376232AD130", "7376232AD131",
 			"7376232AD132",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 304 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7939,11 +7939,11 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376241EC507", "7376241EC508", "7376241EC509", "7376241EC510", "7376241EC511", "7376241EC512",
 			"7376241EC513", "7376241EC514", "7376241EC515", "7376241EC516", "7376241EC517", "7376241EC518",
 			"7376241EC519", "7376241EC520", "7376241EC521", "7376241EC522",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT701 (4 candidates)
 		{HallNo: "ME 304", CourseCode: "22IT701", RegisterNos: []string{
 			"7376232IT101", "7376232IT102", "7376232IT103", "7376232IT104",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI701 (25 candidates)
 		{HallNo: "ME 304", CourseCode: "22AI701", RegisterNos: []string{
 			"7376232AD133", "7376232AD134", "7376232AD135", "7376232AD136", "7376232AD137", "7376232AD138",
@@ -7951,7 +7951,7 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD145", "7376232AD146", "7376232AD147", "7376232AD148", "7376232AD149", "7376232AD150",
 			"7376232AD151", "7376232AD152", "7376232AD153", "7376232AD154", "7376232AD155", "7376232AD156",
 			"7376232AD157",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 305 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7961,7 +7961,7 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT111", "7376232IT112", "7376232IT113", "7376232IT114", "7376232IT115", "7376232IT116",
 			"7376232IT117", "7376232IT118", "7376232IT119", "7376232IT120", "7376232IT121", "7376232IT122",
 			"7376232IT123", "7376232IT124",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI701 (25 candidates)
 		{HallNo: "ME 305", CourseCode: "22AI701", RegisterNos: []string{
 			"7376232AD158", "7376232AD159", "7376232AD160", "7376232AD161", "7376232AD162", "7376232AD163",
@@ -7969,7 +7969,7 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD170", "7376232AD171", "7376232AD172", "7376232AD173", "7376232AD174", "7376232AD175",
 			"7376232AD176", "7376232AD177", "7376232AD178", "7376232AD179", "7376232AD180", "7376232AD181",
 			"7376232AD182",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 306 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7979,7 +7979,7 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT131", "7376232IT132", "7376232IT133", "7376232IT134", "7376232IT135", "7376232IT136",
 			"7376232IT137", "7376232IT138", "7376232IT139", "7376232IT140", "7376232IT141", "7376232IT142",
 			"7376232IT143", "7376232IT144",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI701 (25 candidates)
 		{HallNo: "ME 306", CourseCode: "22AI701", RegisterNos: []string{
 			"7376232AD183", "7376232AD184", "7376232AD185", "7376232AD186", "7376232AD187", "7376232AD188",
@@ -7987,7 +7987,7 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD195", "7376232AD196", "7376232AD197", "7376232AD198", "7376232AD199", "7376232AD200",
 			"7376232AD201", "7376232AD202", "7376232AD203", "7376232AD204", "7376232AD205", "7376232AD206",
 			"7376232AD207",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 001 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -7997,14 +7997,14 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT151", "7376232IT152", "7376232IT153", "7376232IT154", "7376232IT155", "7376232IT156",
 			"7376232IT157", "7376232IT158", "7376232IT159", "7376232IT160", "7376232IT161", "7376232IT162",
 			"7376232IT163", "7376232IT164",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI701 (20 candidates)
 		{HallNo: "SF 001", CourseCode: "22AI701", RegisterNos: []string{
 			"7376232AD208", "7376232AD209", "7376232AD210", "7376232AD211", "7376232AD212", "7376232AD213",
 			"7376232AD214", "7376232AD215", "7376232AD216", "7376232AD217", "7376232AD218", "7376232AD219",
 			"7376232AD220", "7376232AD221", "7376232AD222", "7376232AD223", "7376232AD224", "7376232AD225",
 			"7376232AD226", "7376232AD227",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 002 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8014,14 +8014,14 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT171", "7376232IT172", "7376232IT173", "7376232IT174", "7376232IT175", "7376232IT176",
 			"7376232IT177", "7376232IT178", "7376232IT179", "7376232IT180", "7376232IT181", "7376232IT182",
 			"7376232IT183", "7376232IT184",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI701 (20 candidates)
 		{HallNo: "SF 002", CourseCode: "22AI701", RegisterNos: []string{
 			"7376232AD229", "7376232AD230", "7376232AD231", "7376232AD232", "7376232AD233", "7376232AD234",
 			"7376232AD235", "7376232AD236", "7376232AD237", "7376232AD238", "7376232AD239", "7376232AD240",
 			"7376232AD241", "7376232AD242", "7376232AD243", "7376232AD244", "7376232AD245", "7376232AD246",
 			"7376232AD247", "7376232AD248",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B01 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8031,14 +8031,14 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT191", "7376232IT192", "7376232IT193", "7376232IT194", "7376232IT195", "7376232IT196",
 			"7376232IT197", "7376232IT198", "7376232IT199", "7376232IT200", "7376232IT201", "7376232IT202",
 			"7376232IT203", "7376232IT204",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI701 (20 candidates)
 		{HallNo: "SF B01", CourseCode: "22AI701", RegisterNos: []string{
 			"7376232AD249", "7376232AD250", "7376232AD251", "7376232AD252", "7376232AD253", "7376232AD254",
 			"7376232AD255", "7376232AD256", "7376232AD257", "7376232AD258", "7376232AD259", "7376232AD260",
 			"7376232AD261", "7376232AD262", "7376232AD263", "7376232AD264", "7376232AD265", "7376232AD266",
 			"7376232AD267", "7376232AD268",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B02 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8048,14 +8048,14 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT211", "7376232IT212", "7376232IT213", "7376232IT214", "7376232IT215", "7376232IT216",
 			"7376232IT217", "7376232IT218", "7376232IT219", "7376232IT220", "7376232IT221", "7376232IT222",
 			"7376232IT223", "7376232IT224",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI701 (20 candidates)
 		{HallNo: "SF B02", CourseCode: "22AI701", RegisterNos: []string{
 			"7376232AD269", "7376232AD270", "7376232AD271", "7376232AD272", "7376232AD273", "7376232AD274",
 			"7376232AD275", "7376232AD276", "7376232AD277", "7376232AD278", "7376232AD279", "7376232AD280",
 			"7376232AD281", "7376232AD282", "7376232AD283", "7376232AD284", "7376232AD285", "7376232AD286",
 			"7376242AD501", "7376242AD502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B03 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8065,17 +8065,17 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT234", "7376232IT235", "7376232IT236", "7376232IT237", "7376232IT238", "7376232IT239",
 			"7376232IT240", "7376232IT241", "7376232IT242", "7376232IT243", "7376232IT244", "7376232IT245",
 			"7376232IT225", "7376232IT226",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI701 (8 candidates)
 		{HallNo: "SF B03", CourseCode: "22AI701", RegisterNos: []string{
 			"7376242AD503", "7376242AD504", "7376242AD505", "7376242AD506", "7376242AD507", "7376242AD508",
 			"7376242AD509", "7376242AD510",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM701 (12 candidates)
 		{HallNo: "SF B03", CourseCode: "22AM701", RegisterNos: []string{
 			"7376232AL101", "7376232AL102", "7376232AL103", "7376232AL104", "7376232AL105", "7376232AL106",
 			"7376232AL107", "7376232AL108", "7376232AL109", "7376232AL110", "7376232AL111", "7376232AL112",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 008 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8083,13 +8083,13 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 008", CourseCode: "22IT701", RegisterNos: []string{
 			"7376232IT246", "7376232IT247", "7376232IT248", "7376232IT249", "7376232IT250", "7376232IT251",
 			"7376232IT252", "7376232IT253", "7376232IT254", "7376232IT255",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM701 (15 candidates)
 		{HallNo: "WW 008", CourseCode: "22AM701", RegisterNos: []string{
 			"7376232AL113", "7376232AL114", "7376232AL115", "7376232AL116", "7376232AL117", "7376232AL118",
 			"7376232AL119", "7376232AL120", "7376232AL121", "7376232AL122", "7376232AL123", "7376232AL124",
 			"7376232AL125", "7376232AL126", "7376232AL127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 011 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8097,13 +8097,13 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 011", CourseCode: "22IT701", RegisterNos: []string{
 			"7376232IT256", "7376232IT257", "7376232IT258", "7376232IT259", "7376232IT260", "7376232IT261",
 			"7376232IT262", "7376232IT263", "7376232IT264", "7376232IT265",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM701 (15 candidates)
 		{HallNo: "WW 011", CourseCode: "22AM701", RegisterNos: []string{
 			"7376232AL128", "7376232AL129", "7376232AL130", "7376232AL131", "7376232AL132", "7376232AL133",
 			"7376232AL134", "7376232AL135", "7376232AL136", "7376232AL137", "7376232AL138", "7376232AL139",
 			"7376232AL140", "7376232AL141", "7376232AL142",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 012 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8111,13 +8111,13 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 012", CourseCode: "22IT701", RegisterNos: []string{
 			"7376232IT266", "7376232IT267", "7376232IT268", "7376232IT269", "7376232IT270", "7376232IT271",
 			"7376232IT272", "7376232IT273", "7376232IT274", "7376232IT275",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM701 (15 candidates)
 		{HallNo: "WW 012", CourseCode: "22AM701", RegisterNos: []string{
 			"7376232AL143", "7376232AL144", "7376232AL145", "7376232AL146", "7376232AL147", "7376232AL148",
 			"7376232AL149", "7376232AL150", "7376232AL151", "7376232AL152", "7376232AL153", "7376232AL154",
 			"7376232AL155", "7376232AL156", "7376232AL157",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 113 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8125,13 +8125,13 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 113", CourseCode: "22IT701", RegisterNos: []string{
 			"7376232IT276", "7376232IT277", "7376232IT278", "7376232IT279", "7376232IT280", "7376232IT281",
 			"7376232IT283", "7376232IT284", "7376232IT285", "7376232IT286",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM701 (15 candidates)
 		{HallNo: "WW 113", CourseCode: "22AM701", RegisterNos: []string{
 			"7376232AL158", "7376232AL159", "7376232AL160", "7376232AL161", "7376232AL162", "7376232AL163",
 			"7376232AL164", "7376232AL165", "7376232AL166", "7376232AL167", "7376232AL168", "7376232AL169",
 			"7376232AL170", "7376232AL171", "7376232AL172",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 114 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8139,13 +8139,13 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 114", CourseCode: "22IT701", RegisterNos: []string{
 			"7376242IT501", "7376242IT502", "7376242IT503", "7376242IT504", "7376242IT505", "7376242IT507",
 			"7376242IT508", "7376242IT509", "7376242IT510", "7376242IT511",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM701 (15 candidates)
 		{HallNo: "WW 114", CourseCode: "22AM701", RegisterNos: []string{
 			"7376232AL173", "7376232AL174", "7376232AL175", "7376232AL176", "7376232AL177", "7376232AL178",
 			"7376232AL179", "7376232AL180", "7376232AL181", "7376232AL182", "7376232AL183", "7376232AL184",
 			"7376232AL185", "7376232AL186", "7376232AL187",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 115 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8153,13 +8153,13 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 115", CourseCode: "22BT701*", RegisterNos: []string{
 			"7376232BT101", "7376232BT102", "7376232BT103", "7376232BT104", "7376232BT105", "7376232BT106",
 			"7376232BT107", "7376232BT108", "7376232BT109", "7376232BT110",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM701 (15 candidates)
 		{HallNo: "WW 115", CourseCode: "22AM701", RegisterNos: []string{
 			"7376232AL188", "7376232AL189", "7376232AL190", "7376232AL191", "7376232AL192", "7376232AL193",
 			"7376232AL195", "7376232AL196", "7376232AL197", "7376232AL198", "7376232AL199", "7376232AL200",
 			"7376232AL201", "7376232AL202", "7376232AL203",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 117 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8167,30 +8167,30 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 117", CourseCode: "22BT701*", RegisterNos: []string{
 			"7376232BT111", "7376232BT112", "7376232BT113", "7376232BT114", "7376232BT115", "7376232BT116",
 			"7376232BT117", "7376232BT118", "7376232BT119", "7376232BT120",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM701 (15 candidates)
 		{HallNo: "WW 117", CourseCode: "22AM701", RegisterNos: []string{
 			"7376232AL204", "7376232AL205", "7376232AL206", "7376232AL207", "7376232AL208", "7376232AL209",
 			"7376232AL210", "7376232AL211", "7376232AL212", "7376232AL213", "7376232AL214", "7376232AL215",
 			"7376232AL216", "7376232AL217", "7376232AL218",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 118 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EE701 (5 candidates)
 		{HallNo: "WW 118", CourseCode: "22EE701", RegisterNos: []string{
 			"7376231EE102", "7376231EE103", "7376231EE104", "7376231EE105", "7376231EE106",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT701* (10 candidates)
 		{HallNo: "WW 118", CourseCode: "22BT701*", RegisterNos: []string{
 			"7376232BT121", "7376232BT122", "7376232BT123", "7376232BT124", "7376232BT125", "7376232BT126",
 			"7376232BT127", "7376232BT128", "7376232BT129", "7376232BT130",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM701 (10 candidates)
 		{HallNo: "WW 118", CourseCode: "22AM701", RegisterNos: []string{
 			"7376232AL219", "7376232AL220", "7376232AL221", "7376242AL501", "7376242AL502", "7376242AL503",
 			"7376242AL504", "7376242AL505", "7376242AL506", "7376242AL507",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8199,12 +8199,12 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EE107", "7376231EE108", "7376231EE109", "7376231EE110", "7376231EE111", "7376231EE112",
 			"7376231EE113", "7376231EE114", "7376231EE115", "7376231EE116", "7376231EE117", "7376231EE118",
 			"7376231EE119", "7376231EE120", "7376231EE121",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT701* (10 candidates)
 		{HallNo: "WW 201", CourseCode: "22BT701*", RegisterNos: []string{
 			"7376232BT131", "7376232BT132", "7376232BT133", "7376232BT134", "7376232BT135", "7376232BT136",
 			"7376232BT137", "7376232BT138", "7376232BT139", "7376232BT140",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8215,7 +8215,7 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EE134", "7376231EE135", "7376231EE136", "7376231EE137", "7376231EE138", "7376231EE139",
 			"7376231EE140", "7376231EE141", "7376231EE142", "7376231EE143", "7376231EE144", "7376231EE145",
 			"7376231EE146",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT701* (25 candidates)
 		{HallNo: "WW 202", CourseCode: "22BT701*", RegisterNos: []string{
 			"7376232BT141", "7376232BT142", "7376232BT143", "7376232BT144", "7376232BT145", "7376232BT146",
@@ -8223,7 +8223,7 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232BT154", "7376232BT155", "7376232BT156", "7376232BT157", "7376232BT158", "7376232BT159",
 			"7376232BT160", "7376232BT161", "7376232BT162", "7376232BT163", "7376232BT164", "7376232BT165",
 			"7376232BT166",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8232,29 +8232,29 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EE147", "7376231EE148", "7376231EE149", "7376231EE150", "7376231EE151", "7376231EE152",
 			"7376231EE153", "7376231EE154", "7376231EE155", "7376231EE156", "7376231EE157", "7376231EE158",
 			"7376231EE159", "7376231EE160", "7376231EE161",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT701* (10 candidates)
 		{HallNo: "WW 203", CourseCode: "22BT701*", RegisterNos: []string{
 			"7376232BT167", "7376232BT168", "7376232BT169", "7376232BT170", "7376232BT171", "7376232BT172",
 			"7376232BT173", "7376232BT174", "7376232BT175", "7376232BT176",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EE701 (6 candidates)
 		{HallNo: "WW 204", CourseCode: "22EE701", RegisterNos: []string{
 			"7376241EE501", "7376241EE502", "7376241EE503", "7376241EE504", "7376241EE505", "7376241EE506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME701 (9 candidates)
 		{HallNo: "WW 204", CourseCode: "22ME701", RegisterNos: []string{
 			"7376231ME101", "7376231ME102", "7376231ME103", "7376231ME104", "7376231ME105", "7376231ME106",
 			"7376231ME107", "7376231ME108", "7376231ME109",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT701* (10 candidates)
 		{HallNo: "WW 204", CourseCode: "22BT701*", RegisterNos: []string{
 			"7376232BT177", "7376232BT178", "7376232BT179", "7376232BT180", "7376232BT181", "7376232BT182",
 			"7376232BT183", "7376232BT184", "7376232BT185", "7376232BT187",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8263,12 +8263,12 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231ME110", "7376231ME111", "7376231ME112", "7376231ME113", "7376231ME114", "7376231ME115",
 			"7376231ME116", "7376231ME117", "7376231ME118", "7376231ME119", "7376231ME120", "7376231ME121",
 			"7376231ME122", "7376231ME123", "7376231ME124",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT701* (10 candidates)
 		{HallNo: "WW 205", CourseCode: "22BT701*", RegisterNos: []string{
 			"7376232BT188", "7376232BT189", "7376232BT190", "7376232BT191", "7376232BT192", "7376232BT193",
 			"7376232BT194", "7376232BT195", "7376232BT196", "7376232BT197",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8277,12 +8277,12 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231ME125", "7376231ME126", "7376231ME127", "7376231ME128", "7376231ME129", "7376231ME130",
 			"7376231ME131", "7376231ME132", "7376231ME133", "7376231ME134", "7376231ME135", "7376231ME136",
 			"7376231ME137", "7376231ME138", "7376231ME139",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT701* (10 candidates)
 		{HallNo: "WW 206", CourseCode: "22BT701*", RegisterNos: []string{
 			"7376232BT198", "7376232BT199", "7376232BT200", "7376232BT201", "7376232BT202", "7376232BT203",
 			"7376232BT204", "7376232BT205", "7376232BT206", "7376232BT207",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 207 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8293,36 +8293,36 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231ME152", "7376231ME153", "7376231ME154", "7376231ME155", "7376231ME156", "7376231ME157",
 			"7376231ME158", "7376231ME159", "7376231ME160", "7376231ME161", "7376241ME501", "7376241ME502",
 			"7376241ME503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT701* (8 candidates)
 		{HallNo: "WW 207", CourseCode: "22BT701*", RegisterNos: []string{
 			"7376232BT208", "7376232BT209", "7376232BT210", "7376232BT211", "7376232BT212", "7376232BT213",
 			"7376232BT214", "7376232BT215",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT701 (17 candidates)
 		{HallNo: "WW 207", CourseCode: "22CT701", RegisterNos: []string{
 			"7376232CT101", "7376232CT102", "7376232CT103", "7376232CT104", "7376232CT105", "7376232CT106",
 			"7376232CT107", "7376232CT108", "7376232CT109", "7376232CT110", "7376232CT111", "7376232CT112",
 			"7376232CT113", "7376232CT114", "7376232CT115", "7376232CT116", "7376232CT117",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 208 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22ME701 (2 candidates)
 		{HallNo: "WW 208", CourseCode: "22ME701", RegisterNos: []string{
 			"7376241ME504", "7376241ME505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD701 (13 candidates)
 		{HallNo: "WW 208", CourseCode: "22CD701", RegisterNos: []string{
 			"7376231CD102", "7376231CD103", "7376231CD104", "7376231CD105", "7376231CD106", "7376231CD107",
 			"7376231CD108", "7376231CD109", "7376231CD110", "7376231CD111", "7376231CD112", "7376231CD113",
 			"7376231CD114",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT701 (10 candidates)
 		{HallNo: "WW 208", CourseCode: "22CT701", RegisterNos: []string{
 			"7376232CT118", "7376232CT119", "7376232CT120", "7376232CT121", "7376232CT122", "7376232CT123",
 			"7376232CT124", "7376232CT125", "7376232CT126", "7376232CT127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 209 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8331,12 +8331,12 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CD115", "7376231CD116", "7376231CD117", "7376231CD118", "7376231CD119", "7376231CD120",
 			"7376231CD121", "7376231CD122", "7376231CD123", "7376231CD124", "7376231CD125", "7376231CD126",
 			"7376231CD127", "7376231CD128", "7376231CD129",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT701 (10 candidates)
 		{HallNo: "WW 209", CourseCode: "22CT701", RegisterNos: []string{
 			"7376232CT128", "7376232CT129", "7376232CT130", "7376232CT131", "7376232CT132", "7376232CT133",
 			"7376232CT134", "7376232CT135", "7376232CT136", "7376232CT137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 210 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8345,12 +8345,12 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CD130", "7376231CD131", "7376231CD132", "7376231CD133", "7376231CD134", "7376231CD135",
 			"7376231CD136", "7376231CD137", "7376231CD138", "7376231CD139", "7376231CD140", "7376231CD141",
 			"7376231CD142", "7376231CD143", "7376231CD144",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT701 (10 candidates)
 		{HallNo: "WW 210", CourseCode: "22CT701", RegisterNos: []string{
 			"7376232CT138", "7376232CT139", "7376232CT140", "7376232CT141", "7376232CT142", "7376232CT143",
 			"7376232CT144", "7376232CT145", "7376232CT146", "7376232CT147",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 211 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8359,12 +8359,12 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CD145", "7376231CD146", "7376231CD147", "7376231CD148", "7376231CD149", "7376231CD150",
 			"7376231CD151", "7376231CD152", "7376231CD153", "7376231CD154", "7376231CD155", "7376231CD156",
 			"7376231CD157", "7376231CD158", "7376231CD159",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT701 (10 candidates)
 		{HallNo: "WW 211", CourseCode: "22CT701", RegisterNos: []string{
 			"7376232CT148", "7376232CT149", "7376232CT150", "7376232CT151", "7376232CT152", "7376232CT153",
 			"7376232CT154", "7376232CT155", "7376232CT156", "7376232CT157",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 212 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8374,22 +8374,22 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EI107", "7376231EI108", "7376231EI109", "7376231EI110", "7376231EI111", "7376231EI112",
 			"7376231EI113", "7376231EI114", "7376231EI115", "7376231EI116", "7376231EI117", "7376231EI118",
 			"7376231EI119",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD701 (6 candidates)
 		{HallNo: "WW 212", CourseCode: "22CD701", RegisterNos: []string{
 			"7376231CD160", "7376231CD161", "7376231CD162", "7376241CD501", "7376241CD502", "7376241CD503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC701 (17 candidates)
 		{HallNo: "WW 212", CourseCode: "22MC701", RegisterNos: []string{
 			"7376231MZ101", "7376231MZ102", "7376231MZ103", "7376231MZ104", "7376231MZ105", "7376231MZ106",
 			"7376231MZ107", "7376231MZ108", "7376231MZ109", "7376231MZ110", "7376231MZ111", "7376231MZ112",
 			"7376231MZ113", "7376231MZ114", "7376231MZ115", "7376231MZ116", "7376231MZ117",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT701 (8 candidates)
 		{HallNo: "WW 212", CourseCode: "22CT701", RegisterNos: []string{
 			"7376232CT158", "7376232CT159", "7376232CT160", "7376232CT161", "7376232CT162", "7376242CT501",
 			"7376242CT502", "7376242CT503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 213 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8398,12 +8398,12 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EI120", "7376231EI121", "7376231EI122", "7376231EI123", "7376231EI124", "7376231EI125",
 			"7376231EI126", "7376231EI127", "7376231EI128", "7376231EI129", "7376231EI130", "7376231EI131",
 			"7376231EI132", "7376231EI133", "7376231EI134",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC701 (10 candidates)
 		{HallNo: "WW 213", CourseCode: "22MC701", RegisterNos: []string{
 			"7376231MZ118", "7376231MZ119", "7376231MZ120", "7376231MZ121", "7376231MZ122", "7376231MZ123",
 			"7376231MZ124", "7376231MZ125", "7376231MZ126", "7376231MZ127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 214 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8412,12 +8412,12 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EI135", "7376231EI136", "7376231EI137", "7376231EI138", "7376231EI139", "7376231EI140",
 			"7376231EI141", "7376231EI142", "7376231EI143", "7376231EI144", "7376231EI145", "7376231EI146",
 			"7376231EI147", "7376231EI148", "7376231EI149",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC701 (10 candidates)
 		{HallNo: "WW 214", CourseCode: "22MC701", RegisterNos: []string{
 			"7376231MZ128", "7376231MZ129", "7376231MZ130", "7376231MZ131", "7376231MZ132", "7376231MZ133",
 			"7376231MZ134", "7376231MZ135", "7376231MZ136", "7376231MZ137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 215 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8426,12 +8426,12 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EI150", "7376231EI151", "7376231EI152", "7376231EI153", "7376231EI154", "7376231EI155",
 			"7376231EI156", "7376231EI157", "7376231EI158", "7376231EI159", "7376231EI160", "7376241EI501",
 			"7376241EI502", "7376241EI503", "7376241EI504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC701 (10 candidates)
 		{HallNo: "WW 215", CourseCode: "22MC701", RegisterNos: []string{
 			"7376231MZ138", "7376231MZ139", "7376231MZ140", "7376231MZ141", "7376231MZ142", "7376231MZ143",
 			"7376231MZ144", "7376231MZ145", "7376231MZ146", "7376231MZ147",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 218 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8439,13 +8439,13 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 218", CourseCode: "22MC701", RegisterNos: []string{
 			"7376231MZ148", "7376231MZ149", "7376231MZ150", "7376231MZ151", "7376231MZ152", "7376231MZ153",
 			"7376231MZ154", "7376231MZ155", "7376231MZ156", "7376231MZ157",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB701 (15 candidates)
 		{HallNo: "WW 218", CourseCode: "22CB701", RegisterNos: []string{
 			"7376232CB101", "7376232CB102", "7376232CB103", "7376232CB104", "7376232CB105", "7376232CB106",
 			"7376232CB107", "7376232CB108", "7376232CB109", "7376232CB110", "7376232CB111", "7376232CB112",
 			"7376232CB113", "7376232CB114", "7376232CB115",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 219 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8453,17 +8453,17 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 219", CourseCode: "22MC701", RegisterNos: []string{
 			"7376241MZ501", "7376241MZ502", "7376241MZ503", "7376241MZ504", "7376241MZ505", "7376241MZ506",
 			"7376231MZ158",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB701 (15 candidates)
 		{HallNo: "WW 219", CourseCode: "22CB701", RegisterNos: []string{
 			"7376232CB116", "7376232CB117", "7376232CB118", "7376232CB119", "7376232CB120", "7376232CB121",
 			"7376232CB122", "7376232CB123", "7376232CB124", "7376232CB125", "7376232CB126", "7376232CB127",
 			"7376232CB128", "7376232CB129", "7376232CB130",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG701 (3 candidates)
 		{HallNo: "WW 219", CourseCode: "22AG701", RegisterNos: []string{
 			"7376232AG102", "7376232AG103", "7376232AG104",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 222 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8474,7 +8474,7 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232CB144", "7376232CB145", "7376232CB146", "7376232CB147", "7376232CB148", "7376232CB149",
 			"7376232CB150", "7376232CB151", "7376232CB152", "7376232CB153", "7376232CB154", "7376232CB155",
 			"7376232CB156",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG701 (25 candidates)
 		{HallNo: "WW 222", CourseCode: "22AG701", RegisterNos: []string{
 			"7376232AG105", "7376232AG106", "7376232AG107", "7376232AG108", "7376232AG109", "7376232AG111",
@@ -8482,7 +8482,7 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AG118", "7376232AG119", "7376232AG120", "7376232AG121", "7376232AG122", "7376232AG123",
 			"7376232AG124", "7376232AG125", "7376232AG126", "7376232AG127", "7376232AG128", "7376232AG129",
 			"7376232AG131",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8491,12 +8491,12 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231SE101", "7376231SE102", "7376231SE103", "7376231SE104", "7376231SE105", "7376231SE106",
 			"7376231SE107", "7376231SE108", "7376231SE109", "7376231SE110", "7376231SE111", "7376231SE112",
 			"7376231SE113", "7376231SE114", "7376231SE115", "7376231SE116", "7376231SE117",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB701 (8 candidates)
 		{HallNo: "WW 223", CourseCode: "22CB701", RegisterNos: []string{
 			"7376232CB159", "7376232CB160", "7376232CB161", "7376232CB162", "7376232CB163", "7376232CB157",
 			"7376242CB502", "7376242CB503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG701 (25 candidates)
 		{HallNo: "WW 223", CourseCode: "22AG701", RegisterNos: []string{
 			"7376232AG132", "7376232AG133", "7376232AG134", "7376232AG135", "7376232AG136", "7376232AG137",
@@ -8504,7 +8504,7 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AG144", "7376232AG145", "7376232AG146", "7376232AG147", "7376232AG148", "7376232AG149",
 			"7376232AG150", "7376232AG151", "7376232AG152", "7376232AG153", "7376232AG154", "7376242AG501",
 			"7376242AG502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8514,7 +8514,7 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231BM107", "7376231BM108", "7376231BM109", "7376231BM110", "7376231BM111", "7376231BM112",
 			"7376231BM113", "7376231BM114", "7376231BM115", "7376231BM116", "7376231BM117", "7376231BM118",
 			"7376231BM119", "7376231BM120", "7376231BM121", "7376231BM122", "7376231BM123",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IS701 (25 candidates)
 		{HallNo: "WW 224", CourseCode: "22IS701", RegisterNos: []string{
 			"7376231SE118", "7376231SE119", "7376231SE120", "7376231SE121", "7376231SE122", "7376231SE123",
@@ -8522,11 +8522,11 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231SE130", "7376231SE131", "7376231SE132", "7376231SE133", "7376231SE134", "7376231SE135",
 			"7376231SE136", "7376231SE137", "7376231SE138", "7376231SE139", "7376231SE140", "7376231SE141",
 			"7376231SE142",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG701 (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22AG701", RegisterNos: []string{
 			"7376242AG503", "7376242AG504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 225 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8537,18 +8537,18 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231BM136", "7376231BM137", "7376231BM138", "7376231BM139", "7376231BM140", "7376231BM141",
 			"7376231BM142", "7376231BM143", "7376231BM144", "7376231BM145", "7376231BM146", "7376231BM147",
 			"7376231BM148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IS701 (13 candidates)
 		{HallNo: "WW 225", CourseCode: "22IS701", RegisterNos: []string{
 			"7376231SE145", "7376231SE146", "7376231SE147", "7376231SE148", "7376231SE149", "7376231SE150",
 			"7376231SE151", "7376231SE152", "7376231SE153", "7376231SE154", "7376231SE155", "7376231SE143",
 			"7376241SE501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD701 (12 candidates)
 		{HallNo: "WW 225", CourseCode: "22FD701", RegisterNos: []string{
 			"7376232FD101", "7376232FD102", "7376232FD103", "7376232FD105", "7376232FD106", "7376232FD107",
 			"7376232FD108", "7376232FD109", "7376232FD110", "7376232FD111", "7376232FD112", "7376232FD113",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 226 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8558,11 +8558,11 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CE107", "7376231CE108", "7376231CE109", "7376231CE110", "7376231CE111", "7376231CE112",
 			"7376231CE113", "7376231CE114", "7376231CE115", "7376231CE116", "7376231CE117", "7376231CE118",
 			"7376231CE119", "7376231CE120", "7376231CE121", "7376231CE122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM701 (3 candidates)
 		{HallNo: "WW 226", CourseCode: "22BM701", RegisterNos: []string{
 			"7376231BM149", "7376231BM150", "7376231BM151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD701 (25 candidates)
 		{HallNo: "WW 226", CourseCode: "22FD701", RegisterNos: []string{
 			"7376232FD114", "7376232FD115", "7376232FD116", "7376232FD117", "7376232FD118", "7376232FD119",
@@ -8570,7 +8570,7 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232FD127", "7376232FD128", "7376232FD129", "7376232FD130", "7376232FD131", "7376232FD132",
 			"7376232FD133", "7376232FD134", "7376232FD135", "7376232FD136", "7376232FD137", "7376232FD138",
 			"7376232FD139",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 227 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8578,25 +8578,25 @@ func buildSeatingData27Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 227", CourseCode: "22CE701", RegisterNos: []string{
 			"7376231CE123", "7376231CE124", "7376231CE125", "7376231CE126", "7376231CE127", "7376231CE128",
 			"7376231CE129", "7376241CE501", "7376241CE502", "7376241CE503", "7376241CE504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD701 (13 candidates)
 		{HallNo: "WW 227", CourseCode: "22FD701", RegisterNos: []string{
 			"7376232FD140", "7376232FD141", "7376232FD142", "7376232FD143", "7376232FD144", "7376232FD145",
 			"7376232FD146", "7376232FD147", "7376232FD148", "7376232FD149", "7376232FD150", "7376232FD151",
 			"7376232FD152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FT701 (20 candidates)
 		{HallNo: "WW 227", CourseCode: "22FT701", RegisterNos: []string{
 			"7376232FT101", "7376232FT102", "7376232FT103", "7376232FT104", "7376232FT105", "7376232FT106",
 			"7376232FT108", "7376232FT109", "7376232FT110", "7376232FT111", "7376232FT112", "7376232FT113",
 			"7376232FT114", "7376232FT115", "7376232FT116", "7376232FT117", "7376232FT118", "7376232FT119",
 			"7376232FT120", "7376242FT501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
 
 // ============================================================================
-// 27-11-2026 AFTERNOON SESSION (AN: 01:30 PM ? 04:30 PM) - Total: 1621 Students
+// 27-11-2026 AFTERNOON SESSION (AN: 01:30 PM : 04:30 PM) - Total: 1621 Students
 // ============================================================================
 func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -8609,7 +8609,7 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS166", "7376241CS167", "7376241CS170", "7376241CS182", "7376241CS198", "7376241CS200",
 			"7376241CS210", "7376241CS215", "7376241CS225", "7376241CS230", "7376241CS233", "7376241CS238",
 			"7376241CS241", "7376241CS249",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (25 candidates)
 		{HallNo: "ME 107", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376241CS102", "7376241CS109", "7376241CS112", "7376241CS115", "7376241CS117", "7376241CS123",
@@ -8617,7 +8617,7 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS156", "7376241CS159", "7376241CS160", "7376241CS162", "7376241CS172", "7376241CS178",
 			"7376241CS181", "7376241CS183", "7376241CS191", "7376241CS199", "7376241CS206", "7376241CS208",
 			"7376241CS209",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 108 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8627,7 +8627,7 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS288", "7376241CS289", "7376241CS250", "7376241CS251", "7376241CS254", "7376241CS265",
 			"7376241CS275", "7376241CS282", "7376241CS285", "7376241CS299", "7376241CS306", "7376241CS312",
 			"7376241CS313", "7376241CS316",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (25 candidates)
 		{HallNo: "ME 108", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376241CS258", "7376241CS259", "7376241CS260", "7376241CS211", "7376241CS213", "7376241CS214",
@@ -8635,7 +8635,7 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS255", "7376241CS263", "7376241CS264", "7376241CS266", "7376241CS276", "7376241CS277",
 			"7376241CS290", "7376241CS291", "7376241CS309", "7376241CS314", "7376241CS315", "7376241CS326",
 			"7376241CS331",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8645,7 +8645,7 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS322", "7376241CS324", "7376241CS328", "7376241CS334", "7376241CS337", "7376241CS345",
 			"7376241CS353", "7376241CS356", "7376241CS362", "7376241CS372", "7376241CS381", "7376241CS382",
 			"7376241CS385", "7376241CS388",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (25 candidates)
 		{HallNo: "ME 201", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376241CS416", "7376241CS417", "7376241CS418", "7376241CS419", "7376241CS343", "7376241CS348",
@@ -8653,7 +8653,7 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS383", "7376241CS384", "7376241CS386", "7376241CS389", "7376241CS390", "7376241CS396",
 			"7376241CS402", "7376241CS404", "7376241CS407", "7376241CS427", "7376241CS432", "7376241CS433",
 			"7376241CS435",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8662,30 +8662,30 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS412", "7376241CS413", "7376241CS414", "7376241CS405", "7376241CS408", "7376241CS431",
 			"7376241CS442", "7376241CS445", "7376241CS448", "7376241CS449", "7376241CS451", "7376241CS453",
 			"7376241CS458", "7376241CS463", "7376241CS465", "7376241CS469", "7376241CS471", "7376241CS476",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (7 candidates)
 		{HallNo: "ME 202", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376241CS437", "7376241CS446", "7376241CS454", "7376241CS459", "7376241CS462", "7376241CS464",
 			"7376241CS467",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAG01 (2 candidates)
 		{HallNo: "ME 202", CourseCode: "22OAG01", RegisterNos: []string{
 			"7376241EC109", "7376241EC112",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (10 candidates)
 		{HallNo: "ME 202", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376241EC179", "7376241EC204", "7376241EC206", "7376241EC211", "7376241EC213", "7376241EC221",
 			"7376241EC226", "7376241EC236", "7376241EC288", "7376241EC352",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (7 candidates)
 		{HallNo: "ME 202", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376241EE107", "7376241EE109", "7376241EE110", "7376241EE135", "7376241EE180", "7376241EE199",
 			"7376241EE216",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (1 candidates)
 		{HallNo: "ME 202", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376241ME108",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8694,26 +8694,26 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EC335", "7376241EC336", "7376241EC337", "7376241EC121", "7376241EC131", "7376241EC143",
 			"7376241EC149", "7376241EC150", "7376241EC161", "7376241EC184", "7376241EC209", "7376241EC250",
 			"7376241EC252", "7376241EC262", "7376241EC264", "7376241EC305", "7376241EC317", "7376241EC324",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAG01 (2 candidates)
 		{HallNo: "ME 203", CourseCode: "22OAG01", RegisterNos: []string{
 			"7376241EE144", "7376241EE154",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (10 candidates)
 		{HallNo: "ME 203", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376241ME109", "7376241ME111", "7376241ME125", "7376241ME128", "7376241ME130", "7376241ME132",
 			"7376241ME137", "7376241ME140", "7376241ME150", "7376241ME159",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (1 candidates)
 		{HallNo: "ME 203", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376241MZ112",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (14 candidates)
 		{HallNo: "ME 203", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376242AD104", "7376242AD105", "7376242AD118", "7376242AD124", "7376242AD134", "7376242AD139",
 			"7376242AD150", "7376242AD162", "7376242AD168", "7376242AD170", "7376242AD180", "7376242AD195",
 			"7376242AD197", "7376242AD210",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8721,34 +8721,34 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "ME 204", CourseCode: "22OAG01", RegisterNos: []string{
 			"7376241EE159", "7376241EE167", "7376241EE170", "7376241EE174", "7376241EE198", "7376241EE200",
 			"7376241EE217",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAG01 (2 candidates)
 		{HallNo: "ME 204", CourseCode: "22OAG01", RegisterNos: []string{
 			"7376241EI124", "7376241EI156",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAG01 (1 candidates)
 		{HallNo: "ME 204", CourseCode: "22OAG01", RegisterNos: []string{
 			"7376242BT102",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAG01 (5 candidates)
 		{HallNo: "ME 204", CourseCode: "22OAG01", RegisterNos: []string{
 			"7376242AD136", "7376242AD190", "7376242AD295", "7376242AD313", "7376242AD322",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (16 candidates)
 		{HallNo: "ME 204", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376242AD234", "7376242AD241", "7376242AD246", "7376242AD251", "7376242AD253", "7376242AD258",
 			"7376242AD272", "7376242AD281", "7376242AD304", "7376242AD312", "7376242AD315", "7376242AD318",
 			"7376242AD330", "7376242AD340", "7376242AD345", "7376242AD346",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAG01 (5 candidates)
 		{HallNo: "ME 204", CourseCode: "22OAG01", RegisterNos: []string{
 			"7376242AL111", "7376242AL122", "7376242AL129", "7376242AL134", "7376242AL140",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (9 candidates)
 		{HallNo: "ME 204", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376242AL105", "7376242AL112", "7376242AL118", "7376242AL126", "7376242AL130", "7376242AL132",
 			"7376242AL138", "7376242AL142", "7376242AL150",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8758,22 +8758,22 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242BT110", "7376242BT112", "7376242BT117", "7376242BT118", "7376242BT120", "7376242BT126",
 			"7376242BT127", "7376242BT129", "7376242BT132", "7376242BT134", "7376242BT135", "7376242BT142",
 			"7376242BT144", "7376242BT145",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (2 candidates)
 		{HallNo: "ME 205", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376242BT159", "7376242BT164",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (2 candidates)
 		{HallNo: "ME 205", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376242IT101", "7376242IT104",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (21 candidates)
 		{HallNo: "ME 205", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376242AL194", "7376242AL195", "7376242AL196", "7376242AL197", "7376242AL210", "7376242AL211",
 			"7376242AL212", "7376242AL213", "7376242AL151", "7376242AL155", "7376242AL160", "7376242AL165",
 			"7376242AL167", "7376242AL168", "7376242AL171", "7376242AL173", "7376242AL185", "7376242AL199",
 			"7376242AL200", "7376242AL208", "7376242AL218",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8783,7 +8783,7 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242BT154", "7376242BT162", "7376242BT163", "7376242BT167", "7376242BT171", "7376242BT179",
 			"7376242BT185", "7376242BT187", "7376242BT191", "7376242BT194", "7376242BT197", "7376242BT199",
 			"7376242BT202", "7376242BT203",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (25 candidates)
 		{HallNo: "ME 206", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376242IT156", "7376242IT157", "7376242IT158", "7376242IT159", "7376242IT109", "7376242IT112",
@@ -8791,7 +8791,7 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT135", "7376242IT147", "7376242IT162", "7376242IT170", "7376242IT172", "7376242IT175",
 			"7376242IT177", "7376242IT185", "7376242IT191", "7376242IT197", "7376242IT205", "7376242IT210",
 			"7376242IT212",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 301 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8799,27 +8799,27 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "ME 301", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376241CS106", "7376241CS135", "7376241CS143", "7376241CS164", "7376241CS176", "7376241CS201",
 			"7376241CS205", "7376241CS212", "7376241CS228",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAG01 (7 candidates)
 		{HallNo: "ME 301", CourseCode: "22OAG01", RegisterNos: []string{
 			"7376242BT204", "7376242BT205", "7376242BT211", "7376242BT214", "7376242BT217", "7376242BT221",
 			"7376242BT222",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAG01 (7 candidates)
 		{HallNo: "ME 301", CourseCode: "22OAG01", RegisterNos: []string{
 			"7376242IT113", "7376242IT134", "7376242IT137", "7376242IT138", "7376242IT152", "7376242IT160",
 			"7376242IT178",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (16 candidates)
 		{HallNo: "ME 301", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376242IT252", "7376242IT253", "7376242IT255", "7376242IT264", "7376242IT267", "7376242IT275",
 			"7376242IT285", "7376242IT296", "7376242IT297", "7376242IT299", "7376242IT306", "7376242IT328",
 			"7376242IT329", "7376242IT333", "7376242IT334", "7376242IT351",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAG01 (6 candidates)
 		{HallNo: "ME 301", CourseCode: "22OAG01", RegisterNos: []string{
 			"7376242CB102", "7376242CB133", "7376242CB135", "7376242CB139", "7376242CB140", "7376242CB155",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 302 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8829,31 +8829,31 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS256", "7376241CS280", "7376241CS284", "7376241CS298", "7376241CS302", "7376241CS303",
 			"7376241CS307", "7376241CS308", "7376241CS317", "7376241CS325", "7376241CS332", "7376241CS336",
 			"7376241CS339", "7376241CS358", "7376241CS361", "7376241CS424", "7376241CS460", "7376241CS473",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (1 candidates)
 		{HallNo: "ME 302", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376241EC108",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAG01 (20 candidates)
 		{HallNo: "ME 302", CourseCode: "22OAG01", RegisterNos: []string{
 			"7376242IT187", "7376242IT189", "7376242IT195", "7376242IT208", "7376242IT211", "7376242IT213",
 			"7376242IT214", "7376242IT216", "7376242IT218", "7376242IT223", "7376242IT227", "7376242IT229",
 			"7376242IT234", "7376242IT248", "7376242IT263", "7376242IT281", "7376242IT289", "7376242IT317",
 			"7376242IT346", "7376242IT349",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 303 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22OAG01 (3 candidates)
 		{HallNo: "ME 303", CourseCode: "22OAG01", RegisterNos: []string{
 			"7376251CS501", "7376251CS509", "7376251CS510",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (15 candidates)
 		{HallNo: "ME 303", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376241CS121", "7376241CS122", "7376241CS127", "7376241CS132", "7376241CS133", "7376241CS141",
 			"7376241CS148", "7376241CS149", "7376241CS151", "7376241CS154", "7376241CS163", "7376241CS169",
 			"7376241CS204", "7376241CS207", "7376241CS219",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (25 candidates)
 		{HallNo: "ME 303", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376241EC134", "7376241EC135", "7376241EC136", "7376241EC110", "7376241EC132", "7376241EC145",
@@ -8861,15 +8861,15 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EC176", "7376241EC178", "7376241EC188", "7376241EC194", "7376241EC196", "7376241EC202",
 			"7376241EC214", "7376241EC216", "7376241EC217", "7376241EC219", "7376241EC222", "7376241EC224",
 			"7376241EC229",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAG01 (1 candidates)
 		{HallNo: "ME 303", CourseCode: "22OAG01", RegisterNos: []string{
 			"7376252IT516",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAG01 (1 candidates)
 		{HallNo: "ME 303", CourseCode: "22OAG01", RegisterNos: []string{
 			"7376252CB503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 304 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8879,7 +8879,7 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS301", "7376241CS305", "7376241CS311", "7376241CS319", "7376241CS321", "7376241CS329",
 			"7376241CS330", "7376241CS359", "7376241CS370", "7376241CS378", "7376241CS380", "7376241CS387",
 			"7376241CS397", "7376241CS400",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (25 candidates)
 		{HallNo: "ME 304", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376241EC291", "7376241EC292", "7376241EC293", "7376241EC234", "7376241EC235", "7376241EC238",
@@ -8887,7 +8887,7 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EC258", "7376241EC259", "7376241EC265", "7376241EC267", "7376241EC269", "7376241EC270",
 			"7376241EC272", "7376241EC274", "7376241EC275", "7376241EC280", "7376241EC281", "7376241EC283",
 			"7376241EC295",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 305 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8896,27 +8896,27 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS401", "7376241CS421", "7376241CS428", "7376241CS439", "7376241CS440", "7376241CS444",
 			"7376241CS450", "7376241CS452", "7376241CS456", "7376241CS457", "7376241CS461", "7376241CS474",
 			"7376241CS475",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (14 candidates)
 		{HallNo: "ME 305", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376241EC306", "7376241EC307", "7376241EC308", "7376241EC309", "7376241EC296", "7376241EC298",
 			"7376241EC301", "7376241EC323", "7376241EC325", "7376241EC330", "7376241EC332", "7376241EC339",
 			"7376241EC343", "7376241EC348",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (4 candidates)
 		{HallNo: "ME 305", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376241EI111", "7376241EI145", "7376241EI146", "7376241EI154",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (7 candidates)
 		{HallNo: "ME 305", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376241MZ114", "7376241MZ116", "7376241MZ122", "7376241MZ133", "7376241MZ143", "7376241MZ151",
 			"7376241MZ153",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (7 candidates)
 		{HallNo: "ME 305", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376242AD108", "7376242AD109", "7376242AD112", "7376242AD125", "7376242AD126", "7376242AD128",
 			"7376242AD131",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 306 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8926,18 +8926,18 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AD183", "7376242AD184", "7376242AD213", "7376242AD218", "7376242AD222", "7376242AD252",
 			"7376242AD254", "7376242AD267", "7376242AD303", "7376242AD308", "7376242AD316", "7376242AD335",
 			"7376242AD337",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (20 candidates)
 		{HallNo: "ME 306", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376242AD155", "7376242AD156", "7376242AD157", "7376242AD142", "7376242AD161", "7376242AD163",
 			"7376242AD164", "7376242AD174", "7376242AD181", "7376242AD182", "7376242AD186", "7376242AD193",
 			"7376242AD196", "7376242AD202", "7376242AD203", "7376242AD208", "7376242AD214", "7376242AD216",
 			"7376242AD217", "7376242AD219",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (6 candidates)
 		{HallNo: "ME 306", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376242AG118", "7376242AG119", "7376242AG120", "7376242AG102", "7376242AG111", "7376242AG123",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 008 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8945,38 +8945,38 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 008", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376242AD243", "7376242AD244", "7376242AD245", "7376242AD220", "7376242AD224", "7376242AD226",
 			"7376242AD247", "7376242AD249", "7376242AD289", "7376242AD291",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (14 candidates)
 		{HallNo: "WW 008", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376242AL103", "7376242AL119", "7376242AL120", "7376242AL136", "7376242AL162", "7376242AL177",
 			"7376242AL181", "7376242AL183", "7376242AL186", "7376242AL189", "7376242AL190", "7376242AL198",
 			"7376242AL209", "7376242AL223",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (1 candidates)
 		{HallNo: "WW 008", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376242AG124",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 011 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22OEE02 (2 candidates)
 		{HallNo: "WW 011", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376242BT182", "7376242BT184",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (13 candidates)
 		{HallNo: "WW 011", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376242IT144", "7376242IT145", "7376242IT146", "7376242IT116", "7376242IT120", "7376242IT127",
 			"7376242IT131", "7376242IT181", "7376242IT182", "7376242IT190", "7376242IT196", "7376242IT198",
 			"7376242IT222",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (5 candidates)
 		{HallNo: "WW 011", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376242AD296", "7376242AD300", "7376242AD309", "7376242AD310", "7376242AD344",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (5 candidates)
 		{HallNo: "WW 011", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376242AL113", "7376242AL114", "7376242AL115", "7376242AL109", "7376242AL110",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 012 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -8985,62 +8985,62 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT269", "7376242IT270", "7376242IT271", "7376242IT272", "7376242IT224", "7376242IT225",
 			"7376242IT230", "7376242IT231", "7376242IT235", "7376242IT259", "7376242IT262", "7376242IT276",
 			"7376242IT288", "7376242IT290", "7376242IT293",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (10 candidates)
 		{HallNo: "WW 012", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376242AL147", "7376242AL148", "7376242AL149", "7376242AL117", "7376242AL123", "7376242AL124",
 			"7376242AL131", "7376242AL133", "7376242AL139", "7376242AL152",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 113 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22OEE02 (2 candidates)
 		{HallNo: "WW 113", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376251CS515", "7376251CS520",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (13 candidates)
 		{HallNo: "WW 113", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376242IT325", "7376242IT326", "7376242IT327", "7376242IT300", "7376242IT302", "7376242IT303",
 			"7376242IT305", "7376242IT312", "7376242IT313", "7376242IT321", "7376242IT337", "7376242IT340",
 			"7376242IT345",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (10 candidates)
 		{HallNo: "WW 113", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376242AL154", "7376242AL156", "7376242AL158", "7376242AL159", "7376242AL164", "7376242AL170",
 			"7376242AL178", "7376242AL182", "7376242AL184", "7376242AL191",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 114 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22OEE02 (1 candidates)
 		{HallNo: "WW 114", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376251CS522",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (8 candidates)
 		{HallNo: "WW 114", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376241EC123", "7376241EC124", "7376241EC125", "7376241EC107", "7376241EC113", "7376241EC115",
 			"7376241EC118", "7376241EC119",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (4 candidates)
 		{HallNo: "WW 114", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376251EC501", "7376251EC503", "7376251EC504", "7376251EC507",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (2 candidates)
 		{HallNo: "WW 114", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376242IT103", "7376242IT123",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (3 candidates)
 		{HallNo: "WW 114", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376242CB130", "7376242CB153", "7376242CB154",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (5 candidates)
 		{HallNo: "WW 114", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376242AL214", "7376242AL215", "7376242AL216", "7376242AL193", "7376242AL202",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (2 candidates)
 		{HallNo: "WW 114", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376252AG501", "7376252AG502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 115 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9049,12 +9049,12 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EC139", "7376241EC140", "7376241EC141", "7376241EC128", "7376241EC129", "7376241EC133",
 			"7376241EC144", "7376241EC152", "7376241EC157", "7376241EC166", "7376241EC170", "7376241EC171",
 			"7376241EC185", "7376241EC191", "7376241EC192",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (10 candidates)
 		{HallNo: "WW 115", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376242IT126", "7376242IT128", "7376242IT136", "7376242IT140", "7376242IT143", "7376242IT150",
 			"7376242IT153", "7376242IT174", "7376242IT176", "7376242IT179",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 117 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9063,12 +9063,12 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EC199", "7376241EC200", "7376241EC201", "7376241EC207", "7376241EC220", "7376241EC223",
 			"7376241EC227", "7376241EC230", "7376241EC243", "7376241EC244", "7376241EC255", "7376241EC260",
 			"7376241EC261", "7376241EC263", "7376241EC266",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (10 candidates)
 		{HallNo: "WW 117", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376242IT180", "7376242IT186", "7376242IT193", "7376242IT199", "7376242IT202", "7376242IT204",
 			"7376242IT206", "7376242IT217", "7376242IT219", "7376242IT220",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 118 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9077,12 +9077,12 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EC285", "7376241EC286", "7376241EC287", "7376241EC326", "7376241EC327", "7376241EC328",
 			"7376241EC268", "7376241EC271", "7376241EC278", "7376241EC282", "7376241EC289", "7376241EC297",
 			"7376241EC303", "7376241EC320", "7376241EC322",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (10 candidates)
 		{HallNo: "WW 118", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376242IT240", "7376242IT241", "7376242IT242", "7376242IT232", "7376242IT236", "7376242IT238",
 			"7376242IT246", "7376242IT251", "7376242IT254", "7376242IT258",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9090,24 +9090,24 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 201", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376241EC349", "7376241EC350", "7376241EC351", "7376241EC329", "7376241EC334", "7376241EC338",
 			"7376241EC341",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (4 candidates)
 		{HallNo: "WW 201", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376241EE105", "7376241EE137", "7376241EE146", "7376241EE147",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (2 candidates)
 		{HallNo: "WW 201", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376241EI136", "7376241EI159",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (2 candidates)
 		{HallNo: "WW 201", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376241ME102", "7376241ME103",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (10 candidates)
 		{HallNo: "WW 201", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376242IT265", "7376242IT268", "7376242IT273", "7376242IT274", "7376242IT277", "7376242IT280",
 			"7376242IT286", "7376242IT295", "7376242IT298", "7376242IT301",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9115,49 +9115,49 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 202", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376251CS506", "7376251CS507", "7376251CS508", "7376251CS502", "7376251CS504", "7376251CS511",
 			"7376251CS513", "7376251CS516", "7376251CS517", "7376251CS519", "7376251CS521",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (22 candidates)
 		{HallNo: "WW 202", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376241ME142", "7376241ME143", "7376241ME144", "7376241ME145", "7376241ME151", "7376241ME152",
 			"7376241ME153", "7376241ME154", "7376241ME104", "7376241ME110", "7376241ME112", "7376241ME113",
 			"7376241ME122", "7376241ME129", "7376241ME131", "7376241ME134", "7376241ME136", "7376241ME138",
 			"7376241ME139", "7376241ME149", "7376241ME157", "7376241ME158",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (2 candidates)
 		{HallNo: "WW 202", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376241MZ127", "7376241MZ147",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (14 candidates)
 		{HallNo: "WW 202", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376242IT307", "7376242IT308", "7376242IT309", "7376242IT310", "7376242IT330", "7376242IT331",
 			"7376242IT332", "7376242IT318", "7376242IT319", "7376242IT322", "7376242IT323", "7376242IT336",
 			"7376242IT344", "7376242IT348",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (1 candidates)
 		{HallNo: "WW 202", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376242AD102",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22OEI02 (2 candidates)
 		{HallNo: "WW 203", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376251CS523", "7376251CS524",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (6 candidates)
 		{HallNo: "WW 203", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376252IT509", "7376252IT510", "7376252IT511", "7376252IT512", "7376252IT501", "7376252IT504",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (15 candidates)
 		{HallNo: "WW 203", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376242AD107", "7376242AD114", "7376242AD117", "7376242AD119", "7376242AD120", "7376242AD132",
 			"7376242AD135", "7376242AD141", "7376242AD146", "7376242AD149", "7376242AD153", "7376242AD160",
 			"7376242AD172", "7376242AD175", "7376242AD198",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEI02 (2 candidates)
 		{HallNo: "WW 203", CourseCode: "22OEI02", RegisterNos: []string{
 			"7376252AD515", "7376252AD516",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9165,13 +9165,13 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 204", CourseCode: "22OME01", RegisterNos: []string{
 			"7376241CS103", "7376241CS104", "7376241CS110", "7376241CS120", "7376241CS124", "7376241CS130",
 			"7376241CS142", "7376241CS147", "7376241CS165", "7376241CS168",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (15 candidates)
 		{HallNo: "WW 204", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376242AD209", "7376242AD215", "7376242AD237", "7376242AD239", "7376242AD242", "7376242AD248",
 			"7376242AD259", "7376242AD263", "7376242AD298", "7376242AD311", "7376242AD324", "7376242AD326",
 			"7376242AD332", "7376242AD336", "7376242AD338",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9179,13 +9179,13 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 205", CourseCode: "22OME01", RegisterNos: []string{
 			"7376241CS171", "7376241CS192", "7376241CS194", "7376241CS246", "7376241CS261", "7376241CS272",
 			"7376241CS274", "7376241CS295", "7376241CS304", "7376241CS346",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (15 candidates)
 		{HallNo: "WW 205", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376242AG105", "7376242AG106", "7376242AG107", "7376242AG112", "7376242AG113", "7376242AG114",
 			"7376242AG115", "7376242AG116", "7376242AG117", "7376242AG101", "7376242AG103", "7376242AG109",
 			"7376242AG110", "7376242AG121", "7376242AG122",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9193,17 +9193,17 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 206", CourseCode: "22OME01", RegisterNos: []string{
 			"7376241CS409", "7376241CS410", "7376241CS411", "7376241CS349", "7376241CS350", "7376241CS352",
 			"7376241CS360", "7376241CS364", "7376241CS395", "7376241CS398",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (1 candidates)
 		{HallNo: "WW 206", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376242CB103",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (14 candidates)
 		{HallNo: "WW 206", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376242AL108", "7376242AL127", "7376242AL128", "7376242AL161", "7376242AL169", "7376242AL176",
 			"7376242AL180", "7376242AL187", "7376242AL201", "7376242AL203", "7376242AL206", "7376242AL219",
 			"7376242AL220", "7376242AL222",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 207 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9211,24 +9211,24 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 207", CourseCode: "22OME01", RegisterNos: []string{
 			"7376241CS420", "7376241CS425", "7376241CS426", "7376241CS430", "7376241CS436", "7376241CS466",
 			"7376241CS470",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (2 candidates)
 		{HallNo: "WW 207", CourseCode: "22OME01", RegisterNos: []string{
 			"7376241EC151", "7376241EC279",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (2 candidates)
 		{HallNo: "WW 207", CourseCode: "22OME01", RegisterNos: []string{
 			"7376241EE126", "7376241EE186",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (1 candidates)
 		{HallNo: "WW 207", CourseCode: "22OME01", RegisterNos: []string{
 			"7376241EI119",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (11 candidates)
 		{HallNo: "WW 207", CourseCode: "22OME01", RegisterNos: []string{
 			"7376241MZ104", "7376241MZ111", "7376241MZ113", "7376241MZ115", "7376241MZ117", "7376241MZ123",
 			"7376241MZ138", "7376241MZ140", "7376241MZ148", "7376241MZ150", "7376241MZ156",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (25 candidates)
 		{HallNo: "WW 207", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376242CB111", "7376242CB112", "7376242CB113", "7376242CB126", "7376242CB127", "7376242CB128",
@@ -9236,40 +9236,40 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242CB151", "7376242CB152", "7376242CB108", "7376242CB109", "7376242CB117", "7376242CB119",
 			"7376242CB121", "7376242CB122", "7376242CB124", "7376242CB132", "7376242CB134", "7376242CB137",
 			"7376242CB148",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (2 candidates)
 		{HallNo: "WW 207", CourseCode: "22OME01", RegisterNos: []string{
 			"7376242AD116", "7376242AD152",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 208 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22OBT01 (1 candidates)
 		{HallNo: "WW 208", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376251EC511",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (8 candidates)
 		{HallNo: "WW 208", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376251ME501", "7376251ME502", "7376251ME503", "7376251ME504", "7376251ME505", "7376251ME506",
 			"7376251ME507", "7376251ME508",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (1 candidates)
 		{HallNo: "WW 208", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376251MZ501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (3 candidates)
 		{HallNo: "WW 208", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376242CB156", "7376242CB157", "7376242CB159",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (2 candidates)
 		{HallNo: "WW 208", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376252AD501", "7376252AD510",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (10 candidates)
 		{HallNo: "WW 208", CourseCode: "22OME01", RegisterNos: []string{
 			"7376242AD158", "7376242AD167", "7376242AD169", "7376242AD173", "7376242AD177", "7376242AD188",
 			"7376242AD194", "7376242AD204", "7376242AD211", "7376242AD221",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 209 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9277,20 +9277,20 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 209", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376241EC103", "7376241EC104", "7376241EC105", "7376241EC106", "7376241EC116", "7376241EC122",
 			"7376241EC126", "7376241EC127", "7376241EC130", "7376241EC137", "7376241EC138", "7376241EC142",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (2 candidates)
 		{HallNo: "WW 209", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376252CB501", "7376252CB502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (10 candidates)
 		{HallNo: "WW 209", CourseCode: "22OME01", RegisterNos: []string{
 			"7376242AD260", "7376242AD262", "7376242AD277", "7376242AD278", "7376242AD285", "7376242AD287",
 			"7376242AD292", "7376242AD293", "7376242AD299", "7376242AD317",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (1 candidates)
 		{HallNo: "WW 209", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376252AL501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 210 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9299,16 +9299,16 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EC181", "7376241EC182", "7376241EC183", "7376241EC147", "7376241EC154", "7376241EC158",
 			"7376241EC162", "7376241EC164", "7376241EC165", "7376241EC167", "7376241EC173", "7376241EC174",
 			"7376241EC186", "7376241EC190", "7376241EC210",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (1 candidates)
 		{HallNo: "WW 210", CourseCode: "22OME01", RegisterNos: []string{
 			"7376242AD331",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (9 candidates)
 		{HallNo: "WW 210", CourseCode: "22OME01", RegisterNos: []string{
 			"7376242AL101", "7376242AL102", "7376242AL104", "7376242AL107", "7376242AL116", "7376242AL125",
 			"7376242AL135", "7376242AL137", "7376242AL143",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 211 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9317,16 +9317,16 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EC310", "7376241EC311", "7376241EC312", "7376241EC215", "7376241EC225", "7376241EC228",
 			"7376241EC240", "7376241EC241", "7376241EC248", "7376241EC273", "7376241EC277", "7376241EC290",
 			"7376241EC294", "7376241EC300", "7376241EC314",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (2 candidates)
 		{HallNo: "WW 211", CourseCode: "22OME01", RegisterNos: []string{
 			"7376242BT165", "7376242BT189",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (8 candidates)
 		{HallNo: "WW 211", CourseCode: "22OME01", RegisterNos: []string{
 			"7376242AL153", "7376242AL157", "7376242AL163", "7376242AL179", "7376242AL188", "7376242AL192",
 			"7376242AL205", "7376242AL221",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 212 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9334,41 +9334,41 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 212", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376241EC316", "7376241EC318", "7376241EC319", "7376241EC331", "7376241EC333", "7376241EC344",
 			"7376241EC347",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAI01 (18 candidates)
 		{HallNo: "WW 212", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376241EE148", "7376241EE149", "7376241EE150", "7376241EE102", "7376241EE106", "7376241EE117",
 			"7376241EE123", "7376241EE125", "7376241EE138", "7376241EE161", "7376241EE163", "7376241EE165",
 			"7376241EE166", "7376241EE171", "7376241EE178", "7376241EE179", "7376241EE191", "7376241EE195",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (16 candidates)
 		{HallNo: "WW 212", CourseCode: "22OME01", RegisterNos: []string{
 			"7376242IT105", "7376242IT106", "7376242IT107", "7376242IT108", "7376242IT102", "7376242IT110",
 			"7376242IT114", "7376242IT117", "7376242IT121", "7376242IT122", "7376242IT124", "7376242IT129",
 			"7376242IT132", "7376242IT139", "7376242IT141", "7376242IT142",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (9 candidates)
 		{HallNo: "WW 212", CourseCode: "22OME01", RegisterNos: []string{
 			"7376242CB105", "7376242CB110", "7376242CB118", "7376242CB123", "7376242CB125", "7376242CB131",
 			"7376242CB138", "7376242CB146", "7376242CB149",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 213 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22OAI01 (6 candidates)
 		{HallNo: "WW 213", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376241EE203", "7376241EE206", "7376241EE207", "7376241EE212", "7376241EE214", "7376241EE215",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAI01 (9 candidates)
 		{HallNo: "WW 213", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376241EI112", "7376241EI113", "7376241EI114", "7376241EI101", "7376241EI102", "7376241EI104",
 			"7376241EI107", "7376241EI108", "7376241EI110",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (10 candidates)
 		{HallNo: "WW 213", CourseCode: "22OME01", RegisterNos: []string{
 			"7376242IT166", "7376242IT167", "7376242IT168", "7376242IT169", "7376242IT148", "7376242IT149",
 			"7376242IT151", "7376242IT163", "7376242IT164", "7376242IT171",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 214 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9377,33 +9377,33 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EI120", "7376241EI121", "7376241EI122", "7376241EI123", "7376241EI115", "7376241EI117",
 			"7376241EI118", "7376241EI129", "7376241EI131", "7376241EI137", "7376241EI140", "7376241EI148",
 			"7376241EI152", "7376241EI155",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAI01 (1 candidates)
 		{HallNo: "WW 214", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376241ME106",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (10 candidates)
 		{HallNo: "WW 214", CourseCode: "22OME01", RegisterNos: []string{
 			"7376242IT173", "7376242IT183", "7376242IT184", "7376242IT192", "7376242IT194", "7376242IT200",
 			"7376242IT201", "7376242IT203", "7376242IT207", "7376242IT209",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 215 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22OAI01 (4 candidates)
 		{HallNo: "WW 215", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376241ME117", "7376241ME118", "7376241ME119", "7376241ME114",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAI01 (11 candidates)
 		{HallNo: "WW 215", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376241MZ105", "7376241MZ106", "7376241MZ107", "7376241MZ118", "7376241MZ119", "7376241MZ120",
 			"7376241MZ121", "7376241MZ101", "7376241MZ103", "7376241MZ109", "7376241MZ126",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (10 candidates)
 		{HallNo: "WW 215", CourseCode: "22OME01", RegisterNos: []string{
 			"7376242IT215", "7376242IT221", "7376242IT233", "7376242IT237", "7376242IT243", "7376242IT247",
 			"7376242IT250", "7376242IT256", "7376242IT261", "7376242IT279",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 218 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9412,41 +9412,41 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241MZ134", "7376241MZ135", "7376241MZ136", "7376241MZ137", "7376241MZ144", "7376241MZ145",
 			"7376241MZ146", "7376241MZ128", "7376241MZ132", "7376241MZ139", "7376241MZ141", "7376241MZ149",
 			"7376241MZ154", "7376241MZ155", "7376241MZ157",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (10 candidates)
 		{HallNo: "WW 218", CourseCode: "22OME01", RegisterNos: []string{
 			"7376242IT282", "7376242IT284", "7376242IT287", "7376242IT291", "7376242IT292", "7376242IT294",
 			"7376242IT311", "7376242IT314", "7376242IT316", "7376242IT335",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 219 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22OME01 (2 candidates)
 		{HallNo: "WW 219", CourseCode: "22OME01", RegisterNos: []string{
 			"7376251CS505", "7376251CS518",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAI01 (2 candidates)
 		{HallNo: "WW 219", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376241MZ159", "7376241MZ160",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (1 candidates)
 		{HallNo: "WW 219", CourseCode: "22OME01", RegisterNos: []string{
 			"7376251MZ505",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAI01 (13 candidates)
 		{HallNo: "WW 219", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376242BT109", "7376242BT111", "7376242BT114", "7376242BT116", "7376242BT121", "7376242BT122",
 			"7376242BT124", "7376242BT125", "7376242BT131", "7376242BT133", "7376242BT136", "7376242BT137",
 			"7376242BT141",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (5 candidates)
 		{HallNo: "WW 219", CourseCode: "22OME01", RegisterNos: []string{
 			"7376242IT338", "7376242IT339", "7376242IT342", "7376242IT343", "7376242IT347",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (2 candidates)
 		{HallNo: "WW 219", CourseCode: "22OME01", RegisterNos: []string{
 			"7376252AD504", "7376252AD508",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 222 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9455,34 +9455,34 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS108", "7376241CS111", "7376241CS114", "7376241CS118", "7376241CS125", "7376241CS128",
 			"7376241CS129", "7376241CS137", "7376241CS139", "7376241CS140", "7376241CS144", "7376241CS145",
 			"7376241CS150", "7376241CS157", "7376241CS161", "7376241CS173",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAI01 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376251EC520",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAI01 (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376251EE509", "7376251EE511", "7376251EE516",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAI01 (21 candidates)
 		{HallNo: "WW 222", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376242BT168", "7376242BT169", "7376242BT170", "7376242BT143", "7376242BT146", "7376242BT149",
 			"7376242BT155", "7376242BT158", "7376242BT173", "7376242BT178", "7376242BT180", "7376242BT183",
 			"7376242BT188", "7376242BT192", "7376242BT195", "7376242BT200", "7376242BT208", "7376242BT210",
 			"7376242BT213", "7376242BT218", "7376242BT220",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22OME01", RegisterNos: []string{
 			"7376252BT501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (6 candidates)
 		{HallNo: "WW 222", CourseCode: "22OME01", RegisterNos: []string{
 			"7376252IT503", "7376252IT505", "7376252IT506", "7376252IT508", "7376252IT513", "7376252IT514",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME01 (2 candidates)
 		{HallNo: "WW 222", CourseCode: "22OME01", RegisterNos: []string{
 			"7376252AL502", "7376252AL503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9493,7 +9493,7 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS202", "7376241CS203", "7376241CS220", "7376241CS223", "7376241CS226", "7376241CS227",
 			"7376241CS231", "7376241CS235", "7376241CS237", "7376241CS239", "7376241CS242", "7376241CS245",
 			"7376241CS252",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OIT06 (25 candidates)
 		{HallNo: "WW 223", CourseCode: "22OIT06", RegisterNos: []string{
 			"7376241EC117", "7376241EC120", "7376241EC159", "7376241EC160", "7376241EC163", "7376241EC169",
@@ -9501,7 +9501,7 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EC197", "7376241EC198", "7376241EC203", "7376241EC205", "7376241EC212", "7376241EC218",
 			"7376241EC232", "7376241EC233", "7376241EC237", "7376241EC239", "7376241EC245", "7376241EC246",
 			"7376241EC257",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9512,33 +9512,33 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS355", "7376241CS363", "7376241CS365", "7376241CS371", "7376241CS406", "7376241CS415",
 			"7376241CS423", "7376241CS429", "7376241CS434", "7376241CS438", "7376241CS441", "7376241CS455",
 			"7376241CS468",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OIT06 (11 candidates)
 		{HallNo: "WW 224", CourseCode: "22OIT06", RegisterNos: []string{
 			"7376241EC276", "7376241EC299", "7376241EC302", "7376241EC304", "7376241EC313", "7376241EC315",
 			"7376241EC321", "7376241EC340", "7376241EC342", "7376241EC345", "7376241EC346",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OIT06 (4 candidates)
 		{HallNo: "WW 224", CourseCode: "22OIT06", RegisterNos: []string{
 			"7376241EE141", "7376241EE156", "7376241EE157", "7376241EE201",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OIT06 (10 candidates)
 		{HallNo: "WW 224", CourseCode: "22OIT06", RegisterNos: []string{
 			"7376241EI105", "7376241EI125", "7376241EI128", "7376241EI132", "7376241EI134", "7376241EI139",
 			"7376241EI143", "7376241EI153", "7376241EI157", "7376241EI160",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 225 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22OEC03 (1 candidates)
 		{HallNo: "WW 225", CourseCode: "22OEC03", RegisterNos: []string{
 			"7376241CS472",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OIT06 (7 candidates)
 		{HallNo: "WW 225", CourseCode: "22OIT06", RegisterNos: []string{
 			"7376251EC506", "7376251EC508", "7376251EC509", "7376251EC515", "7376251EC517", "7376251EC518",
 			"7376251EC521",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEC03 (35 candidates)
 		{HallNo: "WW 225", CourseCode: "22OEC03", RegisterNos: []string{
 			"7376241EE113", "7376241EE114", "7376241EE115", "7376241EE116", "7376241EE118", "7376241EE119",
@@ -9547,171 +9547,171 @@ func buildSeatingData27Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EE104", "7376241EE108", "7376241EE111", "7376241EE122", "7376241EE124", "7376241EE136",
 			"7376241EE140", "7376241EE143", "7376241EE155", "7376241EE158", "7376241EE162", "7376241EE164",
 			"7376241EE168", "7376241EE169", "7376241EE176", "7376241EE177", "7376241EE181",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OIT06 (2 candidates)
 		{HallNo: "WW 225", CourseCode: "22OIT06", RegisterNos: []string{
 			"7376251EE514", "7376251EE515",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OIT06 (2 candidates)
 		{HallNo: "WW 225", CourseCode: "22OIT06", RegisterNos: []string{
 			"7376241ME105", "7376241ME155",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OIT06 (1 candidates)
 		{HallNo: "WW 225", CourseCode: "22OIT06", RegisterNos: []string{
 			"7376241MZ142",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OIT06 (2 candidates)
 		{HallNo: "WW 225", CourseCode: "22OIT06", RegisterNos: []string{
 			"7376242BT148", "7376242BT156",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 226 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22OEC03 (2 candidates)
 		{HallNo: "WW 226", CourseCode: "22OEC03", RegisterNos: []string{
 			"7376251CS503", "7376251CS512",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEC03 (18 candidates)
 		{HallNo: "WW 226", CourseCode: "22OEC03", RegisterNos: []string{
 			"7376241EE182", "7376241EE183", "7376241EE184", "7376241EE192", "7376241EE193", "7376241EE194",
 			"7376241EE187", "7376241EE189", "7376241EE197", "7376241EE202", "7376241EE204", "7376241EE209",
 			"7376241EE210", "7376251EE502", "7376251EE506", "7376251EE507", "7376251EE512", "7376251EE517",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEC03 (13 candidates)
 		{HallNo: "WW 226", CourseCode: "22OEC03", RegisterNos: []string{
 			"7376241ME146", "7376241ME147", "7376241ME148", "7376241ME107", "7376241ME115", "7376241ME116",
 			"7376241ME120", "7376241ME121", "7376241ME123", "7376241ME124", "7376241ME127", "7376241ME135",
 			"7376241ME141",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEC03 (2 candidates)
 		{HallNo: "WW 226", CourseCode: "22OEC03", RegisterNos: []string{
 			"7376241MZ129", "7376241MZ152",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEC03 (8 candidates)
 		{HallNo: "WW 226", CourseCode: "22OEC03", RegisterNos: []string{
 			"7376242CB104", "7376242CB107", "7376242CB116", "7376242CB120", "7376242CB136", "7376242CB145",
 			"7376242CB147", "7376242CB158",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEC03 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22OEC03", RegisterNos: []string{
 			"7376242AD270",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 227 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22OEE02 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376231CE117",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEC03 (5 candidates)
 		{HallNo: "WW 227", CourseCode: "22OEC03", RegisterNos: []string{
 			"7376231CS102", "7376231CS190", "7376231CS235", "7376231CS244", "7376231CS259",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376231CS292",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAI01 (6 candidates)
 		{HallNo: "WW 227", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376231EC110", "7376231EC178", "7376231EC222", "7376231EC297", "7376231EC318", "7376231EC331",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376231EC283",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376231EC334",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAI01 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376231EE115",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376231EI144",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OIT06 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OIT06", RegisterNos: []string{
 			"7376231EI128",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376231ME130",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAI01 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OAI01", RegisterNos: []string{
 			"7376231BM107",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376231BM148",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEC03 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OEC03", RegisterNos: []string{
 			"7376231SE139",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376231MZ106",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (4 candidates)
 		{HallNo: "WW 227", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376231MZ107", "7376231MZ114", "7376231MZ132", "7376241MZ501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376232BT142",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376242IT501", "7376242IT504",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376232IT139", "7376232IT224", "7376242IT502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376232CB123",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376232CT122",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCB01 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OCB01", RegisterNos: []string{
 			"7376232CT102",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OBT01 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OBT01", RegisterNos: []string{
 			"7376232AD136",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEC03 (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22OEC03", RegisterNos: []string{
 			"7376232AD115", "7376232AD226", "7376232AD282",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEE02 (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22OEE02", RegisterNos: []string{
 			"7376232AD184", "7376232AD228",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OAG01 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22OAG01", RegisterNos: []string{
 			"7376232AL158",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OEC03 (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22OEC03", RegisterNos: []string{
 			"7376232AL180", "7376242AL503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OIT06 (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22OIT06", RegisterNos: []string{
 			"7376232AG129", "7376232AG132",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 	}
 }
 
 // ============================================================================
-// 28-11-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 1981 Students
+// 28-11-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 1981 Students
 // ============================================================================
 func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -9725,14 +9725,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS113", "7376251CS114", "7376251CS115", "7376251CS116", "7376251CS117", "7376251CS118",
 			"7376251CS119", "7376251CS120", "7376251CS121", "7376251CS122", "7376251CS123", "7376251CS124",
 			"7376251CS125",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (20 candidates)
 		{HallNo: "ME 101", CourseCode: "22AI305", RegisterNos: []string{
 			"7376252AD101", "7376252AD102", "7376252AD103", "7376252AD104", "7376252AD105", "7376252AD106",
 			"7376252AD107", "7376252AD108", "7376252AD109", "7376252AD110", "7376252AD111", "7376252AD112",
 			"7376252AD113", "7376252AD114", "7376252AD115", "7376252AD116", "7376252AD117", "7376252AD118",
 			"7376252AD119", "7376252AD120",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 102 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9743,14 +9743,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS139", "7376251CS140", "7376251CS141", "7376251CS142", "7376251CS143", "7376251CS144",
 			"7376251CS145", "7376251CS146", "7376251CS147", "7376251CS148", "7376251CS149", "7376251CS150",
 			"7376251CS151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (20 candidates)
 		{HallNo: "ME 102", CourseCode: "22AI305", RegisterNos: []string{
 			"7376252AD121", "7376252AD122", "7376252AD123", "7376252AD124", "7376252AD125", "7376252AD126",
 			"7376252AD127", "7376252AD128", "7376252AD129", "7376252AD130", "7376252AD131", "7376252AD132",
 			"7376252AD133", "7376252AD134", "7376252AD135", "7376252AD136", "7376252AD137", "7376252AD138",
 			"7376252AD139", "7376252AD140",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 107 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9761,14 +9761,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS164", "7376251CS165", "7376251CS166", "7376251CS167", "7376251CS168", "7376251CS170",
 			"7376251CS171", "7376251CS172", "7376251CS173", "7376251CS174", "7376251CS175", "7376251CS176",
 			"7376251CS177",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (20 candidates)
 		{HallNo: "ME 107", CourseCode: "22AI305", RegisterNos: []string{
 			"7376252AD141", "7376252AD142", "7376252AD143", "7376252AD144", "7376252AD145", "7376252AD146",
 			"7376252AD147", "7376252AD148", "7376252AD149", "7376252AD150", "7376252AD151", "7376252AD152",
 			"7376252AD153", "7376252AD154", "7376252AD155", "7376252AD156", "7376252AD157", "7376252AD158",
 			"7376252AD159", "7376252AD160",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 108 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9779,14 +9779,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS190", "7376251CS191", "7376251CS192", "7376251CS193", "7376251CS194", "7376251CS195",
 			"7376251CS196", "7376251CS197", "7376251CS198", "7376251CS199", "7376251CS200", "7376251CS201",
 			"7376251CS202",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (20 candidates)
 		{HallNo: "ME 108", CourseCode: "22AI305", RegisterNos: []string{
 			"7376252AD161", "7376252AD162", "7376252AD163", "7376252AD164", "7376252AD165", "7376252AD166",
 			"7376252AD167", "7376252AD168", "7376252AD169", "7376252AD170", "7376252AD171", "7376252AD172",
 			"7376252AD173", "7376252AD174", "7376252AD175", "7376252AD176", "7376252AD177", "7376252AD178",
 			"7376252AD179", "7376252AD180",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9797,14 +9797,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS215", "7376251CS216", "7376251CS217", "7376251CS218", "7376251CS219", "7376251CS220",
 			"7376251CS221", "7376251CS222", "7376251CS223", "7376251CS224", "7376251CS225", "7376251CS226",
 			"7376251CS227",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (20 candidates)
 		{HallNo: "ME 201", CourseCode: "22AI305", RegisterNos: []string{
 			"7376252AD181", "7376252AD182", "7376252AD183", "7376252AD184", "7376252AD185", "7376252AD186",
 			"7376252AD187", "7376252AD188", "7376252AD189", "7376252AD190", "7376252AD191", "7376252AD192",
 			"7376252AD193", "7376252AD194", "7376252AD195", "7376252AD196", "7376252AD197", "7376252AD198",
 			"7376252AD199", "7376252AD200",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9815,14 +9815,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS242", "7376251CS243", "7376251CS244", "7376251CS245", "7376251CS246", "7376251CS247",
 			"7376251CS248", "7376251CS249", "7376251CS250", "7376251CS251", "7376251CS252", "7376251CS253",
 			"7376251CS228",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (20 candidates)
 		{HallNo: "ME 202", CourseCode: "22AI305", RegisterNos: []string{
 			"7376252AD201", "7376252AD202", "7376252AD203", "7376252AD204", "7376252AD205", "7376252AD206",
 			"7376252AD207", "7376252AD208", "7376252AD209", "7376252AD210", "7376252AD211", "7376252AD212",
 			"7376252AD213", "7376252AD214", "7376252AD215", "7376252AD216", "7376252AD217", "7376252AD218",
 			"7376252AD219", "7376252AD220",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9833,14 +9833,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS266", "7376251CS267", "7376251CS268", "7376251CS269", "7376251CS270", "7376251CS271",
 			"7376251CS272", "7376251CS273", "7376251CS274", "7376251CS275", "7376251CS276", "7376251CS277",
 			"7376251CS278",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (20 candidates)
 		{HallNo: "ME 203", CourseCode: "22AI305", RegisterNos: []string{
 			"7376252AD221", "7376252AD222", "7376252AD223", "7376252AD224", "7376252AD225", "7376252AD226",
 			"7376252AD227", "7376252AD228", "7376252AD229", "7376252AD230", "7376252AD231", "7376252AD232",
 			"7376252AD233", "7376252AD234", "7376252AD235", "7376252AD236", "7376252AD237", "7376252AD238",
 			"7376252AD239", "7376252AD240",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9851,14 +9851,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS291", "7376251CS292", "7376251CS293", "7376251CS294", "7376251CS295", "7376251CS296",
 			"7376251CS297", "7376251CS298", "7376251CS299", "7376251CS300", "7376251CS301", "7376251CS302",
 			"7376251CS303",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (20 candidates)
 		{HallNo: "ME 204", CourseCode: "22AI305", RegisterNos: []string{
 			"7376252AD241", "7376252AD242", "7376252AD243", "7376252AD244", "7376252AD245", "7376252AD246",
 			"7376252AD247", "7376252AD248", "7376252AD249", "7376252AD250", "7376252AD251", "7376252AD252",
 			"7376252AD253", "7376252AD254", "7376252AD255", "7376252AD256", "7376252AD257", "7376252AD258",
 			"7376252AD259", "7376252AD260",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9869,14 +9869,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS316", "7376251CS317", "7376251CS318", "7376251CS319", "7376251CS320", "7376251CS321",
 			"7376251CS322", "7376251CS323", "7376251CS324", "7376251CS325", "7376251CS326", "7376251CS327",
 			"7376251CS328",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (20 candidates)
 		{HallNo: "ME 205", CourseCode: "22AI305", RegisterNos: []string{
 			"7376252AD261", "7376252AD262", "7376252AD263", "7376252AD264", "7376252AD265", "7376252AD266",
 			"7376252AD267", "7376252AD268", "7376252AD269", "7376252AD270", "7376252AD271", "7376252AD272",
 			"7376252AD273", "7376252AD274", "7376252AD275", "7376252AD276", "7376252AD277", "7376252AD278",
 			"7376252AD279", "7376252AD280",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9887,14 +9887,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS341", "7376251CS342", "7376251CS343", "7376251CS344", "7376251CS345", "7376251CS346",
 			"7376251CS347", "7376251CS348", "7376251CS349", "7376251CS350", "7376251CS351", "7376251CS352",
 			"7376251CS353",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (20 candidates)
 		{HallNo: "ME 206", CourseCode: "22AI305", RegisterNos: []string{
 			"7376252AD281", "7376252AD282", "7376252AD283", "7376252AD284", "7376252AD285", "7376252AD286",
 			"7376252AD287", "7376252AD288", "7376252AD289", "7376252AD290", "7376252AD291", "7376252AD292",
 			"7376252AD293", "7376252AD294", "7376252AD295", "7376252AD296", "7376252AD297", "7376252AD298",
 			"7376252AD299", "7376252AD300",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 301 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9905,14 +9905,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS366", "7376251CS367", "7376251CS368", "7376251CS369", "7376251CS370", "7376251CS371",
 			"7376251CS373", "7376251CS374", "7376251CS375", "7376251CS376", "7376251CS377", "7376251CS378",
 			"7376251CS379",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (20 candidates)
 		{HallNo: "ME 301", CourseCode: "22AI305", RegisterNos: []string{
 			"7376252AD301", "7376252AD302", "7376252AD303", "7376252AD304", "7376252AD305", "7376252AD306",
 			"7376252AD307", "7376252AD308", "7376252AD309", "7376252AD310", "7376252AD311", "7376252AD312",
 			"7376252AD313", "7376252AD314", "7376252AD315", "7376252AD316", "7376252AD317", "7376252AD318",
 			"7376252AD319", "7376252AD320",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 302 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9923,14 +9923,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS392", "7376251CS393", "7376251CS394", "7376251CS395", "7376251CS396", "7376251CS397",
 			"7376251CS398", "7376251CS399", "7376251CS400", "7376251CS401", "7376251CS402", "7376251CS403",
 			"7376251CS404",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (20 candidates)
 		{HallNo: "ME 302", CourseCode: "22AI305", RegisterNos: []string{
 			"7376252AD321", "7376252AD322", "7376252AD323", "7376252AD324", "7376252AD325", "7376252AD326",
 			"7376252AD327", "7376252AD328", "7376252AD329", "7376252AD330", "7376252AD331", "7376252AD332",
 			"7376252AD333", "7376252AD334", "7376252AD335", "7376252AD336", "7376252AD337", "7376252AD338",
 			"7376252AD339", "7376252AD340",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 303 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9941,14 +9941,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS417", "7376251CS418", "7376251CS419", "7376251CS420", "7376251CS421", "7376251CS422",
 			"7376251CS423", "7376251CS424", "7376251CS425", "7376251CS426", "7376251CS427", "7376251CS428",
 			"7376251CS429",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (20 candidates)
 		{HallNo: "ME 303", CourseCode: "22AI305", RegisterNos: []string{
 			"7376252AD341", "7376252AD342", "7376252AD343", "7376252AD344", "7376252AD345", "7376252AD346",
 			"7376252AD347", "7376252AD348", "7376252AD349", "7376252AD350", "7376252AD351", "7376252AD352",
 			"7376252AD353", "7376252AD354", "7376252AD355", "7376252AD356", "7376252AD357", "7376252AD358",
 			"7376252AD359", "7376252AD360",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 304 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9959,14 +9959,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS442", "7376251CS443", "7376251CS444", "7376251CS445", "7376251CS446", "7376251CS447",
 			"7376251CS448", "7376251CS449", "7376251CS450", "7376251CS451", "7376251CS452", "7376251CS453",
 			"7376251CS454",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (20 candidates)
 		{HallNo: "ME 304", CourseCode: "22AI305", RegisterNos: []string{
 			"7376252AD361", "7376252AD362", "7376252AD363", "7376252AD364", "7376252AD365", "7376252AD366",
 			"7376252AD367", "7376252AD368", "7376252AD369", "7376252AD370", "7376252AD371", "7376252AD372",
 			"7376252AD373", "7376252AD374", "7376252AD375", "7376252AD376", "7376252AD377", "7376252AD378",
 			"7376252AD379", "7376252AD380",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 305 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9977,14 +9977,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS467", "7376251CS468", "7376251CS469", "7376251CS470", "7376251CS471", "7376251CS472",
 			"7376251CS473", "7376251CS474", "7376251CS475", "7376251CS476", "7376251CS477", "7376251CS478",
 			"7376251CS479",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (20 candidates)
 		{HallNo: "ME 305", CourseCode: "22AI305", RegisterNos: []string{
 			"7376262AD501", "7376262AD502", "7376262AD503", "7376262AD504", "7376262AD505", "7376262AD506",
 			"7376262AD507", "7376262AD508", "7376262AD509", "7376262AD510", "7376262AD511", "7376262AD512",
 			"7376262AD513", "7376262AD514", "7376262AD515", "7376262AD516", "7376262AD517", "7376262AD518",
 			"7376262AD519", "7376252AD381",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 306 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -9994,21 +9994,21 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376261CS507", "7376261CS508", "7376261CS509", "7376261CS510", "7376261CS511", "7376261CS512",
 			"7376261CS513", "7376261CS514", "7376261CS516", "7376261CS517", "7376261CS518", "7376261CS519",
 			"7376261CS520", "7376261CS521", "7376261CS522", "7376261CS523", "7376261CS524",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC305 (2 candidates)
 		{HallNo: "ME 306", CourseCode: "22EC305", RegisterNos: []string{
 			"7376251EC101", "7376251EC102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (17 candidates)
 		{HallNo: "ME 306", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT102", "7376252IT103", "7376252IT104", "7376252IT105", "7376252IT106", "7376252IT107",
 			"7376252IT108", "7376252IT109", "7376252IT110", "7376252IT111", "7376252IT112", "7376252IT113",
 			"7376252IT114", "7376252IT115", "7376252IT116", "7376252IT117", "7376252IT118",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (3 candidates)
 		{HallNo: "ME 306", CourseCode: "22AI305", RegisterNos: []string{
 			"7376262AD520", "7376262AD521", "7376262AD522",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 001 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10018,14 +10018,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC109", "7376251EC110", "7376251EC111", "7376251EC112", "7376251EC113", "7376251EC114",
 			"7376251EC115", "7376251EC116", "7376251EC117", "7376251EC118", "7376251EC119", "7376251EC120",
 			"7376251EC121", "7376251EC122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (20 candidates)
 		{HallNo: "SF 001", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT119", "7376252IT120", "7376252IT121", "7376252IT122", "7376252IT123", "7376252IT124",
 			"7376252IT125", "7376252IT126", "7376252IT127", "7376252IT128", "7376252IT129", "7376252IT130",
 			"7376252IT131", "7376252IT132", "7376252IT133", "7376252IT134", "7376252IT135", "7376252IT136",
 			"7376252IT137", "7376252IT138",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 002 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10035,14 +10035,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC129", "7376251EC130", "7376251EC131", "7376251EC132", "7376251EC133", "7376251EC134",
 			"7376251EC135", "7376251EC136", "7376251EC137", "7376251EC138", "7376251EC139", "7376251EC140",
 			"7376251EC141", "7376251EC142",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (20 candidates)
 		{HallNo: "SF 002", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT139", "7376252IT140", "7376252IT141", "7376252IT142", "7376252IT143", "7376252IT144",
 			"7376252IT145", "7376252IT146", "7376252IT147", "7376252IT148", "7376252IT149", "7376252IT150",
 			"7376252IT151", "7376252IT152", "7376252IT153", "7376252IT154", "7376252IT155", "7376252IT156",
 			"7376252IT157", "7376252IT158",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 101 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10052,14 +10052,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC149", "7376251EC150", "7376251EC151", "7376251EC152", "7376251EC153", "7376251EC154",
 			"7376251EC155", "7376251EC156", "7376251EC157", "7376251EC158", "7376251EC159", "7376251EC160",
 			"7376251EC161", "7376251EC162",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (20 candidates)
 		{HallNo: "SF 101", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT159", "7376252IT160", "7376252IT161", "7376252IT162", "7376252IT163", "7376252IT164",
 			"7376252IT165", "7376252IT166", "7376252IT167", "7376252IT168", "7376252IT169", "7376252IT170",
 			"7376252IT171", "7376252IT172", "7376252IT173", "7376252IT174", "7376252IT175", "7376252IT176",
 			"7376252IT177", "7376252IT178",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 102 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10069,14 +10069,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC169", "7376251EC170", "7376251EC171", "7376251EC172", "7376251EC173", "7376251EC174",
 			"7376251EC175", "7376251EC176", "7376251EC177", "7376251EC178", "7376251EC179", "7376251EC180",
 			"7376251EC181", "7376251EC182",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (20 candidates)
 		{HallNo: "SF 102", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT179", "7376252IT180", "7376252IT181", "7376252IT182", "7376252IT183", "7376252IT184",
 			"7376252IT185", "7376252IT186", "7376252IT187", "7376252IT188", "7376252IT189", "7376252IT190",
 			"7376252IT191", "7376252IT192", "7376252IT193", "7376252IT194", "7376252IT195", "7376252IT196",
 			"7376252IT197", "7376252IT198",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 103 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10086,14 +10086,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC189", "7376251EC190", "7376251EC191", "7376251EC192", "7376251EC193", "7376251EC194",
 			"7376251EC195", "7376251EC196", "7376251EC197", "7376251EC198", "7376251EC199", "7376251EC200",
 			"7376251EC201", "7376251EC202",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (20 candidates)
 		{HallNo: "SF 103", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT199", "7376252IT200", "7376252IT201", "7376252IT202", "7376252IT203", "7376252IT204",
 			"7376252IT205", "7376252IT206", "7376252IT207", "7376252IT208", "7376252IT209", "7376252IT210",
 			"7376252IT211", "7376252IT212", "7376252IT213", "7376252IT214", "7376252IT215", "7376252IT216",
 			"7376252IT217", "7376252IT218",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B01 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10103,14 +10103,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC209", "7376251EC210", "7376251EC211", "7376251EC212", "7376251EC213", "7376251EC214",
 			"7376251EC215", "7376251EC216", "7376251EC217", "7376251EC218", "7376251EC219", "7376251EC220",
 			"7376251EC221", "7376251EC222",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (20 candidates)
 		{HallNo: "SF B01", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT219", "7376252IT220", "7376252IT221", "7376252IT222", "7376252IT223", "7376252IT224",
 			"7376252IT225", "7376252IT226", "7376252IT227", "7376252IT228", "7376252IT229", "7376252IT230",
 			"7376252IT231", "7376252IT232", "7376252IT233", "7376252IT234", "7376252IT235", "7376252IT236",
 			"7376252IT237", "7376252IT238",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B02 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10120,14 +10120,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC229", "7376251EC230", "7376251EC231", "7376251EC232", "7376251EC233", "7376251EC234",
 			"7376251EC235", "7376251EC236", "7376251EC237", "7376251EC238", "7376251EC239", "7376251EC240",
 			"7376251EC241", "7376251EC242",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (20 candidates)
 		{HallNo: "SF B02", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT239", "7376252IT240", "7376252IT241", "7376252IT242", "7376252IT243", "7376252IT244",
 			"7376252IT245", "7376252IT246", "7376252IT247", "7376252IT248", "7376252IT249", "7376252IT250",
 			"7376252IT251", "7376252IT252", "7376252IT253", "7376252IT254", "7376252IT255", "7376252IT256",
 			"7376252IT257", "7376252IT258",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B03 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10137,14 +10137,14 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC249", "7376251EC250", "7376251EC251", "7376251EC252", "7376251EC253", "7376251EC254",
 			"7376251EC255", "7376251EC256", "7376251EC257", "7376251EC258", "7376251EC259", "7376251EC260",
 			"7376251EC261", "7376251EC262",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (20 candidates)
 		{HallNo: "SF B03", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT259", "7376252IT260", "7376252IT261", "7376252IT262", "7376252IT263", "7376252IT264",
 			"7376252IT265", "7376252IT266", "7376252IT267", "7376252IT268", "7376252IT269", "7376252IT270",
 			"7376252IT271", "7376252IT272", "7376252IT273", "7376252IT274", "7376252IT275", "7376252IT276",
 			"7376252IT277", "7376252IT278",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 008 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10153,12 +10153,12 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC263", "7376251EC264", "7376251EC265", "7376251EC266", "7376251EC267", "7376251EC268",
 			"7376251EC269", "7376251EC271", "7376251EC272", "7376251EC273", "7376251EC274", "7376251EC275",
 			"7376251EC276", "7376251EC277", "7376251EC278",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (10 candidates)
 		{HallNo: "WW 008", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT279", "7376252IT280", "7376252IT281", "7376252IT282", "7376252IT283", "7376252IT284",
 			"7376252IT285", "7376252IT286", "7376252IT287", "7376252IT288",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 011 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10167,12 +10167,12 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC279", "7376251EC280", "7376251EC281", "7376251EC282", "7376251EC283", "7376251EC284",
 			"7376251EC285", "7376251EC286", "7376251EC287", "7376251EC288", "7376251EC289", "7376251EC290",
 			"7376251EC291", "7376251EC292", "7376251EC293",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (10 candidates)
 		{HallNo: "WW 011", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT289", "7376252IT290", "7376252IT291", "7376252IT292", "7376252IT293", "7376252IT294",
 			"7376252IT295", "7376252IT296", "7376252IT297", "7376252IT298",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 012 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10181,12 +10181,12 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC294", "7376251EC295", "7376251EC296", "7376251EC297", "7376251EC298", "7376251EC299",
 			"7376251EC300", "7376251EC301", "7376251EC302", "7376251EC303", "7376251EC304", "7376251EC305",
 			"7376251EC306", "7376251EC307", "7376251EC308",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (10 candidates)
 		{HallNo: "WW 012", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT299", "7376252IT300", "7376252IT301", "7376252IT302", "7376252IT303", "7376252IT304",
 			"7376252IT305", "7376252IT306", "7376252IT307", "7376252IT308",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 113 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10195,12 +10195,12 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC309", "7376251EC310", "7376251EC311", "7376251EC312", "7376251EC313", "7376251EC314",
 			"7376251EC315", "7376251EC316", "7376251EC317", "7376251EC318", "7376251EC319", "7376251EC320",
 			"7376251EC321", "7376251EC322", "7376251EC323",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (10 candidates)
 		{HallNo: "WW 113", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT309", "7376252IT310", "7376252IT311", "7376252IT312", "7376252IT313", "7376252IT314",
 			"7376252IT315", "7376252IT316", "7376252IT317", "7376252IT318",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 114 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10209,12 +10209,12 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC324", "7376251EC325", "7376251EC326", "7376251EC327", "7376251EC328", "7376251EC329",
 			"7376251EC330", "7376251EC331", "7376251EC332", "7376251EC333", "7376251EC334", "7376251EC335",
 			"7376251EC336", "7376251EC337", "7376251EC338",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (10 candidates)
 		{HallNo: "WW 114", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT319", "7376252IT320", "7376252IT321", "7376252IT322", "7376252IT323", "7376252IT324",
 			"7376252IT325", "7376252IT326", "7376252IT327", "7376252IT328",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 115 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10223,12 +10223,12 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC339", "7376251EC340", "7376251EC341", "7376251EC342", "7376251EC343", "7376251EC344",
 			"7376251EC345", "7376251EC346", "7376251EC347", "7376251EC348", "7376251EC349", "7376251EC350",
 			"7376251EC351", "7376251EC352", "7376261EC502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (10 candidates)
 		{HallNo: "WW 115", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT329", "7376252IT330", "7376252IT331", "7376252IT332", "7376252IT333", "7376252IT334",
 			"7376252IT335", "7376252IT336", "7376252IT338", "7376252IT339",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 117 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10237,29 +10237,29 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376261EC503", "7376261EC504", "7376261EC505", "7376261EC506", "7376261EC507", "7376261EC508",
 			"7376261EC509", "7376261EC510", "7376261EC511", "7376261EC512", "7376261EC513", "7376261EC514",
 			"7376261EC515", "7376261EC516", "7376261EC517",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (10 candidates)
 		{HallNo: "WW 117", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT340", "7376252IT341", "7376252IT342", "7376252IT343", "7376252IT344", "7376252IT345",
 			"7376252IT346", "7376252IT347", "7376252IT348", "7376252IT349",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 118 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EC305 (3 candidates)
 		{HallNo: "WW 118", CourseCode: "22EC305", RegisterNos: []string{
 			"7376261EC518", "7376261EC519", "7376261EC520",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (10 candidates)
 		{HallNo: "WW 118", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT350", "7376252IT351", "7376252IT352", "7376252IT353", "7376252IT354", "7376252IT355",
 			"7376252IT356", "7376252IT357", "7376252IT358", "7376252IT359",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM305 (12 candidates)
 		{HallNo: "WW 118", CourseCode: "22AM305", RegisterNos: []string{
 			"7376252AL101", "7376252AL102", "7376252AL103", "7376252AL104", "7376252AL105", "7376252AL106",
 			"7376252AL107", "7376252AL108", "7376252AL109", "7376252AL110", "7376252AL111", "7376252AL112",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10270,7 +10270,7 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376252IT372", "7376252IT373", "7376252IT374", "7376252IT375", "7376252IT376", "7376252IT377",
 			"7376252IT378", "7376252IT379", "7376252IT380", "7376252IT381", "7376252IT382", "7376252IT383",
 			"7376252IT384",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM305 (25 candidates)
 		{HallNo: "WW 202", CourseCode: "22AM305", RegisterNos: []string{
 			"7376252AL113", "7376252AL114", "7376252AL115", "7376252AL116", "7376252AL117", "7376252AL118",
@@ -10278,7 +10278,7 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376252AL125", "7376252AL126", "7376252AL127", "7376252AL128", "7376252AL129", "7376252AL130",
 			"7376252AL131", "7376252AL132", "7376252AL133", "7376252AL134", "7376252AL135", "7376252AL136",
 			"7376252AL137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10286,31 +10286,31 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 203", CourseCode: "22IT305", RegisterNos: []string{
 			"7376252IT385", "7376252IT386", "7376252IT387", "7376252IT388", "7376262IT502", "7376262IT503",
 			"7376262IT504", "7376262IT505", "7376262IT506", "7376262IT507",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM305 (15 candidates)
 		{HallNo: "WW 203", CourseCode: "22AM305", RegisterNos: []string{
 			"7376252AL138", "7376252AL139", "7376252AL140", "7376252AL141", "7376252AL142", "7376252AL143",
 			"7376252AL144", "7376252AL145", "7376252AL146", "7376252AL147", "7376252AL148", "7376252AL149",
 			"7376252AL150", "7376252AL151", "7376252AL152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EE305 (1 candidates)
 		{HallNo: "WW 204", CourseCode: "22EE305", RegisterNos: []string{
 			"7376251EE102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (9 candidates)
 		{HallNo: "WW 204", CourseCode: "22IT305", RegisterNos: []string{
 			"7376262IT508", "7376262IT509", "7376262IT510", "7376262IT511", "7376262IT512", "7376262IT513",
 			"7376262IT514", "7376262IT515", "7376262IT516",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM305 (15 candidates)
 		{HallNo: "WW 204", CourseCode: "22AM305", RegisterNos: []string{
 			"7376252AL153", "7376252AL154", "7376252AL155", "7376252AL156", "7376252AL157", "7376252AL158",
 			"7376252AL159", "7376252AL160", "7376252AL161", "7376252AL162", "7376252AL163", "7376252AL164",
 			"7376252AL165", "7376252AL166", "7376252AL167",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10318,13 +10318,13 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 205", CourseCode: "22EE305", RegisterNos: []string{
 			"7376251EE103", "7376251EE104", "7376251EE105", "7376251EE106", "7376251EE107", "7376251EE108",
 			"7376251EE109", "7376251EE110", "7376251EE111", "7376251EE112",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM305 (15 candidates)
 		{HallNo: "WW 205", CourseCode: "22AM305", RegisterNos: []string{
 			"7376252AL168", "7376252AL169", "7376252AL170", "7376252AL171", "7376252AL172", "7376252AL173",
 			"7376252AL174", "7376252AL175", "7376252AL176", "7376252AL177", "7376252AL178", "7376252AL179",
 			"7376252AL180", "7376252AL181", "7376252AL182",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10332,13 +10332,13 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 206", CourseCode: "22EE305", RegisterNos: []string{
 			"7376251EE113", "7376251EE114", "7376251EE115", "7376251EE116", "7376251EE117", "7376251EE118",
 			"7376251EE119", "7376251EE120", "7376251EE121", "7376251EE122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM305 (15 candidates)
 		{HallNo: "WW 206", CourseCode: "22AM305", RegisterNos: []string{
 			"7376252AL183", "7376252AL184", "7376252AL185", "7376252AL186", "7376252AL187", "7376252AL188",
 			"7376252AL189", "7376252AL190", "7376252AL191", "7376252AL192", "7376252AL193", "7376252AL194",
 			"7376252AL195", "7376252AL196", "7376252AL197",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 207 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10349,7 +10349,7 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EE135", "7376251EE136", "7376251EE137", "7376251EE138", "7376251EE139", "7376251EE140",
 			"7376251EE141", "7376251EE142", "7376251EE143", "7376251EE144", "7376251EE145", "7376251EE146",
 			"7376251EE147",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM305 (25 candidates)
 		{HallNo: "WW 207", CourseCode: "22AM305", RegisterNos: []string{
 			"7376252AL198", "7376252AL199", "7376252AL200", "7376252AL201", "7376252AL202", "7376252AL203",
@@ -10357,7 +10357,7 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376252AL210", "7376252AL211", "7376252AL212", "7376252AL213", "7376252AL214", "7376252AL215",
 			"7376252AL216", "7376252AL217", "7376252AL218", "7376252AL219", "7376252AL220", "7376252AL221",
 			"7376252AL222",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 208 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10365,13 +10365,13 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 208", CourseCode: "22EE305", RegisterNos: []string{
 			"7376251EE148", "7376251EE149", "7376251EE150", "7376251EE151", "7376251EE152", "7376251EE153",
 			"7376251EE154", "7376251EE155", "7376251EE156", "7376251EE157",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM305 (15 candidates)
 		{HallNo: "WW 208", CourseCode: "22AM305", RegisterNos: []string{
 			"7376252AL223", "7376252AL224", "7376252AL225", "7376252AL226", "7376252AL227", "7376252AL228",
 			"7376252AL229", "7376252AL230", "7376252AL231", "7376252AL232", "7376252AL233", "7376252AL234",
 			"7376252AL235", "7376252AL236", "7376252AL237",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 209 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10379,13 +10379,13 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 209", CourseCode: "22EE305", RegisterNos: []string{
 			"7376251EE158", "7376251EE159", "7376251EE160", "7376251EE161", "7376251EE162", "7376251EE163",
 			"7376251EE164", "7376251EE165", "7376251EE166", "7376251EE167",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM305 (15 candidates)
 		{HallNo: "WW 209", CourseCode: "22AM305", RegisterNos: []string{
 			"7376252AL238", "7376252AL239", "7376252AL240", "7376252AL241", "7376252AL242", "7376252AL243",
 			"7376252AL244", "7376252AL245", "7376252AL246", "7376262AL501", "7376262AL502", "7376262AL503",
 			"7376262AL504", "7376262AL505", "7376262AL506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 210 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10393,16 +10393,16 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 210", CourseCode: "22EE305", RegisterNos: []string{
 			"7376251EE168", "7376251EE169", "7376251EE170", "7376251EE171", "7376251EE172", "7376251EE173",
 			"7376251EE174", "7376251EE175", "7376251EE176", "7376251EE177",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT305 (12 candidates)
 		{HallNo: "WW 210", CourseCode: "22BT305", RegisterNos: []string{
 			"7376252BT102", "7376252BT103", "7376252BT104", "7376252BT105", "7376252BT106", "7376252BT107",
 			"7376252BT108", "7376252BT109", "7376252BT110", "7376252BT111", "7376252BT112", "7376252BT113",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM305 (3 candidates)
 		{HallNo: "WW 210", CourseCode: "22AM305", RegisterNos: []string{
 			"7376262AL507", "7376262AL508", "7376262AL509",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 211 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10410,13 +10410,13 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 211", CourseCode: "22EE305", RegisterNos: []string{
 			"7376251EE178", "7376251EE179", "7376251EE180", "7376251EE181", "7376251EE182", "7376251EE183",
 			"7376251EE184", "7376251EE185", "7376251EE186", "7376251EE187",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT305 (15 candidates)
 		{HallNo: "WW 211", CourseCode: "22BT305", RegisterNos: []string{
 			"7376252BT114", "7376252BT115", "7376252BT116", "7376252BT117", "7376252BT118", "7376252BT119",
 			"7376252BT120", "7376252BT121", "7376252BT122", "7376252BT123", "7376252BT124", "7376252BT125",
 			"7376252BT126", "7376252BT127", "7376252BT128",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 212 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10427,7 +10427,7 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EE200", "7376251EE201", "7376251EE202", "7376251EE203", "7376251EE204", "7376251EE205",
 			"7376261EE502", "7376261EE503", "7376261EE504", "7376261EE505", "7376261EE506", "7376261EE507",
 			"7376261EE508",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT305 (25 candidates)
 		{HallNo: "WW 212", CourseCode: "22BT305", RegisterNos: []string{
 			"7376252BT129", "7376252BT130", "7376252BT131", "7376252BT132", "7376252BT133", "7376252BT134",
@@ -10435,7 +10435,7 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376252BT141", "7376252BT142", "7376252BT143", "7376252BT144", "7376252BT145", "7376252BT146",
 			"7376252BT147", "7376252BT148", "7376252BT149", "7376252BT150", "7376252BT151", "7376252BT152",
 			"7376252BT153",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 213 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10443,13 +10443,13 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 213", CourseCode: "22EE305", RegisterNos: []string{
 			"7376261EE509", "7376261EE510", "7376261EE511", "7376261EE512", "7376261EE513", "7376261EE514",
 			"7376261EE515", "7376261EE516", "7376261EE517", "7376261EE518",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT305 (15 candidates)
 		{HallNo: "WW 213", CourseCode: "22BT305", RegisterNos: []string{
 			"7376252BT155", "7376252BT156", "7376252BT157", "7376252BT158", "7376252BT159", "7376252BT160",
 			"7376252BT161", "7376252BT162", "7376252BT163", "7376252BT164", "7376252BT165", "7376252BT166",
 			"7376252BT167", "7376252BT168", "7376252BT169",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 214 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10457,13 +10457,13 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 214", CourseCode: "22MC305", RegisterNos: []string{
 			"7376251MZ101", "7376251MZ102", "7376251MZ103", "7376251MZ104", "7376251MZ105", "7376251MZ106",
 			"7376251MZ107", "7376251MZ108", "7376251MZ109", "7376251MZ110",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT305 (15 candidates)
 		{HallNo: "WW 214", CourseCode: "22BT305", RegisterNos: []string{
 			"7376252BT170", "7376252BT171", "7376252BT172", "7376252BT173", "7376252BT174", "7376252BT175",
 			"7376252BT176", "7376252BT177", "7376252BT178", "7376252BT179", "7376252BT180", "7376252BT181",
 			"7376252BT182", "7376252BT183", "7376252BT184",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 215 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10471,13 +10471,13 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 215", CourseCode: "22MC305", RegisterNos: []string{
 			"7376251MZ111", "7376251MZ112", "7376251MZ113", "7376251MZ114", "7376251MZ115", "7376251MZ116",
 			"7376251MZ117", "7376251MZ118", "7376251MZ119", "7376251MZ120",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT305 (15 candidates)
 		{HallNo: "WW 215", CourseCode: "22BT305", RegisterNos: []string{
 			"7376252BT185", "7376252BT186", "7376252BT187", "7376252BT188", "7376252BT189", "7376252BT191",
 			"7376252BT192", "7376252BT193", "7376252BT194", "7376252BT195", "7376252BT196", "7376252BT197",
 			"7376252BT199", "7376252BT200", "7376252BT201",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 218 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10485,13 +10485,13 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 218", CourseCode: "22MC305", RegisterNos: []string{
 			"7376251MZ121", "7376251MZ122", "7376251MZ123", "7376251MZ124", "7376251MZ125", "7376251MZ126",
 			"7376251MZ127", "7376251MZ128", "7376251MZ129", "7376251MZ130",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT305 (15 candidates)
 		{HallNo: "WW 218", CourseCode: "22BT305", RegisterNos: []string{
 			"7376252BT202", "7376252BT203", "7376252BT204", "7376252BT205", "7376252BT206", "7376252BT207",
 			"7376252BT208", "7376252BT209", "7376252BT210", "7376252BT211", "7376252BT212", "7376252BT213",
 			"7376252BT214", "7376252BT215", "7376252BT216",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 219 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10499,17 +10499,17 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 219", CourseCode: "22EI305", RegisterNos: []string{
 			"7376251EI101", "7376251EI102", "7376251EI103", "7376251EI104", "7376251EI105", "7376251EI106",
 			"7376251EI107",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC305 (10 candidates)
 		{HallNo: "WW 219", CourseCode: "22MC305", RegisterNos: []string{
 			"7376251MZ131", "7376251MZ132", "7376251MZ133", "7376251MZ134", "7376251MZ135", "7376251MZ136",
 			"7376251MZ137", "7376251MZ138", "7376251MZ139", "7376251MZ140",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT305 (8 candidates)
 		{HallNo: "WW 219", CourseCode: "22BT305", RegisterNos: []string{
 			"7376252BT217", "7376252BT218", "7376252BT219", "7376252BT220", "7376252BT221", "7376252BT222",
 			"7376252BT223", "7376252BT224",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 222 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10520,7 +10520,7 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EI120", "7376251EI121", "7376251EI122", "7376251EI123", "7376251EI124", "7376251EI125",
 			"7376251EI126", "7376251EI127", "7376251EI128", "7376251EI129", "7376251EI130", "7376251EI131",
 			"7376251EI132",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC305 (25 candidates)
 		{HallNo: "WW 222", CourseCode: "22MC305", RegisterNos: []string{
 			"7376251MZ141", "7376251MZ142", "7376251MZ143", "7376251MZ144", "7376251MZ145", "7376251MZ146",
@@ -10528,7 +10528,7 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251MZ153", "7376251MZ154", "7376251MZ155", "7376251MZ156", "7376251MZ157", "7376251MZ158",
 			"7376251MZ159", "7376251MZ160", "7376251MZ161", "7376251MZ162", "7376261MZ502", "7376261MZ503",
 			"7376261MZ504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10539,18 +10539,18 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EI147", "7376251EI148", "7376251EI149", "7376251EI150", "7376251EI151", "7376251EI152",
 			"7376251EI153", "7376251EI154", "7376251EI155", "7376251EI156", "7376251EI157", "7376251EI158",
 			"7376251EI133",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME305 (24 candidates)
 		{HallNo: "WW 223", CourseCode: "22ME305", RegisterNos: []string{
 			"7376251ME102", "7376251ME103", "7376251ME104", "7376251ME105", "7376251ME106", "7376251ME107",
 			"7376251ME108", "7376251ME109", "7376251ME110", "7376251ME111", "7376251ME112", "7376251ME113",
 			"7376251ME114", "7376251ME115", "7376251ME116", "7376251ME117", "7376251ME118", "7376251ME119",
 			"7376251ME120", "7376251ME121", "7376251ME122", "7376251ME123", "7376251ME124", "7376251ME125",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC305 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22MC305", RegisterNos: []string{
 			"7376261MZ505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10558,7 +10558,7 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 224", CourseCode: "22EI305", RegisterNos: []string{
 			"7376251EI159", "7376251EI160", "7376251EI161", "7376261EI501", "7376261EI502", "7376261EI503",
 			"7376261EI504", "7376261EI505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME305 (25 candidates)
 		{HallNo: "WW 224", CourseCode: "22ME305", RegisterNos: []string{
 			"7376251ME126", "7376251ME127", "7376251ME128", "7376251ME129", "7376251ME130", "7376251ME131",
@@ -10566,13 +10566,13 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251ME138", "7376251ME139", "7376251ME140", "7376251ME141", "7376251ME142", "7376251ME143",
 			"7376251ME144", "7376251ME145", "7376251ME146", "7376251ME147", "7376251ME148", "7376251ME149",
 			"7376251ME150",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG305 (17 candidates)
 		{HallNo: "WW 224", CourseCode: "22AG305", RegisterNos: []string{
 			"7376252AG101", "7376252AG102", "7376252AG103", "7376252AG104", "7376252AG105", "7376252AG106",
 			"7376252AG107", "7376252AG108", "7376252AG109", "7376252AG110", "7376252AG111", "7376252AG112",
 			"7376252AG113", "7376252AG115", "7376252AG116", "7376252AG117", "7376252AG118",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 225 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10581,12 +10581,12 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251ME151", "7376251ME152", "7376251ME153", "7376251ME154", "7376251ME155", "7376251ME156",
 			"7376251ME157", "7376251ME158", "7376251ME159", "7376251ME160", "7376261ME504", "7376261ME505",
 			"7376261ME506", "7376261ME507", "7376261ME501", "7376261ME502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG305 (9 candidates)
 		{HallNo: "WW 225", CourseCode: "22AG305", RegisterNos: []string{
 			"7376252AG119", "7376252AG120", "7376252AG121", "7376252AG122", "7376252AG123", "7376252AG124",
 			"7376252AG125", "7376252AG126", "7376252AG127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 226 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10594,108 +10594,108 @@ func buildSeatingData28Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 226", CourseCode: "22EC305*", RegisterNos: []string{
 			"7376231EC110", "7376231EC283", "7376231EC305", "7376231EC331", "7376231EC334", "7376241EC516",
 			"7376241EC521",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT305 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22BT305", RegisterNos: []string{
 			"7376232BT176",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (2 candidates)
 		{HallNo: "WW 226", CourseCode: "22IT305", RegisterNos: []string{
 			"7376232IT118", "7376232IT152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC305* (18 candidates)
 		{HallNo: "WW 226", CourseCode: "22EC305*", RegisterNos: []string{
 			"7376241EC124", "7376241EC137", "7376241EC138", "7376241EC139", "7376241EC157", "7376241EC201",
 			"7376241EC243", "7376241EC284", "7376241EC300", "7376241EC312", "7376251EC506", "7376251EC507",
 			"7376251EC508", "7376251EC511", "7376251EC513", "7376251EC515", "7376251EC517", "7376251EC518",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT305 (9 candidates)
 		{HallNo: "WW 226", CourseCode: "22BT305", RegisterNos: []string{
 			"7376242BT120", "7376242BT138", "7376242BT145", "7376242BT151", "7376242BT156", "7376242BT160",
 			"7376242BT174", "7376242BT178", "7376242BT220",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT305 (13 candidates)
 		{HallNo: "WW 226", CourseCode: "22IT305", RegisterNos: []string{
 			"7376242IT129", "7376242IT146", "7376242IT164", "7376242IT168", "7376242IT184", "7376242IT188",
 			"7376242IT214", "7376242IT227", "7376242IT287", "7376242IT292", "7376252IT504", "7376252IT511",
 			"7376252IT512",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 227 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CE305 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22CE305", RegisterNos: []string{
 			"7376241CE501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS305 (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22CS305", RegisterNos: []string{
 			"7376231CS244", "7376231CS259", "7376231CS292",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM305* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22BM305*", RegisterNos: []string{
 			"7376231BM107",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD305 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22CD305", RegisterNos: []string{
 			"7376241CD501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC305 (5 candidates)
 		{HallNo: "WW 227", CourseCode: "22MC305", RegisterNos: []string{
 			"7376231MZ106", "7376231MZ111", "7376231MZ135", "7376231MZ148", "7376241MZ501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB305* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22CB305*", RegisterNos: []string{
 			"7376232CB123",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM305 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22AM305", RegisterNos: []string{
 			"7376242AL501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG305* (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22AG305*", RegisterNos: []string{
 			"7376232AG113", "7376232AG151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS305 (4 candidates)
 		{HallNo: "WW 227", CourseCode: "22CS305", RegisterNos: []string{
 			"7376241CS230", "7376241CS272", "7376241CS318", "7376241CS395",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC305* (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22EC305*", RegisterNos: []string{
 			"7376251EC519", "7376251EC521",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE305* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22EE305*", RegisterNos: []string{
 			"7376251EE514",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME305 (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22ME305", RegisterNos: []string{
 			"7376241ME123", "7376241ME124", "7376241ME127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC305 (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22MC305", RegisterNos: []string{
 			"7376241MZ124", "7376241MZ139", "7376241MZ143",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT305 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22BT305", RegisterNos: []string{
 			"7376252BT501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB305* (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22CB305*", RegisterNos: []string{
 			"7376242CB118", "7376242CB155",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI305 (6 candidates)
 		{HallNo: "WW 227", CourseCode: "22AI305", RegisterNos: []string{
 			"7376242AD137", "7376242AD189", "7376242AD190", "7376242AD218", "7376242AD320", "7376252AD510",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM305 (4 candidates)
 		{HallNo: "WW 227", CourseCode: "22AM305", RegisterNos: []string{
 			"7376242AL108", "7376242AL157", "7376242AL197", "7376242AL207",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
 
 // ============================================================================
-// 28-11-2026 AFTERNOON SESSION (AN: 01:30 PM ? 04:30 PM) - Total: 53 Students
+// 28-11-2026 AFTERNOON SESSION (AN: 01:30 PM : 04:30 PM) - Total: 53 Students
 // ============================================================================
 func buildSeatingData28Nov2026AN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -10705,16 +10705,16 @@ func buildSeatingData28Nov2026AN() []studentmodels.SeatingRecord {
 		// Course: 22OCS02 (2 candidates)
 		{HallNo: "WW 203", CourseCode: "22OCS02", RegisterNos: []string{
 			"7376241ME126", "7376241ME156",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCS02 (3 candidates)
 		{HallNo: "WW 203", CourseCode: "22OCS02", RegisterNos: []string{
 			"7376241MZ125", "7376251MZ502", "7376251MZ506",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCS02 (9 candidates)
 		{HallNo: "WW 203", CourseCode: "22OCS02", RegisterNos: []string{
 			"7376242BT106", "7376242BT119", "7376242BT130", "7376242BT166", "7376242BT190", "7376242BT198",
 			"7376242BT209", "7376242BT212", "7376242BT216",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10722,79 +10722,79 @@ func buildSeatingData28Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 204", CourseCode: "22CS011", RegisterNos: []string{
 			"7376231CS103", "7376231CS218", "7376231CS244", "7376231CS251", "7376231CS259", "7376231CS283",
 			"7376231CS306", "7376231CS324", "7376231CS350", "7376241CS506",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS201 (2 candidates)
 		{HallNo: "WW 204", CourseCode: "22HS201", RegisterNos: []string{
 			"7376231EC331", "7376231EC334",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCS02 (2 candidates)
 		{HallNo: "WW 204", CourseCode: "22OCS02", RegisterNos: []string{
 			"7376231EC112", "7376231EC231",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCS02 (1 candidates)
 		{HallNo: "WW 204", CourseCode: "22OCS02", RegisterNos: []string{
 			"7376231MZ113",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS201 (1 candidates)
 		{HallNo: "WW 204", CourseCode: "22HS201", RegisterNos: []string{
 			"7376232CT122",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS201 (1 candidates)
 		{HallNo: "WW 204", CourseCode: "22HS201", RegisterNos: []string{
 			"7376241EE193",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS201 (2 candidates)
 		{HallNo: "WW 204", CourseCode: "22HS201", RegisterNos: []string{
 			"7376242IT146", "7376242IT184",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS201 (2 candidates)
 		{HallNo: "WW 204", CourseCode: "22HS201", RegisterNos: []string{
 			"7376242AD189", "7376242AD320",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS201 (1 candidates)
 		{HallNo: "WW 204", CourseCode: "22HS201", RegisterNos: []string{
 			"7376251CS241",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS201 (3 candidates)
 		{HallNo: "WW 204", CourseCode: "22HS201", RegisterNos: []string{
 			"7376251EC105", "7376251EC248", "7376251EC304",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CE403* (2 candidates)
 		{HallNo: "WW 205", CourseCode: "22CE403*", RegisterNos: []string{
 			"7376231CE117", "7376231CE120",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS011 (1 candidates)
 		{HallNo: "WW 205", CourseCode: "22CS011", RegisterNos: []string{
 			"7376241CS512",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCS02 (2 candidates)
 		{HallNo: "WW 205", CourseCode: "22OCS02", RegisterNos: []string{
 			"7376241EC513", "7376241EC515",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME03 (5 candidates)
 		{HallNo: "WW 205", CourseCode: "22OME03", RegisterNos: []string{
 			"7376231MZ111", "7376231MZ153", "7376231MZ154", "7376231MZ158", "7376241MZ501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCS02 (1 candidates)
 		{HallNo: "WW 205", CourseCode: "22OCS02", RegisterNos: []string{
 			"7376232BT115",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCS02 (1 candidates)
 		{HallNo: "WW 205", CourseCode: "22OCS02", RegisterNos: []string{
 			"7376232CB110",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM005 (2 candidates)
 		{HallNo: "WW 205", CourseCode: "22AM005", RegisterNos: []string{
 			"7376232AL156", "7376232AL158",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 	}
 }
 
 // ============================================================================
-// 30-11-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 1869 Students
+// 30-11-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 1869 Students
 // ============================================================================
 func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -10808,14 +10808,14 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS113", "7376231CS114", "7376231CS115", "7376231CS116", "7376231CS117", "7376231CS118",
 			"7376231CS119", "7376231CS120", "7376231CS121", "7376231CS122", "7376231CS123", "7376231CS124",
 			"7376231CS125",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC702 (20 candidates)
 		{HallNo: "ME 101", CourseCode: "22EC702", RegisterNos: []string{
 			"7376231EC101", "7376231EC102", "7376231EC103", "7376231EC104", "7376231EC105", "7376231EC106",
 			"7376231EC107", "7376231EC108", "7376231EC109", "7376231EC110", "7376231EC111", "7376231EC112",
 			"7376231EC113", "7376231EC114", "7376231EC115", "7376231EC116", "7376231EC117", "7376231EC118",
 			"7376231EC119", "7376231EC120",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 102 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10826,14 +10826,14 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS138", "7376231CS139", "7376231CS140", "7376231CS141", "7376231CS142", "7376231CS143",
 			"7376231CS144", "7376231CS145", "7376231CS146", "7376231CS147", "7376231CS148", "7376231CS149",
 			"7376231CS150",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC702 (20 candidates)
 		{HallNo: "ME 102", CourseCode: "22EC702", RegisterNos: []string{
 			"7376231EC121", "7376231EC122", "7376231EC123", "7376231EC124", "7376231EC125", "7376231EC126",
 			"7376231EC127", "7376231EC128", "7376231EC129", "7376231EC130", "7376231EC131", "7376231EC132",
 			"7376231EC133", "7376231EC134", "7376231EC135", "7376231EC136", "7376231EC137", "7376231EC138",
 			"7376231EC139", "7376231EC140",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 107 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10844,14 +10844,14 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS163", "7376231CS164", "7376231CS165", "7376231CS166", "7376231CS168", "7376231CS169",
 			"7376231CS170", "7376231CS171", "7376231CS172", "7376231CS173", "7376231CS174", "7376231CS175",
 			"7376231CS176",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC702 (20 candidates)
 		{HallNo: "ME 107", CourseCode: "22EC702", RegisterNos: []string{
 			"7376231EC141", "7376231EC142", "7376231EC143", "7376231EC144", "7376231EC145", "7376231EC146",
 			"7376231EC147", "7376231EC148", "7376231EC149", "7376231EC150", "7376231EC151", "7376231EC152",
 			"7376231EC153", "7376231EC154", "7376231EC155", "7376231EC156", "7376231EC157", "7376231EC158",
 			"7376231EC159", "7376231EC160",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 108 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10862,14 +10862,14 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS189", "7376231CS190", "7376231CS191", "7376231CS192", "7376231CS193", "7376231CS194",
 			"7376231CS195", "7376231CS196", "7376231CS197", "7376231CS198", "7376231CS199", "7376231CS200",
 			"7376231CS201",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC702 (20 candidates)
 		{HallNo: "ME 108", CourseCode: "22EC702", RegisterNos: []string{
 			"7376231EC161", "7376231EC162", "7376231EC163", "7376231EC164", "7376231EC165", "7376231EC166",
 			"7376231EC167", "7376231EC168", "7376231EC169", "7376231EC170", "7376231EC171", "7376231EC172",
 			"7376231EC173", "7376231EC174", "7376231EC175", "7376231EC176", "7376231EC177", "7376231EC178",
 			"7376231EC179", "7376231EC180",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10880,14 +10880,14 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS214", "7376231CS215", "7376231CS216", "7376231CS217", "7376231CS218", "7376231CS219",
 			"7376231CS220", "7376231CS221", "7376231CS222", "7376231CS223", "7376231CS224", "7376231CS225",
 			"7376231CS226",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC702 (20 candidates)
 		{HallNo: "ME 201", CourseCode: "22EC702", RegisterNos: []string{
 			"7376231EC181", "7376231EC182", "7376231EC183", "7376231EC184", "7376231EC185", "7376231EC186",
 			"7376231EC187", "7376231EC188", "7376231EC189", "7376231EC190", "7376231EC191", "7376231EC192",
 			"7376231EC193", "7376231EC194", "7376231EC195", "7376231EC196", "7376231EC197", "7376231EC198",
 			"7376231EC199", "7376231EC200",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10898,14 +10898,14 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS239", "7376231CS240", "7376231CS241", "7376231CS242", "7376231CS243", "7376231CS244",
 			"7376231CS245", "7376231CS246", "7376231CS247", "7376231CS248", "7376231CS249", "7376231CS250",
 			"7376231CS251",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC702 (20 candidates)
 		{HallNo: "ME 202", CourseCode: "22EC702", RegisterNos: []string{
 			"7376231EC201", "7376231EC202", "7376231EC203", "7376231EC204", "7376231EC205", "7376231EC206",
 			"7376231EC207", "7376231EC208", "7376231EC209", "7376231EC210", "7376231EC211", "7376231EC212",
 			"7376231EC213", "7376231EC214", "7376231EC215", "7376231EC216", "7376231EC217", "7376231EC218",
 			"7376231EC219", "7376231EC220",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10916,14 +10916,14 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS264", "7376231CS265", "7376231CS266", "7376231CS267", "7376231CS268", "7376231CS269",
 			"7376231CS270", "7376231CS271", "7376231CS272", "7376231CS273", "7376231CS274", "7376231CS275",
 			"7376231CS276",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC702 (20 candidates)
 		{HallNo: "ME 203", CourseCode: "22EC702", RegisterNos: []string{
 			"7376231EC221", "7376231EC222", "7376231EC223", "7376231EC224", "7376231EC225", "7376231EC226",
 			"7376231EC227", "7376231EC228", "7376231EC229", "7376231EC230", "7376231EC231", "7376231EC232",
 			"7376231EC233", "7376231EC234", "7376231EC235", "7376231EC236", "7376231EC237", "7376231EC238",
 			"7376231EC239", "7376231EC240",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10934,14 +10934,14 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS290", "7376231CS291", "7376231CS292", "7376231CS293", "7376231CS294", "7376231CS295",
 			"7376231CS296", "7376231CS297", "7376231CS298", "7376231CS299", "7376231CS300", "7376231CS301",
 			"7376231CS302",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC702 (20 candidates)
 		{HallNo: "ME 204", CourseCode: "22EC702", RegisterNos: []string{
 			"7376231EC241", "7376231EC242", "7376231EC243", "7376231EC244", "7376231EC245", "7376231EC246",
 			"7376231EC247", "7376231EC248", "7376231EC249", "7376231EC250", "7376231EC251", "7376231EC252",
 			"7376231EC253", "7376231EC254", "7376231EC255", "7376231EC256", "7376231EC257", "7376231EC258",
 			"7376231EC259", "7376231EC260",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10952,14 +10952,14 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS315", "7376231CS316", "7376231CS317", "7376231CS318", "7376231CS319", "7376231CS320",
 			"7376231CS321", "7376231CS323", "7376231CS324", "7376231CS325", "7376231CS326", "7376231CS328",
 			"7376231CS329",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC702 (20 candidates)
 		{HallNo: "ME 205", CourseCode: "22EC702", RegisterNos: []string{
 			"7376231EC261", "7376231EC262", "7376231EC263", "7376231EC264", "7376231EC265", "7376231EC266",
 			"7376231EC267", "7376231EC268", "7376231EC269", "7376231EC270", "7376231EC271", "7376231EC272",
 			"7376231EC273", "7376231EC274", "7376231EC275", "7376231EC276", "7376231EC277", "7376231EC278",
 			"7376231EC279", "7376231EC280",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10970,14 +10970,14 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS342", "7376231CS343", "7376231CS344", "7376231CS345", "7376231CS346", "7376231CS347",
 			"7376231CS348", "7376231CS349", "7376231CS350", "7376231CS351", "7376231CS352", "7376231CS353",
 			"7376231CS354",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC702 (20 candidates)
 		{HallNo: "ME 206", CourseCode: "22EC702", RegisterNos: []string{
 			"7376231EC281", "7376231EC282", "7376231EC283", "7376231EC284", "7376231EC285", "7376231EC286",
 			"7376231EC287", "7376231EC288", "7376231EC289", "7376231EC290", "7376231EC291", "7376231EC292",
 			"7376231EC293", "7376231EC294", "7376231EC295", "7376231EC296", "7376231EC297", "7376231EC298",
 			"7376231EC299", "7376231EC300",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 301 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -10986,19 +10986,19 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376241CS501", "7376241CS502", "7376241CS503", "7376241CS504", "7376241CS505", "7376241CS506",
 			"7376241CS507", "7376241CS508", "7376241CS509", "7376241CS510", "7376241CS511", "7376241CS512",
 			"7376241CS513", "7376241CS514", "7376241CS515", "7376241CS516", "7376241CS518", "7376241CS519",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC702 (20 candidates)
 		{HallNo: "ME 301", CourseCode: "22EC702", RegisterNos: []string{
 			"7376231EC301", "7376231EC302", "7376231EC303", "7376231EC304", "7376231EC305", "7376231EC306",
 			"7376231EC307", "7376231EC308", "7376231EC309", "7376231EC310", "7376231EC311", "7376231EC312",
 			"7376231EC313", "7376231EC314", "7376231EC315", "7376231EC316", "7376231EC317", "7376231EC318",
 			"7376231EC319", "7376231EC320",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI702 (7 candidates)
 		{HallNo: "ME 301", CourseCode: "22AI702", RegisterNos: []string{
 			"7376232AD101", "7376232AD102", "7376232AD103", "7376232AD104", "7376232AD105", "7376232AD106",
 			"7376232AD107",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 302 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11008,7 +11008,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC327", "7376231EC328", "7376231EC329", "7376231EC330", "7376231EC331", "7376231EC332",
 			"7376231EC333", "7376231EC334", "7376241EC501", "7376241EC502", "7376241EC503", "7376241EC504",
 			"7376241EC505", "7376241EC506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI702 (25 candidates)
 		{HallNo: "ME 302", CourseCode: "22AI702", RegisterNos: []string{
 			"7376232AD108", "7376232AD109", "7376232AD110", "7376232AD111", "7376232AD112", "7376232AD113",
@@ -11016,7 +11016,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD120", "7376232AD121", "7376232AD122", "7376232AD123", "7376232AD124", "7376232AD125",
 			"7376232AD126", "7376232AD127", "7376232AD128", "7376232AD129", "7376232AD130", "7376232AD131",
 			"7376232AD132",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 303 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11025,11 +11025,11 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376241EC507", "7376241EC508", "7376241EC509", "7376241EC510", "7376241EC511", "7376241EC512",
 			"7376241EC513", "7376241EC514", "7376241EC515", "7376241EC516", "7376241EC517", "7376241EC518",
 			"7376241EC519", "7376241EC520", "7376241EC521", "7376241EC522",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT702 (4 candidates)
 		{HallNo: "ME 303", CourseCode: "22IT702", RegisterNos: []string{
 			"7376232IT101", "7376232IT102", "7376232IT103", "7376232IT104",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI702 (25 candidates)
 		{HallNo: "ME 303", CourseCode: "22AI702", RegisterNos: []string{
 			"7376232AD133", "7376232AD134", "7376232AD135", "7376232AD136", "7376232AD137", "7376232AD138",
@@ -11037,7 +11037,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD145", "7376232AD146", "7376232AD147", "7376232AD148", "7376232AD149", "7376232AD150",
 			"7376232AD151", "7376232AD152", "7376232AD153", "7376232AD154", "7376232AD155", "7376232AD156",
 			"7376232AD157",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 304 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11047,7 +11047,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT111", "7376232IT112", "7376232IT113", "7376232IT114", "7376232IT115", "7376232IT116",
 			"7376232IT117", "7376232IT118", "7376232IT119", "7376232IT120", "7376232IT121", "7376232IT122",
 			"7376232IT123", "7376232IT124",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI702 (25 candidates)
 		{HallNo: "ME 304", CourseCode: "22AI702", RegisterNos: []string{
 			"7376232AD158", "7376232AD159", "7376232AD160", "7376232AD161", "7376232AD162", "7376232AD163",
@@ -11055,7 +11055,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD170", "7376232AD171", "7376232AD172", "7376232AD173", "7376232AD174", "7376232AD175",
 			"7376232AD176", "7376232AD177", "7376232AD178", "7376232AD179", "7376232AD180", "7376232AD181",
 			"7376232AD182",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 305 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11065,7 +11065,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT131", "7376232IT132", "7376232IT133", "7376232IT134", "7376232IT135", "7376232IT136",
 			"7376232IT137", "7376232IT138", "7376232IT139", "7376232IT140", "7376232IT141", "7376232IT142",
 			"7376232IT143", "7376232IT144",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI702 (25 candidates)
 		{HallNo: "ME 305", CourseCode: "22AI702", RegisterNos: []string{
 			"7376232AD183", "7376232AD184", "7376232AD185", "7376232AD186", "7376232AD187", "7376232AD188",
@@ -11073,7 +11073,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD195", "7376232AD196", "7376232AD197", "7376232AD198", "7376232AD199", "7376232AD200",
 			"7376232AD201", "7376232AD202", "7376232AD203", "7376232AD204", "7376232AD205", "7376232AD206",
 			"7376232AD207",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 306 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11083,7 +11083,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT151", "7376232IT152", "7376232IT153", "7376232IT154", "7376232IT155", "7376232IT156",
 			"7376232IT157", "7376232IT158", "7376232IT159", "7376232IT160", "7376232IT161", "7376232IT162",
 			"7376232IT163", "7376232IT164",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI702 (25 candidates)
 		{HallNo: "ME 306", CourseCode: "22AI702", RegisterNos: []string{
 			"7376232AD208", "7376232AD209", "7376232AD210", "7376232AD211", "7376232AD212", "7376232AD213",
@@ -11091,7 +11091,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD220", "7376232AD221", "7376232AD222", "7376232AD223", "7376232AD224", "7376232AD225",
 			"7376232AD226", "7376232AD227", "7376232AD229", "7376232AD230", "7376232AD231", "7376232AD232",
 			"7376232AD233",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 001 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11101,14 +11101,14 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT171", "7376232IT172", "7376232IT173", "7376232IT174", "7376232IT175", "7376232IT176",
 			"7376232IT177", "7376232IT178", "7376232IT179", "7376232IT180", "7376232IT181", "7376232IT182",
 			"7376232IT183", "7376232IT184",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI702 (20 candidates)
 		{HallNo: "SF 001", CourseCode: "22AI702", RegisterNos: []string{
 			"7376232AD234", "7376232AD235", "7376232AD236", "7376232AD237", "7376232AD238", "7376232AD239",
 			"7376232AD240", "7376232AD241", "7376232AD242", "7376232AD243", "7376232AD244", "7376232AD245",
 			"7376232AD246", "7376232AD247", "7376232AD248", "7376232AD249", "7376232AD250", "7376232AD251",
 			"7376232AD252", "7376232AD253",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 002 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11118,14 +11118,14 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT191", "7376232IT192", "7376232IT193", "7376232IT194", "7376232IT195", "7376232IT196",
 			"7376232IT197", "7376232IT198", "7376232IT199", "7376232IT200", "7376232IT201", "7376232IT202",
 			"7376232IT203", "7376232IT204",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI702 (20 candidates)
 		{HallNo: "SF 002", CourseCode: "22AI702", RegisterNos: []string{
 			"7376232AD254", "7376232AD255", "7376232AD256", "7376232AD257", "7376232AD258", "7376232AD259",
 			"7376232AD260", "7376232AD261", "7376232AD262", "7376232AD263", "7376232AD264", "7376232AD265",
 			"7376232AD266", "7376232AD267", "7376232AD268", "7376232AD269", "7376232AD270", "7376232AD271",
 			"7376232AD272", "7376232AD273",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 101 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11135,14 +11135,14 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT211", "7376232IT212", "7376232IT213", "7376232IT214", "7376232IT215", "7376232IT216",
 			"7376232IT217", "7376232IT218", "7376232IT219", "7376232IT220", "7376232IT221", "7376232IT222",
 			"7376232IT223", "7376232IT224",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI702 (20 candidates)
 		{HallNo: "SF 101", CourseCode: "22AI702", RegisterNos: []string{
 			"7376232AD274", "7376232AD275", "7376232AD276", "7376232AD277", "7376232AD278", "7376232AD279",
 			"7376232AD280", "7376232AD281", "7376232AD282", "7376232AD283", "7376232AD284", "7376232AD285",
 			"7376232AD286", "7376242AD501", "7376242AD502", "7376242AD503", "7376242AD504", "7376242AD505",
 			"7376242AD506", "7376242AD507",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 102 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11152,17 +11152,17 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT234", "7376232IT235", "7376232IT236", "7376232IT237", "7376232IT238", "7376232IT239",
 			"7376232IT240", "7376232IT241", "7376232IT242", "7376232IT243", "7376232IT244", "7376232IT245",
 			"7376232IT225", "7376232IT226",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI702 (3 candidates)
 		{HallNo: "SF 102", CourseCode: "22AI702", RegisterNos: []string{
 			"7376242AD508", "7376242AD509", "7376242AD510",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM702 (17 candidates)
 		{HallNo: "SF 102", CourseCode: "22AM702", RegisterNos: []string{
 			"7376232AL101", "7376232AL102", "7376232AL103", "7376232AL104", "7376232AL105", "7376232AL106",
 			"7376232AL107", "7376232AL108", "7376232AL109", "7376232AL110", "7376232AL111", "7376232AL112",
 			"7376232AL113", "7376232AL114", "7376232AL115", "7376232AL116", "7376232AL117",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B01 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11172,14 +11172,14 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT252", "7376232IT253", "7376232IT254", "7376232IT255", "7376232IT256", "7376232IT257",
 			"7376232IT258", "7376232IT259", "7376232IT260", "7376232IT261", "7376232IT262", "7376232IT263",
 			"7376232IT264", "7376232IT265",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM702 (20 candidates)
 		{HallNo: "SF B01", CourseCode: "22AM702", RegisterNos: []string{
 			"7376232AL118", "7376232AL119", "7376232AL120", "7376232AL121", "7376232AL122", "7376232AL123",
 			"7376232AL124", "7376232AL125", "7376232AL126", "7376232AL127", "7376232AL128", "7376232AL129",
 			"7376232AL130", "7376232AL131", "7376232AL132", "7376232AL133", "7376232AL134", "7376232AL135",
 			"7376232AL136", "7376232AL137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B02 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11189,14 +11189,14 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT272", "7376232IT273", "7376232IT274", "7376232IT275", "7376232IT276", "7376232IT277",
 			"7376232IT278", "7376232IT279", "7376232IT280", "7376232IT281", "7376232IT283", "7376232IT284",
 			"7376232IT285", "7376232IT286",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM702 (20 candidates)
 		{HallNo: "SF B02", CourseCode: "22AM702", RegisterNos: []string{
 			"7376232AL138", "7376232AL139", "7376232AL140", "7376232AL141", "7376232AL142", "7376232AL143",
 			"7376232AL144", "7376232AL145", "7376232AL146", "7376232AL147", "7376232AL148", "7376232AL149",
 			"7376232AL150", "7376232AL151", "7376232AL152", "7376232AL153", "7376232AL154", "7376232AL155",
 			"7376232AL156", "7376232AL157",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B03 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11204,19 +11204,19 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "SF B03", CourseCode: "22BT702", RegisterNos: []string{
 			"7376232BT101", "7376232BT102", "7376232BT103", "7376232BT104", "7376232BT105", "7376232BT106",
 			"7376232BT107", "7376232BT108", "7376232BT109", "7376232BT110",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT702 (10 candidates)
 		{HallNo: "SF B03", CourseCode: "22IT702", RegisterNos: []string{
 			"7376242IT501", "7376242IT502", "7376242IT503", "7376242IT504", "7376242IT505", "7376242IT507",
 			"7376242IT508", "7376242IT509", "7376242IT510", "7376242IT511",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM702 (20 candidates)
 		{HallNo: "SF B03", CourseCode: "22AM702", RegisterNos: []string{
 			"7376232AL158", "7376232AL159", "7376232AL160", "7376232AL161", "7376232AL162", "7376232AL163",
 			"7376232AL164", "7376232AL165", "7376232AL166", "7376232AL167", "7376232AL168", "7376232AL169",
 			"7376232AL170", "7376232AL171", "7376232AL172", "7376232AL173", "7376232AL174", "7376232AL175",
 			"7376232AL176", "7376232AL177",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 008 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11224,13 +11224,13 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 008", CourseCode: "22BT702", RegisterNos: []string{
 			"7376232BT111", "7376232BT112", "7376232BT113", "7376232BT114", "7376232BT115", "7376232BT116",
 			"7376232BT117", "7376232BT118", "7376232BT119", "7376232BT120",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM702 (15 candidates)
 		{HallNo: "WW 008", CourseCode: "22AM702", RegisterNos: []string{
 			"7376232AL178", "7376232AL179", "7376232AL180", "7376232AL181", "7376232AL182", "7376232AL183",
 			"7376232AL184", "7376232AL185", "7376232AL186", "7376232AL187", "7376232AL188", "7376232AL189",
 			"7376232AL190", "7376232AL191", "7376232AL192",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 011 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11238,13 +11238,13 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 011", CourseCode: "22BT702", RegisterNos: []string{
 			"7376232BT121", "7376232BT122", "7376232BT123", "7376232BT124", "7376232BT125", "7376232BT126",
 			"7376232BT127", "7376232BT128", "7376232BT129", "7376232BT130",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM702 (15 candidates)
 		{HallNo: "WW 011", CourseCode: "22AM702", RegisterNos: []string{
 			"7376232AL195", "7376232AL196", "7376232AL197", "7376232AL198", "7376232AL199", "7376232AL200",
 			"7376232AL201", "7376232AL202", "7376232AL203", "7376232AL204", "7376232AL205", "7376232AL206",
 			"7376232AL207", "7376232AL208", "7376232AL193",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 012 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11252,13 +11252,13 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 012", CourseCode: "22BT702", RegisterNos: []string{
 			"7376232BT131", "7376232BT132", "7376232BT133", "7376232BT134", "7376232BT135", "7376232BT136",
 			"7376232BT137", "7376232BT138", "7376232BT139", "7376232BT140",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM702 (15 candidates)
 		{HallNo: "WW 012", CourseCode: "22AM702", RegisterNos: []string{
 			"7376232AL209", "7376232AL210", "7376232AL211", "7376232AL212", "7376232AL213", "7376232AL214",
 			"7376232AL215", "7376232AL216", "7376232AL217", "7376232AL218", "7376232AL219", "7376232AL220",
 			"7376232AL221", "7376242AL501", "7376242AL502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11266,16 +11266,16 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 201", CourseCode: "22EE702", RegisterNos: []string{
 			"7376231EE102", "7376231EE103", "7376231EE104", "7376231EE105", "7376231EE106", "7376231EE107",
 			"7376231EE108", "7376231EE109", "7376231EE110", "7376231EE111",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT702 (10 candidates)
 		{HallNo: "WW 201", CourseCode: "22BT702", RegisterNos: []string{
 			"7376232BT141", "7376232BT142", "7376232BT143", "7376232BT144", "7376232BT145", "7376232BT146",
 			"7376232BT147", "7376232BT148", "7376232BT149", "7376232BT151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM702 (5 candidates)
 		{HallNo: "WW 201", CourseCode: "22AM702", RegisterNos: []string{
 			"7376242AL503", "7376242AL504", "7376242AL505", "7376242AL506", "7376242AL507",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11286,7 +11286,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EE124", "7376231EE125", "7376231EE126", "7376231EE127", "7376231EE128", "7376231EE129",
 			"7376231EE130", "7376231EE131", "7376231EE132", "7376231EE133", "7376231EE134", "7376231EE135",
 			"7376231EE136",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT702 (25 candidates)
 		{HallNo: "WW 202", CourseCode: "22BT702", RegisterNos: []string{
 			"7376232BT152", "7376232BT153", "7376232BT154", "7376232BT155", "7376232BT156", "7376232BT157",
@@ -11294,7 +11294,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232BT164", "7376232BT165", "7376232BT166", "7376232BT167", "7376232BT168", "7376232BT169",
 			"7376232BT170", "7376232BT171", "7376232BT172", "7376232BT173", "7376232BT174", "7376232BT175",
 			"7376232BT176",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11303,12 +11303,12 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EE137", "7376231EE138", "7376231EE139", "7376231EE140", "7376231EE141", "7376231EE142",
 			"7376231EE143", "7376231EE144", "7376231EE145", "7376231EE146", "7376231EE147", "7376231EE148",
 			"7376231EE149", "7376231EE150", "7376231EE151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT702 (10 candidates)
 		{HallNo: "WW 203", CourseCode: "22BT702", RegisterNos: []string{
 			"7376232BT177", "7376232BT178", "7376232BT179", "7376232BT180", "7376232BT181", "7376232BT182",
 			"7376232BT183", "7376232BT184", "7376232BT185", "7376232BT187",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11317,30 +11317,30 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EE152", "7376231EE153", "7376231EE154", "7376231EE155", "7376231EE156", "7376231EE157",
 			"7376231EE158", "7376231EE159", "7376231EE160", "7376231EE161", "7376241EE501", "7376241EE502",
 			"7376241EE503", "7376241EE504", "7376241EE505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT702 (10 candidates)
 		{HallNo: "WW 204", CourseCode: "22BT702", RegisterNos: []string{
 			"7376232BT188", "7376232BT189", "7376232BT190", "7376232BT191", "7376232BT192", "7376232BT193",
 			"7376232BT194", "7376232BT195", "7376232BT196", "7376232BT197",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EE702 (1 candidates)
 		{HallNo: "WW 205", CourseCode: "22EE702", RegisterNos: []string{
 			"7376241EE506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME702 (14 candidates)
 		{HallNo: "WW 205", CourseCode: "22ME702", RegisterNos: []string{
 			"7376231ME101", "7376231ME102", "7376231ME103", "7376231ME104", "7376231ME105", "7376231ME106",
 			"7376231ME107", "7376231ME108", "7376231ME109", "7376231ME110", "7376231ME111", "7376231ME112",
 			"7376231ME113", "7376231ME114",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT702 (10 candidates)
 		{HallNo: "WW 205", CourseCode: "22BT702", RegisterNos: []string{
 			"7376232BT198", "7376232BT199", "7376232BT200", "7376232BT201", "7376232BT202", "7376232BT203",
 			"7376232BT204", "7376232BT205", "7376232BT206", "7376232BT207",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11349,16 +11349,16 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231ME115", "7376231ME116", "7376231ME117", "7376231ME118", "7376231ME119", "7376231ME120",
 			"7376231ME121", "7376231ME122", "7376231ME123", "7376231ME124", "7376231ME125", "7376231ME126",
 			"7376231ME127", "7376231ME128", "7376231ME129",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT702 (8 candidates)
 		{HallNo: "WW 206", CourseCode: "22BT702", RegisterNos: []string{
 			"7376232BT208", "7376232BT209", "7376232BT210", "7376232BT211", "7376232BT212", "7376232BT213",
 			"7376232BT214", "7376232BT215",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT702 (2 candidates)
 		{HallNo: "WW 206", CourseCode: "22CT702", RegisterNos: []string{
 			"7376232CT101", "7376232CT102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 207 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11369,7 +11369,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231ME142", "7376231ME143", "7376231ME144", "7376231ME145", "7376231ME146", "7376231ME147",
 			"7376231ME148", "7376231ME149", "7376231ME150", "7376231ME151", "7376231ME152", "7376231ME153",
 			"7376231ME154",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT702 (25 candidates)
 		{HallNo: "WW 207", CourseCode: "22CT702", RegisterNos: []string{
 			"7376232CT103", "7376232CT104", "7376232CT105", "7376232CT106", "7376232CT107", "7376232CT108",
@@ -11377,7 +11377,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232CT115", "7376232CT116", "7376232CT117", "7376232CT118", "7376232CT119", "7376232CT120",
 			"7376232CT121", "7376232CT122", "7376232CT123", "7376232CT124", "7376232CT125", "7376232CT126",
 			"7376232CT127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 208 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11385,16 +11385,16 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 208", CourseCode: "22ME702", RegisterNos: []string{
 			"7376231ME155", "7376231ME156", "7376231ME157", "7376231ME158", "7376231ME159", "7376231ME160",
 			"7376231ME161", "7376241ME501", "7376241ME502", "7376241ME503", "7376241ME504", "7376241ME505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD702 (3 candidates)
 		{HallNo: "WW 208", CourseCode: "22CD702", RegisterNos: []string{
 			"7376231CD102", "7376231CD103", "7376231CD104",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT702 (10 candidates)
 		{HallNo: "WW 208", CourseCode: "22CT702", RegisterNos: []string{
 			"7376232CT128", "7376232CT129", "7376232CT130", "7376232CT131", "7376232CT132", "7376232CT133",
 			"7376232CT134", "7376232CT135", "7376232CT136", "7376232CT137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 209 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11403,12 +11403,12 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CD105", "7376231CD106", "7376231CD107", "7376231CD108", "7376231CD109", "7376231CD110",
 			"7376231CD111", "7376231CD112", "7376231CD113", "7376231CD114", "7376231CD115", "7376231CD116",
 			"7376231CD117", "7376231CD118", "7376231CD119",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT702 (10 candidates)
 		{HallNo: "WW 209", CourseCode: "22CT702", RegisterNos: []string{
 			"7376232CT138", "7376232CT139", "7376232CT140", "7376232CT141", "7376232CT142", "7376232CT143",
 			"7376232CT144", "7376232CT145", "7376232CT146", "7376232CT147",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 210 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11417,30 +11417,30 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CD120", "7376231CD121", "7376231CD122", "7376231CD123", "7376231CD124", "7376231CD125",
 			"7376231CD126", "7376231CD127", "7376231CD128", "7376231CD129", "7376231CD130", "7376231CD131",
 			"7376231CD132", "7376231CD133", "7376231CD134",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT702 (10 candidates)
 		{HallNo: "WW 210", CourseCode: "22CT702", RegisterNos: []string{
 			"7376232CT148", "7376232CT149", "7376232CT150", "7376232CT151", "7376232CT152", "7376232CT153",
 			"7376232CT154", "7376232CT155", "7376232CT156", "7376232CT157",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 211 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EI702 (2 candidates)
 		{HallNo: "WW 211", CourseCode: "22EI702", RegisterNos: []string{
 			"7376231EI101", "7376231EI102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD702 (15 candidates)
 		{HallNo: "WW 211", CourseCode: "22CD702", RegisterNos: []string{
 			"7376231CD135", "7376231CD136", "7376231CD137", "7376231CD138", "7376231CD139", "7376231CD140",
 			"7376231CD141", "7376231CD142", "7376231CD143", "7376231CD144", "7376231CD145", "7376231CD146",
 			"7376231CD147", "7376231CD148", "7376231CD149",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT702 (8 candidates)
 		{HallNo: "WW 211", CourseCode: "22CT702", RegisterNos: []string{
 			"7376232CT158", "7376232CT159", "7376232CT160", "7376232CT161", "7376232CT162", "7376242CT501",
 			"7376242CT502", "7376242CT503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 212 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11451,18 +11451,18 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EI115", "7376231EI116", "7376231EI117", "7376231EI118", "7376231EI119", "7376231EI120",
 			"7376231EI121", "7376231EI122", "7376231EI123", "7376231EI124", "7376231EI125", "7376231EI126",
 			"7376231EI127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD702 (16 candidates)
 		{HallNo: "WW 212", CourseCode: "22CD702", RegisterNos: []string{
 			"7376231CD150", "7376231CD151", "7376231CD152", "7376231CD153", "7376231CD154", "7376231CD155",
 			"7376231CD156", "7376231CD157", "7376231CD158", "7376231CD159", "7376231CD160", "7376231CD161",
 			"7376231CD162", "7376241CD501", "7376241CD502", "7376241CD503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC702 (9 candidates)
 		{HallNo: "WW 212", CourseCode: "22MC702", RegisterNos: []string{
 			"7376231MZ101", "7376231MZ102", "7376231MZ103", "7376231MZ104", "7376231MZ105", "7376231MZ106",
 			"7376231MZ107", "7376231MZ108", "7376231MZ109",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 213 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11470,13 +11470,13 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 213", CourseCode: "22EI702", RegisterNos: []string{
 			"7376231EI128", "7376231EI129", "7376231EI130", "7376231EI131", "7376231EI132", "7376231EI133",
 			"7376231EI134", "7376231EI135", "7376231EI136", "7376231EI137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC702 (15 candidates)
 		{HallNo: "WW 213", CourseCode: "22MC702", RegisterNos: []string{
 			"7376231MZ110", "7376231MZ111", "7376231MZ112", "7376231MZ113", "7376231MZ114", "7376231MZ115",
 			"7376231MZ116", "7376231MZ117", "7376231MZ118", "7376231MZ119", "7376231MZ120", "7376231MZ121",
 			"7376231MZ122", "7376231MZ123", "7376231MZ124",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 214 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11484,13 +11484,13 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 214", CourseCode: "22EI702", RegisterNos: []string{
 			"7376231EI138", "7376231EI139", "7376231EI140", "7376231EI141", "7376231EI142", "7376231EI143",
 			"7376231EI144", "7376231EI145", "7376231EI146", "7376231EI147",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC702 (15 candidates)
 		{HallNo: "WW 214", CourseCode: "22MC702", RegisterNos: []string{
 			"7376231MZ125", "7376231MZ126", "7376231MZ127", "7376231MZ128", "7376231MZ129", "7376231MZ130",
 			"7376231MZ131", "7376231MZ132", "7376231MZ133", "7376231MZ134", "7376231MZ135", "7376231MZ136",
 			"7376231MZ137", "7376231MZ138", "7376231MZ139",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 215 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11498,13 +11498,13 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 215", CourseCode: "22EI702", RegisterNos: []string{
 			"7376231EI148", "7376231EI149", "7376231EI150", "7376231EI151", "7376231EI152", "7376231EI153",
 			"7376231EI154", "7376231EI155", "7376231EI156", "7376231EI157",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC702 (15 candidates)
 		{HallNo: "WW 215", CourseCode: "22MC702", RegisterNos: []string{
 			"7376231MZ140", "7376231MZ141", "7376231MZ142", "7376231MZ143", "7376231MZ144", "7376231MZ145",
 			"7376231MZ146", "7376231MZ147", "7376231MZ148", "7376231MZ149", "7376231MZ150", "7376231MZ151",
 			"7376231MZ152", "7376231MZ153", "7376231MZ154",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 218 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11512,20 +11512,20 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 218", CourseCode: "22EI702", RegisterNos: []string{
 			"7376231EI158", "7376231EI159", "7376231EI160", "7376241EI501", "7376241EI502", "7376241EI503",
 			"7376241EI504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC702 (10 candidates)
 		{HallNo: "WW 218", CourseCode: "22MC702", RegisterNos: []string{
 			"7376231MZ155", "7376231MZ156", "7376231MZ157", "7376231MZ158", "7376241MZ501", "7376241MZ502",
 			"7376241MZ503", "7376241MZ504", "7376241MZ505", "7376241MZ506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB702 (3 candidates)
 		{HallNo: "WW 218", CourseCode: "22CB702", RegisterNos: []string{
 			"7376232CB101", "7376232CB102", "7376232CB103",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG702 (5 candidates)
 		{HallNo: "WW 218", CourseCode: "22AG702", RegisterNos: []string{
 			"7376232AG102", "7376232AG103", "7376232AG104", "7376232AG105", "7376232AG106",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 219 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11533,13 +11533,13 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 219", CourseCode: "22CB702", RegisterNos: []string{
 			"7376232CB104", "7376232CB105", "7376232CB106", "7376232CB107", "7376232CB108", "7376232CB109",
 			"7376232CB110", "7376232CB111", "7376232CB112", "7376232CB113",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG702 (15 candidates)
 		{HallNo: "WW 219", CourseCode: "22AG702", RegisterNos: []string{
 			"7376232AG107", "7376232AG108", "7376232AG109", "7376232AG111", "7376232AG112", "7376232AG113",
 			"7376232AG114", "7376232AG115", "7376232AG116", "7376232AG117", "7376232AG118", "7376232AG119",
 			"7376232AG120", "7376232AG121", "7376232AG122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 222 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11550,7 +11550,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232CB126", "7376232CB127", "7376232CB128", "7376232CB129", "7376232CB130", "7376232CB131",
 			"7376232CB132", "7376232CB133", "7376232CB134", "7376232CB135", "7376232CB136", "7376232CB137",
 			"7376232CB139",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG702 (25 candidates)
 		{HallNo: "WW 222", CourseCode: "22AG702", RegisterNos: []string{
 			"7376232AG123", "7376232AG124", "7376232AG125", "7376232AG126", "7376232AG127", "7376232AG128",
@@ -11558,7 +11558,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AG136", "7376232AG137", "7376232AG138", "7376232AG139", "7376232AG140", "7376232AG141",
 			"7376232AG142", "7376232AG143", "7376232AG144", "7376232AG145", "7376232AG146", "7376232AG147",
 			"7376232AG148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11567,7 +11567,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231SE101", "7376231SE102", "7376231SE103", "7376231SE104", "7376231SE105", "7376231SE106",
 			"7376231SE107", "7376231SE108", "7376231SE109", "7376231SE110", "7376231SE111", "7376231SE112",
 			"7376231SE113", "7376231SE114", "7376231SE115",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB702 (25 candidates)
 		{HallNo: "WW 223", CourseCode: "22CB702", RegisterNos: []string{
 			"7376232CB140", "7376232CB141", "7376232CB142", "7376232CB143", "7376232CB144", "7376232CB145",
@@ -11575,12 +11575,12 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232CB152", "7376232CB153", "7376232CB154", "7376232CB155", "7376232CB156", "7376232CB157",
 			"7376232CB159", "7376232CB160", "7376232CB161", "7376232CB162", "7376232CB163", "7376242CB502",
 			"7376242CB503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG702 (10 candidates)
 		{HallNo: "WW 223", CourseCode: "22AG702", RegisterNos: []string{
 			"7376232AG149", "7376232AG150", "7376232AG151", "7376232AG152", "7376232AG153", "7376232AG154",
 			"7376242AG501", "7376242AG502", "7376242AG503", "7376242AG504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11591,7 +11591,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231BM113", "7376231BM114", "7376231BM115", "7376231BM116", "7376231BM117", "7376231BM118",
 			"7376231BM119", "7376231BM120", "7376231BM121", "7376231BM122", "7376231BM123", "7376231BM124",
 			"7376231BM125",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IS702 (25 candidates)
 		{HallNo: "WW 224", CourseCode: "22IS702", RegisterNos: []string{
 			"7376231SE116", "7376231SE117", "7376231SE118", "7376231SE119", "7376231SE120", "7376231SE121",
@@ -11599,7 +11599,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231SE128", "7376231SE129", "7376231SE130", "7376231SE131", "7376231SE132", "7376231SE133",
 			"7376231SE134", "7376231SE135", "7376231SE136", "7376231SE137", "7376231SE138", "7376231SE139",
 			"7376231SE140",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 225 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11610,18 +11610,18 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231BM138", "7376231BM139", "7376231BM140", "7376231BM141", "7376231BM142", "7376231BM143",
 			"7376231BM144", "7376231BM145", "7376231BM146", "7376231BM147", "7376231BM148", "7376231BM149",
 			"7376231BM150",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IS702 (15 candidates)
 		{HallNo: "WW 225", CourseCode: "22IS702", RegisterNos: []string{
 			"7376231SE141", "7376231SE142", "7376231SE143", "7376231SE145", "7376231SE146", "7376231SE147",
 			"7376231SE148", "7376231SE149", "7376231SE150", "7376231SE151", "7376231SE152", "7376231SE153",
 			"7376231SE154", "7376231SE155", "7376241SE501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD702 (10 candidates)
 		{HallNo: "WW 225", CourseCode: "22FD702", RegisterNos: []string{
 			"7376232FD101", "7376232FD102", "7376232FD103", "7376232FD105", "7376232FD106", "7376232FD107",
 			"7376232FD108", "7376232FD109", "7376232FD110", "7376232FD111",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 226 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11631,11 +11631,11 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CE107", "7376231CE108", "7376231CE109", "7376231CE110", "7376231CE111", "7376231CE112",
 			"7376231CE113", "7376231CE114", "7376231CE115", "7376231CE116", "7376231CE117", "7376231CE118",
 			"7376231CE119", "7376231CE120", "7376231CE121", "7376231CE122", "7376231CE123", "7376231CE124",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM702 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22BM702", RegisterNos: []string{
 			"7376231BM151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD702 (25 candidates)
 		{HallNo: "WW 226", CourseCode: "22FD702", RegisterNos: []string{
 			"7376232FD112", "7376232FD113", "7376232FD114", "7376232FD115", "7376232FD116", "7376232FD117",
@@ -11643,7 +11643,7 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232FD125", "7376232FD126", "7376232FD127", "7376232FD128", "7376232FD129", "7376232FD130",
 			"7376232FD131", "7376232FD132", "7376232FD133", "7376232FD134", "7376232FD135", "7376232FD136",
 			"7376232FD137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 227 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11651,25 +11651,25 @@ func buildSeatingData30Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 227", CourseCode: "22CE702", RegisterNos: []string{
 			"7376231CE125", "7376231CE126", "7376231CE127", "7376231CE128", "7376231CE129", "7376241CE501",
 			"7376241CE502", "7376241CE503", "7376241CE504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD702 (15 candidates)
 		{HallNo: "WW 227", CourseCode: "22FD702", RegisterNos: []string{
 			"7376232FD138", "7376232FD139", "7376232FD140", "7376232FD141", "7376232FD142", "7376232FD143",
 			"7376232FD144", "7376232FD145", "7376232FD146", "7376232FD147", "7376232FD148", "7376232FD149",
 			"7376232FD150", "7376232FD151", "7376232FD152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FT702 (20 candidates)
 		{HallNo: "WW 227", CourseCode: "22FT702", RegisterNos: []string{
 			"7376232FT101", "7376232FT102", "7376232FT103", "7376232FT104", "7376232FT105", "7376232FT106",
 			"7376232FT108", "7376232FT109", "7376232FT110", "7376232FT111", "7376232FT112", "7376232FT113",
 			"7376232FT114", "7376232FT115", "7376232FT116", "7376232FT117", "7376232FT118", "7376232FT119",
 			"7376232FT120", "7376242FT501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
 
 // ============================================================================
-// 30-11-2026 AFTERNOON SESSION (AN: 01:30 PM ? 04:30 PM) - Total: 274 Students
+// 30-11-2026 AFTERNOON SESSION (AN: 01:30 PM : 04:30 PM) - Total: 274 Students
 // ============================================================================
 func buildSeatingData30Nov2026AN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -11683,24 +11683,24 @@ func buildSeatingData30Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS320", "7376241CS327", "7376241CS338", "7376241CS344", "7376241CS347", "7376241CS351",
 			"7376241CS366", "7376241CS367", "7376241CS394", "7376241CS399", "7376241CS403", "7376241CS422",
 			"7376241CS447",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 219 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22OME02 (3 candidates)
 		{HallNo: "WW 219", CourseCode: "22OME02", RegisterNos: []string{
 			"7376241EC180", "7376241EC256", "7376241EC284",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (17 candidates)
 		{HallNo: "WW 219", CourseCode: "22OME02", RegisterNos: []string{
 			"7376241EE101", "7376241EE103", "7376241EE121", "7376241EE139", "7376241EE142", "7376241EE145",
 			"7376241EE160", "7376241EE173", "7376241EE175", "7376241EE185", "7376241EE188", "7376241EE190",
 			"7376241EE196", "7376241EE205", "7376241EE208", "7376241EE211", "7376241EE213",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (5 candidates)
 		{HallNo: "WW 219", CourseCode: "22OME02", RegisterNos: []string{
 			"7376241EI103", "7376241EI106", "7376241EI109", "7376241EI116", "7376241EI127",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 222 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11708,12 +11708,12 @@ func buildSeatingData30Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 222", CourseCode: "22OME02", RegisterNos: []string{
 			"7376241EI149", "7376241EI150", "7376241EI151", "7376241EI130", "7376241EI133", "7376241EI135",
 			"7376241EI138", "7376241EI141", "7376241EI142", "7376241EI144", "7376241EI147", "7376241EI158",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (7 candidates)
 		{HallNo: "WW 222", CourseCode: "22OME02", RegisterNos: []string{
 			"7376241MZ102", "7376241MZ108", "7376241MZ110", "7376241MZ124", "7376241MZ130", "7376241MZ131",
 			"7376241MZ158",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (31 candidates)
 		{HallNo: "WW 222", CourseCode: "22OME02", RegisterNos: []string{
 			"7376242AD121", "7376242AD122", "7376242AD123", "7376242AD143", "7376242AD144", "7376242AD145",
@@ -11722,7 +11722,7 @@ func buildSeatingData30Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AD140", "7376242AD151", "7376242AD159", "7376242AD165", "7376242AD171", "7376242AD176",
 			"7376242AD178", "7376242AD179", "7376242AD185", "7376242AD189", "7376242AD191", "7376242AD192",
 			"7376242AD205",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11737,7 +11737,7 @@ func buildSeatingData30Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AD261", "7376242AD268", "7376242AD269", "7376242AD271", "7376242AD279", "7376242AD280",
 			"7376242AD286", "7376242AD288", "7376242AD290", "7376242AD294", "7376242AD297", "7376242AD301",
 			"7376242AD302", "7376242AD314",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11747,29 +11747,29 @@ func buildSeatingData30Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242BT147", "7376242BT152", "7376242BT157", "7376242BT160", "7376242BT172", "7376242BT177",
 			"7376242BT181", "7376242BT186", "7376242BT193", "7376242BT196", "7376242BT201", "7376242BT206",
 			"7376242BT207", "7376242BT215",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (3 candidates)
 		{HallNo: "WW 224", CourseCode: "22OME02", RegisterNos: []string{
 			"7376242IT111", "7376242IT155", "7376242IT161",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22OME02", RegisterNos: []string{
 			"7376242CB114", "7376242CB115",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (11 candidates)
 		{HallNo: "WW 224", CourseCode: "22OME02", RegisterNos: []string{
 			"7376242AD327", "7376242AD328", "7376242AD329", "7376242AD341", "7376242AD342", "7376242AD343",
 			"7376242AD323", "7376242AD325", "7376242AD333", "7376242AD334", "7376242AD339",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (12 candidates)
 		{HallNo: "WW 224", CourseCode: "22OME02", RegisterNos: []string{
 			"7376242AL144", "7376242AL145", "7376242AL146", "7376242AL106", "7376242AL121", "7376242AL141",
 			"7376242AL166", "7376242AL172", "7376242AL174", "7376242AL175", "7376242AL204", "7376242AL217",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22OME02", RegisterNos: []string{
 			"7376242AG104", "7376242AG108",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 225 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11777,85 +11777,85 @@ func buildSeatingData30Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 225", CourseCode: "22OME02", RegisterNos: []string{
 			"7376251EC512", "7376251EC513", "7376251EC514", "7376251EC502", "7376251EC505", "7376251EC510",
 			"7376251EC516", "7376251EC519",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (7 candidates)
 		{HallNo: "WW 225", CourseCode: "22OME02", RegisterNos: []string{
 			"7376251EE503", "7376251EE504", "7376251EE505", "7376251EE501", "7376251EE508", "7376251EE510",
 			"7376251EE513",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (2 candidates)
 		{HallNo: "WW 225", CourseCode: "22OME02", RegisterNos: []string{
 			"7376251EI501", "7376251EI502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (2 candidates)
 		{HallNo: "WW 225", CourseCode: "22OME02", RegisterNos: []string{
 			"7376251MZ503", "7376251MZ504",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (20 candidates)
 		{HallNo: "WW 225", CourseCode: "22OME02", RegisterNos: []string{
 			"7376242IT165", "7376242IT188", "7376242IT226", "7376242IT228", "7376242IT239", "7376242IT244",
 			"7376242IT245", "7376242IT249", "7376242IT257", "7376242IT260", "7376242IT266", "7376242IT278",
 			"7376242IT283", "7376242IT315", "7376242IT320", "7376242IT324", "7376242IT341", "7376242IT350",
 			"7376252IT502", "7376252IT515",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (10 candidates)
 		{HallNo: "WW 225", CourseCode: "22OME02", RegisterNos: []string{
 			"7376252AD505", "7376252AD506", "7376252AD507", "7376252AD511", "7376252AD512", "7376252AD513",
 			"7376252AD514", "7376252AD502", "7376252AD503", "7376252AD509",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 226 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CE020 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22CE020", RegisterNos: []string{
 			"7376231CE117",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (3 candidates)
 		{HallNo: "WW 226", CourseCode: "22OME02", RegisterNos: []string{
 			"7376231CS103", "7376231CS190", "7376231CS235",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCS01 (8 candidates)
 		{HallNo: "WW 226", CourseCode: "22OCS01", RegisterNos: []string{
 			"7376231EC179", "7376231EC196", "7376231EC231", "7376231EC297", "7376231EC331", "7376231EC333",
 			"7376231EC334", "7376241EC521",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCS01 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22OCS01", RegisterNos: []string{
 			"7376231EE111",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22OME02", RegisterNos: []string{
 			"7376231EI159",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (2 candidates)
 		{HallNo: "WW 226", CourseCode: "22OME02", RegisterNos: []string{
 			"7376241CD501", "7376241CD502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22OME02", RegisterNos: []string{
 			"7376232IT274",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22OME02", RegisterNos: []string{
 			"7376242CB502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22OME02", RegisterNos: []string{
 			"7376242AL501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OME02 (2 candidates)
 		{HallNo: "WW 226", CourseCode: "22OME02", RegisterNos: []string{
 			"7376232AG113", "7376232AG151",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB306 (4 candidates)
 		{HallNo: "WW 226", CourseCode: "22CB306", RegisterNos: []string{
 			"7376242CB116", "7376242CB118", "7376242CB147", "7376242CB155",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 	}
 }
 
 // ============================================================================
-// 01-DEC-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 2049 Students
+// 01-DEC-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 2049 Students
 // ============================================================================
 func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -11869,14 +11869,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251CS113", "7376251CS114", "7376251CS115", "7376251CS116", "7376251CS117", "7376251CS118",
 			"7376251CS119", "7376251CS120", "7376251CS121", "7376251CS122", "7376251CS123", "7376251CS124",
 			"7376251CS125",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (20 candidates)
 		{HallNo: "ME 101", CourseCode: "22AI302", RegisterNos: []string{
 			"7376252AD101", "7376252AD102", "7376252AD103", "7376252AD104", "7376252AD105", "7376252AD106",
 			"7376252AD107", "7376252AD108", "7376252AD109", "7376252AD110", "7376252AD111", "7376252AD112",
 			"7376252AD113", "7376252AD114", "7376252AD115", "7376252AD116", "7376252AD117", "7376252AD118",
 			"7376252AD119", "7376252AD120",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 102 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11887,14 +11887,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251CS139", "7376251CS140", "7376251CS141", "7376251CS142", "7376251CS143", "7376251CS144",
 			"7376251CS145", "7376251CS146", "7376251CS147", "7376251CS148", "7376251CS149", "7376251CS150",
 			"7376251CS151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (20 candidates)
 		{HallNo: "ME 102", CourseCode: "22AI302", RegisterNos: []string{
 			"7376252AD121", "7376252AD122", "7376252AD123", "7376252AD124", "7376252AD125", "7376252AD126",
 			"7376252AD127", "7376252AD128", "7376252AD129", "7376252AD130", "7376252AD131", "7376252AD132",
 			"7376252AD133", "7376252AD134", "7376252AD135", "7376252AD136", "7376252AD137", "7376252AD138",
 			"7376252AD139", "7376252AD140",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 107 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11905,14 +11905,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251CS164", "7376251CS165", "7376251CS166", "7376251CS167", "7376251CS168", "7376251CS170",
 			"7376251CS171", "7376251CS172", "7376251CS173", "7376251CS174", "7376251CS175", "7376251CS176",
 			"7376251CS177",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (20 candidates)
 		{HallNo: "ME 107", CourseCode: "22AI302", RegisterNos: []string{
 			"7376252AD141", "7376252AD142", "7376252AD143", "7376252AD144", "7376252AD145", "7376252AD146",
 			"7376252AD147", "7376252AD148", "7376252AD149", "7376252AD150", "7376252AD151", "7376252AD152",
 			"7376252AD153", "7376252AD154", "7376252AD155", "7376252AD156", "7376252AD157", "7376252AD158",
 			"7376252AD159", "7376252AD160",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 108 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11923,14 +11923,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251CS190", "7376251CS191", "7376251CS192", "7376251CS193", "7376251CS194", "7376251CS195",
 			"7376251CS196", "7376251CS197", "7376251CS198", "7376251CS199", "7376251CS200", "7376251CS201",
 			"7376251CS202",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (20 candidates)
 		{HallNo: "ME 108", CourseCode: "22AI302", RegisterNos: []string{
 			"7376252AD161", "7376252AD162", "7376252AD163", "7376252AD164", "7376252AD165", "7376252AD166",
 			"7376252AD167", "7376252AD168", "7376252AD169", "7376252AD170", "7376252AD171", "7376252AD172",
 			"7376252AD173", "7376252AD174", "7376252AD175", "7376252AD176", "7376252AD177", "7376252AD178",
 			"7376252AD179", "7376252AD180",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11941,14 +11941,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251CS215", "7376251CS216", "7376251CS217", "7376251CS218", "7376251CS219", "7376251CS220",
 			"7376251CS221", "7376251CS222", "7376251CS223", "7376251CS224", "7376251CS225", "7376251CS226",
 			"7376251CS227",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (20 candidates)
 		{HallNo: "ME 201", CourseCode: "22AI302", RegisterNos: []string{
 			"7376252AD181", "7376252AD182", "7376252AD183", "7376252AD184", "7376252AD185", "7376252AD186",
 			"7376252AD187", "7376252AD188", "7376252AD189", "7376252AD190", "7376252AD191", "7376252AD192",
 			"7376252AD193", "7376252AD194", "7376252AD195", "7376252AD196", "7376252AD197", "7376252AD198",
 			"7376252AD199", "7376252AD200",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11959,14 +11959,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251CS242", "7376251CS243", "7376251CS244", "7376251CS245", "7376251CS246", "7376251CS247",
 			"7376251CS248", "7376251CS249", "7376251CS250", "7376251CS251", "7376251CS252", "7376251CS253",
 			"7376251CS228",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (20 candidates)
 		{HallNo: "ME 202", CourseCode: "22AI302", RegisterNos: []string{
 			"7376252AD201", "7376252AD202", "7376252AD203", "7376252AD204", "7376252AD205", "7376252AD206",
 			"7376252AD207", "7376252AD208", "7376252AD209", "7376252AD210", "7376252AD211", "7376252AD212",
 			"7376252AD213", "7376252AD214", "7376252AD215", "7376252AD216", "7376252AD217", "7376252AD218",
 			"7376252AD219", "7376252AD220",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11977,14 +11977,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251CS266", "7376251CS267", "7376251CS268", "7376251CS269", "7376251CS270", "7376251CS271",
 			"7376251CS272", "7376251CS273", "7376251CS274", "7376251CS275", "7376251CS276", "7376251CS277",
 			"7376251CS278",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (20 candidates)
 		{HallNo: "ME 203", CourseCode: "22AI302", RegisterNos: []string{
 			"7376252AD221", "7376252AD222", "7376252AD223", "7376252AD224", "7376252AD225", "7376252AD226",
 			"7376252AD227", "7376252AD228", "7376252AD229", "7376252AD230", "7376252AD231", "7376252AD232",
 			"7376252AD233", "7376252AD234", "7376252AD235", "7376252AD236", "7376252AD237", "7376252AD238",
 			"7376252AD239", "7376252AD240",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -11995,14 +11995,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251CS291", "7376251CS292", "7376251CS293", "7376251CS294", "7376251CS295", "7376251CS296",
 			"7376251CS297", "7376251CS298", "7376251CS299", "7376251CS300", "7376251CS301", "7376251CS302",
 			"7376251CS303",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (20 candidates)
 		{HallNo: "ME 204", CourseCode: "22AI302", RegisterNos: []string{
 			"7376252AD241", "7376252AD242", "7376252AD243", "7376252AD244", "7376252AD245", "7376252AD246",
 			"7376252AD247", "7376252AD248", "7376252AD249", "7376252AD250", "7376252AD251", "7376252AD252",
 			"7376252AD253", "7376252AD254", "7376252AD255", "7376252AD256", "7376252AD257", "7376252AD258",
 			"7376252AD259", "7376252AD260",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12013,14 +12013,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251CS316", "7376251CS317", "7376251CS318", "7376251CS319", "7376251CS320", "7376251CS321",
 			"7376251CS322", "7376251CS323", "7376251CS324", "7376251CS325", "7376251CS326", "7376251CS327",
 			"7376251CS328",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (20 candidates)
 		{HallNo: "ME 205", CourseCode: "22AI302", RegisterNos: []string{
 			"7376252AD261", "7376252AD262", "7376252AD263", "7376252AD264", "7376252AD265", "7376252AD266",
 			"7376252AD267", "7376252AD268", "7376252AD269", "7376252AD270", "7376252AD271", "7376252AD272",
 			"7376252AD273", "7376252AD274", "7376252AD275", "7376252AD276", "7376252AD277", "7376252AD278",
 			"7376252AD279", "7376252AD280",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12031,14 +12031,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251CS341", "7376251CS342", "7376251CS343", "7376251CS344", "7376251CS345", "7376251CS346",
 			"7376251CS347", "7376251CS348", "7376251CS349", "7376251CS350", "7376251CS351", "7376251CS352",
 			"7376251CS353",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (20 candidates)
 		{HallNo: "ME 206", CourseCode: "22AI302", RegisterNos: []string{
 			"7376252AD281", "7376252AD282", "7376252AD283", "7376252AD284", "7376252AD285", "7376252AD286",
 			"7376252AD287", "7376252AD288", "7376252AD289", "7376252AD290", "7376252AD291", "7376252AD292",
 			"7376252AD293", "7376252AD294", "7376252AD295", "7376252AD296", "7376252AD297", "7376252AD298",
 			"7376252AD299", "7376252AD300",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 301 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12049,14 +12049,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251CS366", "7376251CS367", "7376251CS368", "7376251CS369", "7376251CS370", "7376251CS371",
 			"7376251CS373", "7376251CS374", "7376251CS375", "7376251CS376", "7376251CS377", "7376251CS378",
 			"7376251CS379",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (20 candidates)
 		{HallNo: "ME 301", CourseCode: "22AI302", RegisterNos: []string{
 			"7376252AD301", "7376252AD302", "7376252AD303", "7376252AD304", "7376252AD305", "7376252AD306",
 			"7376252AD307", "7376252AD308", "7376252AD309", "7376252AD310", "7376252AD311", "7376252AD312",
 			"7376252AD313", "7376252AD314", "7376252AD315", "7376252AD316", "7376252AD317", "7376252AD318",
 			"7376252AD319", "7376252AD320",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 302 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12067,14 +12067,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251CS392", "7376251CS393", "7376251CS394", "7376251CS395", "7376251CS396", "7376251CS397",
 			"7376251CS398", "7376251CS399", "7376251CS400", "7376251CS401", "7376251CS402", "7376251CS403",
 			"7376251CS404",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (20 candidates)
 		{HallNo: "ME 302", CourseCode: "22AI302", RegisterNos: []string{
 			"7376252AD321", "7376252AD322", "7376252AD323", "7376252AD324", "7376252AD325", "7376252AD326",
 			"7376252AD327", "7376252AD328", "7376252AD329", "7376252AD330", "7376252AD331", "7376252AD332",
 			"7376252AD333", "7376252AD334", "7376252AD335", "7376252AD336", "7376252AD337", "7376252AD338",
 			"7376252AD339", "7376252AD340",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 303 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12085,14 +12085,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251CS417", "7376251CS418", "7376251CS419", "7376251CS420", "7376251CS421", "7376251CS422",
 			"7376251CS423", "7376251CS424", "7376251CS425", "7376251CS426", "7376251CS427", "7376251CS428",
 			"7376251CS429",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (20 candidates)
 		{HallNo: "ME 303", CourseCode: "22AI302", RegisterNos: []string{
 			"7376252AD341", "7376252AD342", "7376252AD343", "7376252AD344", "7376252AD345", "7376252AD346",
 			"7376252AD347", "7376252AD348", "7376252AD349", "7376252AD350", "7376252AD351", "7376252AD352",
 			"7376252AD353", "7376252AD354", "7376252AD355", "7376252AD356", "7376252AD357", "7376252AD358",
 			"7376252AD359", "7376252AD360",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 304 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12103,14 +12103,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251CS442", "7376251CS443", "7376251CS444", "7376251CS445", "7376251CS446", "7376251CS447",
 			"7376251CS448", "7376251CS449", "7376251CS450", "7376251CS451", "7376251CS452", "7376251CS453",
 			"7376251CS454",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (20 candidates)
 		{HallNo: "ME 304", CourseCode: "22AI302", RegisterNos: []string{
 			"7376252AD361", "7376252AD362", "7376252AD363", "7376252AD364", "7376252AD365", "7376252AD366",
 			"7376252AD367", "7376252AD368", "7376252AD369", "7376252AD370", "7376252AD371", "7376252AD372",
 			"7376252AD373", "7376252AD374", "7376252AD375", "7376252AD376", "7376252AD377", "7376252AD378",
 			"7376252AD379", "7376252AD380",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 305 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12121,14 +12121,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251CS467", "7376251CS468", "7376251CS469", "7376251CS470", "7376251CS471", "7376251CS472",
 			"7376251CS473", "7376251CS474", "7376251CS475", "7376251CS476", "7376251CS477", "7376251CS478",
 			"7376251CS479",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (20 candidates)
 		{HallNo: "ME 305", CourseCode: "22AI302", RegisterNos: []string{
 			"7376262AD501", "7376262AD502", "7376262AD503", "7376262AD504", "7376262AD505", "7376262AD506",
 			"7376262AD507", "7376262AD508", "7376262AD509", "7376262AD510", "7376262AD511", "7376262AD512",
 			"7376262AD513", "7376262AD514", "7376262AD515", "7376262AD516", "7376262AD517", "7376262AD518",
 			"7376262AD519", "7376252AD381",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 306 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12138,21 +12138,21 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376261CS507", "7376261CS508", "7376261CS509", "7376261CS510", "7376261CS511", "7376261CS512",
 			"7376261CS513", "7376261CS514", "7376261CS516", "7376261CS517", "7376261CS518", "7376261CS519",
 			"7376261CS520", "7376261CS521", "7376261CS522", "7376261CS523", "7376261CS524",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC302 (2 candidates)
 		{HallNo: "ME 306", CourseCode: "22EC302", RegisterNos: []string{
 			"7376251EC101", "7376251EC102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (17 candidates)
 		{HallNo: "ME 306", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT102", "7376252IT103", "7376252IT104", "7376252IT105", "7376252IT106", "7376252IT107",
 			"7376252IT108", "7376252IT109", "7376252IT110", "7376252IT111", "7376252IT112", "7376252IT113",
 			"7376252IT114", "7376252IT115", "7376252IT116", "7376252IT117", "7376252IT118",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302 (3 candidates)
 		{HallNo: "ME 306", CourseCode: "22AI302", RegisterNos: []string{
 			"7376262AD520", "7376262AD521", "7376262AD522",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 001 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12162,14 +12162,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EC109", "7376251EC110", "7376251EC111", "7376251EC112", "7376251EC113", "7376251EC114",
 			"7376251EC115", "7376251EC116", "7376251EC117", "7376251EC118", "7376251EC119", "7376251EC120",
 			"7376251EC121", "7376251EC122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (20 candidates)
 		{HallNo: "SF 001", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT119", "7376252IT120", "7376252IT121", "7376252IT122", "7376252IT123", "7376252IT124",
 			"7376252IT125", "7376252IT126", "7376252IT127", "7376252IT128", "7376252IT129", "7376252IT130",
 			"7376252IT131", "7376252IT132", "7376252IT133", "7376252IT134", "7376252IT135", "7376252IT136",
 			"7376252IT137", "7376252IT138",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 002 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12179,14 +12179,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EC129", "7376251EC130", "7376251EC131", "7376251EC132", "7376251EC133", "7376251EC134",
 			"7376251EC135", "7376251EC136", "7376251EC137", "7376251EC138", "7376251EC139", "7376251EC140",
 			"7376251EC141", "7376251EC142",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (20 candidates)
 		{HallNo: "SF 002", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT139", "7376252IT140", "7376252IT141", "7376252IT142", "7376252IT143", "7376252IT144",
 			"7376252IT145", "7376252IT146", "7376252IT147", "7376252IT148", "7376252IT149", "7376252IT150",
 			"7376252IT151", "7376252IT152", "7376252IT153", "7376252IT154", "7376252IT155", "7376252IT156",
 			"7376252IT157", "7376252IT158",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 101 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12196,14 +12196,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EC149", "7376251EC150", "7376251EC151", "7376251EC152", "7376251EC153", "7376251EC154",
 			"7376251EC155", "7376251EC156", "7376251EC157", "7376251EC158", "7376251EC159", "7376251EC160",
 			"7376251EC161", "7376251EC162",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (20 candidates)
 		{HallNo: "SF 101", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT159", "7376252IT160", "7376252IT161", "7376252IT162", "7376252IT163", "7376252IT164",
 			"7376252IT165", "7376252IT166", "7376252IT167", "7376252IT168", "7376252IT169", "7376252IT170",
 			"7376252IT171", "7376252IT172", "7376252IT173", "7376252IT174", "7376252IT175", "7376252IT176",
 			"7376252IT177", "7376252IT178",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 102 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12213,14 +12213,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EC169", "7376251EC170", "7376251EC171", "7376251EC172", "7376251EC173", "7376251EC174",
 			"7376251EC175", "7376251EC176", "7376251EC177", "7376251EC178", "7376251EC179", "7376251EC180",
 			"7376251EC181", "7376251EC182",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (20 candidates)
 		{HallNo: "SF 102", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT179", "7376252IT180", "7376252IT181", "7376252IT182", "7376252IT183", "7376252IT184",
 			"7376252IT185", "7376252IT186", "7376252IT187", "7376252IT188", "7376252IT189", "7376252IT190",
 			"7376252IT191", "7376252IT192", "7376252IT193", "7376252IT194", "7376252IT195", "7376252IT196",
 			"7376252IT197", "7376252IT198",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 103 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12230,14 +12230,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EC189", "7376251EC190", "7376251EC191", "7376251EC192", "7376251EC193", "7376251EC194",
 			"7376251EC195", "7376251EC196", "7376251EC197", "7376251EC198", "7376251EC199", "7376251EC200",
 			"7376251EC201", "7376251EC202",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (20 candidates)
 		{HallNo: "SF 103", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT199", "7376252IT200", "7376252IT201", "7376252IT202", "7376252IT203", "7376252IT204",
 			"7376252IT205", "7376252IT206", "7376252IT207", "7376252IT208", "7376252IT209", "7376252IT210",
 			"7376252IT211", "7376252IT212", "7376252IT213", "7376252IT214", "7376252IT215", "7376252IT216",
 			"7376252IT217", "7376252IT218",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12247,14 +12247,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EC209", "7376251EC210", "7376251EC211", "7376251EC212", "7376251EC213", "7376251EC214",
 			"7376251EC215", "7376251EC216", "7376251EC217", "7376251EC218", "7376251EC219", "7376251EC220",
 			"7376251EC221", "7376251EC222",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (20 candidates)
 		{HallNo: "SF 201", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT219", "7376252IT220", "7376252IT221", "7376252IT222", "7376252IT223", "7376252IT224",
 			"7376252IT225", "7376252IT226", "7376252IT227", "7376252IT228", "7376252IT229", "7376252IT230",
 			"7376252IT231", "7376252IT232", "7376252IT233", "7376252IT234", "7376252IT235", "7376252IT236",
 			"7376252IT237", "7376252IT238",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12264,14 +12264,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EC229", "7376251EC230", "7376251EC231", "7376251EC232", "7376251EC233", "7376251EC234",
 			"7376251EC235", "7376251EC236", "7376251EC237", "7376251EC238", "7376251EC239", "7376251EC240",
 			"7376251EC241", "7376251EC242",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (20 candidates)
 		{HallNo: "SF 202", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT239", "7376252IT240", "7376252IT241", "7376252IT242", "7376252IT243", "7376252IT244",
 			"7376252IT245", "7376252IT246", "7376252IT247", "7376252IT248", "7376252IT249", "7376252IT250",
 			"7376252IT251", "7376252IT252", "7376252IT253", "7376252IT254", "7376252IT255", "7376252IT256",
 			"7376252IT257", "7376252IT258",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B01 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12281,14 +12281,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EC249", "7376251EC250", "7376251EC251", "7376251EC252", "7376251EC253", "7376251EC254",
 			"7376251EC255", "7376251EC256", "7376251EC257", "7376251EC258", "7376251EC259", "7376251EC260",
 			"7376251EC261", "7376251EC262",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (20 candidates)
 		{HallNo: "SF B01", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT259", "7376252IT260", "7376252IT261", "7376252IT262", "7376252IT263", "7376252IT264",
 			"7376252IT265", "7376252IT266", "7376252IT267", "7376252IT268", "7376252IT269", "7376252IT270",
 			"7376252IT271", "7376252IT272", "7376252IT273", "7376252IT274", "7376252IT275", "7376252IT276",
 			"7376252IT277", "7376252IT278",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B02 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12298,14 +12298,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EC269", "7376251EC271", "7376251EC272", "7376251EC273", "7376251EC274", "7376251EC275",
 			"7376251EC276", "7376251EC277", "7376251EC278", "7376251EC279", "7376251EC280", "7376251EC281",
 			"7376251EC282", "7376251EC283",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (20 candidates)
 		{HallNo: "SF B02", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT279", "7376252IT280", "7376252IT281", "7376252IT282", "7376252IT283", "7376252IT284",
 			"7376252IT285", "7376252IT286", "7376252IT287", "7376252IT288", "7376252IT289", "7376252IT290",
 			"7376252IT291", "7376252IT292", "7376252IT293", "7376252IT294", "7376252IT295", "7376252IT296",
 			"7376252IT297", "7376252IT298",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B03 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12315,14 +12315,14 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EC290", "7376251EC291", "7376251EC292", "7376251EC293", "7376251EC294", "7376251EC295",
 			"7376251EC296", "7376251EC297", "7376251EC298", "7376251EC299", "7376251EC300", "7376251EC301",
 			"7376251EC302", "7376251EC303",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (20 candidates)
 		{HallNo: "SF B03", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT299", "7376252IT300", "7376252IT301", "7376252IT302", "7376252IT303", "7376252IT304",
 			"7376252IT305", "7376252IT306", "7376252IT307", "7376252IT308", "7376252IT309", "7376252IT310",
 			"7376252IT311", "7376252IT312", "7376252IT313", "7376252IT314", "7376252IT315", "7376252IT316",
 			"7376252IT317", "7376252IT318",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 008 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12331,12 +12331,12 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EC304", "7376251EC305", "7376251EC306", "7376251EC307", "7376251EC308", "7376251EC309",
 			"7376251EC310", "7376251EC311", "7376251EC312", "7376251EC313", "7376251EC314", "7376251EC315",
 			"7376251EC316", "7376251EC317", "7376251EC318",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (10 candidates)
 		{HallNo: "WW 008", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT319", "7376252IT320", "7376252IT321", "7376252IT322", "7376252IT323", "7376252IT324",
 			"7376252IT325", "7376252IT326", "7376252IT327", "7376252IT328",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 011 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12345,12 +12345,12 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EC319", "7376251EC320", "7376251EC321", "7376251EC322", "7376251EC323", "7376251EC324",
 			"7376251EC325", "7376251EC326", "7376251EC327", "7376251EC328", "7376251EC329", "7376251EC330",
 			"7376251EC331", "7376251EC332", "7376251EC333",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (10 candidates)
 		{HallNo: "WW 011", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT329", "7376252IT330", "7376252IT331", "7376252IT332", "7376252IT333", "7376252IT334",
 			"7376252IT335", "7376252IT336", "7376252IT338", "7376252IT339",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 012 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12359,12 +12359,12 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EC334", "7376251EC335", "7376251EC336", "7376251EC337", "7376251EC338", "7376251EC339",
 			"7376251EC340", "7376251EC341", "7376251EC342", "7376251EC343", "7376251EC344", "7376251EC345",
 			"7376251EC346", "7376251EC347", "7376251EC348",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (10 candidates)
 		{HallNo: "WW 012", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT340", "7376252IT341", "7376252IT342", "7376252IT343", "7376252IT344", "7376252IT345",
 			"7376252IT346", "7376252IT347", "7376252IT348", "7376252IT349",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 113 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12373,12 +12373,12 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EC349", "7376251EC350", "7376251EC351", "7376251EC352", "7376261EC502", "7376261EC503",
 			"7376261EC504", "7376261EC505", "7376261EC506", "7376261EC507", "7376261EC508", "7376261EC509",
 			"7376261EC510", "7376261EC511", "7376261EC512",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (10 candidates)
 		{HallNo: "WW 113", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT350", "7376252IT351", "7376252IT352", "7376252IT353", "7376252IT354", "7376252IT355",
 			"7376252IT356", "7376252IT357", "7376252IT358", "7376252IT359",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 114 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12386,17 +12386,17 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 114", CourseCode: "22EC302", RegisterNos: []string{
 			"7376261EC513", "7376261EC514", "7376261EC515", "7376261EC516", "7376261EC517", "7376261EC518",
 			"7376261EC519", "7376261EC520",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (10 candidates)
 		{HallNo: "WW 114", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT360", "7376252IT361", "7376252IT362", "7376252IT363", "7376252IT364", "7376252IT365",
 			"7376252IT366", "7376252IT367", "7376252IT368", "7376252IT369",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM302 (7 candidates)
 		{HallNo: "WW 114", CourseCode: "22AM302", RegisterNos: []string{
 			"7376252AL101", "7376252AL102", "7376252AL103", "7376252AL104", "7376252AL105", "7376252AL106",
 			"7376252AL107",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 115 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12404,13 +12404,13 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 115", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT370", "7376252IT371", "7376252IT372", "7376252IT373", "7376252IT374", "7376252IT375",
 			"7376252IT376", "7376252IT377", "7376252IT378", "7376252IT379",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM302 (15 candidates)
 		{HallNo: "WW 115", CourseCode: "22AM302", RegisterNos: []string{
 			"7376252AL108", "7376252AL109", "7376252AL110", "7376252AL111", "7376252AL112", "7376252AL113",
 			"7376252AL114", "7376252AL115", "7376252AL116", "7376252AL117", "7376252AL118", "7376252AL119",
 			"7376252AL120", "7376252AL121", "7376252AL122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 117 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12418,13 +12418,13 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 117", CourseCode: "22IT302", RegisterNos: []string{
 			"7376252IT380", "7376252IT381", "7376252IT382", "7376252IT383", "7376252IT384", "7376252IT385",
 			"7376252IT386", "7376252IT387", "7376252IT388", "7376262IT502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM302 (15 candidates)
 		{HallNo: "WW 117", CourseCode: "22AM302", RegisterNos: []string{
 			"7376252AL123", "7376252AL124", "7376252AL125", "7376252AL126", "7376252AL127", "7376252AL128",
 			"7376252AL129", "7376252AL130", "7376252AL131", "7376252AL132", "7376252AL133", "7376252AL134",
 			"7376252AL135", "7376252AL136", "7376252AL137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 118 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12432,13 +12432,13 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 118", CourseCode: "22IT302", RegisterNos: []string{
 			"7376262IT503", "7376262IT504", "7376262IT505", "7376262IT506", "7376262IT507", "7376262IT508",
 			"7376262IT509", "7376262IT510", "7376262IT511", "7376262IT512",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM302 (15 candidates)
 		{HallNo: "WW 118", CourseCode: "22AM302", RegisterNos: []string{
 			"7376252AL138", "7376252AL139", "7376252AL140", "7376252AL141", "7376252AL142", "7376252AL143",
 			"7376252AL144", "7376252AL145", "7376252AL146", "7376252AL147", "7376252AL148", "7376252AL149",
 			"7376252AL150", "7376252AL151", "7376252AL152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12448,11 +12448,11 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376252BT108", "7376252BT109", "7376252BT110", "7376252BT111", "7376252BT112", "7376252BT113",
 			"7376252BT114", "7376252BT115", "7376252BT116", "7376252BT117", "7376252BT118", "7376252BT119",
 			"7376252BT120", "7376252BT121", "7376252BT122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302 (4 candidates)
 		{HallNo: "WW 202", CourseCode: "22IT302", RegisterNos: []string{
 			"7376262IT513", "7376262IT514", "7376262IT515", "7376262IT516",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM302 (25 candidates)
 		{HallNo: "WW 202", CourseCode: "22AM302", RegisterNos: []string{
 			"7376252AL153", "7376252AL154", "7376252AL155", "7376252AL156", "7376252AL157", "7376252AL158",
@@ -12460,7 +12460,7 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376252AL165", "7376252AL166", "7376252AL167", "7376252AL168", "7376252AL169", "7376252AL170",
 			"7376252AL171", "7376252AL172", "7376252AL173", "7376252AL174", "7376252AL175", "7376252AL176",
 			"7376252AL177",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12468,13 +12468,13 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 203", CourseCode: "22BT302", RegisterNos: []string{
 			"7376252BT123", "7376252BT124", "7376252BT125", "7376252BT126", "7376252BT127", "7376252BT128",
 			"7376252BT129", "7376252BT130", "7376252BT131", "7376252BT132",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM302 (15 candidates)
 		{HallNo: "WW 203", CourseCode: "22AM302", RegisterNos: []string{
 			"7376252AL178", "7376252AL179", "7376252AL180", "7376252AL181", "7376252AL182", "7376252AL183",
 			"7376252AL184", "7376252AL185", "7376252AL186", "7376252AL187", "7376252AL188", "7376252AL189",
 			"7376252AL190", "7376252AL191", "7376252AL192",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12482,13 +12482,13 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 204", CourseCode: "22BT302", RegisterNos: []string{
 			"7376252BT133", "7376252BT134", "7376252BT135", "7376252BT136", "7376252BT137", "7376252BT138",
 			"7376252BT139", "7376252BT140", "7376252BT141", "7376252BT142",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM302 (15 candidates)
 		{HallNo: "WW 204", CourseCode: "22AM302", RegisterNos: []string{
 			"7376252AL193", "7376252AL194", "7376252AL195", "7376252AL196", "7376252AL197", "7376252AL198",
 			"7376252AL199", "7376252AL200", "7376252AL201", "7376252AL202", "7376252AL203", "7376252AL204",
 			"7376252AL205", "7376252AL206", "7376252AL207",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12496,13 +12496,13 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 205", CourseCode: "22BT302", RegisterNos: []string{
 			"7376252BT143", "7376252BT144", "7376252BT145", "7376252BT146", "7376252BT147", "7376252BT148",
 			"7376252BT149", "7376252BT150", "7376252BT151", "7376252BT152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM302 (15 candidates)
 		{HallNo: "WW 205", CourseCode: "22AM302", RegisterNos: []string{
 			"7376252AL208", "7376252AL209", "7376252AL210", "7376252AL211", "7376252AL212", "7376252AL213",
 			"7376252AL214", "7376252AL215", "7376252AL216", "7376252AL217", "7376252AL218", "7376252AL219",
 			"7376252AL220", "7376252AL221", "7376252AL222",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12510,13 +12510,13 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 206", CourseCode: "22BT302", RegisterNos: []string{
 			"7376252BT155", "7376252BT156", "7376252BT157", "7376252BT158", "7376252BT159", "7376252BT160",
 			"7376252BT161", "7376252BT162", "7376252BT163", "7376252BT153",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM302 (15 candidates)
 		{HallNo: "WW 206", CourseCode: "22AM302", RegisterNos: []string{
 			"7376252AL223", "7376252AL224", "7376252AL225", "7376252AL226", "7376252AL227", "7376252AL228",
 			"7376252AL229", "7376252AL230", "7376252AL231", "7376252AL232", "7376252AL233", "7376252AL234",
 			"7376252AL235", "7376252AL236", "7376252AL237",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 207 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12524,7 +12524,7 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 207", CourseCode: "22EE302", RegisterNos: []string{
 			"7376251EE102", "7376251EE103", "7376251EE104", "7376251EE105", "7376251EE106", "7376251EE107",
 			"7376251EE108",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT302 (25 candidates)
 		{HallNo: "WW 207", CourseCode: "22BT302", RegisterNos: []string{
 			"7376252BT164", "7376252BT165", "7376252BT166", "7376252BT167", "7376252BT168", "7376252BT169",
@@ -12532,13 +12532,13 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376252BT176", "7376252BT177", "7376252BT178", "7376252BT179", "7376252BT180", "7376252BT181",
 			"7376252BT182", "7376252BT183", "7376252BT184", "7376252BT185", "7376252BT186", "7376252BT187",
 			"7376252BT188",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM302 (18 candidates)
 		{HallNo: "WW 207", CourseCode: "22AM302", RegisterNos: []string{
 			"7376252AL238", "7376252AL239", "7376252AL240", "7376252AL241", "7376252AL242", "7376252AL243",
 			"7376252AL244", "7376252AL245", "7376252AL246", "7376262AL501", "7376262AL502", "7376262AL503",
 			"7376262AL504", "7376262AL505", "7376262AL506", "7376262AL507", "7376262AL508", "7376262AL509",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 208 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12547,12 +12547,12 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EE111", "7376251EE112", "7376251EE113", "7376251EE114", "7376251EE115", "7376251EE116",
 			"7376251EE117", "7376251EE118", "7376251EE119", "7376251EE120", "7376251EE121", "7376251EE122",
 			"7376251EE123", "7376251EE124", "7376251EE109",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT302 (10 candidates)
 		{HallNo: "WW 208", CourseCode: "22BT302", RegisterNos: []string{
 			"7376252BT191", "7376252BT192", "7376252BT193", "7376252BT194", "7376252BT195", "7376252BT196",
 			"7376252BT197", "7376252BT189", "7376252BT199", "7376252BT200",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 209 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12561,12 +12561,12 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EE125", "7376251EE126", "7376251EE127", "7376251EE128", "7376251EE129", "7376251EE130",
 			"7376251EE131", "7376251EE132", "7376251EE133", "7376251EE134", "7376251EE135", "7376251EE136",
 			"7376251EE137", "7376251EE138", "7376251EE139",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT302 (10 candidates)
 		{HallNo: "WW 209", CourseCode: "22BT302", RegisterNos: []string{
 			"7376252BT201", "7376252BT202", "7376252BT203", "7376252BT204", "7376252BT205", "7376252BT206",
 			"7376252BT207", "7376252BT208", "7376252BT209", "7376252BT210",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 210 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12575,12 +12575,12 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EE140", "7376251EE141", "7376251EE142", "7376251EE143", "7376251EE144", "7376251EE145",
 			"7376251EE146", "7376251EE147", "7376251EE148", "7376251EE149", "7376251EE150", "7376251EE151",
 			"7376251EE152", "7376251EE153", "7376251EE154",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT302 (10 candidates)
 		{HallNo: "WW 210", CourseCode: "22BT302", RegisterNos: []string{
 			"7376252BT211", "7376252BT212", "7376252BT213", "7376252BT214", "7376252BT215", "7376252BT216",
 			"7376252BT217", "7376252BT218", "7376252BT219", "7376252BT220",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 211 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12589,15 +12589,15 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EE155", "7376251EE156", "7376251EE157", "7376251EE158", "7376251EE159", "7376251EE160",
 			"7376251EE161", "7376251EE162", "7376251EE163", "7376251EE164", "7376251EE165", "7376251EE166",
 			"7376251EE167", "7376251EE168", "7376251EE169",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC302 (6 candidates)
 		{HallNo: "WW 211", CourseCode: "22MC302", RegisterNos: []string{
 			"7376251MZ101", "7376251MZ102", "7376251MZ103", "7376251MZ104", "7376251MZ105", "7376251MZ106",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT302 (4 candidates)
 		{HallNo: "WW 211", CourseCode: "22BT302", RegisterNos: []string{
 			"7376252BT221", "7376252BT222", "7376252BT223", "7376252BT224",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 212 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12608,7 +12608,7 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EE182", "7376251EE183", "7376251EE184", "7376251EE185", "7376251EE186", "7376251EE187",
 			"7376251EE188", "7376251EE189", "7376251EE190", "7376251EE191", "7376251EE192", "7376251EE193",
 			"7376251EE194",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC302 (25 candidates)
 		{HallNo: "WW 212", CourseCode: "22MC302", RegisterNos: []string{
 			"7376251MZ107", "7376251MZ108", "7376251MZ109", "7376251MZ110", "7376251MZ111", "7376251MZ112",
@@ -12616,7 +12616,7 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251MZ119", "7376251MZ120", "7376251MZ121", "7376251MZ122", "7376251MZ123", "7376251MZ124",
 			"7376251MZ125", "7376251MZ126", "7376251MZ127", "7376251MZ128", "7376251MZ129", "7376251MZ130",
 			"7376251MZ131",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 213 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12625,12 +12625,12 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EE195", "7376251EE196", "7376251EE197", "7376251EE198", "7376251EE199", "7376251EE200",
 			"7376251EE201", "7376251EE202", "7376251EE203", "7376251EE204", "7376251EE205", "7376261EE502",
 			"7376261EE503", "7376261EE504", "7376261EE505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC302 (10 candidates)
 		{HallNo: "WW 213", CourseCode: "22MC302", RegisterNos: []string{
 			"7376251MZ132", "7376251MZ133", "7376251MZ134", "7376251MZ135", "7376251MZ136", "7376251MZ137",
 			"7376251MZ138", "7376251MZ139", "7376251MZ140", "7376251MZ141",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 214 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12639,16 +12639,16 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376261EE506", "7376261EE507", "7376261EE508", "7376261EE509", "7376261EE510", "7376261EE511",
 			"7376261EE512", "7376261EE513", "7376261EE514", "7376261EE515", "7376261EE516", "7376261EE517",
 			"7376261EE518",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI302 (2 candidates)
 		{HallNo: "WW 214", CourseCode: "22EI302", RegisterNos: []string{
 			"7376251EI101", "7376251EI102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC302 (10 candidates)
 		{HallNo: "WW 214", CourseCode: "22MC302", RegisterNos: []string{
 			"7376251MZ142", "7376251MZ143", "7376251MZ144", "7376251MZ145", "7376251MZ146", "7376251MZ147",
 			"7376251MZ148", "7376251MZ149", "7376251MZ150", "7376251MZ151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 215 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12657,12 +12657,12 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EI103", "7376251EI104", "7376251EI105", "7376251EI106", "7376251EI107", "7376251EI108",
 			"7376251EI109", "7376251EI110", "7376251EI111", "7376251EI112", "7376251EI113", "7376251EI114",
 			"7376251EI115", "7376251EI116", "7376251EI117",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC302 (10 candidates)
 		{HallNo: "WW 215", CourseCode: "22MC302", RegisterNos: []string{
 			"7376251MZ152", "7376251MZ153", "7376251MZ154", "7376251MZ155", "7376251MZ156", "7376251MZ157",
 			"7376251MZ158", "7376251MZ159", "7376251MZ160", "7376251MZ161",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 218 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12671,15 +12671,15 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EI118", "7376251EI119", "7376251EI120", "7376251EI121", "7376251EI122", "7376251EI123",
 			"7376251EI124", "7376251EI125", "7376251EI126", "7376251EI127", "7376251EI128", "7376251EI129",
 			"7376251EI130", "7376251EI131", "7376251EI132",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME302 (5 candidates)
 		{HallNo: "WW 218", CourseCode: "22ME302", RegisterNos: []string{
 			"7376251ME102", "7376251ME103", "7376251ME104", "7376251ME105", "7376251ME106",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC302 (5 candidates)
 		{HallNo: "WW 218", CourseCode: "22MC302", RegisterNos: []string{
 			"7376261MZ502", "7376261MZ503", "7376261MZ504", "7376261MZ505", "7376251MZ162",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 219 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12688,12 +12688,12 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EI135", "7376251EI136", "7376251EI137", "7376251EI138", "7376251EI139", "7376251EI140",
 			"7376251EI141", "7376251EI142", "7376251EI143", "7376251EI144", "7376251EI145", "7376251EI146",
 			"7376251EI147", "7376251EI148", "7376251EI133",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME302 (10 candidates)
 		{HallNo: "WW 219", CourseCode: "22ME302", RegisterNos: []string{
 			"7376251ME107", "7376251ME108", "7376251ME109", "7376251ME110", "7376251ME111", "7376251ME112",
 			"7376251ME113", "7376251ME114", "7376251ME115", "7376251ME116",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 222 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12702,7 +12702,7 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251EI149", "7376251EI150", "7376251EI151", "7376251EI152", "7376251EI153", "7376251EI154",
 			"7376251EI155", "7376251EI156", "7376251EI157", "7376251EI158", "7376251EI159", "7376251EI160",
 			"7376251EI161", "7376261EI501", "7376261EI502", "7376261EI503", "7376261EI504", "7376261EI505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME302 (25 candidates)
 		{HallNo: "WW 222", CourseCode: "22ME302", RegisterNos: []string{
 			"7376251ME117", "7376251ME118", "7376251ME119", "7376251ME120", "7376251ME121", "7376251ME122",
@@ -12710,12 +12710,12 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251ME129", "7376251ME130", "7376251ME131", "7376251ME132", "7376251ME133", "7376251ME134",
 			"7376251ME135", "7376251ME136", "7376251ME137", "7376251ME138", "7376251ME139", "7376251ME140",
 			"7376251ME141",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG302 (7 candidates)
 		{HallNo: "WW 222", CourseCode: "22AG302", RegisterNos: []string{
 			"7376252AG101", "7376252AG102", "7376252AG103", "7376252AG104", "7376252AG105", "7376252AG106",
 			"7376252AG107",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12726,82 +12726,82 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 			"7376251ME154", "7376251ME155", "7376251ME156", "7376251ME157", "7376251ME158", "7376251ME159",
 			"7376251ME160", "7376261ME504", "7376261ME505", "7376261ME506", "7376261ME507", "7376261ME501",
 			"7376261ME502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG302 (19 candidates)
 		{HallNo: "WW 223", CourseCode: "22AG302", RegisterNos: []string{
 			"7376252AG108", "7376252AG109", "7376252AG110", "7376252AG111", "7376252AG112", "7376252AG113",
 			"7376252AG115", "7376252AG116", "7376252AG117", "7376252AG118", "7376252AG119", "7376252AG120",
 			"7376252AG121", "7376252AG122", "7376252AG123", "7376252AG124", "7376252AG125", "7376252AG126",
 			"7376252AG127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CS302* (4 candidates)
 		{HallNo: "WW 224", CourseCode: "22CS302*", RegisterNos: []string{
 			"7376231CS190", "7376231CS235", "7376231CS244", "7376231CS259",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC302 (9 candidates)
 		{HallNo: "WW 224", CourseCode: "22EC302", RegisterNos: []string{
 			"7376231EC101", "7376231EC110", "7376231EC112", "7376231EC121", "7376231EC283", "7376231EC297",
 			"7376231EC305", "7376231EC331", "7376231EC334",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302* (4 candidates)
 		{HallNo: "WW 224", CourseCode: "22IT302*", RegisterNos: []string{
 			"7376232IT118", "7376232IT146", "7376232IT152", "7376242IT502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC302 (16 candidates)
 		{HallNo: "WW 224", CourseCode: "22EC302", RegisterNos: []string{
 			"7376241EC104", "7376241EC124", "7376241EC133", "7376241EC137", "7376241EC138", "7376241EC139",
 			"7376241EC142", "7376241EC144", "7376241EC145", "7376241EC147", "7376241EC151", "7376241EC160",
 			"7376241EC163", "7376241EC167", "7376241EC170", "7376241EC171",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT302* (17 candidates)
 		{HallNo: "WW 224", CourseCode: "22IT302*", RegisterNos: []string{
 			"7376242IT108", "7376242IT141", "7376242IT146", "7376242IT168", "7376242IT184", "7376242IT188",
 			"7376242IT214", "7376242IT227", "7376242IT300", "7376242IT319", "7376242IT345", "7376252IT503",
 			"7376252IT504", "7376252IT508", "7376252IT511", "7376252IT512", "7376252IT513",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 225 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CS302* (1 candidates)
 		{HallNo: "WW 225", CourseCode: "22CS302*", RegisterNos: []string{
 			"7376231CS292",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC302 (1 candidates)
 		{HallNo: "WW 225", CourseCode: "22EC302", RegisterNos: []string{
 			"7376241EC508",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE302 (1 candidates)
 		{HallNo: "WW 225", CourseCode: "22EE302", RegisterNos: []string{
 			"7376231EE111",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302* (1 candidates)
 		{HallNo: "WW 225", CourseCode: "22AI302*", RegisterNos: []string{
 			"7376232AD250",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS302* (8 candidates)
 		{HallNo: "WW 225", CourseCode: "22CS302*", RegisterNos: []string{
 			"7376241CS141", "7376241CS230", "7376241CS272", "7376241CS395", "7376241CS410", "7376251CS501",
 			"7376251CS510", "7376251CS512",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC302 (24 candidates)
 		{HallNo: "WW 225", CourseCode: "22EC302", RegisterNos: []string{
 			"7376241EC177", "7376241EC201", "7376241EC209", "7376241EC241", "7376241EC243", "7376241EC246",
 			"7376241EC256", "7376241EC263", "7376241EC271", "7376241EC273", "7376241EC279", "7376241EC282",
 			"7376241EC284", "7376241EC287", "7376241EC300", "7376241EC312", "7376241EC319", "7376241EC321",
 			"7376241EC322", "7376241EC328", "7376241EC333", "7376241EC334", "7376241EC338", "7376241EC348",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE302 (11 candidates)
 		{HallNo: "WW 225", CourseCode: "22EE302", RegisterNos: []string{
 			"7376241EE132", "7376241EE145", "7376241EE157", "7376241EE188", "7376241EE193", "7376241EE211",
 			"7376251EE502", "7376251EE504", "7376251EE506", "7376251EE507", "7376251EE514",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302* (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22AI302*", RegisterNos: []string{
 			"7376242AD137", "7376242AD183", "7376242AD189",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 226 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -12809,81 +12809,81 @@ func buildSeatingData1Dec2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 226", CourseCode: "22EC302", RegisterNos: []string{
 			"7376241EC511", "7376241EC512", "7376241EC513", "7376241EC515", "7376241EC516", "7376241EC517",
 			"7376241EC520",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT302* (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22BT302*", RegisterNos: []string{
 			"7376232BT200",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB302 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22CB302", RegisterNos: []string{
 			"7376232CB123",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC302 (15 candidates)
 		{HallNo: "WW 226", CourseCode: "22EC302", RegisterNos: []string{
 			"7376251EC503", "7376251EC505", "7376251EC506", "7376251EC507", "7376251EC508", "7376251EC509",
 			"7376251EC510", "7376251EC511", "7376251EC513", "7376251EC515", "7376251EC516", "7376251EC517",
 			"7376251EC518", "7376251EC519", "7376251EC521",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI302 (3 candidates)
 		{HallNo: "WW 226", CourseCode: "22EI302", RegisterNos: []string{
 			"7376241EI104", "7376241EI123", "7376241EI133",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC302 (4 candidates)
 		{HallNo: "WW 226", CourseCode: "22MC302", RegisterNos: []string{
 			"7376241MZ124", "7376241MZ127", "7376251MZ504", "7376251MZ505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT302* (5 candidates)
 		{HallNo: "WW 226", CourseCode: "22BT302*", RegisterNos: []string{
 			"7376242BT156", "7376242BT160", "7376242BT188", "7376242BT214", "7376252BT501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB302 (3 candidates)
 		{HallNo: "WW 226", CourseCode: "22CB302", RegisterNos: []string{
 			"7376242CB116", "7376242CB118", "7376242CB147",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI302* (6 candidates)
 		{HallNo: "WW 226", CourseCode: "22AI302*", RegisterNos: []string{
 			"7376242AD216", "7376242AD218", "7376242AD301", "7376242AD320", "7376242AD326", "7376252AD506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM302* (5 candidates)
 		{HallNo: "WW 226", CourseCode: "22AM302*", RegisterNos: []string{
 			"7376242AL144", "7376242AL157", "7376242AL169", "7376242AL176", "7376242AL207",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 227 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22ME302* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22ME302*", RegisterNos: []string{
 			"7376231ME130",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM302 (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22BM302", RegisterNos: []string{
 			"7376231BM107", "7376231BM134", "7376231BM148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT302* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22CT302*", RegisterNos: []string{
 			"7376232CT122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG302* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22AG302*", RegisterNos: []string{
 			"7376232AG151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI302 (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22EI302", RegisterNos: []string{
 			"7376251EI501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME302* (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22ME302*", RegisterNos: []string{
 			"7376241ME123", "7376251ME503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG302* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22AG302*", RegisterNos: []string{
 			"7376252AG502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
 
 // ============================================================================
-// 01-DEC-2026 AFTERNOON SESSION (AN: 01:30 PM ? 04:30 PM) - Total: 105 Students
+// 01-DEC-2026 AFTERNOON SESSION (AN: 01:30 PM : 04:30 PM) - Total: 105 Students
 // ============================================================================
 func buildSeatingData1Dec2026AN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -12893,161 +12893,161 @@ func buildSeatingData1Dec2026AN() []studentmodels.SeatingRecord {
 		// Course: 22PH102* (1 candidates)
 		{HallNo: "WW 218", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376231CE120",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (2 candidates)
 		{HallNo: "WW 218", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376231CS102", "7376231CS259",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (2 candidates)
 		{HallNo: "WW 218", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376231EC283", "7376231EC334",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (1 candidates)
 		{HallNo: "WW 218", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376231BM107",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CD603 (5 candidates)
 		{HallNo: "WW 218", CourseCode: "22CD603", RegisterNos: []string{
 			"7376231CD111", "7376231CD115", "7376231CD143", "7376241CD501", "7376241CD502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (3 candidates)
 		{HallNo: "WW 218", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376231MZ106", "7376231MZ111", "7376231MZ135",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (1 candidates)
 		{HallNo: "WW 218", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376232IT211",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB406 (1 candidates)
 		{HallNo: "WW 218", CourseCode: "22CB406", RegisterNos: []string{
 			"7376232CB123",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM603* (4 candidates)
 		{HallNo: "WW 218", CourseCode: "22AM603*", RegisterNos: []string{
 			"7376232AL104", "7376232AL142", "7376232AL153", "7376232AL156",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (1 candidates)
 		{HallNo: "WW 218", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376232AG113",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (4 candidates)
 		{HallNo: "WW 218", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376241CS118", "7376241CS185", "7376241CS257", "7376241CS395",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 222 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CB406 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22CB406", RegisterNos: []string{
 			"7376232CB133",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CT602* (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22CT602*", RegisterNos: []string{
 			"7376232CT122",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI603* (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22AI603*", RegisterNos: []string{
 			"7376232AD136", "7376232AD226", "7376232AD250",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG040 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22AG040", RegisterNos: []string{
 			"7376232AG151",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376241CS455", "7376241CS473", "7376241CS474",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376241EC321",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376241EE147",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (2 candidates)
 		{HallNo: "WW 222", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376241MZ124", "7376241MZ143",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376242BT182",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (5 candidates)
 		{HallNo: "WW 222", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376242IT108", "7376242IT110", "7376242IT184", "7376242IT214", "7376242IT227",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB406 (2 candidates)
 		{HallNo: "WW 222", CourseCode: "22CB406", RegisterNos: []string{
 			"7376242CB116", "7376242CB119",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (6 candidates)
 		{HallNo: "WW 222", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376242AD137", "7376242AD189", "7376242AD202", "7376242AD218", "7376242AD308", "7376242AD320",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (2 candidates)
 		{HallNo: "WW 222", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376242AL197", "7376242AL207",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG040 (2 candidates)
 		{HallNo: "WW 222", CourseCode: "22AG040", RegisterNos: []string{
 			"7376252AG501", "7376252AG502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (15 candidates)
 		{HallNo: "WW 222", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376251CS163", "7376251CS166", "7376251CS168", "7376251CS193", "7376251CS200", "7376251CS223",
 			"7376251CS245", "7376251CS268", "7376251CS336", "7376251CS352", "7376251CS385", "7376251CS387",
 			"7376251CS429", "7376251CS467", "7376251CS479",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376251EC186",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376251EE112", "7376251EE114", "7376251EE152",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22PH102* (3 candidates)
 		{HallNo: "WW 223", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376251EI126", "7376251EI134", "7376251EI144",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (5 candidates)
 		{HallNo: "WW 223", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376251ME107", "7376251ME119", "7376251ME140", "7376251ME153", "7376251ME154",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376251MZ104",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (4 candidates)
 		{HallNo: "WW 223", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376252BT120", "7376252BT143", "7376252BT181", "7376252BT187",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (5 candidates)
 		{HallNo: "WW 223", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376252IT122", "7376252IT253", "7376252IT256", "7376252IT331", "7376252IT376",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (10 candidates)
 		{HallNo: "WW 223", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376252AD104", "7376252AD129", "7376252AD141", "7376252AD147", "7376252AD177", "7376252AD187",
 			"7376252AD214", "7376252AD218", "7376252AD222", "7376252AD257",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376252AL208",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22PH102* (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22PH102*", RegisterNos: []string{
 			"7376252AG119",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 	}
 }
 
 // ============================================================================
-// 02-DEC-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 121 Students
+// 02-DEC-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 121 Students
 // ============================================================================
 func buildSeatingData2Dec2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -13057,164 +13057,164 @@ func buildSeatingData2Dec2026FN() []studentmodels.SeatingRecord {
 		// Course: 22CS040 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22CS040", RegisterNos: []string{
 			"7376231CS103",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22GE001", RegisterNos: []string{
 			"7376231CS102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC015 (9 candidates)
 		{HallNo: "WW 222", CourseCode: "22EC015", RegisterNos: []string{
 			"7376231EC124", "7376231EC125", "7376231EC266", "7376231EC283", "7376231EC305", "7376231EC318",
 			"7376241EC504", "7376241EC513", "7376241EC520",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22GE001", RegisterNos: []string{
 			"7376231EC334",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IS603 (4 candidates)
 		{HallNo: "WW 222", CourseCode: "22IS603", RegisterNos: []string{
 			"7376231SE103", "7376231SE128", "7376231SE153", "7376241SE501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD601* (4 candidates)
 		{HallNo: "WW 222", CourseCode: "22CD601*", RegisterNos: []string{
 			"7376231CD143", "7376231CD147", "7376241CD501", "7376241CD502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB603* (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22CB603*", RegisterNos: []string{
 			"7376232CB106", "7376232CB111", "7376232CB133",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI035 (4 candidates)
 		{HallNo: "WW 222", CourseCode: "22AI035", RegisterNos: []string{
 			"7376232AD115", "7376232AD179", "7376232AD250", "7376232AD281",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22GE001", RegisterNos: []string{
 			"7376232AG151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (12 candidates)
 		{HallNo: "WW 222", CourseCode: "22GE001", RegisterNos: []string{
 			"7376241CS118", "7376241CS141", "7376241CS143", "7376241CS151", "7376241CS257", "7376241CS272",
 			"7376241CS294", "7376241CS297", "7376241CS323", "7376241CS332", "7376241CS335", "7376241CS395",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22GE001", RegisterNos: []string{
 			"7376241EC201", "7376241EC278", "7376241EC321",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22GE001", RegisterNos: []string{
 			"7376241EE132", "7376241EE147", "7376241EE193",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22GE001", RegisterNos: []string{
 			"7376241EI146",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (2 candidates)
 		{HallNo: "WW 222", CourseCode: "22GE001", RegisterNos: []string{
 			"7376241ME123", "7376241ME127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22GE001", RegisterNos: []string{
 			"7376241MZ124",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CS040 (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22CS040", RegisterNos: []string{
 			"7376231CS259", "7376231CS324",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM011 (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22BM011", RegisterNos: []string{
 			"7376231BM107", "7376231BM148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC026 (3 candidates)
 		{HallNo: "WW 223", CourseCode: "22MC026", RegisterNos: []string{
 			"7376231MZ106", "7376231MZ107", "7376231MZ111",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD403 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22FD403", RegisterNos: []string{
 			"7376232FD137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22GE001", RegisterNos: []string{
 			"7376241MZ143",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (4 candidates)
 		{HallNo: "WW 223", CourseCode: "22GE001", RegisterNos: []string{
 			"7376242BT145", "7376242BT156", "7376242BT174", "7376242BT182",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (7 candidates)
 		{HallNo: "WW 223", CourseCode: "22GE001", RegisterNos: []string{
 			"7376242IT146", "7376242IT184", "7376242IT214", "7376242IT217", "7376242IT227", "7376242IT318",
 			"7376242IT337",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (9 candidates)
 		{HallNo: "WW 223", CourseCode: "22GE001", RegisterNos: []string{
 			"7376242AD107", "7376242AD137", "7376242AD183", "7376242AD186", "7376242AD189", "7376242AD202",
 			"7376242AD218", "7376242AD320", "7376242AD326",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (4 candidates)
 		{HallNo: "WW 223", CourseCode: "22GE001", RegisterNos: []string{
 			"7376242AL104", "7376242AL190", "7376242AL197", "7376242AL207",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (6 candidates)
 		{HallNo: "WW 223", CourseCode: "22GE001", RegisterNos: []string{
 			"7376251CS166", "7376251CS224", "7376251CS245", "7376251CS387", "7376251CS467", "7376251CS479",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22GE001", RegisterNos: []string{
 			"7376251EC213", "7376251EC248",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22GE001", RegisterNos: []string{
 			"7376251EE144",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22GE001", RegisterNos: []string{
 			"7376251EI126", "7376251EI134",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22GE001", RegisterNos: []string{
 			"7376251ME140",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22GE001", RegisterNos: []string{
 			"7376251MZ104", "7376251MZ105",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (3 candidates)
 		{HallNo: "WW 223", CourseCode: "22GE001", RegisterNos: []string{
 			"7376252AD129", "7376252AD137", "7376252AD141",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22GE001 (1 candidates)
 		{HallNo: "WW 224", CourseCode: "22GE001", RegisterNos: []string{
 			"7376252BT143",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (7 candidates)
 		{HallNo: "WW 224", CourseCode: "22GE001", RegisterNos: []string{
 			"7376252IT122", "7376252IT172", "7376252IT202", "7376252IT253", "7376252IT326", "7376252IT331",
 			"7376252IT376",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (9 candidates)
 		{HallNo: "WW 224", CourseCode: "22GE001", RegisterNos: []string{
 			"7376252AD147", "7376252AD187", "7376252AD192", "7376252AD193", "7376252AD214", "7376252AD222",
 			"7376252AD257", "7376252AD331", "7376252AD364",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22GE001", RegisterNos: []string{
 			"7376252AL208", "7376252AL231",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22GE001 (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22GE001", RegisterNos: []string{
 			"7376252AG119", "7376252AG127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
 
 // ============================================================================
-// 02-DEC-2026 AFTERNOON SESSION (AN: 01:30 PM ? 04:30 PM) - Total: 97 Students
+// 02-DEC-2026 AFTERNOON SESSION (AN: 01:30 PM : 04:30 PM) - Total: 97 Students
 // ============================================================================
 func buildSeatingData2Dec2026AN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -13228,104 +13228,104 @@ func buildSeatingData2Dec2026AN() []studentmodels.SeatingRecord {
 			"7376231CS263", "7376231CS269", "7376231CS279", "7376231CS282", "7376231CS290", "7376231CS292",
 			"7376231CS308", "7376231CS346", "7376231CS348", "7376241CS503", "7376241CS506", "7376241CS508",
 			"7376241CS510",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC040 (12 candidates)
 		{HallNo: "WW 222", CourseCode: "22EC040", RegisterNos: []string{
 			"7376231EC101", "7376231EC121", "7376231EC196", "7376231EC283", "7376231EC297", "7376231EC318",
 			"7376231EC331", "7376231EC334", "7376241EC511", "7376241EC513", "7376241EC516", "7376241EC520",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC040 (13 candidates)
 		{HallNo: "WW 222", CourseCode: "22EC040", RegisterNos: []string{
 			"7376241EC116", "7376241EC163", "7376241EC177", "7376241EC241", "7376241EC243", "7376241EC246",
 			"7376241EC271", "7376241EC278", "7376241EC282", "7376241EC293", "7376251EC506", "7376251EC515",
 			"7376251EC518",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CS602 (3 candidates)
 		{HallNo: "WW 223", CourseCode: "22CS602", RegisterNos: []string{
 			"7376241CS512", "7376241CS516", "7376241CS518",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS002 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22HS002", RegisterNos: []string{
 			"7376231ME104",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BM402* (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22BM402*", RegisterNos: []string{
 			"7376231BM107", "7376231BM148",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IS602 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22IS602", RegisterNos: []string{
 			"7376231SE153",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CD602 (7 candidates)
 		{HallNo: "WW 223", CourseCode: "22CD602", RegisterNos: []string{
 			"7376231CD111", "7376231CD115", "7376231CD122", "7376231CD143", "7376231CD150", "7376241CD501",
 			"7376241CD502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT602 (12 candidates)
 		{HallNo: "WW 223", CourseCode: "22IT602", RegisterNos: []string{
 			"7376232IT122", "7376232IT123", "7376232IT152", "7376232IT228", "7376232IT250", "7376232IT256",
 			"7376232IT261", "7376232IT274", "7376242IT502", "7376242IT504", "7376242IT507", "7376242IT509",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB101 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22CB101", RegisterNos: []string{
 			"7376232CB111",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS002 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22HS002", RegisterNos: []string{
 			"7376232CB123",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI020 (4 candidates)
 		{HallNo: "WW 223", CourseCode: "22AI020", RegisterNos: []string{
 			"7376232AD136", "7376232AD144", "7376232AD250", "7376232AD282",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG405 (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22AG405", RegisterNos: []string{
 			"7376232AG151", "7376242AG502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS002 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22HS002", RegisterNos: []string{
 			"7376241CS474",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS002 (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22HS002", RegisterNos: []string{
 			"7376242IT184", "7376242IT214",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB101 (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22CB101", RegisterNos: []string{
 			"7376242CB119", "7376242CB154",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS002 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22HS002", RegisterNos: []string{
 			"7376242AD320",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS002 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22HS002", RegisterNos: []string{
 			"7376242AL207",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG405 (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22AG405", RegisterNos: []string{
 			"7376252AG501", "7376252AG502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS002 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22HS002", RegisterNos: []string{
 			"7376251EI134",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS002 (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22HS002", RegisterNos: []string{
 			"7376251MZ104", "7376251MZ118",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS002 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22HS002", RegisterNos: []string{
 			"7376252AL208",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 	}
 }
 
 // ============================================================================
-// 03-DEC-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 75 Students
+// 03-DEC-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 75 Students
 // ============================================================================
 func buildSeatingData3Dec2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -13339,115 +13339,115 @@ func buildSeatingData3Dec2026FN() []studentmodels.SeatingRecord {
 			"7376231CS259", "7376231CS263", "7376231CS282", "7376231CS290", "7376231CS292", "7376231CS301",
 			"7376231CS306", "7376231CS308", "7376231CS324", "7376231CS341", "7376231CS346", "7376241CS501",
 			"7376241CS503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS008 (2 candidates)
 		{HallNo: "WW 222", CourseCode: "22HS008", RegisterNos: []string{
 			"7376231EC331", "7376231EC334",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22OME04 (2 candidates)
 		{HallNo: "WW 222", CourseCode: "22OME04", RegisterNos: []string{
 			"7376231EC101", "7376231EC283",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS008 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22HS008", RegisterNos: []string{
 			"7376241CD501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22OME04 (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22OME04", RegisterNos: []string{
 			"7376231MZ135", "7376231MZ150", "7376241MZ502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS008 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22HS008", RegisterNos: []string{
 			"7376232BT142",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22OME04 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22OME04", RegisterNos: []string{
 			"7376232IT118",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22OME04 (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22OME04", RegisterNos: []string{
 			"7376232AD184", "7376232AD226", "7376242AD503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG601* (4 candidates)
 		{HallNo: "WW 222", CourseCode: "22AG601*", RegisterNos: []string{
 			"7376232AG104", "7376232AG111", "7376232AG132", "7376232AG144",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS008 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22HS008", RegisterNos: []string{
 			"7376241CS261",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS008 (2 candidates)
 		{HallNo: "WW 222", CourseCode: "22HS008", RegisterNos: []string{
 			"7376241EC348", "7376251EC509",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS008 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22HS008", RegisterNos: []string{
 			"7376241EE193",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS008 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22HS008", RegisterNos: []string{
 			"7376241EI146",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS008 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22HS008", RegisterNos: []string{
 			"7376241MZ124",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS008 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22HS008", RegisterNos: []string{
 			"7376242IT184",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS008 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22HS008", RegisterNos: []string{
 			"7376252AD503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CS601 (3 candidates)
 		{HallNo: "WW 223", CourseCode: "22CS601", RegisterNos: []string{
 			"7376241CS507", "7376241CS515", "7376241CS519",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22OPH01 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22OPH01", RegisterNos: []string{
 			"7376231CS269",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22OPH01 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22OPH01", RegisterNos: []string{
 			"7376231EE111",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22OPH01 (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22OPH01", RegisterNos: []string{
 			"7376231CD115", "7376231CD143",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22OPH01 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22OPH01", RegisterNos: []string{
 			"7376231MZ111",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22OPH01 (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22OPH01", RegisterNos: []string{
 			"7376232BT152", "7376232BT176",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB604* (3 candidates)
 		{HallNo: "WW 223", CourseCode: "22CB604*", RegisterNos: []string{
 			"7376232CB106", "7376232CB123", "7376232CB133",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI037 (3 candidates)
 		{HallNo: "WW 223", CourseCode: "22AI037", RegisterNos: []string{
 			"7376232AD115", "7376232AD228", "7376232AD250",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG601* (3 candidates)
 		{HallNo: "WW 223", CourseCode: "22AG601*", RegisterNos: []string{
 			"7376232AG151", "7376242AG501", "7376242AG502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT007 (6 candidates)
 		{HallNo: "WW 223", CourseCode: "22IT007", RegisterNos: []string{
 			"7376242IT123", "7376242IT146", "7376242IT214", "7376242IT227", "7376252IT508", "7376252IT512",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
 
 // ============================================================================
-// 03-DEC-2026 AFTERNOON SESSION (AN: 01:30 PM ? 04:30 PM) - Total: 53 Students
+// 03-DEC-2026 AFTERNOON SESSION (AN: 01:30 PM : 04:30 PM) - Total: 53 Students
 // ============================================================================
 func buildSeatingData3Dec2026AN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -13459,79 +13459,79 @@ func buildSeatingData3Dec2026AN() []studentmodels.SeatingRecord {
 			"7376231CS121", "7376231CS126", "7376231CS136", "7376231CS139", "7376231CS190", "7376231CS192",
 			"7376231CS235", "7376231CS244", "7376231CS258", "7376231CS259", "7376231CS263", "7376231CS269",
 			"7376231CS275", "7376231CS283", "7376231CS286",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCH03 (1 candidates)
 		{HallNo: "WW 218", CourseCode: "22OCH03", RegisterNos: []string{
 			"7376231CS102",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCH03 (2 candidates)
 		{HallNo: "WW 218", CourseCode: "22OCH03", RegisterNos: []string{
 			"7376231EC101", "7376231EC305",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCH03 (1 candidates)
 		{HallNo: "WW 218", CourseCode: "22OCH03", RegisterNos: []string{
 			"7376232CB111",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCH03 (5 candidates)
 		{HallNo: "WW 218", CourseCode: "22OCH03", RegisterNos: []string{
 			"7376232AD119", "7376232AD177", "7376232AD247", "7376232AD250", "7376232AD265",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCH03 (1 candidates)
 		{HallNo: "WW 218", CourseCode: "22OCH03", RegisterNos: []string{
 			"7376232AL183",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 222 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CS031 (6 candidates)
 		{HallNo: "WW 222", CourseCode: "22CS031", RegisterNos: []string{
 			"7376231CS324", "7376241CS503", "7376241CS508", "7376241CS510", "7376241CS512", "7376241CS516",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCH03 (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22OCH03", RegisterNos: []string{
 			"7376241EC511", "7376241EC516", "7376241EC521",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CD019* (2 candidates)
 		{HallNo: "WW 222", CourseCode: "22CD019*", RegisterNos: []string{
 			"7376231CD143", "7376241CD501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT011 (4 candidates)
 		{HallNo: "WW 222", CourseCode: "22IT011", RegisterNos: []string{
 			"7376232IT152", "7376232IT157", "7376232IT228", "7376232IT284",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB203* (2 candidates)
 		{HallNo: "WW 222", CourseCode: "22CB203*", RegisterNos: []string{
 			"7376232CB123", "7376232CB133",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCH03 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22OCH03", RegisterNos: []string{
 			"7376232CT122",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCH03 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22OCH03", RegisterNos: []string{
 			"7376242AD510",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG001 (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22AG001", RegisterNos: []string{
 			"7376232AG111", "7376232AG144", "7376232AG151",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS001 (2 candidates)
 		{HallNo: "WW 222", CourseCode: "22HS001", RegisterNos: []string{
 			"7376242IT184", "7376242IT214",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB203* (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22CB203*", RegisterNos: []string{
 			"7376242CB119",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22HS001 (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22HS001", RegisterNos: []string{
 			"7376242AD189", "7376242AD301", "7376242AD320",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 	}
 }
 
 // ============================================================================
-// 04-DEC-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 142 Students
+// 04-DEC-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 142 Students
 // ============================================================================
 func buildSeatingData4Dec2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -13542,125 +13542,125 @@ func buildSeatingData4Dec2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 222", CourseCode: "22CS008", RegisterNos: []string{
 			"7376231CS102", "7376231CS103", "7376231CS139", "7376231CS173", "7376231CS190", "7376231CS235",
 			"7376231CS244", "7376231CS259", "7376231CS292", "7376231CS346",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC602* (22 candidates)
 		{HallNo: "WW 222", CourseCode: "22EC602*", RegisterNos: []string{
 			"7376231EC101", "7376231EC121", "7376231EC131", "7376231EC182", "7376231EC196", "7376231EC272",
 			"7376231EC283", "7376231EC297", "7376231EC305", "7376231EC318", "7376231EC331", "7376231EC332",
 			"7376231EC334", "7376241EC504", "7376241EC506", "7376241EC508", "7376241EC511", "7376241EC512",
 			"7376241EC513", "7376241EC515", "7376241EC516", "7376241EC520",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT008 (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22IT008", RegisterNos: []string{
 			"7376232IT118", "7376232IT146", "7376232IT152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS008 (15 candidates)
 		{HallNo: "WW 222", CourseCode: "22CS008", RegisterNos: []string{
 			"7376241CS103", "7376241CS118", "7376241CS120", "7376241CS121", "7376241CS131", "7376241CS142",
 			"7376241CS143", "7376241CS144", "7376241CS147", "7376241CS151", "7376241CS166", "7376241CS210",
 			"7376241CS216", "7376241CS217", "7376241CS220",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22AI002 (6 candidates)
 		{HallNo: "WW 223", CourseCode: "22AI002", RegisterNos: []string{
 			"7376232AD115", "7376232AD122", "7376232AD136", "7376232AD174", "7376232AD184", "7376232AD250",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG603* (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22AG603*", RegisterNos: []string{
 			"7376232AG104",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS008 (24 candidates)
 		{HallNo: "WW 223", CourseCode: "22CS008", RegisterNos: []string{
 			"7376241CS223", "7376241CS248", "7376241CS263", "7376241CS272", "7376241CS295", "7376241CS307",
 			"7376241CS318", "7376241CS320", "7376241CS323", "7376241CS332", "7376241CS353", "7376241CS359",
 			"7376241CS375", "7376241CS395", "7376241CS406", "7376241CS410", "7376241CS425", "7376241CS461",
 			"7376241CS474", "7376251CS505", "7376251CS515", "7376251CS518", "7376251CS521", "7376251CS522",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT008 (13 candidates)
 		{HallNo: "WW 223", CourseCode: "22IT008", RegisterNos: []string{
 			"7376242IT107", "7376242IT164", "7376242IT184", "7376242IT260", "7376242IT287", "7376242IT292",
 			"7376242IT338", "7376252IT502", "7376252IT503", "7376252IT504", "7376252IT505", "7376252IT506",
 			"7376252IT511",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI002 (6 candidates)
 		{HallNo: "WW 223", CourseCode: "22AI002", RegisterNos: []string{
 			"7376242AD105", "7376242AD146", "7376242AD218", "7376242AD308", "7376242AD320", "7376252AD506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CE029 (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22CE029", RegisterNos: []string{
 			"7376231CE120", "7376241CE501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE603* (1 candidates)
 		{HallNo: "WW 224", CourseCode: "22EE603*", RegisterNos: []string{
 			"7376231EE111",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM008 (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22BM008", RegisterNos: []string{
 			"7376231BM107", "7376231BM148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IS020 (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22IS020", RegisterNos: []string{
 			"7376231SE137", "7376231SE153",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IS601 (3 candidates)
 		{HallNo: "WW 224", CourseCode: "22IS601", RegisterNos: []string{
 			"7376231SE103", "7376231SE114", "7376241SE501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD008 (3 candidates)
 		{HallNo: "WW 224", CourseCode: "22CD008", RegisterNos: []string{
 			"7376231CD143", "7376241CD501", "7376241CD502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC007 (3 candidates)
 		{HallNo: "WW 224", CourseCode: "22MC007", RegisterNos: []string{
 			"7376231MZ106", "7376231MZ111", "7376241MZ501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT042 (3 candidates)
 		{HallNo: "WW 224", CourseCode: "22BT042", RegisterNos: []string{
 			"7376232BT115", "7376232BT126", "7376232BT142",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD601* (1 candidates)
 		{HallNo: "WW 224", CourseCode: "22FD601*", RegisterNos: []string{
 			"7376232FD137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB205 (1 candidates)
 		{HallNo: "WW 224", CourseCode: "22CB205", RegisterNos: []string{
 			"7376232CB133",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT008 (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22CT008", RegisterNos: []string{
 			"7376232CT122", "7376242CT503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG603* (7 candidates)
 		{HallNo: "WW 224", CourseCode: "22AG603*", RegisterNos: []string{
 			"7376232AG111", "7376232AG121", "7376232AG129", "7376232AG132", "7376232AG151", "7376242AG501",
 			"7376242AG502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB205 (3 candidates)
 		{HallNo: "WW 224", CourseCode: "22CB205", RegisterNos: []string{
 			"7376242CB116", "7376242CB118", "7376242CB154",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI002 (1 candidates)
 		{HallNo: "WW 224", CourseCode: "22AI002", RegisterNos: []string{
 			"7376252AD515",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI043 (5 candidates)
 		{HallNo: "WW 224", CourseCode: "22AI043", RegisterNos: []string{
 			"7376242AD137", "7376242AD172", "7376242AD189", "7376242AD276", "7376252AD510",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM002 (3 candidates)
 		{HallNo: "WW 224", CourseCode: "22AM002", RegisterNos: []string{
 			"7376242AL104", "7376242AL169", "7376242AL205",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
 
 // ============================================================================
-// 04-DEC-2026 AFTERNOON SESSION (AN: 01:30 PM ? 04:30 PM) - Total: 197 Students
+// 04-DEC-2026 AFTERNOON SESSION (AN: 01:30 PM : 04:30 PM) - Total: 197 Students
 // ============================================================================
 func buildSeatingData4Dec2026AN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -13671,173 +13671,173 @@ func buildSeatingData4Dec2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 222", CourseCode: "22CS403", RegisterNos: []string{
 			"7376231CS102", "7376231CS103", "7376231CS173", "7376231CS190", "7376231CS235", "7376231CS244",
 			"7376231CS259", "7376231CS292", "7376231CS346",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI403 (7 candidates)
 		{HallNo: "WW 222", CourseCode: "22AI403", RegisterNos: []string{
 			"7376232AD115", "7376232AD122", "7376232AD131", "7376232AD136", "7376232AD174", "7376232AD250",
 			"7376242AD510",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS403 (16 candidates)
 		{HallNo: "WW 222", CourseCode: "22CS403", RegisterNos: []string{
 			"7376241CS103", "7376241CS121", "7376241CS131", "7376241CS143", "7376241CS150", "7376241CS157",
 			"7376241CS166", "7376241CS190", "7376241CS220", "7376241CS223", "7376241CS230", "7376241CS272",
 			"7376241CS293", "7376241CS294", "7376241CS308", "7376241CS318",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI403 (18 candidates)
 		{HallNo: "WW 222", CourseCode: "22AI403", RegisterNos: []string{
 			"7376242AD125", "7376242AD137", "7376242AD146", "7376242AD186", "7376242AD189", "7376242AD190",
 			"7376242AD201", "7376242AD202", "7376242AD209", "7376242AD218", "7376242AD242", "7376242AD288",
 			"7376242AD311", "7376242AD320", "7376242AD321", "7376242AD326", "7376252AD501", "7376252AD503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CS403 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22CS403", RegisterNos: []string{
 			"7376241CS503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC405* (8 candidates)
 		{HallNo: "WW 223", CourseCode: "22EC405*", RegisterNos: []string{
 			"7376231EC101", "7376231EC112", "7376231EC196", "7376231EC283", "7376231EC297", "7376231EC305",
 			"7376231EC331", "7376231EC334",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT403 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22IT403", RegisterNos: []string{
 			"7376232IT152",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS403 (17 candidates)
 		{HallNo: "WW 223", CourseCode: "22CS403", RegisterNos: []string{
 			"7376241CS332", "7376241CS344", "7376241CS358", "7376241CS359", "7376241CS394", "7376241CS395",
 			"7376241CS410", "7376241CS447", "7376241CS474", "7376251CS501", "7376251CS506", "7376251CS509",
 			"7376251CS510", "7376251CS512", "7376251CS513", "7376251CS519", "7376251CS521",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC405* (10 candidates)
 		{HallNo: "WW 223", CourseCode: "22EC405*", RegisterNos: []string{
 			"7376241EC151", "7376241EC159", "7376241EC160", "7376241EC201", "7376241EC206", "7376241EC243",
 			"7376241EC246", "7376241EC256", "7376241EC279", "7376241EC280",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT403 (6 candidates)
 		{HallNo: "WW 223", CourseCode: "22IT403", RegisterNos: []string{
 			"7376242IT108", "7376242IT123", "7376242IT146", "7376242IT164", "7376242IT184", "7376242IT257",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI403 (7 candidates)
 		{HallNo: "WW 223", CourseCode: "22AI403", RegisterNos: []string{
 			"7376252AD506", "7376252AD509", "7376252AD510", "7376252AD511", "7376252AD512", "7376252AD513",
 			"7376252AD515",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EC405* (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22EC405*", RegisterNos: []string{
 			"7376241EC516", "7376241EC521",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE405* (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22EE405*", RegisterNos: []string{
 			"7376231EE111", "7376231EE115",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT403 (1 candidates)
 		{HallNo: "WW 224", CourseCode: "22IT403", RegisterNos: []string{
 			"7376242IT509",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM403 (5 candidates)
 		{HallNo: "WW 224", CourseCode: "22AM403", RegisterNos: []string{
 			"7376232AL125", "7376232AL157", "7376232AL183", "7376232AL217", "7376242AL501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC405* (12 candidates)
 		{HallNo: "WW 224", CourseCode: "22EC405*", RegisterNos: []string{
 			"7376241EC282", "7376241EC284", "7376241EC312", "7376241EC348", "7376251EC503", "7376251EC508",
 			"7376251EC509", "7376251EC513", "7376251EC516", "7376251EC519", "7376251EC520", "7376251EC521",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE405* (8 candidates)
 		{HallNo: "WW 224", CourseCode: "22EE405*", RegisterNos: []string{
 			"7376241EE115", "7376241EE146", "7376241EE147", "7376241EE157", "7376241EE193", "7376251EE502",
 			"7376251EE506", "7376251EE507",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EI405* (1 candidates)
 		{HallNo: "WW 224", CourseCode: "22EI405*", RegisterNos: []string{
 			"7376241EI117",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT403 (13 candidates)
 		{HallNo: "WW 224", CourseCode: "22IT403", RegisterNos: []string{
 			"7376242IT260", "7376242IT287", "7376242IT292", "7376242IT345", "7376252IT502", "7376252IT503",
 			"7376252IT504", "7376252IT505", "7376252IT506", "7376252IT511", "7376252IT512", "7376252IT513",
 			"7376252IT514",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM403 (6 candidates)
 		{HallNo: "WW 224", CourseCode: "22AM403", RegisterNos: []string{
 			"7376242AL101", "7376242AL114", "7376242AL117", "7376242AL157", "7376242AL183", "7376242AL197",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 225 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CE405* (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22CE405*", RegisterNos: []string{
 			"7376231CE117", "7376231CE120", "7376241CE501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BM404 (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22BM404", RegisterNos: []string{
 			"7376231BM107", "7376231BM137", "7376231BM148",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IS403 (1 candidates)
 		{HallNo: "WW 225", CourseCode: "22IS403", RegisterNos: []string{
 			"7376231SE139",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CD403 (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22CD403", RegisterNos: []string{
 			"7376231CD143", "7376241CD501", "7376241CD502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC405* (2 candidates)
 		{HallNo: "WW 225", CourseCode: "22MC405*", RegisterNos: []string{
 			"7376231MZ106", "7376231MZ148",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT004 (4 candidates)
 		{HallNo: "WW 225", CourseCode: "22BT004", RegisterNos: []string{
 			"7376232BT124", "7376232BT142", "7376232BT183", "7376232BT197",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22FD602 (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22FD602", RegisterNos: []string{
 			"7376232FD118", "7376232FD132", "7376232FD137",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB028 (2 candidates)
 		{HallNo: "WW 225", CourseCode: "22CB028", RegisterNos: []string{
 			"7376232CB106", "7376232CB133",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB103* (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22CB103*", RegisterNos: []string{
 			"7376232CB110", "7376232CB111", "7376232CB123",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CT403 (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22CT403", RegisterNos: []string{
 			"7376232CT122", "7376232CT127", "7376242CT503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM403 (1 candidates)
 		{HallNo: "WW 225", CourseCode: "22AM403", RegisterNos: []string{
 			"7376242AL505",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG008 (7 candidates)
 		{HallNo: "WW 225", CourseCode: "22AG008", RegisterNos: []string{
 			"7376232AG104", "7376232AG111", "7376232AG121", "7376232AG129", "7376232AG132", "7376232AG151",
 			"7376242AG501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EI405* (7 candidates)
 		{HallNo: "WW 225", CourseCode: "22EI405*", RegisterNos: []string{
 			"7376241EI119", "7376241EI123", "7376241EI146", "7376241EI157", "7376241EI160", "7376251EI501",
 			"7376251EI502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC405* (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22MC405*", RegisterNos: []string{
 			"7376241MZ124", "7376241MZ127", "7376241MZ139",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB103* (2 candidates)
 		{HallNo: "WW 225", CourseCode: "22CB103*", RegisterNos: []string{
 			"7376242CB116", "7376242CB154",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 	}
 }
 
 // ============================================================================
-// 05-DEC-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 193 Students
+// 05-DEC-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 193 Students
 // ============================================================================
 func buildSeatingData5Dec2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -13848,165 +13848,165 @@ func buildSeatingData5Dec2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 222", CourseCode: "22CS405*", RegisterNos: []string{
 			"7376231CS102", "7376231CS103", "7376231CS190", "7376231CS235", "7376231CS244", "7376231CS259",
 			"7376231CS292",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC404* (6 candidates)
 		{HallNo: "WW 222", CourseCode: "22EC404*", RegisterNos: []string{
 			"7376231EC196", "7376231EC283", "7376231EC297", "7376231EC318", "7376231EC331", "7376231EC334",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS405* (18 candidates)
 		{HallNo: "WW 222", CourseCode: "22CS405*", RegisterNos: []string{
 			"7376241CS103", "7376241CS118", "7376241CS120", "7376241CS131", "7376241CS143", "7376241CS144",
 			"7376241CS150", "7376241CS168", "7376241CS171", "7376241CS204", "7376241CS216", "7376241CS220",
 			"7376241CS223", "7376241CS230", "7376241CS261", "7376241CS262", "7376241CS293", "7376241CS294",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC404* (19 candidates)
 		{HallNo: "WW 222", CourseCode: "22EC404*", RegisterNos: []string{
 			"7376241EC124", "7376241EC137", "7376241EC138", "7376241EC144", "7376241EC151", "7376241EC157",
 			"7376241EC163", "7376241EC170", "7376241EC201", "7376241EC239", "7376241EC243", "7376241EC246",
 			"7376241EC256", "7376241EC261", "7376241EC263", "7376241EC273", "7376241EC278", "7376241EC280",
 			"7376241EC282",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EC404* (4 candidates)
 		{HallNo: "WW 223", CourseCode: "22EC404*", RegisterNos: []string{
 			"7376241EC511", "7376241EC516", "7376241EC517", "7376241EC521",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT405* (3 candidates)
 		{HallNo: "WW 223", CourseCode: "22IT405*", RegisterNos: []string{
 			"7376232IT118", "7376232IT152", "7376232IT228",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI405* (4 candidates)
 		{HallNo: "WW 223", CourseCode: "22AI405*", RegisterNos: []string{
 			"7376232AD136", "7376232AD174", "7376232AD250", "7376232AD282",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS405* (22 candidates)
 		{HallNo: "WW 223", CourseCode: "22CS405*", RegisterNos: []string{
 			"7376241CS305", "7376241CS307", "7376241CS318", "7376241CS332", "7376241CS359", "7376241CS394",
 			"7376241CS395", "7376241CS422", "7376241CS438", "7376241CS474", "7376251CS501", "7376251CS505",
 			"7376251CS506", "7376251CS509", "7376251CS510", "7376251CS512", "7376251CS513", "7376251CS517",
 			"7376251CS518", "7376251CS519", "7376251CS520", "7376251CS521",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC404* (14 candidates)
 		{HallNo: "WW 223", CourseCode: "22EC404*", RegisterNos: []string{
 			"7376241EC287", "7376241EC293", "7376241EC300", "7376241EC302", "7376241EC303", "7376241EC348",
 			"7376251EC506", "7376251EC509", "7376251EC511", "7376251EC516", "7376251EC518", "7376251EC519",
 			"7376251EC520", "7376251EC521",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI405* (3 candidates)
 		{HallNo: "WW 223", CourseCode: "22AI405*", RegisterNos: []string{
 			"7376242AD105", "7376242AD108", "7376242AD123",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EE007 (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22EE007", RegisterNos: []string{
 			"7376231EE111", "7376231EE115",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC404* (1 candidates)
 		{HallNo: "WW 224", CourseCode: "22MC404*", RegisterNos: []string{
 			"7376231MZ106",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT405* (1 candidates)
 		{HallNo: "WW 224", CourseCode: "22IT405*", RegisterNos: []string{
 			"7376232IT274",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE007 (3 candidates)
 		{HallNo: "WW 224", CourseCode: "22EE007", RegisterNos: []string{
 			"7376241EE146", "7376241EE157", "7376241EE198",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT405* (19 candidates)
 		{HallNo: "WW 224", CourseCode: "22IT405*", RegisterNos: []string{
 			"7376242IT108", "7376242IT123", "7376242IT141", "7376242IT146", "7376242IT164", "7376242IT184",
 			"7376242IT204", "7376242IT227", "7376242IT257", "7376242IT287", "7376242IT292", "7376242IT348",
 			"7376252IT502", "7376252IT504", "7376252IT508", "7376252IT511", "7376252IT512", "7376252IT513",
 			"7376252IT514",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI405* (24 candidates)
 		{HallNo: "WW 224", CourseCode: "22AI405*", RegisterNos: []string{
 			"7376242AD144", "7376242AD172", "7376242AD183", "7376242AD189", "7376242AD216", "7376242AD218",
 			"7376242AD236", "7376242AD267", "7376242AD275", "7376242AD288", "7376242AD301", "7376242AD308",
 			"7376242AD318", "7376242AD320", "7376242AD321", "7376242AD326", "7376242AD327", "7376242AD336",
 			"7376252AD503", "7376252AD506", "7376252AD509", "7376252AD510", "7376252AD512", "7376252AD515",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 225 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CE603* (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22CE603*", RegisterNos: []string{
 			"7376231CE108", "7376231CE117", "7376231CE120",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM020 (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22BM020", RegisterNos: []string{
 			"7376231BM107", "7376231BM134", "7376231BM148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD405* (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22CD405*", RegisterNos: []string{
 			"7376231CD143", "7376241CD501", "7376241CD502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC404* (2 candidates)
 		{HallNo: "WW 225", CourseCode: "22MC404*", RegisterNos: []string{
 			"7376231MZ111", "7376241MZ501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT401* (1 candidates)
 		{HallNo: "WW 225", CourseCode: "22BT401*", RegisterNos: []string{
 			"7376232BT142",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD025 (1 candidates)
 		{HallNo: "WW 225", CourseCode: "22FD025", RegisterNos: []string{
 			"7376232FD137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB104* (2 candidates)
 		{HallNo: "WW 225", CourseCode: "22CB104*", RegisterNos: []string{
 			"7376232CB111", "7376232CB123",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22OCE01 (1 candidates)
 		{HallNo: "WW 225", CourseCode: "22OCE01", RegisterNos: []string{
 			"7376232CB133",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT405* (2 candidates)
 		{HallNo: "WW 225", CourseCode: "22CT405*", RegisterNos: []string{
 			"7376232CT122", "7376242CT503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG404* (2 candidates)
 		{HallNo: "WW 225", CourseCode: "22AG404*", RegisterNos: []string{
 			"7376232AG151", "7376242AG501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE007 (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22EE007", RegisterNos: []string{
 			"7376251EE504", "7376251EE506", "7376251EE517",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE033 (2 candidates)
 		{HallNo: "WW 225", CourseCode: "22EE033", RegisterNos: []string{
 			"7376241EE132", "7376241EE147",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC404* (4 candidates)
 		{HallNo: "WW 225", CourseCode: "22MC404*", RegisterNos: []string{
 			"7376241MZ104", "7376241MZ121", "7376241MZ124", "7376241MZ127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT401* (4 candidates)
 		{HallNo: "WW 225", CourseCode: "22BT401*", RegisterNos: []string{
 			"7376242BT120", "7376242BT138", "7376242BT188", "7376242BT192",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB104* (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22CB104*", RegisterNos: []string{
 			"7376242CB116", "7376242CB118", "7376242CB154",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM405* (6 candidates)
 		{HallNo: "WW 225", CourseCode: "22AM405*", RegisterNos: []string{
 			"7376242AL101", "7376242AL104", "7376242AL109", "7376242AL147", "7376242AL153", "7376242AL157",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG404* (1 candidates)
 		{HallNo: "WW 225", CourseCode: "22AG404*", RegisterNos: []string{
 			"7376252AG502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
 
 // ============================================================================
-// 05-DEC-2026 AFTERNOON SESSION (AN: 01:30 PM ? 04:30 PM) - Total: 27 Students
+// 05-DEC-2026 AFTERNOON SESSION (AN: 01:30 PM : 04:30 PM) - Total: 27 Students
 // ============================================================================
 func buildSeatingData5Dec2026AN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -14016,42 +14016,42 @@ func buildSeatingData5Dec2026AN() []studentmodels.SeatingRecord {
 		// Course: 22CE601 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22CE601", RegisterNos: []string{
 			"7376231CE117",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS007 (7 candidates)
 		{HallNo: "WW 222", CourseCode: "22CS007", RegisterNos: []string{
 			"7376231CS102", "7376231CS190", "7376231CS235", "7376231CS244", "7376231CS259", "7376231CS292",
 			"7376231CS346",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC046 (10 candidates)
 		{HallNo: "WW 222", CourseCode: "22EC046", RegisterNos: []string{
 			"7376231EC101", "7376231EC196", "7376231EC272", "7376231EC297", "7376231EC330", "7376231EC331",
 			"7376231EC332", "7376231EC334", "7376241EC516", "7376241EC517",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCE02 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22OCE02", RegisterNos: []string{
 			"7376231EE104",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCE02 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22OCE02", RegisterNos: []string{
 			"7376231SE137",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CD023 (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22CD023", RegisterNos: []string{
 			"7376231CD143", "7376241CD501", "7376241CD502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22OCE02 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22OCE02", RegisterNos: []string{
 			"7376232CB110",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS007 (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22CS007", RegisterNos: []string{
 			"7376251CS501", "7376251CS509", "7376251CS510",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 	}
 }
 
 // ============================================================================
-// 07-DEC-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 159 Students
+// 07-DEC-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 159 Students
 // ============================================================================
 func buildSeatingData7Dec2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -14062,16 +14062,16 @@ func buildSeatingData7Dec2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 221", CourseCode: "22CS404*", RegisterNos: []string{
 			"7376231CS102", "7376231CS103", "7376231CS190", "7376231CS235", "7376231CS244", "7376231CS259",
 			"7376231CS292",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC601 (10 candidates)
 		{HallNo: "WW 221", CourseCode: "22EC601", RegisterNos: []string{
 			"7376231EC101", "7376231EC102", "7376231EC108", "7376231EC110", "7376231EC121", "7376231EC123",
 			"7376231EC124", "7376231EC131", "7376231EC132", "7376231EC196",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS404* (3 candidates)
 		{HallNo: "WW 221", CourseCode: "22CS404*", RegisterNos: []string{
 			"7376241CS103", "7376241CS120", "7376241CS140",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 222 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14082,7 +14082,7 @@ func buildSeatingData7Dec2026FN() []studentmodels.SeatingRecord {
 			"7376231EC332", "7376231EC334", "7376241EC503", "7376241EC504", "7376241EC508", "7376241EC510",
 			"7376241EC511", "7376241EC513", "7376241EC514", "7376241EC515", "7376241EC516", "7376241EC517",
 			"7376241EC520",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS404* (25 candidates)
 		{HallNo: "WW 222", CourseCode: "22CS404*", RegisterNos: []string{
 			"7376241CS141", "7376241CS143", "7376241CS144", "7376241CS166", "7376241CS171", "7376241CS230",
@@ -14090,113 +14090,113 @@ func buildSeatingData7Dec2026FN() []studentmodels.SeatingRecord {
 			"7376241CS395", "7376241CS406", "7376241CS422", "7376241CS455", "7376241CS468", "7376241CS474",
 			"7376251CS501", "7376251CS505", "7376251CS506", "7376251CS509", "7376251CS510", "7376251CS513",
 			"7376251CS517",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EC601 (1 candidates)
 		{HallNo: "WW 223", CourseCode: "22EC601", RegisterNos: []string{
 			"7376241EC521",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT404* (3 candidates)
 		{HallNo: "WW 223", CourseCode: "22IT404*", RegisterNos: []string{
 			"7376232IT118", "7376232IT146", "7376232IT152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI404* (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22AI404*", RegisterNos: []string{
 			"7376232AD115", "7376232AD250",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG602* (8 candidates)
 		{HallNo: "WW 223", CourseCode: "22AG602*", RegisterNos: []string{
 			"7376232AG104", "7376232AG111", "7376232AG117", "7376232AG121", "7376232AG129", "7376232AG132",
 			"7376232AG144", "7376232AG151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS404* (2 candidates)
 		{HallNo: "WW 223", CourseCode: "22CS404*", RegisterNos: []string{
 			"7376251CS519", "7376251CS521",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT404* (20 candidates)
 		{HallNo: "WW 223", CourseCode: "22IT404*", RegisterNos: []string{
 			"7376242IT108", "7376242IT123", "7376242IT141", "7376242IT146", "7376242IT164", "7376242IT168",
 			"7376242IT184", "7376242IT188", "7376242IT214", "7376242IT227", "7376242IT250", "7376242IT287",
 			"7376242IT292", "7376242IT303", "7376242IT318", "7376252IT502", "7376252IT503", "7376252IT504",
 			"7376252IT505", "7376252IT508",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI404* (14 candidates)
 		{HallNo: "WW 223", CourseCode: "22AI404*", RegisterNos: []string{
 			"7376242AD125", "7376242AD172", "7376242AD183", "7376242AD189", "7376242AD202", "7376242AD218",
 			"7376242AD265", "7376242AD301", "7376252AD502", "7376252AD509", "7376252AD510", "7376252AD512",
 			"7376252AD513", "7376252AD515",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CE026 (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22CE026", RegisterNos: []string{
 			"7376231CE117", "7376231CE120",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE402* (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22EE402*", RegisterNos: []string{
 			"7376231EE111", "7376231EE115",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM601* (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22BM601*", RegisterNos: []string{
 			"7376231BM107", "7376231BM148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD404* (1 candidates)
 		{HallNo: "WW 224", CourseCode: "22CD404*", RegisterNos: []string{
 			"7376241CD501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC601* (5 candidates)
 		{HallNo: "WW 224", CourseCode: "22MC601*", RegisterNos: []string{
 			"7376231MZ106", "7376231MZ107", "7376231MZ111", "7376231MZ113", "7376231MZ148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT001 (4 candidates)
 		{HallNo: "WW 224", CourseCode: "22BT001", RegisterNos: []string{
 			"7376232BT142", "7376232BT152", "7376232BT163", "7376232BT176",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD040 (1 candidates)
 		{HallNo: "WW 224", CourseCode: "22FD040", RegisterNos: []string{
 			"7376232FD137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB021 (2 candidates)
 		{HallNo: "WW 224", CourseCode: "22CB021", RegisterNos: []string{
 			"7376232CB123", "7376232CB133",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB106* (1 candidates)
 		{HallNo: "WW 224", CourseCode: "22CB106*", RegisterNos: []string{
 			"7376232CB106",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT601 (1 candidates)
 		{HallNo: "WW 224", CourseCode: "22CT601", RegisterNos: []string{
 			"7376232CT122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG602* (1 candidates)
 		{HallNo: "WW 224", CourseCode: "22AG602*", RegisterNos: []string{
 			"7376242AG501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE402* (7 candidates)
 		{HallNo: "WW 224", CourseCode: "22EE402*", RegisterNos: []string{
 			"7376241EE115", "7376241EE130", "7376241EE147", "7376241EE157", "7376241EE193", "7376251EE510",
 			"7376251EE514",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT404* (3 candidates)
 		{HallNo: "WW 224", CourseCode: "22IT404*", RegisterNos: []string{
 			"7376252IT511", "7376252IT512", "7376252IT513",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB106* (4 candidates)
 		{HallNo: "WW 224", CourseCode: "22CB106*", RegisterNos: []string{
 			"7376242CB116", "7376242CB118", "7376242CB119", "7376242CB154",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM404* (3 candidates)
 		{HallNo: "WW 224", CourseCode: "22AM404*", RegisterNos: []string{
 			"7376242AL156", "7376242AL157", "7376242AL197",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
 
 // ============================================================================
-// 19-NOV-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 2176 Students
+// 19-NOV-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 2176 Students
 // ============================================================================
 func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -14210,14 +14210,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS113", "7376251CS114", "7376251CS115", "7376251CS116", "7376251CS117", "7376251CS118",
 			"7376251CS119", "7376251CS120", "7376251CS121", "7376251CS122", "7376251CS123", "7376251CS124",
 			"7376251CS125",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (20 candidates)
 		{HallNo: "ME 101", CourseCode: "22AI301", RegisterNos: []string{
 			"7376252AD101", "7376252AD102", "7376252AD103", "7376252AD104", "7376252AD105", "7376252AD106",
 			"7376252AD107", "7376252AD108", "7376252AD109", "7376252AD110", "7376252AD111", "7376252AD112",
 			"7376252AD113", "7376252AD114", "7376252AD115", "7376252AD116", "7376252AD117", "7376252AD118",
 			"7376252AD119", "7376252AD120",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 102 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14228,14 +14228,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS139", "7376251CS140", "7376251CS141", "7376251CS142", "7376251CS143", "7376251CS144",
 			"7376251CS145", "7376251CS146", "7376251CS147", "7376251CS148", "7376251CS149", "7376251CS150",
 			"7376251CS151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (20 candidates)
 		{HallNo: "ME 102", CourseCode: "22AI301", RegisterNos: []string{
 			"7376252AD121", "7376252AD122", "7376252AD123", "7376252AD124", "7376252AD125", "7376252AD126",
 			"7376252AD127", "7376252AD128", "7376252AD129", "7376252AD130", "7376252AD131", "7376252AD132",
 			"7376252AD133", "7376252AD134", "7376252AD135", "7376252AD136", "7376252AD137", "7376252AD138",
 			"7376252AD139", "7376252AD140",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 107 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14246,14 +14246,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS164", "7376251CS165", "7376251CS166", "7376251CS167", "7376251CS168", "7376251CS170",
 			"7376251CS171", "7376251CS172", "7376251CS173", "7376251CS174", "7376251CS175", "7376251CS176",
 			"7376251CS177",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (20 candidates)
 		{HallNo: "ME 107", CourseCode: "22AI301", RegisterNos: []string{
 			"7376252AD141", "7376252AD142", "7376252AD143", "7376252AD144", "7376252AD145", "7376252AD146",
 			"7376252AD147", "7376252AD148", "7376252AD149", "7376252AD150", "7376252AD151", "7376252AD152",
 			"7376252AD153", "7376252AD154", "7376252AD155", "7376252AD156", "7376252AD157", "7376252AD158",
 			"7376252AD159", "7376252AD160",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 108 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14264,14 +14264,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS190", "7376251CS191", "7376251CS192", "7376251CS193", "7376251CS194", "7376251CS195",
 			"7376251CS196", "7376251CS197", "7376251CS198", "7376251CS199", "7376251CS200", "7376251CS201",
 			"7376251CS202",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (20 candidates)
 		{HallNo: "ME 108", CourseCode: "22AI301", RegisterNos: []string{
 			"7376252AD161", "7376252AD162", "7376252AD163", "7376252AD164", "7376252AD165", "7376252AD166",
 			"7376252AD167", "7376252AD168", "7376252AD169", "7376252AD170", "7376252AD171", "7376252AD172",
 			"7376252AD173", "7376252AD174", "7376252AD175", "7376252AD176", "7376252AD177", "7376252AD178",
 			"7376252AD179", "7376252AD180",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14282,14 +14282,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS215", "7376251CS216", "7376251CS217", "7376251CS218", "7376251CS219", "7376251CS220",
 			"7376251CS221", "7376251CS222", "7376251CS223", "7376251CS224", "7376251CS225", "7376251CS226",
 			"7376251CS227",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (20 candidates)
 		{HallNo: "ME 201", CourseCode: "22AI301", RegisterNos: []string{
 			"7376252AD181", "7376252AD182", "7376252AD183", "7376252AD184", "7376252AD185", "7376252AD186",
 			"7376252AD187", "7376252AD188", "7376252AD189", "7376252AD190", "7376252AD191", "7376252AD192",
 			"7376252AD193", "7376252AD194", "7376252AD195", "7376252AD196", "7376252AD197", "7376252AD198",
 			"7376252AD199", "7376252AD200",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14300,14 +14300,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS242", "7376251CS243", "7376251CS244", "7376251CS245", "7376251CS246", "7376251CS247",
 			"7376251CS248", "7376251CS249", "7376251CS250", "7376251CS251", "7376251CS252", "7376251CS253",
 			"7376251CS228",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (20 candidates)
 		{HallNo: "ME 202", CourseCode: "22AI301", RegisterNos: []string{
 			"7376252AD201", "7376252AD202", "7376252AD203", "7376252AD204", "7376252AD205", "7376252AD206",
 			"7376252AD207", "7376252AD208", "7376252AD209", "7376252AD210", "7376252AD211", "7376252AD212",
 			"7376252AD213", "7376252AD214", "7376252AD215", "7376252AD216", "7376252AD217", "7376252AD218",
 			"7376252AD219", "7376252AD220",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14318,14 +14318,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS266", "7376251CS267", "7376251CS268", "7376251CS269", "7376251CS270", "7376251CS271",
 			"7376251CS272", "7376251CS273", "7376251CS274", "7376251CS275", "7376251CS276", "7376251CS277",
 			"7376251CS278",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (20 candidates)
 		{HallNo: "ME 203", CourseCode: "22AI301", RegisterNos: []string{
 			"7376252AD221", "7376252AD222", "7376252AD223", "7376252AD224", "7376252AD225", "7376252AD226",
 			"7376252AD227", "7376252AD228", "7376252AD229", "7376252AD230", "7376252AD231", "7376252AD232",
 			"7376252AD233", "7376252AD234", "7376252AD235", "7376252AD236", "7376252AD237", "7376252AD238",
 			"7376252AD239", "7376252AD240",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14336,14 +14336,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS291", "7376251CS292", "7376251CS293", "7376251CS294", "7376251CS295", "7376251CS296",
 			"7376251CS297", "7376251CS298", "7376251CS299", "7376251CS300", "7376251CS301", "7376251CS302",
 			"7376251CS303",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (20 candidates)
 		{HallNo: "ME 204", CourseCode: "22AI301", RegisterNos: []string{
 			"7376252AD241", "7376252AD242", "7376252AD243", "7376252AD244", "7376252AD245", "7376252AD246",
 			"7376252AD247", "7376252AD248", "7376252AD249", "7376252AD250", "7376252AD251", "7376252AD252",
 			"7376252AD253", "7376252AD254", "7376252AD255", "7376252AD256", "7376252AD257", "7376252AD258",
 			"7376252AD259", "7376252AD260",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14354,14 +14354,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS316", "7376251CS317", "7376251CS318", "7376251CS319", "7376251CS320", "7376251CS321",
 			"7376251CS322", "7376251CS323", "7376251CS324", "7376251CS325", "7376251CS326", "7376251CS327",
 			"7376251CS328",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (20 candidates)
 		{HallNo: "ME 205", CourseCode: "22AI301", RegisterNos: []string{
 			"7376252AD261", "7376252AD262", "7376252AD263", "7376252AD264", "7376252AD265", "7376252AD266",
 			"7376252AD267", "7376252AD268", "7376252AD269", "7376252AD270", "7376252AD271", "7376252AD272",
 			"7376252AD273", "7376252AD274", "7376252AD275", "7376252AD276", "7376252AD277", "7376252AD278",
 			"7376252AD279", "7376252AD280",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14372,14 +14372,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS341", "7376251CS342", "7376251CS343", "7376251CS344", "7376251CS345", "7376251CS346",
 			"7376251CS347", "7376251CS348", "7376251CS349", "7376251CS350", "7376251CS351", "7376251CS352",
 			"7376251CS353",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (20 candidates)
 		{HallNo: "ME 206", CourseCode: "22AI301", RegisterNos: []string{
 			"7376252AD281", "7376252AD282", "7376252AD283", "7376252AD284", "7376252AD285", "7376252AD286",
 			"7376252AD287", "7376252AD288", "7376252AD289", "7376252AD290", "7376252AD291", "7376252AD292",
 			"7376252AD293", "7376252AD294", "7376252AD295", "7376252AD296", "7376252AD297", "7376252AD298",
 			"7376252AD299", "7376252AD300",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 301 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14390,14 +14390,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS366", "7376251CS367", "7376251CS368", "7376251CS369", "7376251CS370", "7376251CS371",
 			"7376251CS373", "7376251CS374", "7376251CS375", "7376251CS376", "7376251CS377", "7376251CS378",
 			"7376251CS379",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (20 candidates)
 		{HallNo: "ME 301", CourseCode: "22AI301", RegisterNos: []string{
 			"7376252AD301", "7376252AD302", "7376252AD303", "7376252AD304", "7376252AD305", "7376252AD306",
 			"7376252AD307", "7376252AD308", "7376252AD309", "7376252AD310", "7376252AD311", "7376252AD312",
 			"7376252AD313", "7376252AD314", "7376252AD315", "7376252AD316", "7376252AD317", "7376252AD318",
 			"7376252AD319", "7376252AD320",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 302 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14408,14 +14408,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS392", "7376251CS393", "7376251CS394", "7376251CS395", "7376251CS396", "7376251CS397",
 			"7376251CS398", "7376251CS399", "7376251CS400", "7376251CS401", "7376251CS402", "7376251CS403",
 			"7376251CS404",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (20 candidates)
 		{HallNo: "ME 302", CourseCode: "22AI301", RegisterNos: []string{
 			"7376252AD321", "7376252AD322", "7376252AD323", "7376252AD324", "7376252AD325", "7376252AD326",
 			"7376252AD327", "7376252AD328", "7376252AD329", "7376252AD330", "7376252AD331", "7376252AD332",
 			"7376252AD333", "7376252AD334", "7376252AD335", "7376252AD336", "7376252AD337", "7376252AD338",
 			"7376252AD339", "7376252AD340",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 303 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14426,14 +14426,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS417", "7376251CS418", "7376251CS419", "7376251CS420", "7376251CS421", "7376251CS422",
 			"7376251CS423", "7376251CS424", "7376251CS425", "7376251CS426", "7376251CS427", "7376251CS428",
 			"7376251CS429",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (20 candidates)
 		{HallNo: "ME 303", CourseCode: "22AI301", RegisterNos: []string{
 			"7376252AD341", "7376252AD342", "7376252AD343", "7376252AD344", "7376252AD345", "7376252AD346",
 			"7376252AD347", "7376252AD348", "7376252AD349", "7376252AD350", "7376252AD351", "7376252AD352",
 			"7376252AD353", "7376252AD354", "7376252AD355", "7376252AD356", "7376252AD357", "7376252AD358",
 			"7376252AD359", "7376252AD360",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 304 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14444,14 +14444,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS442", "7376251CS443", "7376251CS444", "7376251CS445", "7376251CS446", "7376251CS447",
 			"7376251CS448", "7376251CS449", "7376251CS450", "7376251CS451", "7376251CS452", "7376251CS453",
 			"7376251CS454",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (20 candidates)
 		{HallNo: "ME 304", CourseCode: "22AI301", RegisterNos: []string{
 			"7376252AD361", "7376252AD362", "7376252AD363", "7376252AD364", "7376252AD365", "7376252AD366",
 			"7376252AD367", "7376252AD368", "7376252AD369", "7376252AD370", "7376252AD371", "7376252AD372",
 			"7376252AD373", "7376252AD374", "7376252AD375", "7376252AD376", "7376252AD377", "7376252AD378",
 			"7376252AD379", "7376252AD380",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 305 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14462,14 +14462,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251CS467", "7376251CS468", "7376251CS469", "7376251CS470", "7376251CS471", "7376251CS472",
 			"7376251CS473", "7376251CS474", "7376251CS475", "7376251CS476", "7376251CS477", "7376251CS478",
 			"7376251CS479",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (20 candidates)
 		{HallNo: "ME 305", CourseCode: "22AI301", RegisterNos: []string{
 			"7376262AD501", "7376262AD502", "7376262AD503", "7376262AD504", "7376262AD505", "7376262AD506",
 			"7376262AD507", "7376262AD508", "7376262AD509", "7376262AD510", "7376262AD511", "7376262AD512",
 			"7376262AD513", "7376262AD514", "7376262AD515", "7376262AD516", "7376262AD517", "7376262AD518",
 			"7376262AD519", "7376252AD381",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 306 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14479,21 +14479,21 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376261CS507", "7376261CS508", "7376261CS509", "7376261CS510", "7376261CS511", "7376261CS512",
 			"7376261CS513", "7376261CS514", "7376261CS516", "7376261CS517", "7376261CS518", "7376261CS519",
 			"7376261CS520", "7376261CS521", "7376261CS522", "7376261CS523", "7376261CS524",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC301 (2 candidates)
 		{HallNo: "ME 306", CourseCode: "22EC301", RegisterNos: []string{
 			"7376251EC101", "7376251EC102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (17 candidates)
 		{HallNo: "ME 306", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT102", "7376252IT103", "7376252IT104", "7376252IT105", "7376252IT106", "7376252IT107",
 			"7376252IT108", "7376252IT109", "7376252IT110", "7376252IT111", "7376252IT112", "7376252IT113",
 			"7376252IT114", "7376252IT115", "7376252IT116", "7376252IT117", "7376252IT118",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (3 candidates)
 		{HallNo: "ME 306", CourseCode: "22AI301", RegisterNos: []string{
 			"7376262AD520", "7376262AD521", "7376262AD522",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 001 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14503,14 +14503,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC109", "7376251EC110", "7376251EC111", "7376251EC112", "7376251EC113", "7376251EC114",
 			"7376251EC115", "7376251EC116", "7376251EC117", "7376251EC118", "7376251EC119", "7376251EC120",
 			"7376251EC121", "7376251EC122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (20 candidates)
 		{HallNo: "SF 001", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT119", "7376252IT120", "7376252IT121", "7376252IT122", "7376252IT123", "7376252IT124",
 			"7376252IT125", "7376252IT126", "7376252IT127", "7376252IT128", "7376252IT129", "7376252IT130",
 			"7376252IT131", "7376252IT132", "7376252IT133", "7376252IT134", "7376252IT135", "7376252IT136",
 			"7376252IT137", "7376252IT138",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 002 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14520,14 +14520,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC129", "7376251EC130", "7376251EC131", "7376251EC132", "7376251EC133", "7376251EC134",
 			"7376251EC135", "7376251EC136", "7376251EC137", "7376251EC138", "7376251EC139", "7376251EC140",
 			"7376251EC141", "7376251EC142",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (20 candidates)
 		{HallNo: "SF 002", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT139", "7376252IT140", "7376252IT141", "7376252IT142", "7376252IT143", "7376252IT144",
 			"7376252IT145", "7376252IT146", "7376252IT147", "7376252IT148", "7376252IT149", "7376252IT150",
 			"7376252IT151", "7376252IT152", "7376252IT153", "7376252IT154", "7376252IT155", "7376252IT156",
 			"7376252IT157", "7376252IT158",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 101 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14537,14 +14537,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC149", "7376251EC150", "7376251EC151", "7376251EC152", "7376251EC153", "7376251EC154",
 			"7376251EC155", "7376251EC156", "7376251EC157", "7376251EC158", "7376251EC159", "7376251EC160",
 			"7376251EC161", "7376251EC162",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (20 candidates)
 		{HallNo: "SF 101", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT159", "7376252IT160", "7376252IT161", "7376252IT162", "7376252IT163", "7376252IT164",
 			"7376252IT165", "7376252IT166", "7376252IT167", "7376252IT168", "7376252IT169", "7376252IT170",
 			"7376252IT171", "7376252IT172", "7376252IT173", "7376252IT174", "7376252IT175", "7376252IT176",
 			"7376252IT177", "7376252IT178",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 102 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14554,14 +14554,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC169", "7376251EC170", "7376251EC171", "7376251EC172", "7376251EC173", "7376251EC174",
 			"7376251EC175", "7376251EC176", "7376251EC177", "7376251EC178", "7376251EC179", "7376251EC180",
 			"7376251EC181", "7376251EC182",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (20 candidates)
 		{HallNo: "SF 102", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT179", "7376252IT180", "7376252IT181", "7376252IT182", "7376252IT183", "7376252IT184",
 			"7376252IT185", "7376252IT186", "7376252IT187", "7376252IT188", "7376252IT189", "7376252IT190",
 			"7376252IT191", "7376252IT192", "7376252IT193", "7376252IT194", "7376252IT195", "7376252IT196",
 			"7376252IT197", "7376252IT198",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 103 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14571,14 +14571,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC189", "7376251EC190", "7376251EC191", "7376251EC192", "7376251EC193", "7376251EC194",
 			"7376251EC195", "7376251EC196", "7376251EC197", "7376251EC198", "7376251EC199", "7376251EC200",
 			"7376251EC201", "7376251EC202",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (20 candidates)
 		{HallNo: "SF 103", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT199", "7376252IT200", "7376252IT201", "7376252IT202", "7376252IT203", "7376252IT204",
 			"7376252IT205", "7376252IT206", "7376252IT207", "7376252IT208", "7376252IT209", "7376252IT210",
 			"7376252IT211", "7376252IT212", "7376252IT213", "7376252IT214", "7376252IT215", "7376252IT216",
 			"7376252IT217", "7376252IT218",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14588,14 +14588,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC209", "7376251EC210", "7376251EC211", "7376251EC212", "7376251EC213", "7376251EC214",
 			"7376251EC215", "7376251EC216", "7376251EC217", "7376251EC218", "7376251EC219", "7376251EC220",
 			"7376251EC221", "7376251EC222",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (20 candidates)
 		{HallNo: "SF 201", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT219", "7376252IT220", "7376252IT221", "7376252IT222", "7376252IT223", "7376252IT224",
 			"7376252IT225", "7376252IT226", "7376252IT227", "7376252IT228", "7376252IT229", "7376252IT230",
 			"7376252IT231", "7376252IT232", "7376252IT233", "7376252IT234", "7376252IT235", "7376252IT236",
 			"7376252IT237", "7376252IT238",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14605,14 +14605,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC229", "7376251EC230", "7376251EC231", "7376251EC232", "7376251EC233", "7376251EC234",
 			"7376251EC235", "7376251EC236", "7376251EC237", "7376251EC238", "7376251EC239", "7376251EC240",
 			"7376251EC241", "7376251EC242",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (20 candidates)
 		{HallNo: "SF 202", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT239", "7376252IT240", "7376252IT241", "7376252IT242", "7376252IT243", "7376252IT244",
 			"7376252IT245", "7376252IT246", "7376252IT247", "7376252IT248", "7376252IT249", "7376252IT250",
 			"7376252IT251", "7376252IT252", "7376252IT253", "7376252IT254", "7376252IT255", "7376252IT256",
 			"7376252IT257", "7376252IT258",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B01 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14622,14 +14622,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC249", "7376251EC250", "7376251EC251", "7376251EC252", "7376251EC253", "7376251EC254",
 			"7376251EC255", "7376251EC256", "7376251EC257", "7376251EC258", "7376251EC259", "7376251EC260",
 			"7376251EC261", "7376251EC262",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (20 candidates)
 		{HallNo: "SF B01", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT259", "7376252IT260", "7376252IT261", "7376252IT262", "7376252IT263", "7376252IT264",
 			"7376252IT265", "7376252IT266", "7376252IT267", "7376252IT268", "7376252IT269", "7376252IT270",
 			"7376252IT271", "7376252IT272", "7376252IT273", "7376252IT274", "7376252IT275", "7376252IT276",
 			"7376252IT277", "7376252IT278",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B02 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14639,14 +14639,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC269", "7376251EC271", "7376251EC272", "7376251EC273", "7376251EC274", "7376251EC275",
 			"7376251EC276", "7376251EC277", "7376251EC278", "7376251EC279", "7376251EC280", "7376251EC281",
 			"7376251EC282", "7376251EC283",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (20 candidates)
 		{HallNo: "SF B02", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT279", "7376252IT280", "7376252IT281", "7376252IT282", "7376252IT283", "7376252IT284",
 			"7376252IT285", "7376252IT286", "7376252IT287", "7376252IT288", "7376252IT289", "7376252IT290",
 			"7376252IT291", "7376252IT292", "7376252IT293", "7376252IT294", "7376252IT295", "7376252IT296",
 			"7376252IT297", "7376252IT298",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: SF B03 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14656,14 +14656,14 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC290", "7376251EC291", "7376251EC292", "7376251EC293", "7376251EC294", "7376251EC295",
 			"7376251EC296", "7376251EC297", "7376251EC298", "7376251EC299", "7376251EC300", "7376251EC301",
 			"7376251EC302", "7376251EC303",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (20 candidates)
 		{HallNo: "SF B03", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT299", "7376252IT300", "7376252IT301", "7376252IT302", "7376252IT303", "7376252IT304",
 			"7376252IT305", "7376252IT306", "7376252IT307", "7376252IT308", "7376252IT309", "7376252IT310",
 			"7376252IT311", "7376252IT312", "7376252IT313", "7376252IT314", "7376252IT315", "7376252IT316",
 			"7376252IT317", "7376252IT318",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 002 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14671,12 +14671,12 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 002", CourseCode: "22EC301", RegisterNos: []string{
 			"7376251EC304", "7376251EC305", "7376251EC306", "7376251EC307", "7376251EC308", "7376251EC309",
 			"7376251EC310", "7376251EC311", "7376251EC312", "7376251EC313",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (10 candidates)
 		{HallNo: "WW 002", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT319", "7376252IT320", "7376252IT321", "7376252IT322", "7376252IT323", "7376252IT324",
 			"7376252IT325", "7376252IT326", "7376252IT327", "7376252IT328",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 003 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14684,12 +14684,12 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 003", CourseCode: "22EC301", RegisterNos: []string{
 			"7376251EC314", "7376251EC315", "7376251EC316", "7376251EC317", "7376251EC318", "7376251EC319",
 			"7376251EC320", "7376251EC321", "7376251EC322", "7376251EC323",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (10 candidates)
 		{HallNo: "WW 003", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT329", "7376252IT330", "7376252IT331", "7376252IT332", "7376252IT333", "7376252IT334",
 			"7376252IT335", "7376252IT336", "7376252IT338", "7376252IT339",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 004 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14697,12 +14697,12 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 004", CourseCode: "22EC301", RegisterNos: []string{
 			"7376251EC324", "7376251EC325", "7376251EC326", "7376251EC327", "7376251EC328", "7376251EC329",
 			"7376251EC330", "7376251EC331", "7376251EC332", "7376251EC333",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (10 candidates)
 		{HallNo: "WW 004", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT340", "7376252IT341", "7376252IT342", "7376252IT343", "7376252IT344", "7376252IT345",
 			"7376252IT346", "7376252IT347", "7376252IT348", "7376252IT349",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 008 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14711,12 +14711,12 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC334", "7376251EC335", "7376251EC336", "7376251EC337", "7376251EC338", "7376251EC339",
 			"7376251EC340", "7376251EC341", "7376251EC342", "7376251EC343", "7376251EC344", "7376251EC345",
 			"7376251EC346", "7376251EC347", "7376251EC348",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (10 candidates)
 		{HallNo: "WW 008", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT350", "7376252IT351", "7376252IT352", "7376252IT353", "7376252IT354", "7376252IT355",
 			"7376252IT356", "7376252IT357", "7376252IT358", "7376252IT359",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 011 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14725,12 +14725,12 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EC349", "7376251EC350", "7376251EC351", "7376251EC352", "7376261EC502", "7376261EC503",
 			"7376261EC504", "7376261EC505", "7376261EC506", "7376261EC507", "7376261EC508", "7376261EC509",
 			"7376261EC510", "7376261EC511", "7376261EC512",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (10 candidates)
 		{HallNo: "WW 011", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT360", "7376252IT361", "7376252IT362", "7376252IT363", "7376252IT364", "7376252IT365",
 			"7376252IT366", "7376252IT367", "7376252IT368", "7376252IT369",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 012 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14738,17 +14738,17 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 012", CourseCode: "22EC301", RegisterNos: []string{
 			"7376261EC513", "7376261EC514", "7376261EC515", "7376261EC516", "7376261EC517", "7376261EC518",
 			"7376261EC519", "7376261EC520",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (10 candidates)
 		{HallNo: "WW 012", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT370", "7376252IT371", "7376252IT372", "7376252IT373", "7376252IT374", "7376252IT375",
 			"7376252IT376", "7376252IT377", "7376252IT378", "7376252IT379",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM301 (7 candidates)
 		{HallNo: "WW 012", CourseCode: "22AM301", RegisterNos: []string{
 			"7376252AL101", "7376252AL102", "7376252AL103", "7376252AL104", "7376252AL105", "7376252AL106",
 			"7376252AL107",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 113 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14756,13 +14756,13 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 113", CourseCode: "22IT301", RegisterNos: []string{
 			"7376252IT380", "7376252IT381", "7376252IT382", "7376252IT383", "7376252IT384", "7376252IT385",
 			"7376252IT386", "7376252IT387", "7376252IT388", "7376262IT502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM301 (15 candidates)
 		{HallNo: "WW 113", CourseCode: "22AM301", RegisterNos: []string{
 			"7376252AL108", "7376252AL109", "7376252AL110", "7376252AL111", "7376252AL112", "7376252AL113",
 			"7376252AL114", "7376252AL115", "7376252AL116", "7376252AL117", "7376252AL118", "7376252AL119",
 			"7376252AL120", "7376252AL121", "7376252AL122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 114 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14770,30 +14770,30 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 114", CourseCode: "22IT301", RegisterNos: []string{
 			"7376262IT503", "7376262IT504", "7376262IT505", "7376262IT506", "7376262IT507", "7376262IT508",
 			"7376262IT509", "7376262IT510", "7376262IT511", "7376262IT512",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM301 (15 candidates)
 		{HallNo: "WW 114", CourseCode: "22AM301", RegisterNos: []string{
 			"7376252AL123", "7376252AL124", "7376252AL125", "7376252AL126", "7376252AL127", "7376252AL128",
 			"7376252AL129", "7376252AL130", "7376252AL131", "7376252AL132", "7376252AL133", "7376252AL134",
 			"7376252AL135", "7376252AL136", "7376252AL137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 115 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22BT301 (6 candidates)
 		{HallNo: "WW 115", CourseCode: "22BT301", RegisterNos: []string{
 			"7376252BT102", "7376252BT103", "7376252BT104", "7376252BT105", "7376252BT106", "7376252BT107",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (4 candidates)
 		{HallNo: "WW 115", CourseCode: "22IT301", RegisterNos: []string{
 			"7376262IT513", "7376262IT514", "7376262IT515", "7376262IT516",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM301 (15 candidates)
 		{HallNo: "WW 115", CourseCode: "22AM301", RegisterNos: []string{
 			"7376252AL138", "7376252AL139", "7376252AL140", "7376252AL141", "7376252AL142", "7376252AL143",
 			"7376252AL144", "7376252AL145", "7376252AL146", "7376252AL147", "7376252AL148", "7376252AL149",
 			"7376252AL150", "7376252AL151", "7376252AL152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 117 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14801,13 +14801,13 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 117", CourseCode: "22BT301", RegisterNos: []string{
 			"7376252BT108", "7376252BT109", "7376252BT110", "7376252BT111", "7376252BT112", "7376252BT113",
 			"7376252BT114", "7376252BT115", "7376252BT116", "7376252BT117",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM301 (15 candidates)
 		{HallNo: "WW 117", CourseCode: "22AM301", RegisterNos: []string{
 			"7376252AL153", "7376252AL154", "7376252AL155", "7376252AL156", "7376252AL157", "7376252AL158",
 			"7376252AL159", "7376252AL160", "7376252AL161", "7376252AL162", "7376252AL163", "7376252AL164",
 			"7376252AL165", "7376252AL166", "7376252AL167",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 118 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14815,13 +14815,13 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 118", CourseCode: "22BT301", RegisterNos: []string{
 			"7376252BT118", "7376252BT119", "7376252BT120", "7376252BT121", "7376252BT122", "7376252BT123",
 			"7376252BT124", "7376252BT125", "7376252BT126", "7376252BT127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM301 (15 candidates)
 		{HallNo: "WW 118", CourseCode: "22AM301", RegisterNos: []string{
 			"7376252AL168", "7376252AL169", "7376252AL170", "7376252AL171", "7376252AL172", "7376252AL173",
 			"7376252AL174", "7376252AL175", "7376252AL176", "7376252AL177", "7376252AL178", "7376252AL179",
 			"7376252AL180", "7376252AL181", "7376252AL182",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14832,7 +14832,7 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376252BT140", "7376252BT141", "7376252BT142", "7376252BT143", "7376252BT144", "7376252BT145",
 			"7376252BT146", "7376252BT147", "7376252BT148", "7376252BT149", "7376252BT150", "7376252BT151",
 			"7376252BT152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM301 (25 candidates)
 		{HallNo: "WW 202", CourseCode: "22AM301", RegisterNos: []string{
 			"7376252AL183", "7376252AL184", "7376252AL185", "7376252AL186", "7376252AL187", "7376252AL188",
@@ -14840,7 +14840,7 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376252AL195", "7376252AL196", "7376252AL197", "7376252AL198", "7376252AL199", "7376252AL200",
 			"7376252AL201", "7376252AL202", "7376252AL203", "7376252AL204", "7376252AL205", "7376252AL206",
 			"7376252AL207",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14848,13 +14848,13 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 203", CourseCode: "22BT301", RegisterNos: []string{
 			"7376252BT155", "7376252BT156", "7376252BT157", "7376252BT158", "7376252BT159", "7376252BT160",
 			"7376252BT161", "7376252BT162", "7376252BT163", "7376252BT153",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM301 (15 candidates)
 		{HallNo: "WW 203", CourseCode: "22AM301", RegisterNos: []string{
 			"7376252AL208", "7376252AL209", "7376252AL210", "7376252AL211", "7376252AL212", "7376252AL213",
 			"7376252AL214", "7376252AL215", "7376252AL216", "7376252AL217", "7376252AL218", "7376252AL219",
 			"7376252AL220", "7376252AL221", "7376252AL222",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14862,13 +14862,13 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 204", CourseCode: "22BT301", RegisterNos: []string{
 			"7376252BT164", "7376252BT165", "7376252BT166", "7376252BT167", "7376252BT168", "7376252BT169",
 			"7376252BT170", "7376252BT171", "7376252BT172", "7376252BT173",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM301 (15 candidates)
 		{HallNo: "WW 204", CourseCode: "22AM301", RegisterNos: []string{
 			"7376252AL223", "7376252AL224", "7376252AL225", "7376252AL226", "7376252AL227", "7376252AL228",
 			"7376252AL229", "7376252AL230", "7376252AL231", "7376252AL232", "7376252AL233", "7376252AL234",
 			"7376252AL235", "7376252AL236", "7376252AL237",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14876,13 +14876,13 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 205", CourseCode: "22BT301", RegisterNos: []string{
 			"7376252BT174", "7376252BT175", "7376252BT176", "7376252BT177", "7376252BT178", "7376252BT179",
 			"7376252BT180", "7376252BT181", "7376252BT182", "7376252BT183",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM301 (15 candidates)
 		{HallNo: "WW 205", CourseCode: "22AM301", RegisterNos: []string{
 			"7376252AL238", "7376252AL239", "7376252AL240", "7376252AL241", "7376252AL242", "7376252AL243",
 			"7376252AL244", "7376252AL245", "7376252AL246", "7376262AL501", "7376262AL502", "7376262AL503",
 			"7376262AL504", "7376262AL505", "7376262AL506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14890,16 +14890,16 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 206", CourseCode: "22EE301", RegisterNos: []string{
 			"7376251EE102", "7376251EE103", "7376251EE104", "7376251EE105", "7376251EE106", "7376251EE107",
 			"7376251EE108", "7376251EE109", "7376251EE111", "7376251EE112", "7376251EE113", "7376251EE114",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT301 (10 candidates)
 		{HallNo: "WW 206", CourseCode: "22BT301", RegisterNos: []string{
 			"7376252BT184", "7376252BT185", "7376252BT186", "7376252BT187", "7376252BT188", "7376252BT189",
 			"7376252BT191", "7376252BT192", "7376252BT193", "7376252BT194",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM301 (3 candidates)
 		{HallNo: "WW 206", CourseCode: "22AM301", RegisterNos: []string{
 			"7376262AL507", "7376262AL508", "7376262AL509",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 207 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14910,7 +14910,7 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EE127", "7376251EE128", "7376251EE129", "7376251EE130", "7376251EE131", "7376251EE132",
 			"7376251EE133", "7376251EE134", "7376251EE135", "7376251EE136", "7376251EE137", "7376251EE138",
 			"7376251EE139",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT301 (25 candidates)
 		{HallNo: "WW 207", CourseCode: "22BT301", RegisterNos: []string{
 			"7376252BT195", "7376252BT196", "7376252BT197", "7376252BT199", "7376252BT200", "7376252BT201",
@@ -14918,7 +14918,7 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376252BT208", "7376252BT209", "7376252BT210", "7376252BT211", "7376252BT212", "7376252BT213",
 			"7376252BT214", "7376252BT215", "7376252BT216", "7376252BT217", "7376252BT218", "7376252BT219",
 			"7376252BT220",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 208 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14927,15 +14927,15 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EE140", "7376251EE141", "7376251EE142", "7376251EE143", "7376251EE144", "7376251EE145",
 			"7376251EE146", "7376251EE147", "7376251EE148", "7376251EE149", "7376251EE150", "7376251EE151",
 			"7376251EE152", "7376251EE153", "7376251EE154",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC301 (6 candidates)
 		{HallNo: "WW 208", CourseCode: "22MC301", RegisterNos: []string{
 			"7376251MZ101", "7376251MZ102", "7376251MZ103", "7376251MZ104", "7376251MZ105", "7376251MZ106",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT301 (4 candidates)
 		{HallNo: "WW 208", CourseCode: "22BT301", RegisterNos: []string{
 			"7376252BT221", "7376252BT222", "7376252BT223", "7376252BT224",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 209 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14944,12 +14944,12 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EE155", "7376251EE156", "7376251EE157", "7376251EE158", "7376251EE159", "7376251EE160",
 			"7376251EE161", "7376251EE162", "7376251EE163", "7376251EE164", "7376251EE165", "7376251EE166",
 			"7376251EE167", "7376251EE168", "7376251EE169",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC301 (10 candidates)
 		{HallNo: "WW 209", CourseCode: "22MC301", RegisterNos: []string{
 			"7376251MZ107", "7376251MZ108", "7376251MZ109", "7376251MZ110", "7376251MZ111", "7376251MZ112",
 			"7376251MZ113", "7376251MZ114", "7376251MZ115", "7376251MZ116",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 210 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14958,12 +14958,12 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EE170", "7376251EE171", "7376251EE172", "7376251EE173", "7376251EE174", "7376251EE175",
 			"7376251EE176", "7376251EE177", "7376251EE178", "7376251EE179", "7376251EE180", "7376251EE181",
 			"7376251EE182", "7376251EE183", "7376251EE184",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC301 (10 candidates)
 		{HallNo: "WW 210", CourseCode: "22MC301", RegisterNos: []string{
 			"7376251MZ117", "7376251MZ118", "7376251MZ119", "7376251MZ120", "7376251MZ121", "7376251MZ122",
 			"7376251MZ123", "7376251MZ124", "7376251MZ125", "7376251MZ126",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 211 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14972,12 +14972,12 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EE185", "7376251EE186", "7376251EE187", "7376251EE188", "7376251EE189", "7376251EE190",
 			"7376251EE191", "7376251EE192", "7376251EE193", "7376251EE194", "7376251EE195", "7376251EE196",
 			"7376251EE197", "7376251EE198", "7376251EE199",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC301 (10 candidates)
 		{HallNo: "WW 211", CourseCode: "22MC301", RegisterNos: []string{
 			"7376251MZ127", "7376251MZ128", "7376251MZ129", "7376251MZ130", "7376251MZ131", "7376251MZ132",
 			"7376251MZ133", "7376251MZ134", "7376251MZ135", "7376251MZ136",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 212 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -14987,11 +14987,11 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376261EE502", "7376261EE503", "7376261EE504", "7376261EE505", "7376261EE506", "7376261EE507",
 			"7376261EE508", "7376261EE509", "7376261EE510", "7376261EE511", "7376261EE512", "7376261EE513",
 			"7376261EE514", "7376261EE515", "7376261EE516", "7376261EE517", "7376261EE518",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI301 (2 candidates)
 		{HallNo: "WW 212", CourseCode: "22EI301", RegisterNos: []string{
 			"7376251EI101", "7376251EI102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC301 (25 candidates)
 		{HallNo: "WW 212", CourseCode: "22MC301", RegisterNos: []string{
 			"7376251MZ137", "7376251MZ138", "7376251MZ139", "7376251MZ140", "7376251MZ141", "7376251MZ142",
@@ -14999,7 +14999,7 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251MZ149", "7376251MZ150", "7376251MZ151", "7376251MZ152", "7376251MZ153", "7376251MZ154",
 			"7376251MZ155", "7376251MZ156", "7376251MZ157", "7376251MZ158", "7376251MZ159", "7376251MZ160",
 			"7376251MZ161",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 213 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15008,15 +15008,15 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EI103", "7376251EI104", "7376251EI105", "7376251EI106", "7376251EI107", "7376251EI108",
 			"7376251EI109", "7376251EI110", "7376251EI111", "7376251EI112", "7376251EI113", "7376251EI114",
 			"7376251EI115", "7376251EI116", "7376251EI117",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME301 (5 candidates)
 		{HallNo: "WW 213", CourseCode: "22ME301", RegisterNos: []string{
 			"7376251ME102", "7376251ME103", "7376251ME104", "7376251ME105", "7376251ME106",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC301 (5 candidates)
 		{HallNo: "WW 213", CourseCode: "22MC301", RegisterNos: []string{
 			"7376261MZ502", "7376261MZ503", "7376261MZ504", "7376261MZ505", "7376251MZ162",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 214 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15025,12 +15025,12 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EI118", "7376251EI119", "7376251EI120", "7376251EI121", "7376251EI122", "7376251EI123",
 			"7376251EI124", "7376251EI125", "7376251EI126", "7376251EI127", "7376251EI128", "7376251EI129",
 			"7376251EI130", "7376251EI131", "7376251EI132",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME301 (10 candidates)
 		{HallNo: "WW 214", CourseCode: "22ME301", RegisterNos: []string{
 			"7376251ME107", "7376251ME108", "7376251ME109", "7376251ME110", "7376251ME111", "7376251ME112",
 			"7376251ME113", "7376251ME114", "7376251ME115", "7376251ME116",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 215 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15039,12 +15039,12 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 			"7376251EI135", "7376251EI136", "7376251EI137", "7376251EI138", "7376251EI139", "7376251EI140",
 			"7376251EI141", "7376251EI142", "7376251EI143", "7376251EI144", "7376251EI145", "7376251EI146",
 			"7376251EI147", "7376251EI148", "7376251EI133",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME301 (10 candidates)
 		{HallNo: "WW 215", CourseCode: "22ME301", RegisterNos: []string{
 			"7376251ME117", "7376251ME118", "7376251ME119", "7376251ME120", "7376251ME121", "7376251ME122",
 			"7376251ME123", "7376251ME124", "7376251ME125", "7376251ME126",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 216 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15052,12 +15052,12 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 216", CourseCode: "22EI301", RegisterNos: []string{
 			"7376251EI149", "7376251EI150", "7376251EI151", "7376251EI152", "7376251EI153", "7376251EI154",
 			"7376251EI155", "7376251EI156", "7376251EI157", "7376251EI158",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME301 (10 candidates)
 		{HallNo: "WW 216", CourseCode: "22ME301", RegisterNos: []string{
 			"7376251ME127", "7376251ME128", "7376251ME129", "7376251ME130", "7376251ME131", "7376251ME132",
 			"7376251ME133", "7376251ME134", "7376251ME135", "7376251ME136",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 217 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15065,16 +15065,16 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 217", CourseCode: "22EI301", RegisterNos: []string{
 			"7376251EI159", "7376251EI160", "7376251EI161", "7376261EI501", "7376261EI502", "7376261EI503",
 			"7376261EI504", "7376261EI505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME301 (10 candidates)
 		{HallNo: "WW 217", CourseCode: "22ME301", RegisterNos: []string{
 			"7376251ME137", "7376251ME138", "7376251ME139", "7376251ME140", "7376251ME141", "7376251ME142",
 			"7376251ME143", "7376251ME144", "7376251ME145", "7376251ME146",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG301 (2 candidates)
 		{HallNo: "WW 217", CourseCode: "22AG301", RegisterNos: []string{
 			"7376252AG101", "7376252AG102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 218 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15082,13 +15082,13 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 218", CourseCode: "22ME301", RegisterNos: []string{
 			"7376251ME147", "7376251ME148", "7376251ME149", "7376251ME150", "7376251ME151", "7376251ME152",
 			"7376251ME153", "7376251ME154", "7376251ME155", "7376251ME156",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG301 (15 candidates)
 		{HallNo: "WW 218", CourseCode: "22AG301", RegisterNos: []string{
 			"7376252AG103", "7376252AG104", "7376252AG105", "7376252AG106", "7376252AG107", "7376252AG108",
 			"7376252AG109", "7376252AG110", "7376252AG111", "7376252AG112", "7376252AG113", "7376252AG115",
 			"7376252AG116", "7376252AG117", "7376252AG118",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 219 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15096,12 +15096,12 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 219", CourseCode: "22ME301", RegisterNos: []string{
 			"7376251ME157", "7376251ME158", "7376251ME159", "7376251ME160", "7376261ME504", "7376261ME505",
 			"7376261ME506", "7376261ME507", "7376261ME501", "7376261ME502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG301 (9 candidates)
 		{HallNo: "WW 219", CourseCode: "22AG301", RegisterNos: []string{
 			"7376252AG119", "7376252AG120", "7376252AG121", "7376252AG122", "7376252AG123", "7376252AG124",
 			"7376252AG125", "7376252AG126", "7376252AG127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 220 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15109,19 +15109,19 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 220", CourseCode: "22EC301", RegisterNos: []string{
 			"7376231EC101", "7376231EC110", "7376231EC112", "7376231EC196", "7376231EC283", "7376231EC297",
 			"7376231EC305", "7376231EC331", "7376231EC334",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (5 candidates)
 		{HallNo: "WW 220", CourseCode: "22IT301", RegisterNos: []string{
 			"7376232IT113", "7376232IT118", "7376232IT139", "7376232IT152", "7376232IT228",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC301 (1 candidates)
 		{HallNo: "WW 220", CourseCode: "22EC301", RegisterNos: []string{
 			"7376241EC124",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (5 candidates)
 		{HallNo: "WW 220", CourseCode: "22IT301", RegisterNos: []string{
 			"7376242IT108", "7376242IT110", "7376242IT123", "7376242IT129", "7376242IT141",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 221 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15129,41 +15129,41 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 221", CourseCode: "22EC301", RegisterNos: []string{
 			"7376241EC133", "7376241EC137", "7376241EC138", "7376241EC139", "7376241EC142", "7376241EC145",
 			"7376241EC151", "7376241EC160", "7376241EC163", "7376241EC177",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (10 candidates)
 		{HallNo: "WW 221", CourseCode: "22IT301", RegisterNos: []string{
 			"7376242IT146", "7376242IT155", "7376242IT161", "7376242IT164", "7376242IT168", "7376242IT184",
 			"7376242IT188", "7376242IT214", "7376242IT217", "7376242IT227",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 222 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CS301 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22CS301", RegisterNos: []string{
 			"7376231CS102",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC301 (3 candidates)
 		{HallNo: "WW 222", CourseCode: "22EC301", RegisterNos: []string{
 			"7376241EC511", "7376241EC513", "7376241EC516",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (2 candidates)
 		{HallNo: "WW 222", CourseCode: "22IT301", RegisterNos: []string{
 			"7376242IT502", "7376242IT509",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC301 (21 candidates)
 		{HallNo: "WW 222", CourseCode: "22EC301", RegisterNos: []string{
 			"7376241EC201", "7376241EC243", "7376241EC256", "7376241EC273", "7376241EC282", "7376241EC284",
 			"7376241EC300", "7376241EC312", "7376241EC321", "7376241EC328", "7376241EC333", "7376241EC334",
 			"7376251EC506", "7376251EC507", "7376251EC509", "7376251EC513", "7376251EC515", "7376251EC516",
 			"7376251EC517", "7376251EC518", "7376251EC521",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT301 (23 candidates)
 		{HallNo: "WW 222", CourseCode: "22IT301", RegisterNos: []string{
 			"7376242IT257", "7376242IT287", "7376242IT292", "7376242IT293", "7376242IT297", "7376242IT300",
 			"7376242IT318", "7376242IT336", "7376242IT337", "7376242IT339", "7376242IT341", "7376242IT348",
 			"7376252IT501", "7376252IT502", "7376252IT503", "7376252IT505", "7376252IT508", "7376252IT509",
 			"7376252IT511", "7376252IT512", "7376252IT513", "7376252IT514", "7376252IT515",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15171,167 +15171,167 @@ func buildSeatingData19Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 223", CourseCode: "22CS301", RegisterNos: []string{
 			"7376231CS103", "7376231CS173", "7376231CS190", "7376231CS235", "7376231CS244", "7376231CS259",
 			"7376231CS269", "7376231CS292",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE301 (6 candidates)
 		{HallNo: "WW 223", CourseCode: "22EE301", RegisterNos: []string{
 			"7376231EE111", "7376231EE115", "7376231EE149", "7376231EE159", "7376241EE502", "7376241EE503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS301 (17 candidates)
 		{HallNo: "WW 223", CourseCode: "22CS301", RegisterNos: []string{
 			"7376241CS141", "7376241CS143", "7376241CS150", "7376241CS151", "7376241CS157", "7376241CS171",
 			"7376241CS190", "7376241CS196", "7376241CS230", "7376241CS257", "7376241CS272", "7376241CS279",
 			"7376241CS318", "7376241CS359", "7376241CS395", "7376241CS409", "7376241CS410",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE301 (19 candidates)
 		{HallNo: "WW 223", CourseCode: "22EE301", RegisterNos: []string{
 			"7376241EE115", "7376241EE127", "7376241EE130", "7376241EE132", "7376241EE145", "7376241EE146",
 			"7376241EE147", "7376241EE157", "7376241EE167", "7376241EE177", "7376241EE188", "7376241EE193",
 			"7376241EE198", "7376241EE208", "7376241EE211", "7376251EE502", "7376251EE504", "7376251EE506",
 			"7376251EE507",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CS301 (4 candidates)
 		{HallNo: "WW 224", CourseCode: "22CS301", RegisterNos: []string{
 			"7376241CS503", "7376241CS504", "7376241CS506", "7376241CS508",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI301 (7 candidates)
 		{HallNo: "WW 224", CourseCode: "22EI301", RegisterNos: []string{
 			"7376231EI124", "7376231EI128", "7376231EI143", "7376231EI151", "7376231EI153", "7376231EI156",
 			"7376231EI159",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC301 (11 candidates)
 		{HallNo: "WW 224", CourseCode: "22MC301", RegisterNos: []string{
 			"7376231MZ106", "7376231MZ107", "7376231MZ111", "7376231MZ113", "7376231MZ114", "7376231MZ115",
 			"7376231MZ119", "7376231MZ135", "7376231MZ143", "7376231MZ145", "7376231MZ148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CS301 (11 candidates)
 		{HallNo: "WW 224", CourseCode: "22CS301", RegisterNos: []string{
 			"7376241CS473", "7376251CS501", "7376251CS502", "7376251CS503", "7376251CS505", "7376251CS508",
 			"7376251CS509", "7376251CS510", "7376251CS512", "7376251CS518", "7376251CS521",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EE301 (5 candidates)
 		{HallNo: "WW 224", CourseCode: "22EE301", RegisterNos: []string{
 			"7376251EE508", "7376251EE510", "7376251EE512", "7376251EE514", "7376251EE517",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI301 (3 candidates)
 		{HallNo: "WW 224", CourseCode: "22EI301", RegisterNos: []string{
 			"7376241EI101", "7376241EI104", "7376241EI106",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC301 (9 candidates)
 		{HallNo: "WW 224", CourseCode: "22MC301", RegisterNos: []string{
 			"7376241MZ105", "7376241MZ108", "7376241MZ112", "7376241MZ120", "7376241MZ121", "7376241MZ124",
 			"7376241MZ127", "7376241MZ137", "7376241MZ139",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 225 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EI301 (2 candidates)
 		{HallNo: "WW 225", CourseCode: "22EI301", RegisterNos: []string{
 			"7376241EI501", "7376241EI503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME301 (1 candidates)
 		{HallNo: "WW 225", CourseCode: "22ME301", RegisterNos: []string{
 			"7376231ME101",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC301 (3 candidates)
 		{HallNo: "WW 225", CourseCode: "22MC301", RegisterNos: []string{
 			"7376241MZ501", "7376241MZ504", "7376241MZ505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT301 (7 candidates)
 		{HallNo: "WW 225", CourseCode: "22BT301", RegisterNos: []string{
 			"7376232BT115", "7376232BT124", "7376232BT134", "7376232BT142", "7376232BT148", "7376232BT176",
 			"7376232BT191",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (5 candidates)
 		{HallNo: "WW 225", CourseCode: "22AI301", RegisterNos: []string{
 			"7376232AD119", "7376232AD184", "7376232AD250", "7376242AD502", "7376242AD510",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI301 (9 candidates)
 		{HallNo: "WW 225", CourseCode: "22EI301", RegisterNos: []string{
 			"7376241EI111", "7376241EI119", "7376241EI123", "7376241EI133", "7376241EI142", "7376241EI146",
 			"7376241EI160", "7376251EI501", "7376251EI502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC301 (5 candidates)
 		{HallNo: "WW 225", CourseCode: "22MC301", RegisterNos: []string{
 			"7376241MZ143", "7376251MZ503", "7376251MZ504", "7376251MZ505", "7376251MZ506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT301 (7 candidates)
 		{HallNo: "WW 225", CourseCode: "22BT301", RegisterNos: []string{
 			"7376242BT120", "7376242BT145", "7376242BT156", "7376242BT160", "7376242BT174", "7376242BT182",
 			"7376242BT186",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI301 (11 candidates)
 		{HallNo: "WW 225", CourseCode: "22AI301", RegisterNos: []string{
 			"7376242AD137", "7376242AD189", "7376242AD190", "7376242AD291", "7376242AD320", "7376242AD326",
 			"7376252AD502", "7376252AD503", "7376252AD509", "7376252AD513", "7376252AD515",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 226 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CE301 (3 candidates)
 		{HallNo: "WW 226", CourseCode: "22CE301", RegisterNos: []string{
 			"7376231CE117", "7376241CE501", "7376241CE502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME301 (8 candidates)
 		{HallNo: "WW 226", CourseCode: "22ME301", RegisterNos: []string{
 			"7376231ME103", "7376231ME104", "7376231ME127", "7376231ME130", "7376231ME143", "7376231ME149",
 			"7376241ME501", "7376241ME505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM301 (4 candidates)
 		{HallNo: "WW 226", CourseCode: "22BM301", RegisterNos: []string{
 			"7376231BM107", "7376231BM132", "7376231BM137", "7376231BM148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IS301 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22IS301", RegisterNos: []string{
 			"7376231SE137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD301 (4 candidates)
 		{HallNo: "WW 226", CourseCode: "22CD301", RegisterNos: []string{
 			"7376231CD115", "7376231CD143", "7376241CD501", "7376241CD502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD301 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22FD301", RegisterNos: []string{
 			"7376232FD137",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB301 (2 candidates)
 		{HallNo: "WW 226", CourseCode: "22CB301", RegisterNos: []string{
 			"7376232CB123", "7376232CB133",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT301 (4 candidates)
 		{HallNo: "WW 226", CourseCode: "22CT301", RegisterNos: []string{
 			"7376232CT102", "7376232CT122", "7376232CT127", "7376242CT503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM301 (2 candidates)
 		{HallNo: "WW 226", CourseCode: "22AM301", RegisterNos: []string{
 			"7376242AL501", "7376242AL505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG301 (2 candidates)
 		{HallNo: "WW 226", CourseCode: "22AG301", RegisterNos: []string{
 			"7376232AG113", "7376232AG151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME301 (4 candidates)
 		{HallNo: "WW 226", CourseCode: "22ME301", RegisterNos: []string{
 			"7376241ME123", "7376241ME127", "7376251ME503", "7376251ME507",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT301 (1 candidates)
 		{HallNo: "WW 226", CourseCode: "22BT301", RegisterNos: []string{
 			"7376252BT501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB301 (5 candidates)
 		{HallNo: "WW 226", CourseCode: "22CB301", RegisterNos: []string{
 			"7376242CB116", "7376242CB118", "7376242CB119", "7376242CB147", "7376242CB154",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM301 (6 candidates)
 		{HallNo: "WW 226", CourseCode: "22AM301", RegisterNos: []string{
 			"7376242AL104", "7376242AL157", "7376242AL169", "7376242AL197", "7376242AL207", "7376252AL503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
 
 // ============================================================================
-// 19-NOV-2026 AFTERNOON SESSION (AN: 01:30 PM ? 04:30 PM) - Total: 268 Students
+// 19-NOV-2026 AFTERNOON SESSION (AN: 01:30 PM : 04:30 PM) - Total: 268 Students
 // ============================================================================
 func buildSeatingData19Nov2026AN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -15342,24 +15342,24 @@ func buildSeatingData19Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 202", CourseCode: "22CS402*", RegisterNos: []string{
 			"7376231CS103", "7376231CS190", "7376231CS235", "7376231CS244", "7376231CS259", "7376231CS292",
 			"7376231CS346",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC402* (9 candidates)
 		{HallNo: "WW 202", CourseCode: "22EC402*", RegisterNos: []string{
 			"7376231EC110", "7376231EC121", "7376231EC196", "7376231EC231", "7376231EC283", "7376231EC297",
 			"7376231EC305", "7376231EC331", "7376231EC334",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS402* (18 candidates)
 		{HallNo: "WW 202", CourseCode: "22CS402*", RegisterNos: []string{
 			"7376241CS103", "7376241CS118", "7376241CS120", "7376241CS141", "7376241CS142", "7376241CS145",
 			"7376241CS147", "7376241CS150", "7376241CS151", "7376241CS166", "7376241CS171", "7376241CS185",
 			"7376241CS190", "7376241CS204", "7376241CS223", "7376241CS230", "7376241CS248", "7376241CS251",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC402* (16 candidates)
 		{HallNo: "WW 202", CourseCode: "22EC402*", RegisterNos: []string{
 			"7376241EC109", "7376241EC116", "7376241EC124", "7376241EC133", "7376241EC137", "7376241EC138",
 			"7376241EC140", "7376241EC144", "7376241EC151", "7376241EC160", "7376241EC163", "7376241EC167",
 			"7376241EC170", "7376241EC177", "7376241EC184", "7376241EC201",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15367,60 +15367,60 @@ func buildSeatingData19Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 203", CourseCode: "22CS402*", RegisterNos: []string{
 			"7376241CS257", "7376241CS272", "7376241CS294", "7376241CS344", "7376241CS358", "7376241CS395",
 			"7376241CS406", "7376241CS474", "7376251CS501", "7376251CS502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC402* (15 candidates)
 		{HallNo: "WW 203", CourseCode: "22EC402*", RegisterNos: []string{
 			"7376241EC206", "7376241EC239", "7376241EC241", "7376241EC243", "7376241EC246", "7376241EC256",
 			"7376241EC261", "7376241EC273", "7376241EC278", "7376241EC280", "7376241EC282", "7376241EC284",
 			"7376241EC287", "7376241EC293", "7376241EC300",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EC402* (3 candidates)
 		{HallNo: "WW 204", CourseCode: "22EC402*", RegisterNos: []string{
 			"7376241EC513", "7376241EC515", "7376241EC516",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS402* (10 candidates)
 		{HallNo: "WW 204", CourseCode: "22CS402*", RegisterNos: []string{
 			"7376251CS503", "7376251CS505", "7376251CS506", "7376251CS507", "7376251CS508", "7376251CS509",
 			"7376251CS510", "7376251CS512", "7376251CS515", "7376251CS518",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC402* (12 candidates)
 		{HallNo: "WW 204", CourseCode: "22EC402*", RegisterNos: []string{
 			"7376241EC312", "7376241EC328", "7376241EC341", "7376241EC348", "7376251EC503", "7376251EC505",
 			"7376251EC506", "7376251EC507", "7376251EC508", "7376251EC509", "7376251EC510", "7376251EC511",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22IT402* (1 candidates)
 		{HallNo: "WW 205", CourseCode: "22IT402*", RegisterNos: []string{
 			"7376232IT228",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI402* (1 candidates)
 		{HallNo: "WW 205", CourseCode: "22AI402*", RegisterNos: []string{
 			"7376232AD250",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CS402* (2 candidates)
 		{HallNo: "WW 205", CourseCode: "22CS402*", RegisterNos: []string{
 			"7376251CS521", "7376251CS522",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC402* (7 candidates)
 		{HallNo: "WW 205", CourseCode: "22EC402*", RegisterNos: []string{
 			"7376251EC513", "7376251EC515", "7376251EC516", "7376251EC517", "7376251EC519", "7376251EC520",
 			"7376251EC521",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT402* (7 candidates)
 		{HallNo: "WW 205", CourseCode: "22IT402*", RegisterNos: []string{
 			"7376242IT106", "7376242IT107", "7376242IT108", "7376242IT110", "7376242IT123", "7376242IT139",
 			"7376242IT141",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI402* (7 candidates)
 		{HallNo: "WW 205", CourseCode: "22AI402*", RegisterNos: []string{
 			"7376242AD108", "7376242AD123", "7376242AD137", "7376242AD144", "7376242AD171", "7376242AD172",
 			"7376242AD189",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15428,145 +15428,145 @@ func buildSeatingData19Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 206", CourseCode: "22IT402*", RegisterNos: []string{
 			"7376242IT146", "7376242IT164", "7376242IT168", "7376242IT184", "7376242IT188", "7376242IT209",
 			"7376242IT214", "7376242IT217", "7376242IT224", "7376242IT227",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI402* (15 candidates)
 		{HallNo: "WW 206", CourseCode: "22AI402*", RegisterNos: []string{
 			"7376242AD209", "7376242AD216", "7376242AD218", "7376242AD236", "7376242AD242", "7376242AD265",
 			"7376242AD291", "7376242AD308", "7376242AD311", "7376242AD320", "7376242AD321", "7376242AD326",
 			"7376252AD501", "7376252AD503", "7376252AD506",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 207 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EE401 (2 candidates)
 		{HallNo: "WW 207", CourseCode: "22EE401", RegisterNos: []string{
 			"7376231EE111", "7376231EE115",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT405* (1 candidates)
 		{HallNo: "WW 207", CourseCode: "22BT405*", RegisterNos: []string{
 			"7376232BT142",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE401 (15 candidates)
 		{HallNo: "WW 207", CourseCode: "22EE401", RegisterNos: []string{
 			"7376241EE115", "7376241EE130", "7376241EE132", "7376241EE145", "7376241EE146", "7376241EE147",
 			"7376241EE157", "7376241EE188", "7376241EE193", "7376241EE208", "7376251EE504", "7376251EE506",
 			"7376251EE507", "7376251EE514", "7376251EE517",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT405* (1 candidates)
 		{HallNo: "WW 207", CourseCode: "22BT405*", RegisterNos: []string{
 			"7376242BT120",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT402* (19 candidates)
 		{HallNo: "WW 207", CourseCode: "22IT402*", RegisterNos: []string{
 			"7376242IT250", "7376242IT257", "7376242IT278", "7376242IT287", "7376242IT292", "7376242IT318",
 			"7376242IT319", "7376242IT336", "7376242IT339", "7376242IT341", "7376252IT502", "7376252IT503",
 			"7376252IT504", "7376252IT508", "7376252IT510", "7376252IT511", "7376252IT512", "7376252IT513",
 			"7376252IT514",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI402* (6 candidates)
 		{HallNo: "WW 207", CourseCode: "22AI402*", RegisterNos: []string{
 			"7376252AD509", "7376252AD510", "7376252AD511", "7376252AD512", "7376252AD513", "7376252AD515",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM402* (6 candidates)
 		{HallNo: "WW 207", CourseCode: "22AM402*", RegisterNos: []string{
 			"7376242AL101", "7376242AL102", "7376242AL104", "7376242AL109", "7376242AL114", "7376242AL144",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 208 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CB404 (2 candidates)
 		{HallNo: "WW 208", CourseCode: "22CB404", RegisterNos: []string{
 			"7376232CB106", "7376232CB133",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG017 (3 candidates)
 		{HallNo: "WW 208", CourseCode: "22AG017", RegisterNos: []string{
 			"7376232AG111", "7376232AG117", "7376232AG118",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT405* (10 candidates)
 		{HallNo: "WW 208", CourseCode: "22BT405*", RegisterNos: []string{
 			"7376242BT138", "7376242BT151", "7376242BT156", "7376242BT160", "7376242BT176", "7376242BT178",
 			"7376242BT193", "7376242BT205", "7376242BT220", "7376252BT501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB404 (3 candidates)
 		{HallNo: "WW 208", CourseCode: "22CB404", RegisterNos: []string{
 			"7376242CB129", "7376242CB147", "7376242CB154",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM402* (7 candidates)
 		{HallNo: "WW 208", CourseCode: "22AM402*", RegisterNos: []string{
 			"7376242AL147", "7376242AL148", "7376242AL153", "7376242AL156", "7376242AL157", "7376242AL190",
 			"7376242AL197",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 209 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EI402* (1 candidates)
 		{HallNo: "WW 209", CourseCode: "22EI402*", RegisterNos: []string{
 			"7376231EI159",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BM031 (1 candidates)
 		{HallNo: "WW 209", CourseCode: "22BM031", RegisterNos: []string{
 			"7376231BM107",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC402* (1 candidates)
 		{HallNo: "WW 209", CourseCode: "22MC402*", RegisterNos: []string{
 			"7376231MZ111",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22FD008 (5 candidates)
 		{HallNo: "WW 209", CourseCode: "22FD008", RegisterNos: []string{
 			"7376232FD107", "7376232FD114", "7376232FD118", "7376232FD132", "7376232FD137",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB404 (1 candidates)
 		{HallNo: "WW 209", CourseCode: "22CB404", RegisterNos: []string{
 			"7376242CB502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG017 (5 candidates)
 		{HallNo: "WW 209", CourseCode: "22AG017", RegisterNos: []string{
 			"7376232AG119", "7376232AG132", "7376232AG151", "7376242AG501", "7376242AG502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EI402* (5 candidates)
 		{HallNo: "WW 209", CourseCode: "22EI402*", RegisterNos: []string{
 			"7376241EI104", "7376241EI111", "7376241EI117", "7376241EI119", "7376251EI501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC402* (5 candidates)
 		{HallNo: "WW 209", CourseCode: "22MC402*", RegisterNos: []string{
 			"7376241MZ124", "7376241MZ127", "7376241MZ139", "7376251MZ504", "7376251MZ505",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB404 (1 candidates)
 		{HallNo: "WW 209", CourseCode: "22CB404", RegisterNos: []string{
 			"7376242CB155",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 210 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CE602 (3 candidates)
 		{HallNo: "WW 210", CourseCode: "22CE602", RegisterNos: []string{
 			"7376231CE117", "7376231CE120", "7376241CE501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22ME602* (3 candidates)
 		{HallNo: "WW 210", CourseCode: "22ME602*", RegisterNos: []string{
 			"7376231ME117", "7376231ME130", "7376231ME149",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BM031 (3 candidates)
 		{HallNo: "WW 210", CourseCode: "22BM031", RegisterNos: []string{
 			"7376231BM134", "7376231BM137", "7376231BM148",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CD402* (4 candidates)
 		{HallNo: "WW 210", CourseCode: "22CD402*", RegisterNos: []string{
 			"7376231CD111", "7376231CD143", "7376241CD501", "7376241CD502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CT402* (2 candidates)
 		{HallNo: "WW 210", CourseCode: "22CT402*", RegisterNos: []string{
 			"7376232CT122", "7376242CT503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22ME402* (3 candidates)
 		{HallNo: "WW 210", CourseCode: "22ME402*", RegisterNos: []string{
 			"7376241ME144", "7376241ME146", "7376251ME503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 	}
 }
 
 // ============================================================================
-// 20-NOV-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 1428 Students
+// 20-NOV-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 1428 Students
 // ============================================================================
 func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -15579,7 +15579,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS129", "7376231CS130", "7376231CS131", "7376231CS134", "7376231CS135", "7376231CS136",
 			"7376231CS105", "7376231CS107", "7376231CS109", "7376231CS111", "7376231CS113", "7376231CS121",
 			"7376231CS123", "7376231CS124",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC044 (25 candidates)
 		{HallNo: "ME 102", CourseCode: "22EC044", RegisterNos: []string{
 			"7376231EC101", "7376231EC102", "7376231EC103", "7376231EC104", "7376231EC105", "7376231EC106",
@@ -15587,7 +15587,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC118", "7376231EC119", "7376231EC120", "7376231EC121", "7376231EC122", "7376231EC123",
 			"7376231EC124", "7376231EC125", "7376231EC126", "7376231EC127", "7376231EC115", "7376231EC116",
 			"7376231EC129",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 107 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15597,7 +15597,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS148", "7376231CS149", "7376231CS150", "7376231CS151", "7376231CS155", "7376231CS156",
 			"7376231CS157", "7376231CS142", "7376231CS143", "7376231CS159", "7376231CS160", "7376231CS162",
 			"7376231CS163", "7376231CS168",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC044 (25 candidates)
 		{HallNo: "ME 107", CourseCode: "22EC044", RegisterNos: []string{
 			"7376231EC130", "7376231EC131", "7376231EC132", "7376231EC133", "7376231EC134", "7376231EC135",
@@ -15605,7 +15605,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC145", "7376231EC146", "7376231EC147", "7376231EC148", "7376231EC149", "7376231EC150",
 			"7376231EC151", "7376231EC152", "7376231EC153", "7376231EC143", "7376231EC155", "7376231EC157",
 			"7376231EC159",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15615,7 +15615,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS180", "7376231CS183", "7376231CS184", "7376231CS185", "7376231CS186", "7376231CS187",
 			"7376231CS193", "7376231CS194", "7376231CS195", "7376231CS196", "7376231CS169", "7376231CS171",
 			"7376231CS202", "7376231CS203",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC044 (25 candidates)
 		{HallNo: "ME 201", CourseCode: "22EC044", RegisterNos: []string{
 			"7376231EC160", "7376231EC161", "7376231EC162", "7376231EC163", "7376231EC164", "7376231EC165",
@@ -15623,7 +15623,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC174", "7376231EC175", "7376231EC176", "7376231EC177", "7376231EC178", "7376231EC179",
 			"7376231EC180", "7376231EC181", "7376231EC182", "7376231EC183", "7376231EC184", "7376231EC185",
 			"7376231EC186",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15633,7 +15633,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS224", "7376231CS225", "7376231CS226", "7376231CS227", "7376231CS228", "7376231CS238",
 			"7376231CS239", "7376231CS240", "7376231CS209", "7376231CS212", "7376231CS213", "7376231CS216",
 			"7376231CS218", "7376231CS242",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC044 (25 candidates)
 		{HallNo: "ME 202", CourseCode: "22EC044", RegisterNos: []string{
 			"7376231EC187", "7376231EC188", "7376231EC189", "7376231EC190", "7376231EC191", "7376231EC192",
@@ -15641,7 +15641,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC208", "7376231EC210", "7376231EC211", "7376231EC212", "7376231EC213", "7376231EC214",
 			"7376231EC215", "7376231EC216", "7376231EC198", "7376231EC199", "7376231EC201", "7376231EC202",
 			"7376231EC204",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15651,7 +15651,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS252", "7376231CS253", "7376231CS243", "7376231CS256", "7376231CS258", "7376231CS263",
 			"7376231CS265", "7376231CS266", "7376231CS268", "7376231CS269", "7376231CS272", "7376231CS273",
 			"7376231CS275", "7376231CS276",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC044 (25 candidates)
 		{HallNo: "ME 203", CourseCode: "22EC044", RegisterNos: []string{
 			"7376231EC217", "7376231EC218", "7376231EC219", "7376231EC220", "7376231EC221", "7376231EC222",
@@ -15659,7 +15659,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC229", "7376231EC230", "7376231EC231", "7376231EC232", "7376231EC233", "7376231EC234",
 			"7376231EC235", "7376231EC236", "7376231EC238", "7376231EC239", "7376231EC240", "7376231EC242",
 			"7376231EC243",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15669,7 +15669,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS285", "7376231CS286", "7376231CS287", "7376231CS296", "7376231CS297", "7376231CS298",
 			"7376231CS299", "7376231CS290", "7376231CS291", "7376231CS293", "7376231CS294", "7376231CS301",
 			"7376231CS304", "7376231CS306",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC044 (25 candidates)
 		{HallNo: "ME 204", CourseCode: "22EC044", RegisterNos: []string{
 			"7376231EC247", "7376231EC248", "7376231EC249", "7376231EC250", "7376231EC251", "7376231EC252",
@@ -15677,7 +15677,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC259", "7376231EC260", "7376231EC261", "7376231EC262", "7376231EC263", "7376231EC265",
 			"7376231EC266", "7376231EC267", "7376231EC268", "7376231EC269", "7376231EC270", "7376231EC244",
 			"7376231EC245",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15687,7 +15687,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS325", "7376231CS336", "7376231CS337", "7376231CS338", "7376231CS339", "7376231CS341",
 			"7376231CS342", "7376231CS343", "7376231CS307", "7376231CS308", "7376231CS316", "7376231CS328",
 			"7376231CS331", "7376231CS332",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC044 (25 candidates)
 		{HallNo: "ME 205", CourseCode: "22EC044", RegisterNos: []string{
 			"7376231EC271", "7376231EC272", "7376231EC273", "7376231EC274", "7376231EC275", "7376231EC276",
@@ -15695,7 +15695,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC283", "7376231EC285", "7376231EC286", "7376231EC287", "7376231EC288", "7376231EC289",
 			"7376231EC290", "7376231EC291", "7376231EC292", "7376231EC293", "7376231EC294", "7376231EC295",
 			"7376231EC296",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15705,7 +15705,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376241CS503", "7376241CS504", "7376241CS505", "7376241CS506", "7376241CS507", "7376241CS510",
 			"7376241CS511", "7376241CS512", "7376241CS513", "7376241CS514", "7376241CS515", "7376231CS346",
 			"7376231CS354", "7376241CS518",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC044 (25 candidates)
 		{HallNo: "ME 206", CourseCode: "22EC044", RegisterNos: []string{
 			"7376231EC297", "7376231EC298", "7376231EC299", "7376231EC300", "7376231EC301", "7376231EC302",
@@ -15713,14 +15713,14 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC309", "7376231EC310", "7376231EC311", "7376231EC312", "7376231EC313", "7376231EC314",
 			"7376231EC315", "7376231EC316", "7376231EC317", "7376231EC318", "7376231EC319", "7376231EC320",
 			"7376231EC321",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 301 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CS016 (1 candidates)
 		{HallNo: "ME 301", CourseCode: "22CS016", RegisterNos: []string{
 			"7376241CS519",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EC044 (25 candidates)
 		{HallNo: "ME 301", CourseCode: "22EC044", RegisterNos: []string{
 			"7376231EC322", "7376231EC323", "7376231EC324", "7376231EC325", "7376231EC326", "7376231EC327",
@@ -15728,14 +15728,14 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EC334", "7376241EC501", "7376241EC502", "7376241EC503", "7376241EC504", "7376241EC505",
 			"7376241EC506", "7376241EC507", "7376241EC508", "7376241EC509", "7376241EC510", "7376241EC511",
 			"7376241EC512",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI042 (19 candidates)
 		{HallNo: "ME 301", CourseCode: "22AI042", RegisterNos: []string{
 			"7376232AD108", "7376232AD109", "7376232AD110", "7376232AD112", "7376232AD113", "7376232AD114",
 			"7376232AD115", "7376232AD119", "7376232AD120", "7376232AD121", "7376232AD122", "7376232AD123",
 			"7376232AD124", "7376232AD125", "7376232AD126", "7376232AD101", "7376232AD102", "7376232AD104",
 			"7376232AD106",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 302 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15743,20 +15743,20 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "ME 302", CourseCode: "22EC044", RegisterNos: []string{
 			"7376241EC513", "7376241EC514", "7376241EC515", "7376241EC516", "7376241EC517", "7376241EC518",
 			"7376241EC519", "7376241EC520", "7376241EC521", "7376241EC522",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI042 (20 candidates)
 		{HallNo: "ME 302", CourseCode: "22AI042", RegisterNos: []string{
 			"7376232AD127", "7376232AD128", "7376232AD129", "7376232AD131", "7376232AD132", "7376232AD133",
 			"7376232AD134", "7376232AD135", "7376232AD136", "7376232AD137", "7376232AD138", "7376232AD139",
 			"7376232AD140", "7376232AD141", "7376232AD142", "7376232AD144", "7376232AD145", "7376232AD146",
 			"7376232AD147", "7376232AD148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM007 (15 candidates)
 		{HallNo: "ME 302", CourseCode: "22AM007", RegisterNos: []string{
 			"7376232AL102", "7376232AL103", "7376232AL104", "7376232AL105", "7376232AL106", "7376232AL107",
 			"7376232AL108", "7376232AL109", "7376232AL110", "7376232AL111", "7376232AL113", "7376232AL114",
 			"7376232AL115", "7376232AL116", "7376232AL117",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: ME 303 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15766,7 +15766,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AD158", "7376232AD159", "7376232AD166", "7376232AD167", "7376232AD168", "7376232AD169",
 			"7376232AD170", "7376232AD171", "7376232AD172", "7376232AD173", "7376232AD174", "7376232AD161",
 			"7376232AD163", "7376232AD164",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM007 (25 candidates)
 		{HallNo: "ME 303", CourseCode: "22AM007", RegisterNos: []string{
 			"7376232AL118", "7376232AL119", "7376232AL120", "7376232AL121", "7376232AL122", "7376232AL123",
@@ -15774,7 +15774,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AL130", "7376232AL131", "7376232AL132", "7376232AL133", "7376232AL134", "7376232AL135",
 			"7376232AL136", "7376232AL137", "7376232AL138", "7376232AL139", "7376232AL140", "7376232AL141",
 			"7376232AL142",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 008 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15782,13 +15782,13 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 008", CourseCode: "22AI042", RegisterNos: []string{
 			"7376232AD175", "7376232AD176", "7376232AD177", "7376232AD181", "7376232AD182", "7376232AD183",
 			"7376232AD184", "7376232AD185", "7376232AD186", "7376232AD179",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM007 (15 candidates)
 		{HallNo: "WW 008", CourseCode: "22AM007", RegisterNos: []string{
 			"7376232AL144", "7376232AL145", "7376232AL146", "7376232AL147", "7376232AL148", "7376232AL149",
 			"7376232AL150", "7376232AL152", "7376232AL153", "7376232AL154", "7376232AL155", "7376232AL156",
 			"7376232AL157", "7376232AL158", "7376232AL159",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 011 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15796,13 +15796,13 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 011", CourseCode: "22AI042", RegisterNos: []string{
 			"7376232AD190", "7376232AD191", "7376232AD192", "7376232AD194", "7376232AD195", "7376232AD196",
 			"7376232AD187", "7376232AD188", "7376232AD198", "7376232AD199",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM007 (15 candidates)
 		{HallNo: "WW 011", CourseCode: "22AM007", RegisterNos: []string{
 			"7376232AL160", "7376232AL161", "7376232AL162", "7376232AL163", "7376232AL164", "7376232AL165",
 			"7376232AL166", "7376232AL167", "7376232AL168", "7376232AL169", "7376232AL171", "7376232AL172",
 			"7376232AL173", "7376232AL174", "7376232AL175",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 012 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15810,13 +15810,13 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 012", CourseCode: "22AI042", RegisterNos: []string{
 			"7376232AD200", "7376232AD201", "7376232AD202", "7376232AD203", "7376232AD204", "7376232AD205",
 			"7376232AD206", "7376232AD207", "7376232AD208", "7376232AD209",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM007 (15 candidates)
 		{HallNo: "WW 012", CourseCode: "22AM007", RegisterNos: []string{
 			"7376232AL176", "7376232AL177", "7376232AL178", "7376232AL179", "7376232AL180", "7376232AL181",
 			"7376232AL182", "7376232AL183", "7376232AL184", "7376232AL185", "7376232AL186", "7376232AL187",
 			"7376232AL188", "7376232AL189", "7376232AL190",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 113 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15824,13 +15824,13 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 113", CourseCode: "22AI042", RegisterNos: []string{
 			"7376232AD210", "7376232AD211", "7376232AD212", "7376232AD213", "7376232AD215", "7376232AD216",
 			"7376232AD217", "7376232AD219", "7376232AD221", "7376232AD222",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM007 (15 candidates)
 		{HallNo: "WW 113", CourseCode: "22AM007", RegisterNos: []string{
 			"7376232AL196", "7376232AL197", "7376232AL198", "7376232AL199", "7376232AL200", "7376232AL201",
 			"7376232AL202", "7376232AL203", "7376232AL204", "7376232AL205", "7376232AL206", "7376232AL191",
 			"7376232AL193", "7376232AL208", "7376232AL210",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 114 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15838,13 +15838,13 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 114", CourseCode: "22AI042", RegisterNos: []string{
 			"7376232AD225", "7376232AD226", "7376232AD227", "7376232AD229", "7376232AD230", "7376232AD231",
 			"7376232AD232", "7376232AD233", "7376232AD234", "7376232AD235",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM007 (15 candidates)
 		{HallNo: "WW 114", CourseCode: "22AM007", RegisterNos: []string{
 			"7376232AL211", "7376232AL212", "7376232AL213", "7376232AL214", "7376232AL215", "7376232AL216",
 			"7376232AL217", "7376232AL218", "7376232AL219", "7376232AL220", "7376232AL221", "7376242AL501",
 			"7376242AL502", "7376242AL503", "7376242AL504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 115 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15852,16 +15852,16 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 115", CourseCode: "22IT013", RegisterNos: []string{
 			"7376232IT149", "7376232IT150", "7376232IT151", "7376232IT105", "7376232IT109", "7376232IT111",
 			"7376232IT112", "7376232IT122", "7376232IT138", "7376232IT142", "7376232IT143", "7376232IT145",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI042 (10 candidates)
 		{HallNo: "WW 115", CourseCode: "22AI042", RegisterNos: []string{
 			"7376232AD246", "7376232AD247", "7376232AD248", "7376232AD249", "7376232AD236", "7376232AD237",
 			"7376232AD239", "7376232AD240", "7376232AD242", "7376232AD243",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AM007 (3 candidates)
 		{HallNo: "WW 115", CourseCode: "22AM007", RegisterNos: []string{
 			"7376242AL505", "7376242AL506", "7376242AL507",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 117 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15870,12 +15870,12 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT156", "7376232IT157", "7376232IT158", "7376232IT152", "7376232IT160", "7376232IT161",
 			"7376232IT164", "7376232IT168", "7376232IT172", "7376232IT173", "7376232IT177", "7376232IT181",
 			"7376232IT187", "7376232IT189", "7376232IT193",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI042 (10 candidates)
 		{HallNo: "WW 117", CourseCode: "22AI042", RegisterNos: []string{
 			"7376232AD257", "7376232AD258", "7376232AD259", "7376232AD260", "7376232AD261", "7376232AD262",
 			"7376232AD263", "7376232AD264", "7376232AD250", "7376232AD255",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 118 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15884,12 +15884,12 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT221", "7376232IT222", "7376232IT223", "7376232IT194", "7376232IT195", "7376232IT199",
 			"7376232IT202", "7376232IT207", "7376232IT211", "7376232IT212", "7376232IT214", "7376232IT215",
 			"7376232IT217", "7376232IT225", "7376232IT228",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI042 (10 candidates)
 		{HallNo: "WW 118", CourseCode: "22AI042", RegisterNos: []string{
 			"7376232AD265", "7376232AD266", "7376232AD267", "7376232AD268", "7376232AD269", "7376232AD270",
 			"7376232AD271", "7376232AD272", "7376232AD273", "7376232AD274",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15900,18 +15900,18 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232IT271", "7376232IT229", "7376232IT238", "7376232IT240", "7376232IT249", "7376232IT252",
 			"7376232IT253", "7376232IT257", "7376232IT258", "7376232IT274", "7376232IT276", "7376232IT279",
 			"7376232IT280",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT016 (5 candidates)
 		{HallNo: "WW 202", CourseCode: "22IT016", RegisterNos: []string{
 			"7376232IT101", "7376232IT102", "7376232IT103", "7376232IT107", "7376232IT108",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AI042 (20 candidates)
 		{HallNo: "WW 202", CourseCode: "22AI042", RegisterNos: []string{
 			"7376232AD275", "7376232AD276", "7376232AD277", "7376232AD281", "7376232AD282", "7376232AD283",
 			"7376232AD284", "7376232AD285", "7376232AD286", "7376242AD501", "7376242AD502", "7376242AD503",
 			"7376242AD504", "7376242AD505", "7376242AD506", "7376242AD507", "7376242AD508", "7376242AD509",
 			"7376242AD510", "7376232AD279",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15919,17 +15919,17 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 203", CourseCode: "22MC012", RegisterNos: []string{
 			"7376231MZ101", "7376231MZ102", "7376231MZ103", "7376231MZ104", "7376231MZ105", "7376231MZ106",
 			"7376231MZ107",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT013 (8 candidates)
 		{HallNo: "WW 203", CourseCode: "22IT013", RegisterNos: []string{
 			"7376242IT502", "7376242IT503", "7376242IT504", "7376242IT507", "7376242IT508", "7376242IT509",
 			"7376232IT281", "7376232IT285",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT016 (10 candidates)
 		{HallNo: "WW 203", CourseCode: "22IT016", RegisterNos: []string{
 			"7376232IT115", "7376232IT116", "7376232IT117", "7376232IT118", "7376232IT119", "7376232IT110",
 			"7376232IT113", "7376232IT121", "7376232IT123", "7376232IT124",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15938,12 +15938,12 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231MZ110", "7376231MZ111", "7376231MZ112", "7376231MZ113", "7376231MZ114", "7376231MZ115",
 			"7376231MZ116", "7376231MZ117", "7376231MZ118", "7376231MZ119", "7376231MZ120", "7376231MZ121",
 			"7376231MZ122", "7376231MZ123", "7376231MZ108",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT016 (10 candidates)
 		{HallNo: "WW 204", CourseCode: "22IT016", RegisterNos: []string{
 			"7376232IT132", "7376232IT133", "7376232IT134", "7376232IT146", "7376232IT147", "7376232IT148",
 			"7376232IT125", "7376232IT127", "7376232IT129", "7376232IT139",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15952,12 +15952,12 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231MZ124", "7376231MZ125", "7376231MZ126", "7376231MZ127", "7376231MZ128", "7376231MZ129",
 			"7376231MZ131", "7376231MZ132", "7376231MZ133", "7376231MZ134", "7376231MZ135", "7376231MZ136",
 			"7376231MZ137", "7376231MZ138", "7376231MZ139",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT016 (10 candidates)
 		{HallNo: "WW 205", CourseCode: "22IT016", RegisterNos: []string{
 			"7376232IT169", "7376232IT170", "7376232IT171", "7376232IT153", "7376232IT162", "7376232IT163",
 			"7376232IT165", "7376232IT166", "7376232IT176", "7376232IT186",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15966,12 +15966,12 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231MZ140", "7376231MZ141", "7376231MZ142", "7376231MZ143", "7376231MZ144", "7376231MZ145",
 			"7376231MZ146", "7376231MZ147", "7376231MZ148", "7376231MZ149", "7376231MZ150", "7376231MZ151",
 			"7376231MZ152", "7376231MZ153", "7376231MZ154",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT016 (10 candidates)
 		{HallNo: "WW 206", CourseCode: "22IT016", RegisterNos: []string{
 			"7376232IT190", "7376232IT191", "7376232IT192", "7376232IT188", "7376232IT201", "7376232IT205",
 			"7376232IT206", "7376232IT209", "7376232IT210", "7376232IT213",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 207 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -15980,23 +15980,23 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EE102", "7376231EE103", "7376231EE104", "7376231EE105", "7376231EE106", "7376231EE107",
 			"7376231EE108", "7376231EE110", "7376231EE111", "7376231EE112", "7376231EE113", "7376231EE114",
 			"7376231EE115", "7376231EE116", "7376231EE117",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22MC012 (10 candidates)
 		{HallNo: "WW 207", CourseCode: "22MC012", RegisterNos: []string{
 			"7376231MZ155", "7376231MZ156", "7376231MZ157", "7376231MZ158", "7376241MZ501", "7376241MZ502",
 			"7376241MZ503", "7376241MZ504", "7376241MZ505", "7376241MZ506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT047 (1 candidates)
 		{HallNo: "WW 207", CourseCode: "22BT047", RegisterNos: []string{
 			"7376232BT101",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IT016 (24 candidates)
 		{HallNo: "WW 207", CourseCode: "22IT016", RegisterNos: []string{
 			"7376232IT233", "7376232IT234", "7376232IT235", "7376232IT236", "7376232IT237", "7376232IT216",
 			"7376232IT218", "7376232IT220", "7376232IT224", "7376232IT230", "7376232IT231", "7376232IT239",
 			"7376232IT248", "7376232IT250", "7376232IT255", "7376232IT256", "7376232IT272", "7376232IT275",
 			"7376232IT277", "7376232IT278", "7376232IT284", "7376232IT286", "7376242IT501", "7376242IT511",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 208 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16005,12 +16005,12 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EE118", "7376231EE119", "7376231EE120", "7376231EE121", "7376231EE122", "7376231EE123",
 			"7376231EE124", "7376231EE125", "7376231EE126", "7376231EE127", "7376231EE128", "7376231EE129",
 			"7376231EE130", "7376231EE131", "7376231EE132",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT047 (10 candidates)
 		{HallNo: "WW 208", CourseCode: "22BT047", RegisterNos: []string{
 			"7376232BT114", "7376232BT115", "7376232BT116", "7376232BT118", "7376232BT119", "7376232BT120",
 			"7376232BT103", "7376232BT104", "7376232BT108", "7376232BT110",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 209 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16019,12 +16019,12 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EE136", "7376231EE137", "7376231EE138", "7376231EE141", "7376231EE142", "7376231EE143",
 			"7376231EE144", "7376231EE145", "7376231EE146", "7376231EE147", "7376231EE148", "7376231EE149",
 			"7376231EE150", "7376231EE133", "7376231EE134",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT047 (10 candidates)
 		{HallNo: "WW 209", CourseCode: "22BT047", RegisterNos: []string{
 			"7376232BT121", "7376232BT126", "7376232BT128", "7376232BT129", "7376232BT131", "7376232BT133",
 			"7376232BT134", "7376232BT137", "7376232BT139", "7376232BT142",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 210 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16033,37 +16033,37 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231EE154", "7376231EE155", "7376231EE156", "7376231EE157", "7376231EE158", "7376231EE159",
 			"7376231EE160", "7376231EE161", "7376241EE501", "7376241EE502", "7376241EE503", "7376241EE504",
 			"7376241EE505", "7376231EE151", "7376231EE152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT047 (10 candidates)
 		{HallNo: "WW 210", CourseCode: "22BT047", RegisterNos: []string{
 			"7376232BT146", "7376232BT147", "7376232BT148", "7376232BT156", "7376232BT157", "7376232BT158",
 			"7376232BT159", "7376232BT160", "7376232BT151", "7376232BT162",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 211 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EE023 (1 candidates)
 		{HallNo: "WW 211", CourseCode: "22EE023", RegisterNos: []string{
 			"7376241EE506",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME031 (14 candidates)
 		{HallNo: "WW 211", CourseCode: "22ME031", RegisterNos: []string{
 			"7376231ME101", "7376231ME102", "7376231ME103", "7376231ME104", "7376231ME105", "7376231ME113",
 			"7376231ME114", "7376231ME115", "7376231ME116", "7376231ME107", "7376231ME108", "7376231ME110",
 			"7376231ME111", "7376231ME118",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT047 (10 candidates)
 		{HallNo: "WW 211", CourseCode: "22BT047", RegisterNos: []string{
 			"7376232BT168", "7376232BT169", "7376232BT170", "7376232BT163", "7376232BT165", "7376232BT166",
 			"7376232BT173", "7376232BT174", "7376232BT176", "7376232BT177",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 212 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EI045 (6 candidates)
 		{HallNo: "WW 212", CourseCode: "22EI045", RegisterNos: []string{
 			"7376231EI101", "7376231EI102", "7376231EI103", "7376231EI104", "7376231EI106", "7376231EI108",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME031 (25 candidates)
 		{HallNo: "WW 212", CourseCode: "22ME031", RegisterNos: []string{
 			"7376231ME119", "7376231ME120", "7376231ME121", "7376231ME122", "7376231ME123", "7376231ME126",
@@ -16071,14 +16071,14 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231ME134", "7376231ME135", "7376231ME136", "7376231ME137", "7376231ME138", "7376231ME139",
 			"7376231ME140", "7376231ME141", "7376231ME143", "7376231ME144", "7376231ME145", "7376231ME146",
 			"7376231ME147",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BT047 (19 candidates)
 		{HallNo: "WW 212", CourseCode: "22BT047", RegisterNos: []string{
 			"7376232BT179", "7376232BT180", "7376232BT181", "7376232BT190", "7376232BT191", "7376232BT192",
 			"7376232BT199", "7376232BT200", "7376232BT201", "7376232BT202", "7376232BT183", "7376232BT184",
 			"7376232BT188", "7376232BT204", "7376232BT207", "7376232BT208", "7376232BT211", "7376232BT212",
 			"7376232BT215",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 213 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16086,13 +16086,13 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 213", CourseCode: "22EI045", RegisterNos: []string{
 			"7376231EI109", "7376231EI110", "7376231EI111", "7376231EI112", "7376231EI113", "7376231EI115",
 			"7376231EI116", "7376231EI117", "7376231EI118", "7376231EI119",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME031 (15 candidates)
 		{HallNo: "WW 213", CourseCode: "22ME031", RegisterNos: []string{
 			"7376231ME148", "7376231ME149", "7376231ME150", "7376231ME151", "7376231ME152", "7376231ME153",
 			"7376231ME154", "7376231ME155", "7376231ME156", "7376231ME157", "7376231ME158", "7376231ME159",
 			"7376231ME160", "7376231ME161", "7376241ME501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 214 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16100,16 +16100,16 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 214", CourseCode: "22CS013", RegisterNos: []string{
 			"7376231CS102", "7376231CS103", "7376231CS106", "7376231CS110", "7376231CS112", "7376231CS114",
 			"7376231CS120", "7376231CS122", "7376231CS144", "7376231CS165", "7376231CS170", "7376231CS172",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI045 (10 candidates)
 		{HallNo: "WW 214", CourseCode: "22EI045", RegisterNos: []string{
 			"7376231EI120", "7376231EI121", "7376231EI122", "7376231EI123", "7376231EI124", "7376231EI125",
 			"7376231EI126", "7376231EI128", "7376231EI129", "7376231EI130",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22ME031 (3 candidates)
 		{HallNo: "WW 214", CourseCode: "22ME031", RegisterNos: []string{
 			"7376241ME503", "7376241ME504", "7376241ME505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 215 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16118,12 +16118,12 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS188", "7376231CS189", "7376231CS190", "7376231CS229", "7376231CS230", "7376231CS231",
 			"7376231CS234", "7376231CS235", "7376231CS236", "7376231CS173", "7376231CS192", "7376231CS214",
 			"7376231CS215", "7376231CS221", "7376231CS244",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI045 (10 candidates)
 		{HallNo: "WW 215", CourseCode: "22EI045", RegisterNos: []string{
 			"7376231EI131", "7376231EI132", "7376231EI133", "7376231EI134", "7376231EI135", "7376231EI136",
 			"7376231EI138", "7376231EI139", "7376231EI140", "7376231EI141",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 218 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16132,37 +16132,37 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CS254", "7376231CS255", "7376231CS257", "7376231CS259", "7376231CS267", "7376231CS271",
 			"7376231CS280", "7376231CS292", "7376231CS295", "7376231CS300", "7376231CS315", "7376231CS318",
 			"7376231CS320", "7376231CS321", "7376231CS334",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI045 (10 candidates)
 		{HallNo: "WW 218", CourseCode: "22EI045", RegisterNos: []string{
 			"7376231EI146", "7376231EI147", "7376231EI148", "7376231EI149", "7376231EI150", "7376231EI143",
 			"7376231EI144", "7376231EI152", "7376231EI153", "7376231EI156",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 222 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CS013 (1 candidates)
 		{HallNo: "WW 222", CourseCode: "22CS013", RegisterNos: []string{
 			"7376241CS508",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22EI045 (8 candidates)
 		{HallNo: "WW 222", CourseCode: "22EI045", RegisterNos: []string{
 			"7376231EI157", "7376231EI158", "7376231EI159", "7376231EI160", "7376241EI501", "7376241EI502",
 			"7376241EI503", "7376241EI504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22BM040 (24 candidates)
 		{HallNo: "WW 222", CourseCode: "22BM040", RegisterNos: []string{
 			"7376231BM109", "7376231BM110", "7376231BM111", "7376231BM113", "7376231BM114", "7376231BM115",
 			"7376231BM116", "7376231BM117", "7376231BM119", "7376231BM120", "7376231BM121", "7376231BM123",
 			"7376231BM124", "7376231BM125", "7376231BM126", "7376231BM127", "7376231BM128", "7376231BM129",
 			"7376231BM101", "7376231BM102", "7376231BM104", "7376231BM106", "7376231BM107", "7376231BM131",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD030 (17 candidates)
 		{HallNo: "WW 222", CourseCode: "22FD030", RegisterNos: []string{
 			"7376232FD105", "7376232FD106", "7376232FD107", "7376232FD108", "7376232FD109", "7376232FD110",
 			"7376232FD111", "7376232FD112", "7376232FD116", "7376232FD117", "7376232FD118", "7376232FD119",
 			"7376232FD120", "7376232FD102", "7376232FD103", "7376232FD114", "7376232FD122",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16171,7 +16171,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231BM132", "7376231BM133", "7376231BM134", "7376231BM135", "7376231BM136", "7376231BM137",
 			"7376231BM138", "7376231BM139", "7376231BM140", "7376231BM142", "7376231BM143", "7376231BM144",
 			"7376231BM145", "7376231BM146", "7376231BM147", "7376231BM148", "7376231BM150", "7376231BM151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FD030 (25 candidates)
 		{HallNo: "WW 223", CourseCode: "22FD030", RegisterNos: []string{
 			"7376232FD127", "7376232FD128", "7376232FD129", "7376232FD130", "7376232FD131", "7376232FD132",
@@ -16179,12 +16179,12 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232FD140", "7376232FD142", "7376232FD143", "7376232FD144", "7376232FD145", "7376232FD146",
 			"7376232FD147", "7376232FD148", "7376232FD149", "7376232FD150", "7376232FD123", "7376232FD125",
 			"7376232FD152",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG015 (7 candidates)
 		{HallNo: "WW 223", CourseCode: "22AG015", RegisterNos: []string{
 			"7376232AG103", "7376232AG104", "7376232AG105", "7376232AG106", "7376232AG107", "7376232AG108",
 			"7376232AG109",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16195,7 +16195,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232CB129", "7376232CB130", "7376232CB131", "7376232CB132", "7376232CB133", "7376232CB134",
 			"7376232CB135", "7376232CB102", "7376232CB103", "7376232CB110", "7376232CB111", "7376232CB114",
 			"7376232CB125",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG015 (25 candidates)
 		{HallNo: "WW 224", CourseCode: "22AG015", RegisterNos: []string{
 			"7376232AG114", "7376232AG115", "7376232AG116", "7376232AG117", "7376232AG118", "7376232AG119",
@@ -16203,7 +16203,7 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376232AG131", "7376232AG132", "7376232AG133", "7376232AG134", "7376232AG136", "7376232AG137",
 			"7376232AG138", "7376232AG111", "7376232AG112", "7376232AG121", "7376232AG144", "7376232AG145",
 			"7376232AG148",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 225 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16211,24 +16211,24 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 225", CourseCode: "22IS010", RegisterNos: []string{
 			"7376231SE102", "7376231SE103", "7376231SE105", "7376231SE107", "7376231SE111", "7376231SE112",
 			"7376231SE121", "7376231SE122", "7376231SE124", "7376231SE126", "7376231SE127", "7376231SE130",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD016 (17 candidates)
 		{HallNo: "WW 225", CourseCode: "22CD016", RegisterNos: []string{
 			"7376231CD106", "7376231CD107", "7376231CD108", "7376231CD109", "7376231CD112", "7376231CD113",
 			"7376231CD114", "7376231CD115", "7376231CD121", "7376231CD122", "7376231CD123", "7376231CD124",
 			"7376231CD125", "7376231CD103", "7376231CD104", "7376231CD117", "7376231CD127",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CB033 (13 candidates)
 		{HallNo: "WW 225", CourseCode: "22CB033", RegisterNos: []string{
 			"7376232CB137", "7376232CB139", "7376232CB141", "7376232CB144", "7376232CB145", "7376232CB147",
 			"7376232CB154", "7376232CB157", "7376232CB160", "7376232CB162", "7376232CB163", "7376242CB502",
 			"7376242CB503",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22AG015 (8 candidates)
 		{HallNo: "WW 225", CourseCode: "22AG015", RegisterNos: []string{
 			"7376232AG149", "7376232AG150", "7376232AG151", "7376232AG152", "7376232AG153", "7376242AG501",
 			"7376242AG502", "7376242AG504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 226 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16236,24 +16236,24 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 226", CourseCode: "22CE032", RegisterNos: []string{
 			"7376231CE101", "7376231CE102", "7376231CE103", "7376231CE107", "7376231CE108", "7376231CE109",
 			"7376231CE110", "7376231CE111", "7376231CE105",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22IS010 (16 candidates)
 		{HallNo: "WW 226", CourseCode: "22IS010", RegisterNos: []string{
 			"7376231SE151", "7376231SE152", "7376231SE153", "7376231SE131", "7376231SE132", "7376231SE134",
 			"7376231SE135", "7376231SE137", "7376231SE139", "7376231SE143", "7376231SE145", "7376231SE146",
 			"7376231SE148", "7376231SE149", "7376231SE155", "7376241SE501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CD016 (21 candidates)
 		{HallNo: "WW 226", CourseCode: "22CD016", RegisterNos: []string{
 			"7376231CD128", "7376231CD129", "7376231CD130", "7376231CD138", "7376231CD139", "7376231CD140",
 			"7376231CD141", "7376231CD145", "7376231CD146", "7376231CD147", "7376231CD148", "7376231CD149",
 			"7376231CD156", "7376231CD157", "7376231CD158", "7376241CD501", "7376241CD502", "7376241CD503",
 			"7376231CD134", "7376231CD143", "7376231CD151",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT016 (4 candidates)
 		{HallNo: "WW 226", CourseCode: "22CT016", RegisterNos: []string{
 			"7376232CT102", "7376232CT103", "7376232CT111", "7376232CT116",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 227 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16262,22 +16262,22 @@ func buildSeatingData20Nov2026FN() []studentmodels.SeatingRecord {
 			"7376231CE117", "7376231CE118", "7376231CE119", "7376231CE120", "7376231CE121", "7376231CE112",
 			"7376231CE114", "7376231CE124", "7376231CE126", "7376231CE127", "7376231CE129", "7376241CE501",
 			"7376241CE502", "7376241CE504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22FT010 (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22FT010", RegisterNos: []string{
 			"7376232FT101", "7376232FT110",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22CT016 (17 candidates)
 		{HallNo: "WW 227", CourseCode: "22CT016", RegisterNos: []string{
 			"7376232CT120", "7376232CT121", "7376232CT122", "7376232CT134", "7376232CT135", "7376232CT136",
 			"7376242CT501", "7376242CT502", "7376242CT503", "7376232CT126", "7376232CT131", "7376232CT139",
 			"7376232CT141", "7376232CT153", "7376232CT156", "7376232CT160", "7376232CT161",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
 
 // ============================================================================
-// 20-NOV-2026 AFTERNOON SESSION (AN: 01:30 PM ? 04:30 PM) - Total: 1903 Students
+// 20-NOV-2026 AFTERNOON SESSION (AN: 01:30 PM : 04:30 PM) - Total: 1903 Students
 // ============================================================================
 func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -16291,14 +16291,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS114", "7376241CS115", "7376241CS116", "7376241CS117", "7376241CS118", "7376241CS119",
 			"7376241CS120", "7376241CS121", "7376241CS122", "7376241CS123", "7376241CS124", "7376241CS125",
 			"7376241CS126",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC503 (20 candidates)
 		{HallNo: "ME 102", CourseCode: "22EC503", RegisterNos: []string{
 			"7376241EC103", "7376241EC104", "7376241EC105", "7376241EC106", "7376241EC107", "7376241EC108",
 			"7376241EC109", "7376241EC110", "7376241EC115", "7376241EC116", "7376241EC117", "7376241EC118",
 			"7376241EC119", "7376241EC120", "7376241EC121", "7376241EC122", "7376241EC123", "7376241EC124",
 			"7376241EC112", "7376241EC113",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 107 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16309,14 +16309,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS139", "7376241CS140", "7376241CS141", "7376241CS142", "7376241CS143", "7376241CS144",
 			"7376241CS145", "7376241CS146", "7376241CS147", "7376241CS148", "7376241CS149", "7376241CS150",
 			"7376241CS151",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC503 (20 candidates)
 		{HallNo: "ME 107", CourseCode: "22EC503", RegisterNos: []string{
 			"7376241EC125", "7376241EC126", "7376241EC127", "7376241EC128", "7376241EC129", "7376241EC130",
 			"7376241EC131", "7376241EC132", "7376241EC133", "7376241EC134", "7376241EC135", "7376241EC136",
 			"7376241EC137", "7376241EC138", "7376241EC139", "7376241EC140", "7376241EC141", "7376241EC142",
 			"7376241EC143", "7376241EC144",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 108 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16327,14 +16327,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS165", "7376241CS166", "7376241CS167", "7376241CS168", "7376241CS169", "7376241CS170",
 			"7376241CS171", "7376241CS172", "7376241CS173", "7376241CS174", "7376241CS175", "7376241CS176",
 			"7376241CS177",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC503 (20 candidates)
 		{HallNo: "ME 108", CourseCode: "22EC503", RegisterNos: []string{
 			"7376241EC145", "7376241EC146", "7376241EC147", "7376241EC148", "7376241EC149", "7376241EC150",
 			"7376241EC151", "7376241EC152", "7376241EC153", "7376241EC154", "7376241EC155", "7376241EC156",
 			"7376241EC157", "7376241EC158", "7376241EC159", "7376241EC160", "7376241EC161", "7376241EC162",
 			"7376241EC163", "7376241EC164",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16345,14 +16345,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS191", "7376241CS192", "7376241CS193", "7376241CS194", "7376241CS195", "7376241CS196",
 			"7376241CS197", "7376241CS198", "7376241CS199", "7376241CS200", "7376241CS201", "7376241CS202",
 			"7376241CS203",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC503 (20 candidates)
 		{HallNo: "ME 201", CourseCode: "22EC503", RegisterNos: []string{
 			"7376241EC165", "7376241EC166", "7376241EC167", "7376241EC168", "7376241EC169", "7376241EC170",
 			"7376241EC171", "7376241EC172", "7376241EC173", "7376241EC174", "7376241EC176", "7376241EC177",
 			"7376241EC178", "7376241EC179", "7376241EC180", "7376241EC181", "7376241EC182", "7376241EC183",
 			"7376241EC184", "7376241EC185",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16363,14 +16363,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS216", "7376241CS217", "7376241CS218", "7376241CS219", "7376241CS220", "7376241CS221",
 			"7376241CS222", "7376241CS223", "7376241CS224", "7376241CS225", "7376241CS226", "7376241CS227",
 			"7376241CS228",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC503 (20 candidates)
 		{HallNo: "ME 202", CourseCode: "22EC503", RegisterNos: []string{
 			"7376241EC186", "7376241EC187", "7376241EC188", "7376241EC189", "7376241EC190", "7376241EC191",
 			"7376241EC192", "7376241EC193", "7376241EC194", "7376241EC195", "7376241EC196", "7376241EC197",
 			"7376241EC198", "7376241EC199", "7376241EC200", "7376241EC201", "7376241EC202", "7376241EC203",
 			"7376241EC204", "7376241EC205",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16381,14 +16381,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS242", "7376241CS243", "7376241CS244", "7376241CS245", "7376241CS246", "7376241CS247",
 			"7376241CS248", "7376241CS249", "7376241CS250", "7376241CS251", "7376241CS252", "7376241CS253",
 			"7376241CS254",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC503 (20 candidates)
 		{HallNo: "ME 203", CourseCode: "22EC503", RegisterNos: []string{
 			"7376241EC209", "7376241EC210", "7376241EC211", "7376241EC212", "7376241EC213", "7376241EC214",
 			"7376241EC215", "7376241EC216", "7376241EC217", "7376241EC218", "7376241EC219", "7376241EC220",
 			"7376241EC221", "7376241EC222", "7376241EC223", "7376241EC224", "7376241EC225", "7376241EC226",
 			"7376241EC206", "7376241EC207",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16399,14 +16399,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS267", "7376241CS268", "7376241CS269", "7376241CS270", "7376241CS271", "7376241CS272",
 			"7376241CS273", "7376241CS274", "7376241CS275", "7376241CS276", "7376241CS277", "7376241CS278",
 			"7376241CS279",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC503 (20 candidates)
 		{HallNo: "ME 204", CourseCode: "22EC503", RegisterNos: []string{
 			"7376241EC227", "7376241EC228", "7376241EC229", "7376241EC230", "7376241EC232", "7376241EC233",
 			"7376241EC234", "7376241EC235", "7376241EC236", "7376241EC237", "7376241EC238", "7376241EC239",
 			"7376241EC240", "7376241EC241", "7376241EC242", "7376241EC243", "7376241EC244", "7376241EC245",
 			"7376241EC246", "7376241EC247",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16417,14 +16417,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS292", "7376241CS293", "7376241CS294", "7376241CS295", "7376241CS296", "7376241CS297",
 			"7376241CS298", "7376241CS299", "7376241CS300", "7376241CS301", "7376241CS302", "7376241CS303",
 			"7376241CS304",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC503 (20 candidates)
 		{HallNo: "ME 205", CourseCode: "22EC503", RegisterNos: []string{
 			"7376241EC248", "7376241EC249", "7376241EC250", "7376241EC251", "7376241EC252", "7376241EC253",
 			"7376241EC254", "7376241EC255", "7376241EC256", "7376241EC257", "7376241EC258", "7376241EC259",
 			"7376241EC260", "7376241EC261", "7376241EC262", "7376241EC263", "7376241EC264", "7376241EC265",
 			"7376241EC266", "7376241EC267",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16435,14 +16435,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS317", "7376241CS318", "7376241CS319", "7376241CS320", "7376241CS321", "7376241CS322",
 			"7376241CS323", "7376241CS324", "7376241CS325", "7376241CS326", "7376241CS327", "7376241CS328",
 			"7376241CS329",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC503 (20 candidates)
 		{HallNo: "ME 206", CourseCode: "22EC503", RegisterNos: []string{
 			"7376241EC268", "7376241EC269", "7376241EC270", "7376241EC271", "7376241EC272", "7376241EC273",
 			"7376241EC274", "7376241EC275", "7376241EC276", "7376241EC277", "7376241EC278", "7376241EC279",
 			"7376241EC280", "7376241EC281", "7376241EC282", "7376241EC283", "7376241EC284", "7376241EC285",
 			"7376241EC286", "7376241EC287",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 301 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16453,14 +16453,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS342", "7376241CS343", "7376241CS344", "7376241CS345", "7376241CS346", "7376241CS347",
 			"7376241CS348", "7376241CS349", "7376241CS350", "7376241CS351", "7376241CS352", "7376241CS353",
 			"7376241CS355",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC503 (20 candidates)
 		{HallNo: "ME 301", CourseCode: "22EC503", RegisterNos: []string{
 			"7376241EC288", "7376241EC289", "7376241EC290", "7376241EC291", "7376241EC292", "7376241EC293",
 			"7376241EC294", "7376241EC295", "7376241EC296", "7376241EC297", "7376241EC298", "7376241EC299",
 			"7376241EC300", "7376241EC301", "7376241EC302", "7376241EC303", "7376241EC304", "7376241EC305",
 			"7376241EC306", "7376241EC307",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 302 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16471,14 +16471,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS368", "7376241CS369", "7376241CS370", "7376241CS371", "7376241CS372", "7376241CS373",
 			"7376241CS374", "7376241CS375", "7376241CS376", "7376241CS377", "7376241CS378", "7376241CS379",
 			"7376241CS380",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC503 (20 candidates)
 		{HallNo: "ME 302", CourseCode: "22EC503", RegisterNos: []string{
 			"7376241EC308", "7376241EC309", "7376241EC310", "7376241EC311", "7376241EC312", "7376241EC313",
 			"7376241EC314", "7376241EC315", "7376241EC316", "7376241EC317", "7376241EC318", "7376241EC319",
 			"7376241EC320", "7376241EC321", "7376241EC322", "7376241EC323", "7376241EC324", "7376241EC325",
 			"7376241EC326", "7376241EC327",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 303 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16489,14 +16489,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS393", "7376241CS394", "7376241CS395", "7376241CS396", "7376241CS397", "7376241CS398",
 			"7376241CS399", "7376241CS400", "7376241CS401", "7376241CS402", "7376241CS403", "7376241CS404",
 			"7376241CS405",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC503 (20 candidates)
 		{HallNo: "ME 303", CourseCode: "22EC503", RegisterNos: []string{
 			"7376241EC328", "7376241EC329", "7376241EC330", "7376241EC331", "7376241EC332", "7376241EC333",
 			"7376241EC334", "7376241EC335", "7376241EC336", "7376241EC337", "7376241EC338", "7376241EC339",
 			"7376241EC340", "7376241EC341", "7376241EC342", "7376241EC343", "7376241EC344", "7376241EC345",
 			"7376241EC346", "7376241EC347",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 304 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16507,14 +16507,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS418", "7376241CS419", "7376241CS420", "7376241CS421", "7376241CS422", "7376241CS423",
 			"7376241CS424", "7376241CS425", "7376241CS426", "7376241CS427", "7376241CS428", "7376241CS429",
 			"7376241CS430",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC503 (20 candidates)
 		{HallNo: "ME 304", CourseCode: "22EC503", RegisterNos: []string{
 			"7376241EC348", "7376241EC349", "7376241EC350", "7376241EC351", "7376241EC352", "7376251EC501",
 			"7376251EC502", "7376251EC503", "7376251EC504", "7376251EC505", "7376251EC506", "7376251EC507",
 			"7376251EC508", "7376251EC509", "7376251EC510", "7376251EC511", "7376251EC512", "7376251EC513",
 			"7376251EC514", "7376251EC515",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 305 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16525,17 +16525,17 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS444", "7376241CS445", "7376241CS446", "7376241CS447", "7376241CS448", "7376241CS449",
 			"7376241CS450", "7376241CS451", "7376241CS452", "7376241CS453", "7376241CS454", "7376241CS455",
 			"7376241CS456",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC503 (6 candidates)
 		{HallNo: "ME 305", CourseCode: "22EC503", RegisterNos: []string{
 			"7376251EC516", "7376251EC517", "7376251EC518", "7376251EC519", "7376251EC520", "7376251EC521",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT503 (14 candidates)
 		{HallNo: "ME 305", CourseCode: "22IT503", RegisterNos: []string{
 			"7376242IT101", "7376242IT102", "7376242IT103", "7376242IT104", "7376242IT105", "7376242IT106",
 			"7376242IT107", "7376242IT108", "7376242IT109", "7376242IT110", "7376242IT111", "7376242IT112",
 			"7376242IT113", "7376242IT114",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: ME 306 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16546,14 +16546,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241CS469", "7376241CS470", "7376241CS471", "7376241CS472", "7376241CS473", "7376241CS474",
 			"7376241CS475", "7376241CS476", "7376251CS501", "7376251CS502", "7376251CS503", "7376251CS504",
 			"7376251CS505",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT503 (20 candidates)
 		{HallNo: "ME 306", CourseCode: "22IT503", RegisterNos: []string{
 			"7376242IT115", "7376242IT116", "7376242IT117", "7376242IT118", "7376242IT119", "7376242IT120",
 			"7376242IT121", "7376242IT122", "7376242IT123", "7376242IT124", "7376242IT125", "7376242IT126",
 			"7376242IT127", "7376242IT128", "7376242IT129", "7376242IT130", "7376242IT131", "7376242IT132",
 			"7376242IT133", "7376242IT134",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF 001 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16562,18 +16562,18 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376251CS506", "7376251CS507", "7376251CS508", "7376251CS509", "7376251CS510", "7376251CS511",
 			"7376251CS512", "7376251CS513", "7376251CS515", "7376251CS516", "7376251CS517", "7376251CS518",
 			"7376251CS519", "7376251CS520", "7376251CS521", "7376251CS522", "7376251CS523", "7376251CS524",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT503 (20 candidates)
 		{HallNo: "SF 001", CourseCode: "22IT503", RegisterNos: []string{
 			"7376242IT135", "7376242IT136", "7376242IT137", "7376242IT138", "7376242IT139", "7376242IT140",
 			"7376242IT141", "7376242IT142", "7376242IT143", "7376242IT144", "7376242IT145", "7376242IT146",
 			"7376242IT147", "7376242IT148", "7376242IT149", "7376242IT150", "7376242IT151", "7376242IT152",
 			"7376242IT153", "7376242IT155",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503 (2 candidates)
 		{HallNo: "SF 001", CourseCode: "22AI503", RegisterNos: []string{
 			"7376242AD102", "7376242AD103",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF 002 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16583,14 +16583,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT162", "7376242IT163", "7376242IT164", "7376242IT165", "7376242IT166", "7376242IT167",
 			"7376242IT168", "7376242IT169", "7376242IT170", "7376242IT171", "7376242IT172", "7376242IT173",
 			"7376242IT174", "7376242IT175",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503 (20 candidates)
 		{HallNo: "SF 002", CourseCode: "22AI503", RegisterNos: []string{
 			"7376242AD104", "7376242AD105", "7376242AD106", "7376242AD107", "7376242AD108", "7376242AD109",
 			"7376242AD110", "7376242AD111", "7376242AD112", "7376242AD113", "7376242AD114", "7376242AD115",
 			"7376242AD116", "7376242AD117", "7376242AD118", "7376242AD119", "7376242AD120", "7376242AD121",
 			"7376242AD122", "7376242AD123",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF 101 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16600,14 +16600,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT182", "7376242IT183", "7376242IT184", "7376242IT185", "7376242IT186", "7376242IT187",
 			"7376242IT188", "7376242IT189", "7376242IT190", "7376242IT191", "7376242IT192", "7376242IT193",
 			"7376242IT194", "7376242IT195",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503 (20 candidates)
 		{HallNo: "SF 101", CourseCode: "22AI503", RegisterNos: []string{
 			"7376242AD124", "7376242AD125", "7376242AD126", "7376242AD127", "7376242AD128", "7376242AD129",
 			"7376242AD131", "7376242AD132", "7376242AD133", "7376242AD134", "7376242AD135", "7376242AD136",
 			"7376242AD137", "7376242AD138", "7376242AD139", "7376242AD140", "7376242AD141", "7376242AD142",
 			"7376242AD143", "7376242AD144",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF 102 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16617,14 +16617,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT202", "7376242IT203", "7376242IT204", "7376242IT205", "7376242IT206", "7376242IT207",
 			"7376242IT208", "7376242IT209", "7376242IT210", "7376242IT211", "7376242IT212", "7376242IT213",
 			"7376242IT214", "7376242IT215",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503 (20 candidates)
 		{HallNo: "SF 102", CourseCode: "22AI503", RegisterNos: []string{
 			"7376242AD145", "7376242AD146", "7376242AD147", "7376242AD148", "7376242AD149", "7376242AD150",
 			"7376242AD151", "7376242AD152", "7376242AD153", "7376242AD154", "7376242AD155", "7376242AD156",
 			"7376242AD157", "7376242AD158", "7376242AD159", "7376242AD160", "7376242AD161", "7376242AD162",
 			"7376242AD163", "7376242AD164",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF 103 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16634,14 +16634,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT222", "7376242IT223", "7376242IT224", "7376242IT225", "7376242IT226", "7376242IT227",
 			"7376242IT228", "7376242IT229", "7376242IT230", "7376242IT231", "7376242IT232", "7376242IT233",
 			"7376242IT234", "7376242IT235",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503 (20 candidates)
 		{HallNo: "SF 103", CourseCode: "22AI503", RegisterNos: []string{
 			"7376242AD165", "7376242AD166", "7376242AD167", "7376242AD168", "7376242AD169", "7376242AD170",
 			"7376242AD171", "7376242AD172", "7376242AD173", "7376242AD174", "7376242AD176", "7376242AD177",
 			"7376242AD178", "7376242AD179", "7376242AD180", "7376242AD181", "7376242AD182", "7376242AD183",
 			"7376242AD184", "7376242AD185",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF 201 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16651,14 +16651,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT242", "7376242IT243", "7376242IT244", "7376242IT245", "7376242IT246", "7376242IT247",
 			"7376242IT248", "7376242IT249", "7376242IT250", "7376242IT251", "7376242IT252", "7376242IT253",
 			"7376242IT254", "7376242IT255",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503 (20 candidates)
 		{HallNo: "SF 201", CourseCode: "22AI503", RegisterNos: []string{
 			"7376242AD188", "7376242AD189", "7376242AD190", "7376242AD191", "7376242AD192", "7376242AD193",
 			"7376242AD194", "7376242AD195", "7376242AD196", "7376242AD197", "7376242AD198", "7376242AD199",
 			"7376242AD200", "7376242AD201", "7376242AD202", "7376242AD203", "7376242AD204", "7376242AD205",
 			"7376242AD206", "7376242AD186",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16668,14 +16668,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT262", "7376242IT263", "7376242IT264", "7376242IT265", "7376242IT266", "7376242IT267",
 			"7376242IT268", "7376242IT269", "7376242IT270", "7376242IT271", "7376242IT272", "7376242IT273",
 			"7376242IT274", "7376242IT275",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503 (20 candidates)
 		{HallNo: "SF 202", CourseCode: "22AI503", RegisterNos: []string{
 			"7376242AD207", "7376242AD208", "7376242AD209", "7376242AD210", "7376242AD211", "7376242AD212",
 			"7376242AD213", "7376242AD214", "7376242AD215", "7376242AD216", "7376242AD217", "7376242AD218",
 			"7376242AD219", "7376242AD220", "7376242AD221", "7376242AD222", "7376242AD223", "7376242AD224",
 			"7376242AD225", "7376242AD226",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF B01 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16685,14 +16685,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT282", "7376242IT283", "7376242IT284", "7376242IT285", "7376242IT286", "7376242IT287",
 			"7376242IT288", "7376242IT289", "7376242IT290", "7376242IT291", "7376242IT292", "7376242IT293",
 			"7376242IT294", "7376242IT295",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503 (20 candidates)
 		{HallNo: "SF B01", CourseCode: "22AI503", RegisterNos: []string{
 			"7376242AD227", "7376242AD228", "7376242AD229", "7376242AD230", "7376242AD231", "7376242AD232",
 			"7376242AD233", "7376242AD234", "7376242AD235", "7376242AD236", "7376242AD237", "7376242AD238",
 			"7376242AD239", "7376242AD240", "7376242AD241", "7376242AD242", "7376242AD243", "7376242AD244",
 			"7376242AD245", "7376242AD246",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF B02 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16702,14 +16702,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT302", "7376242IT303", "7376242IT305", "7376242IT306", "7376242IT307", "7376242IT308",
 			"7376242IT309", "7376242IT310", "7376242IT311", "7376242IT312", "7376242IT313", "7376242IT314",
 			"7376242IT315", "7376242IT316",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503 (20 candidates)
 		{HallNo: "SF B02", CourseCode: "22AI503", RegisterNos: []string{
 			"7376242AD247", "7376242AD248", "7376242AD249", "7376242AD250", "7376242AD251", "7376242AD252",
 			"7376242AD253", "7376242AD254", "7376242AD255", "7376242AD256", "7376242AD257", "7376242AD258",
 			"7376242AD259", "7376242AD260", "7376242AD261", "7376242AD262", "7376242AD263", "7376242AD264",
 			"7376242AD265", "7376242AD266",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: SF B03 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16719,14 +16719,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242IT323", "7376242IT324", "7376242IT325", "7376242IT326", "7376242IT327", "7376242IT328",
 			"7376242IT329", "7376242IT330", "7376242IT331", "7376242IT332", "7376242IT333", "7376242IT334",
 			"7376242IT335", "7376242IT336",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503 (20 candidates)
 		{HallNo: "SF B03", CourseCode: "22AI503", RegisterNos: []string{
 			"7376242AD267", "7376242AD268", "7376242AD269", "7376242AD270", "7376242AD271", "7376242AD272",
 			"7376242AD273", "7376242AD274", "7376242AD275", "7376242AD276", "7376242AD277", "7376242AD278",
 			"7376242AD279", "7376242AD280", "7376242AD281", "7376242AD282", "7376242AD283", "7376242AD284",
 			"7376242AD285", "7376242AD286",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 008 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16734,13 +16734,13 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 008", CourseCode: "22IT503", RegisterNos: []string{
 			"7376242IT337", "7376242IT338", "7376242IT339", "7376242IT340", "7376242IT341", "7376242IT342",
 			"7376242IT343", "7376242IT344", "7376242IT345", "7376242IT346",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503 (15 candidates)
 		{HallNo: "WW 008", CourseCode: "22AI503", RegisterNos: []string{
 			"7376242AD287", "7376242AD288", "7376242AD289", "7376242AD290", "7376242AD291", "7376242AD292",
 			"7376242AD293", "7376242AD294", "7376242AD295", "7376242AD296", "7376242AD297", "7376242AD298",
 			"7376242AD299", "7376242AD300", "7376242AD301",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 011 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16748,13 +16748,13 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 011", CourseCode: "22IT503", RegisterNos: []string{
 			"7376242IT347", "7376242IT348", "7376242IT349", "7376242IT350", "7376242IT351", "7376252IT501",
 			"7376252IT502", "7376252IT503", "7376252IT504", "7376252IT505",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503 (15 candidates)
 		{HallNo: "WW 011", CourseCode: "22AI503", RegisterNos: []string{
 			"7376242AD302", "7376242AD303", "7376242AD304", "7376242AD305", "7376242AD306", "7376242AD307",
 			"7376242AD308", "7376242AD309", "7376242AD310", "7376242AD311", "7376242AD312", "7376242AD313",
 			"7376242AD314", "7376242AD315", "7376242AD316",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 012 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16762,13 +16762,13 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 012", CourseCode: "22IT503", RegisterNos: []string{
 			"7376252IT508", "7376252IT509", "7376252IT510", "7376252IT511", "7376252IT512", "7376252IT513",
 			"7376252IT514", "7376252IT515", "7376252IT516", "7376252IT506",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503 (15 candidates)
 		{HallNo: "WW 012", CourseCode: "22AI503", RegisterNos: []string{
 			"7376242AD317", "7376242AD318", "7376242AD319", "7376242AD320", "7376242AD321", "7376242AD322",
 			"7376242AD323", "7376242AD324", "7376242AD325", "7376242AD326", "7376242AD327", "7376242AD328",
 			"7376242AD329", "7376242AD330", "7376242AD331",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 202 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16779,7 +16779,7 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EE114", "7376241EE115", "7376241EE116", "7376241EE117", "7376241EE118", "7376241EE119",
 			"7376241EE120", "7376241EE121", "7376241EE122", "7376241EE123", "7376241EE124", "7376241EE125",
 			"7376241EE126",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503 (25 candidates)
 		{HallNo: "WW 202", CourseCode: "22AI503", RegisterNos: []string{
 			"7376242AD332", "7376242AD333", "7376242AD334", "7376242AD335", "7376242AD336", "7376242AD337",
@@ -16787,7 +16787,7 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AD344", "7376242AD345", "7376242AD346", "7376252AD501", "7376252AD502", "7376252AD503",
 			"7376252AD504", "7376252AD505", "7376252AD506", "7376252AD507", "7376252AD508", "7376252AD509",
 			"7376252AD510",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16795,16 +16795,16 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 203", CourseCode: "22EE503", RegisterNos: []string{
 			"7376241EE127", "7376241EE128", "7376241EE129", "7376241EE130", "7376241EE131", "7376241EE132",
 			"7376241EE133", "7376241EE134", "7376241EE135", "7376241EE136",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503 (6 candidates)
 		{HallNo: "WW 203", CourseCode: "22AI503", RegisterNos: []string{
 			"7376252AD511", "7376252AD512", "7376252AD513", "7376252AD514", "7376252AD515", "7376252AD516",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM503 (9 candidates)
 		{HallNo: "WW 203", CourseCode: "22AM503", RegisterNos: []string{
 			"7376242AL101", "7376242AL102", "7376242AL103", "7376242AL104", "7376242AL105", "7376242AL106",
 			"7376242AL107", "7376242AL108", "7376242AL109",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16812,13 +16812,13 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 204", CourseCode: "22EE503", RegisterNos: []string{
 			"7376241EE137", "7376241EE138", "7376241EE139", "7376241EE140", "7376241EE141", "7376241EE142",
 			"7376241EE143", "7376241EE144", "7376241EE145", "7376241EE146",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM503 (15 candidates)
 		{HallNo: "WW 204", CourseCode: "22AM503", RegisterNos: []string{
 			"7376242AL110", "7376242AL111", "7376242AL112", "7376242AL113", "7376242AL114", "7376242AL115",
 			"7376242AL116", "7376242AL117", "7376242AL118", "7376242AL119", "7376242AL120", "7376242AL121",
 			"7376242AL122", "7376242AL123", "7376242AL124",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16826,13 +16826,13 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 205", CourseCode: "22EE503", RegisterNos: []string{
 			"7376241EE147", "7376241EE148", "7376241EE149", "7376241EE150", "7376241EE151", "7376241EE152",
 			"7376241EE153", "7376241EE154", "7376241EE155", "7376241EE156",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM503 (15 candidates)
 		{HallNo: "WW 205", CourseCode: "22AM503", RegisterNos: []string{
 			"7376242AL125", "7376242AL126", "7376242AL127", "7376242AL128", "7376242AL129", "7376242AL130",
 			"7376242AL131", "7376242AL132", "7376242AL133", "7376242AL134", "7376242AL135", "7376242AL136",
 			"7376242AL137", "7376242AL138", "7376242AL139",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16840,13 +16840,13 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 206", CourseCode: "22EE503", RegisterNos: []string{
 			"7376241EE157", "7376241EE158", "7376241EE159", "7376241EE160", "7376241EE161", "7376241EE162",
 			"7376241EE163", "7376241EE164", "7376241EE165", "7376241EE166",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM503 (15 candidates)
 		{HallNo: "WW 206", CourseCode: "22AM503", RegisterNos: []string{
 			"7376242AL140", "7376242AL141", "7376242AL142", "7376242AL143", "7376242AL144", "7376242AL145",
 			"7376242AL146", "7376242AL147", "7376242AL148", "7376242AL149", "7376242AL150", "7376242AL151",
 			"7376242AL152", "7376242AL153", "7376242AL154",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 207 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16857,7 +16857,7 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EE180", "7376241EE181", "7376241EE182", "7376241EE183", "7376241EE184", "7376241EE185",
 			"7376241EE186", "7376241EE187", "7376241EE188", "7376241EE189", "7376241EE190", "7376241EE191",
 			"7376241EE192",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM503 (25 candidates)
 		{HallNo: "WW 207", CourseCode: "22AM503", RegisterNos: []string{
 			"7376242AL155", "7376242AL156", "7376242AL157", "7376242AL158", "7376242AL159", "7376242AL160",
@@ -16865,7 +16865,7 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242AL167", "7376242AL168", "7376242AL169", "7376242AL170", "7376242AL171", "7376242AL172",
 			"7376242AL173", "7376242AL174", "7376242AL175", "7376242AL176", "7376242AL177", "7376242AL178",
 			"7376242AL179",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 208 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16873,13 +16873,13 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 208", CourseCode: "22EE503", RegisterNos: []string{
 			"7376241EE193", "7376241EE194", "7376241EE195", "7376241EE196", "7376241EE197", "7376241EE198",
 			"7376241EE199", "7376241EE200", "7376241EE201", "7376241EE202",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM503 (15 candidates)
 		{HallNo: "WW 208", CourseCode: "22AM503", RegisterNos: []string{
 			"7376242AL180", "7376242AL181", "7376242AL182", "7376242AL183", "7376242AL184", "7376242AL185",
 			"7376242AL186", "7376242AL187", "7376242AL188", "7376242AL189", "7376242AL190", "7376242AL191",
 			"7376242AL192", "7376242AL193", "7376242AL194",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 209 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16887,13 +16887,13 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 209", CourseCode: "22EE503", RegisterNos: []string{
 			"7376241EE203", "7376241EE204", "7376241EE205", "7376241EE206", "7376241EE207", "7376241EE208",
 			"7376241EE209", "7376241EE210", "7376241EE211", "7376241EE212",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM503 (15 candidates)
 		{HallNo: "WW 209", CourseCode: "22AM503", RegisterNos: []string{
 			"7376242AL195", "7376242AL196", "7376242AL197", "7376242AL198", "7376242AL199", "7376242AL200",
 			"7376242AL201", "7376242AL202", "7376242AL203", "7376242AL204", "7376242AL205", "7376242AL206",
 			"7376242AL208", "7376242AL209", "7376242AL210",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 210 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16901,13 +16901,13 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 210", CourseCode: "22EE503", RegisterNos: []string{
 			"7376241EE213", "7376241EE214", "7376241EE215", "7376241EE216", "7376241EE217", "7376251EE501",
 			"7376251EE502", "7376251EE503", "7376251EE504", "7376251EE505",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM503 (15 candidates)
 		{HallNo: "WW 210", CourseCode: "22AM503", RegisterNos: []string{
 			"7376242AL211", "7376242AL212", "7376242AL213", "7376242AL214", "7376242AL215", "7376242AL216",
 			"7376242AL217", "7376242AL218", "7376242AL219", "7376242AL220", "7376242AL221", "7376242AL222",
 			"7376242AL223", "7376252AL501", "7376252AL502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 211 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16915,31 +16915,31 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 211", CourseCode: "22EE503", RegisterNos: []string{
 			"7376251EE506", "7376251EE507", "7376251EE508", "7376251EE509", "7376251EE510", "7376251EE511",
 			"7376251EE512", "7376251EE513", "7376251EE514", "7376251EE515",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT503 (14 candidates)
 		{HallNo: "WW 211", CourseCode: "22BT503", RegisterNos: []string{
 			"7376242BT102", "7376242BT103", "7376242BT104", "7376242BT105", "7376242BT106", "7376242BT107",
 			"7376242BT108", "7376242BT109", "7376242BT110", "7376242BT111", "7376242BT112", "7376242BT113",
 			"7376242BT114", "7376242BT115",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AM503 (1 candidates)
 		{HallNo: "WW 211", CourseCode: "22AM503", RegisterNos: []string{
 			"7376252AL503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 212 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EE503 (2 candidates)
 		{HallNo: "WW 212", CourseCode: "22EE503", RegisterNos: []string{
 			"7376251EE516", "7376251EE517",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC503 (23 candidates)
 		{HallNo: "WW 212", CourseCode: "22MC503", RegisterNos: []string{
 			"7376241MZ101", "7376241MZ102", "7376241MZ103", "7376241MZ104", "7376241MZ105", "7376241MZ106",
 			"7376241MZ107", "7376241MZ108", "7376241MZ109", "7376241MZ110", "7376241MZ111", "7376241MZ112",
 			"7376241MZ113", "7376241MZ114", "7376241MZ115", "7376241MZ116", "7376241MZ117", "7376241MZ118",
 			"7376241MZ119", "7376241MZ120", "7376241MZ121", "7376241MZ122", "7376241MZ123",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT503 (25 candidates)
 		{HallNo: "WW 212", CourseCode: "22BT503", RegisterNos: []string{
 			"7376242BT116", "7376242BT117", "7376242BT118", "7376242BT119", "7376242BT120", "7376242BT121",
@@ -16947,7 +16947,7 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242BT128", "7376242BT129", "7376242BT130", "7376242BT131", "7376242BT132", "7376242BT133",
 			"7376242BT134", "7376242BT135", "7376242BT136", "7376242BT137", "7376242BT138", "7376242BT139",
 			"7376242BT140",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 213 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16955,13 +16955,13 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 213", CourseCode: "22MC503", RegisterNos: []string{
 			"7376241MZ124", "7376241MZ125", "7376241MZ126", "7376241MZ127", "7376241MZ128", "7376241MZ129",
 			"7376241MZ130", "7376241MZ131", "7376241MZ132", "7376241MZ133",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT503 (15 candidates)
 		{HallNo: "WW 213", CourseCode: "22BT503", RegisterNos: []string{
 			"7376242BT141", "7376242BT142", "7376242BT143", "7376242BT144", "7376242BT145", "7376242BT146",
 			"7376242BT147", "7376242BT148", "7376242BT149", "7376242BT150", "7376242BT151", "7376242BT152",
 			"7376242BT153", "7376242BT154", "7376242BT155",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 214 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16969,13 +16969,13 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 214", CourseCode: "22MC503", RegisterNos: []string{
 			"7376241MZ134", "7376241MZ135", "7376241MZ136", "7376241MZ137", "7376241MZ138", "7376241MZ139",
 			"7376241MZ140", "7376241MZ141", "7376241MZ142", "7376241MZ143",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT503 (15 candidates)
 		{HallNo: "WW 214", CourseCode: "22BT503", RegisterNos: []string{
 			"7376242BT156", "7376242BT157", "7376242BT158", "7376242BT159", "7376242BT160", "7376242BT162",
 			"7376242BT163", "7376242BT164", "7376242BT165", "7376242BT166", "7376242BT167", "7376242BT168",
 			"7376242BT169", "7376242BT170", "7376242BT171",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 215 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16983,13 +16983,13 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 215", CourseCode: "22MC503", RegisterNos: []string{
 			"7376241MZ144", "7376241MZ145", "7376241MZ146", "7376241MZ147", "7376241MZ148", "7376241MZ149",
 			"7376241MZ150", "7376241MZ151", "7376241MZ152", "7376241MZ153",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT503 (15 candidates)
 		{HallNo: "WW 215", CourseCode: "22BT503", RegisterNos: []string{
 			"7376242BT172", "7376242BT173", "7376242BT174", "7376242BT175", "7376242BT176", "7376242BT177",
 			"7376242BT178", "7376242BT179", "7376242BT180", "7376242BT181", "7376242BT182", "7376242BT183",
 			"7376242BT184", "7376242BT185", "7376242BT186",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 218 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -16997,13 +16997,13 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 218", CourseCode: "22MC503", RegisterNos: []string{
 			"7376241MZ154", "7376241MZ155", "7376241MZ156", "7376241MZ157", "7376241MZ158", "7376241MZ159",
 			"7376241MZ160", "7376251MZ501", "7376251MZ502", "7376251MZ503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT503 (15 candidates)
 		{HallNo: "WW 218", CourseCode: "22BT503", RegisterNos: []string{
 			"7376242BT187", "7376242BT188", "7376242BT189", "7376242BT190", "7376242BT191", "7376242BT192",
 			"7376242BT193", "7376242BT194", "7376242BT195", "7376242BT196", "7376242BT197", "7376242BT198",
 			"7376242BT199", "7376242BT200", "7376242BT201",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 219 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -17011,33 +17011,33 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 219", CourseCode: "22ME503", RegisterNos: []string{
 			"7376241ME102", "7376241ME103", "7376241ME104", "7376241ME105", "7376241ME106", "7376241ME107",
 			"7376241ME108",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC503 (3 candidates)
 		{HallNo: "WW 219", CourseCode: "22MC503", RegisterNos: []string{
 			"7376251MZ504", "7376251MZ505", "7376251MZ506",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT503 (15 candidates)
 		{HallNo: "WW 219", CourseCode: "22BT503", RegisterNos: []string{
 			"7376242BT202", "7376242BT203", "7376242BT204", "7376242BT205", "7376242BT206", "7376242BT207",
 			"7376242BT208", "7376242BT209", "7376242BT210", "7376242BT211", "7376242BT212", "7376242BT213",
 			"7376242BT214", "7376242BT215", "7376242BT216",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 220 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22EI503 (4 candidates)
 		{HallNo: "WW 220", CourseCode: "22EI503", RegisterNos: []string{
 			"7376241EI101", "7376241EI102", "7376241EI103", "7376241EI104",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22ME503 (10 candidates)
 		{HallNo: "WW 220", CourseCode: "22ME503", RegisterNos: []string{
 			"7376241ME111", "7376241ME112", "7376241ME113", "7376241ME114", "7376241ME115", "7376241ME116",
 			"7376241ME117", "7376241ME118", "7376241ME119", "7376241ME109",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT503 (6 candidates)
 		{HallNo: "WW 220", CourseCode: "22BT503", RegisterNos: []string{
 			"7376242BT220", "7376242BT221", "7376242BT222", "7376242BT217", "7376242BT218", "7376252BT501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 221 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -17045,12 +17045,12 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 221", CourseCode: "22EI503", RegisterNos: []string{
 			"7376241EI105", "7376241EI106", "7376241EI107", "7376241EI108", "7376241EI109", "7376241EI110",
 			"7376241EI111", "7376241EI112", "7376241EI113", "7376241EI114",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22ME503 (10 candidates)
 		{HallNo: "WW 221", CourseCode: "22ME503", RegisterNos: []string{
 			"7376241ME120", "7376241ME121", "7376241ME122", "7376241ME123", "7376241ME124", "7376241ME125",
 			"7376241ME126", "7376241ME127", "7376241ME128", "7376241ME129",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 222 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -17061,7 +17061,7 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EI128", "7376241EI129", "7376241EI130", "7376241EI131", "7376241EI132", "7376241EI133",
 			"7376241EI134", "7376241EI135", "7376241EI136", "7376241EI137", "7376241EI138", "7376241EI139",
 			"7376241EI140",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22ME503 (25 candidates)
 		{HallNo: "WW 222", CourseCode: "22ME503", RegisterNos: []string{
 			"7376241ME130", "7376241ME131", "7376241ME132", "7376241ME134", "7376241ME135", "7376241ME136",
@@ -17069,7 +17069,7 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241ME143", "7376241ME144", "7376241ME145", "7376241ME146", "7376241ME147", "7376241ME148",
 			"7376241ME149", "7376241ME150", "7376241ME151", "7376241ME152", "7376241ME153", "7376241ME154",
 			"7376241ME155",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 223 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -17079,22 +17079,22 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376241EI147", "7376241EI148", "7376241EI149", "7376241EI150", "7376241EI151", "7376241EI152",
 			"7376241EI153", "7376241EI154", "7376241EI155", "7376241EI156", "7376241EI157", "7376241EI158",
 			"7376241EI159", "7376241EI160", "7376251EI501", "7376251EI502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22ME503 (12 candidates)
 		{HallNo: "WW 223", CourseCode: "22ME503", RegisterNos: []string{
 			"7376241ME156", "7376241ME157", "7376241ME158", "7376241ME159", "7376251ME501", "7376251ME502",
 			"7376251ME503", "7376251ME504", "7376251ME505", "7376251ME506", "7376251ME507", "7376251ME508",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB503 (13 candidates)
 		{HallNo: "WW 223", CourseCode: "22CB503", RegisterNos: []string{
 			"7376242CB102", "7376242CB103", "7376242CB104", "7376242CB105", "7376242CB107", "7376242CB108",
 			"7376242CB109", "7376242CB110", "7376242CB111", "7376242CB112", "7376242CB113", "7376242CB114",
 			"7376242CB115",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG503 (3 candidates)
 		{HallNo: "WW 223", CourseCode: "22AG503", RegisterNos: []string{
 			"7376242AG101", "7376242AG102", "7376242AG103",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 224 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -17105,14 +17105,14 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242CB128", "7376242CB129", "7376242CB130", "7376242CB131", "7376242CB132", "7376242CB133",
 			"7376242CB134", "7376242CB135", "7376242CB136", "7376242CB137", "7376242CB138", "7376242CB139",
 			"7376242CB140", "7376242CB141", "7376242CB142",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG503 (23 candidates)
 		{HallNo: "WW 224", CourseCode: "22AG503", RegisterNos: []string{
 			"7376242AG104", "7376242AG105", "7376242AG106", "7376242AG107", "7376242AG108", "7376242AG109",
 			"7376242AG110", "7376242AG111", "7376242AG112", "7376242AG113", "7376242AG114", "7376242AG115",
 			"7376242AG116", "7376242AG117", "7376242AG118", "7376242AG119", "7376242AG120", "7376242AG121",
 			"7376242AG122", "7376242AG123", "7376242AG124", "7376252AG501", "7376252AG502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 225 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -17122,81 +17122,81 @@ func buildSeatingData20Nov2026AN() []studentmodels.SeatingRecord {
 			"7376242CB149", "7376242CB150", "7376242CB151", "7376242CB152", "7376242CB153", "7376242CB154",
 			"7376242CB155", "7376242CB156", "7376242CB157", "7376242CB158", "7376242CB159", "7376252CB501",
 			"7376252CB502", "7376252CB503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 226 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CS503* (5 candidates)
 		{HallNo: "WW 226", CourseCode: "22CS503*", RegisterNos: []string{
 			"7376231CS102", "7376231CS190", "7376231CS235", "7376231CS244", "7376231CS259",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EC503* (16 candidates)
 		{HallNo: "WW 226", CourseCode: "22EC503*", RegisterNos: []string{
 			"7376231EC101", "7376231EC110", "7376231EC112", "7376231EC196", "7376231EC231", "7376231EC283",
 			"7376231EC297", "7376231EC305", "7376231EC318", "7376231EC331", "7376231EC334", "7376241EC511",
 			"7376241EC513", "7376241EC514", "7376241EC516", "7376241EC520",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22MC503* (6 candidates)
 		{HallNo: "WW 226", CourseCode: "22MC503*", RegisterNos: []string{
 			"7376231MZ106", "7376231MZ107", "7376231MZ111", "7376231MZ135", "7376231MZ145", "7376241MZ501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22IT503 (8 candidates)
 		{HallNo: "WW 226", CourseCode: "22IT503", RegisterNos: []string{
 			"7376232IT118", "7376232IT139", "7376232IT152", "7376232IT211", "7376232IT224", "7376232IT228",
 			"7376242IT502", "7376242IT504",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CT503 (6 candidates)
 		{HallNo: "WW 226", CourseCode: "22CT503", RegisterNos: []string{
 			"7376232CT103", "7376232CT117", "7376232CT122", "7376232CT127", "7376232CT160", "7376242CT503",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503* (4 candidates)
 		{HallNo: "WW 226", CourseCode: "22AI503*", RegisterNos: []string{
 			"7376232AD115", "7376232AD184", "7376232AD228", "7376232AD250",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AG503 (5 candidates)
 		{HallNo: "WW 226", CourseCode: "22AG503", RegisterNos: []string{
 			"7376232AG111", "7376232AG113", "7376232AG129", "7376232AG132", "7376232AG151",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 
 		// Hall: WW 227 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22CE503* (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22CE503*", RegisterNos: []string{
 			"7376231CE117", "7376231CE120", "7376241CE501",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22EE503 (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22EE503", RegisterNos: []string{
 			"7376231EE111", "7376231EE115", "7376231EE149",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22ME503* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22ME503*", RegisterNos: []string{
 			"7376231ME130",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BM503 (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22BM503", RegisterNos: []string{
 			"7376231BM107", "7376231BM148",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CD503 (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22CD503", RegisterNos: []string{
 			"7376231CD143", "7376241CD501", "7376241CD502",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22BT503* (2 candidates)
 		{HallNo: "WW 227", CourseCode: "22BT503*", RegisterNos: []string{
 			"7376232BT142", "7376232BT148",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22CB503* (3 candidates)
 		{HallNo: "WW 227", CourseCode: "22CB503*", RegisterNos: []string{
 			"7376232CB111", "7376232CB123", "7376232CB133",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 		// Course: 22AI503* (1 candidates)
 		{HallNo: "WW 227", CourseCode: "22AI503*", RegisterNos: []string{
 			"7376232AD282",
-		}, Time: "01:30 PM ? 04:30 PM"},
+		}, Time: "01:30 PM : 04:30 PM"},
 	}
 }
 
 // ============================================================================
-// 21-NOV-2026 FORENOON SESSION (FN: 09:00 AM ? 12:00 PM) - Total: 131 Students
+// 21-NOV-2026 FORENOON SESSION (FN: 09:00 AM : 12:00 PM) - Total: 131 Students
 // ============================================================================
 func buildSeatingData21Nov2026FN() []studentmodels.SeatingRecord {
 	return []studentmodels.SeatingRecord{
@@ -17209,19 +17209,19 @@ func buildSeatingData21Nov2026FN() []studentmodels.SeatingRecord {
 			"7376261CS507", "7376261CS508", "7376261CS509", "7376261CS510", "7376261CS511", "7376261CS512",
 			"7376261CS513", "7376261CS514", "7376261CS516", "7376261CS517", "7376261CS518", "7376261CS519",
 			"7376261CS520", "7376261CS521", "7376261CS522", "7376261CS523", "7376261CS524",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS003 (19 candidates)
 		{HallNo: "WW 202", CourseCode: "22HS003", RegisterNos: []string{
 			"7376261EC502", "7376261EC503", "7376261EC504", "7376261EC505", "7376261EC506", "7376261EC507",
 			"7376261EC508", "7376261EC509", "7376261EC510", "7376261EC511", "7376261EC512", "7376261EC513",
 			"7376261EC514", "7376261EC515", "7376261EC516", "7376261EC517", "7376261EC518", "7376261EC519",
 			"7376261EC520",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS003 (8 candidates)
 		{HallNo: "WW 202", CourseCode: "22HS003", RegisterNos: []string{
 			"7376261EE502", "7376261EE503", "7376261EE504", "7376261EE505", "7376261EE506", "7376261EE507",
 			"7376261EE508", "7376261EE509",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 203 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -17229,23 +17229,23 @@ func buildSeatingData21Nov2026FN() []studentmodels.SeatingRecord {
 		{HallNo: "WW 203", CourseCode: "22HS003", RegisterNos: []string{
 			"7376261EE510", "7376261EE511", "7376261EE512", "7376261EE513", "7376261EE514", "7376261EE515",
 			"7376261EE516", "7376261EE517", "7376261EE518",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS003 (5 candidates)
 		{HallNo: "WW 203", CourseCode: "22HS003", RegisterNos: []string{
 			"7376261EI501", "7376261EI502", "7376261EI503", "7376261EI504", "7376261EI505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS003 (6 candidates)
 		{HallNo: "WW 203", CourseCode: "22HS003", RegisterNos: []string{
 			"7376261ME504", "7376261ME505", "7376261ME506", "7376261ME507", "7376261ME501", "7376261ME502",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS003 (4 candidates)
 		{HallNo: "WW 203", CourseCode: "22HS003", RegisterNos: []string{
 			"7376261MZ502", "7376261MZ503", "7376261MZ504", "7376261MZ505",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS003 (1 candidates)
 		{HallNo: "WW 203", CourseCode: "22HS003", RegisterNos: []string{
 			"7376262AD501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 204 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -17255,11 +17255,11 @@ func buildSeatingData21Nov2026FN() []studentmodels.SeatingRecord {
 			"7376262AD508", "7376262AD509", "7376262AD510", "7376262AD511", "7376262AD512", "7376262AD513",
 			"7376262AD514", "7376262AD515", "7376262AD516", "7376262AD517", "7376262AD518", "7376262AD519",
 			"7376262AD520", "7376262AD521", "7376262AD522",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS003 (4 candidates)
 		{HallNo: "WW 204", CourseCode: "22HS003", RegisterNos: []string{
 			"7376262AL501", "7376262AL502", "7376262AL503", "7376262AL504",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 205 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
@@ -17268,45 +17268,45 @@ func buildSeatingData21Nov2026FN() []studentmodels.SeatingRecord {
 			"7376262IT502", "7376262IT503", "7376262IT504", "7376262IT505", "7376262IT506", "7376262IT507",
 			"7376262IT508", "7376262IT509", "7376262IT510", "7376262IT511", "7376262IT512", "7376262IT513",
 			"7376262IT514", "7376262IT515", "7376262IT516",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS003 (5 candidates)
 		{HallNo: "WW 205", CourseCode: "22HS003", RegisterNos: []string{
 			"7376262AL505", "7376262AL506", "7376262AL507", "7376262AL508", "7376262AL509",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 
 		// Hall: WW 206 (candidate totals follow from PDF rows)
 		// --------------------------------------------------------------------
 		// Course: 22HS003 (1 candidates)
 		{HallNo: "WW 206", CourseCode: "22HS003", RegisterNos: []string{
 			"7376231CS235",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS003 (2 candidates)
 		{HallNo: "WW 206", CourseCode: "22HS003", RegisterNos: []string{
 			"7376231EC283", "7376231EC331",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS003 (1 candidates)
 		{HallNo: "WW 206", CourseCode: "22HS003", RegisterNos: []string{
 			"7376241CD501",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS003 (1 candidates)
 		{HallNo: "WW 206", CourseCode: "22HS003", RegisterNos: []string{
 			"7376241CS474",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS003 (1 candidates)
 		{HallNo: "WW 206", CourseCode: "22HS003", RegisterNos: []string{
 			"7376242IT184",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS003 (2 candidates)
 		{HallNo: "WW 206", CourseCode: "22HS003", RegisterNos: []string{
 			"7376242CB116", "7376242CB118",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS003 (2 candidates)
 		{HallNo: "WW 206", CourseCode: "22HS003", RegisterNos: []string{
 			"7376242AD189", "7376242AD190",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 		// Course: 22HS003 (1 candidates)
 		{HallNo: "WW 206", CourseCode: "22HS003", RegisterNos: []string{
 			"7376242AL207",
-		}, Time: "09:00 AM ? 12:00 PM"},
+		}, Time: "09:00 AM : 12:00 PM"},
 	}
 }
