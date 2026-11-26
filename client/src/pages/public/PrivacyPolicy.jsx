@@ -92,10 +92,10 @@ function PrivacyPolicy() {
               <a className="font-black text-blue-600 hover:underline dark:text-blue-400" href="mailto:developer@bitsathy.in">
                 developer@bitsathy.in
               </a>{" "}
-              or call{" "}
-              <a className="font-black text-blue-600 hover:underline dark:text-blue-400" href="tel:+91">
-                +91 
-              </a>.
+              or visit our{" "}
+              <Link className="font-black text-blue-600 hover:underline dark:text-blue-400" to="/contact">
+                Contact & Feedback page
+              </Link>.
             </p>
           </section>
 

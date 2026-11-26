@@ -84,10 +84,10 @@ function Terms() {
               <a className="font-black text-blue-600 hover:underline dark:text-blue-400" href="mailto:developer@bitsathy.in">
                 developer@bitsathy.in
               </a>{" "}
-              or by phone at{" "}
-              <a className="font-black text-blue-600 hover:underline dark:text-blue-400" href="tel:+91">
-                +91 
-              </a>.
+              or through our{" "}
+              <Link className="font-black text-blue-600 hover:underline dark:text-blue-400" to="/contact">
+                Contact & Feedback page
+              </Link>.
             </p>
           </section>
           <nav className="mt-8 flex flex-wrap gap-4 text-xs font-black uppercase tracking-wider" aria-label="Related public pages">

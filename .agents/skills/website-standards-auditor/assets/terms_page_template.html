@@ -1,0 +1,188 @@
+<!--
+  Terms of Service / Terms and Conditions page template (RESIL-05).
+  Self contained: no external images, fonts, scripts, or styles.
+  Uses an inline SVG document icon rather than an emoji.
+
+  DESIGN TOKENS: The :root block below uses the same default tokens as
+  not_found_template.html, offline_page_template.html, and
+  privacy_page_template.html:
+    background #0f1115, text #e6e8eb, accent #8ab4ff, muted #aeb4bd,
+    surface #1b1e24, border #3a3f47, font system-ui stack.
+
+  Before shipping:
+  1. Replace EVERY placeholder in angle brackets with real values.
+  2. Copy font, color, and spacing tokens from your project's design
+     system into the :root block to match existing pages (Rule 4).
+  3. Have a qualified lawyer review and approve the legal text.
+  4. Link this page from your site footer alongside the privacy page.
+  5. Confirm the server returns a 200 status for this page.
+  6. Remove this comment block.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="index, follow">
+  <title>Terms of Service | <site name></title>
+  <meta name="description" content="Terms of Service for <site name>: the rules and conditions that govern your use of this website and its services.">
+  <style>
+    /*
+      IMPORTANT: Replace the token values below with your project's
+      actual design tokens to satisfy Rule 4 (never change existing UI/UX).
+      Do not ship this page with the default template tokens if your project
+      already has a design system.
+    */
+    :root {
+      --bg:            #0f1115;
+      --text:          #e6e8eb;
+      --muted:         #aeb4bd;
+      --accent:        #8ab4ff;
+      --surface:       #1b1e24;
+      --surface-hover: #232730;
+      --border:        #3a3f47;
+      --font:          system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      --radius:        8px;
+      --max-w:         52rem;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      padding: 40px 24px 64px;
+      line-height: 1.7;
+    }
+    .page { max-width: var(--max-w); margin: 0 auto; }
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .icon { width: 40px; height: 40px; color: var(--accent); flex-shrink: 0; }
+    h1 { font-size: 1.75rem; margin: 0; }
+    .meta { font-size: 0.875rem; color: var(--muted); margin: 4px 0 0; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+    h2 { font-size: 1.1rem; margin: 28px 0 8px; color: var(--text); }
+    p { margin: 0 0 16px; color: var(--muted); }
+    ul, ol { margin: 0 0 16px 20px; color: var(--muted); }
+    ul li, ol li { margin-bottom: 6px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .highlight-box {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 24px;
+    }
+    .highlight-box p { margin: 0; color: var(--text); }
+    .contact-box {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-top: 12px;
+    }
+    .contact-box p { margin: 0; color: var(--text); }
+    .back-link {
+      display: inline-block;
+      margin-top: 40px;
+      padding: 10px 18px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+    .back-link:hover { background: var(--surface-hover); }
+  </style>
+</head>
+<body>
+  <main class="page">
+
+    <header class="page-header">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+      <div>
+        <h1>Terms of Service</h1>
+        <p class="meta">Last updated: <date of last update, e.g. 17 June 2026></p>
+      </div>
+    </header>
+
+    <div class="highlight-box">
+      <p>Please read these terms carefully before using <site name>. By accessing or using this website you agree to be bound by these terms. If you do not agree, do not use this website.</p>
+    </div>
+
+    <h2>1. Who we are</h2>
+    <p><site name> is operated by <legal entity name>, registered at <registered address> (<jurisdiction>). You can contact us at <contact email>.</p>
+
+    <hr>
+
+    <h2>2. Acceptance of terms</h2>
+    <p>By using this website you confirm that you are at least <minimum age, e.g. 13 or 18> years old, that you have the legal capacity to enter into these terms, and that you agree to comply with them. If you are using the website on behalf of an organization, you represent that you have the authority to bind that organization to these terms.</p>
+
+    <h2>3. Use of the website</h2>
+    <p>You may use this website only for lawful purposes and in a way that does not infringe the rights of others or restrict their use of the website. Prohibited uses include:</p>
+    <ul>
+      <li>Transmitting any material that is unlawful, defamatory, offensive, or fraudulent.</li>
+      <li>Attempting to gain unauthorized access to any part of the website or its infrastructure.</li>
+      <li>Scraping or harvesting content in a way that places unreasonable load on our servers.</li>
+      <li>Reproducing, duplicating, or reselling any part of the website in breach of these terms.</li>
+      <li><Add any use restrictions specific to your service or industry.></li>
+    </ul>
+
+    <h2>4. Intellectual property</h2>
+    <p>All content on this website, including but not limited to text, graphics, logos, and software, is the property of <legal entity name> or its licensors and is protected by applicable intellectual property laws. You may not reproduce, distribute, or create derivative works without our prior written consent, except as permitted by law.</p>
+    <p>Any feedback, suggestions, or ideas you submit to us may be used by us without restriction or compensation to you.</p>
+
+    <h2>5. User accounts</h2>
+    <p><Include this section only if your website has user accounts. Remove it otherwise.></p>
+    <p>If you register for an account, you are responsible for maintaining the confidentiality of your credentials and for all activity that occurs under your account. You must notify us immediately at <contact email> if you suspect unauthorized use of your account. We reserve the right to suspend or terminate accounts that violate these terms.</p>
+
+    <h2>6. Third-party links and services</h2>
+    <p>This website may contain links to third-party websites or services. These links are provided for your convenience only. We do not endorse and are not responsible for the content, privacy practices, or availability of any third-party site. Accessing any linked site is at your own risk.</p>
+
+    <h2>7. Disclaimers</h2>
+    <p>This website and its content are provided on an "as is" and "as available" basis without any warranties of any kind, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement. We do not warrant that the website will be uninterrupted, error-free, or free of viruses or other harmful components.</p>
+    <p><Adjust or expand based on your jurisdiction and the nature of your service.></p>
+
+    <h2>8. Limitation of liability</h2>
+    <p>To the fullest extent permitted by applicable law, <legal entity name> and its officers, directors, employees, and agents will not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or in connection with your use of, or inability to use, this website or its content, even if we have been advised of the possibility of such damages.</p>
+    <p>Our total liability to you for any claim arising out of these terms or your use of the website will not exceed <cap amount, e.g. the amount you paid us in the preceding 12 months, or a fixed amount>.</p>
+    <p><Review the applicable liability cap rules in your jurisdiction before shipping.></p>
+
+    <h2>9. Indemnification</h2>
+    <p>You agree to indemnify, defend, and hold harmless <legal entity name> and its officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, and expenses, including reasonable legal fees, arising out of or in connection with your violation of these terms or your use of the website.</p>
+
+    <h2>10. Governing law and disputes</h2>
+    <p>These terms are governed by the laws of <jurisdiction, e.g. England and Wales, State of Delaware, India>. Any dispute arising out of or in connection with these terms will be subject to the exclusive jurisdiction of the courts of <jurisdiction>.</p>
+    <p><If you offer an alternative dispute resolution process, describe it here.></p>
+
+    <h2>11. Changes to these terms</h2>
+    <p>We may update these terms from time to time. When we do, we will update the "Last updated" date at the top of this page. We will notify registered users of material changes by <describe notification method, e.g. email or an in-app notice>. Continued use of the website after changes take effect constitutes acceptance of the revised terms.</p>
+
+    <h2>12. Contact</h2>
+    <div class="contact-box">
+      <p><legal entity name><br>
+         <registered address line 1><br>
+         <city, country><br>
+         Email: <a href="mailto:<contact email>"><contact email></a></p>
+    </div>
+
+    <a class="back-link" href="/">&larr; Back to home</a>
+
+  </main>
+</body>
+</html>

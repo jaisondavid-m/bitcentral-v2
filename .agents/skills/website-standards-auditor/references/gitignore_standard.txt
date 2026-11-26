@@ -1,0 +1,230 @@
+# =========================================
+# Organization Standard .gitignore
+# Must be included in all repositories
+# =========================================
+
+# -------------------------
+# OS generated files
+# -------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+
+# -------------------------
+# Logs
+# -------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# -------------------------
+# Environment / Secrets
+# -------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets.json
+credentials.json
+service-account.json
+
+# -------------------------
+# IDE / Editors
+# -------------------------
+.vscode/
+.idea/
+*.iml
+
+# -------------------------
+# Node / React
+# -------------------------
+node_modules/
+dist/
+build/
+.next/
+out/
+coverage/
+
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+env/
+.venv/
+.pytest_cache/
+.mypy_cache/
+
+# -------------------------
+# Frappe / ERPNext
+# -------------------------
+sites/assets
+sites/*/private/files
+sites/*/public/files
+sites/*/logs
+sites/.build
+sites/.cache
+
+# -------------------------
+# Docker
+# -------------------------
+docker-data/
+*.tar
+
+# -------------------------
+# Temporary files
+# -------------------------
+tmp/
+temp/
+*.tmp
+.cache/
+
+# -------------------------
+# Build artifacts
+# -------------------------
+*.zip
+*.tar.gz
+*.rar
+
+# -------------------------
+# AI tools / Agent generated
+# -------------------------
+
+# Anthropic / Claude
+.claude/
+claude-settings.json
+claude_settings.json
+.claude_files/
+
+# Google Gemini / Antigravity / IDX
+.gemini/
+.idx/
+
+# OpenAI / Codex / ChatGPT
+.codex/
+.openai/
+.chatgpt/
+
+# Cursor editor
+.cursor/
+.cursorignore
+.cursorindexingignore
+
+# Windsurf (Codeium)
+.windsurf/
+.codeium/
+
+# Kilo Code
+.kilocode/
+
+# Cline / Roo Cline
+.cline/
+.roo/
+
+# Continue.dev
+.continue/
+
+# Aider
+.aider*
+aider.conf.yml
+
+# GitHub Copilot
+.copilot/
+
+# Tabnine
+.tabnine/
+
+# Supermaven
+.supermaven/
+
+# Amp
+.amp/
+
+# Devin
+.devin/
+
+# Pythagora / GPT Pilot
+.pythagora/
+gpt-pilot-debug.log
+gpt-pilot-debug-ste*.log
+
+# Qodo (formerly CodiumAI)
+.qodo/
+.codiumai/
+
+# Replit AI
+.replit
+.upm/
+
+# Zed AI
+.zed/
+
+# OMC
+.omc/
+
+# Pear AI
+.pear/
+
+# Bolt.new
+.bolt/
+
+# Lovable
+.lovable/
+
+# Generic agent / skill / memory directories
+.ai/
+.agents/
+.agent/
+.skills/
+.memory/
+.prompt-cache/
+.llm-cache/
+.context/
+
+# Generic agent config files
+agent-config.json
+agent-config.yaml
+agent-config.yml
+.agentrc
+
+# -------------------------
+# Testing output
+# -------------------------
+coverage/
+playwright-report/
+test-results/
+
+# -------------------------
+# Local development
+# -------------------------
+.local/
+.history/
+
+# -------------------------
+# Misc
+# -------------------------
+*.bak
+*.old
+*.backup
+
+# -------------------------
+# Website standards auditor output
+# -------------------------
+audit_findings.json
+gap_identification.md
+fix_summary.md
+media_replacements.json
+lighthouse-report.json
+lighthouse-report.html

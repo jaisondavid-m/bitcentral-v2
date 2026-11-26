@@ -4,8 +4,6 @@
    Preserves authenticated app interface untouched.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
-
 /* --- Root Neo-Brutalist Variables --- */
 .public-ui {
   /* Core palette */

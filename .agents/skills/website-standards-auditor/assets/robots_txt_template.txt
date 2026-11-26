@@ -1,0 +1,14 @@
+# robots.txt template
+# Replace <https://canonical-domain> with the real canonical origin.
+# Review the Disallow lines for the specific project before shipping.
+# Never ship "Disallow: /" on a production site you want indexed.
+
+User-agent: *
+Allow: /
+
+# Block paths that should not be crawled (edit for the project):
+# Disallow: /admin/
+# Disallow: /cart/
+# Disallow: /search
+
+Sitemap: <https://canonical-domain>/sitemap.xml

@@ -1,0 +1,184 @@
+<!--
+  Privacy page template (RESIL-04 and EEAT-04).
+  Self contained: no external images, fonts, scripts, or styles.
+  Uses an inline SVG shield icon rather than an emoji.
+
+  DESIGN TOKENS: The :root block below uses the same default tokens as
+  not_found_template.html and offline_page_template.html:
+    background #0f1115, text #e6e8eb, accent #8ab4ff, muted #aeb4bd,
+    surface #1b1e24, border #3a3f47, font system-ui stack.
+
+  Before shipping:
+  1. Replace EVERY placeholder in angle brackets with real values.
+  2. Copy font, color, and spacing tokens from your project's design
+     system into the :root block to match existing pages (Rule 4).
+  3. Have a qualified lawyer review and approve the legal text.
+  4. Link this page from your site footer.
+  5. Confirm the server returns a 200 status for this page.
+  6. Remove this comment block.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="index, follow">
+  <title>Privacy Policy | <site name></title>
+  <meta name="description" content="Privacy policy for <site name>: what data we collect, why we collect it, and your rights.">
+  <style>
+    /*
+      IMPORTANT: Replace the token values below with your project's
+      actual design tokens to satisfy Rule 4 (never change existing UI/UX).
+      Do not ship this page with the default template tokens if your project
+      already has a design system.
+    */
+    :root {
+      --bg:          #0f1115;
+      --text:        #e6e8eb;
+      --muted:       #aeb4bd;
+      --accent:      #8ab4ff;
+      --surface:     #1b1e24;
+      --surface-hover: #232730;
+      --border:      #3a3f47;
+      --font:        system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      --radius:      8px;
+      --max-w:       52rem;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      padding: 40px 24px 64px;
+      line-height: 1.7;
+    }
+    .page { max-width: var(--max-w); margin: 0 auto; }
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .icon { width: 40px; height: 40px; color: var(--accent); flex-shrink: 0; }
+    h1 { font-size: 1.75rem; margin: 0; }
+    .meta { font-size: 0.875rem; color: var(--muted); margin: 4px 0 0; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+    h2 { font-size: 1.1rem; margin: 28px 0 8px; color: var(--text); }
+    p { margin: 0 0 16px; color: var(--muted); }
+    ul { margin: 0 0 16px 20px; color: var(--muted); }
+    ul li { margin-bottom: 6px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .contact-box {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-top: 12px;
+    }
+    .contact-box p { margin: 0; color: var(--text); }
+    .back-link {
+      display: inline-block;
+      margin-top: 40px;
+      padding: 10px 18px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+    .back-link:hover { background: var(--surface-hover); }
+  </style>
+</head>
+<body>
+  <main class="page">
+
+    <header class="page-header">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      </svg>
+      <div>
+        <h1>Privacy Policy</h1>
+        <p class="meta">Last updated: <date of last update, e.g. 17 June 2026></p>
+      </div>
+    </header>
+
+    <p>This policy explains what information <site name> collects when you use this website, why we collect it, how long we keep it, and what rights you have over your information. We do not sell your data.</p>
+
+    <hr>
+
+    <h2>1. Who we are</h2>
+    <p>The data controller for this website is <legal entity name>, registered at <registered address>. If you have questions about this policy, contact us at <privacy contact email>.</p>
+
+    <h2>2. What data we collect and why</h2>
+    <p>We collect only the data necessary to operate this website:</p>
+    <ul>
+      <li><strong>Server logs</strong>: your IP address, browser type, referring URL, and the pages you visit. We use this to diagnose errors and understand aggregate traffic. Logs are retained for <log retention period, e.g. 30 days> and then deleted.</li>
+      <li><strong>Contact form submissions</strong> (if applicable): your name and email address when you submit a form. We use this only to respond to your message. Submissions are retained for <retention period> and then deleted.</li>
+      <li><strong>Analytics</strong> (if applicable): we use <analytics provider, e.g. Plausible, Fathom, or Google Analytics> to understand how visitors use the site. <Describe what is and is not collected, e.g. Plausible does not use cookies and collects no personal data.></li>
+    </ul>
+    <p>We do not collect data we do not need. We do not use tracking pixels, behavioral advertising, or cross-site tracking.</p>
+
+    <h2>3. Cookies</h2>
+    <p><Describe your cookie use accurately. Examples:></p>
+    <ul>
+      <li>This website does not use any cookies.</li>
+      <li>This website uses a single session cookie to maintain your login state. It expires when you close your browser. No third-party cookies are set.</li>
+    </ul>
+
+    <h2>4. Third-party services</h2>
+    <p>We use the following third-party services that may process your data:</p>
+    <ul>
+      <li><Service name>: <what it does and link to its privacy policy>. Example: our hosting provider processes server logs.</li>
+    </ul>
+    <p>If no third-party services are used, state that clearly here.</p>
+
+    <h2>5. How long we keep your data</h2>
+    <p>We retain each type of data only for as long as necessary:</p>
+    <ul>
+      <li>Server logs: <retention period></li>
+      <li>Contact form data: <retention period></li>
+      <li><Add others as applicable></li>
+    </ul>
+    <p>After retention periods expire, data is securely deleted or anonymized.</p>
+
+    <h2>6. Your rights</h2>
+    <p>Depending on your location, you may have the following rights regarding your personal data:</p>
+    <ul>
+      <li><strong>Access</strong>: request a copy of the data we hold about you.</li>
+      <li><strong>Correction</strong>: ask us to correct inaccurate data.</li>
+      <li><strong>Deletion</strong>: ask us to delete your data (the right to be forgotten).</li>
+      <li><strong>Portability</strong>: receive your data in a machine-readable format.</li>
+      <li><strong>Objection</strong>: object to processing based on our legitimate interests.</li>
+      <li><strong>Withdraw consent</strong>: if we rely on consent, withdraw it at any time.</li>
+    </ul>
+    <p>To exercise any of these rights, contact us at the address below. We will respond within 30 days.</p>
+    <p>If you are in the European Economic Area, you also have the right to lodge a complaint with your national data protection authority.</p>
+
+    <h2>7. Data security</h2>
+    <p>We use HTTPS throughout this website and apply reasonable technical and organizational measures to protect your data against unauthorized access, loss, or disclosure. No method of transmission over the internet is 100% secure. If you discover a security issue, please contact us at <security contact email>.</p>
+
+    <h2>8. Children</h2>
+    <p>This website is not directed at children under the age of <13 or 16 depending on jurisdiction>. We do not knowingly collect data from minors. If you believe a minor has provided us data, contact us and we will delete it promptly.</p>
+
+    <h2>9. Changes to this policy</h2>
+    <p>We may update this policy from time to time. When we do, we will update the "Last updated" date at the top. Continued use of the website after a change constitutes acceptance of the updated policy.</p>
+
+    <h2>10. Contact</h2>
+    <div class="contact-box">
+      <p><legal entity name><br>
+         <registered address line 1><br>
+         <city, country><br>
+         Email: <a href="mailto:<privacy contact email>"><privacy contact email></a></p>
+    </div>
+
+    <a class="back-link" href="/">&larr; Back to home</a>
+
+  </main>
+</body>
+</html>

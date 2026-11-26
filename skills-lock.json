@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "skills": {
+    "website-standards-auditor": {
+      "source": "Abhishek-Chougule/website-standards-auditor",
+      "commit": "0491159794c9ec6795689eb5cbdbce9bb41bf5d2",
+      "sourceType": "github",
+      "skillPath": "skills/website-standards-auditor/SKILL.md",
+      "computedHash": "0ec754aaeb4b5abc9e38d95e909eb5648925090fe5e034afec9add7ae273b8f3"
+    }
+  }
+}
