@@ -60,6 +60,7 @@ function App() {
     "/rpsite",
     "/pcdp",
     "/exam-hall",
+    "/exam-hall-manual",
     "/leavedetails",
     "/mess",
     "/support-dev",
