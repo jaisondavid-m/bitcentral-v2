@@ -48,6 +48,8 @@ func SetupRouter(
 			"https://bitcentral.vercel.app",
 			"https://bitcentral.bitsathy.in",
 			"http://bitcentral.bitsathy.in",
+			"https://bitsathy.in",
+			"http://bitsathy.in",
 		},
 		AllowOriginFunc: func(origin string) bool {
 			return strings.HasSuffix(origin, ".bitsathy.in") ||
