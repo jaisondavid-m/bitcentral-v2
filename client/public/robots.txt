@@ -1,6 +1,31 @@
 User-agent: Mediapartners-Google
 Allow: /
 
+User-agent: Googlebot
+Allow: /
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /login
+Disallow: /admin
+Disallow: /semester
+Disallow: /mess
+Disallow: /exam-hall
+Disallow: /exam-hall-manual
+Disallow: /leavedetails
+Disallow: /rpsite
+Disallow: /pcdp
+Disallow: /findmyway
+Disallow: /ak_22ph202
+Disallow: /tamil_ak
+Disallow: /faculty
+Disallow: /faculty-directory
+Disallow: /student-report
+Disallow: /ps-
+Disallow: /apsite
+Disallow: /support-dev
+Disallow: /payment-success
+Disallow: /*?
+
 User-agent: *
 Allow: /
 Disallow: /dashboard

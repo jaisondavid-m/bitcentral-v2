@@ -29,7 +29,7 @@ export const developerProfile = {
     "Jaison David M developed BIT Central as a student-focused web application for the Bannari Amman Institute of Technology community. BIT Central helps BIT Sathy students access academic resources, question banks, answer keys, mess menu information, reward points links, and campus service tools.",
   institution: "Bannari Amman Institute of Technology, Sathyamangalam",
   email: "developer@bitsathy.in",
-  phone: "+91 ",
+  phone: "[PLACEHOLDER: +91 98437 77817]",
   sameAs: [
     "https://github.com/jaisondavid-m",
     "https://www.linkedin.com/in/jaison-david-m-a14072360/",
@@ -125,9 +125,9 @@ export const contactMethods = [
   },
   {
     icon: Phone,
-    label: "Phone",
-    value: "+91 ",
-    href: "tel:+91",
+    label: "Support Desk",
+    value: "[PLACEHOLDER: +91 98437 77817]",
+    href: "tel:+919843777817",
   },
   {
     icon: MessageSquare,

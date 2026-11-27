@@ -183,6 +183,7 @@ export default function SEO({ pathname, meta = {} }) {
       <meta name="keywords" content={keywords} />
       <meta name="robots" content={noIndex ? "noindex, nofollow" : "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"} />
       <meta name="author" content="Jaison David M" />
+      <meta name="google-adsense-account" content="ca-pub-3448484444007213" />
       <link rel="canonical" href={canonical} />
 
       <meta property="og:type" content={meta.type || SEO_DEFAULTS.type} />

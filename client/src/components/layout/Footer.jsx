@@ -39,10 +39,24 @@ export default function Footer() {
             </Link>
             <span className="text-blue-300" aria-hidden="true">•</span>
             <Link
+              to="/disclaimer"
+              className="text-white hover:text-blue-100 hover:underline underline-offset-4 decoration-2 decoration-white transition-colors"
+            >
+              Disclaimer
+            </Link>
+            <span className="text-blue-300" aria-hidden="true">•</span>
+            <Link
               to="/about"
               className="text-white hover:text-blue-100 hover:underline underline-offset-4 decoration-2 decoration-white transition-colors"
             >
               About
+            </Link>
+            <span className="text-blue-300" aria-hidden="true">•</span>
+            <Link
+              to="/contact"
+              className="text-white hover:text-blue-100 hover:underline underline-offset-4 decoration-2 decoration-white transition-colors"
+            >
+              Contact
             </Link>
             <span className="text-blue-300" aria-hidden="true">•</span>
             <Link
@@ -62,10 +76,13 @@ export default function Footer() {
               <Mail className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
               developer@bitsathy.in
             </a>
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-900 bg-white px-2.5 py-1 text-xs font-bold text-zinc-900 shadow-[2px_2px_0px_#18181b] dark:border-white dark:bg-zinc-900 dark:text-white dark:shadow-[2px_2px_0px_#ffffff]">
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-900 bg-white px-2.5 py-1 text-xs font-bold text-zinc-900 shadow-[2px_2px_0px_#18181b] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_#18181b] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none dark:border-white dark:bg-zinc-900 dark:text-white dark:shadow-[2px_2px_0px_#ffffff] transition-all"
+            >
               <Phone className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-              +91 
-            </span>
+              Contact Desk
+            </Link>
           </div>
         </div>
       </div>
